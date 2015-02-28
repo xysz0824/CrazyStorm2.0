@@ -1,0 +1,8 @@
+﻿<Window x:Class="CrazyStorm.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="CrazyStorm 2.0" Height="400" Width="600" ResizeMode="NoResize" WindowStartupLocation="CenterScreen" WindowStyle="None" AllowsTransparency="True" Icon="/CrazyStorm2.0;component/Images/icon.ico" Opacity="0">
+    <Window.Background>
+        <ImageBrush ImageSource="/CrazyStorm2.0;component/Images/startup1.png" />
+    </Window.Background>
+</Window>
