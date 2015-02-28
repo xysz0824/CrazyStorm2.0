@@ -26,3 +26,5 @@ F:\LargeProject\CrazyStorm-2.0\obj\x86\Debug\CrazyStorm2.0_MarkupCompile.cache
 F:\LargeProject\CrazyStorm-2.0\obj\x86\Debug\CrazyStorm2.0.g.resources
 F:\LargeProject\CrazyStorm-2.0\obj\x86\Debug\CrazyStorm.Properties.Resources.resources
 F:\LargeProject\CrazyStorm-2.0\obj\x86\Debug\CrazyStorm2.0.csproj.GenerateResource.Cache
+F:\LargeProject\CrazyStorm2.0\obj\x86\Debug\CrazyStorm2.0.exe
+F:\LargeProject\CrazyStorm2.0\obj\x86\Debug\CrazyStorm2.0.pdb
