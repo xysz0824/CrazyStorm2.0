@@ -1,3 +1,4 @@
+![Logo](/logo.png)
 # ABOUT
 CrazyStorm is a visual editor for particle barrage to make game easier.
 The project is developing now so we prohibit fork temporarily.Please wait, thank you.
