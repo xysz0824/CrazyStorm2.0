@@ -9,8 +9,8 @@ The project is developing now so we prohibit fork temporarily.Please wait, thank
 5. Independent player
 6. so on
 # Development Environment #
-- Windows 7 x64
-- Visual Studio 2010
+1. Windows 7 x64
+2. Visual Studio 2010
 # LICENSE #
 The MIT License (MIT)
 
