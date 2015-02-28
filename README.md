@@ -1,8 +1,7 @@
-
-# ABOUT 
+# ABOUT
 CrazyStorm is a visual editor for particle barrage to make game easier.
 The project is developing now so we prohibit fork temporarily.Please wait, thank you.
-## What's new 
+## What's new
 1. Opensource
 2. New format and old version conversion
 3. Script 
@@ -10,11 +9,11 @@ The project is developing now so we prohibit fork temporarily.Please wait, thank
 5. Independent player
 6. so on  
 
-## Development Environment 
-* Windows 7 x64
-* Visual Studio 2010  
+## Development Environment
+- Windows 7 x64
+- Visual Studio 2010  
 
-## LICENSE 
+## LICENSE
 The MIT License (MIT)
 
 Copyright (c) StarX 2015 
