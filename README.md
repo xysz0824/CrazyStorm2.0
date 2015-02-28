@@ -1,7 +1,7 @@
-# ABOUT
+# ABOUT #
 CrazyStorm is a visual editor for particle barrage to make game easier.
 The project is developing now so we prohibit fork temporarily.Please wait, thank you.
-# What's new
+# What's new #
 1. Opensource
 2. New format and old version conversion
 3. Script 
