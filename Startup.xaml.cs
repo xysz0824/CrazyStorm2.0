@@ -1,4 +1,8 @@
-﻿using System;
+﻿/*
+ * The MIT License (MIT)
+ * Copyright (c) StarX 2015 
+ */
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -20,10 +24,14 @@ namespace CrazyStorm
     /// </summary>
     public partial class MainWindow : Window
     {
+        #region Private Members
         //Control the startup
-        private DispatcherTimer dTimer = new DispatcherTimer();
-        private short totalsecond = 1;
-        private short frame = 0;
+        DispatcherTimer dTimer = new DispatcherTimer();
+        short totalsecond = 1;
+        short frame = 0;
+        #endregion
+
+        #region Constructor
         public MainWindow()
         {
             InitializeComponent();
@@ -32,6 +40,9 @@ namespace CrazyStorm
             dTimer.Interval = new TimeSpan(0, 0, 0, 0, 16);
             dTimer.Start();
         }
+        #endregion
+
+        #region Private Methods
         private void dTimer_Tick(object sender, EventArgs e)
         {
             //a frame approximately equal to 16ms(because 60 frames equals one second)
@@ -47,5 +58,6 @@ namespace CrazyStorm
                 this.Close();
             }
         }
+        #endregion
     }
 }

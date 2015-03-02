@@ -1,4 +1,8 @@
-﻿using System;
+﻿/*
+ * The MIT License (MIT)
+ * Copyright (c) StarX 2015 
+ */
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,6 +14,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using CrazyStorm.CoreLibrary;
 
 namespace CrazyStorm
 {
@@ -18,11 +23,27 @@ namespace CrazyStorm
     /// </summary>
     public partial class Main : Window
     {
+        #region Private Members
+        File file;
+        #endregion
+
+        #region Constructor
         public Main()
         {
             InitializeComponent();
+            InitializeCore();
         }
+        #endregion
 
+        #region Private Methods
+        void InitializeCore()
+        {
+            file = new File("Untitled");
+            Title = AppInfo.AppTitle + " - " + file.FileName;
+        }
+        #endregion
+
+        #region EventHandler
         private void EmitterImage_MouseEnter(object sender, MouseEventArgs e)
         {
             EmitterImage.Source = new BitmapImage(new Uri(@"Images\button1on.png", UriKind.Relative));
@@ -77,5 +98,6 @@ namespace CrazyStorm
         {
             TimeScale.Width = ActualWidth - 200;
         }
+        #endregion
     }
 }
