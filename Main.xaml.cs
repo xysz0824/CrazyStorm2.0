@@ -31,15 +31,34 @@ namespace CrazyStorm
         public Main()
         {
             InitializeComponent();
-            InitializeCore();
+            InitializeSystem();
         }
         #endregion
 
         #region Private Methods
-        void InitializeCore()
+        void InitializeSystem()
         {
             file = new File("Untitled");
             Title = AppInfo.AppTitle + " - " + file.FileName;
+            CreateSceneTab(file.Barrages.First());
+            //Initialize layer
+            LayerTree.ItemsSource = file.Barrages.First().Layers;
+        }
+        void CreateSceneTab(Barrage barrage)
+        {
+            TabItem tabItem = new TabItem();
+            Binding binding = new Binding();
+            binding.Source = barrage;
+            binding.Path = new PropertyPath("Name");
+            tabItem.SetBinding(TabItem.HeaderProperty, binding);
+            Canvas canvas = new Canvas()
+            {
+                Width = 640,
+                Height = 480,
+                Background = new SolidColorBrush(Color.FromRgb(0,0,0))
+            };
+            tabItem.Content = canvas;
+            SceneTabControl.Items.Add(tabItem);
         }
         #endregion
 

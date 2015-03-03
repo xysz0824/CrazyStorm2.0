@@ -38,6 +38,10 @@
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="CoreLibrary, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\CrazyStorm Core\bin\Debug\CoreLibrary.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
@@ -69,6 +73,7 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="LayerColor.cs" />
     <Compile Include="Main.xaml.cs">
       <DependentUpon>Main.xaml</DependentUpon>
     </Compile>
@@ -166,10 +171,7 @@
     <Resource Include="Images\button5on.png" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\CrazyStorm Core\CoreLibrary.csproj">
-      <Project>{1FED6550-8156-45BA-ABD3-7C400FD86A03}</Project>
-      <Name>CoreLibrary</Name>
-    </ProjectReference>
+    <Resource Include="Images\layercolor.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -1,7 +1,7 @@
 ﻿<Window x:Class="CrazyStorm.Main"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Crazy Storm" mc:Ignorable="d" xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" DataContext="{Binding}" WindowStartupLocation="CenterScreen" WindowState="Normal" Icon="/;component/Images/icon.ico" IsEnabled="True" Width="1024" Height="768" SizeChanged="Window_SizeChanged">
+        Title="Crazy Storm" mc:Ignorable="d" xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" DataContext="{Binding}" WindowStartupLocation="CenterScreen" WindowState="Normal" Icon="Images/icon.ico" IsEnabled="True" Width="1024" Height="768" SizeChanged="Window_SizeChanged">
     <Window.Resources>
         <Style x:Key="LayerStyle" TargetType="TreeViewItem">
             <Setter Property="Template">
@@ -77,7 +77,7 @@
                 <Separator/>
                 <MenuItem Header="复制弹幕" />
                 <Separator/>
-                <MenuItem Header="弹幕设置" /> 
+                <MenuItem Header="弹幕设置" />
             </MenuItem>
             <MenuItem Header="图层" >
                 <MenuItem Header="添加图层" />
@@ -123,40 +123,40 @@
                 </LinearGradientBrush>
             </ToolBar.Background>
             <Button Name="New" IsEnabled="True" IsDefault="False" IsCancel="False" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ToolTip="新建">
-                <Image Source="/;component/Images/document-new-3.ico" Stretch="None" />
+                <Image Source="Images/document-new-3.ico" Stretch="None" />
             </Button>
             <Button Name="Open" IsEnabled="True" IsDefault="False" IsCancel="False" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ToolTip="打开">
-                <Image Source="/;component/Images/document-open-2.ico" Stretch="None" />
+                <Image Source="Images/document-open-2.ico" Stretch="None" />
             </Button>
             <Button Name="Save" IsEnabled="True" IsDefault="False" IsCancel="False" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ToolTip="保存">
-                <Image Source="/;component/Images/document-export.ico" Stretch="None" />
+                <Image Source="Images/document-export.ico" Stretch="None" />
             </Button>
             <Separator/>
             <Button Name="Cut" IsEnabled="True" IsDefault="False" IsCancel="False" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ToolTip="剪切">
-                <Image Source="/;component/Images/edit-cut-3.ico" Stretch="None" />
+                <Image Source="Images/edit-cut-3.ico" Stretch="None" />
             </Button>
             <Button Name="Copy" IsEnabled="True" IsDefault="False" IsCancel="False" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ToolTip="复制">
-                <Image Source="/;component/Images/edit-copy-3.ico" Stretch="None" />
+                <Image Source="Images/edit-copy-3.ico" Stretch="None" />
             </Button>
             <Button Name="Paste" IsEnabled="True" IsDefault="False" IsCancel="False" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ToolTip="粘贴">
-                <Image Source="/;component/Images/edit-paste-3.ico" Stretch="None" />
+                <Image Source="Images/edit-paste-3.ico" Stretch="None" />
             </Button>
             <Button Name="Find" IsEnabled="True" IsDefault="False" IsCancel="False" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ToolTip="粘贴">
-                <Image Source="/;component/Images/edit-find-5.ico" Stretch="None" />
+                <Image Source="Images/edit-find-5.ico" Stretch="None" />
             </Button>
             <Separator/>
             <Button Name="Undo" IsEnabled="True" IsDefault="False" IsCancel="False" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ToolTip="撤销">
-                <Image Source="/;component/Images/edit-undo-3.ico" Stretch="None" />
+                <Image Source="Images/edit-undo-3.ico" Stretch="None" />
             </Button>
             <Button Name="Redo" IsEnabled="True" IsDefault="False" IsCancel="False" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ToolTip="恢复">
-                <Image Source="/;component/Images/edit-redo-3.ico" Stretch="None" />
+                <Image Source="Images/edit-redo-3.ico" Stretch="None" />
             </Button>
             <Separator/>
             <Button Name="Play" IsEnabled="True" IsDefault="False" IsCancel="False" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ToolTip="测试">
-                <Image Source="/;component/Images/arrow-right-3.ico" Stretch="None" />
+                <Image Source="Images/arrow-right-3.ico" Stretch="None" />
             </Button>
             <Button Name="Setting" IsEnabled="True" IsDefault="False" IsCancel="False" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ToolTip="配置">
-                <Image Source="/;component/Images/configure-5.ico" Stretch="None" />
+                <Image Source="Images/configure-5.ico" Stretch="None" />
             </Button>
         </ToolBar>
         <Grid Height="Auto" Name="grid1" Width="Auto">
@@ -172,64 +172,51 @@
                     <RowDefinition/>
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="200"/>
+                    <ColumnDefinition Width="220"/>
                     <ColumnDefinition/>
                 </Grid.ColumnDefinitions>
                 <GridSplitter HorizontalAlignment="Right" Name="gridSplitter3" Width="1" Background="#FFDBDBDB" IsEnabled="False"/>
-                <TabControl Grid.Column="1" Name="MainTabControl">
+                <TabControl Grid.Column="1" Name="SceneTabControl">
                     <TabControl.Background>
                         <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
                             <GradientStop Color="#FFD4D4D4" Offset="0" />
                             <GradientStop Color="White" Offset="1" />
                         </LinearGradientBrush>
                     </TabControl.Background>
-                    <TabItem Header="Untitled" Name="tabItem1" Padding="6,6,6,1">
-                        <ScrollViewer Name="scrollViewer1" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
-                            <Canvas Height="480" Name="canvas1" Width="640" Background="Black" />
-                        </ScrollViewer>
-                    </TabItem>
                 </TabControl>
                 <TabControl  Margin="0,0,0,0" Name="LeftTabControl">
                     <TabItem Header="常用" Name="Frequently" Padding="6,5,6,1">
                         <DockPanel Name="ComponentPanel">
                             <GroupBox DockPanel.Dock="Top" Header="组件板" Name="groupBox1" VerticalAlignment="Top" Height="60" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" BorderBrush="#FFC6C6C6">
                                 <StackPanel Name="stackPanel1" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
-                                    <Button Name="Emitter" Width="34" Height="34" Padding="0" Margin="1" Background="#00000000">
-                                        <Image Name="EmitterImage" Source="/;component/Images/button1.png" Stretch="Uniform" ToolTip="发射器" MouseEnter="EmitterImage_MouseEnter" MouseLeave="EmitterImage_MouseLeave" />
+                                    <Button Name="Emitter" Width="34" Height="34" Padding="0" Margin="1,1,2,1" Background="#00000000">
+                                        <Image Name="EmitterImage" Source="Images/button1.png" Stretch="Uniform" ToolTip="发射器" MouseEnter="EmitterImage_MouseEnter" MouseLeave="EmitterImage_MouseLeave" />
                                     </Button>
-                                    <Button Name="Laser" Width="34" Height="34" Background="{x:Null}" Padding="0" Margin="1">
-                                        <Image Name="LaserImage" Source="/;component/Images/button2.png" Stretch="Uniform" ToolTip="激光" MouseEnter="LaserImage_MouseEnter" MouseLeave="LaserImage_MouseLeave" />
+                                    <Button Name="Laser" Width="34" Height="34" Background="{x:Null}" Padding="0" Margin="1,1,2,1">
+                                        <Image Name="LaserImage" Source="Images/button2.png" Stretch="Uniform" ToolTip="激光" MouseEnter="LaserImage_MouseEnter" MouseLeave="LaserImage_MouseLeave" />
                                     </Button>
-                                    <Button Name="Mask" Width="34" Height="34" Background="{x:Null}" Padding="0" Margin="1">
-                                        <Image Name="MaskImage" Source="/;component/Images/button3.png" Stretch="Uniform" ToolTip="遮罩" MouseEnter="MaskImage_MouseEnter" MouseLeave="MaskImage_MouseLeave" />
+                                    <Button Name="Mask" Width="34" Height="34" Background="{x:Null}" Padding="0" Margin="1,1,2,1">
+                                        <Image Name="MaskImage" Source="Images/button3.png" Stretch="Uniform" ToolTip="遮罩" MouseEnter="MaskImage_MouseEnter" MouseLeave="MaskImage_MouseLeave" />
                                     </Button>
-                                    <Button Name="Rebound" Width="34" Height="34" Background="{x:Null}" Padding="0" Margin="1">
-                                        <Image Name="ReboundImage" Source="/;component/Images/button4.png" Stretch="Uniform" ToolTip="反弹板" MouseEnter="ReboundImage_MouseEnter" MouseLeave="ReboundImage_MouseLeave" />
+                                    <Button Name="Rebound" Width="34" Height="34" Background="{x:Null}" Padding="0" Margin="1,1,2,1">
+                                        <Image Name="ReboundImage" Source="Images/button4.png" Stretch="Uniform" ToolTip="反弹板" MouseEnter="ReboundImage_MouseEnter" MouseLeave="ReboundImage_MouseLeave" />
                                     </Button>
-                                    <Button Name="Force" Width="34" Height="34" Background="{x:Null}" Padding="0" Margin="1">
-                                        <Image Name="ForceImage" Source="/;component/Images/button5.png" Stretch="Uniform" ToolTip="力场" MouseEnter="ForceImage_MouseEnter" MouseLeave="ForceImage_MouseLeave" />
+                                    <Button Name="Force" Width="34" Height="34" Background="{x:Null}" Padding="0" Margin="1,1,2,1">
+                                        <Image Name="ForceImage" Source="Images/button5.png" Stretch="Uniform" ToolTip="力场" MouseEnter="ForceImage_MouseEnter" MouseLeave="ForceImage_MouseLeave" />
                                     </Button>
                                 </StackPanel>
                             </GroupBox>
                             <Viewbox DockPanel.Dock="Bottom" Height="70">
 
                             </Viewbox>
-                            <GroupBox Header="资源库" Name="ResourceLibrary" >
-                                <TreeView Name="ResourceTree" Margin="0">
+                            <GroupBox Header="场景" Name="Scene" >
+                                <TreeView Name="ResourceTree" Margin="0" DataContext="{DynamicResource Component}" ItemsSource="{Binding}">
                                     <TreeView.ContextMenu>
                                         <ContextMenu Name="contextMenu">
 
                                         </ContextMenu>
                                     </TreeView.ContextMenu>
-                                    <TreeViewItem Header="图案(0)" Padding="0,2,2,2">
-                                        <TreeViewItem Header="此分类下没有资源。" />
-                                    </TreeViewItem>
-                                    <TreeViewItem Header="音效(0)" Padding="0,2,2,2">
-                                        <TreeViewItem Header="此分类下没有资源。" />
-                                    </TreeViewItem>
-                                    <TreeViewItem Header="脚本(0)" Padding="0,2,2,2">
-                                        <TreeViewItem Header="此分类下没有资源。" />
-                                    </TreeViewItem>
+                                    <TreeViewItem Header="场景中尚未添加组件。" Padding="0,2,2,2" />
                                 </TreeView>
                             </GroupBox>
                         </DockPanel>
@@ -238,7 +225,7 @@
             </Grid>
             <Grid Grid.Row="1" Name="grid2" ShowGridLines="False" Margin="0">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="190"/>
+                    <ColumnDefinition Width="210"/>
                     <ColumnDefinition Width="10" />
                     <ColumnDefinition/>
                 </Grid.ColumnDefinitions>
@@ -252,23 +239,39 @@
                         </StackPanel.Background>
                         <Label  Content="图层" Height="28" Name="label1" Padding="5,6,5,5" BorderBrush="{x:Null}" />
                     </StackPanel>
-                    <TreeView  Name="LayerTree" BorderBrush="White">
-                        <TreeViewItem Style="{StaticResource LayerStyle}" Header="Main" />
+                    <TreeView  Name="LayerTree" BorderBrush="White" DataContext="{DynamicResource Layer}" ItemsSource="{Binding}">
+                        <TreeView.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal" Margin ="-22,0,0,0">
+                                    <Label Height="12" Width="12" Margin ="5,0,5,0" RenderTransformOrigin="0.5,0.5">
+                                        <Label.Background>
+                                            <ImageBrush ImageSource="Images/layercolor.png" Stretch="None" AlignmentX="Left" AlignmentY="Top" Viewbox="{Binding Path=ColorValue}">
+                                            </ImageBrush>
+                                        </Label.Background>
+                                    </Label>
+                                    <Border x:Name="border" >
+                                        <TextBlock Text="{Binding Path=Name}" />
+                                    </Border>
+                                </StackPanel>
+                            </DataTemplate>
+                        </TreeView.ItemTemplate>
                     </TreeView>
                 </DockPanel>
                 <DockPanel Grid.Column ="2" Name="dockPanel4" >
-                    <Canvas Name="TimeAxis">
-                        <Label Height="28" Name="TimeScale">
-                            <Label.Background>
-                                <ImageBrush ImageSource="/;component/Images/ruler.png" Stretch="None" TileMode="FlipY" Viewport="0,0,39.9949991333244,35.9954992199919" ViewportUnits="Absolute" />
-                            </Label.Background>
-                        </Label>
-                    </Canvas>
+                    <ScrollViewer Name="scrollViewer2" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+                        <Canvas Name="TimeAxis">
+                            <Label Height="28" Name="TimeScale">
+                                <Label.Background>
+                                    <ImageBrush ImageSource="Images/ruler.png" Stretch="None" TileMode="FlipY" Viewport="0,0,39.9949991333244,35.9954992199919" ViewportUnits="Absolute" />
+                                </Label.Background>
+                            </Label>
+                        </Canvas>
+                    </ScrollViewer>
                 </DockPanel>
                 <GridSplitter VerticalAlignment="Stretch" Name="gridSplitter4" Width="1" HorizontalAlignment="Right" Background="#FFDBDBDB" Grid.Column="1" IsEnabled="False" />
             </Grid>
             <GridSplitter Grid.Row="1"  VerticalAlignment="Top" Name="gridSplitter1" Height="1" HorizontalAlignment="Stretch" Background="White"/>
-            <GridSplitter Grid.Row="0"  VerticalAlignment="Top" Name="gridSplitter2" Height="5" HorizontalAlignment="Stretch" Background="#FFDBDBDB" IsEnabled="False"/>
+            <GridSplitter Grid.Row="0"  VerticalAlignment="Top" Name="gridSplitter2" Height="1" HorizontalAlignment="Stretch" Background="#FFDBDBDB" IsEnabled="False"/>
         </Grid>
     </DockPanel>
 </Window>
