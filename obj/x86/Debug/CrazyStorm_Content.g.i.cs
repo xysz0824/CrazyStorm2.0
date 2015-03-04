@@ -8,6 +8,6 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-[assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("images/layercolor.png")]
+[assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("images/layernew.png")]
 
 

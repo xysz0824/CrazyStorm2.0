@@ -8,6 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
@@ -25,6 +26,9 @@ namespace CrazyStorm
     {
         #region Private Members
         File file;
+        Barrage selectedBarrage;
+        Layer selectedLayer;
+        string status = String.Empty;
         #endregion
 
         #region Constructor
@@ -32,37 +36,59 @@ namespace CrazyStorm
         {
             InitializeComponent();
             InitializeSystem();
+            status = "已就绪";
         }
         #endregion
 
         #region Private Methods
         void InitializeSystem()
         {
+            LoadConfig();
+            CreateNewFile();
+            InitializeScene();
+            InitializeLayer();
+            InitializeStatus();
+        }
+        void LoadConfig()
+        {
+
+        }
+        void CreateNewFile()
+        {
             file = new File("Untitled");
             Title = AppInfo.AppTitle + " - " + file.FileName;
-            CreateSceneTab(file.Barrages.First());
-            //Initialize layer
-            LayerTree.ItemsSource = file.Barrages.First().Layers;
         }
-        void CreateSceneTab(Barrage barrage)
+        void InitializeScene()
         {
+            selectedBarrage = file.Barrages.First();
             TabItem tabItem = new TabItem();
-            Binding binding = new Binding();
-            binding.Source = barrage;
-            binding.Path = new PropertyPath("Name");
-            tabItem.SetBinding(TabItem.HeaderProperty, binding);
+            tabItem.Header = selectedBarrage.Name;
             Canvas canvas = new Canvas()
             {
-                Width = 640,
-                Height = 480,
+                Width = Config.ScreenWidth,
+                Height = Config.ScreenHeight,
                 Background = new SolidColorBrush(Color.FromRgb(0,0,0))
             };
             tabItem.Content = canvas;
             SceneTabControl.Items.Add(tabItem);
+            ComponentTree.ItemsSource = selectedBarrage.Components;
+        }
+        void InitializeLayer()
+        {
+            LayerTree.ItemsSource = selectedBarrage.Layers;
+            LayerAxis.ItemsSource = selectedBarrage.Layers;
+            CopyLayer.IsEnabled = false;
+            DeleteLayer.IsEnabled = false;
+            SetLayer.IsEnabled = false;
+        }
+        void InitializeStatus()
+        {
+            var item = StatusBar.Items[0] as StatusBarItem;
+            item.DataContext = this;
         }
         #endregion
 
-        #region EventHandler
+        #region Window EventHandler
         private void EmitterImage_MouseEnter(object sender, MouseEventArgs e)
         {
             EmitterImage.Source = new BitmapImage(new Uri(@"Images\button1on.png", UriKind.Relative));
@@ -111,11 +137,6 @@ namespace CrazyStorm
         private void ForceImage_MouseLeave(object sender, MouseEventArgs e)
         {
             ForceImage.Source = new BitmapImage(new Uri(@"Images\button5.png", UriKind.Relative));
-        }
-
-        private void Window_SizeChanged(object sender, SizeChangedEventArgs e)
-        {
-            TimeScale.Width = ActualWidth - 200;
         }
         #endregion
     }

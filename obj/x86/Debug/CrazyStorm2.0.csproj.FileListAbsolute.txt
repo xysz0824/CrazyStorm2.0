@@ -42,3 +42,7 @@ F:\LargeProject\CrazyStorm2.0\obj\x86\Debug\CrazyStorm.Properties.Resources.reso
 F:\LargeProject\CrazyStorm2.0\obj\x86\Debug\CrazyStorm2.0.csproj.GenerateResource.Cache
 F:\LargeProject\CrazyStorm2.0\bin\Debug\CoreLibrary.dll
 F:\LargeProject\CrazyStorm2.0\bin\Debug\CoreLibrary.pdb
+F:\LargeProject\CrazyStorm2.0\obj\x86\Debug\GeneratedInternalTypeHelper.g.cs
+F:\LargeProject\CrazyStorm2.0\obj\x86\Debug\CrazyStorm_MarkupCompile.lref
+F:\LargeProject\CrazyStorm2.0\obj\x86\Debug\LayerSetting.baml
+F:\LargeProject\CrazyStorm2.0\obj\x86\Debug\LayerSetting.g.cs

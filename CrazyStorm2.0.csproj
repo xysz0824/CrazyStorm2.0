@@ -61,6 +61,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Page Include="LayerSetting.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Main.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -73,10 +77,18 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="LayerColor.cs" />
+    <Compile Include="Converter\LayerAxisConverter.cs" />
+    <Compile Include="Converter\LayerIconConverter.cs" />
+    <Compile Include="Config.cs" />
+    <Compile Include="Converter\LayerLengthConverter.cs" />
+    <Compile Include="Converter\LayerStartConverter.cs" />
+    <Compile Include="LayerSetting.xaml.cs">
+      <DependentUpon>LayerSetting.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Main.xaml.cs">
       <DependentUpon>Main.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Main\LayerPart.cs" />
     <Compile Include="Startup.xaml.cs">
       <DependentUpon>Startup.xaml</DependentUpon>
       <SubType>Code</SubType>
@@ -172,6 +184,19 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Images\layercolor.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\rulerscale.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\layervisible.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\layerdown.png" />
+    <Resource Include="Images\layerup.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\layernew.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
