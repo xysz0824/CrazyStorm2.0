@@ -16,19 +16,35 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using CrazyStorm.CoreLibrary;
+using System.ComponentModel;
 
 namespace CrazyStorm
 {
     /// <summary>
     /// Main.xaml 的交互逻辑
     /// </summary>
-    public partial class Main : Window
+    public partial class Main : Window, INotifyPropertyChanged
     {
+        public event PropertyChangedEventHandler PropertyChanged;
+
         #region Private Members
         File file;
         Barrage selectedBarrage;
         Layer selectedLayer;
         string status = String.Empty;
+        #endregion
+
+        #region Public Members
+        public string Status
+        {
+            get { return status; }
+            set
+            {
+                status = value;
+                if (PropertyChanged != null)
+                    PropertyChanged(this, new PropertyChangedEventArgs("Status"));
+            }
+        }
         #endregion
 
         #region Constructor
@@ -89,54 +105,27 @@ namespace CrazyStorm
         #endregion
 
         #region Window EventHandler
-        private void EmitterImage_MouseEnter(object sender, MouseEventArgs e)
+        private void Component_MouseEnter(object sender, MouseEventArgs e)
         {
-            EmitterImage.Source = new BitmapImage(new Uri(@"Images\button1on.png", UriKind.Relative));
+            var image = sender as Image;
+            string[] condition = new string[] { "EmitterImage", "LaserImage", "MaskImage", "ReboundImage", "ForceImage" };
+            for (int i = 1; i <= condition.Length; ++i)
+                if (image.Name == condition[i - 1])
+                {
+                    image.Source = new BitmapImage(new Uri(@"Images\button" + i + "on.png", UriKind.Relative));
+                    break;
+                }
         }
-
-        private void EmitterImage_MouseLeave(object sender, MouseEventArgs e)
+        private void Component_MouseLeave(object sender, MouseEventArgs e)
         {
-            EmitterImage.Source = new BitmapImage(new Uri(@"Images\button1.png", UriKind.Relative));
-        }
-
-        private void LaserImage_MouseEnter(object sender, MouseEventArgs e)
-        {
-            LaserImage.Source = new BitmapImage(new Uri(@"Images\button2on.png", UriKind.Relative));
-        }
-
-        private void LaserImage_MouseLeave(object sender, MouseEventArgs e)
-        {
-            LaserImage.Source = new BitmapImage(new Uri(@"Images\button2.png", UriKind.Relative));
-        }
-
-        private void MaskImage_MouseEnter(object sender, MouseEventArgs e)
-        {
-            MaskImage.Source = new BitmapImage(new Uri(@"Images\button3on.png", UriKind.Relative));
-        }
-
-        private void MaskImage_MouseLeave(object sender, MouseEventArgs e)
-        {
-            MaskImage.Source = new BitmapImage(new Uri(@"Images\button3.png", UriKind.Relative));
-        }
-
-        private void ReboundImage_MouseEnter(object sender, MouseEventArgs e)
-        {
-            ReboundImage.Source = new BitmapImage(new Uri(@"Images\button4on.png", UriKind.Relative));
-        }
-
-        private void ReboundImage_MouseLeave(object sender, MouseEventArgs e)
-        {
-            ReboundImage.Source = new BitmapImage(new Uri(@"Images\button4.png", UriKind.Relative));
-        }
-
-        private void ForceImage_MouseEnter(object sender, MouseEventArgs e)
-        {
-            ForceImage.Source = new BitmapImage(new Uri(@"Images\button5on.png", UriKind.Relative));
-        }
-
-        private void ForceImage_MouseLeave(object sender, MouseEventArgs e)
-        {
-            ForceImage.Source = new BitmapImage(new Uri(@"Images\button5.png", UriKind.Relative));
+            var image = sender as Image;
+            string[] condition = new string[] { "EmitterImage", "LaserImage", "MaskImage", "ReboundImage", "ForceImage" };
+            for (int i = 1; i <= condition.Length; ++i)
+                if (image.Name == condition[i - 1])
+                {
+                    image.Source = new BitmapImage(new Uri(@"Images\button" + i + ".png", UriKind.Relative));
+                    break;
+                }
         }
         #endregion
     }

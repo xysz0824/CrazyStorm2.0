@@ -159,19 +159,19 @@
                             <GroupBox DockPanel.Dock="Top" Header="组件板" Name="groupBox1" VerticalAlignment="Top" Height="60" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" BorderBrush="#FFC6C6C6">
                                 <StackPanel Name="stackPanel1" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
                                     <Button Name="Emitter" Width="34" Height="34" Padding="0" Margin="1,1,2,1" Background="#00000000">
-                                        <Image Name="EmitterImage" Source="Images/button1.png" Stretch="Uniform" ToolTip="发射器" MouseEnter="EmitterImage_MouseEnter" MouseLeave="EmitterImage_MouseLeave" />
+                                        <Image Name="EmitterImage" Source="Images/button1.png" Stretch="Uniform" ToolTip="发射器" MouseEnter="Component_MouseEnter" MouseLeave="Component_MouseLeave" />
                                     </Button>
                                     <Button Name="Laser" Width="34" Height="34" Background="{x:Null}" Padding="0" Margin="1,1,2,1">
-                                        <Image Name="LaserImage" Source="Images/button2.png" Stretch="Uniform" ToolTip="激光" MouseEnter="LaserImage_MouseEnter" MouseLeave="LaserImage_MouseLeave" />
+                                        <Image Name="LaserImage" Source="Images/button2.png" Stretch="Uniform" ToolTip="激光" MouseEnter="Component_MouseEnter" MouseLeave="Component_MouseLeave" />
                                     </Button>
                                     <Button Name="Mask" Width="34" Height="34" Background="{x:Null}" Padding="0" Margin="1,1,2,1">
-                                        <Image Name="MaskImage" Source="Images/button3.png" Stretch="Uniform" ToolTip="遮罩" MouseEnter="MaskImage_MouseEnter" MouseLeave="MaskImage_MouseLeave" />
+                                        <Image Name="MaskImage" Source="Images/button3.png" Stretch="Uniform" ToolTip="遮罩" MouseEnter="Component_MouseEnter" MouseLeave="Component_MouseLeave" />
                                     </Button>
                                     <Button Name="Rebound" Width="34" Height="34" Background="{x:Null}" Padding="0" Margin="1,1,2,1">
-                                        <Image Name="ReboundImage" Source="Images/button4.png" Stretch="Uniform" ToolTip="反弹板" MouseEnter="ReboundImage_MouseEnter" MouseLeave="ReboundImage_MouseLeave" />
+                                        <Image Name="ReboundImage" Source="Images/button4.png" Stretch="Uniform" ToolTip="反弹板" MouseEnter="Component_MouseEnter" MouseLeave="Component_MouseLeave" />
                                     </Button>
                                     <Button Name="Force" Width="34" Height="34" Background="{x:Null}" Padding="0" Margin="1,1,2,1">
-                                        <Image Name="ForceImage" Source="Images/button5.png" Stretch="Uniform" ToolTip="力场" MouseEnter="ForceImage_MouseEnter" MouseLeave="ForceImage_MouseLeave" />
+                                        <Image Name="ForceImage" Source="Images/button5.png" Stretch="Uniform" ToolTip="力场" MouseEnter="Component_MouseEnter" MouseLeave="Component_MouseLeave" />
                                     </Button>
                                 </StackPanel>
                             </GroupBox>
@@ -213,92 +213,96 @@
                             </Label.Background>
                         </Label>
                     </DockPanel>
-                    <TreeView x:Name="LayerTree"  BorderBrush="White" SelectedItemChanged="LayerTree_SelectedItemChanged" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Disabled" >
-                        <TreeView.ItemTemplate>
-                            <DataTemplate>
-                                <DockPanel Width="214" Margin ="-22,0,0,0" Background="{x:Null}">
-                                    <Label Height="12" Width="12" DockPanel.Dock="Right" >
-                                        <Label.Background>
-                                            <ImageBrush ImageSource="Images/layerdown.png" Stretch="Uniform" AlignmentX="Left" AlignmentY="Top">
-                                            </ImageBrush>
-                                        </Label.Background>
-                                    </Label>
-                                    <Label Height="12" Width="12" DockPanel.Dock="Right" >
-                                        <Label.Background>
-                                            <ImageBrush ImageSource="Images/layerup.png" Stretch="Uniform" AlignmentX="Left" AlignmentY="Top">
-                                            </ImageBrush>
-                                        </Label.Background>
-                                    </Label>
-                                    <Label x:Name="LayerVisible" Height="12" Width="12" Margin ="2,0,2,0" DockPanel.Dock="Right" MouseUp="LayerVisible_MouseUp" >
-                                        <Label.Background>
-                                            <ImageBrush ImageSource="Images/layervisible.png" Stretch="Uniform" AlignmentX="Left" AlignmentY="Top">
-                                            </ImageBrush>
-                                        </Label.Background>
-                                        <Label.Opacity>
-                                            <Binding Path="Visible" />
-                                        </Label.Opacity>
-                                    </Label>
-                                    <Label x:Name="LayerColor" Height="12" Width="12" Margin ="5,0,5,0" RenderTransformOrigin="0.5,0.5" MouseUp="LayerColor_MouseUp">
-                                        <Label.Background>
-                                            <ImageBrush ImageSource="Images/layercolor.png" Stretch="None" AlignmentX="Left" AlignmentY="Top">
-                                                <ImageBrush.Viewbox>
-                                                    <Binding Path="Color"  Converter="{StaticResource LayerIconConverter}" />
-                                                </ImageBrush.Viewbox>
-                                            </ImageBrush>
-                                        </Label.Background>
-                                    </Label>
-                                    <Border x:Name="border" >
-                                        <TextBlock Text="{Binding Path=Name}" />
-                                    </Border>
-                                </DockPanel>
-                            </DataTemplate>
-                        </TreeView.ItemTemplate>
-                    </TreeView>
-                </DockPanel>
-                <DockPanel Grid.Column ="2" Name="dockPanel4" >
-                    <ScrollViewer Name="scrollViewer2" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
-                            <StackPanel Name="TimeAxis" MouseMove="TimeAxis_MouseMove" ToolTipService.Placement="Relative">
-                                <StackPanel.Background>
-                                    <ImageBrush Stretch="Uniform" ImageSource="Images/rulerscale.png" TileMode="Tile" ViewportUnits="Absolute" Viewport="0,0,30,16"/>
-                                </StackPanel.Background>
-                                <Label Height="30" Name="TimeScale" Padding="0" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch">
-                                    <Label.Background>
-                                        <ImageBrush ImageSource="Images/ruler.png" Stretch="Uniform" TileMode="Tile" Viewport="0,0,30,30" ViewportUnits="Absolute"  />
-                                    </Label.Background>
-                                </Label>
-                                <ListView Name="LayerAxis" BorderBrush="{x:Null}" Background="{x:Null}" BorderThickness="0" IsEnabled="False" VerticalContentAlignment="Top" Margin="-3,-1,0,0" Foreground="{x:Null}">
-                                    <ListView.ItemTemplate>
-                                        <DataTemplate>
-                                            <Label Height="16" Padding="0" VerticalAlignment="Top" HorizontalAlignment="Left" >
-                                                <Label.Background>
-                                                    <ImageBrush ImageSource="Images/layercolor.png" TileMode="FlipY">
-                                                        <ImageBrush.Viewbox>
-                                                            <Binding Path="Color" Converter="{StaticResource LayerAxisConverter}"/>
-                                                        </ImageBrush.Viewbox>
-                                                    </ImageBrush>
-                                                </Label.Background>
-                                                <Label.Margin>
-                                                    <Binding Path="BeginFrame" Converter="{StaticResource LayerStartConverter}" />
-                                                </Label.Margin>
-                                                <Label.Width>
-                                                    <Binding Path="EndFrame" Converter="{StaticResource LayerLengthConverter}" />
-                                                </Label.Width>
-                                            </Label>
-                                        </DataTemplate>
-                                    </ListView.ItemTemplate>
-                                </ListView>
-                            <StackPanel.ToolTip>
-                                <ToolTip x:Name="axisTip">
-                                    <TextBlock></TextBlock>
-                                </ToolTip>
-                            </StackPanel.ToolTip>
-                            </StackPanel>
+                    <ScrollViewer  Name="LayerScrollViewer" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" ScrollChanged="LayerScrollViewer_ScrollChanged" CanContentScroll="True">
+                        <ScrollViewer.ContextMenu >
+                            <ContextMenu>
+                                <MenuItem x:Name="LayerShortSetting" Header="设置" Click="LayerShortSetting_Click" />
+                                <MenuItem x:Name="LayerShortCopy" Header="复制" Click="LayerShortCopy_Click"/>
+                                <MenuItem x:Name="LayerShortDelete" Header="删除" Click="LayerShortDelete_Click"/>
+                            </ContextMenu>
+                        </ScrollViewer.ContextMenu>
+                        <TreeView x:Name="LayerTree"  BorderBrush="White" SelectedItemChanged="LayerTree_SelectedItemChanged" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Auto" >
+                            <TreeView.ItemTemplate >
+                                <DataTemplate>
+                                    <DockPanel Width="214" Margin ="-22,0,0,0" Background="{x:Null}">
+                                        <Label x:Name="LayerDown" Height="12" Width="12" DockPanel.Dock="Right" MouseUp="LayerDown_MouseUp" >
+                                            <Label.Background>
+                                                <ImageBrush ImageSource="Images/layerdown.png" Stretch="Uniform" AlignmentX="Left" AlignmentY="Top">
+                                                </ImageBrush>
+                                            </Label.Background>
+                                        </Label>
+                                        <Label x:Name="LayerUp" Height="12" Width="12" DockPanel.Dock="Right" MouseUp="LayerUp_MouseUp" >
+                                            <Label.Background>
+                                                <ImageBrush ImageSource="Images/layerup.png" Stretch="Uniform" AlignmentX="Left" AlignmentY="Top">
+                                                </ImageBrush>
+                                            </Label.Background>
+                                        </Label>
+                                        <Label x:Name="LayerVisible" Height="12" Width="12" Margin ="2,0,2,0" DockPanel.Dock="Right" MouseUp="LayerVisible_MouseUp" >
+                                            <Label.Background>
+                                                <ImageBrush ImageSource="Images/layervisible.png" Stretch="Uniform" AlignmentX="Left" AlignmentY="Top">
+                                                </ImageBrush>
+                                            </Label.Background>
+                                            <Label.Opacity>
+                                                <Binding Path="Visible" />
+                                            </Label.Opacity>
+                                        </Label>
+                                        <Label x:Name="LayerColor" Height="12" Width="12" Margin ="5,0,5,0" RenderTransformOrigin="0.5,0.5" MouseUp="LayerColor_MouseUp">
+                                            <Label.Background>
+                                                <ImageBrush ImageSource="Images/layercolor.png" Stretch="None" AlignmentX="Left" AlignmentY="Top">
+                                                    <ImageBrush.Viewbox>
+                                                        <Binding Path="Color"  Converter="{StaticResource LayerIconConverter}" />
+                                                    </ImageBrush.Viewbox>
+                                                </ImageBrush>
+                                            </Label.Background>
+                                        </Label>
+                                        <Border x:Name="border" >
+                                            <TextBlock Text="{Binding Path=Name}" />
+                                        </Border>
+                                    </DockPanel>
+                                </DataTemplate>
+                            </TreeView.ItemTemplate>
+                        </TreeView>
                     </ScrollViewer>
+                </DockPanel>
+                <DockPanel Grid.Column ="2" Name="TimeAxis" MouseMove="TimeAxis_MouseMove" ToolTipService.Placement="Relative" ScrollViewer.VerticalScrollBarVisibility="Disabled">
+                    <DockPanel.Background>
+                        <ImageBrush Stretch="Uniform" ImageSource="Images/rulerscale.png" TileMode="Tile" ViewportUnits="Absolute" Viewport="0,-2,30,16"/>
+                    </DockPanel.Background>
+                    <DockPanel.ToolTip>
+                        <ToolTip x:Name="axisTip">
+                            <TextBlock></TextBlock>
+                        </ToolTip>
+                    </DockPanel.ToolTip>
+                    <Label DockPanel.Dock="Top" Height="30" Name="TimeScale" Padding="0" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch">
+                        <Label.Background>
+                            <ImageBrush ImageSource="Images/ruler.png" Stretch="Uniform" TileMode="Tile" Viewport="0,0,30,30" ViewportUnits="Absolute"  />
+                        </Label.Background>
+                    </Label>
+                    <ListView Name="LayerAxis" BorderBrush="{x:Null}" Background="{x:Null}" BorderThickness="0" VerticalContentAlignment="Top" Margin="-3,-1,0,0" Foreground="{x:Null}" ScrollViewer.VerticalScrollBarVisibility="Hidden" >
+                        <ListView.ItemTemplate>
+                            <DataTemplate>
+                                <Label Height="16" Padding="0" VerticalAlignment="Top" HorizontalAlignment="Left" >
+                                    <Label.Background>
+                                        <ImageBrush ImageSource="Images/layercolor.png" TileMode="FlipY">
+                                            <ImageBrush.Viewbox>
+                                                <Binding Path="Color" Converter="{StaticResource LayerAxisConverter}"/>
+                                            </ImageBrush.Viewbox>
+                                        </ImageBrush>
+                                    </Label.Background>
+                                    <Label.Margin>
+                                        <Binding Path="BeginFrame" Converter="{StaticResource LayerStartConverter}" />
+                                    </Label.Margin>
+                                    <Label.Width>
+                                        <Binding Path="TotalFrame" Converter="{StaticResource LayerLengthConverter}" />
+                                    </Label.Width>
+                                </Label>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
                 </DockPanel>
                 <GridSplitter VerticalAlignment="Stretch" Name="gridSplitter4" Width="1" HorizontalAlignment="Right" Background="#FFDBDBDB" Grid.Column="1" IsEnabled="False" />
             </Grid>
             <GridSplitter Grid.Row="1"  VerticalAlignment="Top" Name="gridSplitter1" Height="1" HorizontalAlignment="Stretch" Background="White"/>
-            
         </Grid>
     </DockPanel>
 </Window>
