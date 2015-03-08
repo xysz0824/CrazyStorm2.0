@@ -11,6 +11,79 @@
         <local:LayerAxisConverter x:Key="LayerAxisConverter"/>
         <local:LayerStartConverter x:Key="LayerStartConverter" />
         <local:LayerLengthConverter x:Key="LayerLengthConverter" />
+        <Style TargetType="ListViewItem">
+            <Style.Resources>
+                <SolidColorBrush x:Key="{x:Static SystemColors.ControlBrushKey}" Color="#00FFFFFF"/>
+                <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color=" #00FFFFFF"/>
+            </Style.Resources>
+            <Setter Property="Panel.Background" Value="#00FFFFFF"/>
+            <Setter Property="Control.HorizontalContentAlignment">
+                <Setter.Value>
+                    <Binding Path="HorizontalContentAlignment" 
+                              RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=ItemsControl, AncestorLevel=1}" />
+                </Setter.Value>
+            </Setter>
+            <Setter Property="Control.VerticalContentAlignment">
+                <Setter.Value>
+                    <Binding Path="VerticalContentAlignment" 
+                              RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=ItemsControl, AncestorLevel=1}" />
+                </Setter.Value>
+            </Setter>
+            <Setter Property="Control.Padding" Value="2,0,0,0"/>
+            <Setter Property="Control.Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ListViewItem">
+                        <Border BorderThickness="{TemplateBinding Border.BorderThickness}" 
+                                 Padding="{TemplateBinding Control.Padding}" 
+                                 BorderBrush="{TemplateBinding Border.BorderBrush}" 
+                                 Background="{TemplateBinding Panel.Background}" 
+                                 Name="Bd" 
+                                 SnapsToDevicePixels="True">
+                            <ContentPresenter 
+                                 Content="{TemplateBinding ContentControl.Content}" 
+                                 ContentTemplate="{TemplateBinding ContentControl.ContentTemplate}" 
+                                 ContentStringFormat="{TemplateBinding ContentControl.ContentStringFormat}" 
+                                 HorizontalAlignment="{TemplateBinding Control.HorizontalContentAlignment}" 
+                                 VerticalAlignment="{TemplateBinding Control.VerticalContentAlignment}" 
+                                 SnapsToDevicePixels="{TemplateBinding UIElement.SnapsToDevicePixels}" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="Selector.IsSelected" Value="True">
+                                <Setter Property="Panel.Background" TargetName="Bd" Value="#00FFFFFF" />
+                                <Setter Property="TextElement.Foreground">
+                                    <Setter.Value>
+                                        <DynamicResource ResourceKey="{x:Static SystemColors.HighlightTextBrushKey}" />
+                                    </Setter.Value>
+                                </Setter>
+                            </Trigger>
+                            <MultiTrigger>
+                                <MultiTrigger.Conditions>
+                                    <Condition Property="Selector.IsSelected" Value="True"/>
+                                    <Condition Property="Selector.IsSelectionActive" Value="False"/>
+                                </MultiTrigger.Conditions>
+                                <Setter Property="Panel.Background" TargetName="Bd" Value="#00FFFFFF" />
+                                <Setter Property="TextElement.Foreground">
+                                    <Setter.Value>
+                                        <DynamicResource ResourceKey="{x:Static SystemColors.ControlTextBrushKey}" />
+                                    </Setter.Value>
+                                </Setter>
+                            </MultiTrigger>
+                            <Trigger Property="UIElement.IsEnabled" Value="False">
+                                <Setter Property="TextElement.Foreground">
+                                    <Setter.Value>
+                                        <DynamicResource ResourceKey="{x:Static SystemColors.GrayTextBrushKey}" />
+                                    </Setter.Value>
+                                </Setter>
+                            </Trigger>
+                            <Trigger Property="UIElement.IsMouseOver" Value="True">
+                                <Setter Property="Panel.Background" TargetName="Bd" Value="#00FFFFFF">
+                                </Setter>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
     </Window.Resources>
     <DockPanel Height="Auto" Name="dockPanel1" Width="Auto">
         <Menu Height="23" Name="menu1" Width="Auto" DockPanel.Dock="Top" Padding="2,0,0,0" IsEnabled="True">
@@ -41,7 +114,7 @@
                 <MenuItem Header="查找" InputGestureText="Ctrl+F"/>
                 <MenuItem Header="选中全部" InputGestureText="Ctrl+A"/>
             </MenuItem>
-            <MenuItem Header="弹幕">
+            <MenuItem Name="BarrageMenu" Header="弹幕" Click="BarrageMenu_Click" >
                 <MenuItem Header="添加弹幕" />
                 <MenuItem Header="删除弹幕" />
                 <Separator/>
@@ -66,9 +139,6 @@
                 <Separator/>
                 <MenuItem Header="组件绑定" InputGestureText="Ctrl+B"/>
                 <MenuItem Header="组件解绑" InputGestureText="Ctrl+N"/>
-            </MenuItem>
-            <MenuItem Header="脚本">
-                <MenuItem Header="脚本管理" />
             </MenuItem>
             <MenuItem Header="测试" >
                 <MenuItem Header="测试当前弹幕" InputGestureText="F5"/>
@@ -145,7 +215,7 @@
                     <ColumnDefinition/>
                 </Grid.ColumnDefinitions>
                 <GridSplitter HorizontalAlignment="Right" Name="gridSplitter3" Width="1" Background="#FFDBDBDB" IsEnabled="False"/>
-                <TabControl Grid.Column="1" Name="SceneTabControl">
+                <TabControl Name="BarrageTabControl" SelectionChanged="BarrageTabControl_SelectionChanged" Grid.Column="1" ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Auto">
                     <TabControl.Background>
                         <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
                             <GradientStop Color="#FFD4D4D4" Offset="0" />
@@ -154,7 +224,7 @@
                     </TabControl.Background>
                 </TabControl>
                 <TabControl  Margin="0,0,0,0" Name="LeftTabControl">
-                    <TabItem Header="常用" Name="Frequently" Padding="6,5,6,1">
+                    <TabItem Header="常用" Name="Frequent" Padding="6,5,6,1" HorizontalAlignment="Left" Width="42">
                         <DockPanel Name="ComponentPanel">
                             <GroupBox DockPanel.Dock="Top" Header="组件板" Name="groupBox1" VerticalAlignment="Top" Height="60" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" BorderBrush="#FFC6C6C6">
                                 <StackPanel Name="stackPanel1" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
@@ -179,15 +249,55 @@
 
                             </Canvas>
                             <GroupBox Header="组件浏览器" Name="Scene" >
-                                <TreeView Name="ComponentTree" Margin="0">
+                                <TreeView Name="ComponentList" Padding="-12,1,1,1">
+                                </TreeView>
+                            </GroupBox>
+                        </DockPanel>
+                    </TabItem>
+                    <TabItem Header="资源" Name="Resource" Padding="6,5,6,1">
+                        <StackPanel>
+                            <GroupBox Header="图案" Height="138" Margin="0">
+                                <TreeView Name="ImageList" Padding="-12,1,1,1">
                                     <TreeView.ContextMenu>
-                                        <ContextMenu Name="contextMenu">
-
+                                        <ContextMenu>
+                                            <MenuItem Name="AddImage" Header="添加图案" Click="AddImage_Click" />
+                                        </ContextMenu>
+                                    </TreeView.ContextMenu>
+                                    <TreeView.ItemTemplate>
+                                        <DataTemplate>
+                                            <DockPanel>
+                                                <DockPanel.ContextMenu >
+                                                    <ContextMenu>
+                                                        
+                                                    </ContextMenu>
+                                                </DockPanel.ContextMenu>
+                                                <Border>
+                                                    <TextBlock Text="{Binding Path=Label}" />
+                                                </Border>
+                                            </DockPanel>
+                                        </DataTemplate>
+                                    </TreeView.ItemTemplate>
+                                </TreeView>
+                            </GroupBox>
+                            <GroupBox Header="音效" Height="138" Margin="0">
+                                <TreeView Name="SoundList" Padding="-12,1,1,1">
+                                    <TreeView.ContextMenu>
+                                        <ContextMenu>
+                                            <MenuItem Name="AddSound" Header="添加音效" Click="AddSound_Click" />
                                         </ContextMenu>
                                     </TreeView.ContextMenu>
                                 </TreeView>
                             </GroupBox>
-                        </DockPanel>
+                            <GroupBox Header="脚本" Height="138" Margin="0">
+                                <TreeView Name="ScriptList" Padding="-12,1,1,1">
+                                    <TreeView.ContextMenu>
+                                        <ContextMenu>
+                                            <MenuItem Name="AddScript" Header="添加脚本" Click="AddScript_Click" />
+                                        </ContextMenu>
+                                    </TreeView.ContextMenu>
+                                </TreeView>
+                            </GroupBox>
+                        </StackPanel>
                     </TabItem>
                 </TabControl>
             </Grid>
@@ -214,17 +324,17 @@
                         </Label>
                     </DockPanel>
                     <ScrollViewer  Name="LayerScrollViewer" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" ScrollChanged="LayerScrollViewer_ScrollChanged" CanContentScroll="True">
-                        <ScrollViewer.ContextMenu >
-                            <ContextMenu>
-                                <MenuItem x:Name="LayerShortSetting" Header="设置" Click="LayerShortSetting_Click" />
-                                <MenuItem x:Name="LayerShortCopy" Header="复制" Click="LayerShortCopy_Click"/>
-                                <MenuItem x:Name="LayerShortDelete" Header="删除" Click="LayerShortDelete_Click"/>
-                            </ContextMenu>
-                        </ScrollViewer.ContextMenu>
                         <TreeView x:Name="LayerTree"  BorderBrush="White" SelectedItemChanged="LayerTree_SelectedItemChanged" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Auto" >
-                            <TreeView.ItemTemplate >
+                            <TreeView.ItemTemplate>
                                 <DataTemplate>
-                                    <DockPanel Width="214" Margin ="-22,0,0,0" Background="{x:Null}">
+                                    <DockPanel Name="LayerElement" Width="214" Margin ="-22,0,0,0" Background="{x:Null}" PreviewMouseRightButtonDown="LayerElement_PreviewMouseRightButtonDown" >
+                                        <DockPanel.ContextMenu >
+                                            <ContextMenu>
+                                                <MenuItem x:Name="LayerShortSetting" Header="设置" Click="LayerShortSetting_Click" />
+                                                <MenuItem x:Name="LayerShortCopy" Header="复制" Click="LayerShortCopy_Click"/>
+                                                <MenuItem x:Name="LayerShortDelete" Header="删除" Click="LayerShortDelete_Click"/>
+                                            </ContextMenu>
+                                        </DockPanel.ContextMenu>
                                         <Label x:Name="LayerDown" Height="12" Width="12" DockPanel.Dock="Right" MouseUp="LayerDown_MouseUp" >
                                             <Label.Background>
                                                 <ImageBrush ImageSource="Images/layerdown.png" Stretch="Uniform" AlignmentX="Left" AlignmentY="Top">

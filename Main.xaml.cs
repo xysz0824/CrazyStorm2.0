@@ -15,8 +15,8 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
-using CrazyStorm.CoreLibrary;
 using System.ComponentModel;
+using CrazyStorm.CoreLibrary;
 
 namespace CrazyStorm
 {
@@ -50,6 +50,7 @@ namespace CrazyStorm
         #region Constructor
         public Main()
         {
+            file = new File("Untitled");
             InitializeComponent();
             InitializeSystem();
             status = "已就绪";
@@ -57,10 +58,17 @@ namespace CrazyStorm
         #endregion
 
         #region Private Methods
+        static DependencyObject VisualUpwardSearch<T>(DependencyObject source)
+        {
+            while (source != null && source.GetType() != typeof(T))
+                source = VisualTreeHelper.GetParent(source);
+
+            return source;
+        }
         void InitializeSystem()
         {
             LoadConfig();
-            CreateNewFile();
+            InitializeFile();
             InitializeScene();
             InitializeLayer();
             InitializeStatus();
@@ -69,25 +77,18 @@ namespace CrazyStorm
         {
 
         }
-        void CreateNewFile()
+        void InitializeFile()
         {
-            file = new File("Untitled");
             Title = AppInfo.AppTitle + " - " + file.FileName;
+            ImageList.ItemsSource = file.Images;
+            SoundList.ItemsSource = file.Sounds;
+            ScriptList.ItemsSource = file.Scripts;
         }
         void InitializeScene()
         {
             selectedBarrage = file.Barrages.First();
-            TabItem tabItem = new TabItem();
-            tabItem.Header = selectedBarrage.Name;
-            Canvas canvas = new Canvas()
-            {
-                Width = Config.ScreenWidth,
-                Height = Config.ScreenHeight,
-                Background = new SolidColorBrush(Color.FromRgb(0,0,0))
-            };
-            tabItem.Content = canvas;
-            SceneTabControl.Items.Add(tabItem);
-            ComponentTree.ItemsSource = selectedBarrage.Components;
+            AddNewBarrageTab(selectedBarrage);
+            ComponentList.ItemsSource = selectedBarrage.Components;
         }
         void InitializeLayer()
         {
@@ -126,6 +127,24 @@ namespace CrazyStorm
                     image.Source = new BitmapImage(new Uri(@"Images\button" + i + ".png", UriKind.Relative));
                     break;
                 }
+        }
+        private void AddImage_Click(object sender, RoutedEventArgs e)
+        {
+            var open = new System.Windows.Forms.OpenFileDialog();
+            open.Filter = "PNG图像(*.png)|*.png";
+            if (open.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            {
+                var image = new Resource(open.SafeFileName, open.FileName);
+                file.Images.Add(image);
+            }
+        }
+        private void AddSound_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+        private void AddScript_Click(object sender, RoutedEventArgs e)
+        {
+
         }
         #endregion
     }

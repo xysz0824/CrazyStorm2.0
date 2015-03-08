@@ -46,3 +46,5 @@ F:\LargeProject\CrazyStorm2.0\obj\x86\Debug\GeneratedInternalTypeHelper.g.cs
 F:\LargeProject\CrazyStorm2.0\obj\x86\Debug\CrazyStorm_MarkupCompile.lref
 F:\LargeProject\CrazyStorm2.0\obj\x86\Debug\LayerSetting.baml
 F:\LargeProject\CrazyStorm2.0\obj\x86\Debug\LayerSetting.g.cs
+F:\LargeProject\CrazyStorm2.0\obj\x86\Debug\BarrageSetting.baml
+F:\LargeProject\CrazyStorm2.0\obj\x86\Debug\BarrageSetting.g.cs

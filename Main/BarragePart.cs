@@ -1,0 +1,109 @@
+﻿/*
+ * The MIT License (MIT)
+ * Copyright (c) StarX 2015 
+ */
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
+using System.Windows.Data;
+using System.Windows.Documents;
+using System.Windows.Input;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
+using System.Windows.Shapes;
+using CrazyStorm.CoreLibrary;
+
+namespace CrazyStorm
+{
+    public partial class Main
+    {
+        #region Private Methods
+        void AddNewBarrageTab(Barrage barrage)
+        {
+            TabItem tabItem = new TabItem();
+            tabItem.Header = barrage.Name;
+            Canvas canvas = new Canvas()
+            {
+                Width = Config.ScreenWidth,
+                Height = Config.ScreenHeight,
+                Background = new SolidColorBrush(Color.FromRgb(0, 0, 0))
+            };
+            tabItem.Content = canvas;
+            BarrageTabControl.Items.Add(tabItem);
+            BarrageTabControl.SelectedItem = tabItem;
+        }
+        void CreateNewBarrage()
+        {
+            var barrage = new Barrage("New Barrage");
+            file.Barrages.Add(barrage);
+            selectedBarrage = barrage;
+            AddNewBarrageTab(barrage);
+        }
+        void DeleteSeletedBarrage()
+        {
+            if (file.Barrages.Count > 1)
+            {
+                TabItem selected = null;
+                foreach (TabItem item in BarrageTabControl.Items)
+                    if (selectedBarrage.Name == (string)item.Header)
+                    {
+                        selected = item;
+                        break;
+                    }
+
+                file.Barrages.Remove(selectedBarrage);
+                BarrageTabControl.Items.Remove(selected);
+            }
+            else
+                MessageBox.Show("不能删除所有弹幕", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
+        }
+        void CopySeletedBarrage()
+        {
+
+        }
+        void OpenSelectedBarrageSetting()
+        {
+            BarrageSetting window = new BarrageSetting(selectedBarrage);
+            window.Owner = this;
+            window.ShowDialog();
+        }
+        #endregion
+
+        #region Window EventHandler
+        private void BarrageMenu_Click(object sender, RoutedEventArgs e)
+        {
+            var item = e.Source as MenuItem;
+            switch ((string)item.Header)
+            {
+                case "添加弹幕":
+                    CreateNewBarrage();
+                    break;
+                case "删除弹幕":
+                    DeleteSeletedBarrage();
+                    break;
+                case "复制弹幕":
+                    CopySeletedBarrage();
+                    break;
+                case "弹幕设置":
+                    OpenSelectedBarrageSetting();
+                    break;
+            }
+        }
+        private void BarrageTabControl_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            var tabItem = e.AddedItems.Count > 0 ? e.AddedItems[0] as TabItem : e.RemovedItems[0] as TabItem;
+            foreach (var item in file.Barrages)
+                if (item.Name == (string)tabItem.Header)
+                {
+                    selectedBarrage = item;
+
+                    return;
+                }
+        }
+        #endregion
+    }
+}

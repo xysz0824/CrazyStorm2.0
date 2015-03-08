@@ -1,4 +1,8 @@
-﻿using System;
+﻿/*
+ * The MIT License (MIT)
+ * Copyright (c) StarX 2015 
+ */
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -61,6 +65,7 @@ namespace CrazyStorm
                 selectedLayer = selectedBarrage.Layers[LayerTree.Items.IndexOf(LayerTree.SelectedItem)];
             else
                 selectedLayer = null;
+
             CopyLayer.IsEnabled = selectedLayer != null ? true : false;
             DeleteLayer.IsEnabled = CopyLayer.IsEnabled;
             SetLayer.IsEnabled = CopyLayer.IsEnabled;
@@ -132,18 +137,24 @@ namespace CrazyStorm
         }
         private void LayerShortSetting_Click(object sender, RoutedEventArgs e)
         {
-            if (selectedLayer != null)
             OpenSelectedLayerSetting();
         }
         private void LayerShortCopy_Click(object sender, RoutedEventArgs e)
         {
-            if (selectedLayer != null)
                 CopySelectedLayer();
         }
         private void LayerShortDelete_Click(object sender, RoutedEventArgs e)
         {
-            if (selectedLayer != null)
             DeleteSelectedLayer();
+        }
+        private void LayerElement_PreviewMouseRightButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            var item = VisualUpwardSearch<TreeViewItem>(e.OriginalSource as DependencyObject) as TreeViewItem;
+            if (item != null)
+            {
+                item.Focus();
+                e.Handled = true;
+            }
         }
         #endregion
     }
