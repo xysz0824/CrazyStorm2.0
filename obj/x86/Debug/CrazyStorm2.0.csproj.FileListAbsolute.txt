@@ -30,7 +30,6 @@ F:\LargeProject\CrazyStorm2.0\obj\x86\Debug\CrazyStorm.exe
 F:\LargeProject\CrazyStorm2.0\obj\x86\Debug\CrazyStorm.pdb
 F:\LargeProject\CrazyStorm2.0\bin\Debug\CrazyStorm.exe
 F:\LargeProject\CrazyStorm2.0\bin\Debug\CrazyStorm.pdb
-F:\LargeProject\CrazyStorm2.0\obj\x86\Debug\CrazyStorm2.0.csprojResolveAssemblyReference.cache
 F:\LargeProject\CrazyStorm2.0\obj\x86\Debug\Main.baml
 F:\LargeProject\CrazyStorm2.0\obj\x86\Debug\Startup.baml
 F:\LargeProject\CrazyStorm2.0\obj\x86\Debug\Main.g.cs
@@ -48,3 +47,6 @@ F:\LargeProject\CrazyStorm2.0\obj\x86\Debug\LayerSetting.baml
 F:\LargeProject\CrazyStorm2.0\obj\x86\Debug\LayerSetting.g.cs
 F:\LargeProject\CrazyStorm2.0\obj\x86\Debug\BarrageSetting.baml
 F:\LargeProject\CrazyStorm2.0\obj\x86\Debug\BarrageSetting.g.cs
+F:\LargeProject\CrazyStorm2.0\obj\x86\Debug\Lang\Chinese.baml
+F:\LargeProject\CrazyStorm2.0\obj\x86\Debug\App.baml
+F:\LargeProject\CrazyStorm2.0\obj\x86\Debug\CrazyStorm2.0.csprojResolveAssemblyReference.cache

@@ -1,0 +1,49 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:sys="clr-namespace:System;assembly=mscorlib">
+    <sys:String x:Key="Ready">
+        已就绪
+    </sys:String>
+    <sys:String x:Key="AddLayer">
+        添加图层
+    </sys:String>
+    <sys:String x:Key="DeleteLayer">
+        删除图层
+    </sys:String>
+    <sys:String x:Key="CopyLayer">
+        复制图层
+    </sys:String>
+    <sys:String x:Key="SetLayer">
+        图层设置
+    </sys:String>
+    <sys:String x:Key="AddBarrage">
+        添加弹幕
+    </sys:String>
+    <sys:String x:Key="DeleteBarrage">
+        删除弹幕
+    </sys:String>
+    <sys:String x:Key="CopyBarrage">
+        复制弹幕
+    </sys:String>
+    <sys:String x:Key="SetBarrage">
+        弹幕设置
+    </sys:String>
+    <sys:String x:Key="TipTitle">
+        提示
+    </sys:String>
+    <sys:String x:Key="CanNotDeleteAllBarrage">
+        不能删除所有弹幕
+    </sys:String>   
+    <sys:String x:Key="CanNotDeleteAllLayer">
+        不能删除所有图层
+    </sys:String>
+    <sys:String x:Key="LayerNameCanNotBeEmpty">
+        图层名称不能为空
+    </sys:String>
+    <sys:String x:Key="ValueInvalid">
+        数值填入有误，请重试
+    </sys:String>
+    <sys:String x:Key="ImageType">
+        PNG图像(*.png)|*.png
+    </sys:String>
+</ResourceDictionary>

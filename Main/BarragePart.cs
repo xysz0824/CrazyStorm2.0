@@ -30,7 +30,7 @@ namespace CrazyStorm
             {
                 Width = Config.ScreenWidth,
                 Height = Config.ScreenHeight,
-                Background = new SolidColorBrush(Color.FromRgb(0, 0, 0))
+                Background = new SolidColorBrush(Colors.Black)
             };
             tabItem.Content = canvas;
             BarrageTabControl.Items.Add(tabItem);
@@ -59,11 +59,12 @@ namespace CrazyStorm
                 BarrageTabControl.Items.Remove(selected);
             }
             else
-                MessageBox.Show("不能删除所有弹幕", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show((string)FindResource("CanNotDeleteAllBarrage"), (string)FindResource("TipTitle"), 
+                    MessageBoxButton.OK, MessageBoxImage.Warning);
         }
         void CopySeletedBarrage()
         {
-
+            //TODO : Copy function.
         }
         void OpenSelectedBarrageSetting()
         {
@@ -77,18 +78,18 @@ namespace CrazyStorm
         private void BarrageMenu_Click(object sender, RoutedEventArgs e)
         {
             var item = e.Source as MenuItem;
-            switch ((string)item.Header)
+            switch (item.Name)
             {
-                case "添加弹幕":
+                case "AddBarrage":
                     CreateNewBarrage();
                     break;
-                case "删除弹幕":
+                case "DeleteBarrage":
                     DeleteSeletedBarrage();
                     break;
-                case "复制弹幕":
+                case "CopyBarrage":
                     CopySeletedBarrage();
                     break;
-                case "弹幕设置":
+                case "SetBarrage":
                     OpenSelectedBarrageSetting();
                     break;
             }
@@ -100,7 +101,7 @@ namespace CrazyStorm
                 if (item.Name == (string)tabItem.Header)
                 {
                     selectedBarrage = item;
-
+                    //TODO : Display components.
                     return;
                 }
         }

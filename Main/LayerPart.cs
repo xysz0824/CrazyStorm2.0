@@ -32,11 +32,12 @@ namespace CrazyStorm
             if (selectedBarrage.Layers.Count > 1)
                 selectedBarrage.Layers.Remove(selectedLayer);
             else
-                MessageBox.Show("不能删除所有图层", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show((string)FindResource("CanNotDeleteAllLayer"), (string)FindResource("TipTitle"), 
+                    MessageBoxButton.OK, MessageBoxImage.Warning);
         }
         void CopySelectedLayer()
         {
-
+            //TODO : Copy function.
         }
         void OpenSelectedLayerSetting()
         {
@@ -106,23 +107,23 @@ namespace CrazyStorm
             if (Enum.IsDefined(typeof(LayerColor), selectedLayer.Color + 1))
                 selectedLayer.Color += 1;
             else
-                selectedLayer.Color = LayerColor.BLUE;
+                selectedLayer.Color = LayerColor.Blue;
         }
         private void LayerMenu_Click(object sender, RoutedEventArgs e)
         {
             var item = e.Source as MenuItem;
-            switch ((string)item.Header)
+            switch (item.Name)
             {
-                case "添加图层":
+                case "AddLayer":
                     CreateNewLayer();
                     break;
-                case "删除图层":
+                case "DeleteLayer":
                     DeleteSelectedLayer();
                     break;
-                case "复制图层":
+                case "CopyLayer":
                     CopySelectedLayer();
                     break;
-                case "图层设置":
+                case "SetLayer":
                     OpenSelectedLayerSetting();
                     break;
             }
@@ -141,7 +142,7 @@ namespace CrazyStorm
         }
         private void LayerShortCopy_Click(object sender, RoutedEventArgs e)
         {
-                CopySelectedLayer();
+            CopySelectedLayer();
         }
         private void LayerShortDelete_Click(object sender, RoutedEventArgs e)
         {

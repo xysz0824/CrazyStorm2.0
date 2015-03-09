@@ -11,6 +11,7 @@
         <local:LayerAxisConverter x:Key="LayerAxisConverter"/>
         <local:LayerStartConverter x:Key="LayerStartConverter" />
         <local:LayerLengthConverter x:Key="LayerLengthConverter" />
+        <local:ResourceValidConverter x:Key="ResourceValidConverter" />
         <Style TargetType="ListViewItem">
             <Style.Resources>
                 <SolidColorBrush x:Key="{x:Static SystemColors.ControlBrushKey}" Color="#00FFFFFF"/>
@@ -115,15 +116,15 @@
                 <MenuItem Header="选中全部" InputGestureText="Ctrl+A"/>
             </MenuItem>
             <MenuItem Name="BarrageMenu" Header="弹幕" Click="BarrageMenu_Click" >
-                <MenuItem Header="添加弹幕" />
-                <MenuItem Header="删除弹幕" />
+                <MenuItem x:Name="AddBarrage" Header="添加弹幕" />
+                <MenuItem x:Name="DeleteBarrage" Header="删除弹幕" />
                 <Separator/>
-                <MenuItem Header="复制弹幕" />
+                <MenuItem x:Name="CopyBarrage" Header="复制弹幕" />
                 <Separator/>
-                <MenuItem Header="弹幕设置" />
+                <MenuItem x:Name="SetBarrage" Header="弹幕设置" />
             </MenuItem>
             <MenuItem Name="LayerMenu"  Header="图层" Click="LayerMenu_Click">
-                <MenuItem Header="添加图层" />
+                <MenuItem x:Name ="AddLayer" Header="添加图层" />
                 <MenuItem x:Name="DeleteLayer" Header="删除图层" />
                 <Separator/>
                 <MenuItem x:Name="CopyLayer"  Header="复制图层" />
@@ -151,8 +152,8 @@
                 <MenuItem Header="关于" />
             </MenuItem>
         </Menu>
-        <StatusBar Height="23" Name="StatusBar" Width="Auto" DockPanel.Dock="Bottom" Background="#FFE4E4E4" Padding="1,0,6,0">
-            <StatusBarItem Content="{Binding Path=Status}" />
+        <StatusBar Height="23" Width="Auto" DockPanel.Dock="Bottom" Background="#FFE4E4E4" Padding="1,0,6,0">
+            <StatusBarItem Name="StatusText" Content="{Binding Path=Status}" />
         </StatusBar>
         <ToolBar Height="34" Name="ToolBar" Width="Auto" DockPanel.Dock="Top" HorizontalAlignment="Stretch" AllowDrop="False">
             <ToolBar.Background>
@@ -215,14 +216,16 @@
                     <ColumnDefinition/>
                 </Grid.ColumnDefinitions>
                 <GridSplitter HorizontalAlignment="Right" Name="gridSplitter3" Width="1" Background="#FFDBDBDB" IsEnabled="False"/>
-                <TabControl Name="BarrageTabControl" SelectionChanged="BarrageTabControl_SelectionChanged" Grid.Column="1" ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Auto">
-                    <TabControl.Background>
-                        <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
-                            <GradientStop Color="#FFD4D4D4" Offset="0" />
-                            <GradientStop Color="White" Offset="1" />
-                        </LinearGradientBrush>
-                    </TabControl.Background>
-                </TabControl>
+                <ScrollViewer  Grid.Column="1" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+                    <TabControl Name="BarrageTabControl" SelectionChanged="BarrageTabControl_SelectionChanged">
+                        <TabControl.Background>
+                            <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                                <GradientStop Color="#FFD4D4D4" Offset="0" />
+                                <GradientStop Color="White" Offset="1" />
+                            </LinearGradientBrush>
+                        </TabControl.Background>
+                    </TabControl>
+                </ScrollViewer>
                 <TabControl  Margin="0,0,0,0" Name="LeftTabControl">
                     <TabItem Header="常用" Name="Frequent" Padding="6,5,6,1" HorizontalAlignment="Left" Width="42">
                         <DockPanel Name="ComponentPanel">
@@ -257,7 +260,7 @@
                     <TabItem Header="资源" Name="Resource" Padding="6,5,6,1">
                         <StackPanel>
                             <GroupBox Header="图案" Height="138" Margin="0">
-                                <TreeView Name="ImageList" Padding="-12,1,1,1">
+                                <TreeView Name="ImageList" Padding="-12,1,1,1" PreviewMouseRightButtonDown="ImageList_PreviewMouseRightButtonDown">
                                     <TreeView.ContextMenu>
                                         <ContextMenu>
                                             <MenuItem Name="AddImage" Header="添加图案" Click="AddImage_Click" />
@@ -268,12 +271,14 @@
                                             <DockPanel>
                                                 <DockPanel.ContextMenu >
                                                     <ContextMenu>
-                                                        
+                                                        <MenuItem Name="DeleteImage" Header="删除" Click="DeleteImage_Click" />
                                                     </ContextMenu>
                                                 </DockPanel.ContextMenu>
-                                                <Border>
-                                                    <TextBlock Text="{Binding Path=Label}" />
-                                                </Border>
+                                                <TextBlock Text="{Binding Path=Label}">
+                                                    <TextBlock.TextDecorations>
+                                                        <Binding Path="Valid" Converter="{StaticResource ResourceValidConverter}"/>
+                                                    </TextBlock.TextDecorations>
+                                                </TextBlock>
                                             </DockPanel>
                                         </DataTemplate>
                                     </TreeView.ItemTemplate>

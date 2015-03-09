@@ -53,7 +53,7 @@ namespace CrazyStorm
             file = new File("Untitled");
             InitializeComponent();
             InitializeSystem();
-            status = "已就绪";
+            status = (string)FindResource("Ready");
         }
         #endregion
 
@@ -75,7 +75,7 @@ namespace CrazyStorm
         }
         void LoadConfig()
         {
-
+            //TODO : Load config.
         }
         void InitializeFile()
         {
@@ -100,51 +100,7 @@ namespace CrazyStorm
         }
         void InitializeStatus()
         {
-            var item = StatusBar.Items[0] as StatusBarItem;
-            item.DataContext = this;
-        }
-        #endregion
-
-        #region Window EventHandler
-        private void Component_MouseEnter(object sender, MouseEventArgs e)
-        {
-            var image = sender as Image;
-            string[] condition = new string[] { "EmitterImage", "LaserImage", "MaskImage", "ReboundImage", "ForceImage" };
-            for (int i = 1; i <= condition.Length; ++i)
-                if (image.Name == condition[i - 1])
-                {
-                    image.Source = new BitmapImage(new Uri(@"Images\button" + i + "on.png", UriKind.Relative));
-                    break;
-                }
-        }
-        private void Component_MouseLeave(object sender, MouseEventArgs e)
-        {
-            var image = sender as Image;
-            string[] condition = new string[] { "EmitterImage", "LaserImage", "MaskImage", "ReboundImage", "ForceImage" };
-            for (int i = 1; i <= condition.Length; ++i)
-                if (image.Name == condition[i - 1])
-                {
-                    image.Source = new BitmapImage(new Uri(@"Images\button" + i + ".png", UriKind.Relative));
-                    break;
-                }
-        }
-        private void AddImage_Click(object sender, RoutedEventArgs e)
-        {
-            var open = new System.Windows.Forms.OpenFileDialog();
-            open.Filter = "PNG图像(*.png)|*.png";
-            if (open.ShowDialog() == System.Windows.Forms.DialogResult.OK)
-            {
-                var image = new Resource(open.SafeFileName, open.FileName);
-                file.Images.Add(image);
-            }
-        }
-        private void AddSound_Click(object sender, RoutedEventArgs e)
-        {
-
-        }
-        private void AddScript_Click(object sender, RoutedEventArgs e)
-        {
-
+            StatusText.DataContext = this;
         }
         #endregion
     }

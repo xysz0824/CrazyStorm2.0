@@ -67,6 +67,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Lang\Chinese.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="LayerSetting.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -91,6 +95,7 @@
     <Compile Include="Config.cs" />
     <Compile Include="Converter\LayerLengthConverter.cs" />
     <Compile Include="Converter\LayerStartConverter.cs" />
+    <Compile Include="Converter\ResourceValidConverter.cs" />
     <Compile Include="LayerSetting.xaml.cs">
       <DependentUpon>LayerSetting.xaml</DependentUpon>
     </Compile>
@@ -98,7 +103,9 @@
       <DependentUpon>Main.xaml</DependentUpon>
     </Compile>
     <Compile Include="Main\BarragePart.cs" />
+    <Compile Include="Main\ComponentPart.cs" />
     <Compile Include="Main\LayerPart.cs" />
+    <Compile Include="Main\ResourcePart.cs" />
     <Compile Include="Startup.xaml.cs">
       <DependentUpon>Startup.xaml</DependentUpon>
       <SubType>Code</SubType>

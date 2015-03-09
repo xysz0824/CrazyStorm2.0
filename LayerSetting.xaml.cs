@@ -58,7 +58,8 @@ namespace CrazyStorm
             int beginFrame, totalFrame;
             if (string.IsNullOrWhiteSpace(LayerName.Text))
             {
-                MessageBox.Show("图层名称不能为空", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show((string)FindResource("LayerNameCanNotBeEmpty"), (string)FindResource("TipTitle"), 
+                    MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
             if (Int32.TryParse(BeginFrame.Text, out beginFrame) && Int32.TryParse(EndFrame.Text, out totalFrame))
@@ -70,7 +71,8 @@ namespace CrazyStorm
                 this.Close();
             }
             else
-                MessageBox.Show("数值填入有误，请重试", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show((string)FindResource("ValueInvalid"), (string)FindResource("TipTitle"), 
+                    MessageBoxButton.OK, MessageBoxImage.Warning);
         }
         #endregion
     }
