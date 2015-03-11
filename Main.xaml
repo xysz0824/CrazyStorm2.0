@@ -279,6 +279,11 @@
                                                         <Binding Path="Valid" Converter="{StaticResource ResourceValidConverter}"/>
                                                     </TextBlock.TextDecorations>
                                                 </TextBlock>
+                                                <DockPanel.ToolTip>
+                                                    <ToolTip>
+                                                        <Image Source="{Binding Path=AbsolutePath}" Stretch="Uniform" Width="128" Height="128" StretchDirection="Both" />
+                                                    </ToolTip>
+                                                </DockPanel.ToolTip>
                                             </DockPanel>
                                         </DataTemplate>
                                     </TreeView.ItemTemplate>
@@ -321,7 +326,7 @@
                             </LinearGradientBrush>
                         </DockPanel.Background>
                         <Label  Content="图层" Height="28" Width="196" Name="label1" Padding="5,6,5,5" BorderBrush="{x:Null}" />
-                        <Label Name="NewLayer" Width="12" Height="12" DockPanel.Dock="Right" MouseUp="NewLayer_MouseUp">
+                        <Label Name="NewLayer" Width="12" Height="12" DockPanel.Dock="Right" MouseLeftButtonUp="NewLayer_MouseUp">
                             <Label.Background>
                                 <ImageBrush ImageSource="Images/layernew.png" Stretch="Uniform" AlignmentX="Left" AlignmentY="Top">
                                 </ImageBrush>
@@ -340,19 +345,19 @@
                                                 <MenuItem x:Name="LayerShortDelete" Header="删除" Click="LayerShortDelete_Click"/>
                                             </ContextMenu>
                                         </DockPanel.ContextMenu>
-                                        <Label x:Name="LayerDown" Height="12" Width="12" DockPanel.Dock="Right" MouseUp="LayerDown_MouseUp" >
+                                        <Label x:Name="LayerDown" Height="12" Width="12" DockPanel.Dock="Right" MouseLeftButtonUp="LayerDown_MouseUp" >
                                             <Label.Background>
                                                 <ImageBrush ImageSource="Images/layerdown.png" Stretch="Uniform" AlignmentX="Left" AlignmentY="Top">
                                                 </ImageBrush>
                                             </Label.Background>
                                         </Label>
-                                        <Label x:Name="LayerUp" Height="12" Width="12" DockPanel.Dock="Right" MouseUp="LayerUp_MouseUp" >
+                                        <Label x:Name="LayerUp" Height="12" Width="12" DockPanel.Dock="Right" MouseLeftButtonUp="LayerUp_MouseUp" >
                                             <Label.Background>
                                                 <ImageBrush ImageSource="Images/layerup.png" Stretch="Uniform" AlignmentX="Left" AlignmentY="Top">
                                                 </ImageBrush>
                                             </Label.Background>
                                         </Label>
-                                        <Label x:Name="LayerVisible" Height="12" Width="12" Margin ="2,0,2,0" DockPanel.Dock="Right" MouseUp="LayerVisible_MouseUp" >
+                                        <Label x:Name="LayerVisible" Height="12" Width="12" Margin ="2,0,2,0" DockPanel.Dock="Right" MouseLeftButtonUp="LayerVisible_MouseUp" >
                                             <Label.Background>
                                                 <ImageBrush ImageSource="Images/layervisible.png" Stretch="Uniform" AlignmentX="Left" AlignmentY="Top">
                                                 </ImageBrush>
@@ -361,7 +366,7 @@
                                                 <Binding Path="Visible" />
                                             </Label.Opacity>
                                         </Label>
-                                        <Label x:Name="LayerColor" Height="12" Width="12" Margin ="5,0,5,0" RenderTransformOrigin="0.5,0.5" MouseUp="LayerColor_MouseUp">
+                                        <Label x:Name="LayerColor" Height="12" Width="12" Margin ="5,0,5,0" RenderTransformOrigin="0.5,0.5" MouseLeftButtonUp="LayerColor_MouseUp">
                                             <Label.Background>
                                                 <ImageBrush ImageSource="Images/layercolor.png" Stretch="None" AlignmentX="Left" AlignmentY="Top">
                                                     <ImageBrush.Viewbox>

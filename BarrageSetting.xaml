@@ -1,66 +1,93 @@
 ﻿<Window x:Class="CrazyStorm.BarrageSetting"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
+        xmlns:local ="clr-namespace:CrazyStorm"
         Title="弹幕设置" Height="380" Width="400" WindowStyle="ToolWindow" WindowStartupLocation="CenterScreen" ResizeMode="NoResize">
+    <Window.Resources>
+    </Window.Resources>
     <TabControl>
         <TabItem Header="弹型">
             <Canvas>
-                <ListView Height="175" Canvas.Left="10" Canvas.Top="10" Width="120">
+                <ListView Name="TypeList" Height="175" Canvas.Left="10" Canvas.Top="10" Width="120" SelectionChanged="TypeList_SelectionChanged">
                     <ListView.ContextMenu>
                         <ContextMenu>
-                            <MenuItem Header="添加弹型" />
+                            <MenuItem Header="添加弹型" Click="AddNewType_Click" />
                         </ContextMenu>
                     </ListView.ContextMenu>
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <DockPanel Width="110">
+                                <DockPanel.ContextMenu>
+                                    <ContextMenu>
+                                        <MenuItem Name="DeleteType" Header="删除" Click="DeleteType_Click" />
+                                    </ContextMenu>
+                                </DockPanel.ContextMenu>
+                                <TextBlock Text="{Binding Path=Name}"/>
+                            </DockPanel>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
                 </ListView>
-                <Canvas Height="175" Width="239" Canvas.Left="135" Canvas.Top="10" 
-                        ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Auto">
-                    
-                </Canvas>
-                <GroupBox IsEnabled="False" Header="设置" Canvas.Left="10" Canvas.Top="190" Width="364" Height="125">
+                <ScrollViewer Height="175" Width="239" Canvas.Left="135" Canvas.Top="10" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+                    <Canvas Height="{Binding ElementName=Image, Path=ActualHeight}" Width="{Binding ElementName=Image, Path=ActualWidth}">
+                        <Image Name="Image" DataContext="{Binding ElementName=ImageCombo,Path=SelectedItem}" Source="{Binding Path=AbsolutePath}" Canvas.Left="0" Canvas.Top="0"/>
+                        <Rectangle 
+                            Fill="Blue" 
+                            Width="{Binding ElementName=Width, Path=Text}" Height="{Binding ElementName=Height, Path=Text}" 
+                            Canvas.Left="{Binding ElementName=StartPointX, Path=Text}" Canvas.Top="{Binding ElementName=StartPointY, Path=Text}" 
+                            Stroke="Black" Opacity="0.5"/>
+                        <Rectangle 
+                            Width="{Binding ElementName=Width, Path=Text}" Height="{Binding ElementName=Height, Path=Text}" 
+                            Canvas.Left="{Binding ElementName=StartPointX, Path=Text}" Canvas.Top="{Binding ElementName=StartPointY, Path=Text}" 
+                            Stroke="Red" Opacity="0.8"/>
+                    </Canvas>
+                </ScrollViewer>
+                <GroupBox Name="Setting"  IsEnabled="False" Header="设置" Canvas.Left="10" Canvas.Top="190" Width="364" Height="125">
                     <StackPanel>
                         <WrapPanel>
                             <Label Content="名称" Margin="0,0,7,0"/>
-                            <TextBox Width="141"/>
+                            <TextBox Text="{Binding Path=Name}" Width="141"/>
                             <Label Content="图案" />
-                            <ComboBox Width="134"/>
+                            <ComboBox Name="ImageCombo" SelectedItem="{Binding Path=Image}" Width="134"/>
                         </WrapPanel>
                         <WrapPanel VerticalAlignment="Top">
-                        <Label Content="起点X" />
-                        <TextBox Width="50"/>
-                        <Label Content="起点Y" />
-                        <TextBox Width="50"/>
-                        <Label Content="宽度" />
-                        <TextBox Width="50"/>
-                        <Label Content="高度" />
-                        <TextBox Width="50"/>
-                        <Label Content="中心X" />
-                        <TextBox Width="50"/>
-                        <Label Content="中心Y" />
-                        <TextBox Width="50"/>
-                        <Label Content="帧数" />
-                        <TextBox Width="50"/>
-                        <Label Content="延迟" />
-                        <TextBox Width="50"/>
-                        <Label Content="颜色标识" />
-                        <Label Width="30" Height="20"  Padding="0" Content="无"
+                            <Label Content="起点X" />
+                            <TextBox Name="StartPointX" Text="{Binding Path=StartPointX}" Width="50"/>
+                            <Label Content="起点Y" />
+                            <TextBox Name="StartPointY" Text="{Binding Path=StartPointY}" Width="50"/>
+                            <Label Content="宽度" />
+                            <TextBox Name="Width" Text="{Binding Path=Width}" Width="50"/>
+                            <Label Content="高度" />
+                            <TextBox Name="Height" Text="{Binding Path=Height}" Width="50"/>
+                            <Label Content="中心X" />
+                            <TextBox Name="CenterPointX" Text="{Binding Path=CenterPointX}" Width="50"/>
+                            <Label Content="中心Y" />
+                            <TextBox Name="CenterPointY" Text="{Binding Path=CenterPointY}" Width="50"/>
+                            <Label Content="帧数" />
+                            <TextBox Name="Frames" Text="{Binding Path=Frames}" Width="50"/>
+                            <Label Content="延迟" />
+                            <TextBox Text="{Binding Path=Delay}" Width="50"/>
+                            <Label Content="颜色标识" />
+                            <StackPanel Name="ColorPanel"  Orientation="Horizontal" MouseLeftButtonUp="ColorPanel_MouseUp" >
+                                <Label Width="30" Height="20"  Padding="0" Content="无"
                                HorizontalContentAlignment="Center" VerticalContentAlignment="Center" BorderBrush="Black"/>
-                        <Label Width="30" Height="20"  Padding="0" Content="红"
-                               HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Foreground="Red" BorderBrush="Black"/>
-                        <Label Width="30" Height="20"  Padding="0" Content="紫" 
-                               HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Foreground="Purple" BorderBrush="Black"/>
-                        <Label Width="30" Height="20"  Padding="0" Content="蓝" 
-                               HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Foreground="Blue" BorderBrush="Black"/>
-                        <Label Width="30" Height="20"  Padding="0" Content="青" 
-                               HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Foreground="Cyan" BorderBrush="Black"/>
-                        <Label Width="30" Height="20"  Padding="0" Content="绿" 
-                               HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Foreground="Green" BorderBrush="Black"/>
-                        <Label Width="30" Height="20"  Padding="0" Content="黄" 
-                               HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Foreground="Yellow" BorderBrush="Black"/>
-                        <Label Width="30" Height="20"  Padding="0" Content="橙" 
-                               HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Foreground="Orange" BorderBrush="Black"/>
-                        <Label Width="30" Height="20"  Padding="0" Content="灰"
-                               HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Foreground="Gray" BorderBrush="Black"/>
-                    </WrapPanel>
+                                <Label Width="30" Height="20"  Padding="0" Content="红"
+                               HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Foreground="Red" BorderBrush="Red"/>
+                                <Label Width="30" Height="20"  Padding="0" Content="紫" 
+                               HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Foreground="Purple" BorderBrush="Purple"/>
+                                <Label Width="30" Height="20"  Padding="0" Content="蓝" 
+                               HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Foreground="Blue" BorderBrush="Blue"/>
+                                <Label Width="30" Height="20"  Padding="0" Content="青" 
+                               HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Foreground="Cyan" BorderBrush="Cyan"/>
+                                <Label Width="30" Height="20"  Padding="0" Content="绿" 
+                               HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Foreground="Green" BorderBrush="Green"/>
+                                <Label Width="30" Height="20"  Padding="0" Content="黄" 
+                               HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Foreground="Yellow" BorderBrush="Yellow"/>
+                                <Label Width="30" Height="20"  Padding="0" Content="橙" 
+                               HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Foreground="Orange" BorderBrush="Orange"/>
+                                <Label Width="30" Height="20"  Padding="0" Content="灰"
+                               HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Foreground="Gray" BorderBrush="Gray"/>
+                            </StackPanel>
+                        </WrapPanel>
                     </StackPanel>
                 </GroupBox>
             </Canvas>

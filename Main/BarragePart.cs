@@ -68,7 +68,7 @@ namespace CrazyStorm
         }
         void OpenSelectedBarrageSetting()
         {
-            BarrageSetting window = new BarrageSetting(selectedBarrage);
+            BarrageSetting window = new BarrageSetting(file, selectedBarrage);
             window.Owner = this;
             window.ShowDialog();
         }
@@ -96,14 +96,17 @@ namespace CrazyStorm
         }
         private void BarrageTabControl_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            var tabItem = e.AddedItems.Count > 0 ? e.AddedItems[0] as TabItem : e.RemovedItems[0] as TabItem;
-            foreach (var item in file.Barrages)
-                if (item.Name == (string)tabItem.Header)
-                {
-                    selectedBarrage = item;
-                    //TODO : Display components.
-                    return;
-                }
+            if (e.AddedItems.Count > 0)
+            {
+                var tabItem = e.AddedItems[0] as TabItem;
+                foreach (var item in file.Barrages)
+                    if (item.Name == (string)tabItem.Header)
+                    {
+                        selectedBarrage = item;
+                        break;
+                    }
+            }
+            //TODO : Update components.
         }
         #endregion
     }
