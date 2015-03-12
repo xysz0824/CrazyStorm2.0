@@ -100,7 +100,7 @@
                 <MenuItem Header="保存" InputGestureText="Ctrl+S"/>
                 <MenuItem Header="另存为..." InputGestureText="Ctrl+Shift+S"/>
                 <Separator/>
-                <MenuItem Header="文件设置" />
+                <MenuItem Header="导出GIF" />
                 <Separator/>
                 <MenuItem Header="退出" />
             </MenuItem>
@@ -114,6 +114,11 @@
                 <Separator/>
                 <MenuItem Header="查找" InputGestureText="Ctrl+F"/>
                 <MenuItem Header="选中全部" InputGestureText="Ctrl+A"/>
+            </MenuItem>
+            <MenuItem Header="资源">
+                <MenuItem Header="添加图案" Click="AddImage_Click"/>
+                <MenuItem Header="添加音效" />
+                <MenuItem Header="添加脚本" />
             </MenuItem>
             <MenuItem Name="BarrageMenu" Header="弹幕" Click="BarrageMenu_Click" >
                 <MenuItem x:Name="AddBarrage" Header="添加弹幕" />
@@ -260,7 +265,7 @@
                     <TabItem Header="资源" Name="Resource" Padding="6,5,6,1">
                         <StackPanel>
                             <GroupBox Header="图案" Height="138" Margin="0">
-                                <TreeView Name="ImageList" Padding="-12,1,1,1" PreviewMouseRightButtonDown="ImageList_PreviewMouseRightButtonDown">
+                                <TreeView Name="ImageList" Padding="-12,1,1,1" PreviewMouseRightButtonDown="ImageList_PreviewMouseRightButtonDown" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.HorizontalScrollBarVisibility="Auto">
                                     <TreeView.ContextMenu>
                                         <ContextMenu>
                                             <MenuItem Name="AddImage" Header="添加图案" Click="AddImage_Click" />

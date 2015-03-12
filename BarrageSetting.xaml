@@ -16,7 +16,7 @@
                     </ListView.ContextMenu>
                     <ListView.ItemTemplate>
                         <DataTemplate>
-                            <DockPanel Width="110">
+                            <DockPanel>
                                 <DockPanel.ContextMenu>
                                     <ContextMenu>
                                         <MenuItem Name="DeleteType" Header="删除" Click="DeleteType_Click" />
@@ -39,6 +39,11 @@
                             Width="{Binding ElementName=Width, Path=Text}" Height="{Binding ElementName=Height, Path=Text}" 
                             Canvas.Left="{Binding ElementName=StartPointX, Path=Text}" Canvas.Top="{Binding ElementName=StartPointY, Path=Text}" 
                             Stroke="Red" Opacity="0.8"/>
+                        <Ellipse 
+                            Fill="Red"
+                            Width="{Binding ElementName=Diameter, Path=Text}" Height="{Binding ElementName=Diameter, Path=Text}"
+                            Canvas.Left="{Binding ElementName=CircleBoxX, Path=Text}" Canvas.Top="{Binding ElementName=CircleBoxY, Path=Text}" 
+                            Stroke="Red" Opacity="0.5"/>
                     </Canvas>
                 </ScrollViewer>
                 <GroupBox Name="Setting"  IsEnabled="False" Header="设置" Canvas.Left="10" Canvas.Top="190" Width="364" Height="125">
@@ -66,25 +71,30 @@
                             <TextBox Name="Frames" Text="{Binding Path=Frames}" Width="50"/>
                             <Label Content="延迟" />
                             <TextBox Text="{Binding Path=Delay}" Width="50"/>
+                            <Label Content="半径  " />
+                            <TextBox Name="Radius"  Text="{Binding Path=Radius}" Width="50"/>
+                            <TextBlock Name="Diameter" Text="{Binding Path=Diameter}" Height="0" Width="0"/>
+                            <TextBlock Name="CircleBoxX" Text="{Binding Path=CircleBoxX}" Height="0" Width="0"/>
+                            <TextBlock Name="CircleBoxY" Text="{Binding Path=CircleBoxY}" Height="0" Width="0"/>
                             <Label Content="颜色标识" />
                             <StackPanel Name="ColorPanel"  Orientation="Horizontal" MouseLeftButtonUp="ColorPanel_MouseUp" >
-                                <Label Width="30" Height="20"  Padding="0" Content="无"
+                                <Label Width="20" Height="20"  Padding="0" Content="无"
                                HorizontalContentAlignment="Center" VerticalContentAlignment="Center" BorderBrush="Black"/>
-                                <Label Width="30" Height="20"  Padding="0" Content="红"
+                                <Label Width="20" Height="20"  Padding="0" Content="红"
                                HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Foreground="Red" BorderBrush="Red"/>
-                                <Label Width="30" Height="20"  Padding="0" Content="紫" 
+                                <Label Width="20" Height="20"  Padding="0" Content="紫" 
                                HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Foreground="Purple" BorderBrush="Purple"/>
-                                <Label Width="30" Height="20"  Padding="0" Content="蓝" 
+                                <Label Width="20" Height="20"  Padding="0" Content="蓝" 
                                HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Foreground="Blue" BorderBrush="Blue"/>
-                                <Label Width="30" Height="20"  Padding="0" Content="青" 
+                                <Label Width="20" Height="20"  Padding="0" Content="青" 
                                HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Foreground="Cyan" BorderBrush="Cyan"/>
-                                <Label Width="30" Height="20"  Padding="0" Content="绿" 
+                                <Label Width="20" Height="20"  Padding="0" Content="绿" 
                                HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Foreground="Green" BorderBrush="Green"/>
-                                <Label Width="30" Height="20"  Padding="0" Content="黄" 
+                                <Label Width="20" Height="20"  Padding="0" Content="黄" 
                                HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Foreground="Yellow" BorderBrush="Yellow"/>
-                                <Label Width="30" Height="20"  Padding="0" Content="橙" 
+                                <Label Width="20" Height="20"  Padding="0" Content="橙" 
                                HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Foreground="Orange" BorderBrush="Orange"/>
-                                <Label Width="30" Height="20"  Padding="0" Content="灰"
+                                <Label Width="20" Height="20"  Padding="0" Content="灰"
                                HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Foreground="Gray" BorderBrush="Gray"/>
                             </StackPanel>
                         </WrapPanel>
