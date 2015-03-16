@@ -6,29 +6,36 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.ComponentModel;
 
 namespace CrazyStorm
 {
-    static class Config
+    class Config
     {
-        private static int screenWidth = 640;
-        private static int screenHeight = 480;
-        private static bool gridAlignment = true;
+        #region Private Members
+        int screenWidth = 640;
+        int screenHeight = 480;
+        bool gridAlignment = true;
+        #endregion
 
-        public static int ScreenWidth 
+        #region Public Members
+        public int ScreenWidth 
         { 
             get { return screenWidth; }
             set { screenWidth = value > 0 ? value : screenWidth; }
         }
-        public static int ScreenHeight
+        public int ScreenWidthOver2 { get { return screenWidth / 2; } }
+        public int ScreenHeight
         {
             get { return screenHeight; }
             set { screenHeight = value > 0 ? value : screenHeight; }
         }
-        public static bool GridAlignment
+        public int ScreenHeightOver2 { get { return screenHeight / 2; } }
+        public bool GridAlignment
         {
             get { return gridAlignment; }
             set { gridAlignment = value; }
         }
+        #endregion
     }
 }

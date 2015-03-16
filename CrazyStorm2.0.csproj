@@ -79,6 +79,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="ScreenSetting.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Startup.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -106,6 +110,10 @@
     <Compile Include="Main\ComponentPart.cs" />
     <Compile Include="Main\LayerPart.cs" />
     <Compile Include="Main\ResourcePart.cs" />
+    <Compile Include="Main\ScreenPart.cs" />
+    <Compile Include="ScreenSetting.xaml.cs">
+      <DependentUpon>ScreenSetting.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Startup.xaml.cs">
       <DependentUpon>Startup.xaml</DependentUpon>
       <SubType>Code</SubType>
@@ -214,6 +222,10 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Images\layernew.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\center.png" />
+    <Resource Include="Images\grid.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

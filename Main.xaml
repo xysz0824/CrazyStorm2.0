@@ -100,7 +100,7 @@
                 <MenuItem Header="保存" InputGestureText="Ctrl+S"/>
                 <MenuItem Header="另存为..." InputGestureText="Ctrl+Shift+S"/>
                 <Separator/>
-                <MenuItem Header="导出GIF" />
+                <MenuItem Name="ScreenSetting" Header="屏幕设置" Click="ScreenSetting_Click" />
                 <Separator/>
                 <MenuItem Header="退出" />
             </MenuItem>
@@ -200,7 +200,7 @@
             <Button Name="Play" IsEnabled="True" IsDefault="False" IsCancel="False" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ToolTip="测试">
                 <Image Source="Images/arrow-right-3.ico" Stretch="None" />
             </Button>
-            <Button Name="Setting" IsEnabled="True" IsDefault="False" IsCancel="False" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ToolTip="配置">
+            <Button Name="Setting" IsEnabled="True" IsDefault="False" IsCancel="False" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ToolTip="设置">
                 <Image Source="Images/configure-5.ico" Stretch="None" />
             </Button>
         </ToolBar>
@@ -229,6 +229,36 @@
                                 <GradientStop Color="White" Offset="1" />
                             </LinearGradientBrush>
                         </TabControl.Background>
+                        <TabControl.ItemTemplate>
+                            <DataTemplate>
+                                <Canvas Width="{Binding Path=ScreenWidth}" Height="{Binding Path=ScreenHeight}">
+                                    <Canvas.Background>
+                                        <SolidColorBrush Color="Black"/>
+                                    </Canvas.Background>
+                                    <Canvas Name="Grid" Canvas.Top="0" Canvas.Left="0" Width="{Binding Path=ScreenWidth}" Height="{Binding Path=ScreenHeight}">
+                                        <Canvas.Background>
+                                            <ImageBrush ImageSource="Images/grid.png" Stretch="Uniform" TileMode="Tile" ViewportUnits="Absolute" Viewport="0,0,32,32" />
+                                        </Canvas.Background>
+                                    </Canvas>
+                                    <Image Source="Images/center.png" Width="65" Height="65" Stretch="Fill" RenderTransformOrigin="0.5,0.5">
+                                        <Image.RenderTransform>
+                                            <TransformGroup>
+                                                <ScaleTransform/>
+                                                <SkewTransform/>
+                                                <RotateTransform/>
+                                                <TranslateTransform X="-33" Y="-33"/>
+                                            </TransformGroup>
+                                        </Image.RenderTransform>
+                                        <Canvas.Left>
+                                            <Binding Path="ScreenWidthOver2"/>
+                                        </Canvas.Left>
+                                        <Canvas.Top>
+                                            <Binding Path="ScreenHeightOver2"/>
+                                        </Canvas.Top>
+                                    </Image>
+                                </Canvas>
+                            </DataTemplate>
+                        </TabControl.ItemTemplate>
                     </TabControl>
                 </ScrollViewer>
                 <TabControl  Margin="0,0,0,0" Name="LeftTabControl">
@@ -254,10 +284,27 @@
                                 </StackPanel>
                             </GroupBox>
                             <Canvas DockPanel.Dock="Bottom" Height="100">
-
                             </Canvas>
-                            <GroupBox Header="组件浏览器" Name="Scene" >
-                                <TreeView Name="ComponentList" Padding="-12,1,1,1">
+                            <GroupBox Header="组件浏览器" Name="Explorer" >
+                                <TreeView Name="ComponentList" Padding="-2,1,1,1">
+                                    <TreeView.ItemTemplate >
+                                        <HierarchicalDataTemplate ItemsSource="{Binding Children}">
+                                            <TextBlock Text="{Binding Name}">
+                                                <TextBlock.Style >
+                                                    <Style TargetType="TextBlock">
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding HasOutStandingTask}" Value="true">
+                                                                <Setter Property="Foreground" Value="DarkOrange" />
+                                                            </DataTrigger>
+                                                            <DataTrigger Binding="{Binding HasOutStandingTask}" Value="false">
+                                                                <Setter Property="Foreground" Value="Aqua" />
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </TextBlock.Style>
+                                            </TextBlock>
+                                        </HierarchicalDataTemplate>
+                                    </TreeView.ItemTemplate>
                                 </TreeView>
                             </GroupBox>
                         </DockPanel>
@@ -336,6 +383,9 @@
                                 <ImageBrush ImageSource="Images/layernew.png" Stretch="Uniform" AlignmentX="Left" AlignmentY="Top">
                                 </ImageBrush>
                             </Label.Background>
+                            <Label.ToolTip>
+                                <TextBlock Text="新建"/>
+                            </Label.ToolTip>
                         </Label>
                     </DockPanel>
                     <ScrollViewer  Name="LayerScrollViewer" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" ScrollChanged="LayerScrollViewer_ScrollChanged" CanContentScroll="True">

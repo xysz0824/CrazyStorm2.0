@@ -8,6 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-[assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("images/layernew.png")]
+[assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("images/center.png")]
+[assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("images/grid.png")]
 
 

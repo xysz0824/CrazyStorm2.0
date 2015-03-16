@@ -26,13 +26,8 @@ namespace CrazyStorm
         {
             TabItem tabItem = new TabItem();
             tabItem.Header = barrage.Name;
-            Canvas canvas = new Canvas()
-            {
-                Width = Config.ScreenWidth,
-                Height = Config.ScreenHeight,
-                Background = new SolidColorBrush(Colors.Black)
-            };
-            tabItem.Content = canvas;
+            tabItem.DataContext = config;
+            tabItem.Content = BarrageTabControl.ItemTemplate.LoadContent();
             BarrageTabControl.Items.Add(tabItem);
             BarrageTabControl.SelectedItem = tabItem;
         }

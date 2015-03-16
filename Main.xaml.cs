@@ -28,6 +28,7 @@ namespace CrazyStorm
         public event PropertyChangedEventHandler PropertyChanged;
 
         #region Private Members
+        Config config;
         File file;
         Barrage selectedBarrage;
         Layer selectedLayer;
@@ -69,12 +70,13 @@ namespace CrazyStorm
         {
             LoadConfig();
             InitializeFile();
-            InitializeScene();
+            InitializeBarrage();
             InitializeLayer();
             InitializeStatus();
         }
         void LoadConfig()
         {
+            config = new Config();
             //TODO : Load config.
         }
         void InitializeFile()
@@ -84,7 +86,7 @@ namespace CrazyStorm
             SoundList.ItemsSource = file.Sounds;
             ScriptList.ItemsSource = file.Scripts;
         }
-        void InitializeScene()
+        void InitializeBarrage()
         {
             selectedBarrage = file.Barrages.First();
             AddNewBarrageTab(selectedBarrage);
