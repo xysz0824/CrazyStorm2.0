@@ -26,7 +26,6 @@ namespace CrazyStorm
         {
             TabItem tabItem = new TabItem();
             tabItem.Header = barrage.Name;
-            tabItem.DataContext = config;
             tabItem.Content = BarrageTabControl.ItemTemplate.LoadContent();
             BarrageTabControl.Items.Add(tabItem);
             BarrageTabControl.SelectedItem = tabItem;
@@ -63,13 +62,19 @@ namespace CrazyStorm
         }
         void OpenSelectedBarrageSetting()
         {
-            BarrageSetting window = new BarrageSetting(file, selectedBarrage);
+            BarrageSetting window = new BarrageSetting(file, selectedBarrage, BarrageTabControl);
             window.Owner = this;
             window.ShowDialog();
         }
         #endregion
 
         #region Window EventHandler
+        private void ScreenSetting_Click(object sender, RoutedEventArgs e)
+        {
+            ScreenSetting window = new ScreenSetting(config);
+            window.Owner = this;
+            window.ShowDialog();
+        }
         private void BarrageMenu_Click(object sender, RoutedEventArgs e)
         {
             var item = e.Source as MenuItem;

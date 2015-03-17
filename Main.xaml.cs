@@ -89,6 +89,7 @@ namespace CrazyStorm
         void InitializeBarrage()
         {
             selectedBarrage = file.Barrages.First();
+            BarrageTabControl.DataContext = config;
             AddNewBarrageTab(selectedBarrage);
             ComponentList.ItemsSource = selectedBarrage.Components;
         }

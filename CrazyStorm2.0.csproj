@@ -110,7 +110,6 @@
     <Compile Include="Main\ComponentPart.cs" />
     <Compile Include="Main\LayerPart.cs" />
     <Compile Include="Main\ResourcePart.cs" />
-    <Compile Include="Main\ScreenPart.cs" />
     <Compile Include="ScreenSetting.xaml.cs">
       <DependentUpon>ScreenSetting.xaml</DependentUpon>
     </Compile>

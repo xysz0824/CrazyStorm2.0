@@ -235,27 +235,38 @@
                                     <Canvas.Background>
                                         <SolidColorBrush Color="Black"/>
                                     </Canvas.Background>
-                                    <Canvas Name="Grid" Canvas.Top="0" Canvas.Left="0" Width="{Binding Path=ScreenWidth}" Height="{Binding Path=ScreenHeight}">
+                                    <Canvas Width="{Binding Path=ScreenWidth}" Height="{Binding Path=ScreenHeight}">
                                         <Canvas.Background>
-                                            <ImageBrush ImageSource="Images/grid.png" Stretch="Uniform" TileMode="Tile" ViewportUnits="Absolute" Viewport="0,0,32,32" />
+                                            <ImageBrush Stretch="Uniform" ImageSource="{Binding Path=ImagePath}" />
                                         </Canvas.Background>
+                                        <Canvas Name="Grid" Canvas.Top="0" Canvas.Left="0" Width="{Binding Path=ScreenWidth}" Height="{Binding Path=ScreenHeight}">
+                                            <Canvas.Background>
+                                                <ImageBrush ImageSource="Images/grid.png" Stretch="Uniform" TileMode="Tile" ViewportUnits="Absolute" Viewport="0,0,32,32" />
+                                            </Canvas.Background>
+                                            <Canvas.Opacity>
+                                                <Binding Path="GridAlignment" />
+                                            </Canvas.Opacity>
+                                        </Canvas>
+                                        <Image Source="Images/center.png" Width="65" Height="65" Stretch="Fill" RenderTransformOrigin="0.5,0.5">
+                                            <Image.RenderTransform>
+                                                <TransformGroup>
+                                                    <ScaleTransform/>
+                                                    <SkewTransform/>
+                                                    <RotateTransform/>
+                                                    <TranslateTransform X="-33" Y="-33"/>
+                                                </TransformGroup>
+                                            </Image.RenderTransform>
+                                            <Canvas.Left>
+                                                <Binding Path="ScreenWidthOver2"/>
+                                            </Canvas.Left>
+                                            <Canvas.Top>
+                                                <Binding Path="ScreenHeightOver2"/>
+                                            </Canvas.Top>
+                                            <Image.Opacity>
+                                                <Binding Path="CenterDisplay" />
+                                            </Image.Opacity>
+                                        </Image>
                                     </Canvas>
-                                    <Image Source="Images/center.png" Width="65" Height="65" Stretch="Fill" RenderTransformOrigin="0.5,0.5">
-                                        <Image.RenderTransform>
-                                            <TransformGroup>
-                                                <ScaleTransform/>
-                                                <SkewTransform/>
-                                                <RotateTransform/>
-                                                <TranslateTransform X="-33" Y="-33"/>
-                                            </TransformGroup>
-                                        </Image.RenderTransform>
-                                        <Canvas.Left>
-                                            <Binding Path="ScreenWidthOver2"/>
-                                        </Canvas.Left>
-                                        <Canvas.Top>
-                                            <Binding Path="ScreenHeightOver2"/>
-                                        </Canvas.Top>
-                                    </Image>
                                 </Canvas>
                             </DataTemplate>
                         </TabControl.ItemTemplate>

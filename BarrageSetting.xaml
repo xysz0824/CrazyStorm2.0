@@ -8,6 +8,9 @@
     <TabControl>
         <TabItem Header="弹型">
             <Canvas>
+                <Label Content="弹幕名称" Canvas.Left="189" Canvas.Top="-28" />
+                <TextBox Name="BarrageName" Height="23" TextWrapping="Wrap" Text="{Binding Path=Name, Mode=OneTime}" Width="79" Canvas.Left="249" Canvas.Top="-27"/>
+                <Button Content="修改" Canvas.Left="333" Canvas.Top="-27" Width="42" Click="Button_Click"/>
                 <ListView Name="TypeList" Height="175" Canvas.Left="10" Canvas.Top="10" Width="120" SelectionChanged="TypeList_SelectionChanged">
                     <ListView.ContextMenu>
                         <ContextMenu>
