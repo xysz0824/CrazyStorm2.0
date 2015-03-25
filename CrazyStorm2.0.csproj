@@ -42,6 +42,7 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\CrazyStorm Core\bin\Debug\CoreLibrary.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.Expression.Effects, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Windows.Forms" />
@@ -94,9 +95,10 @@
     <Compile Include="BarrageSetting.xaml.cs">
       <DependentUpon>BarrageSetting.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Command\Command.cs" />
     <Compile Include="Converter\LayerAxisConverter.cs" />
     <Compile Include="Converter\LayerIconConverter.cs" />
-    <Compile Include="Config.cs" />
+    <Compile Include="Config\Config.cs" />
     <Compile Include="Converter\LayerLengthConverter.cs" />
     <Compile Include="Converter\LayerStartConverter.cs" />
     <Compile Include="Converter\ResourceValidConverter.cs" />
@@ -225,6 +227,12 @@
   <ItemGroup>
     <Resource Include="Images\center.png" />
     <Resource Include="Images\grid.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\aimbox.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\selecting.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

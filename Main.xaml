@@ -5,6 +5,7 @@
         Title="Crazy Storm" mc:Ignorable="d" 
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+        xmlns:ef="http://schemas.microsoft.com/expression/2010/effects" 
         DataContext="{Binding}" WindowStartupLocation="CenterScreen" WindowState="Normal" Icon="Images/icon.ico" IsEnabled="True" Width="1024" Height="768">
     <Window.Resources>
         <local:LayerIconConverter x:Key="LayerIconConverter"/>
@@ -12,6 +13,18 @@
         <local:LayerStartConverter x:Key="LayerStartConverter" />
         <local:LayerLengthConverter x:Key="LayerLengthConverter" />
         <local:ResourceValidConverter x:Key="ResourceValidConverter" />
+        <Style TargetType="Image">
+            <Style.Triggers>
+                <Trigger Property="IsEnabled" Value="False">
+                    <Setter Property="Effect">
+                        <Setter.Value>
+                            <ef:ColorToneEffect  DarkColor="Black" Desaturation="1" ToneAmount="0" LightColor="#FF979797"/>
+                        </Setter.Value>
+                    </Setter>
+                    <Setter Property="Opacity" Value="0.5" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
         <Style TargetType="ListViewItem">
             <Style.Resources>
                 <SolidColorBrush x:Key="{x:Static SystemColors.ControlBrushKey}" Color="#00FFFFFF"/>
@@ -85,6 +98,20 @@
                 </Setter.Value>
             </Setter>
         </Style>
+        <DataTemplate x:Key="ComponentItem">
+            <Canvas>
+                <Label Name="Frame" Width="32" Height="32">
+                    <Label.Background>
+                        <ImageBrush ImageSource="Images/layercolor.png" TileMode="FlipY">
+                            <ImageBrush.Viewbox>
+                                <Binding Path="Color" Converter="{StaticResource LayerAxisConverter}"/>
+                            </ImageBrush.Viewbox>
+                        </ImageBrush>
+                    </Label.Background>
+                </Label>
+                <Image Name="Icon" Canvas.Left="2" Canvas.Top="2" Stretch="Uniform" Width="28" Height="28"/>
+            </Canvas>
+        </DataTemplate>
     </Window.Resources>
     <DockPanel Height="Auto" Name="dockPanel1" Width="Auto">
         <Menu Height="23" Name="menu1" Width="Auto" DockPanel.Dock="Top" Padding="2,0,0,0" IsEnabled="True">
@@ -105,12 +132,12 @@
                 <MenuItem Header="退出" />
             </MenuItem>
             <MenuItem Header="编辑">
-                <MenuItem Header="撤销" InputGestureText="Ctrl+Z"/>
-                <MenuItem Header="恢复" InputGestureText="Ctrl+Y"/>
+                <MenuItem Name="Undo" Header="撤销" InputGestureText="Ctrl+Z"/>
+                <MenuItem Name="Redo" Header="恢复" InputGestureText="Ctrl+Y"/>
                 <Separator/>
-                <MenuItem Header="剪切" InputGestureText="Ctrl+X"/>
-                <MenuItem Header="复制" InputGestureText="Ctrl+C"/>
-                <MenuItem Header="粘贴" InputGestureText="Ctrl+V"/>
+                <MenuItem Name="Cut" Header="剪切" InputGestureText="Ctrl+X"/>
+                <MenuItem Name="Copy" Header="复制" InputGestureText="Ctrl+C"/>
+                <MenuItem Name="Paste" Header="粘贴" InputGestureText="Ctrl+V"/>
                 <Separator/>
                 <MenuItem Header="查找" InputGestureText="Ctrl+F"/>
                 <MenuItem Header="选中全部" InputGestureText="Ctrl+A"/>
@@ -167,40 +194,40 @@
                     <GradientStop Color="#FFF6F6F6" Offset="1" />
                 </LinearGradientBrush>
             </ToolBar.Background>
-            <Button Name="New" IsEnabled="True" IsDefault="False" IsCancel="False" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ToolTip="新建">
+            <Button Name="NewButton" IsDefault="False" IsCancel="False" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ToolTip="新建">
                 <Image Source="Images/document-new-3.ico" Stretch="None" />
             </Button>
-            <Button Name="Open" IsEnabled="True" IsDefault="False" IsCancel="False" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ToolTip="打开">
+            <Button Name="OpenButton" IsDefault="False" IsCancel="False" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ToolTip="打开">
                 <Image Source="Images/document-open-2.ico" Stretch="None" />
             </Button>
-            <Button Name="Save" IsEnabled="True" IsDefault="False" IsCancel="False" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ToolTip="保存">
+            <Button Name="SaveButton" IsDefault="False" IsCancel="False" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ToolTip="保存">
                 <Image Source="Images/document-export.ico" Stretch="None" />
             </Button>
             <Separator/>
-            <Button Name="Cut" IsEnabled="True" IsDefault="False" IsCancel="False" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ToolTip="剪切">
+            <Button Name="CutButton" IsDefault="False" IsCancel="False" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ToolTip="剪切">
                 <Image Source="Images/edit-cut-3.ico" Stretch="None" />
             </Button>
-            <Button Name="Copy" IsEnabled="True" IsDefault="False" IsCancel="False" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ToolTip="复制">
+            <Button Name="CopyButton" IsDefault="False" IsCancel="False" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ToolTip="复制">
                 <Image Source="Images/edit-copy-3.ico" Stretch="None" />
             </Button>
-            <Button Name="Paste" IsEnabled="True" IsDefault="False" IsCancel="False" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ToolTip="粘贴">
+            <Button Name="PasteButton" IsDefault="False" IsCancel="False" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ToolTip="粘贴">
                 <Image Source="Images/edit-paste-3.ico" Stretch="None" />
             </Button>
-            <Button Name="Find" IsEnabled="True" IsDefault="False" IsCancel="False" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ToolTip="粘贴">
+            <Button Name="FindButton" IsDefault="False" IsCancel="False" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ToolTip="粘贴">
                 <Image Source="Images/edit-find-5.ico" Stretch="None" />
             </Button>
             <Separator/>
-            <Button Name="Undo" IsEnabled="True" IsDefault="False" IsCancel="False" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ToolTip="撤销">
+            <Button Name="UndoButton" IsDefault="False" IsCancel="False" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ToolTip="撤销">
                 <Image Source="Images/edit-undo-3.ico" Stretch="None" />
             </Button>
-            <Button Name="Redo" IsEnabled="True" IsDefault="False" IsCancel="False" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ToolTip="恢复">
+            <Button Name="RedoButton" IsDefault="False" IsCancel="False" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ToolTip="恢复">
                 <Image Source="Images/edit-redo-3.ico" Stretch="None" />
             </Button>
             <Separator/>
-            <Button Name="Play" IsEnabled="True" IsDefault="False" IsCancel="False" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ToolTip="测试">
+            <Button Name="PlayButton" IsDefault="False" IsCancel="False" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ToolTip="测试">
                 <Image Source="Images/arrow-right-3.ico" Stretch="None" />
             </Button>
-            <Button Name="Setting" IsEnabled="True" IsDefault="False" IsCancel="False" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ToolTip="设置">
+            <Button Name="SettingButton" IsDefault="False" IsCancel="False" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ToolTip="设置">
                 <Image Source="Images/configure-5.ico" Stretch="None" />
             </Button>
         </ToolBar>
@@ -222,7 +249,7 @@
                 </Grid.ColumnDefinitions>
                 <GridSplitter HorizontalAlignment="Right" Name="gridSplitter3" Width="1" Background="#FFDBDBDB" IsEnabled="False"/>
                 <ScrollViewer  Grid.Column="1" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
-                    <TabControl Name="BarrageTabControl" SelectionChanged="BarrageTabControl_SelectionChanged">
+                    <TabControl Name="BarrageTabControl" SelectionChanged="BarrageTabControl_SelectionChanged" MouseLeave="BarrageTabControl_MouseLeave" MouseLeftButtonUp="BarrageTabControl_MouseLeftButtonUp">
                         <TabControl.Background>
                             <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
                                 <GradientStop Color="#FFD4D4D4" Offset="0" />
@@ -231,7 +258,7 @@
                         </TabControl.Background>
                         <TabControl.ItemTemplate>
                             <DataTemplate>
-                                <Canvas Width="{Binding Path=ScreenWidth}" Height="{Binding Path=ScreenHeight}">
+                                <Canvas Name="Screen" Width="{Binding Path=ScreenWidth}" Height="{Binding Path=ScreenHeight}" MouseMove="Screen_MouseMove" MouseRightButtonDown="Screen_MouseRightButtonDown" MouseLeftButtonDown="Screen_MouseLeftButtonDown">
                                     <Canvas.Background>
                                         <SolidColorBrush Color="Black"/>
                                     </Canvas.Background>
@@ -247,7 +274,7 @@
                                                 <Binding Path="GridAlignment" />
                                             </Canvas.Opacity>
                                         </Canvas>
-                                        <Image Source="Images/center.png" Width="65" Height="65" Stretch="Fill" RenderTransformOrigin="0.5,0.5">
+                                        <Image Source="Images/center.png" Width="65" Height="65" Stretch="Fill" RenderTransformOrigin="0.5,0.5" >
                                             <Image.RenderTransform>
                                                 <TransformGroup>
                                                     <ScaleTransform/>
@@ -266,6 +293,9 @@
                                                 <Binding Path="CenterDisplay" />
                                             </Image.Opacity>
                                         </Image>
+                                        <Canvas Name="ComponentLayer" Canvas.Top="0" Canvas.Left="0" Width="{Binding Path=ScreenWidth}" Height="{Binding Path=ScreenHeight}"/>
+                                        <Image Name="AimBox" Opacity="0" Source="Images/aimBox.png" Width="32" Height="32" />
+                                        <Image Name="SelectingBox" Source="Images/selecting.png" Width="0" Height="0" Stretch="Fill" />
                                     </Canvas>
                                 </Canvas>
                             </DataTemplate>
@@ -273,24 +303,24 @@
                     </TabControl>
                 </ScrollViewer>
                 <TabControl  Margin="0,0,0,0" Name="LeftTabControl">
-                    <TabItem Header="常用" Name="Frequent" Padding="6,5,6,1" HorizontalAlignment="Left" Width="42">
+                    <TabItem Header="组件" Name="Frequent" Padding="6,5,6,1" HorizontalAlignment="Left" Width="42">
                         <DockPanel Name="ComponentPanel">
                             <GroupBox DockPanel.Dock="Top" Header="组件板" Name="groupBox1" VerticalAlignment="Top" Height="60" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" BorderBrush="#FFC6C6C6">
                                 <StackPanel Name="stackPanel1" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
-                                    <Button Name="Emitter" Width="34" Height="34" Padding="0" Margin="1,1,2,1" Background="#00000000">
-                                        <Image Name="EmitterImage" Source="Images/button1.png" Stretch="Uniform" ToolTip="发射器" MouseEnter="Component_MouseEnter" MouseLeave="Component_MouseLeave" />
+                                    <Button Name="Emitter" Width="33" Height="33" Padding="0" Margin="1,1,2,1" Background="#00000000" Click="Component_Click">
+                                        <Image Name="EmitterImage" Source="Images/button1.png" Stretch="Uniform" ToolTip="发射器" MouseEnter="Component_MouseEnter" MouseLeave="Component_MouseLeave" Width="27" Height="27" />
                                     </Button>
-                                    <Button Name="Laser" Width="34" Height="34" Background="{x:Null}" Padding="0" Margin="1,1,2,1">
-                                        <Image Name="LaserImage" Source="Images/button2.png" Stretch="Uniform" ToolTip="激光" MouseEnter="Component_MouseEnter" MouseLeave="Component_MouseLeave" />
+                                    <Button Name="Laser" Width="33" Height="33" Background="{x:Null}" Padding="0" Margin="1,1,2,1" Click="Component_Click">
+                                        <Image Name="LaserImage" Source="Images/button2.png" Stretch="Uniform" ToolTip="激光" MouseEnter="Component_MouseEnter" MouseLeave="Component_MouseLeave" Width="27" Height="27" />
                                     </Button>
-                                    <Button Name="Mask" Width="34" Height="34" Background="{x:Null}" Padding="0" Margin="1,1,2,1">
-                                        <Image Name="MaskImage" Source="Images/button3.png" Stretch="Uniform" ToolTip="遮罩" MouseEnter="Component_MouseEnter" MouseLeave="Component_MouseLeave" />
+                                    <Button Name="Mask" Width="33" Height="33" Background="{x:Null}" Padding="0" Margin="1,1,2,1" Click="Component_Click">
+                                        <Image Name="MaskImage" Source="Images/button3.png" Stretch="Uniform" ToolTip="遮罩" MouseEnter="Component_MouseEnter" MouseLeave="Component_MouseLeave" Width="27" Height="27" />
                                     </Button>
-                                    <Button Name="Rebound" Width="34" Height="34" Background="{x:Null}" Padding="0" Margin="1,1,2,1">
-                                        <Image Name="ReboundImage" Source="Images/button4.png" Stretch="Uniform" ToolTip="反弹板" MouseEnter="Component_MouseEnter" MouseLeave="Component_MouseLeave" />
+                                    <Button Name="Rebound" Width="33" Height="33" Background="{x:Null}" Padding="0" Margin="1,1,2,1" Click="Component_Click">
+                                        <Image Name="ReboundImage" Source="Images/button4.png" Stretch="Uniform" ToolTip="反弹板" MouseEnter="Component_MouseEnter" MouseLeave="Component_MouseLeave" Width="27" Height="27" />
                                     </Button>
-                                    <Button Name="Force" Width="34" Height="34" Background="{x:Null}" Padding="0" Margin="1,1,2,1">
-                                        <Image Name="ForceImage" Source="Images/button5.png" Stretch="Uniform" ToolTip="力场" MouseEnter="Component_MouseEnter" MouseLeave="Component_MouseLeave" />
+                                    <Button Name="Force" Width="33" Height="33" Background="{x:Null}" Padding="0" Margin="1,1,2,1" Click="Component_Click">
+                                        <Image Name="ForceImage" Source="Images/button5.png" Stretch="Uniform" ToolTip="力场" MouseEnter="Component_MouseEnter" MouseLeave="Component_MouseLeave" Width="27" Height="27" />
                                     </Button>
                                 </StackPanel>
                             </GroupBox>

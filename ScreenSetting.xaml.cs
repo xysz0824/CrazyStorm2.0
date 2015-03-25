@@ -61,7 +61,8 @@ namespace CrazyStorm
         private void Button_Click(object sender, RoutedEventArgs e)
         {
             int width, height;
-            if (Int32.TryParse(Width.Text, out width) && Int32.TryParse(Height.Text, out height))
+            if (Int32.TryParse(ScreenWidth.Text, out width) && 
+                Int32.TryParse(ScreenHeight.Text, out height))
             {
                 config.ScreenWidth = width;
                 config.ScreenHeight = height;

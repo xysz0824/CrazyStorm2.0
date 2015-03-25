@@ -30,8 +30,6 @@ namespace CrazyStorm
         #region Private Members
         Config config;
         File file;
-        Barrage selectedBarrage;
-        Layer selectedLayer;
         string status = String.Empty;
         #endregion
 
@@ -66,13 +64,36 @@ namespace CrazyStorm
 
             return source;
         }
+        static DependencyObject VisualDownwardSearch(DependencyObject source, string name)
+        {
+            if (source == null)
+                return null;
+            var count = VisualTreeHelper.GetChildrenCount(source);
+            if (count == 0)
+                return null;
+            for (int i = 0; i < count; ++i)
+            {
+                var child = VisualTreeHelper.GetChild(source, i);
+                if ((string)child.GetValue(NameProperty) == name)
+                    return child;
+                else
+                {
+                    child = VisualDownwardSearch(child, name);
+                    if (child != null)
+                        return child;
+                }
+            }
+            return null;
+        }
         void InitializeSystem()
         {
             LoadConfig();
             InitializeFile();
             InitializeBarrage();
             InitializeLayer();
+            InitializeEdit();
             InitializeStatus();
+            UpdateScreen();
         }
         void LoadConfig()
         {
@@ -95,11 +116,25 @@ namespace CrazyStorm
         }
         void InitializeLayer()
         {
+            selectedLayer = selectedBarrage.Layers.First();
             LayerTree.ItemsSource = selectedBarrage.Layers;
             LayerAxis.ItemsSource = selectedBarrage.Layers;
             CopyLayer.IsEnabled = false;
             DeleteLayer.IsEnabled = false;
             SetLayer.IsEnabled = false;
+        }
+        void InitializeEdit()
+        {
+            Cut.IsEnabled = false;
+            Copy.IsEnabled = false;
+            Paste.IsEnabled = false;
+            Undo.IsEnabled = false;
+            Redo.IsEnabled = false;
+            CutButton.IsEnabled = false;
+            CopyButton.IsEnabled = false;
+            PasteButton.IsEnabled = false;
+            UndoButton.IsEnabled = false;
+            RedoButton.IsEnabled = false;
         }
         void InitializeStatus()
         {

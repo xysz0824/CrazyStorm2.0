@@ -22,6 +22,10 @@ namespace CrazyStorm
 {
     public partial class Main
     {
+        #region Private Members
+        Layer selectedLayer;
+        #endregion
+
         #region Private Methods
         void CreateNewLayer()
         {
