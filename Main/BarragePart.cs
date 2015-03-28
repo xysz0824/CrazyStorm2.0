@@ -22,17 +22,20 @@ namespace CrazyStorm
     public partial class Main
     {
         #region Private Members
+        static readonly string[] componentNames = new string[] 
+        { "", "Emitter", "Laser", "Mask", "Rebound", "Force" };
         Barrage selectedBarrage;
-        DependencyObject aimBox;
+        DependencyObject aimRect;
         Component aimComponent;
-        DependencyObject selectingBox;
+        DependencyObject selectionRect;
+        readonly List<Component> selectComponents = new List<Component>();
         bool selecting;
-        static readonly string[] componentNames = new string[] { "", "Emitter", "Laser", "Mask", "Rebound", "Force" };
         #endregion
 
         #region Private Methods
         void UpdateScreen()
         {
+            //Update everything in current screen.
             var content = (DependencyObject)BarrageTabControl.SelectedContent;
             var canvas = VisualDownwardSearch(content, "ComponentLayer") as Canvas;
             if (canvas != null)
@@ -40,24 +43,50 @@ namespace CrazyStorm
                 canvas.Children.Clear();
                 var itemTemplate = FindResource("ComponentItem") as DataTemplate;
                 foreach (var layer in selectedBarrage.Layers)
-                    foreach (var component in layer.Components)
-                    {
-                        var item = itemTemplate.LoadContent();
-                        var frame = VisualDownwardSearch(item, "Frame") as Label;
-                        frame.DataContext = layer;
-                        var icon = VisualDownwardSearch(item, "Icon") as Image;
-                        for (int i = 0; i < componentNames.Length; ++i)
-                            if (componentNames[i] == component.GetType().Name)
-                            {
-                                icon.Source = new BitmapImage(new Uri(@"Images/button" + i + ".png", UriKind.Relative));
-                                break;
-                            }
+                    if (layer.Visible)
+                        foreach (var component in layer.Components)
+                        {
+                            var item = itemTemplate.LoadContent() as Canvas;
+                            var frame = VisualDownwardSearch(item, "Frame") as Label;
+                            frame.DataContext = layer;
+                            var icon = VisualDownwardSearch(item, "Icon") as Image;
+                            icon.DataContext = component;
+                            for (int i = 0; i < componentNames.Length; ++i)
+                                if (componentNames[i] == component.GetType().Name)
+                                {
+                                    icon.Source = new BitmapImage(new Uri(@"Images/button" + i + ".png", UriKind.Relative));
+                                    break;
+                                }
 
-                        item.SetValue(Canvas.LeftProperty, (double)component.X);
-                        item.SetValue(Canvas.TopProperty, (double)component.Y);
-                        canvas.Children.Add(item as UIElement);
-                    }
+                            item.SetValue(Canvas.LeftProperty, (double)component.X);
+                            item.SetValue(Canvas.TopProperty, (double)component.Y);
+                            canvas.Children.Add(item as UIElement);
+                        }
             }
+        }
+        void SelectComponent(int x, int y, int width, int height)
+        {
+            //Select those involved in selection rect. 
+            selectComponents.Clear();
+            var content = (DependencyObject)BarrageTabControl.SelectedContent;
+            var canvas = VisualDownwardSearch(content, "ComponentLayer") as Canvas;
+            int index = 0;
+            if (canvas != null)
+                foreach (var layer in selectedBarrage.Layers)
+                    if (layer.Visible)
+                        foreach (var component in layer.Components)
+                        {
+                            var box = VisualDownwardSearch(canvas.Children[index], "Box") as Image;
+                            box.Opacity = 0;
+                            var selectRect = new Rect(x, y, width, height);
+                            var componentRect = new Rect(component.X, component.Y, 32, 32);
+                            if (selectRect.IntersectsWith(componentRect))
+                            {
+                                box.Opacity = 1;
+                                selectComponents.Add(component);
+                            }
+                            index++;
+                        }
         }
         void CreateNewBarrage()
         {
@@ -113,38 +142,41 @@ namespace CrazyStorm
             int y = (int)point.Y;
             if (x >= 0 && x < config.ScreenWidth && y >= 0 && y < config.ScreenHeight)
             {
-                if (aimBox != null)
+                //Display a rect with red edge to mark the position that component will be put.
+                if (aimRect != null)
                 {
                     if (config.GridAlignment)
                     {
-                        aimBox.SetValue(Canvas.LeftProperty, (double)((x / 32) * 32));
-                        aimBox.SetValue(Canvas.TopProperty, (double)((y / 32) * 32));
+                        aimRect.SetValue(Canvas.LeftProperty, (double)((x / 32) * 32));
+                        aimRect.SetValue(Canvas.TopProperty, (double)((y / 32) * 32));
                     }
                     else if (x <= config.ScreenWidth - 32 && y <= config.ScreenHeight - 32)
                     {
-                        aimBox.SetValue(Canvas.LeftProperty, (double)x);
-                        aimBox.SetValue(Canvas.TopProperty, (double)y);
+                        aimRect.SetValue(Canvas.LeftProperty, (double)x);
+                        aimRect.SetValue(Canvas.TopProperty, (double)y);
                     }
                 }
-                if (selectingBox != null)
+                //Display a coloured  rect to mark the range that is selecting.
+                if (selectionRect != null)
                 {
-                    var width =  x - (double)selectingBox.GetValue(Canvas.LeftProperty);
+                    var width =  x - (double)selectionRect.GetValue(Canvas.LeftProperty);
                     if (width <= 0)
                         width = 0;
-                    var height = y - (double)selectingBox.GetValue(Canvas.TopProperty);
+                    var height = y - (double)selectionRect.GetValue(Canvas.TopProperty);
                     if (height <= 0)
                         height = 0;
-                    selectingBox.SetValue(WidthProperty, width);
-                    selectingBox.SetValue(HeightProperty, height);
+                    selectionRect.SetValue(WidthProperty, width);
+                    selectionRect.SetValue(HeightProperty, height);
                 }
             }
         }
         private void Screen_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
         {
-            if (aimBox != null)
+            //Take away the rect.
+            if (aimRect != null)
             {
-                aimBox.SetValue(OpacityProperty, 0.0d);
-                aimBox = null;
+                aimRect.SetValue(OpacityProperty, 0.0d);
+                aimRect = null;
             }
         }
         private void Screen_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
@@ -154,16 +186,20 @@ namespace CrazyStorm
             int y = (int)point.Y;
             selecting = true;
             var content = (DependencyObject)BarrageTabControl.SelectedContent;
-            selectingBox = VisualDownwardSearch(content, "SelectingBox");
-            selectingBox.SetValue(Canvas.LeftProperty, (double)x);
-            selectingBox.SetValue(Canvas.TopProperty, (double)y);
-            if (aimBox != null)
+            selectionRect = VisualDownwardSearch(content, "SelectingBox");
+            selectionRect.SetValue(Canvas.LeftProperty, (double)x);
+            selectionRect.SetValue(Canvas.TopProperty, (double)y);
+            //Add component to the place where mouse down with left-button.
+            if (aimRect != null)
             {
-                aimBox.SetValue(OpacityProperty, 0.0d);
-                var boxX = (double)aimBox.GetValue(Canvas.LeftProperty);
-                var boxY = (double)aimBox.GetValue(Canvas.TopProperty);
-                AddComponent(aimComponent, (int)boxX, (int)boxY);
-                aimBox = null;
+                aimRect.SetValue(OpacityProperty, 0.0d);
+                var boxX = (double)aimRect.GetValue(Canvas.LeftProperty);
+                var boxY = (double)aimRect.GetValue(Canvas.TopProperty);
+                aimComponent.X = (int)boxX;
+                aimComponent.Y = (int)boxY;
+                selectedBarrage.AddComponentToLayer(selectedLayer, aimComponent);
+                UpdateScreen();
+                aimRect = null;
             }
         }
         private void BarrageTabControl_MouseLeave(object sender, MouseEventArgs e)
@@ -173,22 +209,30 @@ namespace CrazyStorm
         }
         private void BarrageTabControl_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
+            //Cancel selection.
             selecting = false;
-            if (selectingBox != null)
+            if (selectionRect != null)
             {
-                selectingBox.SetValue(WidthProperty, 0.0d);
-                selectingBox.SetValue(HeightProperty, 0.0d);
-                selectingBox = null;
+                var x = (double)selectionRect.GetValue(LeftProperty);
+                var y = (double)selectionRect.GetValue(TopProperty);
+                var width = (double)selectionRect.GetValue(WidthProperty);
+                var height = (double)selectionRect.GetValue(HeightProperty);
+                SelectComponent((int)x, (int)y, (int)width, (int)height);
+                selectionRect.SetValue(WidthProperty, 0.0d);
+                selectionRect.SetValue(HeightProperty, 0.0d);
+                selectionRect = null;
             }
         }
         private void ScreenSetting_Click(object sender, RoutedEventArgs e)
         {
+            //Open screen setting window.
             ScreenSetting window = new ScreenSetting(config);
             window.Owner = this;
             window.ShowDialog();
         }
         private void BarrageMenu_Click(object sender, RoutedEventArgs e)
         {
+            //Navigate to the corresponding function of barrage menu.
             var item = e.Source as MenuItem;
             switch (item.Name)
             {
@@ -208,6 +252,7 @@ namespace CrazyStorm
         }
         private void BarrageTabControl_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
+            //Maintain selected barrage.
             if (e.AddedItems.Count > 0)
             {
                 UpdateScreen();

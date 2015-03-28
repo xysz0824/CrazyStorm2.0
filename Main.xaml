@@ -98,7 +98,7 @@
                 </Setter.Value>
             </Setter>
         </Style>
-        <DataTemplate x:Key="ComponentItem">
+        <DataTemplate x:Key="ComponentItem" >
             <Canvas>
                 <Label Name="Frame" Width="32" Height="32">
                     <Label.Background>
@@ -109,7 +109,8 @@
                         </ImageBrush>
                     </Label.Background>
                 </Label>
-                <Image Name="Icon" Canvas.Left="2" Canvas.Top="2" Stretch="Uniform" Width="28" Height="28"/>
+                <Image Name="Icon" Canvas.Left="2" Canvas.Top="2" Stretch="Uniform" Width="28" Height="28" />
+                <Image Name="Box" Opacity="0" Source="Images/aimBox.png" Width="32" Height="32" />
             </Canvas>
         </DataTemplate>
     </Window.Resources>
@@ -258,7 +259,7 @@
                         </TabControl.Background>
                         <TabControl.ItemTemplate>
                             <DataTemplate>
-                                <Canvas Name="Screen" Width="{Binding Path=ScreenWidth}" Height="{Binding Path=ScreenHeight}" MouseMove="Screen_MouseMove" MouseRightButtonDown="Screen_MouseRightButtonDown" MouseLeftButtonDown="Screen_MouseLeftButtonDown">
+                                <Canvas Name="Screen" Width="{Binding Path=ScreenWidth}" Height="{Binding Path=ScreenHeight}" PreviewMouseLeftButtonDown="Screen_MouseLeftButtonDown" PreviewMouseMove="Screen_MouseMove" PreviewMouseRightButtonDown="Screen_MouseRightButtonDown">
                                     <Canvas.Background>
                                         <SolidColorBrush Color="Black"/>
                                     </Canvas.Background>
@@ -330,7 +331,7 @@
                                 <TreeView Name="ComponentList" Padding="-2,1,1,1">
                                     <TreeView.ItemTemplate >
                                         <HierarchicalDataTemplate ItemsSource="{Binding Children}">
-                                            <TextBlock Text="{Binding Name}">
+                                            <TextBlock Text="{Binding Name}" MouseLeftButtonDown="ComponentList_MouseLeftButtonDown">
                                                 <TextBlock.Style >
                                                     <Style TargetType="TextBlock">
                                                         <Style.Triggers>

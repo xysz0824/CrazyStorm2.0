@@ -25,6 +25,7 @@ namespace CrazyStorm
         #region Window EventHandler
         private void ImageList_PreviewMouseRightButtonDown(object sender, MouseButtonEventArgs e)
         {
+            //Focus pointed item when mouse right-button down.
             var item = VisualUpwardSearch<TreeViewItem>(e.OriginalSource as DependencyObject) as TreeViewItem;
             if (item != null)
             {
@@ -34,6 +35,7 @@ namespace CrazyStorm
         }
         private void AddImage_Click(object sender, RoutedEventArgs e)
         {
+            //Open file dialog to add a new image.
             using (var open = new System.Windows.Forms.OpenFileDialog())
             {
                 open.Filter = (string)FindResource("ImageType");
@@ -46,6 +48,7 @@ namespace CrazyStorm
         }
         private void DeleteImage_Click(object sender, RoutedEventArgs e)
         {
+            //Delete selected image.
             var item = ImageList.SelectedItem as Resource;
             file.Images.Remove(item);
         }

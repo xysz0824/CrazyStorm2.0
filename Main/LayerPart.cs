@@ -29,14 +29,17 @@ namespace CrazyStorm
         #region Private Methods
         void CreateNewLayer()
         {
-            selectedBarrage.Layers.Add(new Layer("New Layer"));
+            selectedBarrage.AddLayer(new Layer("New Layer"));
         }
         void DeleteSelectedLayer()
         {
             if (selectedBarrage.Layers.Count > 1)
-                selectedBarrage.Layers.Remove(selectedLayer);
+            {
+                selectedBarrage.DeleteLayer(selectedLayer);
+                UpdateScreen();
+            }
             else
-                MessageBox.Show((string)FindResource("CanNotDeleteAllLayer"), (string)FindResource("TipTitle"), 
+                MessageBox.Show((string)FindResource("CanNotDeleteAllLayer"), (string)FindResource("TipTitle"),
                     MessageBoxButton.OK, MessageBoxImage.Warning);
         }
         void CopySelectedLayer()
@@ -54,6 +57,7 @@ namespace CrazyStorm
         #region Window EventHandler
         private void TimeAxis_MouseMove(object sender, MouseEventArgs e)
         {
+            //Display the frame that mouse pointed on tooltip.
             var pos = e.GetPosition(TimeAxis);
             var textBlock = axisTip.Content as TextBlock;
             textBlock.Text = ((int)(pos.X + 1) / 3).ToString();
@@ -66,6 +70,7 @@ namespace CrazyStorm
         }
         private void LayerTree_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
+            //Maintain selected layer.
             if (LayerTree.SelectedItem != null)
                 selectedLayer = selectedBarrage.Layers[LayerTree.Items.IndexOf(LayerTree.SelectedItem)];
             else
@@ -77,11 +82,14 @@ namespace CrazyStorm
         }
         private void LayerVisible_MouseUp(object sender, MouseButtonEventArgs e)
         {
+            //Set the visibllity of layer.
             var visible = sender as Label;
             selectedLayer.Visible = visible.Opacity == 0 ? true : false;
+            UpdateScreen();
         }
         private void LayerDown_MouseUp(object sender, MouseButtonEventArgs e)
         {
+            //Move down selected layer.
             if (selectedLayer == null)
                 return;
             int index = selectedBarrage.Layers.IndexOf(selectedLayer);
@@ -94,8 +102,10 @@ namespace CrazyStorm
         }
         private void LayerUp_MouseUp(object sender, MouseButtonEventArgs e)
         {
+            //Move up selected layer.
             if (selectedLayer == null)
                 return;
+
             int index = selectedBarrage.Layers.IndexOf(selectedLayer);
             if (index != 0)
             {
@@ -106,8 +116,10 @@ namespace CrazyStorm
         }
         private void LayerColor_MouseUp(object sender, MouseButtonEventArgs e)
         {
+            //Set the color of layer.
             if (selectedLayer == null)
                 return;
+
             if (Enum.IsDefined(typeof(LayerColor), selectedLayer.Color + 1))
                 selectedLayer.Color += 1;
             else
@@ -115,6 +127,7 @@ namespace CrazyStorm
         }
         private void LayerMenu_Click(object sender, RoutedEventArgs e)
         {
+            //Navigate to the corresponding function of layer menu.
             var item = e.Source as MenuItem;
             switch (item.Name)
             {
@@ -134,6 +147,7 @@ namespace CrazyStorm
         }
         private void LayerScrollViewer_ScrollChanged(object sender, ScrollChangedEventArgs e)
         {
+            //Keep pace with the scroll viewer of layer axis.
             double offset = e.VerticalOffset;
             ListViewAutomationPeer lvap = new ListViewAutomationPeer(LayerAxis);
             var svap = lvap.GetPattern(PatternInterface.Scroll) as ScrollViewerAutomationPeer;
@@ -154,6 +168,7 @@ namespace CrazyStorm
         }
         private void LayerElement_PreviewMouseRightButtonDown(object sender, MouseButtonEventArgs e)
         {
+            //Focus pointed item when mouse right-button down.
             var item = VisualUpwardSearch<TreeViewItem>(e.OriginalSource as DependencyObject) as TreeViewItem;
             if (item != null)
             {

@@ -28,23 +28,13 @@ namespace CrazyStorm
         { "EmitterImage", "LaserImage", "MaskImage", "ReboundImage", "ForceImage" };
         #endregion
 
-        #region Private Methods
-        void AddComponent(CoreLibrary.Component component, int x, int y)
-        {
-            component.X = x;
-            component.Y = y;
-            selectedBarrage.Components.Add(aimComponent);
-            selectedLayer.Components.Add(aimComponent);
-            UpdateScreen();
-        }
-        #endregion
-
         #region Window EventHandler
         private void Component_Click(object sender, RoutedEventArgs e)
         {
+            //Create corresponding component according to different button.
             var button = sender as Button;
-            aimBox = VisualDownwardSearch((DependencyObject)BarrageTabControl.SelectedContent, "AimBox");
-            aimBox.SetValue(OpacityProperty, 1.0d);
+            aimRect = VisualDownwardSearch((DependencyObject)BarrageTabControl.SelectedContent, "AimBox");
+            aimRect.SetValue(OpacityProperty, 1.0d);
             switch (button.Name)
             {
                 case "Emitter":
@@ -66,6 +56,7 @@ namespace CrazyStorm
         }
         private void Component_MouseEnter(object sender, MouseEventArgs e)
         {
+            //Light up button when mouse enter.
             var image = sender as Image;
             for (int i = 1; i <= componentImages.Length; ++i)
                 if (image.Name == componentImages[i - 1])
@@ -76,11 +67,23 @@ namespace CrazyStorm
         }
         private void Component_MouseLeave(object sender, MouseEventArgs e)
         {
+            //Reset button when mouse leave.
             var image = sender as Image;
             for (int i = 1; i <= componentImages.Length; ++i)
                 if (image.Name == componentImages[i - 1])
                 {
                     image.Source = new BitmapImage(new Uri(@"Images\button" + i + ".png", UriKind.Relative));
+                    break;
+                }
+        }
+        private void ComponentList_MouseLeftButtonDown(object sender, MouseEventArgs e)
+        {
+            //Select pointed component when mouse left-button down. 
+            var textBlock = sender as TextBlock;
+            foreach (var component in selectedBarrage.Components)
+                if (component == textBlock.DataContext)
+                {
+                    SelectComponent((int)component.X, (int)component.Y, 1, 1);
                     break;
                 }
         }
