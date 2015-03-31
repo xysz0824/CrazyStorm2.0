@@ -49,4 +49,10 @@
     <sys:String x:Key="BackGroundImageType">
         JPEG图像(*.jpg)|*.jpg|PNG图像(*.png)|*.png|BMP图像(*.bmp)|*.bmp
     </sys:String>
+    <sys:String x:Key="DoubleClickTip">
+        继续双击进入属性面板
+    </sys:String>
+    <sys:String x:Key="ComponentUnit">
+        个组件
+    </sys:String>
 </ResourceDictionary>

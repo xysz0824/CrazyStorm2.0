@@ -115,6 +115,7 @@
         </DataTemplate>
     </Window.Resources>
     <DockPanel Height="Auto" Name="dockPanel1" Width="Auto">
+        <!-- Top Menu -->
         <Menu Height="23" Name="menu1" Width="Auto" DockPanel.Dock="Top" Padding="2,0,0,0" IsEnabled="True">
             <Menu.Background>
                 <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
@@ -185,9 +186,11 @@
                 <MenuItem Header="关于" />
             </MenuItem>
         </Menu>
+        <!-- Status Bar -->
         <StatusBar Height="23" Width="Auto" DockPanel.Dock="Bottom" Background="#FFE4E4E4" Padding="1,0,6,0">
             <StatusBarItem Name="StatusText" Content="{Binding Path=Status}" />
         </StatusBar>
+        <!-- Tool Bar -->
         <ToolBar Height="34" Name="ToolBar" Width="Auto" DockPanel.Dock="Top" HorizontalAlignment="Stretch" AllowDrop="False">
             <ToolBar.Background>
                 <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
@@ -232,6 +235,7 @@
                 <Image Source="Images/configure-5.ico" Stretch="None" />
             </Button>
         </ToolBar>
+        <!-- Middle Grid -->
         <Grid Height="Auto" Name="grid1" Width="Auto">
             <Grid.RowDefinitions>
                 <RowDefinition/>
@@ -249,6 +253,7 @@
                     <ColumnDefinition/>
                 </Grid.ColumnDefinitions>
                 <GridSplitter HorizontalAlignment="Right" Name="gridSplitter3" Width="1" Background="#FFDBDBDB" IsEnabled="False"/>
+                <!-- Screen -->
                 <ScrollViewer  Grid.Column="1" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
                     <TabControl Name="BarrageTabControl" SelectionChanged="BarrageTabControl_SelectionChanged" MouseLeave="BarrageTabControl_MouseLeave" MouseLeftButtonUp="BarrageTabControl_MouseLeftButtonUp">
                         <TabControl.Background>
@@ -303,10 +308,11 @@
                         </TabControl.ItemTemplate>
                     </TabControl>
                 </ScrollViewer>
+                <!-- Sidebar -->
                 <TabControl  Margin="0,0,0,0" Name="LeftTabControl">
                     <TabItem Header="组件" Name="Frequent" Padding="6,5,6,1" HorizontalAlignment="Left" Width="42">
                         <DockPanel Name="ComponentPanel">
-                            <GroupBox DockPanel.Dock="Top" Header="组件板" Name="groupBox1" VerticalAlignment="Top" Height="60" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" BorderBrush="#FFC6C6C6">
+                            <GroupBox DockPanel.Dock="Top" Header="组件板" VerticalAlignment="Top" Height="60" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" BorderBrush="#FFC6C6C6">
                                 <StackPanel Name="stackPanel1" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
                                     <Button Name="Emitter" Width="33" Height="33" Padding="0" Margin="1,1,2,1" Background="#00000000" Click="Component_Click">
                                         <Image Name="EmitterImage" Source="Images/button1.png" Stretch="Uniform" ToolTip="发射器" MouseEnter="Component_MouseEnter" MouseLeave="Component_MouseLeave" Width="27" Height="27" />
@@ -325,8 +331,24 @@
                                     </Button>
                                 </StackPanel>
                             </GroupBox>
-                            <Canvas DockPanel.Dock="Bottom" Height="100">
-                            </Canvas>
+                            <GroupBox DockPanel.Dock="Bottom" Header="已选中" Height="100" BorderBrush="#FFC6C6C6" Name="SelectedGroup" Opacity="0">
+                                <GroupBox.Background>
+                                    <ImageBrush ImageSource="Images/selectedgroup.png" Stretch="Uniform"/>
+                                </GroupBox.Background>
+                                <Canvas>
+                                    <Canvas.Background>
+                                        <ImageBrush/>
+                                    </Canvas.Background>
+                                    <Image Source="Images/button1.png" Width="42" Canvas.Left="10" Canvas.Top="10" >
+                                        <Image.Effect>
+                                            <DropShadowEffect ShadowDepth="0" BlurRadius="10" Opacity="0.5"/>
+                                        </Image.Effect>
+                                    </Image>
+                                    <TextBlock Name="SelectedGroupType" Canvas.Left="66" Canvas.Top="10" />
+                                    <TextBlock Name="SelectedGroupName" Canvas.Left="66" Canvas.Top="26" FontSize="20" />
+                                    <TextBlock Name="SelectedGroupTip" Canvas.Left="8" Canvas.Top="59" Foreground="#FF8B8B8B" />
+                                </Canvas>
+                            </GroupBox>
                             <GroupBox Header="组件浏览器" Name="Explorer" >
                                 <TreeView Name="ComponentList" Padding="-2,1,1,1">
                                     <TreeView.ItemTemplate >
@@ -405,6 +427,7 @@
                     </TabItem>
                 </TabControl>
             </Grid>
+            <!-- Layerbar -->
             <Grid Grid.Row="1" Name="grid2" ShowGridLines="False" Margin="0">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="210"/>

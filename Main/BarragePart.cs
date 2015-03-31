@@ -28,7 +28,7 @@ namespace CrazyStorm
         DependencyObject aimRect;
         Component aimComponent;
         DependencyObject selectionRect;
-        readonly List<Component> selectComponents = new List<Component>();
+        readonly List<Component> selectedComponents = new List<Component>();
         bool selecting;
         #endregion
 
@@ -67,7 +67,7 @@ namespace CrazyStorm
         void SelectComponent(int x, int y, int width, int height)
         {
             //Select those involved in selection rect. 
-            selectComponents.Clear();
+            selectedComponents.Clear();
             var content = (DependencyObject)BarrageTabControl.SelectedContent;
             var canvas = VisualDownwardSearch(content, "ComponentLayer") as Canvas;
             int index = 0;
@@ -83,10 +83,32 @@ namespace CrazyStorm
                             if (selectRect.IntersectsWith(componentRect))
                             {
                                 box.Opacity = 1;
-                                selectComponents.Add(component);
+                                selectedComponents.Add(component);
                             }
                             index++;
                         }
+        }
+        void UpdateSelectedGroup()
+        {
+            if (selectedComponents.Count > 0)
+            {
+                SelectedGroup.Opacity = 1;
+                if (selectedComponents.Count == 1)
+                {
+                    var component = selectedComponents.First();
+                    SelectedGroupType.Text = component.GetType().Name;
+                    SelectedGroupName.Text = component.Name;
+                    SelectedGroupTip.Text = (string)FindResource("DoubleClickTip");
+                }
+                else
+                {
+                    SelectedGroupType.Text = "Group";
+                    SelectedGroupName.Text = selectedComponents.Count + (string)FindResource("ComponentUnit");
+                    SelectedGroupTip.Text = string.Empty;
+                }
+            }
+            else
+                SelectedGroup.Opacity = 0;
         }
         void CreateNewBarrage()
         {
@@ -142,7 +164,7 @@ namespace CrazyStorm
             int y = (int)point.Y;
             if (x >= 0 && x < config.ScreenWidth && y >= 0 && y < config.ScreenHeight)
             {
-                //Display a rect with red edge to mark the position that component will be put.
+                //Display a rect with red edge to mark the location that component will be put on.
                 if (aimRect != null)
                 {
                     if (config.GridAlignment)
@@ -209,7 +231,7 @@ namespace CrazyStorm
         }
         private void BarrageTabControl_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
-            //Cancel selection.
+            //Determine selection of components.
             selecting = false;
             if (selectionRect != null)
             {
@@ -218,6 +240,7 @@ namespace CrazyStorm
                 var width = (double)selectionRect.GetValue(WidthProperty);
                 var height = (double)selectionRect.GetValue(HeightProperty);
                 SelectComponent((int)x, (int)y, (int)width, (int)height);
+                UpdateSelectedGroup();
                 selectionRect.SetValue(WidthProperty, 0.0d);
                 selectionRect.SetValue(HeightProperty, 0.0d);
                 selectionRect = null;

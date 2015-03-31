@@ -102,6 +102,7 @@
     <Compile Include="Converter\LayerLengthConverter.cs" />
     <Compile Include="Converter\LayerStartConverter.cs" />
     <Compile Include="Converter\ResourceValidConverter.cs" />
+    <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="LayerSetting.xaml.cs">
       <DependentUpon>LayerSetting.xaml</DependentUpon>
     </Compile>
@@ -233,6 +234,9 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Images\selecting.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\selectedgroup.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
