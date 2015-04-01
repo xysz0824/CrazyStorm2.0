@@ -96,6 +96,8 @@
       <DependentUpon>BarrageSetting.xaml</DependentUpon>
     </Compile>
     <Compile Include="Command\Command.cs" />
+    <Compile Include="Command\CommandStack.cs" />
+    <Compile Include="Command\DelComponentCommand.cs" />
     <Compile Include="Converter\LayerAxisConverter.cs" />
     <Compile Include="Converter\LayerIconConverter.cs" />
     <Compile Include="Config\Config.cs" />
@@ -113,6 +115,7 @@
     <Compile Include="Main\ComponentPart.cs" />
     <Compile Include="Main\LayerPart.cs" />
     <Compile Include="Main\ResourcePart.cs" />
+    <Compile Include="Main\ShortcutPart.cs" />
     <Compile Include="ScreenSetting.xaml.cs">
       <DependentUpon>ScreenSetting.xaml</DependentUpon>
     </Compile>

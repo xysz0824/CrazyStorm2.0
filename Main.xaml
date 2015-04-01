@@ -113,7 +113,16 @@
                 <Image Name="Box" Opacity="0" Source="Images/aimBox.png" Width="32" Height="32" />
             </Canvas>
         </DataTemplate>
+        <RoutedUICommand x:Key="DelComponent" Text="DelComponent"/>
     </Window.Resources>
+    <Window.InputBindings>
+        <KeyBinding  Key="Delete" Command="{StaticResource DelComponent}" />
+    </Window.InputBindings>
+    <Window.CommandBindings>
+        <CommandBinding Command="{StaticResource DelComponent}"
+                                            CanExecute="CommandBinding_CanExecute"
+                                            Executed="CommandBinding_Executed" />
+    </Window.CommandBindings>
     <DockPanel Height="Auto" Name="dockPanel1" Width="Auto">
         <!-- Top Menu -->
         <Menu Height="23" Name="menu1" Width="Auto" DockPanel.Dock="Top" Padding="2,0,0,0" IsEnabled="True">
@@ -166,14 +175,10 @@
                 <MenuItem x:Name="SetLayer" Header="图层设置" />
             </MenuItem>
             <MenuItem Header="组件" >
-                <MenuItem Header="添加发射器" />
-                <MenuItem Header="添加激光" />
-                <MenuItem Header="添加遮罩" />
-                <MenuItem Header="添加反弹板" />
-                <MenuItem Header="添加遮罩" />
+                <MenuItem x:Name="DeleteComponent" Header="删除组件" InputGestureText="Del" Click="DeleteComponent_Click" />
                 <Separator/>
-                <MenuItem Header="组件绑定" InputGestureText="Ctrl+B"/>
-                <MenuItem Header="组件解绑" InputGestureText="Ctrl+N"/>
+                <MenuItem x:Name="BindComponent" Header="组件绑定" InputGestureText="Ctrl+B"/>
+                <MenuItem x:Name="UnbindComponent" Header="组件解绑" InputGestureText="Ctrl+N"/>
             </MenuItem>
             <MenuItem Header="测试" >
                 <MenuItem Header="测试当前弹幕" InputGestureText="F5"/>
@@ -253,7 +258,7 @@
                     <ColumnDefinition/>
                 </Grid.ColumnDefinitions>
                 <GridSplitter HorizontalAlignment="Right" Name="gridSplitter3" Width="1" Background="#FFDBDBDB" IsEnabled="False"/>
-                <!-- Screen -->
+                <!-- BarrageScreen -->
                 <ScrollViewer  Grid.Column="1" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
                     <TabControl Name="BarrageTabControl" SelectionChanged="BarrageTabControl_SelectionChanged" MouseLeave="BarrageTabControl_MouseLeave" MouseLeftButtonUp="BarrageTabControl_MouseLeftButtonUp">
                         <TabControl.Background>

@@ -41,7 +41,8 @@ namespace CrazyStorm
         void InitializeSetting()
         {
             Setting.DataContext = layer;
-            var item = ColorPalette.Children[(int)layer.Color] as Label;
+            selectedColor = (int)layer.Color;
+            var item = ColorPalette.Children[selectedColor] as Label;
             item.BorderThickness = new Thickness(1);
         }
         #endregion

@@ -87,6 +87,12 @@ namespace CrazyStorm
                             }
                             index++;
                         }
+
+            //Enable delection if selected one or more
+            DeleteComponent.IsEnabled = selectedComponents.Count > 0;
+            //Enable binding if selected one
+            BindComponent.IsEnabled = selectedComponents.Count == 1;
+            UnbindComponent.IsEnabled = BindComponent.IsEnabled;
         }
         void UpdateSelectedGroup()
         {
@@ -246,6 +252,21 @@ namespace CrazyStorm
                 selectionRect = null;
             }
         }
+        private void BarrageTabControl_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            //Maintain selected barrage.
+            if (e.AddedItems.Count > 0)
+            {
+                UpdateScreen();
+                var tabItem = e.AddedItems[0] as TabItem;
+                foreach (var item in file.Barrages)
+                    if (item.Name == (string)tabItem.Header)
+                    {
+                        selectedBarrage = item;
+                        break;
+                    }
+            }
+        }
         private void ScreenSetting_Click(object sender, RoutedEventArgs e)
         {
             //Open screen setting window.
@@ -273,20 +294,10 @@ namespace CrazyStorm
                     break;
             }
         }
-        private void BarrageTabControl_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void DeleteComponent_Click(object sender, RoutedEventArgs e)
         {
-            //Maintain selected barrage.
-            if (e.AddedItems.Count > 0)
-            {
-                UpdateScreen();
-                var tabItem = e.AddedItems[0] as TabItem;
-                foreach (var item in file.Barrages)
-                    if (item.Name == (string)tabItem.Header)
-                    {
-                        selectedBarrage = item;
-                        break;
-                    }
-            }
+            new DelComponentCommand().Do(selectedBarrage, selectedComponents);
+            Update();
         }
         #endregion
     }

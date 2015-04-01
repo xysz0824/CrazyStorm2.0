@@ -88,6 +88,7 @@ namespace CrazyStorm
         void InitializeSystem()
         {
             LoadConfig();
+            InitializeCommandStack();
             InitializeFile();
             InitializeBarrage();
             InitializeLayer();
@@ -99,6 +100,10 @@ namespace CrazyStorm
         {
             config = new Config();
             //TODO : Load config.
+        }
+        void InitializeCommandStack()
+        {
+            CommandStack.Clear();
         }
         void InitializeFile()
         {
@@ -113,6 +118,9 @@ namespace CrazyStorm
             BarrageTabControl.DataContext = config;
             AddNewBarrageTab(selectedBarrage);
             ComponentList.ItemsSource = selectedBarrage.Components;
+            DeleteComponent.IsEnabled = false;
+            BindComponent.IsEnabled = false;
+            UnbindComponent.IsEnabled = false;
         }
         void InitializeLayer()
         {

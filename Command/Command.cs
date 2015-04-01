@@ -6,18 +6,19 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Windows.Input;
 
 namespace CrazyStorm
 {
     abstract class Command
     {
-        object target;
-
-        public Command(object target)
+        public virtual void Do(params object[] parameter)
         {
-            this.target = target;
+            CommandStack.DoPush(this);
         }
-        public abstract void Do();
-        public abstract void Undo();
+        public virtual void Undo(params object[] parameter)
+        {
+            CommandStack.UndoPush(this);
+        }
     }
 }
