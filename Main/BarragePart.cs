@@ -31,13 +31,21 @@ namespace CrazyStorm
         readonly List<Component> selectedComponents = new List<Component>();
         bool selecting;
         #endregion
-
+        //Mainly implement operation to data.
         #region Private Methods
         void UpdateScreen()
         {
             //Update everything in current screen.
-            var content = (DependencyObject)BarrageTabControl.SelectedContent;
-            var canvas = VisualDownwardSearch(content, "ComponentLayer") as Canvas;
+            Canvas canvas = null;
+            foreach (TabItem item in BarrageTabControl.Items)
+            {
+                var content = item.Content as Canvas;
+                if ((string)item.Header == selectedBarrage.Name)
+                {
+                    canvas = VisualDownwardSearch(content, "ComponentLayer") as Canvas;
+                    break;
+                }
+            }
             if (canvas != null)
             {
                 canvas.Children.Clear();
@@ -72,6 +80,7 @@ namespace CrazyStorm
             var canvas = VisualDownwardSearch(content, "ComponentLayer") as Canvas;
             int index = 0;
             if (canvas != null)
+            {
                 foreach (var layer in selectedBarrage.Layers)
                     if (layer.Visible)
                         foreach (var component in layer.Components)
@@ -83,19 +92,63 @@ namespace CrazyStorm
                             if (selectRect.IntersectsWith(componentRect))
                             {
                                 box.Opacity = 1;
+                                //Prevent overlay shade from other preceding components.
+                                if (width == 0 && height == 0 && selectedComponents.Count > 0)
+                                    selectedComponents[selectedComponents.Count - 1] = component;
+                                else
+                                    selectedComponents.Add(component);
+                            }
+                            index++;
+                        }
+            }
+            //Enable delection if selected one or more.
+            DeleteComponent.IsEnabled = selectedComponents.Count > 0;
+            //Enable binding if selected one.
+            BindComponent.IsEnabled = selectedComponents.Count == 1;
+            UnbindComponent.IsEnabled = BindComponent.IsEnabled;
+            //Update.
+            UpdateSelectedGroup();
+        }
+        void SelectComponent(Component target)
+        {
+            selectedComponents.Clear();
+            var content = (DependencyObject)BarrageTabControl.SelectedContent;
+            var canvas = VisualDownwardSearch(content, "ComponentLayer") as Canvas;
+            int index = 0;
+            if (canvas != null && target != null)
+            {
+                foreach (var layer in selectedBarrage.Layers)
+                    if (layer.Visible)
+                        foreach (var component in layer.Components)
+                        {
+                            var box = VisualDownwardSearch(canvas.Children[index], "Box") as Image;
+                            box.Opacity = 0;
+                            if (component == target)
+                            {
+                                box.Opacity = 1;
                                 selectedComponents.Add(component);
                             }
                             index++;
                         }
-
-            //Enable delection if selected one or more
+            }
+            //Enable delection if selected one or more.
             DeleteComponent.IsEnabled = selectedComponents.Count > 0;
-            //Enable binding if selected one
+            //Enable binding if selected one.
             BindComponent.IsEnabled = selectedComponents.Count == 1;
             UnbindComponent.IsEnabled = BindComponent.IsEnabled;
+            //Update.
+            UpdateSelectedGroup();
         }
         void UpdateSelectedGroup()
         {
+            //Clean abandoned component.
+            for (int i = 0; i < selectedComponents.Count; ++i )
+                if (!selectedBarrage.Components.Contains(selectedComponents[i]))
+                {
+                    selectedComponents.RemoveAt(i);
+                    i--;
+                }
+            //Update selected group.
             if (selectedComponents.Count > 0)
             {
                 SelectedGroup.Opacity = 1;
@@ -121,13 +174,14 @@ namespace CrazyStorm
             var barrage = new Barrage("New Barrage");
             file.Barrages.Add(barrage);
             selectedBarrage = barrage;
+            commandStacks[selectedBarrage] = new CommandStack();
             AddNewBarrageTab(barrage);
         }
         void AddNewBarrageTab(Barrage barrage)
         {
-            TabItem tabItem = new TabItem();
+            var tabItem = new TabItem();
             tabItem.Header = barrage.Name;
-            tabItem.Content = BarrageTabControl.ItemTemplate.LoadContent();
+            tabItem.Content = BarrageTabControl.ItemTemplate.LoadContent() as Canvas;
             BarrageTabControl.Items.Add(tabItem);
             BarrageTabControl.SelectedItem = tabItem;
         }
@@ -143,6 +197,7 @@ namespace CrazyStorm
                         break;
                     }
 
+                commandStacks.Remove(selectedBarrage);
                 file.Barrages.Remove(selectedBarrage);
                 BarrageTabControl.Items.Remove(selected);
             }
@@ -161,7 +216,7 @@ namespace CrazyStorm
             window.ShowDialog();
         }
         #endregion
-
+        //Implement control and interaction with UI.
         #region Window EventHandler
         private void Screen_MouseMove(object sender, MouseEventArgs e)
         {
@@ -226,7 +281,7 @@ namespace CrazyStorm
                 aimComponent.X = (int)boxX;
                 aimComponent.Y = (int)boxY;
                 selectedBarrage.AddComponentToLayer(selectedLayer, aimComponent);
-                UpdateScreen();
+                UpdateComponent();
                 aimRect = null;
             }
         }
@@ -246,18 +301,18 @@ namespace CrazyStorm
                 var width = (double)selectionRect.GetValue(WidthProperty);
                 var height = (double)selectionRect.GetValue(HeightProperty);
                 SelectComponent((int)x, (int)y, (int)width, (int)height);
-                UpdateSelectedGroup();
                 selectionRect.SetValue(WidthProperty, 0.0d);
                 selectionRect.SetValue(HeightProperty, 0.0d);
                 selectionRect = null;
             }
+            else
+                SelectComponent(null);
         }
         private void BarrageTabControl_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             //Maintain selected barrage.
             if (e.AddedItems.Count > 0)
             {
-                UpdateScreen();
                 var tabItem = e.AddedItems[0] as TabItem;
                 foreach (var item in file.Barrages)
                     if (item.Name == (string)tabItem.Header)
@@ -265,6 +320,9 @@ namespace CrazyStorm
                         selectedBarrage = item;
                         break;
                     }
+                UpdateBarrage();
+                UpdateLayer();
+                UpdateComponent();
             }
         }
         private void ScreenSetting_Click(object sender, RoutedEventArgs e)
@@ -296,8 +354,8 @@ namespace CrazyStorm
         }
         private void DeleteComponent_Click(object sender, RoutedEventArgs e)
         {
-            new DelComponentCommand().Do(selectedBarrage, selectedComponents);
-            Update();
+            new DelComponentCommand().Do(commandStacks[selectedBarrage], selectedBarrage, selectedComponents);
+            UpdateComponent();
         }
         #endregion
     }

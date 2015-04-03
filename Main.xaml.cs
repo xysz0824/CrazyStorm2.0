@@ -30,6 +30,7 @@ namespace CrazyStorm
         #region Private Members
         Config config;
         File file;
+        Dictionary<Barrage, CommandStack> commandStacks;
         string status = String.Empty;
         #endregion
 
@@ -50,6 +51,7 @@ namespace CrazyStorm
         public Main()
         {
             file = new File("Untitled");
+            commandStacks = new Dictionary<Barrage, CommandStack>();
             InitializeComponent();
             InitializeSystem();
             status = (string)FindResource("Ready");
@@ -88,22 +90,17 @@ namespace CrazyStorm
         void InitializeSystem()
         {
             LoadConfig();
-            InitializeCommandStack();
             InitializeFile();
             InitializeBarrage();
             InitializeLayer();
             InitializeEdit();
             InitializeStatus();
-            UpdateScreen();
+            UpdateComponent();
         }
         void LoadConfig()
         {
             config = new Config();
             //TODO : Load config.
-        }
-        void InitializeCommandStack()
-        {
-            CommandStack.Clear();
         }
         void InitializeFile()
         {
@@ -115,6 +112,7 @@ namespace CrazyStorm
         void InitializeBarrage()
         {
             selectedBarrage = file.Barrages.First();
+            commandStacks[selectedBarrage] = new CommandStack();
             BarrageTabControl.DataContext = config;
             AddNewBarrageTab(selectedBarrage);
             ComponentList.ItemsSource = selectedBarrage.Components;
@@ -147,6 +145,22 @@ namespace CrazyStorm
         void InitializeStatus()
         {
             StatusText.DataContext = this;
+        }
+        void UpdateBarrage()
+        {
+            ComponentList.ItemsSource = selectedBarrage.Components;
+            DeleteComponent.IsEnabled = false;
+            BindComponent.IsEnabled = false;
+            UnbindComponent.IsEnabled = false;
+        }
+        void UpdateLayer()
+        {
+            InitializeLayer();
+        }
+        void UpdateComponent()
+        {
+            UpdateScreen();
+            UpdateSelectedGroup();
         }
         #endregion
     }

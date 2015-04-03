@@ -75,3 +75,4 @@ F:\LargeProject\CrazyStorm2.0\bin\Debug\ja\System.Windows.Interactivity.resource
 F:\LargeProject\CrazyStorm2.0\bin\Debug\ko\System.Windows.Interactivity.resources.dll
 F:\LargeProject\CrazyStorm2.0\bin\Debug\zh-Hans\System.Windows.Interactivity.resources.dll
 F:\LargeProject\CrazyStorm2.0\bin\Debug\zh-Hant\System.Windows.Interactivity.resources.dll
+F:\LargeProject\CrazyStorm2.0\obj\x86\Debug\CrazyStorm2.0.csprojResolveAssemblyReference.cache

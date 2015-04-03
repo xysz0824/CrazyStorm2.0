@@ -27,15 +27,11 @@ namespace CrazyStorm
         static readonly string[] componentImages = new string[] 
         { "EmitterImage", "LaserImage", "MaskImage", "ReboundImage", "ForceImage" };
         #endregion
-
-        #region Window EventHandler
-        private void Component_Click(object sender, RoutedEventArgs e)
+        //Mainly implement operation to data.
+        #region Private Methods
+        void CreateAimedComponent(string name)
         {
-            //Create corresponding component according to different button.
-            var button = sender as Button;
-            aimRect = VisualDownwardSearch((DependencyObject)BarrageTabControl.SelectedContent, "AimBox");
-            aimRect.SetValue(OpacityProperty, 1.0d);
-            switch (button.Name)
+            switch (name)
             {
                 case "Emitter":
                     aimComponent = new Emitter();
@@ -53,6 +49,17 @@ namespace CrazyStorm
                     aimComponent = new Force();
                     break;
             }
+        }
+        #endregion
+        //Implement control and interaction with UI.
+        #region Window EventHandler
+        private void Component_Click(object sender, RoutedEventArgs e)
+        {
+            //Create corresponding component according to different button.
+            var button = sender as Button;
+            aimRect = VisualDownwardSearch((DependencyObject)BarrageTabControl.SelectedContent, "AimBox");
+            aimRect.SetValue(OpacityProperty, 1.0d);
+            CreateAimedComponent(button.Name);
         }
         private void Component_MouseEnter(object sender, MouseEventArgs e)
         {
@@ -83,7 +90,7 @@ namespace CrazyStorm
             foreach (var component in selectedBarrage.Components)
                 if (component == textBlock.DataContext)
                 {
-                    SelectComponent((int)component.X, (int)component.Y, 1, 1);
+                    SelectComponent(component);
                     break;
                 }
         }

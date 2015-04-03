@@ -98,13 +98,15 @@
     <Compile Include="Command\Command.cs" />
     <Compile Include="Command\CommandStack.cs" />
     <Compile Include="Command\DelComponentCommand.cs" />
+    <Compile Include="Command\DelLayerCommand.cs" />
+    <Compile Include="Command\NewLayerCommand.cs" />
+    <Compile Include="Command\SetLayerCommand.cs" />
     <Compile Include="Converter\LayerAxisConverter.cs" />
     <Compile Include="Converter\LayerIconConverter.cs" />
     <Compile Include="Config\Config.cs" />
     <Compile Include="Converter\LayerLengthConverter.cs" />
     <Compile Include="Converter\LayerStartConverter.cs" />
     <Compile Include="Converter\ResourceValidConverter.cs" />
-    <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="LayerSetting.xaml.cs">
       <DependentUpon>LayerSetting.xaml</DependentUpon>
     </Compile>

@@ -10,15 +10,15 @@ using System.Windows.Input;
 
 namespace CrazyStorm
 {
-    abstract class Command
+    public abstract class Command
     {
-        public virtual void Do(params object[] parameter)
+        public virtual void Do(CommandStack stack, params object[] parameter)
         {
-            CommandStack.DoPush(this);
+            stack.DoPush(this);
         }
-        public virtual void Undo(params object[] parameter)
+        public virtual void Undo(CommandStack stack, params object[] parameter)
         {
-            CommandStack.UndoPush(this);
+            stack.UndoPush(this);
         }
     }
 }

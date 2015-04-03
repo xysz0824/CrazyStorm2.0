@@ -24,13 +24,15 @@ namespace CrazyStorm
     public partial class LayerSetting : Window
     {
         #region Private Members
+        CommandStack commandStack;
         Layer layer;
         int selectedColor;
         #endregion
 
         #region Constructor
-        public LayerSetting(Layer layer)
+        public LayerSetting(CommandStack commandStack, Layer layer)
         {
+            this.commandStack = commandStack;
             this.layer = layer;
             InitializeComponent();
             InitializeSetting();
@@ -65,10 +67,11 @@ namespace CrazyStorm
             }
             if (Int32.TryParse(BeginFrame.Text, out beginFrame) && Int32.TryParse(EndFrame.Text, out totalFrame))
             {
-                layer.Color = (LayerColor)selectedColor;
-                layer.BeginFrame = beginFrame;
-                layer.TotalFrame = totalFrame;
-                layer.Name = LayerName.Text;
+                new SetLayerCommand().Do(commandStack, layer, 
+                    (LayerColor)selectedColor, 
+                    beginFrame, 
+                    totalFrame, 
+                    LayerName.Text);
                 this.Close();
             }
             else

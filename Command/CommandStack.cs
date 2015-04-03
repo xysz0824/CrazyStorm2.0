@@ -9,27 +9,40 @@ using System.Text;
 
 namespace CrazyStorm
 {
-    class CommandStack
+    public class CommandStack
     {
-        static readonly Stack<Command> doCommands = new Stack<Command>();
-        static readonly Stack<Command> undoCommands = new Stack<Command>();
-        public static void DoPush(Command command)
+        Stack<Command> doCommands;
+        Stack<Command> undoCommands;
+        public CommandStack()
+        {
+            doCommands = new Stack<Command>();
+            undoCommands = new Stack<Command>();
+        }
+        public Command DoPeek()
+        {
+            return doCommands.Peek();
+        }
+        public void DoPush(Command command)
         {
             doCommands.Push(command);
         }
-        public static Command DoPop()
+        public Command DoPop()
         {
             return doCommands.Pop();
         }
-        public static void UndoPush(Command command)
+        public Command UndoPeek()
+        {
+            return undoCommands.Peek();
+        }
+        public void UndoPush(Command command)
         {
             undoCommands.Push(command);
         }
-        public static Command UndoPop()
+        public Command UndoPop()
         {
             return undoCommands.Pop();
         }
-        public static void Clear()
+        public void Clear()
         {
             doCommands.Clear();
             undoCommands.Clear();

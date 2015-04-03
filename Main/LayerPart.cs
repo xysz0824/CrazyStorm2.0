@@ -25,18 +25,18 @@ namespace CrazyStorm
         #region Private Members
         Layer selectedLayer;
         #endregion
-
+        //Mainly Implement operation to data.
         #region Private Methods
         void CreateNewLayer()
         {
-            selectedBarrage.AddLayer(new Layer("New Layer"));
+            new NewLayerCommand().Do(commandStacks[selectedBarrage], selectedBarrage);
         }
         void DeleteSelectedLayer()
         {
             if (selectedBarrage.Layers.Count > 1)
             {
-                selectedBarrage.DeleteLayer(selectedLayer);
-                UpdateScreen();
+                new DelLayerCommand().Do(commandStacks[selectedBarrage], selectedBarrage, selectedLayer);
+                UpdateComponent();
             }
             else
                 MessageBox.Show((string)FindResource("CanNotDeleteAllLayer"), (string)FindResource("TipTitle"),
@@ -48,12 +48,12 @@ namespace CrazyStorm
         }
         void OpenSelectedLayerSetting()
         {
-            LayerSetting window = new LayerSetting(selectedLayer);
+            LayerSetting window = new LayerSetting(commandStacks[selectedBarrage], selectedLayer);
             window.Owner = this;
             window.ShowDialog();
         }
         #endregion
-
+        //Implement control and interaction with UI.
         #region Window EventHandler
         private void TimeAxis_MouseMove(object sender, MouseEventArgs e)
         {
@@ -85,7 +85,7 @@ namespace CrazyStorm
             //Set the visibllity of layer.
             var visible = sender as Label;
             selectedLayer.Visible = visible.Opacity == 0 ? true : false;
-            UpdateScreen();
+            UpdateComponent();
         }
         private void LayerDown_MouseUp(object sender, MouseButtonEventArgs e)
         {

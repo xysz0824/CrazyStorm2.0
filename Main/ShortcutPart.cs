@@ -12,14 +12,7 @@ namespace CrazyStorm
 {
     partial class Main
     {
-        #region Private Methods
-        void Update()
-        {
-            UpdateScreen();
-            UpdateSelectedGroup();
-        }
-        #endregion
-
+        //Implement control and interaction with UI.
         #region Window EventHandler
         private void CommandBinding_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
@@ -39,10 +32,10 @@ namespace CrazyStorm
             switch (command.Text)
             {
                 case "DelComponent":
-                    new DelComponentCommand().Do(selectedBarrage, selectedComponents);
+                    new DelComponentCommand().Do(commandStacks[selectedBarrage], selectedBarrage, selectedComponents);
                     break;
             }
-            Update();
+            UpdateComponent();
         }
         #endregion
     }

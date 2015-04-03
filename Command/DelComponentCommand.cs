@@ -12,9 +12,9 @@ namespace CrazyStorm
 {
     class DelComponentCommand : Command 
     {
-        public override void Do(params object[] parameter)
+        public override void Do(CommandStack stack, params object[] parameter)
         {
-            base.Do(parameter);
+            base.Do(stack, parameter);
             var selectedBarrage = parameter[0] as Barrage;
             var selectedComponents = parameter[1] as List<Component>;
             foreach (var component in selectedComponents)
@@ -27,9 +27,9 @@ namespace CrazyStorm
 
             selectedComponents.Clear();
         }
-        public override void Undo(params object[] parameter)
+        public override void Undo(CommandStack stack, params object[] parameter)
         {
-            base.Undo(parameter);
+            base.Undo(stack, parameter);
 
         }
     }

@@ -22,6 +22,7 @@ namespace CrazyStorm
 {
     public partial class Main
     {
+        //Implement control and interaction with UI.
         #region Window EventHandler
         private void ImageList_PreviewMouseRightButtonDown(object sender, MouseButtonEventArgs e)
         {
