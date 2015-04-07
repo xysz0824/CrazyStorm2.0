@@ -17,7 +17,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using System.Reflection;
 using System.ComponentModel;
-using CrazyStorm.CoreLibrary;
+using CrazyStorm.Core;
 
 namespace CrazyStorm
 {
@@ -27,7 +27,7 @@ namespace CrazyStorm
         static readonly string[] componentImages = new string[] 
         { "EmitterImage", "LaserImage", "MaskImage", "ReboundImage", "ForceImage" };
         #endregion
-        //Mainly implement operation to data.
+
         #region Private Methods
         void CreateAimedComponent(string name)
         {
@@ -51,7 +51,7 @@ namespace CrazyStorm
             }
         }
         #endregion
-        //Implement control and interaction with UI.
+
         #region Window EventHandler
         private void Component_Click(object sender, RoutedEventArgs e)
         {
@@ -83,16 +83,40 @@ namespace CrazyStorm
                     break;
                 }
         }
+        private void ComponentList_PreviewMouseRightButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            //Focus pointed item when mouse right-button down.
+            var item = VisualUpwardSearch<TreeViewItem>(e.OriginalSource as DependencyObject) as TreeViewItem;
+            if (item != null)
+            {
+                item.Focus();
+                e.Handled = true;
+            }
+        }
         private void ComponentList_MouseLeftButtonDown(object sender, MouseEventArgs e)
         {
             //Select pointed component when mouse left-button down. 
             var textBlock = sender as TextBlock;
+            var set = new List<CrazyStorm.Core.Component>();
             foreach (var component in selectedBarrage.Components)
                 if (component == textBlock.DataContext)
                 {
-                    SelectComponent(component);
+                    set.Add(component);
+                    SelectComponents(set);
                     break;
                 }
+        }
+        private void CopyComponent_Click(object sender, RoutedEventArgs e)
+        {
+            //TODO : Copy function.
+        }
+        private void DelComponent_Click(object sender, RoutedEventArgs e)
+        {
+            var item = ComponentList.SelectedItem as CrazyStorm.Core.Component; 
+            var list = new List<CrazyStorm.Core.Component>();
+            list.Add(item);
+            new DelComponentCommand().Do(commandStacks[selectedBarrage], selectedBarrage, list);
+            UpdateComponent();
         }
         #endregion
     }

@@ -16,7 +16,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using System.ComponentModel;
-using CrazyStorm.CoreLibrary;
+using CrazyStorm.Core;
 
 namespace CrazyStorm
 {
@@ -31,6 +31,7 @@ namespace CrazyStorm
         Config config;
         File file;
         Dictionary<Barrage, CommandStack> commandStacks;
+        ClipBoard clipBoard;
         string status = String.Empty;
         #endregion
 
@@ -50,11 +51,12 @@ namespace CrazyStorm
         #region Constructor
         public Main()
         {
+            config = new Config();
             file = new File("Untitled");
             commandStacks = new Dictionary<Barrage, CommandStack>();
+            clipBoard = new ClipBoard();
             InitializeComponent();
             InitializeSystem();
-            status = (string)FindResource("Ready");
         }
         #endregion
 
@@ -96,10 +98,10 @@ namespace CrazyStorm
             InitializeEdit();
             InitializeStatus();
             UpdateComponent();
+            status = (string)FindResource("Ready");
         }
         void LoadConfig()
         {
-            config = new Config();
             //TODO : Load config.
         }
         void InitializeFile()
@@ -112,30 +114,38 @@ namespace CrazyStorm
         void InitializeBarrage()
         {
             selectedBarrage = file.Barrages.First();
-            commandStacks[selectedBarrage] = new CommandStack();
             BarrageTabControl.DataContext = config;
+            InitializeCommandStack();
             AddNewBarrageTab(selectedBarrage);
             ComponentList.ItemsSource = selectedBarrage.Components;
-            DeleteComponent.IsEnabled = false;
-            BindComponent.IsEnabled = false;
-            UnbindComponent.IsEnabled = false;
+            DeleteComponentItem.IsEnabled = false;
+            BindComponentItem.IsEnabled = false;
+            UnbindComponentItem.IsEnabled = false;
         }
         void InitializeLayer()
         {
             selectedLayer = selectedBarrage.Layers.First();
             LayerTree.ItemsSource = selectedBarrage.Layers;
             LayerAxis.ItemsSource = selectedBarrage.Layers;
-            CopyLayer.IsEnabled = false;
-            DeleteLayer.IsEnabled = false;
-            SetLayer.IsEnabled = false;
+            CopyLayerItem.IsEnabled = false;
+            DeleteLayerItem.IsEnabled = false;
+            SetLayerItem.IsEnabled = false;
+        }
+        void InitializeCommandStack()
+        {
+            commandStacks[selectedBarrage] = new CommandStack();
+            commandStacks[selectedBarrage].StackChanged += () =>
+            {
+                UpdateEdit();
+            };
         }
         void InitializeEdit()
         {
-            Cut.IsEnabled = false;
-            Copy.IsEnabled = false;
-            Paste.IsEnabled = false;
-            Undo.IsEnabled = false;
-            Redo.IsEnabled = false;
+            CutItem.IsEnabled = false;
+            CopyItem.IsEnabled = false;
+            PasteItem.IsEnabled = false;
+            UndoItem.IsEnabled = false;
+            RedoItem.IsEnabled = false;
             CutButton.IsEnabled = false;
             CopyButton.IsEnabled = false;
             PasteButton.IsEnabled = false;
@@ -149,9 +159,9 @@ namespace CrazyStorm
         void UpdateBarrage()
         {
             ComponentList.ItemsSource = selectedBarrage.Components;
-            DeleteComponent.IsEnabled = false;
-            BindComponent.IsEnabled = false;
-            UnbindComponent.IsEnabled = false;
+            DeleteComponentItem.IsEnabled = false;
+            BindComponentItem.IsEnabled = false;
+            UnbindComponentItem.IsEnabled = false;
         }
         void UpdateLayer()
         {
@@ -161,6 +171,7 @@ namespace CrazyStorm
         {
             UpdateScreen();
             UpdateSelectedGroup();
+            UpdateEdit();
         }
         #endregion
     }

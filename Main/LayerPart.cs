@@ -16,7 +16,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using System.Windows.Automation.Peers;
-using CrazyStorm.CoreLibrary;
+using CrazyStorm.Core;
 
 namespace CrazyStorm
 {
@@ -25,11 +25,11 @@ namespace CrazyStorm
         #region Private Members
         Layer selectedLayer;
         #endregion
-        //Mainly Implement operation to data.
+
         #region Private Methods
         void CreateNewLayer()
         {
-            new NewLayerCommand().Do(commandStacks[selectedBarrage], selectedBarrage);
+            new AddLayerCommand().Do(commandStacks[selectedBarrage], selectedBarrage);
         }
         void DeleteSelectedLayer()
         {
@@ -53,7 +53,7 @@ namespace CrazyStorm
             window.ShowDialog();
         }
         #endregion
-        //Implement control and interaction with UI.
+
         #region Window EventHandler
         private void TimeAxis_MouseMove(object sender, MouseEventArgs e)
         {
@@ -76,9 +76,9 @@ namespace CrazyStorm
             else
                 selectedLayer = null;
 
-            CopyLayer.IsEnabled = selectedLayer != null ? true : false;
-            DeleteLayer.IsEnabled = CopyLayer.IsEnabled;
-            SetLayer.IsEnabled = CopyLayer.IsEnabled;
+            CopyLayerItem.IsEnabled = selectedLayer != null ? true : false;
+            DeleteLayerItem.IsEnabled = CopyLayerItem.IsEnabled;
+            SetLayerItem.IsEnabled = CopyLayerItem.IsEnabled;
         }
         private void LayerVisible_MouseUp(object sender, MouseButtonEventArgs e)
         {
@@ -121,9 +121,22 @@ namespace CrazyStorm
                 return;
 
             if (Enum.IsDefined(typeof(LayerColor), selectedLayer.Color + 1))
-                selectedLayer.Color += 1;
+            {
+                new SetLayerCommand().Do(commandStacks[selectedBarrage], selectedLayer,
+                    (LayerColor)selectedLayer.Color + 1,
+                    selectedLayer.BeginFrame,
+                    selectedLayer.TotalFrame,
+                    selectedLayer.Name);
+            }
             else
+            {
                 selectedLayer.Color = LayerColor.Blue;
+                new SetLayerCommand().Do(commandStacks[selectedBarrage], selectedLayer,
+                    LayerColor.Blue,
+                    selectedLayer.BeginFrame,
+                    selectedLayer.TotalFrame,
+                    selectedLayer.Name);
+            }
         }
         private void LayerMenu_Click(object sender, RoutedEventArgs e)
         {
@@ -131,16 +144,16 @@ namespace CrazyStorm
             var item = e.Source as MenuItem;
             switch (item.Name)
             {
-                case "AddLayer":
+                case "AddLayerItem":
                     CreateNewLayer();
                     break;
-                case "DeleteLayer":
+                case "DeleteLayerItem":
                     DeleteSelectedLayer();
                     break;
-                case "CopyLayer":
+                case "CopyLayerItem":
                     CopySelectedLayer();
                     break;
-                case "SetLayer":
+                case "SetLayerItem":
                     OpenSelectedLayerSetting();
                     break;
             }

@@ -1,9 +1,11 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 11.00
-# Visual Studio 2010
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.21005.1
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CrazyStorm2.0", "CrazyStorm2.0.csproj", "{EE69285F-83AD-45D9-8D86-3F78EC496717}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CoreLibrary", "..\CrazyStorm Core\CoreLibrary.csproj", "{1FED6550-8156-45BA-ABD3-7C400FD86A03}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core", "..\CrazyStorm Core\Core.csproj", "{1FED6550-8156-45BA-ABD3-7C400FD86A03}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

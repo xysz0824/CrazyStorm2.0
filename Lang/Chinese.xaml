@@ -1,9 +1,11 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:sys="clr-namespace:System;assembly=mscorlib">
+    <!-- Status Bar -->
     <sys:String x:Key="Ready">
         已就绪
     </sys:String>
+    <!-- Top Menu -->
     <sys:String x:Key="AddLayer">
         添加图层
     </sys:String>
@@ -28,8 +30,12 @@
     <sys:String x:Key="SetBarrage">
         弹幕设置
     </sys:String>
+    <!-- Message Box -->
     <sys:String x:Key="TipTitle">
         提示
+    </sys:String>
+    <sys:String x:Key="ConfirmDeleteBarrage">
+        确定要删除此弹幕吗（删除后无法撤销）？
     </sys:String>
     <sys:String x:Key="CanNotDeleteAllBarrage">
         不能删除所有弹幕
@@ -43,12 +49,14 @@
     <sys:String x:Key="ValueInvalid">
         数值填入有误，请重试
     </sys:String>
+    <!-- File Window-->
     <sys:String x:Key="ImageType">
         PNG图像(*.png)|*.png
     </sys:String>
     <sys:String x:Key="BackGroundImageType">
         JPEG图像(*.jpg)|*.jpg|PNG图像(*.png)|*.png|BMP图像(*.bmp)|*.bmp
     </sys:String>
+    <!-- Component Sidebar -->
     <sys:String x:Key="DoubleClickTip">
         继续双击进入属性面板
     </sys:String>

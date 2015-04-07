@@ -15,7 +15,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
-using CrazyStorm.CoreLibrary;
+using CrazyStorm.Core;
 
 namespace CrazyStorm
 {
@@ -31,7 +31,7 @@ namespace CrazyStorm
         readonly List<Component> selectedComponents = new List<Component>();
         bool selecting;
         #endregion
-        //Mainly implement operation to data.
+
         #region Private Methods
         void UpdateScreen()
         {
@@ -48,6 +48,7 @@ namespace CrazyStorm
             }
             if (canvas != null)
             {
+                selectedComponents.Clear();
                 canvas.Children.Clear();
                 var itemTemplate = FindResource("ComponentItem") as DataTemplate;
                 foreach (var layer in selectedBarrage.Layers)
@@ -59,6 +60,10 @@ namespace CrazyStorm
                             frame.DataContext = layer;
                             var icon = VisualDownwardSearch(item, "Icon") as Image;
                             icon.DataContext = component;
+                            var box = VisualDownwardSearch(item, "Box") as Image;
+                            box.Opacity = component.Selected ? 1 : 0;
+                            if (component.Selected)
+                                selectedComponents.Add(component);
                             for (int i = 0; i < componentNames.Length; ++i)
                                 if (componentNames[i] == component.GetType().Name)
                                 {
@@ -72,72 +77,57 @@ namespace CrazyStorm
                         }
             }
         }
-        void SelectComponent(int x, int y, int width, int height)
+        void SelectComponents(int x, int y, int width, int height)
         {
+            var set = new List<Component>();
             //Select those involved in selection rect. 
-            selectedComponents.Clear();
-            var content = (DependencyObject)BarrageTabControl.SelectedContent;
-            var canvas = VisualDownwardSearch(content, "ComponentLayer") as Canvas;
             int index = 0;
-            if (canvas != null)
-            {
-                foreach (var layer in selectedBarrage.Layers)
-                    if (layer.Visible)
-                        foreach (var component in layer.Components)
+            foreach (var layer in selectedBarrage.Layers)
+                if (layer.Visible)
+                    foreach (var component in layer.Components)
+                    {
+                        var selectRect = new Rect(x, y, width, height);
+                        var componentRect = new Rect(component.X, component.Y, 32, 32);
+                        if (selectRect.IntersectsWith(componentRect))
                         {
-                            var box = VisualDownwardSearch(canvas.Children[index], "Box") as Image;
-                            box.Opacity = 0;
-                            var selectRect = new Rect(x, y, width, height);
-                            var componentRect = new Rect(component.X, component.Y, 32, 32);
-                            if (selectRect.IntersectsWith(componentRect))
-                            {
-                                box.Opacity = 1;
-                                //Prevent overlay shade from other preceding components.
-                                if (width == 0 && height == 0 && selectedComponents.Count > 0)
-                                    selectedComponents[selectedComponents.Count - 1] = component;
-                                else
-                                    selectedComponents.Add(component);
-                            }
-                            index++;
+                            //Prevent overlay shade from preceding components.
+                            if (width == 0 && height == 0 && set.Count > 0)
+                                set[set.Count - 1] = component;
+                            else
+                                set.Add(component);
                         }
-            }
-            //Enable delection if selected one or more.
-            DeleteComponent.IsEnabled = selectedComponents.Count > 0;
-            //Enable binding if selected one.
-            BindComponent.IsEnabled = selectedComponents.Count == 1;
-            UnbindComponent.IsEnabled = BindComponent.IsEnabled;
-            //Update.
-            UpdateSelectedGroup();
+                        index++;
+                    }
+            SelectComponents(set);
         }
-        void SelectComponent(Component target)
+        void SelectComponents(List<Component> set)
         {
-            selectedComponents.Clear();
-            var content = (DependencyObject)BarrageTabControl.SelectedContent;
-            var canvas = VisualDownwardSearch(content, "ComponentLayer") as Canvas;
-            int index = 0;
-            if (canvas != null && target != null)
+            foreach (var layer in selectedBarrage.Layers)
             {
-                foreach (var layer in selectedBarrage.Layers)
-                    if (layer.Visible)
-                        foreach (var component in layer.Components)
+                if (layer.Visible)
+                {
+                    foreach (var component in layer.Components)
+                    {
+                        component.Selected = false;
+                        if (set != null)
                         {
-                            var box = VisualDownwardSearch(canvas.Children[index], "Box") as Image;
-                            box.Opacity = 0;
-                            if (component == target)
-                            {
-                                box.Opacity = 1;
-                                selectedComponents.Add(component);
-                            }
-                            index++;
+                            foreach (var target in set)
+                                if (component == target)
+                                {
+                                    component.Selected = true;
+                                    break;
+                                }
                         }
+                    }
+                }
             }
-            //Enable delection if selected one or more.
-            DeleteComponent.IsEnabled = selectedComponents.Count > 0;
-            //Enable binding if selected one.
-            BindComponent.IsEnabled = selectedComponents.Count == 1;
-            UnbindComponent.IsEnabled = BindComponent.IsEnabled;
             //Update.
-            UpdateSelectedGroup();
+            UpdateComponent();
+            //Enable delection if selected one or more.
+            DeleteComponentItem.IsEnabled = selectedComponents.Count > 0;
+            //Enable binding if selected one.
+            BindComponentItem.IsEnabled = selectedComponents.Count == 1;
+            UnbindComponentItem.IsEnabled = BindComponentItem.IsEnabled;
         }
         void UpdateSelectedGroup()
         {
@@ -174,7 +164,7 @@ namespace CrazyStorm
             var barrage = new Barrage("New Barrage");
             file.Barrages.Add(barrage);
             selectedBarrage = barrage;
-            commandStacks[selectedBarrage] = new CommandStack();
+            InitializeCommandStack();
             AddNewBarrageTab(barrage);
         }
         void AddNewBarrageTab(Barrage barrage)
@@ -196,10 +186,13 @@ namespace CrazyStorm
                         selected = item;
                         break;
                     }
-
-                commandStacks.Remove(selectedBarrage);
-                file.Barrages.Remove(selectedBarrage);
-                BarrageTabControl.Items.Remove(selected);
+                if (MessageBox.Show((string)FindResource("ConfirmDeleteBarrage"), (string)FindResource("TipTitle"),
+                    MessageBoxButton.YesNo, MessageBoxImage.Warning) == MessageBoxResult.Yes)
+                {
+                    commandStacks.Remove(selectedBarrage);
+                    file.Barrages.Remove(selectedBarrage);
+                    BarrageTabControl.Items.Remove(selected);
+                }
             }
             else
                 MessageBox.Show((string)FindResource("CanNotDeleteAllBarrage"), (string)FindResource("TipTitle"), 
@@ -216,7 +209,7 @@ namespace CrazyStorm
             window.ShowDialog();
         }
         #endregion
-        //Implement control and interaction with UI.
+
         #region Window EventHandler
         private void Screen_MouseMove(object sender, MouseEventArgs e)
         {
@@ -272,7 +265,7 @@ namespace CrazyStorm
             selectionRect = VisualDownwardSearch(content, "SelectingBox");
             selectionRect.SetValue(Canvas.LeftProperty, (double)x);
             selectionRect.SetValue(Canvas.TopProperty, (double)y);
-            //Add component to the place where mouse down with left-button.
+            //Add component to where mouse down with left-button.
             if (aimRect != null)
             {
                 aimRect.SetValue(OpacityProperty, 0.0d);
@@ -280,8 +273,10 @@ namespace CrazyStorm
                 var boxY = (double)aimRect.GetValue(Canvas.TopProperty);
                 aimComponent.X = (int)boxX;
                 aimComponent.Y = (int)boxY;
-                selectedBarrage.AddComponentToLayer(selectedLayer, aimComponent);
+                new AddComponentCommand().Do(commandStacks[selectedBarrage],
+                    selectedBarrage, selectedLayer, aimComponent);
                 UpdateComponent();
+                aimComponent = null;
                 aimRect = null;
             }
         }
@@ -300,13 +295,13 @@ namespace CrazyStorm
                 var y = (double)selectionRect.GetValue(TopProperty);
                 var width = (double)selectionRect.GetValue(WidthProperty);
                 var height = (double)selectionRect.GetValue(HeightProperty);
-                SelectComponent((int)x, (int)y, (int)width, (int)height);
+                SelectComponents((int)x, (int)y, (int)width, (int)height);
                 selectionRect.SetValue(WidthProperty, 0.0d);
                 selectionRect.SetValue(HeightProperty, 0.0d);
                 selectionRect = null;
             }
             else
-                SelectComponent(null);
+                SelectComponents(null);
         }
         private void BarrageTabControl_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
@@ -323,9 +318,10 @@ namespace CrazyStorm
                 UpdateBarrage();
                 UpdateLayer();
                 UpdateComponent();
+                UpdateEdit();
             }
         }
-        private void ScreenSetting_Click(object sender, RoutedEventArgs e)
+        private void ScreenSettingItem_Click(object sender, RoutedEventArgs e)
         {
             //Open screen setting window.
             ScreenSetting window = new ScreenSetting(config);
@@ -338,16 +334,16 @@ namespace CrazyStorm
             var item = e.Source as MenuItem;
             switch (item.Name)
             {
-                case "AddBarrage":
+                case "AddBarrageItem":
                     CreateNewBarrage();
                     break;
-                case "DeleteBarrage":
+                case "DeleteBarrageItem":
                     DeleteSeletedBarrage();
                     break;
-                case "CopyBarrage":
+                case "CopyBarrageItem":
                     CopySeletedBarrage();
                     break;
-                case "SetBarrage":
+                case "SetBarrageItem":
                     OpenSelectedBarrageSetting();
                     break;
             }

@@ -16,13 +16,12 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using System.ComponentModel;
-using CrazyStorm.CoreLibrary;
+using CrazyStorm.Core;
 
 namespace CrazyStorm
 {
     public partial class Main
     {
-        //Implement control and interaction with UI.
         #region Window EventHandler
         private void ImageList_PreviewMouseRightButtonDown(object sender, MouseButtonEventArgs e)
         {
@@ -34,7 +33,7 @@ namespace CrazyStorm
                 e.Handled = true;
             }
         }
-        private void AddImage_Click(object sender, RoutedEventArgs e)
+        private void AddImageItem_Click(object sender, RoutedEventArgs e)
         {
             //Open file dialog to add a new image.
             using (var open = new System.Windows.Forms.OpenFileDialog())
@@ -55,11 +54,11 @@ namespace CrazyStorm
         }
         private void AddSound_Click(object sender, RoutedEventArgs e)
         {
-
+            //TODO : Add sound.
         }
         private void AddScript_Click(object sender, RoutedEventArgs e)
         {
-
+            //TODO : Add script.
         }
         #endregion
     }

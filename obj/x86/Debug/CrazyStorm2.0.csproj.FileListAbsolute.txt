@@ -39,8 +39,6 @@ F:\LargeProject\CrazyStorm2.0\obj\x86\Debug\CrazyStorm_MarkupCompile.cache
 F:\LargeProject\CrazyStorm2.0\obj\x86\Debug\CrazyStorm.g.resources
 F:\LargeProject\CrazyStorm2.0\obj\x86\Debug\CrazyStorm.Properties.Resources.resources
 F:\LargeProject\CrazyStorm2.0\obj\x86\Debug\CrazyStorm2.0.csproj.GenerateResource.Cache
-F:\LargeProject\CrazyStorm2.0\bin\Debug\CoreLibrary.dll
-F:\LargeProject\CrazyStorm2.0\bin\Debug\CoreLibrary.pdb
 F:\LargeProject\CrazyStorm2.0\obj\x86\Debug\GeneratedInternalTypeHelper.g.cs
 F:\LargeProject\CrazyStorm2.0\obj\x86\Debug\CrazyStorm_MarkupCompile.lref
 F:\LargeProject\CrazyStorm2.0\obj\x86\Debug\LayerSetting.baml
@@ -75,4 +73,6 @@ F:\LargeProject\CrazyStorm2.0\bin\Debug\ja\System.Windows.Interactivity.resource
 F:\LargeProject\CrazyStorm2.0\bin\Debug\ko\System.Windows.Interactivity.resources.dll
 F:\LargeProject\CrazyStorm2.0\bin\Debug\zh-Hans\System.Windows.Interactivity.resources.dll
 F:\LargeProject\CrazyStorm2.0\bin\Debug\zh-Hant\System.Windows.Interactivity.resources.dll
+F:\LargeProject\CrazyStorm2.0\bin\Debug\Core.dll
+F:\LargeProject\CrazyStorm2.0\bin\Debug\Core.pdb
 F:\LargeProject\CrazyStorm2.0\obj\x86\Debug\CrazyStorm2.0.csprojResolveAssemblyReference.cache

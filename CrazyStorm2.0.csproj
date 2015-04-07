@@ -15,6 +15,21 @@
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <WarningLevel>4</WarningLevel>
+    <PublishUrl>发布\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
     <PlatformTarget>x86</PlatformTarget>
@@ -25,7 +40,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRuleSet>BasicDesignGuidelineRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
     <PlatformTarget>x86</PlatformTarget>
@@ -37,10 +52,12 @@
     <WarningLevel>4</WarningLevel>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>false</SignAssembly>
+  </PropertyGroup>
   <ItemGroup>
-    <Reference Include="CoreLibrary, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\CrazyStorm Core\bin\Debug\CoreLibrary.dll</HintPath>
+    <Reference Include="Core">
+      <HintPath>..\CrazyStorm Core\bin\Debug\Core.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Expression.Effects, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
     <Reference Include="System" />
@@ -95,18 +112,22 @@
     <Compile Include="BarrageSetting.xaml.cs">
       <DependentUpon>BarrageSetting.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Command\Command.cs" />
-    <Compile Include="Command\CommandStack.cs" />
-    <Compile Include="Command\DelComponentCommand.cs" />
-    <Compile Include="Command\DelLayerCommand.cs" />
-    <Compile Include="Command\NewLayerCommand.cs" />
-    <Compile Include="Command\SetLayerCommand.cs" />
+    <Compile Include="Edit\Command\Component\AddComponentCommand.cs" />
+    <Compile Include="Edit\Command\Command.cs" />
+    <Compile Include="Edit\Command\CommandStack.cs" />
+    <Compile Include="Edit\Command\Component\DelComponentCommand.cs" />
+    <Compile Include="Edit\Command\Layer\DelLayerCommand.cs" />
+    <Compile Include="Edit\Command\Layer\AddLayerCommand.cs" />
+    <Compile Include="Edit\Command\Layer\SetLayerCommand.cs" />
+    <Compile Include="Edit\Command\Component\MoveComponentCommand.cs" />
     <Compile Include="Converter\LayerAxisConverter.cs" />
     <Compile Include="Converter\LayerIconConverter.cs" />
     <Compile Include="Config\Config.cs" />
     <Compile Include="Converter\LayerLengthConverter.cs" />
     <Compile Include="Converter\LayerStartConverter.cs" />
     <Compile Include="Converter\ResourceValidConverter.cs" />
+    <Compile Include="Edit\ClipBoard.cs" />
+    <Compile Include="Edit\Command\ParameterEmptyException.cs" />
     <Compile Include="LayerSetting.xaml.cs">
       <DependentUpon>LayerSetting.xaml</DependentUpon>
     </Compile>
@@ -115,9 +136,10 @@
     </Compile>
     <Compile Include="Main\BarragePart.cs" />
     <Compile Include="Main\ComponentPart.cs" />
+    <Compile Include="Main\EditPart.cs" />
     <Compile Include="Main\LayerPart.cs" />
     <Compile Include="Main\ResourcePart.cs" />
-    <Compile Include="Main\ShortcutPart.cs" />
+    <Compile Include="Main\ShortKeyPart.cs" />
     <Compile Include="ScreenSetting.xaml.cs">
       <DependentUpon>ScreenSetting.xaml</DependentUpon>
     </Compile>
@@ -243,6 +265,29 @@
   <ItemGroup>
     <Resource Include="Images\selectedgroup.png" />
   </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include=".NETFramework,Version=v4.0,Profile=Client">
+      <Visible>False</Visible>
+      <ProductName>Microsoft .NET Framework 4 Client Profile %28x86 和 x64%29</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1 Client Profile</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Windows.Installer.4.5">
+      <Visible>False</Visible>
+      <ProductName>Windows Installer 4.5</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
