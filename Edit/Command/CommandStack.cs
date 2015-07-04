@@ -28,10 +28,24 @@ namespace CrazyStorm
         #endregion
 
         #region Private Methods
-        void CheckLimit(List<Command> list)
+        static void CheckLimit(List<Command> list)
         {
             if (list.Count > MaxSize)
                 list.RemoveAt(0);
+        }
+        static void DoCompact(List<Command> list, Command command)
+        {
+            //As for move command, it's nessesary to merge to reduce occupation of command stack.
+            if (list.Count > 0
+                && list[list.Count - 1] is MoveComponentCommand 
+                && command             is MoveComponentCommand)
+            {
+                var last   = list[list.Count - 1] as MoveComponentCommand;
+                var now = command              as MoveComponentCommand;
+                last.Move += now.Move;
+            }
+            else
+                list.Add(command);
         }
         #endregion
 
@@ -45,7 +59,7 @@ namespace CrazyStorm
         public void RedoPush(Command command)
         {
             CheckLimit(redoCommands);
-            redoCommands.Add(command);
+            DoCompact(redoCommands, command);
             if (StackChanged != null)
                 StackChanged();
         }

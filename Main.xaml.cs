@@ -30,7 +30,7 @@ namespace CrazyStorm
         #region Private Members
         Config config;
         File file;
-        Dictionary<Barrage, CommandStack> commandStacks;
+        Dictionary<ParticleSystem, CommandStack> commandStacks;
         ClipBoard clipBoard;
         string status = String.Empty;
         #endregion
@@ -53,7 +53,7 @@ namespace CrazyStorm
         {
             config = new Config();
             file = new File("Untitled");
-            commandStacks = new Dictionary<Barrage, CommandStack>();
+            commandStacks = new Dictionary<ParticleSystem, CommandStack>();
             clipBoard = new ClipBoard();
             InitializeComponent();
             InitializeSystem();
@@ -72,9 +72,11 @@ namespace CrazyStorm
         {
             if (source == null)
                 return null;
+
             var count = VisualTreeHelper.GetChildrenCount(source);
             if (count == 0)
                 return null;
+
             for (int i = 0; i < count; ++i)
             {
                 var child = VisualTreeHelper.GetChild(source, i);
@@ -93,7 +95,7 @@ namespace CrazyStorm
         {
             LoadConfig();
             InitializeFile();
-            InitializeBarrage();
+            InitializeParticle();
             InitializeLayer();
             InitializeEdit();
             InitializeStatus();
@@ -111,30 +113,30 @@ namespace CrazyStorm
             SoundList.ItemsSource = file.Sounds;
             ScriptList.ItemsSource = file.Scripts;
         }
-        void InitializeBarrage()
+        void InitializeParticle()
         {
-            selectedBarrage = file.Barrages.First();
-            BarrageTabControl.DataContext = config;
+            selectedParticle = file.Particles.First();
+            ParticleTabControl.DataContext = config;
             InitializeCommandStack();
-            AddNewBarrageTab(selectedBarrage);
-            ComponentList.ItemsSource = selectedBarrage.Components;
+            AddNewParticleTab(selectedParticle);
+            ComponentList.ItemsSource = selectedParticle.Components;
             DeleteComponentItem.IsEnabled = false;
             BindComponentItem.IsEnabled = false;
             UnbindComponentItem.IsEnabled = false;
         }
         void InitializeLayer()
         {
-            selectedLayer = selectedBarrage.Layers.First();
-            LayerTree.ItemsSource = selectedBarrage.Layers;
-            LayerAxis.ItemsSource = selectedBarrage.Layers;
+            selectedLayer = selectedParticle.Layers.First();
+            LayerTree.ItemsSource = selectedParticle.Layers;
+            LayerAxis.ItemsSource = selectedParticle.Layers;
             CopyLayerItem.IsEnabled = false;
             DeleteLayerItem.IsEnabled = false;
             SetLayerItem.IsEnabled = false;
         }
         void InitializeCommandStack()
         {
-            commandStacks[selectedBarrage] = new CommandStack();
-            commandStacks[selectedBarrage].StackChanged += () =>
+            commandStacks[selectedParticle] = new CommandStack();
+            commandStacks[selectedParticle].StackChanged += () =>
             {
                 UpdateEdit();
             };
@@ -156,9 +158,9 @@ namespace CrazyStorm
         {
             StatusText.DataContext = this;
         }
-        void UpdateBarrage()
+        void UpdateParticle()
         {
-            ComponentList.ItemsSource = selectedBarrage.Components;
+            ComponentList.ItemsSource = selectedParticle.Components;
             DeleteComponentItem.IsEnabled = false;
             BindComponentItem.IsEnabled = false;
             UnbindComponentItem.IsEnabled = false;
@@ -169,6 +171,7 @@ namespace CrazyStorm
         }
         void UpdateComponent()
         {
+            UpdatePropertyPanel();
             UpdateScreen();
             UpdateSelectedGroup();
             UpdateEdit();

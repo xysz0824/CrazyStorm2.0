@@ -14,17 +14,17 @@ namespace CrazyStorm
     {
         public event Action ContentChanged;
 
-        List<Component> content;
+        List<Component> contents;
         public ClipBoard()
         {
-            content = new List<Component>();
+            contents = new List<Component>();
         }
         public void Put(List<Component> content)
         {
             if (content != null)
             {
                 foreach (var item in content)
-                    this.content.Add(item);
+                    contents.Add(item);
                 if (ContentChanged != null)
                     ContentChanged();
             }

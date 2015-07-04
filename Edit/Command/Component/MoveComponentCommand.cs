@@ -19,58 +19,65 @@ namespace CrazyStorm
     }
     class MoveComponentCommand : Command
     {
+        Vector2 move;
+
+        public Vector2 Move 
+        { 
+            get { return move; }
+            set { move = value; }
+        }
+        public MoveComponentCommand(MoveStatus status, bool gridAlignment)
+        {
+            move = Vector2.Zero;
+            switch (status)
+            {
+                case MoveStatus.Up:
+                    move = new Vector2(0, -1);
+                    break;
+                case MoveStatus.Down:
+                    move = new Vector2(0, 1);
+                    break;
+                case MoveStatus.Left:
+                    move = new Vector2(-1, 0);
+                    break;
+                case MoveStatus.Right:
+                    move = new Vector2(1, 0);
+                    break;
+            }
+            if (gridAlignment)
+                move *= 32f;
+        }
         public override void Redo(CommandStack stack)
         {
             base.Redo(stack);
             List<Component> selectedComponents;
-            if (history[0] == null)
+            if (History[0] == null)
             {
                 //Be careful that the reference of list could be modified outside, 
                 //so there should copy it.
                 selectedComponents = new List<Component>();
-                var temp = parameter[0] as List<Component>;
+                var temp = Parameter[0] as List<Component>;
                 foreach (var item in temp)
                     selectedComponents.Add(item);
-                history[0] = selectedComponents;
+                History[0] = selectedComponents;
             }
             else
-                selectedComponents = history[0] as List<Component>;
+                selectedComponents = History[0] as List<Component>;
 
-            var gridAlignment = (bool)parameter[2];
-            Vector2 delta = Vector2.Zero;
-            switch ((MoveStatus)parameter[1])
-            {
-                case MoveStatus.Up:
-                    delta = new Vector2(0, -1);
-                    break;
-                case MoveStatus.Down:
-                    delta = new Vector2(0, 1);
-                    break;
-                case MoveStatus.Left:
-                    delta = new Vector2(-1, 0);
-                    break;
-                case MoveStatus.Right:
-                    delta = new Vector2(1, 0);
-                    break;
-            }
-            if (gridAlignment)
-                delta *= 32f;
-            history[1] = delta;
             foreach (var item in selectedComponents)
             {
-                item.X += delta.x;
-                item.Y += delta.y;
+                item.X += move.x;
+                item.Y += move.y;
             }
         }
         public override void Undo(CommandStack stack)
         {
             base.Undo(stack);
-            var selectedComponents = history[0] as List<Component>;
-            var delta = (Vector2)history[1];
+            var selectedComponents = History[0] as List<Component>;
             foreach (var item in selectedComponents)
             {
-                item.X -= delta.x;
-                item.Y -= delta.y;
+                item.X -= move.x;
+                item.Y -= move.y;
             }
         }
     }

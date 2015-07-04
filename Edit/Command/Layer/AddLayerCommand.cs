@@ -12,24 +12,27 @@ namespace CrazyStorm
 {
     class AddLayerCommand : Command
     {
+        static int colorIndex = 0;
+
         public override void Redo(CommandStack stack)
         {
             base.Redo(stack);
-            var selectedBarrage = parameter[0] as Barrage;
-            if (history[0] == null)
+            var selectedParticle = Parameter[0] as ParticleSystem;
+            if (History[0] == null)
             {
                 var newLayer = new Layer("New Layer");
-                history[0] = newLayer;
-                selectedBarrage.AddLayer(newLayer);
+                newLayer.Color = (LayerColor)((++colorIndex) % 7);
+                History[0] = newLayer;
+                selectedParticle.AddLayer(newLayer);
             }
             else
-                selectedBarrage.AddLayer(history[0] as Layer);
+                selectedParticle.AddLayer(History[0] as Layer);
         }
         public override void Undo(CommandStack stack)
         {
             base.Undo(stack);
-            var selectedBarrage = parameter[0] as Barrage;
-            selectedBarrage.DeleteLayer(history[0] as Layer);
+            var selectedParticle = Parameter[0] as ParticleSystem;
+            selectedParticle.DeleteLayer(History[0] as Layer);
         }
     }
 }

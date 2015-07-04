@@ -15,18 +15,18 @@ namespace CrazyStorm
         public override void Redo(CommandStack stack)
         {
             base.Redo(stack);
-            var selectedBarrage = parameter[0] as Barrage;
-            var selectedLayer = parameter[1] as Layer;
-            var aimComponent = parameter[2] as Component;
-            selectedBarrage.AddComponentToLayer(selectedLayer, aimComponent);
+            var selectedParticle = Parameter[0] as ParticleSystem;
+            var selectedLayer = Parameter[1] as Layer;
+            var aimComponent = Parameter[2] as Component;
+            selectedParticle.AddComponentToLayer(selectedLayer, aimComponent);
         }
         public override void Undo(CommandStack stack)
         {
             base.Undo(stack);
-            var selectedBarrage = parameter[0] as Barrage;
-            var selectedLayer = parameter[1] as Layer;
-            var aimComponent = parameter[2] as Component;
-            selectedBarrage.DeleteComponentFromLayer(selectedLayer, aimComponent);
+            var selectedParticle = Parameter[0] as ParticleSystem;
+            var selectedLayer = Parameter[1] as Layer;
+            var aimComponent = Parameter[2] as Component;
+            selectedParticle.DeleteComponentFromLayer(selectedLayer, aimComponent);
         }
     }
 }

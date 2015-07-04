@@ -2,65 +2,29 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:sys="clr-namespace:System;assembly=mscorlib">
     <!-- Status Bar -->
-    <sys:String x:Key="Ready">
-        已就绪
-    </sys:String>
+    <sys:String x:Key="Ready">已就绪</sys:String>
     <!-- Top Menu -->
-    <sys:String x:Key="AddLayer">
-        添加图层
-    </sys:String>
-    <sys:String x:Key="DeleteLayer">
-        删除图层
-    </sys:String>
-    <sys:String x:Key="CopyLayer">
-        复制图层
-    </sys:String>
-    <sys:String x:Key="SetLayer">
-        图层设置
-    </sys:String>
-    <sys:String x:Key="AddBarrage">
-        添加弹幕
-    </sys:String>
-    <sys:String x:Key="DeleteBarrage">
-        删除弹幕
-    </sys:String>
-    <sys:String x:Key="CopyBarrage">
-        复制弹幕
-    </sys:String>
-    <sys:String x:Key="SetBarrage">
-        弹幕设置
-    </sys:String>
+    <sys:String x:Key="AddLayer">添加图层</sys:String>
+    <sys:String x:Key="DeleteLayer">删除图层</sys:String>
+    <sys:String x:Key="CopyLayer">复制图层</sys:String>
+    <sys:String x:Key="SetLayer">图层设置</sys:String>
+    <sys:String x:Key="AddParticle">添加粒子</sys:String>
+    <sys:String x:Key="DeleteParticle">删除粒子</sys:String>
+    <sys:String x:Key="CopyParticle">复制粒子</sys:String>
+    <sys:String x:Key="SetParticle">粒子设置</sys:String>
     <!-- Message Box -->
-    <sys:String x:Key="TipTitle">
-        提示
-    </sys:String>
-    <sys:String x:Key="ConfirmDeleteBarrage">
-        确定要删除此弹幕吗（删除后无法撤销）？
-    </sys:String>
-    <sys:String x:Key="CanNotDeleteAllBarrage">
-        不能删除所有弹幕
-    </sys:String>   
-    <sys:String x:Key="CanNotDeleteAllLayer">
-        不能删除所有图层
-    </sys:String>
-    <sys:String x:Key="LayerNameCanNotBeEmpty">
-        图层名称不能为空
-    </sys:String>
-    <sys:String x:Key="ValueInvalid">
-        数值填入有误，请重试
-    </sys:String>
+    <sys:String x:Key="TipTitle">提示</sys:String>
+    <sys:String x:Key="ConfirmDeleteParticle">确定要删除此粒子吗（删除后无法撤销）？</sys:String>
+    <sys:String x:Key="CanNotDeleteAllParticle">不能删除所有粒子</sys:String>   
+    <sys:String x:Key="CanNotDeleteAllLayer">不能删除所有图层</sys:String>
+    <sys:String x:Key="ParticleNameCanNotBeEmpty">粒子名称不能为空</sys:String>
+    <sys:String x:Key="ParticleNameSuccessfullyChanged">粒子名称修改成功</sys:String>
+    <sys:String x:Key="LayerNameCanNotBeEmpty">图层名称不能为空</sys:String>
+    <sys:String x:Key="ValueInvalid">数值填入有误，请重试</sys:String>
     <!-- File Window-->
-    <sys:String x:Key="ImageType">
-        PNG图像(*.png)|*.png
-    </sys:String>
-    <sys:String x:Key="BackGroundImageType">
-        JPEG图像(*.jpg)|*.jpg|PNG图像(*.png)|*.png|BMP图像(*.bmp)|*.bmp
-    </sys:String>
+    <sys:String x:Key="ImageType">PNG图像(*.png)|*.png</sys:String>
+    <sys:String x:Key="BackGroundImageType">JPEG图像(*.jpg)|*.jpg|PNG图像(*.png)|*.png|BMP图像(*.bmp)|*.bmp</sys:String>
     <!-- Component Sidebar -->
-    <sys:String x:Key="DoubleClickTip">
-        继续双击进入属性面板
-    </sys:String>
-    <sys:String x:Key="ComponentUnit">
-        个组件
-    </sys:String>
+    <sys:String x:Key="DoubleClickTip">继续双击进入属性面板</sys:String>
+    <sys:String x:Key="ComponentUnit">个组件</sys:String>
 </ResourceDictionary>

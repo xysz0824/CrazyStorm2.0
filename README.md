@@ -1,20 +1,24 @@
 ![Logo](/logo.png)
-# ABOUT
-CrazyStorm is a visual editor for particle barrage to make game easier.
-The project is developing now so we prohibit fork temporarily.Please wait, thank you.
-## What's new
+# About
+CrazyStorm is a visual editor for particle to make game effect easier.
+The project is developing now so we prohibit unofficial modification and other usage temporarily. Please wait official version, thank you!
+
+## Features Overview
+Wait to work out.
+
+## What's Our Goal
 1. Opensource
 2. New format and old version conversion
-3. Script 
+3. Independent player
 4. Universal engine framework to support multiplatforms
-5. Independent player
-6. so on  
+6. Script support
+6. so on
 
-## Development Environment
-- Windows 7 x64
-- Visual Studio 2010  
+## Runtime Environment
+- Windows XP/Vista/7 or above
+- .NET Framework 4.0
 
-## LICENSE
+## License
 The MIT License (MIT)
 
 Copyright (c) StarX 2015 

@@ -17,12 +17,7 @@
         <Style TargetType="Image">
             <Style.Triggers>
                 <Trigger Property="IsEnabled" Value="False">
-                    <Setter Property="Effect">
-                        <Setter.Value>
-                            <ef:ColorToneEffect  DarkColor="Black" Desaturation="1" ToneAmount="0" LightColor="#FF979797"/>
-                        </Setter.Value>
-                    </Setter>
-                    <Setter Property="Opacity" Value="0.5" />
+                    <Setter Property="Opacity" Value="0.4" />
                 </Trigger>
             </Style.Triggers>
         </Style>
@@ -93,6 +88,56 @@
                             <Trigger Property="UIElement.IsMouseOver" Value="True">
                                 <Setter Property="Panel.Background" TargetName="Bd" Value="#00FFFFFF">
                                 </Setter>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style TargetType="TabItem">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TabItem">
+                        <Grid>
+                            <Border Name="bd" Background="{TemplateBinding Background}" BorderBrush="#8C8E94"
+                            BorderThickness="1" CornerRadius="1,1,0,0" Margin="0,0,0,0">
+                                <ContentPresenter ContentSource="Header" Margin="8,1"/>
+                            </Border>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter TargetName="bd" Property="Background" Value="White" />
+                                <Setter TargetName="bd" Property="Margin" Value="0" />
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="bd" Property="Background" Value="White" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style TargetType="TabItem" x:Key="CanCloseStyle">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TabItem">
+                        <Grid>
+                            <Border Name="bd" Background="{TemplateBinding Background}" BorderBrush="#8C8E94"
+                            BorderThickness="1" CornerRadius="1,1,0,0" Margin="0,0,0,0">
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
+                                    <ContentPresenter ContentSource="Header" Margin="8,1"/>
+                                    <Image Name="TabClose" Source="Images/close.png" Width="11" Height="11" Margin="0,0,5,0" 
+                                           VerticalAlignment="Center" HorizontalAlignment="Center" MouseLeftButtonDown="TabClose_MouseLeftButtonDown" />
+                                </StackPanel>
+                            </Border>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter TargetName="bd" Property="Background" Value="White" />
+                                <Setter TargetName="bd" Property="Margin" Value="0" />
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="bd" Property="Background" Value="White" />
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -194,13 +239,13 @@
                 <MenuItem Header="添加音效" />
                 <MenuItem Header="添加脚本" />
             </MenuItem>
-            <MenuItem Name="BarrageMenu" Header="弹幕" Click="BarrageMenu_Click" >
-                <MenuItem Name="AddBarrageItem" Header="添加弹幕" />
-                <MenuItem Name="DeleteBarrageItem" Header="删除弹幕" />
+            <MenuItem Name="ParticleMenu" Header="粒子" Click="ParticleMenu_Click" >
+                <MenuItem Name="AddParticleItem" Header="添加粒子" />
+                <MenuItem Name="DeleteParticleItem" Header="删除粒子" />
                 <Separator/>
-                <MenuItem Name="CopyBarrageItem" Header="复制弹幕" />
+                <MenuItem Name="CopyParticleItem" Header="复制粒子" />
                 <Separator/>
-                <MenuItem Name="SetBarrageItem" Header="弹幕设置" />
+                <MenuItem Name="SetParticleItem" Header="粒子设置" />
             </MenuItem>
             <MenuItem Name="LayerMenu"  Header="图层" Click="LayerMenu_Click">
                 <MenuItem Name ="AddLayerItem" Header="添加图层" />
@@ -211,14 +256,14 @@
                 <MenuItem Name="SetLayerItem" Header="图层设置" />
             </MenuItem>
             <MenuItem Header="组件" >
-                <MenuItem Name="DeleteComponentItem" Header="删除组件" InputGestureText="Del" Click="DeleteComponent_Click" />
+                <MenuItem Name="DeleteComponentItem" Header="删除组件" InputGestureText="Del" Click="DeleteComponentItem_Click" />
                 <Separator/>
                 <MenuItem Name="BindComponentItem" Header="组件绑定" InputGestureText="Ctrl+B"/>
                 <MenuItem Name="UnbindComponentItem" Header="组件解绑" InputGestureText="Ctrl+N"/>
             </MenuItem>
             <MenuItem Header="测试" >
-                <MenuItem Header="测试当前弹幕" InputGestureText="F5"/>
-                <MenuItem Header="测试所有弹幕" InputGestureText="F10"/>
+                <MenuItem Header="测试当前粒子" InputGestureText="F5"/>
+                <MenuItem Header="测试所有粒子" InputGestureText="F10"/>
                 <Separator/>
                 <MenuItem Header="测试设置" />
             </MenuItem>
@@ -258,7 +303,7 @@
             <Button Name="PasteButton" IsDefault="False" IsCancel="False" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ToolTip="粘贴" Click="PasteButton_Click">
                 <Image Source="Images/edit-paste-3.ico" Stretch="None" />
             </Button>
-            <Button Name="FindButton" IsDefault="False" IsCancel="False" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ToolTip="粘贴">
+            <Button Name="FindButton" IsDefault="False" IsCancel="False" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ToolTip="查找" >
                 <Image Source="Images/edit-find-5.ico" Stretch="None" />
             </Button>
             <Separator/>
@@ -276,7 +321,7 @@
                 <Image Source="Images/configure-5.ico" Stretch="None" />
             </Button>
         </ToolBar>
-        <!-- Middle Grid -->
+        <!-- Main Grid -->
         <Grid Height="Auto" Name="grid1" Width="Auto">
             <Grid.RowDefinitions>
                 <RowDefinition/>
@@ -294,9 +339,9 @@
                     <ColumnDefinition/>
                 </Grid.ColumnDefinitions>
                 <GridSplitter HorizontalAlignment="Right" Name="gridSplitter3" Width="1" Background="#FFDBDBDB" IsEnabled="False"/>
-                <!-- BarrageScreen -->
+                <!-- ParticleScreen -->
                 <ScrollViewer  Grid.Column="1" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
-                    <TabControl Name="BarrageTabControl" SelectionChanged="BarrageTabControl_SelectionChanged" MouseLeave="BarrageTabControl_MouseLeave" MouseLeftButtonUp="BarrageTabControl_MouseLeftButtonUp">
+                    <TabControl Name="ParticleTabControl" SelectionChanged="ParticleTabControl_SelectionChanged" MouseLeave="ParticleTabControl_MouseLeave" MouseLeftButtonUp="ParticleTabControl_MouseLeftButtonUp">
                         <TabControl.Background>
                             <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
                                 <GradientStop Color="#FFD4D4D4" Offset="0" />
@@ -305,7 +350,8 @@
                         </TabControl.Background>
                         <TabControl.ItemTemplate>
                             <DataTemplate>
-                                <Canvas Name="Screen" Width="{Binding Path=ScreenWidth}" Height="{Binding Path=ScreenHeight}" PreviewMouseLeftButtonDown="Screen_MouseLeftButtonDown" PreviewMouseMove="Screen_MouseMove" PreviewMouseRightButtonDown="Screen_MouseRightButtonDown">
+                                <Canvas Name="Screen" Width="{Binding Path=ScreenWidth}" Height="{Binding Path=ScreenHeight}" PreviewMouseLeftButtonDown="Screen_MouseLeftButtonDown" 
+                                        PreviewMouseMove="Screen_MouseMove" PreviewMouseRightButtonDown="Screen_MouseRightButtonDown">
                                     <Canvas.Background>
                                         <SolidColorBrush Color="Black"/>
                                     </Canvas.Background>
@@ -350,137 +396,139 @@
                     </TabControl>
                 </ScrollViewer>
                 <!-- Sidebar -->
-                <TabControl  Margin="0,0,0,0" Name="LeftTabControl">
-                    <TabItem Header="组件" Name="Frequent" Padding="6,5,6,1" HorizontalAlignment="Left" Width="42">
-                        <DockPanel Name="ComponentPanel">
-                            <GroupBox DockPanel.Dock="Top" Header="组件板" VerticalAlignment="Top" Height="60" HorizontalAlignment="Stretch" 
+                <DockPanel Background="#FFF9F9F9">
+                    <GroupBox DockPanel.Dock="Bottom" Header="已选中" Height="100" BorderBrush="#FFC6C6C6" Name="SelectedGroup" Opacity="0">
+                        <GroupBox.Background>
+                            <ImageBrush ImageSource="Images/selectedgroup.png" Stretch="Uniform"/>
+                        </GroupBox.Background>
+                        <Canvas>
+                            <Canvas.Background>
+                                <ImageBrush/>
+                            </Canvas.Background>
+                            <Image Source="Images/button1.png" Width="42" Canvas.Left="10" Canvas.Top="10" >
+                                <Image.Effect>
+                                    <DropShadowEffect ShadowDepth="0" BlurRadius="10" Opacity="0.5"/>
+                                </Image.Effect>
+                            </Image>
+                            <TextBlock Name="SelectedGroupType" Canvas.Left="66" Canvas.Top="10" />
+                            <TextBlock Name="SelectedGroupName" Canvas.Left="66" Canvas.Top="26" FontSize="20" />
+                            <TextBlock Name="SelectedGroupTip" Canvas.Left="8" Canvas.Top="59" Foreground="#FF8B8B8B" />
+                        </Canvas>
+                    </GroupBox>
+                    <TabControl  Margin="0,0,0,0" Name="LeftTabControl" VerticalContentAlignment="Stretch" HorizontalContentAlignment="Stretch">
+                        <TabItem Header="组件" Name="Frequent" Padding="6,5,6,1">
+                            <DockPanel Name="ComponentPanel">
+                                <GroupBox DockPanel.Dock="Top" Header="组件板" VerticalAlignment="Top" Height="60" HorizontalAlignment="Stretch" 
                                       HorizontalContentAlignment="Center" VerticalContentAlignment="Center" BorderBrush="#FFC6C6C6">
-                                <StackPanel Name="stackPanel1" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
-                                    <Button Name="Emitter" Width="33" Height="33" Padding="0" Margin="1,1,2,1" Background="#00000000" Click="Component_Click">
-                                        <Image Name="EmitterImage" Source="Images/button1.png" Stretch="Uniform" ToolTip="发射器" 
+                                    <StackPanel Name="stackPanel1" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                        <Button Name="Emitter" Width="33" Height="33" Padding="0" Margin="1,1,2,1" Background="#00000000" Click="Component_Click">
+                                            <Image Name="EmitterImage" Source="Images/button1.png" Stretch="Uniform" ToolTip="多向发射器" 
                                                MouseEnter="Component_MouseEnter" MouseLeave="Component_MouseLeave" Width="27" Height="27" />
-                                    </Button>
-                                    <Button Name="Laser" Width="33" Height="33" Background="{x:Null}" Padding="0" Margin="1,1,2,1" Click="Component_Click">
-                                        <Image Name="LaserImage" Source="Images/button2.png" Stretch="Uniform" ToolTip="激光" 
+                                        </Button>
+                                        <Button Name="Laser" Width="33" Height="33" Background="{x:Null}" Padding="0" Margin="1,1,2,1" Click="Component_Click">
+                                            <Image Name="LaserImage" Source="Images/button2.png" Stretch="Uniform" ToolTip="激光发射器" 
                                                MouseEnter="Component_MouseEnter" MouseLeave="Component_MouseLeave" Width="27" Height="27" />
-                                    </Button>
-                                    <Button Name="Mask" Width="33" Height="33" Background="{x:Null}" Padding="0" Margin="1,1,2,1" Click="Component_Click">
-                                        <Image Name="MaskImage" Source="Images/button3.png" Stretch="Uniform" ToolTip="遮罩" 
+                                        </Button>
+                                        <Button Name="Mask" Width="33" Height="33" Background="{x:Null}" Padding="0" Margin="1,1,2,1" Click="Component_Click">
+                                            <Image Name="MaskImage" Source="Images/button3.png" Stretch="Uniform" ToolTip="遮罩" 
                                                MouseEnter="Component_MouseEnter" MouseLeave="Component_MouseLeave" Width="27" Height="27" />
-                                    </Button>
-                                    <Button Name="Rebound" Width="33" Height="33" Background="{x:Null}" Padding="0" Margin="1,1,2,1" Click="Component_Click">
-                                        <Image Name="ReboundImage" Source="Images/button4.png" Stretch="Uniform" ToolTip="反弹板" 
+                                        </Button>
+                                        <Button Name="Rebound" Width="33" Height="33" Background="{x:Null}" Padding="0" Margin="1,1,2,1" Click="Component_Click">
+                                            <Image Name="ReboundImage" Source="Images/button4.png" Stretch="Uniform" ToolTip="反弹板" 
                                                MouseEnter="Component_MouseEnter" MouseLeave="Component_MouseLeave" Width="27" Height="27" />
-                                    </Button>
-                                    <Button Name="Force" Width="33" Height="33" Background="{x:Null}" Padding="0" Margin="1,1,2,1" Click="Component_Click">
-                                        <Image Name="ForceImage" Source="Images/button5.png" Stretch="Uniform" ToolTip="力场" 
+                                        </Button>
+                                        <Button Name="Force" Width="33" Height="33" Background="{x:Null}" Padding="0" Margin="1,1,2,1" Click="Component_Click">
+                                            <Image Name="ForceImage" Source="Images/button5.png" Stretch="Uniform" ToolTip="力场" 
                                                MouseEnter="Component_MouseEnter" MouseLeave="Component_MouseLeave" Width="27" Height="27" />
-                                    </Button>
-                                </StackPanel>
-                            </GroupBox>
-                            <GroupBox DockPanel.Dock="Bottom" Header="已选中" Height="100" BorderBrush="#FFC6C6C6" Name="SelectedGroup" Opacity="0">
-                                <GroupBox.Background>
-                                    <ImageBrush ImageSource="Images/selectedgroup.png" Stretch="Uniform"/>
-                                </GroupBox.Background>
-                                <Canvas>
-                                    <Canvas.Background>
-                                        <ImageBrush/>
-                                    </Canvas.Background>
-                                    <Image Source="Images/button1.png" Width="42" Canvas.Left="10" Canvas.Top="10" >
-                                        <Image.Effect>
-                                            <DropShadowEffect ShadowDepth="0" BlurRadius="10" Opacity="0.5"/>
-                                        </Image.Effect>
-                                    </Image>
-                                    <TextBlock Name="SelectedGroupType" Canvas.Left="66" Canvas.Top="10" />
-                                    <TextBlock Name="SelectedGroupName" Canvas.Left="66" Canvas.Top="26" FontSize="20" />
-                                    <TextBlock Name="SelectedGroupTip" Canvas.Left="8" Canvas.Top="59" Foreground="#FF8B8B8B" />
-                                </Canvas>
-                            </GroupBox>
-                            <GroupBox Header="组件浏览器" Name="Explorer" >
-                                <TreeView Name="ComponentList" Padding="-2,1,1,1">
-                                    <TreeView.ItemTemplate >
-                                        <HierarchicalDataTemplate ItemsSource="{Binding Children}">
-                                            <TextBlock Text="{Binding Name}" 
+                                        </Button>
+                                    </StackPanel>
+                                </GroupBox>
+                                <GroupBox Header="组件浏览器" Name="Explorer" VerticalContentAlignment="Stretch" HorizontalContentAlignment="Stretch" >
+                                    <TreeView Name="ComponentList" Padding="-2,1,1,1" VerticalContentAlignment="Stretch" HorizontalContentAlignment="Stretch">
+                                        <TreeView.ItemTemplate >
+                                            <HierarchicalDataTemplate ItemsSource="{Binding Children}">
+                                                <TextBlock Text="{Binding Name}" 
                                                        MouseLeftButtonDown="ComponentList_MouseLeftButtonDown" 
                                                        PreviewMouseRightButtonDown="ComponentList_PreviewMouseRightButtonDown">
-                                                <TextBlock.ContextMenu>
-                                                    <ContextMenu>
-                                                        <MenuItem Name="CopyComponent"  Header="复制" Click="CopyComponent_Click"></MenuItem>
-                                                        <MenuItem Name="DelComponent" Header="删除" Click="DelComponent_Click"></MenuItem>
-                                                    </ContextMenu>
-                                                </TextBlock.ContextMenu>
-                                                <TextBlock.Style >
-                                                    <Style TargetType="TextBlock">
-                                                        <Style.Triggers>
-                                                            <DataTrigger Binding="{Binding HasOutStandingTask}" Value="true">
-                                                                <Setter Property="Foreground" Value="DarkOrange" />
-                                                            </DataTrigger>
-                                                            <DataTrigger Binding="{Binding HasOutStandingTask}" Value="false">
-                                                                <Setter Property="Foreground" Value="Aqua" />
-                                                            </DataTrigger>
-                                                        </Style.Triggers>
-                                                    </Style>
-                                                </TextBlock.Style>
-                                            </TextBlock>
-                                        </HierarchicalDataTemplate>
-                                    </TreeView.ItemTemplate>
-                                </TreeView>
-                            </GroupBox>
-                        </DockPanel>
-                    </TabItem>
-                    <TabItem Header="资源" Name="Resource" Padding="6,5,6,1">
-                        <StackPanel>
-                            <GroupBox Header="图案" Height="138" Margin="0">
-                                <TreeView Name="ImageList" Padding="-12,1,1,1" PreviewMouseRightButtonDown="ImageList_PreviewMouseRightButtonDown" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.HorizontalScrollBarVisibility="Auto">
-                                    <TreeView.ContextMenu>
-                                        <ContextMenu>
-                                            <MenuItem Name="AddImage" Header="添加图案" Click="AddImageItem_Click" />
-                                        </ContextMenu>
-                                    </TreeView.ContextMenu>
-                                    <TreeView.ItemTemplate>
-                                        <DataTemplate>
-                                            <DockPanel>
-                                                <DockPanel.ContextMenu >
-                                                    <ContextMenu>
-                                                        <MenuItem Name="DeleteImage" Header="删除" Click="DeleteImage_Click" />
-                                                    </ContextMenu>
-                                                </DockPanel.ContextMenu>
-                                                <TextBlock Text="{Binding Path=Label}">
-                                                    <TextBlock.TextDecorations>
-                                                        <Binding Path="Valid" Converter="{StaticResource ResourceValidConverter}"/>
-                                                    </TextBlock.TextDecorations>
+                                                    <TextBlock.ContextMenu>
+                                                        <ContextMenu>
+                                                            <MenuItem Name="CopyComponent"  Header="复制" Click="CopyComponent_Click"></MenuItem>
+                                                            <MenuItem Name="DeleteComponent" Header="删除" Click="DeleteComponent_Click"></MenuItem>
+                                                        </ContextMenu>
+                                                    </TextBlock.ContextMenu>
+                                                    <TextBlock.Style >
+                                                        <Style TargetType="TextBlock">
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding HasOutStandingTask}" Value="true">
+                                                                    <Setter Property="Foreground" Value="DarkOrange" />
+                                                                </DataTrigger>
+                                                                <DataTrigger Binding="{Binding HasOutStandingTask}" Value="false">
+                                                                    <Setter Property="Foreground" Value="Aqua" />
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </TextBlock.Style>
                                                 </TextBlock>
-                                                <DockPanel.ToolTip>
-                                                    <ToolTip>
-                                                        <Image Source="{Binding Path=AbsolutePath}" Stretch="Uniform" Width="128" Height="128" StretchDirection="Both" />
-                                                    </ToolTip>
-                                                </DockPanel.ToolTip>
-                                            </DockPanel>
-                                        </DataTemplate>
-                                    </TreeView.ItemTemplate>
-                                </TreeView>
-                            </GroupBox>
-                            <GroupBox Header="音效" Height="138" Margin="0">
-                                <TreeView Name="SoundList" Padding="-12,1,1,1">
-                                    <TreeView.ContextMenu>
-                                        <ContextMenu>
-                                            <MenuItem Name="AddSound" Header="添加音效" Click="AddSound_Click" />
-                                        </ContextMenu>
-                                    </TreeView.ContextMenu>
-                                </TreeView>
-                            </GroupBox>
-                            <GroupBox Header="脚本" Height="138" Margin="0">
-                                <TreeView Name="ScriptList" Padding="-12,1,1,1">
-                                    <TreeView.ContextMenu>
-                                        <ContextMenu>
-                                            <MenuItem Name="AddScript" Header="添加脚本" Click="AddScript_Click" />
-                                        </ContextMenu>
-                                    </TreeView.ContextMenu>
-                                </TreeView>
-                            </GroupBox>
-                        </StackPanel>
-                    </TabItem>
-                </TabControl>
+                                            </HierarchicalDataTemplate>
+                                        </TreeView.ItemTemplate>
+                                    </TreeView>
+                                </GroupBox>
+                            </DockPanel>
+                        </TabItem>
+                        <TabItem Header="资源" Name="Resource" Padding="6,5,6,1">
+                            <StackPanel>
+                                <GroupBox Header="图案" Height="138" Margin="0">
+                                    <TreeView Name="ImageList" Padding="-12,1,1,1" PreviewMouseRightButtonDown="ImageList_PreviewMouseRightButtonDown" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.HorizontalScrollBarVisibility="Auto">
+                                        <TreeView.ContextMenu>
+                                            <ContextMenu>
+                                                <MenuItem Name="AddImage" Header="添加图案" Click="AddImageItem_Click" />
+                                            </ContextMenu>
+                                        </TreeView.ContextMenu>
+                                        <TreeView.ItemTemplate>
+                                            <DataTemplate>
+                                                <DockPanel>
+                                                    <DockPanel.ContextMenu >
+                                                        <ContextMenu>
+                                                            <MenuItem Name="DeleteImage" Header="删除" Click="DeleteImage_Click" />
+                                                        </ContextMenu>
+                                                    </DockPanel.ContextMenu>
+                                                    <TextBlock Text="{Binding Path=Label}">
+                                                        <TextBlock.TextDecorations>
+                                                            <Binding Path="Valid" Converter="{StaticResource ResourceValidConverter}"/>
+                                                        </TextBlock.TextDecorations>
+                                                    </TextBlock>
+                                                    <DockPanel.ToolTip>
+                                                        <ToolTip>
+                                                            <Image Source="{Binding Path=AbsolutePath}" Stretch="Uniform" Width="128" Height="128" StretchDirection="Both" />
+                                                        </ToolTip>
+                                                    </DockPanel.ToolTip>
+                                                </DockPanel>
+                                            </DataTemplate>
+                                        </TreeView.ItemTemplate>
+                                    </TreeView>
+                                </GroupBox>
+                                <GroupBox Header="音效" Height="138" Margin="0">
+                                    <TreeView Name="SoundList" Padding="-12,1,1,1">
+                                        <TreeView.ContextMenu>
+                                            <ContextMenu>
+                                                <MenuItem Name="AddSound" Header="添加音效" Click="AddSound_Click" />
+                                            </ContextMenu>
+                                        </TreeView.ContextMenu>
+                                    </TreeView>
+                                </GroupBox>
+                                <GroupBox Header="脚本" Height="138" Margin="0">
+                                    <TreeView Name="ScriptList" Padding="-12,1,1,1">
+                                        <TreeView.ContextMenu>
+                                            <ContextMenu>
+                                                <MenuItem Name="AddScript" Header="添加脚本" Click="AddScript_Click" />
+                                            </ContextMenu>
+                                        </TreeView.ContextMenu>
+                                    </TreeView>
+                                </GroupBox>
+                            </StackPanel>
+                        </TabItem>
+                    </TabControl>
+                </DockPanel>
             </Grid>
             <!-- Layerbar -->
             <Grid Grid.Row="1" Name="grid2" ShowGridLines="False" Margin="0">

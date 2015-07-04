@@ -15,24 +15,24 @@ namespace CrazyStorm
         public override void Redo(CommandStack stack)
         {
             base.Redo(stack);
-            var layer = parameter[0] as Layer;
-            history[1] = layer.Color;
-            layer.Color = (LayerColor)parameter[1];
-            history[2] = layer.BeginFrame;
-            layer.BeginFrame = (int)parameter[2];
-            history[3] = layer.TotalFrame;
-            layer.TotalFrame = (int)parameter[3];
-            history[4] = layer.Name;
-            layer.Name = (string)parameter[4];
+            var layer = Parameter[0] as Layer;
+            History[1] = layer.Color;
+            layer.Color = (LayerColor)Parameter[1];
+            History[2] = layer.BeginFrame;
+            layer.BeginFrame = (int)Parameter[2];
+            History[3] = layer.TotalFrame;
+            layer.TotalFrame = (int)Parameter[3];
+            History[4] = layer.Name;
+            layer.Name = (string)Parameter[4];
         }
         public override void Undo(CommandStack stack)
         {
             base.Undo(stack);
-            var layer = parameter[0] as Layer;
-            layer.Color = (LayerColor)history[1];
-            layer.BeginFrame = (int)history[2];
-            layer.TotalFrame = (int)history[3];
-            layer.Name = (string)history[4];
+            var layer = Parameter[0] as Layer;
+            layer.Color = (LayerColor)History[1];
+            layer.BeginFrame = (int)History[2];
+            layer.TotalFrame = (int)History[3];
+            layer.Name = (string)History[4];
         }
     }
 }

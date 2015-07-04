@@ -49,6 +49,7 @@ namespace CrazyStorm
             frame++;
             if (Opacity < 1.0f) 
                 Opacity += 0.1f;
+
             if (frame >= totalsecond * 60)
             {
                 dTimer.Stop();
