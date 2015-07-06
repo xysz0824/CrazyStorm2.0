@@ -20,7 +20,6 @@ namespace CrazyStorm
     class MoveComponentCommand : Command
     {
         Vector2 move;
-
         public Vector2 Move 
         { 
             get { return move; }
@@ -47,14 +46,29 @@ namespace CrazyStorm
             if (gridAlignment)
                 move *= 32f;
         }
+        public bool IsSameTarget(MoveComponentCommand command)
+        {
+            if (command == null)
+                return false;
+
+            var target1 = History[0] as List<Component>;
+            var target2 = command.History[0] as List<Component>;
+            if (target2 == null || target1.Count != target2.Count)
+                return false;
+
+            foreach (var item in target1)
+                if (!target2.Contains(item))
+                    return false;
+            
+            return true;
+        }
         public override void Redo(CommandStack stack)
         {
-            base.Redo(stack);
             List<Component> selectedComponents;
             if (History[0] == null)
             {
                 //Be careful that the reference of list could be modified outside, 
-                //so there should copy it.
+                //so they should be copyed.
                 selectedComponents = new List<Component>();
                 var temp = Parameter[0] as List<Component>;
                 foreach (var item in temp)
@@ -69,6 +83,10 @@ namespace CrazyStorm
                 item.X += move.x;
                 item.Y += move.y;
             }
+            //Because it needs first to initialize History[0],
+            //the base method is put in there instead of the start,
+            //otherwise the IsSamgeTarget() can't get right result.
+            base.Redo(stack);
         }
         public override void Undo(CommandStack stack)
         {

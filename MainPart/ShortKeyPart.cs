@@ -15,6 +15,7 @@ namespace CrazyStorm
         #region Window EventHandler
         private void CommandBinding_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
+            e.ContinueRouting = true;
             e.CanExecute = true;
             //Check if didn't select component the relevant command will be prohibited.
             var command = (RoutedUICommand)e.Command;

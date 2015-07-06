@@ -1,0 +1,48 @@
+﻿<UserControl x:Class="CrazyStorm.EmitterPanel"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             mc:Ignorable="d" Loaded="UserControl_Loaded">
+    <StackPanel Background="White">
+        <GroupBox Header="组件" Background="#FFF9F9F9">
+            <DataGrid Name="ComponentGrid" ItemsSource="{Binding}" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" 
+                          GridLinesVisibility="Horizontal" ColumnWidth="Auto" SelectionMode="Single" AutoGenerateColumns="False"  CanUserAddRows="False" CanUserReorderColumns="False" CanUserSortColumns="False" 
+                      ScrollViewer.CanContentScroll="False" CanUserResizeRows="False">
+                <DataGrid.HorizontalGridLinesBrush>
+                    <SolidColorBrush Color="{DynamicResource {x:Static SystemColors.ControlColorKey}}"/>
+                </DataGrid.HorizontalGridLinesBrush>
+                <DataGrid.Columns>
+                    <DataGridTextColumn x:Name="ComponentKey" Header="属性名" IsReadOnly="True" Binding="{Binding Name}" CanUserResize="False"/>
+                    <DataGridTextColumn x:Name="ComponentValue" Header="属性值" Binding="{Binding Value}" />
+                </DataGrid.Columns>
+            </DataGrid>
+        </GroupBox>
+        <GroupBox Header="发射器" Background="#FFF9F9F9">
+            <DataGrid Name="EmitterGrid" ItemsSource="{Binding}" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" 
+                          GridLinesVisibility="Horizontal" ColumnWidth="Auto" SelectionMode="Single" AutoGenerateColumns="False"  CanUserAddRows="False" CanUserReorderColumns="False" CanUserSortColumns="False" 
+                      ScrollViewer.CanContentScroll="False" CanUserResizeRows="False">
+                <DataGrid.HorizontalGridLinesBrush>
+                    <SolidColorBrush Color="{DynamicResource {x:Static SystemColors.ControlColorKey}}"/>
+                </DataGrid.HorizontalGridLinesBrush>
+                <DataGrid.Columns>
+                    <DataGridTextColumn x:Name="EmitterKey" Header="属性名" IsReadOnly="True" Binding="{Binding Name}" CanUserResize="False"/>
+                    <DataGridTextColumn x:Name="EmitterValue" Header="属性值" Binding="{Binding Value}" />
+                </DataGrid.Columns>
+            </DataGrid>
+        </GroupBox>
+        <GroupBox Header="粒子" Background="#FFF9F9F9">
+            <DataGrid Name="ParticleGrid" ItemsSource="{Binding}" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" 
+                          GridLinesVisibility="Horizontal" ColumnWidth="Auto" SelectionMode="Single" AutoGenerateColumns="False"  CanUserAddRows="False" CanUserReorderColumns="False" CanUserSortColumns="False" 
+                      ScrollViewer.CanContentScroll="False" CanUserResizeRows="False">
+                <DataGrid.HorizontalGridLinesBrush>
+                    <SolidColorBrush Color="{DynamicResource {x:Static SystemColors.ControlColorKey}}"/>
+                </DataGrid.HorizontalGridLinesBrush>
+                <DataGrid.Columns>
+                    <DataGridTextColumn x:Name="ParticleKey"  Header="属性名" IsReadOnly="True" Binding="{Binding Name}" CanUserResize="False"/>
+                    <DataGridTextColumn x:Name="ParticleValue"  Header="属性值" Binding="{Binding Value}" />
+                </DataGrid.Columns>
+            </DataGrid>
+        </GroupBox>
+    </StackPanel>
+</UserControl>

@@ -22,8 +22,8 @@ namespace CrazyStorm
         #region Constructor
         public CommandStack()
         {
-            redoCommands = new List<Command>();
-            undoCommands = new List<Command>();
+            redoCommands = new List<Command>(MaxSize);
+            undoCommands = new List<Command>(MaxSize);
         }
         #endregion
 
@@ -35,17 +35,20 @@ namespace CrazyStorm
         }
         static void DoCompact(List<Command> list, Command command)
         {
-            //As for move command, it's nessesary to merge to reduce occupation of command stack.
+            //As for move command, it's better to merge them to reduce occupation of command stack.
             if (list.Count > 0
-                && list[list.Count - 1] is MoveComponentCommand 
+                && list[list.Count - 1]  is MoveComponentCommand 
                 && command             is MoveComponentCommand)
             {
-                var last   = list[list.Count - 1] as MoveComponentCommand;
+                var last   = list[list.Count - 1]   as MoveComponentCommand;
                 var now = command              as MoveComponentCommand;
-                last.Move += now.Move;
+                if (last.IsSameTarget(now))
+                {
+                    last.Move += now.Move;
+                    return;
+                }
             }
-            else
-                list.Add(command);
+            list.Add(command);
         }
         #endregion
 
@@ -92,9 +95,8 @@ namespace CrazyStorm
                 StackChanged();
             return pop;
         }
-        public void Clear()
+        public void UndoClear()
         {
-            redoCommands.Clear();
             undoCommands.Clear();
         }
         #endregion

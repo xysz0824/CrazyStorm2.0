@@ -25,6 +25,7 @@ namespace CrazyStorm
                 history.Add(null);
 
             Redo(stack);
+            stack.UndoClear();
         }
         public virtual void Redo(CommandStack stack)
         {

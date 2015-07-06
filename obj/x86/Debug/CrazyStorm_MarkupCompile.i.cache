@@ -10,11 +10,11 @@ none
 false
 DEBUG;TRACE
 F:\LargeProject\CrazyStorm2.0\App.xaml
-11-1416356288
+11-930866782
 
-40-1518760129
+42621080506
 151738014222
-PropertyPanel\ForcePanel.xaml;PropertyPanel\LaserPanel.xaml;PropertyPanel\MaskPanel.xaml;PropertyPanel\ReboundPanel.xaml;SettingForm\ParticleSetting.xaml;Lang\Chinese.xaml;SettingForm\LayerSetting.xaml;Main.xaml;PropertyPanel\EmitterPanel.xaml;SettingForm\ScreenSetting.xaml;Startup.xaml;
+Property\ForcePanel.xaml;Property\LaserPanel.xaml;Property\MaskPanel.xaml;Property\ReboundPanel.xaml;Setting\ParticleSetting.xaml;Lang\Chinese.xaml;Setting\LayerSetting.xaml;Main.xaml;Property\EmitterPanel.xaml;Setting\ScreenSetting.xaml;Startup.xaml;
 
 False
 

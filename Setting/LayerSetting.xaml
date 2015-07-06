@@ -5,7 +5,7 @@
     <Canvas x:Name="Setting">
         <Label Content="图层名称" Canvas.Left="8" Canvas.Top="10"/>
         <Label Content="图层标识" Canvas.Left="8" Canvas.Top="40"/>
-        <Label Content="开始帧" Canvas.Left="8" Canvas.Top="70"/>
+        <Label Content="起始帧" Canvas.Left="8" Canvas.Top="70"/>
         <Label Content="持续帧" Canvas.Left="126" Canvas.Top="70"/>
         <Button Content="确定" Canvas.Left="81" Canvas.Top="108" Width="75" Click="Button_Click"/>
         <TextBox x:Name="LayerName" Height="23" Canvas.Left="81" TextWrapping="Wrap" Text="{Binding Path=Name, Mode=OneWay}" Canvas.Top="13" Width="139" MaxLength="20"/>

@@ -28,6 +28,7 @@ namespace CrazyStorm
         DependencyObject aimRect;
         Component aimComponent;
         DependencyObject selectionRect;
+        int selectionRectX, selectionRectY;
         bool selectingComponent;
         readonly List<Component> selectedComponents = new List<Component>();
         readonly DoubleClickDetector dclickDetector = new DoubleClickDetector();
@@ -49,7 +50,7 @@ namespace CrazyStorm
             }
             if (canvas != null)
             {
-                //Update components in current screen.
+                //Update components on current screen.
                 selectedComponents.Clear();
                 canvas.Children.Clear();
                 var itemTemplate = FindResource("ComponentItem") as DataTemplate;
@@ -120,7 +121,6 @@ namespace CrazyStorm
                         }
                     }
 
-            //Update.
             UpdateComponent();
             //Enable delection if selected one or more.
             DeleteComponentItem.IsEnabled = selectedComponents.Count > 0;
@@ -135,44 +135,6 @@ namespace CrazyStorm
             if (set.Count > 0 && dclickDetector.IsDetected())
                 CreatePropertyPanel(set.First());
         }
-        void UpdateSelectedGroup()
-        {
-            //Clean abandoned component.
-            for (int i = 0; i < selectedComponents.Count; ++i )
-                if (!selectedParticle.Components.Contains(selectedComponents[i]))
-                {
-                    selectedComponents.RemoveAt(i);
-                    i--;
-                }
-            //Update selected group.
-            if (selectedComponents.Count > 0)
-            {
-                SelectedGroup.Opacity = 1;
-                if (selectedComponents.Count == 1)
-                {
-                    var component = selectedComponents.First();
-                    SelectedGroupType.Text = component.GetType().Name;
-                    SelectedGroupName.Text = component.Name;
-                    SelectedGroupTip.Text = (string)FindResource("DoubleClickTip");
-                }
-                else
-                {
-                    SelectedGroupType.Text = "Group";
-                    SelectedGroupName.Text = selectedComponents.Count + (string)FindResource("ComponentUnit");
-                    SelectedGroupTip.Text = string.Empty;
-                }
-            }
-            else
-                SelectedGroup.Opacity = 0;
-        }
-        void CreateNewParticle()
-        {
-            var particle = new ParticleSystem("New Particle");
-            file.Particles.Add(particle);
-            selectedParticle = particle;
-            InitializeCommandStack();
-            AddNewParticleTab(particle);
-        }
         void AddNewParticleTab(ParticleSystem particle)
         {
             var tabItem = new TabItem();
@@ -180,39 +142,6 @@ namespace CrazyStorm
             tabItem.Content = ParticleTabControl.ItemTemplate.LoadContent() as Canvas;
             ParticleTabControl.Items.Add(tabItem);
             ParticleTabControl.SelectedItem = tabItem;
-        }
-        void DeleteSeletedParticle()
-        {
-            if (file.Particles.Count > 1)
-            {
-                TabItem selected = null;
-                foreach (TabItem item in ParticleTabControl.Items)
-                    if (selectedParticle.Name == (string)item.Header)
-                    {
-                        selected = item;
-                        break;
-                    }
-                if (MessageBox.Show((string)FindResource("ConfirmDeleteParticle"), (string)FindResource("TipTitle"),
-                    MessageBoxButton.YesNo, MessageBoxImage.Warning) == MessageBoxResult.Yes)
-                {
-                    commandStacks.Remove(selectedParticle);
-                    file.Particles.Remove(selectedParticle);
-                    ParticleTabControl.Items.Remove(selected);
-                }
-            }
-            else
-                MessageBox.Show((string)FindResource("CanNotDeleteAllParticle"), (string)FindResource("TipTitle"), 
-                    MessageBoxButton.OK, MessageBoxImage.Warning);
-        }
-        void CopySeletedParticle()
-        {
-            //TODO : Copy function.
-        }
-        void OpenSelectedParticleSetting()
-        {
-            ParticleSetting window = new ParticleSetting(file, selectedParticle, ParticleTabControl);
-            window.Owner = this;
-            window.ShowDialog();
         }
         #endregion
 
@@ -241,14 +170,28 @@ namespace CrazyStorm
                 //Display a coloured  rect to mark the range that is selecting.
                 if (selectionRect != null)
                 {
-                    var width =  x - (double)selectionRect.GetValue(Canvas.LeftProperty);
-                    if (width <= 0)
-                        width = 0;
-                    var height = y - (double)selectionRect.GetValue(Canvas.TopProperty);
-                    if (height <= 0)
-                        height = 0;
-                    selectionRect.SetValue(WidthProperty, width);
-                    selectionRect.SetValue(HeightProperty, height);
+                    var width = x - selectionRectX;
+                    if (width >= 0)
+                    {
+                        selectionRect.SetValue(Canvas.LeftProperty, (double)selectionRectX);
+                        selectionRect.SetValue(WidthProperty, (double)width);
+                    }
+                    else
+                    {
+                        selectionRect.SetValue(Canvas.LeftProperty, (double)x);
+                        selectionRect.SetValue(WidthProperty, (double)-width);
+                    }
+                    var height = y - selectionRectY;
+                    if (height >= 0)
+                    {
+                        selectionRect.SetValue(Canvas.TopProperty, (double)selectionRectY);
+                        selectionRect.SetValue(HeightProperty, (double)height);
+                    }
+                    else
+                    {
+                        selectionRect.SetValue(Canvas.TopProperty, (double)y);
+                        selectionRect.SetValue(HeightProperty, (double)-height);
+                    }
                 }
             }
         }
@@ -272,6 +215,8 @@ namespace CrazyStorm
             selectionRect = VisualDownwardSearch(content, "SelectingBox");
             selectionRect.SetValue(Canvas.LeftProperty, (double)x);
             selectionRect.SetValue(Canvas.TopProperty, (double)y);
+            selectionRectX = x;
+            selectionRectY = y;
             //When aimed then add component to where mouse down with left-button.
             if (aimRect != null)
             {
@@ -335,26 +280,6 @@ namespace CrazyStorm
             ScreenSetting window = new ScreenSetting(config);
             window.Owner = this;
             window.ShowDialog();
-        }
-        private void ParticleMenu_Click(object sender, RoutedEventArgs e)
-        {
-            //Navigate to the corresponding function of Particle menu.
-            var item = e.Source as MenuItem;
-            switch (item.Name)
-            {
-                case "AddParticleItem":
-                    CreateNewParticle();
-                    break;
-                case "DeleteParticleItem":
-                    DeleteSeletedParticle();
-                    break;
-                case "CopyParticleItem":
-                    CopySeletedParticle();
-                    break;
-                case "SetParticleItem":
-                    OpenSelectedParticleSetting();
-                    break;
-            }
         }
         #endregion
     }

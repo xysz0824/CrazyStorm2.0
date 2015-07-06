@@ -86,23 +86,23 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Page Include="PropertyPanel\ForcePanel.xaml">
+    <Page Include="Property\ForcePanel.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="PropertyPanel\LaserPanel.xaml">
+    <Page Include="Property\LaserPanel.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="PropertyPanel\MaskPanel.xaml">
+    <Page Include="Property\MaskPanel.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="PropertyPanel\ReboundPanel.xaml">
+    <Page Include="Property\ReboundPanel.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="SettingForm\ParticleSetting.xaml">
+    <Page Include="Setting\ParticleSetting.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -110,7 +110,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="SettingForm\LayerSetting.xaml">
+    <Page Include="Setting\LayerSetting.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -118,11 +118,11 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="PropertyPanel\EmitterPanel.xaml">
+    <Page Include="Property\EmitterPanel.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="SettingForm\ScreenSetting.xaml">
+    <Page Include="Setting\ScreenSetting.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -135,20 +135,22 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Factory\ComponentFactory.cs" />
-    <Compile Include="PropertyPanel\ForcePanel.xaml.cs">
+    <Compile Include="MainPart\ParticlePart.cs" />
+    <Compile Include="Property\ForcePanel.xaml.cs">
       <DependentUpon>ForcePanel.xaml</DependentUpon>
     </Compile>
-    <Compile Include="PropertyPanel\LaserPanel.xaml.cs">
+    <Compile Include="Property\LaserPanel.xaml.cs">
       <DependentUpon>LaserPanel.xaml</DependentUpon>
     </Compile>
-    <Compile Include="PropertyPanel\MaskPanel.xaml.cs">
+    <Compile Include="Property\MaskPanel.xaml.cs">
       <DependentUpon>MaskPanel.xaml</DependentUpon>
     </Compile>
     <Compile Include="Factory\PropertyPanelFactory.cs" />
-    <Compile Include="PropertyPanel\ReboundPanel.xaml.cs">
+    <Compile Include="Property\Property.cs" />
+    <Compile Include="Property\ReboundPanel.xaml.cs">
       <DependentUpon>ReboundPanel.xaml</DependentUpon>
     </Compile>
-    <Compile Include="SettingForm\ParticleSetting.xaml.cs">
+    <Compile Include="Setting\ParticleSetting.xaml.cs">
       <DependentUpon>ParticleSetting.xaml</DependentUpon>
     </Compile>
     <Compile Include="Edit\Command\Component\AddComponentCommand.cs" />
@@ -168,22 +170,22 @@
     <Compile Include="Edit\ClipBoard.cs" />
     <Compile Include="Edit\Command\ParameterEmptyException.cs" />
     <Compile Include="Helper\DoubleClickDetector.cs" />
-    <Compile Include="SettingForm\LayerSetting.xaml.cs">
+    <Compile Include="Setting\LayerSetting.xaml.cs">
       <DependentUpon>LayerSetting.xaml</DependentUpon>
     </Compile>
     <Compile Include="Main.xaml.cs">
       <DependentUpon>Main.xaml</DependentUpon>
     </Compile>
-    <Compile Include="MainPart\BarragePart.cs" />
+    <Compile Include="MainPart\ScreenPart.cs" />
     <Compile Include="MainPart\ComponentPart.cs" />
     <Compile Include="MainPart\EditPart.cs" />
     <Compile Include="MainPart\LayerPart.cs" />
     <Compile Include="MainPart\ResourcePart.cs" />
     <Compile Include="MainPart\ShortKeyPart.cs" />
-    <Compile Include="PropertyPanel\EmitterPanel.xaml.cs">
+    <Compile Include="Property\EmitterPanel.xaml.cs">
       <DependentUpon>EmitterPanel.xaml</DependentUpon>
     </Compile>
-    <Compile Include="SettingForm\ScreenSetting.xaml.cs">
+    <Compile Include="Setting\ScreenSetting.xaml.cs">
       <DependentUpon>ScreenSetting.xaml</DependentUpon>
     </Compile>
     <Compile Include="Startup.xaml.cs">
@@ -332,6 +334,9 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Images\close.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\group.png" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="icon.ico" />

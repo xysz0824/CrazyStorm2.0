@@ -274,7 +274,7 @@
         </Menu>
         <!-- Status Bar -->
         <StatusBar Height="23" Width="Auto" DockPanel.Dock="Bottom" Background="#FFE4E4E4" Padding="1,0,6,0">
-            <StatusBarItem Name="StatusText" Content="{Binding Path=Status}" />
+            <StatusBarItem Name="StatusText" Content="{Binding Path=Status}" Background="#FFF9F9F9" />
         </StatusBar>
         <!-- Tool Bar -->
         <ToolBar Height="34" Name="ToolBar" Width="Auto" DockPanel.Dock="Top" HorizontalAlignment="Stretch" AllowDrop="False">
@@ -322,10 +322,10 @@
             </Button>
         </ToolBar>
         <!-- Main Grid -->
-        <Grid Height="Auto" Name="grid1" Width="Auto">
+        <Grid Height="Auto" Width="Auto">
             <Grid.RowDefinitions>
                 <RowDefinition/>
-                <RowDefinition Height="100"/>
+                <RowDefinition Height="126"/>
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition/>
@@ -341,7 +341,8 @@
                 <GridSplitter HorizontalAlignment="Right" Name="gridSplitter3" Width="1" Background="#FFDBDBDB" IsEnabled="False"/>
                 <!-- ParticleScreen -->
                 <ScrollViewer  Grid.Column="1" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
-                    <TabControl Name="ParticleTabControl" SelectionChanged="ParticleTabControl_SelectionChanged" MouseLeave="ParticleTabControl_MouseLeave" MouseLeftButtonUp="ParticleTabControl_MouseLeftButtonUp">
+                    <TabControl Name="ParticleTabControl" SelectionChanged="ParticleTabControl_SelectionChanged" 
+                                MouseLeave="ParticleTabControl_MouseLeave" MouseLeftButtonUp="ParticleTabControl_MouseLeftButtonUp">
                         <TabControl.Background>
                             <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
                                 <GradientStop Color="#FFD4D4D4" Offset="0" />
@@ -405,7 +406,8 @@
                             <Canvas.Background>
                                 <ImageBrush/>
                             </Canvas.Background>
-                            <Image Source="Images/button1.png" Width="42" Canvas.Left="10" Canvas.Top="10" >
+                            <Image Name="SelectedGroupImage" RenderOptions.BitmapScalingMode="HighQuality" Source="Images/button1.png" 
+                                   Width="42" Canvas.Left="10" Canvas.Top="10" >
                                 <Image.Effect>
                                     <DropShadowEffect ShadowDepth="0" BlurRadius="10" Opacity="0.5"/>
                                 </Image.Effect>
@@ -421,30 +423,33 @@
                                 <GroupBox DockPanel.Dock="Top" Header="组件板" VerticalAlignment="Top" Height="60" HorizontalAlignment="Stretch" 
                                       HorizontalContentAlignment="Center" VerticalContentAlignment="Center" BorderBrush="#FFC6C6C6">
                                     <StackPanel Name="stackPanel1" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
-                                        <Button Name="Emitter" Width="33" Height="33" Padding="0" Margin="1,1,2,1" Background="#00000000" Click="Component_Click">
-                                            <Image Name="EmitterImage" Source="Images/button1.png" Stretch="Uniform" ToolTip="多向发射器" 
-                                               MouseEnter="Component_MouseEnter" MouseLeave="Component_MouseLeave" Width="27" Height="27" />
+                                        <Button Name="Emitter" Width="32" Height="32" Padding="0" Margin="1,1,2,1" Background="#00000000" Click="Component_Click">
+                                            <Image RenderOptions.BitmapScalingMode="NearestNeighbor" Name="EmitterImage" Source="Images/button1.png" Stretch="Uniform" ToolTip="多向发射器" 
+                                               MouseEnter="Component_MouseEnter" MouseLeave="Component_MouseLeave" Width="28" Height="28"  UseLayoutRounding="True"/>
                                         </Button>
-                                        <Button Name="Laser" Width="33" Height="33" Background="{x:Null}" Padding="0" Margin="1,1,2,1" Click="Component_Click">
-                                            <Image Name="LaserImage" Source="Images/button2.png" Stretch="Uniform" ToolTip="激光发射器" 
-                                               MouseEnter="Component_MouseEnter" MouseLeave="Component_MouseLeave" Width="27" Height="27" />
+                                        <Button Name="Laser" Width="32" Height="32" Background="{x:Null}" Padding="0" Margin="1,1,2,1" Click="Component_Click">
+                                            <Image RenderOptions.BitmapScalingMode="NearestNeighbor" Name="LaserImage" Source="Images/button2.png" Stretch="Uniform" ToolTip="激光发射器" 
+                                               MouseEnter="Component_MouseEnter" MouseLeave="Component_MouseLeave" Width="28" Height="28"  UseLayoutRounding="True"/>
                                         </Button>
-                                        <Button Name="Mask" Width="33" Height="33" Background="{x:Null}" Padding="0" Margin="1,1,2,1" Click="Component_Click">
-                                            <Image Name="MaskImage" Source="Images/button3.png" Stretch="Uniform" ToolTip="遮罩" 
-                                               MouseEnter="Component_MouseEnter" MouseLeave="Component_MouseLeave" Width="27" Height="27" />
+                                        <Button Name="Mask" Background="{x:Null}" Padding="0" Margin="1,1,2,1" Click="Component_Click" Width="32" Height="32">
+                                            <Image  RenderOptions.BitmapScalingMode="NearestNeighbor" Name="MaskImage" Source="Images/button3.png" ToolTip="遮罩" 
+                                               MouseEnter="Component_MouseEnter" MouseLeave="Component_MouseLeave" Width="28" Height="28" UseLayoutRounding="True">
+                                            </Image>
                                         </Button>
-                                        <Button Name="Rebound" Width="33" Height="33" Background="{x:Null}" Padding="0" Margin="1,1,2,1" Click="Component_Click">
-                                            <Image Name="ReboundImage" Source="Images/button4.png" Stretch="Uniform" ToolTip="反弹板" 
-                                               MouseEnter="Component_MouseEnter" MouseLeave="Component_MouseLeave" Width="27" Height="27" />
+                                        <Button Name="Rebound" Width="32" Height="32" Background="{x:Null}" Padding="0" Margin="1,1,2,1" Click="Component_Click">
+                                            <Image RenderOptions.BitmapScalingMode="NearestNeighbor" Name="ReboundImage" Source="Images/button4.png" Stretch="Uniform" ToolTip="反弹板" 
+                                               MouseEnter="Component_MouseEnter" MouseLeave="Component_MouseLeave" Width="28" Height="28"  UseLayoutRounding="True"/>
                                         </Button>
-                                        <Button Name="Force" Width="33" Height="33" Background="{x:Null}" Padding="0" Margin="1,1,2,1" Click="Component_Click">
-                                            <Image Name="ForceImage" Source="Images/button5.png" Stretch="Uniform" ToolTip="力场" 
-                                               MouseEnter="Component_MouseEnter" MouseLeave="Component_MouseLeave" Width="27" Height="27" />
+                                        <Button Name="Force" Width="32" Height="32" Background="{x:Null}" Padding="0" Margin="1,1,2,1" Click="Component_Click">
+                                            <Image RenderOptions.BitmapScalingMode="NearestNeighbor" Name="ForceImage" Source="Images/button5.png" Stretch="Uniform" ToolTip="力场" 
+                                               MouseEnter="Component_MouseEnter" MouseLeave="Component_MouseLeave" Width="28" Height="28"  UseLayoutRounding="True"/>
                                         </Button>
                                     </StackPanel>
                                 </GroupBox>
                                 <GroupBox Header="组件浏览器" Name="Explorer" VerticalContentAlignment="Stretch" HorizontalContentAlignment="Stretch" >
-                                    <TreeView Name="ComponentList" Padding="-2,1,1,1" VerticalContentAlignment="Stretch" HorizontalContentAlignment="Stretch">
+                                    <TreeView Name="ComponentList" Padding="-2,1,1,1" VerticalContentAlignment="Stretch" HorizontalContentAlignment="Stretch" 
+                                              AllowDrop="True" MouseMove="ComponentList_MouseMove" 
+                                              DragEnter="ComponentList_CheckDrop" DragOver="ComponentList_CheckDrop" DragLeave="ComponentList_CheckDrop" Drop="ComponentList_Drop">
                                         <TreeView.ItemTemplate >
                                             <HierarchicalDataTemplate ItemsSource="{Binding Children}">
                                                 <TextBlock Text="{Binding Name}" 
@@ -476,9 +481,11 @@
                             </DockPanel>
                         </TabItem>
                         <TabItem Header="资源" Name="Resource" Padding="6,5,6,1">
-                            <StackPanel>
-                                <GroupBox Header="图案" Height="138" Margin="0">
-                                    <TreeView Name="ImageList" Padding="-12,1,1,1" PreviewMouseRightButtonDown="ImageList_PreviewMouseRightButtonDown" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.HorizontalScrollBarVisibility="Auto">
+                            <ScrollViewer VerticalScrollBarVisibility="Auto">
+                                <StackPanel>
+                                <GroupBox Header="图案" Height="131" Margin="0">
+                                    <TreeView Name="ImageList" Padding="-12,1,1,1" PreviewMouseRightButtonDown="ImageList_PreviewMouseRightButtonDown" 
+                                              ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.HorizontalScrollBarVisibility="Auto">
                                         <TreeView.ContextMenu>
                                             <ContextMenu>
                                                 <MenuItem Name="AddImage" Header="添加图案" Click="AddImageItem_Click" />
@@ -507,7 +514,7 @@
                                         </TreeView.ItemTemplate>
                                     </TreeView>
                                 </GroupBox>
-                                <GroupBox Header="音效" Height="138" Margin="0">
+                                <GroupBox Header="音效" Height="131" Margin="0">
                                     <TreeView Name="SoundList" Padding="-12,1,1,1">
                                         <TreeView.ContextMenu>
                                             <ContextMenu>
@@ -516,7 +523,7 @@
                                         </TreeView.ContextMenu>
                                     </TreeView>
                                 </GroupBox>
-                                <GroupBox Header="脚本" Height="138" Margin="0">
+                                <GroupBox Header="脚本" Height="130" Margin="0">
                                     <TreeView Name="ScriptList" Padding="-12,1,1,1">
                                         <TreeView.ContextMenu>
                                             <ContextMenu>
@@ -526,18 +533,19 @@
                                     </TreeView>
                                 </GroupBox>
                             </StackPanel>
+                            </ScrollViewer>
                         </TabItem>
                     </TabControl>
                 </DockPanel>
             </Grid>
             <!-- Layerbar -->
-            <Grid Grid.Row="1" Name="grid2" ShowGridLines="False" Margin="0">
+            <Grid Grid.Row="1" ShowGridLines="False" Margin="0">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="210"/>
                     <ColumnDefinition Width="10" />
                     <ColumnDefinition/>
                 </Grid.ColumnDefinitions>
-                <DockPanel Name="dockPanel3" Grid.ColumnSpan="2">
+                <DockPanel Name="Layer" Grid.ColumnSpan="2">
                     <DockPanel DockPanel.Dock="Top" Name="stackPanel2" Margin="0">
                         <DockPanel.Background>
                             <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
@@ -545,7 +553,7 @@
                                 <GradientStop Color="#FFE0E0E0" Offset="1" />
                             </LinearGradientBrush>
                         </DockPanel.Background>
-                        <Label  Content="图层" Height="28" Width="196" Name="label1" Padding="5,6,5,5" BorderBrush="{x:Null}" />
+                        <Label  Content="图层" Height="28" Width="198" Name="label1" Padding="5,6,5,5" BorderBrush="{x:Null}" />
                         <Label Name="NewLayer" Width="12" Height="12" DockPanel.Dock="Right" MouseLeftButtonUp="NewLayer_MouseUp">
                             <Label.Background>
                                 <ImageBrush ImageSource="Images/layernew.png" Stretch="Uniform" AlignmentX="Left" AlignmentY="Top">
@@ -562,7 +570,7 @@
                                   ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Auto" >
                             <TreeView.ItemTemplate>
                                 <DataTemplate>
-                                    <DockPanel Name="LayerElement" Width="214" Margin ="-22,0,0,0" Background="{x:Null}" 
+                                    <DockPanel Name="LayerElement" Width="200" Margin ="-22,0,0,0" Background="{x:Null}" 
                                                PreviewMouseRightButtonDown="LayerElement_PreviewMouseRightButtonDown" >
                                         <DockPanel.ContextMenu >
                                             <ContextMenu>
@@ -653,7 +661,7 @@
                               HorizontalAlignment="Right" Background="#FFDBDBDB" Grid.Column="1" IsEnabled="False" />
             </Grid>
             <GridSplitter Grid.Row="1"  VerticalAlignment="Top" Name="gridSplitter1" Height="1" 
-                          HorizontalAlignment="Stretch" Background="White"/>
+                          HorizontalAlignment="Stretch" Background="White" IsEnabled="False"/>
         </Grid>
     </DockPanel>
 </Window>
