@@ -26,8 +26,8 @@ namespace CrazyStorm
     {
         #region Private Members
         //Control the startup
+        Main mainWindow;
         DispatcherTimer dTimer = new DispatcherTimer();
-        short totalsecond = 1;
         short frame = 0;
         #endregion
 
@@ -39,6 +39,8 @@ namespace CrazyStorm
             dTimer.Tick += dTimer_Tick;
             dTimer.Interval = new TimeSpan(0, 0, 0, 0, 16);
             dTimer.Start();
+
+            mainWindow = new Main();
         }
         #endregion
 
@@ -50,12 +52,11 @@ namespace CrazyStorm
             if (Opacity < 1.0f) 
                 Opacity += 0.1f;
 
-            if (frame >= totalsecond * 60)
+            if (frame >= 60)
             {
                 dTimer.Stop();
                 //Enter main ui
-                Main window = new Main();
-                window.Show();
+                mainWindow.Show();
                 this.Close();
             }
         }

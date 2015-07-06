@@ -221,9 +221,6 @@
     <Resource Include="Images\startup1.png" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Images\icon.ico" />
-  </ItemGroup>
-  <ItemGroup>
     <Resource Include="Images\document-open-2.ico" />
   </ItemGroup>
   <ItemGroup>
