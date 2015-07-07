@@ -36,7 +36,7 @@ namespace CrazyStorm
             if (selectedParticle.Layers.Count > 1)
             {
                 new DelLayerCommand().Do(commandStacks[selectedParticle], selectedParticle, selectedLayer);
-                UpdateComponent();
+                Update();
             }
             else
                 MessageBox.Show((string)FindResource("CanNotDeleteAllLayer"), (string)FindResource("TipTitle"),
@@ -68,7 +68,7 @@ namespace CrazyStorm
         {
             CreateNewLayer();
         }
-        private void LayerTree_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
+        private void LayerTree_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
             //Maintain selected layer.
             if (LayerTree.SelectedItem != null)
@@ -85,7 +85,7 @@ namespace CrazyStorm
             //Set the visibllity of layer.
             var visible = sender as Label;
             selectedLayer.Visible = visible.Opacity == 0 ? true : false;
-            UpdateComponent();
+            Update();
         }
         private void LayerDown_MouseUp(object sender, MouseButtonEventArgs e)
         {
@@ -182,7 +182,7 @@ namespace CrazyStorm
         private void LayerElement_PreviewMouseRightButtonDown(object sender, MouseButtonEventArgs e)
         {
             //Focus pointed item when mouse right-button down.
-            var item = VisualUpwardSearch<TreeViewItem>(e.OriginalSource as DependencyObject) as TreeViewItem;
+            var item = VisualHelper.VisualUpwardSearch<TreeViewItem>(e.OriginalSource as DependencyObject) as TreeViewItem;
             if (item != null)
             {
                 item.Focus();

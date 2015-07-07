@@ -26,7 +26,7 @@ namespace CrazyStorm
         private DependencyObject lastSelectedItem;
         #region Private Members
         static readonly string[] componentImages = new string[] 
-        { "EmitterImage", "LaserImage", "MaskImage", "ReboundImage", "ForceImage" };
+        { "MultiEmitterImage", "CurveEmitterImage", "MaskImage", "ReboundImage", "ForceImage" };
         #endregion
 
         #region Private Methods
@@ -47,7 +47,8 @@ namespace CrazyStorm
                 {
                     var component = selectedComponents.First();
                     SelectedGroupType.Text = component.GetType().Name;
-                    SelectedGroupName.Text = component.Name;
+                    SelectedGroupName.DataContext = component;
+                    SelectedGroupName.SetBinding(TextBlock.TextProperty, "Name");
                     SelectedGroupTip.Text = (string)FindResource("DoubleClickTip");
                     for (int i = 0; i < componentNames.Length; ++i)
                         if (componentNames[i] == component.GetType().Name)
@@ -83,7 +84,6 @@ namespace CrazyStorm
             }
             item = new TabItem();
             item.DataContext = component;
-            item.Header = component.Name;
             item.Style = (Style)FindResource("CanCloseStyle");
             var scroll = new ScrollViewer();
             scroll.VerticalScrollBarVisibility = ScrollBarVisibility.Auto;
@@ -112,7 +112,7 @@ namespace CrazyStorm
         {
             //Create corresponding component according to different button.
             var button = sender as Button;
-            aimRect = VisualDownwardSearch((DependencyObject)ParticleTabControl.SelectedContent, "AimBox");
+            aimRect = VisualHelper.VisualDownwardSearch((DependencyObject)ParticleTabControl.SelectedContent, "AimBox");
             aimRect.SetValue(OpacityProperty, 1.0d);
             aimComponent = ComponentFactory.Create(button.Name);
         }
@@ -141,7 +141,7 @@ namespace CrazyStorm
         private void ComponentList_PreviewMouseRightButtonDown(object sender, MouseButtonEventArgs e)
         {
             //Focus pointed item when mouse right-button down.
-            var item = VisualUpwardSearch<TreeViewItem>(e.OriginalSource as DependencyObject) as TreeViewItem;
+            var item = VisualHelper.VisualUpwardSearch<TreeViewItem>(e.OriginalSource as DependencyObject) as TreeViewItem;
             if (item != null)
             {
                 item.Focus();
@@ -237,18 +237,19 @@ namespace CrazyStorm
             var list = new List<CrazyStorm.Core.Component>();
             list.Add(item);
             new DelComponentCommand().Do(commandStacks[selectedParticle], selectedParticle, list);
-            UpdateComponent();
+            Update();
         }
         private void DeleteComponentItem_Click(object sender, RoutedEventArgs e)
         {
             new DelComponentCommand().Do(commandStacks[selectedParticle], selectedParticle, selectedComponents);
-            UpdateComponent();
+            Update();
         }
         private void TabClose_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            var item = VisualUpwardSearch<TabItem>(sender as DependencyObject) as TabItem;
-            var tab = VisualUpwardSearch<TabControl>(item) as TabControl;
-            tab.Items.Remove(item);
+            var item = VisualHelper.VisualUpwardSearch<TabItem>(sender as DependencyObject) as TabItem;
+            var tab = VisualHelper.VisualUpwardSearch<TabControl>(item) as TabControl;
+            if (tab != null)
+                tab.Items.Remove(item);
         }
         #endregion
     }

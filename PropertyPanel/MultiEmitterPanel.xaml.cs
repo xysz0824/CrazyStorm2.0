@@ -21,29 +21,42 @@ using System.Collections.ObjectModel;
 namespace CrazyStorm
 {
     /// <summary>
-    /// PropertyPanel.xaml 的交互逻辑
+    /// MultiEmitterPanel.xaml 的交互逻辑
     /// </summary>
-    public partial class EmitterPanel : UserControl
+    public partial class MultiEmitterPanel : UserControl
     {
-        public EmitterPanel(Emitter emitter)
+        MultiEmitter multiEmitter;
+        public MultiEmitterPanel(MultiEmitter multiEmitter)
         {
+            this.multiEmitter = multiEmitter;
             InitializeComponent();
-            ObservableCollection<Property> member = new ObservableCollection<Property>();
-            member.Add(new Property() { Name = "起始帧", Value = "" });
-            member.Add(new Property() { Name = "持续帧", Value = "" });
-            member.Add(new Property() { Name = "坐标", Value = "" });
-            member.Add(new Property() { Name = "速度", Value = "" });
-            member.Add(new Property() { Name = "速度角", Value = "" });
-            member.Add(new Property() { Name = "加速度", Value = "" });
-            member.Add(new Property() { Name = "加速度角", Value = "" });
-            ComponentGrid.DataContext = member;
+
+            var componentProperties = new ObservableCollection<Property>();
+            var componentList = multiEmitter.InitializeProperties(typeof(Component));
+            foreach (var item in componentList)
+            {
+                var property = new Property() {
+                    Info = item,
+                    Name = item.Name,
+                    Value = multiEmitter.Properties[item]
+                };
+                componentProperties.Add(property);
+            }
+            //member.Add(new Property() { Name = "起始帧", Value = "" });
+            //member.Add(new Property() { Name = "持续帧", Value = "" });
+            //member.Add(new Property() { Name = "坐标", Value = "" });
+            //member.Add(new Property() { Name = "速度", Value = "" });
+            //member.Add(new Property() { Name = "速度角", Value = "" });
+            //member.Add(new Property() { Name = "加速度", Value = "" });
+            //member.Add(new Property() { Name = "加速度角", Value = "" });
+            ComponentGrid.DataContext = componentProperties;
             ObservableCollection<Property> member2 = new ObservableCollection<Property>();
             member2.Add(new Property() { Name = "坐标", Value = "" });
             member2.Add(new Property() { Name = "条数", Value = "" });
             member2.Add(new Property() { Name = "周期", Value = "" });
             member2.Add(new Property() { Name = "发射角", Value = "" });
             member2.Add(new Property() { Name = "范围角", Value = "" });
-            EmitterGrid.DataContext = member2;
+            MultiEmitterGrid.DataContext = member2;
             ObservableCollection<Property> member3 = new ObservableCollection<Property>();
             member3.Add(new Property() { Name = "生命", Value = "" });
             member3.Add(new Property() { Name = "类型", Value = "" });
@@ -70,13 +83,19 @@ namespace CrazyStorm
             ParticleGrid.DataContext = member3;
         }
 
-        private void UserControl_Loaded(object sender, RoutedEventArgs e)
+        private void ComponentGrid_CellEditEnding(object sender, DataGridCellEditEndingEventArgs e)
         {
-            double[] width = new double[] { ComponentKey.ActualWidth, EmitterKey.ActualWidth, ParticleKey.ActualWidth };
-            double maxWidth = width.Max();
-            ComponentKey.Width = maxWidth;
-            EmitterKey.Width = maxWidth;
-            ParticleKey.Width = maxWidth;
+            PropertyPanelHelper.UpdateProperty(multiEmitter, e);
+        }
+
+        private void MultiEmitterGrid_CellEditEnding(object sender, DataGridCellEditEndingEventArgs e)
+        {
+            PropertyPanelHelper.UpdateProperty(multiEmitter, e);
+        }
+
+        private void ParticleGrid_CellEditEnding(object sender, DataGridCellEditEndingEventArgs e)
+        {
+            PropertyPanelHelper.UpdateProperty(multiEmitter.Particle, e);
         }
     }
 }

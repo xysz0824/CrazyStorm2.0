@@ -20,7 +20,7 @@ namespace CrazyStorm
             var selectedParticle = Parameter[0] as ParticleSystem;
             if (History[0] == null)
             {
-                var newLayer = new Layer("New Layer");
+                var newLayer = new Layer("NewLayer");
                 newLayer.Color = (LayerColor)((++colorIndex) % 7);
                 History[0] = newLayer;
                 selectedParticle.AddLayer(newLayer);

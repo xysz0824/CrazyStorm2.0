@@ -124,11 +124,11 @@
                         <Grid>
                             <Border Name="bd" Background="{TemplateBinding Background}" BorderBrush="#8C8E94"
                             BorderThickness="1" CornerRadius="1,1,0,0" Margin="0,0,0,0">
-                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
-                                    <ContentPresenter ContentSource="Header" Margin="8,1"/>
+                                <DockPanel>
+                                    <TextBlock Text="{Binding Name}" Margin="8,1" DockPanel.Dock="Left"/>
                                     <Image Name="TabClose" Source="Images/close.png" Width="11" Height="11" Margin="0,0,5,0" 
-                                           VerticalAlignment="Center" HorizontalAlignment="Center" MouseLeftButtonDown="TabClose_MouseLeftButtonDown" />
-                                </StackPanel>
+                                           VerticalAlignment="Center" DockPanel.Dock="Right" MouseLeftButtonDown="TabClose_MouseLeftButtonDown" HorizontalAlignment="Right" />
+                                </DockPanel>
                             </Border>
                         </Grid>
                         <ControlTemplate.Triggers>
@@ -402,7 +402,7 @@
                         <GroupBox.Background>
                             <ImageBrush ImageSource="Images/selectedgroup.png" Stretch="Uniform"/>
                         </GroupBox.Background>
-                        <Canvas>
+                        <Canvas ClipToBounds="True">
                             <Canvas.Background>
                                 <ImageBrush/>
                             </Canvas.Background>
@@ -413,7 +413,7 @@
                                 </Image.Effect>
                             </Image>
                             <TextBlock Name="SelectedGroupType" Canvas.Left="66" Canvas.Top="10" />
-                            <TextBlock Name="SelectedGroupName" Canvas.Left="66" Canvas.Top="26" FontSize="20" />
+                            <TextBlock Name="SelectedGroupName"  Text="{Binding Name}" Canvas.Left="66" Canvas.Top="26" FontSize="20"/>
                             <TextBlock Name="SelectedGroupTip" Canvas.Left="8" Canvas.Top="59" Foreground="#FF8B8B8B" />
                         </Canvas>
                     </GroupBox>
@@ -423,12 +423,12 @@
                                 <GroupBox DockPanel.Dock="Top" Header="组件板" VerticalAlignment="Top" Height="60" HorizontalAlignment="Stretch" 
                                       HorizontalContentAlignment="Center" VerticalContentAlignment="Center" BorderBrush="#FFC6C6C6">
                                     <StackPanel Name="stackPanel1" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
-                                        <Button Name="Emitter" Width="32" Height="32" Padding="0" Margin="1,1,2,1" Background="#00000000" Click="Component_Click">
-                                            <Image RenderOptions.BitmapScalingMode="NearestNeighbor" Name="EmitterImage" Source="Images/button1.png" Stretch="Uniform" ToolTip="多向发射器" 
+                                        <Button Name="MultiEmitter" Width="32" Height="32" Padding="0" Margin="1,1,2,1" Background="#00000000" Click="Component_Click">
+                                            <Image RenderOptions.BitmapScalingMode="NearestNeighbor" Name="MultiEmitterImage" Source="Images/button1.png" Stretch="Uniform" ToolTip="多向发射器" 
                                                MouseEnter="Component_MouseEnter" MouseLeave="Component_MouseLeave" Width="28" Height="28"  UseLayoutRounding="True"/>
                                         </Button>
-                                        <Button Name="Laser" Width="32" Height="32" Background="{x:Null}" Padding="0" Margin="1,1,2,1" Click="Component_Click">
-                                            <Image RenderOptions.BitmapScalingMode="NearestNeighbor" Name="LaserImage" Source="Images/button2.png" Stretch="Uniform" ToolTip="激光发射器" 
+                                        <Button Name="CurveEmitter" Width="32" Height="32" Background="{x:Null}" Padding="0" Margin="1,1,2,1" Click="Component_Click">
+                                            <Image RenderOptions.BitmapScalingMode="NearestNeighbor" Name="CurveEmitterImage" Source="Images/button2.png" Stretch="Uniform" ToolTip="曲线发射器" 
                                                MouseEnter="Component_MouseEnter" MouseLeave="Component_MouseLeave" Width="28" Height="28"  UseLayoutRounding="True"/>
                                         </Button>
                                         <Button Name="Mask" Background="{x:Null}" Padding="0" Margin="1,1,2,1" Click="Component_Click" Width="32" Height="32">
@@ -523,11 +523,11 @@
                                         </TreeView.ContextMenu>
                                     </TreeView>
                                 </GroupBox>
-                                <GroupBox Header="脚本" Height="130" Margin="0">
-                                    <TreeView Name="ScriptList" Padding="-12,1,1,1">
+                                <GroupBox Header="全局变量" Height="130" Margin="0">
+                                    <TreeView Name="GlobalList" Padding="-12,1,1,1">
                                         <TreeView.ContextMenu>
                                             <ContextMenu>
-                                                <MenuItem Name="AddScript" Header="添加脚本" Click="AddScript_Click" />
+                                                <MenuItem Name="AddGlobal" Header="添加全局变量" Click="AddGlobal_Click" />
                                             </ContextMenu>
                                         </TreeView.ContextMenu>
                                     </TreeView>
@@ -566,8 +566,8 @@
                     </DockPanel>
                     <ScrollViewer  Name="LayerScrollViewer" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" 
                                    ScrollChanged="LayerScrollViewer_ScrollChanged" CanContentScroll="True">
-                        <TreeView x:Name="LayerTree"  BorderBrush="White" SelectedItemChanged="LayerTree_SelectedItemChanged" 
-                                  ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Auto" >
+                        <TreeView x:Name="LayerTree"  BorderBrush="White" 
+                                  ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Auto" MouseLeftButtonUp="LayerTree_MouseLeftButtonUp" >
                             <TreeView.ItemTemplate>
                                 <DataTemplate>
                                     <DockPanel Name="LayerElement" Width="200" Margin ="-22,0,0,0" Background="{x:Null}" 

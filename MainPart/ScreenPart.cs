@@ -23,7 +23,7 @@ namespace CrazyStorm
     {
         #region Private Members
         static readonly string[] componentNames = new string[] 
-        { "", "Emitter", "Laser", "Mask", "Rebound", "Force" };
+        { "", "MultiEmitter", "CurveEmitter", "Mask", "Rebound", "Force" };
         ParticleSystem selectedParticle;
         DependencyObject aimRect;
         Component aimComponent;
@@ -44,7 +44,7 @@ namespace CrazyStorm
                 var content = item.Content as Canvas;
                 if ((string)item.Header == selectedParticle.Name)
                 {
-                    canvas = VisualDownwardSearch(content, "ComponentLayer") as Canvas;
+                    canvas = VisualHelper.VisualDownwardSearch(content, "ComponentLayer") as Canvas;
                     break;
                 }
             }
@@ -59,11 +59,11 @@ namespace CrazyStorm
                         foreach (var component in layer.Components)
                         {
                             var item = itemTemplate.LoadContent() as Canvas;
-                            var frame = VisualDownwardSearch(item, "Frame") as Label;
+                            var frame = VisualHelper.VisualDownwardSearch(item, "Frame") as Label;
                             frame.DataContext = layer;
-                            var icon = VisualDownwardSearch(item, "Icon") as Image;
+                            var icon = VisualHelper.VisualDownwardSearch(item, "Icon") as Image;
                             icon.DataContext = component;
-                            var box = VisualDownwardSearch(item, "Box") as Image;
+                            var box = VisualHelper.VisualDownwardSearch(item, "Box") as Image;
                             box.Opacity = component.Selected ? 1 : 0;
                             if (component.Selected)
                                 selectedComponents.Add(component);
@@ -121,7 +121,7 @@ namespace CrazyStorm
                         }
                     }
 
-            UpdateComponent();
+            Update();
             //Enable delection if selected one or more.
             DeleteComponentItem.IsEnabled = selectedComponents.Count > 0;
             //Enable binding if selected one.
@@ -212,7 +212,7 @@ namespace CrazyStorm
             int y = (int)point.Y;
             selectingComponent = true;
             var content = (DependencyObject)ParticleTabControl.SelectedContent;
-            selectionRect = VisualDownwardSearch(content, "SelectingBox");
+            selectionRect = VisualHelper.VisualDownwardSearch(content, "SelectingBox");
             selectionRect.SetValue(Canvas.LeftProperty, (double)x);
             selectionRect.SetValue(Canvas.TopProperty, (double)y);
             selectionRectX = x;
@@ -227,7 +227,7 @@ namespace CrazyStorm
                 aimComponent.Y = (int)boxY;
                 new AddComponentCommand().Do(commandStacks[selectedParticle],
                     selectedParticle, selectedLayer, aimComponent);
-                UpdateComponent();
+                Update();
                 aimComponent = null;
                 aimRect = null;
             }
@@ -268,10 +268,7 @@ namespace CrazyStorm
                         selectedParticle = item;
                         break;
                     }
-                UpdateParticle();
-                UpdateLayer();
-                UpdateComponent();
-                UpdateEdit();
+                Update();
             }
         }
         private void ScreenSettingItem_Click(object sender, RoutedEventArgs e)

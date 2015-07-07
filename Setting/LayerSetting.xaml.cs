@@ -65,7 +65,7 @@ namespace CrazyStorm
                     MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
-            if (Int32.TryParse(BeginFrame.Text, out beginFrame) && Int32.TryParse(EndFrame.Text, out totalFrame))
+            if (Int32.TryParse(BeginFrame.Text, out beginFrame) && Int32.TryParse(TotalFrame.Text, out totalFrame))
             {
                 new SetLayerCommand().Do(commandStack, layer, 
                     (LayerColor)selectedColor, 

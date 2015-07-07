@@ -64,7 +64,7 @@ namespace CrazyStorm
                     Redo();
                     break;
             }
-            UpdateComponent();
+            Update();
         }
         #endregion
     }

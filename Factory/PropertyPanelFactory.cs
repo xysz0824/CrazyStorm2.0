@@ -1,4 +1,8 @@
-﻿using System;
+﻿/*
+ * The MIT License (MIT)
+ * Copyright (c) StarX 2015 
+ */
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -16,10 +20,10 @@ namespace CrazyStorm
         {
             switch (component.GetType().Name)
             {
-                case "Emitter":
-                    return new EmitterPanel(component as Emitter);
-                case "Laser":
-                    return new LaserPanel(component as Laser);
+                case "MultiEmitter":
+                    return new MultiEmitterPanel(component as MultiEmitter);
+                case "CurveEmitter":
+                    return new CurveEmitterPanel(component as CurveEmitter);
                 case "Mask":
                     return new MaskPanel(component as Mask);
                 case "Rebound":

@@ -24,6 +24,8 @@ namespace CrazyStorm
             layer.TotalFrame = (int)Parameter[3];
             History[4] = layer.Name;
             layer.Name = (string)Parameter[4];
+            foreach (var component in layer.Components)
+                component.SetFrameRange(layer.BeginFrame, layer.TotalFrame);
         }
         public override void Undo(CommandStack stack)
         {

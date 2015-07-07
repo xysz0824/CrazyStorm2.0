@@ -26,7 +26,7 @@ namespace CrazyStorm
         private void ImageList_PreviewMouseRightButtonDown(object sender, MouseButtonEventArgs e)
         {
             //Focus pointed item when mouse right-button down.
-            var item = VisualUpwardSearch<TreeViewItem>(e.OriginalSource as DependencyObject) as TreeViewItem;
+            var item = VisualHelper.VisualUpwardSearch<TreeViewItem>(e.OriginalSource as DependencyObject) as TreeViewItem;
             if (item != null)
             {
                 item.Focus();
@@ -41,7 +41,7 @@ namespace CrazyStorm
                 open.Filter = (string)FindResource("ImageType");
                 if (open.ShowDialog() == System.Windows.Forms.DialogResult.OK)
                 {
-                    var image = new Resource(open.SafeFileName, open.FileName);
+                    var image = new FileResource(open.SafeFileName, open.FileName);
                     file.Images.Add(image);
                 }
             }
@@ -56,9 +56,9 @@ namespace CrazyStorm
         {
             //TODO : Add sound.
         }
-        private void AddScript_Click(object sender, RoutedEventArgs e)
+        private void AddGlobal_Click(object sender, RoutedEventArgs e)
         {
-            //TODO : Add script.
+            //TODO : Add global.
         }
         #endregion
     }

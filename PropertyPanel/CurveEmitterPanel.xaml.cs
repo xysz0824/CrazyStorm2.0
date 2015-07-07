@@ -16,11 +16,11 @@ using CrazyStorm.Core;
 namespace CrazyStorm
 {
     /// <summary>
-    /// LaserPanel.xaml 的交互逻辑
+    /// CurveEmitterPanel.xaml 的交互逻辑
     /// </summary>
-    public partial class LaserPanel : UserControl
+    public partial class CurveEmitterPanel : UserControl
     {
-        public LaserPanel(Laser laser)
+        public CurveEmitterPanel(CurveEmitter curveEmitter)
         {
             InitializeComponent();
         }

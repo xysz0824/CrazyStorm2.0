@@ -40,29 +40,29 @@ namespace CrazyStorm
             var stack = commandStacks[selectedParticle];
             var command = stack.RedoPop();
             command.Undo(stack);
-            UpdateComponent();
+            Update();
         }
         void Redo()
         {
             var stack = commandStacks[selectedParticle];
             var command = stack.UndoPop();
             command.Redo(stack);
-            UpdateComponent();
+            Update();
         }
         void Cut()
         {
             //TODO : Cut.
-            UpdateComponent();
+            Update();
         }
         void Copy()
         {
             //TODO : Copy.
-            UpdateComponent();
+            Update();
         }
         void Paste()
         {
             //TODO : Paste;
-            UpdateComponent();
+            Update();
         }
         #endregion
 

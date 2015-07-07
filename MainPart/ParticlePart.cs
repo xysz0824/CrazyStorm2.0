@@ -24,10 +24,10 @@ namespace CrazyStorm
         #region Private Methods
         void CreateNewParticle()
         {
-            var particle = new ParticleSystem("New Particle");
+            var particle = new ParticleSystem("NewParticle");
             file.Particles.Add(particle);
             selectedParticle = particle;
-            InitializeCommandStack();
+            InitializeCommandStacks();
             AddNewParticleTab(particle);
         }
         void DeleteSeletedParticle()

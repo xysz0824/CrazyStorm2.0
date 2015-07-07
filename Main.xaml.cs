@@ -61,36 +61,6 @@ namespace CrazyStorm
         #endregion
 
         #region Private Methods
-        static DependencyObject VisualUpwardSearch<T>(DependencyObject source)
-        {
-            while (source != null && source.GetType() != typeof(T))
-                source = VisualTreeHelper.GetParent(source);
-
-            return source;
-        }
-        static DependencyObject VisualDownwardSearch(DependencyObject source, string name)
-        {
-            if (source == null)
-                return null;
-
-            var count = VisualTreeHelper.GetChildrenCount(source);
-            if (count == 0)
-                return null;
-
-            for (int i = 0; i < count; ++i)
-            {
-                var child = VisualTreeHelper.GetChild(source, i);
-                if ((string)child.GetValue(NameProperty) == name)
-                    return child;
-                else
-                {
-                    child = VisualDownwardSearch(child, name);
-                    if (child != null)
-                        return child;
-                }
-            }
-            return null;
-        }
         void InitializeSystem()
         {
             LoadConfig();
@@ -99,7 +69,7 @@ namespace CrazyStorm
             InitializeLayer();
             InitializeEdit();
             InitializeStatus();
-            UpdateComponent();
+            Update();
             status = (string)FindResource("Ready");
         }
         void LoadConfig()
@@ -111,13 +81,13 @@ namespace CrazyStorm
             Title = AppInfo.AppTitle + " - " + file.FileName;
             ImageList.ItemsSource = file.Images;
             SoundList.ItemsSource = file.Sounds;
-            ScriptList.ItemsSource = file.Scripts;
+            GlobalList.ItemsSource = file.Globals;
         }
         void InitializeParticle()
         {
             selectedParticle = file.Particles.First();
             ParticleTabControl.DataContext = config;
-            InitializeCommandStack();
+            InitializeCommandStacks();
             AddNewParticleTab(selectedParticle);
             ComponentList.ItemsSource = selectedParticle.Components;
             DeleteComponentItem.IsEnabled = false;
@@ -133,7 +103,7 @@ namespace CrazyStorm
             DeleteLayerItem.IsEnabled = false;
             SetLayerItem.IsEnabled = false;
         }
-        void InitializeCommandStack()
+        void InitializeCommandStacks()
         {
             commandStacks[selectedParticle] = new CommandStack();
             commandStacks[selectedParticle].StackChanged += () =>
@@ -158,7 +128,7 @@ namespace CrazyStorm
         {
             StatusText.DataContext = this;
         }
-        void UpdateParticle()
+        void UpdateComponent()
         {
             ComponentList.ItemsSource = selectedParticle.Components;
             DeleteComponentItem.IsEnabled = false;
@@ -169,8 +139,10 @@ namespace CrazyStorm
         {
             InitializeLayer();
         }
-        void UpdateComponent()
+        void Update()
         {
+            UpdateComponent();
+            UpdateLayer();
             UpdatePropertyPanel();
             UpdateScreen();
             UpdateSelectedGroup();
