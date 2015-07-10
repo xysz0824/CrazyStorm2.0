@@ -86,23 +86,9 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="PropertyPanel\PropertyPanelItem.cs" />
+    <Compile Include="Edit\Command\PropertyPanel\SetPropertyCommand.cs" />
     <Compile Include="Helper\VisualHelper.cs" />
-    <Page Include="PropertyPanel\ForcePanel.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="PropertyPanel\CurveEmitterPanel.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="PropertyPanel\MaskPanel.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="PropertyPanel\ReboundPanel.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="Setting\ParticleSetting.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -119,7 +105,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="PropertyPanel\MultiEmitterPanel.xaml">
+    <Page Include="PropertyPanel\PropertyPanel.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -137,20 +123,6 @@
     </Compile>
     <Compile Include="Factory\ComponentFactory.cs" />
     <Compile Include="MainPart\ParticlePart.cs" />
-    <Compile Include="Helper\PropertyPanelHelper.cs" />
-    <Compile Include="PropertyPanel\ForcePanel.xaml.cs">
-      <DependentUpon>ForcePanel.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="PropertyPanel\CurveEmitterPanel.xaml.cs">
-      <DependentUpon>CurveEmitterPanel.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="PropertyPanel\MaskPanel.xaml.cs">
-      <DependentUpon>MaskPanel.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Factory\PropertyPanelFactory.cs" />
-    <Compile Include="PropertyPanel\ReboundPanel.xaml.cs">
-      <DependentUpon>ReboundPanel.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Setting\ParticleSetting.xaml.cs">
       <DependentUpon>ParticleSetting.xaml</DependentUpon>
     </Compile>
@@ -183,8 +155,8 @@
     <Compile Include="MainPart\LayerPart.cs" />
     <Compile Include="MainPart\ResourcePart.cs" />
     <Compile Include="MainPart\ShortKeyPart.cs" />
-    <Compile Include="PropertyPanel\MultiEmitterPanel.xaml.cs">
-      <DependentUpon>MultiEmitterPanel.xaml</DependentUpon>
+    <Compile Include="PropertyPanel\PropertyPanel.xaml.cs">
+      <DependentUpon>PropertyPanel.xaml</DependentUpon>
     </Compile>
     <Compile Include="Setting\ScreenSetting.xaml.cs">
       <DependentUpon>ScreenSetting.xaml</DependentUpon>

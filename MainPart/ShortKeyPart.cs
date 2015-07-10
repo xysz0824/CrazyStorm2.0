@@ -6,7 +6,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
+using CrazyStorm.Core;
 
 namespace CrazyStorm
 {
@@ -35,6 +38,7 @@ namespace CrazyStorm
         }
         private void CommandBinding_Executed(object sender, ExecutedRoutedEventArgs e)
         {
+            var gridSize = config.GridSize;
             var command = (RoutedUICommand)e.Command;
             var stack = commandStacks[selectedParticle];
             switch (command.Text)
@@ -43,16 +47,20 @@ namespace CrazyStorm
                     new DelComponentCommand().Do(stack, selectedParticle, selectedComponents);
                     break;
                 case "UpComponent":
-                    new MoveComponentCommand(MoveStatus.Up, config.GridAlignment).Do(stack, selectedComponents);
+                    new MoveComponentCommand(MoveStatus.Up, gridSize, config.GridAlignment).Do(stack, selectedComponents, 
+                        new Action(UpdateProperty));
                     break;
                 case "DownComponent":
-                    new MoveComponentCommand(MoveStatus.Down, config.GridAlignment).Do(stack, selectedComponents);
+                    new MoveComponentCommand(MoveStatus.Down, gridSize, config.GridAlignment).Do(stack, selectedComponents,
+                        new Action(UpdateProperty));
                     break;
                 case "LeftComponent":
-                    new MoveComponentCommand(MoveStatus.Left, config.GridAlignment).Do(stack, selectedComponents);
+                    new MoveComponentCommand(MoveStatus.Left, gridSize, config.GridAlignment).Do(stack, selectedComponents,
+                        new Action(UpdateProperty));
                     break;
                 case "RightComponent":
-                    new MoveComponentCommand(MoveStatus.Right, config.GridAlignment).Do(stack, selectedComponents);
+                    new MoveComponentCommand(MoveStatus.Right, gridSize, config.GridAlignment).Do(stack, selectedComponents,
+                        new Action(UpdateProperty));
                     break;
                 case "SelectAll":
                     SelectAll();

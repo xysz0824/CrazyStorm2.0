@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.ComponentModel;
+using CrazyStorm.Core;
 
 namespace CrazyStorm
 {
@@ -61,6 +62,9 @@ namespace CrazyStorm
                     PropertyChanged(this, new PropertyChangedEventArgs("ImagePath"));
             }
         }
+        public Vector2 GridSize { get { return new Vector2(32, 32); } }
+        public int GridWidth { get { return 32; } }
+        public int GridHeight { get { return 32; } }
         public bool GridAlignment
         {
             get { return gridAlignment; }

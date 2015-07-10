@@ -98,6 +98,8 @@ namespace CrazyStorm
         public void UndoClear()
         {
             undoCommands.Clear();
+            if (StackChanged != null)
+                StackChanged();
         }
         #endregion
     }

@@ -16,6 +16,7 @@
     <sys:String x:Key="TipTitle">提示</sys:String>
     <sys:String x:Key="ConfirmDeleteParticle">确定要删除此粒子吗（删除后无法撤销）？</sys:String>
     <sys:String x:Key="CanNotDeleteAllParticle">不能删除所有粒子</sys:String>   
+    <sys:String x:Key="CanNotAddMoreLayer">图层数已达上限，无法继续添加</sys:String>
     <sys:String x:Key="CanNotDeleteAllLayer">不能删除所有图层</sys:String>
     <sys:String x:Key="ParticleNameCanNotBeEmpty">粒子名称不能为空</sys:String>
     <sys:String x:Key="ParticleNameSuccessfullyChanged">粒子名称修改成功</sys:String>

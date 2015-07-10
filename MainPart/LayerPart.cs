@@ -29,7 +29,11 @@ namespace CrazyStorm
         #region Private Methods
         void CreateNewLayer()
         {
-            new AddLayerCommand().Do(commandStacks[selectedParticle], selectedParticle);
+            if (selectedParticle.Layers.Count < 6)
+                new AddLayerCommand().Do(commandStacks[selectedParticle], selectedParticle);
+            else
+                MessageBox.Show((string)FindResource("CanNotAddMoreLayer"), (string)FindResource("TipTitle"),
+                    MessageBoxButton.OK, MessageBoxImage.Warning);
         }
         void DeleteSelectedLayer()
         {
@@ -57,10 +61,11 @@ namespace CrazyStorm
         #region Window EventHandler
         private void TimeAxis_MouseMove(object sender, MouseEventArgs e)
         {
+            var scrollviewer = VisualHelper.GetVisualChild<ScrollViewer>(TimeAxis);
             //Display the frame that mouse pointed on tooltip.
             var pos = e.GetPosition(TimeAxis);
             var textBlock = axisTip.Content as TextBlock;
-            textBlock.Text = ((int)(pos.X + 1) / 3).ToString();
+            textBlock.Text = ((int)(pos.X + scrollviewer.HorizontalOffset + 1) / 3).ToString();
             axisTip.HorizontalOffset = pos.X + 20;
             axisTip.VerticalOffset = pos.Y + 20;
         }
@@ -68,7 +73,12 @@ namespace CrazyStorm
         {
             CreateNewLayer();
         }
-        private void LayerTree_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        private void LayerTree_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            if (e.OriginalSource is TextBlock && LayerTree.SelectedItem != null)
+                OpenSelectedLayerSetting();
+        }
+        private void LayerTree_MouseUp(object sender, MouseButtonEventArgs e)
         {
             //Maintain selected layer.
             if (LayerTree.SelectedItem != null)
@@ -157,15 +167,6 @@ namespace CrazyStorm
                     OpenSelectedLayerSetting();
                     break;
             }
-        }
-        private void LayerScrollViewer_ScrollChanged(object sender, ScrollChangedEventArgs e)
-        {
-            //Keep pace with the scroll viewer of layer axis.
-            double offset = e.VerticalOffset;
-            ListViewAutomationPeer lvap = new ListViewAutomationPeer(LayerAxis);
-            var svap = lvap.GetPattern(PatternInterface.Scroll) as ScrollViewerAutomationPeer;
-            var scroll = svap.Owner as ScrollViewer;
-            scroll.ScrollToVerticalOffset((int)(offset / 16));
         }
         private void LayerShortSetting_Click(object sender, RoutedEventArgs e)
         {

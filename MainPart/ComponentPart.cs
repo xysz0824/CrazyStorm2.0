@@ -22,9 +22,9 @@ namespace CrazyStorm
 {
     public partial class Main
     {
-        private Point lastMouseDown;
-        private DependencyObject lastSelectedItem;
         #region Private Members
+        Point lastMouseDown;
+        DependencyObject lastSelectedItem;
         static readonly string[] componentImages = new string[] 
         { "MultiEmitterImage", "CurveEmitterImage", "MaskImage", "ReboundImage", "ForceImage" };
         #endregion
@@ -87,10 +87,24 @@ namespace CrazyStorm
             item.Style = (Style)FindResource("CanCloseStyle");
             var scroll = new ScrollViewer();
             scroll.VerticalScrollBarVisibility = ScrollBarVisibility.Auto;
-            scroll.Content = PropertyPanelFactory.Create(component); 
+            scroll.Content = new PropertyPanel(commandStacks[selectedParticle], component, UpdateProperty);
             item.Content = scroll;
             LeftTabControl.Items.Add(item);
             item.Focus();
+        }
+        void UpdateProperty()
+        {
+            foreach (TabItem item in LeftTabControl.Items)
+            {
+                var scroll = item.Content as ScrollViewer;
+                if (scroll != null)
+                {
+                    var content = scroll.Content as PropertyPanel;
+                    if (content != null)
+                        content.UpdateProperty();
+                }
+            }
+            UpdateScreen();
         }
         void UpdatePropertyPanel()
         {

@@ -60,10 +60,10 @@ namespace CrazyStorm
                         {
                             var item = itemTemplate.LoadContent() as Canvas;
                             var frame = VisualHelper.VisualDownwardSearch(item, "Frame") as Label;
-                            frame.DataContext = layer;
                             var icon = VisualHelper.VisualDownwardSearch(item, "Icon") as Image;
-                            icon.DataContext = component;
                             var box = VisualHelper.VisualDownwardSearch(item, "Box") as Image;
+                            frame.DataContext = layer;
+                            icon.DataContext = component;
                             box.Opacity = component.Selected ? 1 : 0;
                             if (component.Selected)
                                 selectedComponents.Add(component);
@@ -74,8 +74,8 @@ namespace CrazyStorm
                                     break;
                                 }
 
-                            item.SetValue(Canvas.LeftProperty, (double)component.X);
-                            item.SetValue(Canvas.TopProperty, (double)component.Y);
+                            item.SetValue(Canvas.LeftProperty, (double)component.X - box.Width / 2 + config.ScreenWidthOver2);
+                            item.SetValue(Canvas.TopProperty, (double)component.Y - box.Height / 2 + config.ScreenHeightOver2);
                             canvas.Children.Add(item as UIElement);
                         }
             }
@@ -90,7 +90,8 @@ namespace CrazyStorm
                     foreach (var component in layer.Components)
                     {
                         var selectRect = new Rect(x, y, width, height);
-                        var componentRect = new Rect(component.X, component.Y, 32, 32);
+                        var componentRect = new Rect(component.X - config.GridWidth / 2 + config.ScreenWidthOver2,
+                            component.Y - config.GridHeight / 2 + config.ScreenHeightOver2, config.GridWidth, config.GridHeight);
                         if (selectRect.IntersectsWith(componentRect))
                         {
                             //Prevent overlay shade from preceding components.
@@ -158,10 +159,10 @@ namespace CrazyStorm
                 {
                     if (config.GridAlignment)
                     {
-                        aimRect.SetValue(Canvas.LeftProperty, (double)((x / 32) * 32));
-                        aimRect.SetValue(Canvas.TopProperty, (double)((y / 32) * 32));
+                        aimRect.SetValue(Canvas.LeftProperty, (double)((x / (int)config.GridWidth) * config.GridWidth));
+                        aimRect.SetValue(Canvas.TopProperty, (double)((y / (int)config.GridHeight) * config.GridHeight));
                     }
-                    else if (x <= config.ScreenWidth - 32 && y <= config.ScreenHeight - 32)
+                    else if (x <= config.ScreenWidth - config.GridWidth && y <= config.ScreenHeight - config.GridHeight)
                     {
                         aimRect.SetValue(Canvas.LeftProperty, (double)x);
                         aimRect.SetValue(Canvas.TopProperty, (double)y);
@@ -206,7 +207,7 @@ namespace CrazyStorm
         }
         private void Screen_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            //Show selection rect from mouse position.
+            //Show selection rect.
             Point point = e.GetPosition(sender as IInputElement);
             int x = (int)point.X;
             int y = (int)point.Y;
@@ -217,14 +218,14 @@ namespace CrazyStorm
             selectionRect.SetValue(Canvas.TopProperty, (double)y);
             selectionRectX = x;
             selectionRectY = y;
-            //When aimed then add component to where mouse down with left-button.
+            //When aimed then add component to the place mouse down with left-button.
             if (aimRect != null)
             {
                 aimRect.SetValue(OpacityProperty, 0.0d);
                 var boxX = (double)aimRect.GetValue(Canvas.LeftProperty);
                 var boxY = (double)aimRect.GetValue(Canvas.TopProperty);
-                aimComponent.X = (int)boxX;
-                aimComponent.Y = (int)boxY;
+                aimComponent.X = (int)(boxX + (double)aimRect.GetValue(Canvas.WidthProperty) / 2 - config.ScreenWidthOver2);
+                aimComponent.Y = (int)(boxY + (double)aimRect.GetValue(Canvas.HeightProperty) / 2 - config.ScreenHeightOver2);
                 new AddComponentCommand().Do(commandStacks[selectedParticle],
                     selectedParticle, selectedLayer, aimComponent);
                 Update();

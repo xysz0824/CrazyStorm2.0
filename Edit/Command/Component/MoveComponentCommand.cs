@@ -25,7 +25,7 @@ namespace CrazyStorm
             get { return move; }
             set { move = value; }
         }
-        public MoveComponentCommand(MoveStatus status, bool gridAlignment)
+        public MoveComponentCommand(MoveStatus status, Vector2 gridSize, bool gridAlignment)
         {
             move = Vector2.Zero;
             switch (status)
@@ -44,7 +44,10 @@ namespace CrazyStorm
                     break;
             }
             if (gridAlignment)
-                move *= 32f;
+            {
+                move.x *= gridSize.x / 2;
+                move.y *= gridSize.y / 2;
+            }
         }
         public bool IsSameTarget(MoveComponentCommand command)
         {
@@ -83,9 +86,11 @@ namespace CrazyStorm
                 item.X += move.x;
                 item.Y += move.y;
             }
+            var updateFunc = Parameter[1] as Action;
+            updateFunc();
             //Because it needs first to initialize History[0],
             //the base method is put in there instead of the start,
-            //otherwise the IsSamgeTarget() can't get right result.
+            //otherwise the IsSameTarget() can't get right result.
             base.Redo(stack);
         }
         public override void Undo(CommandStack stack)
@@ -97,6 +102,8 @@ namespace CrazyStorm
                 item.X -= move.x;
                 item.Y -= move.y;
             }
+            var updateFunc = Parameter[1] as Action;
+            updateFunc();
         }
     }
 }
