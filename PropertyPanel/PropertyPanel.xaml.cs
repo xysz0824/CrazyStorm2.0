@@ -43,7 +43,7 @@ namespace CrazyStorm
                 var property = new PropertyPanelItem() {
                     Info = item,
                     Name = item.Name,
-                    Value = component.Properties[item]
+                    Value = component.Properties[item].Value
                 };
                 componentProperties.Add(property);
             }
@@ -57,7 +57,7 @@ namespace CrazyStorm
                 {
                     Info = item,
                     Name = item.Name,
-                    Value = component.Properties[item]
+                    Value = component.Properties[item].Value
                 };
                 specificProperties.Add(property);
             }
@@ -121,15 +121,15 @@ namespace CrazyStorm
             foreach (var item in componentProperties)
             {
                 var result = item.Info.GetGetMethod().Invoke(component, null).ToString();
-                component.Properties[item.Info] = result;
-                item.Value = component.Properties[item.Info];
+                component.Properties[item.Info].Value = result;
+                item.Value = component.Properties[item.Info].Value;
             }
             var specificProperties = SpecificGrid.DataContext as ObservableCollection<PropertyPanelItem>;
             foreach (var item in specificProperties)
             {
                 var result = item.Info.GetGetMethod().Invoke(component, null).ToString();
-                component.Properties[item.Info] = result;
-                item.Value = component.Properties[item.Info];
+                component.Properties[item.Info].Value = result;
+                item.Value = component.Properties[item.Info].Value;
             }
             //
         }

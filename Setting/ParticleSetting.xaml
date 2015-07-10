@@ -35,11 +35,11 @@
                         <Image Name="Image" DataContext="{Binding ElementName=ImageCombo,Path=SelectedItem}" Source="{Binding Path=AbsolutePath}" Canvas.Left="0" Canvas.Top="0"/>
                         <Rectangle 
                             Fill="Blue" 
-                            Width="{Binding ElementName=Width, Path=Text}" Height="{Binding ElementName=Height, Path=Text}" 
+                            Width="{Binding ElementName=RectWidth, Path=Text}" Height="{Binding ElementName=RectHeight, Path=Text}" 
                             Canvas.Left="{Binding ElementName=StartPointX, Path=Text}" Canvas.Top="{Binding ElementName=StartPointY, Path=Text}" 
                             Stroke="Black" Opacity="0.5"/>
                         <Rectangle 
-                            Width="{Binding ElementName=Width, Path=Text}" Height="{Binding ElementName=Height, Path=Text}" 
+                            Width="{Binding ElementName=RectWidth, Path=Text}" Height="{Binding ElementName=RectHeight, Path=Text}" 
                             Canvas.Left="{Binding ElementName=StartPointX, Path=Text}" Canvas.Top="{Binding ElementName=StartPointY, Path=Text}" 
                             Stroke="Red" Opacity="0.8"/>
                         <Ellipse 

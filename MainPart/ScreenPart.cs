@@ -22,8 +22,6 @@ namespace CrazyStorm
     public partial class Main
     {
         #region Private Members
-        static readonly string[] componentNames = new string[] 
-        { "", "MultiEmitter", "CurveEmitter", "Mask", "Rebound", "Force" };
         ParticleSystem selectedParticle;
         DependencyObject aimRect;
         Component aimComponent;
@@ -67,10 +65,10 @@ namespace CrazyStorm
                             box.Opacity = component.Selected ? 1 : 0;
                             if (component.Selected)
                                 selectedComponents.Add(component);
-                            for (int i = 0; i < componentNames.Length; ++i)
-                                if (componentNames[i] == component.GetType().Name)
+                            for (int i = 0; i < Component.ComponentNames.Count; ++i)
+                                if (Component.ComponentNames[i] == component.GetType().Name)
                                 {
-                                    icon.Source = new BitmapImage(new Uri(@"Images/button" + i + ".png", UriKind.Relative));
+                                    icon.Source = new BitmapImage(new Uri(@"Images/button" + (i+1) + ".png", UriKind.Relative));
                                     break;
                                 }
 

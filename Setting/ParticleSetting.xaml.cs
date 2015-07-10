@@ -24,19 +24,18 @@ namespace CrazyStorm
     public partial class ParticleSetting : Window
     {
         #region Private Members
-        List<string> colorList = new List<string>{ "无", "红", "紫", "蓝", "青", "绿", "黄", "橙", "灰" };
         File file;
         ParticleSystem selectedParticle;
         ParticleType selectedType;
-        TabControl particleTabControl;
+        TabItem selectedTab;
         #endregion
 
         #region Constructor
-        public ParticleSetting(File file, ParticleSystem particle, TabControl particleTabControl)
+        public ParticleSetting(File file, ParticleSystem particle, TabItem selectedTab)
         {
             this.file = file;
             this.selectedParticle = particle;
-            this.particleTabControl = particleTabControl;
+            this.selectedTab = selectedTab;
             InitializeComponent();
             InitializeDataBinding();
         }
@@ -54,7 +53,7 @@ namespace CrazyStorm
         {
             foreach (Label item in ColorPanel.Children)
             {
-                if (selectedType != null && colorList[(int)selectedType.Color] == (string)item.Content)
+                if (selectedType != null && ParticleType.ColorList[(int)selectedType.Color] == (string)item.Content)
                     item.BorderThickness = new Thickness(1);
                 else
                     item.BorderThickness = new Thickness(0);
@@ -72,8 +71,7 @@ namespace CrazyStorm
                 return;
             }
             selectedParticle.Name = ParticleName.Text;
-            var item = particleTabControl.SelectedItem as TabItem;
-            item.Header = ParticleName.Text;
+            selectedTab.Header = ParticleName.Text;
             MessageBox.Show((string)FindResource("ParticleNameSuccessfullyChanged"), (string)FindResource("TipTitle"),
                 MessageBoxButton.OK, MessageBoxImage.Information);
         }
@@ -102,7 +100,7 @@ namespace CrazyStorm
             var color = e.OriginalSource as TextBlock;
             if (color != null && selectedType != null)
             {
-                selectedType.Color = (ParticleColor)colorList.FindIndex(s => s == color.Text);
+                selectedType.Color = (ParticleColor)ParticleType.ColorList.FindIndex(s => s == color.Text);
                 UpdateColor();
             }
         }

@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Reflection;
 using CrazyStorm.Core;
 
 namespace CrazyStorm
@@ -16,21 +17,7 @@ namespace CrazyStorm
         { }
         public static Component Create(string name)
         {
-            switch (name)
-            {
-                case "MultiEmitter":
-                    return new MultiEmitter();
-                case "CurveEmitter":
-                    return new CurveEmitter();
-                case "Mask":
-                    return new Mask();
-                case "Rebound":
-                    return new Rebound();
-                case "Force":
-                    return new Force();
-                default:
-                    return null;
-            }
+            return Assembly.Load("Core").CreateInstance("CrazyStorm.Core." + name, false) as Component;
         }
     }
 }

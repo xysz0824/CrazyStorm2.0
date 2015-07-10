@@ -25,8 +25,6 @@ namespace CrazyStorm
         #region Private Members
         Point lastMouseDown;
         DependencyObject lastSelectedItem;
-        static readonly string[] componentImages = new string[] 
-        { "MultiEmitterImage", "CurveEmitterImage", "MaskImage", "ReboundImage", "ForceImage" };
         #endregion
 
         #region Private Methods
@@ -50,10 +48,10 @@ namespace CrazyStorm
                     SelectedGroupName.DataContext = component;
                     SelectedGroupName.SetBinding(TextBlock.TextProperty, "Name");
                     SelectedGroupTip.Text = (string)FindResource("DoubleClickTip");
-                    for (int i = 0; i < componentNames.Length; ++i)
-                        if (componentNames[i] == component.GetType().Name)
+                    for (int i = 0; i < Component.ComponentNames.Count; ++i)
+                        if (Component.ComponentNames[i] == component.GetType().Name)
                         {
-                            SelectedGroupImage.Source = new BitmapImage(new Uri(@"Images/button" + i + ".png", UriKind.Relative));
+                            SelectedGroupImage.Source = new BitmapImage(new Uri(@"Images/button" + (i+1) + ".png", UriKind.Relative));
                             break;
                         }
                 }
@@ -134,8 +132,9 @@ namespace CrazyStorm
         {
             //Light up button when mouse enter.
             var image = sender as Image;
-            for (int i = 1; i <= componentImages.Length; ++i)
-                if (image.Name == componentImages[i - 1])
+            var button = VisualHelper.VisualUpwardSearch<Button>(image) as Button;
+            for (int i = 1; i <= Component.ComponentNames.Count; ++i)
+                if (button.Name == Component.ComponentNames[i - 1])
                 {
                     image.Source = new BitmapImage(new Uri(@"Images\button" + i + "on.png", UriKind.Relative));
                     break;
@@ -145,8 +144,9 @@ namespace CrazyStorm
         {
             //Reset button when mouse leave.
             var image = sender as Image;
-            for (int i = 1; i <= componentImages.Length; ++i)
-                if (image.Name == componentImages[i - 1])
+            var button = VisualHelper.VisualUpwardSearch<Button>(image) as Button;
+            for (int i = 1; i <= Component.ComponentNames.Count; ++i)
+                if (button.Name == Component.ComponentNames[i - 1])
                 {
                     image.Source = new BitmapImage(new Uri(@"Images\button" + i + ".png", UriKind.Relative));
                     break;

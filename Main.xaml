@@ -155,8 +155,13 @@
                         </ImageBrush>
                     </Label.Background>
                 </Label>
-                <Image Name="Icon" Canvas.Left="2" Canvas.Top="2" Stretch="Uniform" Width="28" Height="28" />
-                <Image Name="Box" Opacity="0" Source="Images/aimBox.png" Width="32" Height="32" />
+                <Image Name="Icon" Canvas.Left="2" Canvas.Top="2" Stretch="Uniform" Width="28" Height="28">
+                </Image>
+                <Image Name="Box" Opacity="0" Source="Images/aimBox.png" Width="32" Height="32">
+                    <Image.Effect>
+                        <DropShadowEffect ShadowDepth="0" BlurRadius="8" />
+                    </Image.Effect>
+                </Image>
             </Canvas>
         </DataTemplate>
         <RoutedUICommand x:Key="DelComponent" Text="DelComponent"/>
@@ -424,24 +429,24 @@
                                       HorizontalContentAlignment="Center" VerticalContentAlignment="Center" BorderBrush="#FFC6C6C6">
                                     <StackPanel Name="stackPanel1" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
                                         <Button Name="MultiEmitter" Width="32" Height="32" Padding="0" Margin="1,1,2,1" Background="#00000000" Click="Component_Click">
-                                            <Image RenderOptions.BitmapScalingMode="NearestNeighbor" Name="MultiEmitterImage" Source="Images/button1.png" Stretch="Uniform" ToolTip="多向发射器" 
+                                            <Image RenderOptions.BitmapScalingMode="NearestNeighbor" Source="Images/button1.png" Stretch="Uniform" ToolTip="多向发射器" 
                                                MouseEnter="Component_MouseEnter" MouseLeave="Component_MouseLeave" Width="28" Height="28"  UseLayoutRounding="True"/>
                                         </Button>
                                         <Button Name="CurveEmitter" Width="32" Height="32" Background="{x:Null}" Padding="0" Margin="1,1,2,1" Click="Component_Click">
-                                            <Image RenderOptions.BitmapScalingMode="NearestNeighbor" Name="CurveEmitterImage" Source="Images/button2.png" Stretch="Uniform" ToolTip="曲线发射器" 
+                                            <Image RenderOptions.BitmapScalingMode="NearestNeighbor" Source="Images/button2.png" Stretch="Uniform" ToolTip="曲线发射器" 
                                                MouseEnter="Component_MouseEnter" MouseLeave="Component_MouseLeave" Width="28" Height="28"  UseLayoutRounding="True"/>
                                         </Button>
                                         <Button Name="Mask" Background="{x:Null}" Padding="0" Margin="1,1,2,1" Click="Component_Click" Width="32" Height="32">
-                                            <Image  RenderOptions.BitmapScalingMode="NearestNeighbor" Name="MaskImage" Source="Images/button3.png" ToolTip="遮罩" 
+                                            <Image  RenderOptions.BitmapScalingMode="NearestNeighbor" Source="Images/button3.png" ToolTip="遮罩" 
                                                MouseEnter="Component_MouseEnter" MouseLeave="Component_MouseLeave" Width="28" Height="28" UseLayoutRounding="True">
                                             </Image>
                                         </Button>
                                         <Button Name="Rebound" Width="32" Height="32" Background="{x:Null}" Padding="0" Margin="1,1,2,1" Click="Component_Click">
-                                            <Image RenderOptions.BitmapScalingMode="NearestNeighbor" Name="ReboundImage" Source="Images/button4.png" Stretch="Uniform" ToolTip="反弹板" 
+                                            <Image RenderOptions.BitmapScalingMode="NearestNeighbor" Source="Images/button4.png" Stretch="Uniform" ToolTip="反弹板" 
                                                MouseEnter="Component_MouseEnter" MouseLeave="Component_MouseLeave" Width="28" Height="28"  UseLayoutRounding="True"/>
                                         </Button>
                                         <Button Name="Force" Width="32" Height="32" Background="{x:Null}" Padding="0" Margin="1,1,2,1" Click="Component_Click">
-                                            <Image RenderOptions.BitmapScalingMode="NearestNeighbor" Name="ForceImage" Source="Images/button5.png" Stretch="Uniform" ToolTip="力场" 
+                                            <Image RenderOptions.BitmapScalingMode="NearestNeighbor" Source="Images/button5.png" Stretch="Uniform" ToolTip="力场" 
                                                MouseEnter="Component_MouseEnter" MouseLeave="Component_MouseLeave" Width="28" Height="28"  UseLayoutRounding="True"/>
                                         </Button>
                                     </StackPanel>
