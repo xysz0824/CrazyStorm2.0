@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
@@ -35,7 +36,7 @@ namespace CrazyStorm
             this.component = component;
             this.updateFunc = updateFunc;
             InitializeComponent();
-           
+           //Load component properties.
             var componentProperties = new ObservableCollection<PropertyPanelItem>();
             var componentList = component.InitializeProperties(typeof(Component));
             foreach (var item in componentList)
@@ -48,9 +49,14 @@ namespace CrazyStorm
                 componentProperties.Add(property);
             }
             ComponentGrid.DataContext = componentProperties;
-
+            //Load specific properties.
             var specificProperties = new ObservableCollection<PropertyPanelItem>();
-            var specificList = component.InitializeProperties(component.GetType());
+            IList<PropertyInfo> specificList;
+            if (component is Emitter)
+                specificList = component.InitializeProperties(typeof(Emitter));
+            else
+                specificList = component.InitializeProperties(component.GetType());
+
             foreach (var item in specificList)
             {
                 var property = new PropertyPanelItem()
@@ -62,42 +68,42 @@ namespace CrazyStorm
                 specificProperties.Add(property);
             }
             SpecificGrid.DataContext = specificProperties;
-            
-            //var particleProperties = new ObservableCollection<Property>();
-            //var particleList = multiEmitter.Particle.InitializeProperties(typeof(Particle));
-            //foreach (var item in particleList)
-            //{
-            //    var property = new Property()
-            //    {
-            //        Info = item,
-            //        Name = item.Name,
-            //        Value = multiEmitter.Particle.Properties[item]
-            //    };
-            //    particleProperties.Add(property);
-            //}
-            //ParticleGrid.DataContext = particleProperties;
-            //member3.Add(new Property() { Name = "生命", Value = "" });
-            //member3.Add(new Property() { Name = "类型", Value = "" });
-            //member3.Add(new Property() { Name = "宽度比", Value = "" });
-            //member3.Add(new Property() { Name = "高度比", Value = "" });
-            //member3.Add(new Property() { Name = "RGB", Value = "" });
-            //member3.Add(new Property() { Name = "不透明度", Value = "" });
-            //member3.Add(new Property() { Name = "旋转", Value = "" });
-            //member3.Add(new Property() { Name = "旋转速度方向相关", Value = "" });
-            //member3.Add(new Property() { Name = "旋转保持比例", Value = "" });
-            //member3.Add(new Property() { Name = "速度", Value = "" });
-            //member3.Add(new Property() { Name = "速度角", Value = "" });
-            //member3.Add(new Property() { Name = "加速度", Value = "" });
-            //member3.Add(new Property() { Name = "加速度角", Value = "" });
-            //member3.Add(new Property() { Name = "雾化效果", Value = "" });
-            //member3.Add(new Property() { Name = "消隐效果", Value = "" });
-            //member3.Add(new Property() { Name = "拖影效果", Value = "" });
-            //member3.Add(new Property() { Name = "混合模式", Value = "" });
-            //member3.Add(new Property() { Name = "出屏即消", Value = "" });
-            //member3.Add(new Property() { Name = "开启碰撞", Value = "" });
-            //member3.Add(new Property() { Name = "不受遮罩影响", Value = "" });
-            //member3.Add(new Property() { Name = "不受反弹板影响", Value = "" });
-            //member3.Add(new Property() { Name = "不受力场影响", Value = "" });
+            //Load particle properties.
+            if (component is MultiEmitter)
+            {
+                ParticleGroup.Visibility = Visibility.Visible;
+                var particleProperties = new ObservableCollection<PropertyPanelItem>();
+                var particleList = (component as MultiEmitter).Particle.InitializeProperties(typeof(Particle));
+                foreach (var item in particleList)
+                {
+                    var property = new PropertyPanelItem()
+                    {
+                        Info = item,
+                        Name = item.Name,
+                        Value = (component as MultiEmitter).Particle.Properties[item].Value
+                    };
+                    particleProperties.Add(property);
+                }
+                ParticleGrid.DataContext = particleProperties;
+            }
+            else if (component is CurveEmitter)
+            {
+                ParticleGroup.Visibility = Visibility.Visible;
+                var particleProperties = new ObservableCollection<PropertyPanelItem>();
+                var particleList = (component as CurveEmitter).CurveParticle.InitializeProperties(typeof(CurveParticle));
+                foreach (var item in particleList)
+                {
+                    var property = new PropertyPanelItem()
+                    {
+                        Info = item,
+                        Name = item.Name,
+                        Value = (component as CurveEmitter).CurveParticle.Properties[item].Value
+                    };
+                    particleProperties.Add(property);
+                }
+                ParticleGrid.DataContext = particleProperties;
+            }
+ 
         }
 
         void SetProperty(PropertyContainer container, DataGridCellEditEndingEventArgs e)
@@ -117,6 +123,7 @@ namespace CrazyStorm
 
         public void UpdateProperty()
         {
+            //Update component property.
             var componentProperties = ComponentGrid.DataContext as ObservableCollection<PropertyPanelItem>;
             foreach (var item in componentProperties)
             {
@@ -124,6 +131,7 @@ namespace CrazyStorm
                 component.Properties[item.Info].Value = result;
                 item.Value = component.Properties[item.Info].Value;
             }
+            //Update specific property.
             var specificProperties = SpecificGrid.DataContext as ObservableCollection<PropertyPanelItem>;
             foreach (var item in specificProperties)
             {
@@ -131,7 +139,28 @@ namespace CrazyStorm
                 component.Properties[item.Info].Value = result;
                 item.Value = component.Properties[item.Info].Value;
             }
-            //
+            //Update particle property.
+            var particleProperties = ParticleGrid.DataContext as ObservableCollection<PropertyPanelItem>;
+            if (component is MultiEmitter)
+            {
+                var particle = (component as MultiEmitter).Particle;
+                foreach (var item in particleProperties)
+                {
+                    var result = item.Info.GetGetMethod().Invoke(particle, null).ToString();
+                    particle.Properties[item.Info].Value = result;
+                    item.Value = particle.Properties[item.Info].Value;
+                }
+            }
+            else if (component is CurveEmitter)
+            {
+                var curveParticle = (component as CurveEmitter).CurveParticle;
+                foreach (var item in particleProperties)
+                {
+                    var result = item.Info.GetGetMethod().Invoke(curveParticle, null).ToString();
+                    curveParticle.Properties[item.Info].Value = result;
+                    item.Value = curveParticle.Properties[item.Info].Value;
+                }
+            }
         }
 
         private void ComponentGrid_CellEditEnding(object sender, DataGridCellEditEndingEventArgs e)
@@ -146,7 +175,10 @@ namespace CrazyStorm
 
         private void ParticleGrid_CellEditEnding(object sender, DataGridCellEditEndingEventArgs e)
         {
-            //PropertyPanelHelper.UpdateProperty(component.Particle, e);
+            if (component is MultiEmitter)
+                SetProperty((component as MultiEmitter).Particle, e);
+            else if (component is CurveEmitter)
+                SetProperty((component as CurveEmitter).CurveParticle, e);
         }
     }
 }

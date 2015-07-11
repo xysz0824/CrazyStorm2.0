@@ -36,18 +36,24 @@
                 </DataGrid.Columns>
             </DataGrid>
         </GroupBox>
-        <GroupBox Header="粒子" Background="#FFF9F9F9">
-            <DataGrid Name="ParticleGrid" ItemsSource="{Binding}" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" 
+        <GroupBox Name="ParticleGroup"  Header="粒子" Background="#FFF9F9F9" Visibility="Collapsed">
+            <StackPanel>
+                <DockPanel>
+                    <Label Content="Type" HorizontalContentAlignment="Center" Margin="6,0,1,1"/>
+                    <ComboBox Name="TypeCombo" SelectedItem="{Binding Path=Image}" Margin="0,1"/>
+                </DockPanel>
+                <DataGrid Name="ParticleGrid" ItemsSource="{Binding}" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" 
                           GridLinesVisibility="Horizontal" ColumnWidth="Auto" SelectionMode="Single" AutoGenerateColumns="False"  CanUserAddRows="False" CanUserReorderColumns="False" CanUserSortColumns="False" 
                       ScrollViewer.CanContentScroll="False" CanUserResizeRows="False" CellEditEnding="ParticleGrid_CellEditEnding">
-                <DataGrid.HorizontalGridLinesBrush>
-                    <SolidColorBrush Color="{DynamicResource {x:Static SystemColors.ControlColorKey}}"/>
-                </DataGrid.HorizontalGridLinesBrush>
-                <DataGrid.Columns>
-                    <DataGridTextColumn x:Name="ParticleKey"  Header="属性名" IsReadOnly="True" Binding="{Binding Name}" CanUserResize="False"/>
-                    <DataGridTextColumn x:Name="ParticleValue"  Header="属性值" Binding="{Binding Value}" />
-                </DataGrid.Columns>
-            </DataGrid>
+                    <DataGrid.HorizontalGridLinesBrush>
+                        <SolidColorBrush Color="{DynamicResource {x:Static SystemColors.ControlColorKey}}"/>
+                    </DataGrid.HorizontalGridLinesBrush>
+                    <DataGrid.Columns>
+                        <DataGridTextColumn x:Name="ParticleKey"  Header="属性名" IsReadOnly="True" Binding="{Binding Name}" CanUserResize="False"/>
+                        <DataGridTextColumn x:Name="ParticleValue"  Header="属性值" Binding="{Binding Value}" />
+                    </DataGrid.Columns>
+                </DataGrid>
+            </StackPanel>
         </GroupBox>
         <GroupBox Header="变量" Background="#FFF9F9F9" MinHeight="70">
             <DataGrid Name="VariableGrid" ItemsSource="{Binding}" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" 
