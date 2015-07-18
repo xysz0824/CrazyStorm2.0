@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
@@ -64,14 +65,26 @@ namespace CrazyStorm
                             icon.DataContext = component;
                             box.Opacity = component.Selected ? 1 : 0;
                             if (component.Selected)
+                            {
                                 selectedComponents.Add(component);
-                            for (int i = 0; i < Component.ComponentNames.Count; ++i)
-                                if (Component.ComponentNames[i] == component.GetType().Name)
-                                {
-                                    icon.Source = new BitmapImage(new Uri(@"Images/button" + (i+1) + ".png", UriKind.Relative));
-                                    break;
-                                }
+                                //Draw specific mark.
+                                object marker;
+                                if (component is Emitter)
+                                    marker = Assembly.GetExecutingAssembly().CreateInstance("CrazyStorm.EmitterMarker");
+                                else
+                                    marker = Assembly.GetExecutingAssembly().CreateInstance("CrazyStorm." + component.GetType().Name + "Marker");
 
+                                (marker as IComponentMark).Draw(canvas, component, (int)component.X + config.ScreenWidthOver2,
+                                    (int)component.Y + config.ScreenHeightOver2);
+                            }
+                            else
+                            {
+                                //Draw component mark.
+                                var marker = Assembly.GetExecutingAssembly().CreateInstance("CrazyStorm.ComponentMarker");
+                                (marker as IComponentMark).Draw(canvas, component, (int)component.X + config.ScreenWidthOver2,
+                                    (int)component.Y + config.ScreenHeightOver2);
+                            }
+                            icon.Source = new BitmapImage(new Uri(@"Images/button-" + component.GetType().Name + ".png", UriKind.Relative));
                             item.SetValue(Canvas.LeftProperty, (double)component.X - box.Width / 2 + config.ScreenWidthOver2);
                             item.SetValue(Canvas.TopProperty, (double)component.Y - box.Height / 2 + config.ScreenHeightOver2);
                             canvas.Children.Add(item as UIElement);
@@ -157,8 +170,8 @@ namespace CrazyStorm
                 {
                     if (config.GridAlignment)
                     {
-                        aimRect.SetValue(Canvas.LeftProperty, (double)((x / (int)config.GridWidth) * config.GridWidth));
-                        aimRect.SetValue(Canvas.TopProperty, (double)((y / (int)config.GridHeight) * config.GridHeight));
+                        aimRect.SetValue(Canvas.LeftProperty, (double)((x / ((int)config.GridWidth / 2)) * (config.GridWidth / 2)));
+                        aimRect.SetValue(Canvas.TopProperty, (double)((y / ((int)config.GridHeight / 2)) * (config.GridHeight / 2)));
                     }
                     else if (x <= config.ScreenWidth - config.GridWidth && y <= config.ScreenHeight - config.GridHeight)
                     {

@@ -7,7 +7,7 @@ using System.Windows;
 
 namespace CrazyStorm
 {
-    class VisualHelper
+    static class VisualHelper
     {
         public static DependencyObject VisualUpwardSearch<T>(DependencyObject source)
         {

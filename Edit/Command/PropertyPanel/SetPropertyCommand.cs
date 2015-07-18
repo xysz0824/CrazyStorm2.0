@@ -44,7 +44,7 @@ namespace CrazyStorm
             if (History[1] != null && !(bool)History[1])
                 stack.UndoPop();
         }
-        bool SetProperty(PropertyContainer container, 
+        static bool SetProperty(PropertyContainer container, 
             PropertyInfo propertyInfo, DataGridCell cell, string newValue, PropertyAttribute attribute, Action updateFunc)
         {
             object value;

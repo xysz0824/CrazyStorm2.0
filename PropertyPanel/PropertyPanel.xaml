@@ -13,7 +13,7 @@
         <GroupBox Header="基本" Background="#FFF9F9F9">
             <DataGrid Name="ComponentGrid" ItemsSource="{Binding}" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" 
                           GridLinesVisibility="Horizontal" ColumnWidth="Auto" SelectionMode="Single" AutoGenerateColumns="False"  CanUserAddRows="False" CanUserReorderColumns="False" CanUserSortColumns="False" 
-                      ScrollViewer.CanContentScroll="False" CanUserResizeRows="False" CellEditEnding="ComponentGrid_CellEditEnding" >
+                      ScrollViewer.CanContentScroll="False" CanUserResizeRows="False" CellEditEnding="ComponentGrid_CellEditEnding" CanUserDeleteRows="False">
                 <DataGrid.HorizontalGridLinesBrush>
                     <SolidColorBrush Color="{DynamicResource {x:Static SystemColors.ControlColorKey}}"/>
                 </DataGrid.HorizontalGridLinesBrush>
@@ -26,7 +26,7 @@
         <GroupBox Header="组件" Background="#FFF9F9F9">
             <DataGrid Name="SpecificGrid" ItemsSource="{Binding}" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" 
                           GridLinesVisibility="Horizontal" ColumnWidth="Auto" SelectionMode="Single" AutoGenerateColumns="False"  CanUserAddRows="False" CanUserReorderColumns="False" CanUserSortColumns="False" 
-                      ScrollViewer.CanContentScroll="False" CanUserResizeRows="False" CellEditEnding="SpecificGrid_CellEditEnding">
+                      ScrollViewer.CanContentScroll="False" CanUserResizeRows="False" CellEditEnding="SpecificGrid_CellEditEnding" CanUserDeleteRows="False">
                 <DataGrid.HorizontalGridLinesBrush>
                     <SolidColorBrush Color="{DynamicResource {x:Static SystemColors.ControlColorKey}}"/>
                 </DataGrid.HorizontalGridLinesBrush>
@@ -39,12 +39,16 @@
         <GroupBox Name="ParticleGroup"  Header="粒子" Background="#FFF9F9F9" Visibility="Collapsed">
             <StackPanel>
                 <DockPanel>
-                    <Label Content="Type" HorizontalContentAlignment="Center" Margin="6,0,1,1"/>
-                    <ComboBox Name="TypeCombo" SelectedItem="{Binding Path=Image}" Margin="0,1"/>
+                    <Label Content="类型" HorizontalContentAlignment="Center" Margin="0,0,1,1" DockPanel.Dock="Left"/>
+                    <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+                        <Label Content="标识色" HorizontalContentAlignment="Center" Margin="0,0,1,1"/>
+                        <ComboBox Name="ColorCombo" Width = "30" Margin="0,1" SelectionChanged="ColorCombo_SelectionChanged" />
+                    </StackPanel>
+                    <ComboBox Name="TypeCombo" ItemsSource="{Binding}" Margin="0,1" SelectionChanged="TypeCombo_SelectionChanged" />
                 </DockPanel>
                 <DataGrid Name="ParticleGrid" ItemsSource="{Binding}" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" 
                           GridLinesVisibility="Horizontal" ColumnWidth="Auto" SelectionMode="Single" AutoGenerateColumns="False"  CanUserAddRows="False" CanUserReorderColumns="False" CanUserSortColumns="False" 
-                      ScrollViewer.CanContentScroll="False" CanUserResizeRows="False" CellEditEnding="ParticleGrid_CellEditEnding">
+                      ScrollViewer.CanContentScroll="False" CanUserResizeRows="False" CellEditEnding="ParticleGrid_CellEditEnding" CanUserDeleteRows="False">
                     <DataGrid.HorizontalGridLinesBrush>
                         <SolidColorBrush Color="{DynamicResource {x:Static SystemColors.ControlColorKey}}"/>
                     </DataGrid.HorizontalGridLinesBrush>
@@ -55,18 +59,24 @@
                 </DataGrid>
             </StackPanel>
         </GroupBox>
-        <GroupBox Header="变量" Background="#FFF9F9F9" MinHeight="70">
-            <DataGrid Name="VariableGrid" ItemsSource="{Binding}" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" 
-                          GridLinesVisibility="Horizontal" ColumnWidth="Auto" SelectionMode="Single" AutoGenerateColumns="False" CanUserReorderColumns="False" CanUserSortColumns="False" 
-                      ScrollViewer.CanContentScroll="False" CanUserResizeRows="False">
-                <DataGrid.HorizontalGridLinesBrush>
-                    <SolidColorBrush Color="{DynamicResource {x:Static SystemColors.ControlColorKey}}"/>
-                </DataGrid.HorizontalGridLinesBrush>
-                <DataGrid.Columns>
-                    <DataGridTextColumn x:Name="VariableKey"  Header="变量名" IsReadOnly="True" Binding="{Binding Name}" CanUserResize="False"/>
-                    <DataGridTextColumn x:Name="VariableValue"  Header="变量值" Binding="{Binding Value}" />
-                </DataGrid.Columns>
-            </DataGrid>
+        <GroupBox Header="变量" Background="#FFF9F9F9">
+            <StackPanel>
+                <DataGrid Name="VariableGrid" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" 
+                          GridLinesVisibility="Horizontal" ColumnWidth="Auto" SelectionMode="Single" CanUserReorderColumns="False" CanUserSortColumns="False" 
+                      ScrollViewer.CanContentScroll="False" CanUserResizeRows="False" CanUserAddRows="False" CanUserDeleteRows="False" AutoGenerateColumns="False" CellEditEnding="VariableGrid_CellEditEnding">
+                    <DataGrid.HorizontalGridLinesBrush>
+                        <SolidColorBrush Color="{DynamicResource {x:Static SystemColors.ControlColorKey}}"/>
+                    </DataGrid.HorizontalGridLinesBrush>
+                    <DataGrid.Columns>
+                        <DataGridTextColumn x:Name="VariableKey"  Header="变量名" Binding="{Binding Label}"/>
+                        <DataGridTextColumn x:Name="VariableValue"  Header="变量值" Binding="{Binding Value}" />
+                    </DataGrid.Columns>
+                </DataGrid>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" >
+                    <Button Name="AddVariable" Width ="40" Content="添加" Margin="2,0" Click="AddVariable_Click" />
+                    <Button Name="DeleteVariable" Width ="40" Content="删除" Click="DeleteVariable_Click" />
+                </StackPanel>
+            </StackPanel>
         </GroupBox>
         <GroupBox Header="组件事件组" Height="130" Margin="0">
             <TreeView Name="ComponentEventList" Padding="-12,1,1,1">

@@ -8,6 +8,15 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-[assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("icon.ico")]
+[assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("images/button-curveemitter-on.png")]
+[assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("images/button-curveemitter.png")]
+[assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("images/button-force-on.png")]
+[assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("images/button-force.png")]
+[assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("images/button-mask-on.png")]
+[assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("images/button-mask.png")]
+[assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("images/button-multiemitter-on.png")]
+[assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("images/button-multiemitter.png")]
+[assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("images/button-rebound-on.png")]
+[assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("images/button-rebound.png")]
 
 

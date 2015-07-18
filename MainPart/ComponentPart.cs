@@ -48,12 +48,8 @@ namespace CrazyStorm
                     SelectedGroupName.DataContext = component;
                     SelectedGroupName.SetBinding(TextBlock.TextProperty, "Name");
                     SelectedGroupTip.Text = (string)FindResource("DoubleClickTip");
-                    for (int i = 0; i < Component.ComponentNames.Count; ++i)
-                        if (Component.ComponentNames[i] == component.GetType().Name)
-                        {
-                            SelectedGroupImage.Source = new BitmapImage(new Uri(@"Images/button" + (i+1) + ".png", UriKind.Relative));
-                            break;
-                        }
+                    SelectedGroupImage.Source = new BitmapImage(
+                        new Uri(@"Images/button-" + component.GetType().Name + ".png", UriKind.Relative));
                 }
                 else
                 {
@@ -85,7 +81,7 @@ namespace CrazyStorm
             item.Style = (Style)FindResource("CanCloseStyle");
             var scroll = new ScrollViewer();
             scroll.VerticalScrollBarVisibility = ScrollBarVisibility.Auto;
-            scroll.Content = new PropertyPanel(commandStacks[selectedParticle], component, UpdateProperty);
+            scroll.Content = new PropertyPanel(commandStacks[selectedParticle], selectedParticle, component, UpdateProperty);
             item.Content = scroll;
             LeftTabControl.Items.Add(item);
             item.Focus();
@@ -133,24 +129,14 @@ namespace CrazyStorm
             //Light up button when mouse enter.
             var image = sender as Image;
             var button = VisualHelper.VisualUpwardSearch<Button>(image) as Button;
-            for (int i = 1; i <= Component.ComponentNames.Count; ++i)
-                if (button.Name == Component.ComponentNames[i - 1])
-                {
-                    image.Source = new BitmapImage(new Uri(@"Images\button" + i + "on.png", UriKind.Relative));
-                    break;
-                }
+            image.Source = new BitmapImage(new Uri(@"Images\button-" + button.Name + "-on.png", UriKind.Relative));
         }
         private void Component_MouseLeave(object sender, MouseEventArgs e)
         {
             //Reset button when mouse leave.
             var image = sender as Image;
             var button = VisualHelper.VisualUpwardSearch<Button>(image) as Button;
-            for (int i = 1; i <= Component.ComponentNames.Count; ++i)
-                if (button.Name == Component.ComponentNames[i - 1])
-                {
-                    image.Source = new BitmapImage(new Uri(@"Images\button" + i + ".png", UriKind.Relative));
-                    break;
-                }
+            image.Source = new BitmapImage(new Uri(@"Images\button-" + button.Name + ".png", UriKind.Relative));
         }
         private void ComponentList_PreviewMouseRightButtonDown(object sender, MouseButtonEventArgs e)
         {
@@ -186,9 +172,7 @@ namespace CrazyStorm
                     (Math.Abs(currentPosition.Y - lastMouseDown.Y) > 2.0))
                 {
                     if (lastSelectedItem != null)
-                    {
-                        DragDropEffects finalDropEffect = DragDrop.DoDragDrop(lastSelectedItem, sender, DragDropEffects.Move);
-                    }
+                        DragDrop.DoDragDrop(lastSelectedItem, sender, DragDropEffects.Move);
                 }
             }
         }
@@ -263,7 +247,15 @@ namespace CrazyStorm
             var item = VisualHelper.VisualUpwardSearch<TabItem>(sender as DependencyObject) as TabItem;
             var tab = VisualHelper.VisualUpwardSearch<TabControl>(item) as TabControl;
             if (tab != null)
-                tab.Items.Remove(item);
+            {
+                var scroll = item.Content as ScrollViewer;
+                var panel = scroll.Content as PropertyPanel;
+                if (!panel.InvalidVariable)
+                    tab.Items.Remove(item);
+                else
+                    MessageBox.Show((string)FindResource("VariableInvalid"), (string)FindResource("TipTitle"),
+                        MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
         }
         #endregion
     }

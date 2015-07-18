@@ -86,6 +86,13 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Marker\ComponentMarker.cs" />
+    <Compile Include="Marker\ForceMarker.cs" />
+    <Compile Include="Marker\IComponentMark.cs" />
+    <Compile Include="Marker\EmitterMarker.cs" />
+    <Compile Include="Helper\DrawHelper.cs" />
+    <Compile Include="Marker\MaskMarker.cs" />
+    <Compile Include="Marker\ReboundMarker.cs" />
     <Compile Include="PropertyPanel\PropertyPanelItem.cs" />
     <Compile Include="Edit\Command\PropertyPanel\SetPropertyCommand.cs" />
     <Compile Include="Helper\VisualHelper.cs" />
@@ -121,7 +128,6 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Factory\ComponentFactory.cs" />
     <Compile Include="MainPart\ParticlePart.cs" />
     <Compile Include="Setting\ParticleSetting.xaml.cs">
       <DependentUpon>ParticleSetting.xaml</DependentUpon>
@@ -224,32 +230,10 @@
     <Resource Include="Images\document-new-3.ico" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Images\button1.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Images\button2.png" />
-  </ItemGroup>
-  <ItemGroup>
     <Resource Include="Images\edit-find-5.ico" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Images\button3.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Images\button4.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Images\button5.png" />
-  </ItemGroup>
-  <ItemGroup>
     <Resource Include="Images\ruler.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Images\button1on.png" />
-    <Resource Include="Images\button2on.png" />
-    <Resource Include="Images\button3on.png" />
-    <Resource Include="Images\button4on.png" />
-    <Resource Include="Images\button5on.png" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Images\layercolor.png" />
@@ -310,6 +294,18 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="icon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\button-CurveEmitter-on.png" />
+    <Resource Include="Images\button-CurveEmitter.png" />
+    <Resource Include="Images\button-Force-on.png" />
+    <Resource Include="Images\button-Force.png" />
+    <Resource Include="Images\button-Mask-on.png" />
+    <Resource Include="Images\button-Mask.png" />
+    <Resource Include="Images\button-MultiEmitter-on.png" />
+    <Resource Include="Images\button-MultiEmitter.png" />
+    <Resource Include="Images\button-Rebound-on.png" />
+    <Resource Include="Images\button-Rebound.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

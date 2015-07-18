@@ -51,9 +51,10 @@ namespace CrazyStorm
         }
         void UpdateColor()
         {
-            foreach (Label item in ColorPanel.Children)
+            for (int i = 0; i < ColorPanel.Children.Count;++i )
             {
-                if (selectedType != null && ParticleType.ColorList[(int)selectedType.Color] == (string)item.Content)
+                var item = ColorPanel.Children[i] as Label;
+                if (selectedType != null && (int)selectedType.Color == i)
                     item.BorderThickness = new Thickness(1);
                 else
                     item.BorderThickness = new Thickness(0);
@@ -97,11 +98,15 @@ namespace CrazyStorm
         }
         private void ColorPanel_MouseUp(object sender, MouseButtonEventArgs e)
         {
-            var color = e.OriginalSource as TextBlock;
-            if (color != null && selectedType != null)
+            var selectedColor = e.Source as Label;
+            for (int i = 0; i < ColorPanel.Children.Count; ++i)
             {
-                selectedType.Color = (ParticleColor)ParticleType.ColorList.FindIndex(s => s == color.Text);
-                UpdateColor();
+                var item = ColorPanel.Children[i] as Label;
+                if (selectedColor == item)
+                {
+                    selectedType.Color = (ParticleColor)i;
+                    UpdateColor();
+                }
             }
         }
         private void DeleteType_Click(object sender, RoutedEventArgs e)

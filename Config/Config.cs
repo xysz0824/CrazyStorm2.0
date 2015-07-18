@@ -18,6 +18,9 @@ namespace CrazyStorm
         #region Private Members
         int screenWidth = 640;
         int screenHeight = 480;
+        int gridWidth = 32;
+        int gridHeight = 32;
+
         string imagePath = string.Empty;
         bool gridAlignment = true;
         bool centerDisplay = true;
@@ -62,9 +65,9 @@ namespace CrazyStorm
                     PropertyChanged(this, new PropertyChangedEventArgs("ImagePath"));
             }
         }
-        public Vector2 GridSize { get { return new Vector2(32, 32); } }
-        public int GridWidth { get { return 32; } }
-        public int GridHeight { get { return 32; } }
+        public Vector2 GridSize { get { return new Vector2(gridWidth, gridHeight); } }
+        public int GridWidth { get { return gridWidth; } }
+        public int GridHeight { get { return gridHeight; } }
         public bool GridAlignment
         {
             get { return gridAlignment; }

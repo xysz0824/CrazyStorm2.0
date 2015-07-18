@@ -28,11 +28,16 @@ namespace CrazyStorm
     public partial class PropertyPanel : UserControl
     {
         CommandStack commandStack;
+        ParticleSystem particle;
         Component component;
         Action updateFunc;
-        public PropertyPanel(CommandStack commandStack, Component component, Action updateFunc)
+        bool initializeType;
+        bool invalidVariable;
+        public bool InvalidVariable { get { return invalidVariable; } }
+        public PropertyPanel(CommandStack commandStack, ParticleSystem particle, Component component, Action updateFunc)
         {
             this.commandStack = commandStack;
+            this.particle = particle;
             this.component = component;
             this.updateFunc = updateFunc;
             InitializeComponent();
@@ -103,7 +108,52 @@ namespace CrazyStorm
                 }
                 ParticleGrid.DataContext = particleProperties;
             }
- 
+            //Load particle types.
+            var types = new List<ParticleType>();
+            foreach (var item in particle.CustomType)
+            {
+                bool exist = false;
+                for (int i = 0;i < types.Count; ++i)
+                {
+                    if (item.Name == types[i].Name)
+                    {
+                        exist = true;
+                        break;
+                    }
+                }
+                if (!exist)
+                    types.Add(item);
+            }
+            TypeCombo.ItemsSource = types;
+            ParticleType type = null;
+            if (component is MultiEmitter)
+                type = (component as MultiEmitter).Particle.Type;
+            else if (component is CurveEmitter)
+                type = (component as CurveEmitter).CurveParticle.Type;
+            if (type != null)
+            {
+                //Select specific type.
+                foreach (var item in types)
+                    if (item.Name == type.Name)
+                    {
+                        TypeCombo.SelectedItem = item;
+                        break;
+                    }
+                //Avoid activing ColorCombo_SelectionChanged()
+                //otherwise it would initialize again after selecting specific type.
+                initializeType = true;
+                //Select specific color.
+                InitializeColorCombo();
+                for (int i = 0; i < ColorCombo.Items.Count; ++i)
+                    if (type.Color.ToString() == (string)((ColorCombo.Items[i] as ComboBoxItem).Content))
+                    {
+                        ColorCombo.SelectedIndex = i;
+                        break;
+                    }
+            }
+            //Load variables.
+            VariableGrid.ItemsSource = component.Variables;
+            DeleteVariable.IsEnabled = component.Variables.Count > 0 ? true : false;
         }
 
         void SetProperty(PropertyContainer container, DataGridCellEditEndingEventArgs e)
@@ -179,6 +229,121 @@ namespace CrazyStorm
                 SetProperty((component as MultiEmitter).Particle, e);
             else if (component is CurveEmitter)
                 SetProperty((component as CurveEmitter).CurveParticle, e);
+        }
+
+        private void AddVariable_Click(object sender, RoutedEventArgs e)
+        {
+            var label = "Untitled_";
+            for (int i = 0;; ++i)
+            {
+                //To avoid repeating name, use number.
+                var name = label + i;
+                bool ok = true;
+                for (int k = 0;k < component.Variables.Count;++k)
+                    if (component.Variables[k].Label == name)
+                    {
+                        ok = false;
+                        break;
+                    }
+
+                if (ok)
+                {
+                    var newVar = new VariableResource(name);
+                    component.Variables.Add(newVar);
+                    DeleteVariable.IsEnabled = true;
+                    return;
+                }
+            }
+        }
+
+        private void DeleteVariable_Click(object sender, RoutedEventArgs e)
+        {
+            if (VariableGrid.SelectedItem != null)
+            {
+                component.Variables.Remove(VariableGrid.SelectedItem as VariableResource);
+                DeleteVariable.IsEnabled = component.Variables.Count > 0 ? true : false;
+            }
+        }
+
+        private void VariableGrid_CellEditEnding(object sender, DataGridCellEditEndingEventArgs e)
+        {
+            if (e.EditAction == DataGridEditAction.Commit)
+            {
+                var editItem = e.EditingElement.DataContext as VariableResource;
+                var newValue = (e.EditingElement as TextBox).Text;
+                if (e.Column.SortMemberPath == "Label")
+                {
+                    //Check the commit to avoid repeating name.
+                    newValue = newValue.Trim();
+                    foreach (var item in component.Variables)
+                        if (item != editItem && item.Label == newValue)
+                        {
+                            MessageBox.Show((string)FindResource("NameRepeating"), (string)FindResource("TipTitle"),
+                                MessageBoxButton.OK, MessageBoxImage.Warning);
+                            invalidVariable = true;
+                            return;
+                        }
+                }
+                else if (e.Column.SortMemberPath == "Value")
+                {
+                    //Check the commit to avoid invalid value.
+                    float value;
+                    bool result = float.TryParse(newValue, out value);
+                    if (!result)
+                    {
+                        MessageBox.Show((string)FindResource("ValueInvalid"), (string)FindResource("TipTitle"),
+                            MessageBoxButton.OK, MessageBoxImage.Warning);
+                        invalidVariable = true;
+                        return;
+                    }
+                }
+                invalidVariable = false;
+            }
+        }
+
+        void InitializeColorCombo()
+        {
+            ColorCombo.Items.Clear();
+            var selectedItem = TypeCombo.SelectedItem as ParticleType;
+            foreach (var item in particle.CustomType)
+            {
+                if (item.Name == selectedItem.Name)
+                {
+                    var color = new ComboBoxItem();
+                    color.Content = item.Color.ToString();
+                    ColorCombo.Items.Add(color);
+                }
+            }
+        }
+
+        private void TypeCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (TypeCombo.SelectedItem != null && !initializeType)
+            {
+                //Refresh color combobox.
+                InitializeColorCombo();
+            }
+            initializeType = false;
+        }
+
+        private void ColorCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (ColorCombo.SelectedItem != null)
+            {
+                var selectedItem = TypeCombo.SelectedItem as ParticleType;
+                var color = ColorCombo.SelectedItem as ComboBoxItem;
+                foreach (var item in particle.CustomType)
+                {
+                    if (item.Name == selectedItem.Name && item.Color.ToString() == (string)color.Content)
+                    {
+                        if (component is MultiEmitter)
+                            (component as MultiEmitter).Particle.Type = item;
+                        else if (component is CurveEmitter)
+                            (component as CurveEmitter).CurveParticle.Type = item;
+                        break;
+                    }
+                }
+            }
         }
     }
 }
