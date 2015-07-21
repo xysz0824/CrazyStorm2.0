@@ -1,7 +1,7 @@
 ![Logo](/logo.png)
 # About
 CrazyStorm is a visual editor for particle to make game effect easier.
-The project is developing now so we prohibit unofficial modification and other usage temporarily. Please wait official version, thank you!
+The project is developing now so we don't accept unofficial modification and other usage temporarily. Please wait official version, thank you!
 
 ## Features Overview
 Wait to work out.
