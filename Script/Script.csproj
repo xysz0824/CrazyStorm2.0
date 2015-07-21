@@ -40,6 +40,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CompileException.cs" />
+    <Compile Include="Syntax\Arguments.cs" />
+    <Compile Include="Syntax\Call.cs" />
     <Compile Include="Syntax\BinaryExpression.cs" />
     <Compile Include="Syntax\Name.cs" />
     <Compile Include="Syntax\Number.cs" />

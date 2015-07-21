@@ -43,14 +43,14 @@ namespace CrazyStorm.Script
         bool IsIdentifierToken(string name)
         {
             Token token = lexer.Peek(0);
-            return token is IdentifierToken && name == (string)token.GetValue();
+            return (token is IdentifierToken && name == (string)token.GetValue());
         }
 
         void IdentifierToken(string name)
         {
             Token token = lexer.Read();
             if (!(token is IdentifierToken && name == (string)token.GetValue()))
-                throw new Exception();
+                throw new CompileException("Syntax error.");
         }
 
         Precedence GetNextOperator()
@@ -58,6 +58,7 @@ namespace CrazyStorm.Script
             Token token = lexer.Peek(0);
             if (token is IdentifierToken && operators.ContainsKey((string)token.GetValue()))
                 return operators[(string)token.GetValue()];
+
             return null;
         }
 
@@ -105,10 +106,41 @@ namespace CrazyStorm.Script
                 if (token is NumberToken)
                     return new Number(token);
                 else if (token is IdentifierToken)
-                    return new Name(token);
+                {
+                    if (IsIdentifierToken("("))
+                        return new Call(token, Call());
+                    else
+                        return new Name(token);
+                }
                 else
-                    throw new Exception();
+                    throw new CompileException("Syntax error.");
             }
+        }
+
+        public SyntaxTree Call()
+        {
+            IdentifierToken("(");
+            SyntaxTree arguments = null;
+            if (!IsIdentifierToken(")"))
+                arguments = Arguments();
+
+            IdentifierToken(")");
+            return arguments;
+        }
+
+        public SyntaxTree Arguments()
+        {
+            SyntaxTree expression = Expression();
+            List<SyntaxTree> argumentList = new List<SyntaxTree>();
+            argumentList.Add(expression);
+            while (IsIdentifierToken(","))
+            {
+                IdentifierToken(",");
+                argumentList.Add(Expression());
+            }
+
+            SyntaxTree arguments = new Arguments(argumentList);
+            return arguments;
         }
     }
 }

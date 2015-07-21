@@ -14,7 +14,7 @@ namespace CrazyStorm.Script
     public class Lexer
     {
         static Regex NumberTokenRegex = new Regex(@"[-]?([0-9]+\.[0-9]+|[0-9]+)");
-        static Regex IdentifierTokenRegex = new Regex(@"[A-Z_a-z][A-Z_a-z0-9]*|[+\-*/%()]");
+        static Regex IdentifierTokenRegex = new Regex(@"[A-Z_a-z][A-Z_a-z0-9]*|[+\-*/%(,)]");
         List<Token> tokens;
 
         public void Load(string content)
@@ -56,7 +56,7 @@ namespace CrazyStorm.Script
 
         public Token Peek(int i )
         {
-            if (i >= tokens.Count)
+            if (i < 0 && i >= tokens.Count)
                 return null;
 
             return tokens[i];

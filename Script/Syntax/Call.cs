@@ -5,14 +5,15 @@ using System.Text;
 
 namespace CrazyStorm.Script
 {
-    class Name : SyntaxTree
+    class Call : SyntaxTree
     {
-        public Name(Token token)
+        public Call(Token token, SyntaxTree arguments)
             : base()
         {
             Token = token;
+            AddChild(arguments);
         }
 
-        public string GetName() { return (string)Token.GetValue(); }
+        public SyntaxTree GetArguments() { return GetChildren()[0]; }
     }
 }
