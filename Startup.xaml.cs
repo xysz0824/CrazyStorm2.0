@@ -34,6 +34,11 @@ namespace CrazyStorm
         #region Constructor
         public MainWindow()
         {
+            Script.Lexer lexer = new Script.Lexer();
+            lexer.Load("(x + y) * 2");
+            Script.Parser parser = new Script.Parser(lexer);
+            Script.SyntaxTree tree = parser.Expression();
+
             InitializeComponent();
 
             dTimer.Tick += dTimer_Tick;

@@ -53,4 +53,6 @@ F:\LargeProject\CrazyStorm2.0\obj\x86\Debug\CrazyStorm.Properties.Resources.reso
 F:\LargeProject\CrazyStorm2.0\obj\x86\Debug\CrazyStorm2.0.csproj.GenerateResource.Cache
 F:\LargeProject\CrazyStorm2.0\obj\x86\Debug\CrazyStorm.exe
 F:\LargeProject\CrazyStorm2.0\obj\x86\Debug\CrazyStorm.pdb
+F:\LargeProject\CrazyStorm2.0\bin\Debug\Script.dll
+F:\LargeProject\CrazyStorm2.0\bin\Debug\Script.pdb
 F:\LargeProject\CrazyStorm2.0\obj\x86\Debug\CrazyStorm2.0.csprojResolveAssemblyReference.cache

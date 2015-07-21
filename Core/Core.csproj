@@ -1,0 +1,85 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{1FED6550-8156-45BA-ABD3-7C400FD86A03}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>CrazyStorm.Core</RootNamespace>
+    <AssemblyName>Core</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile>Client</TargetFrameworkProfile>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <CodeAnalysisRuleSet>BasicDesignGuidelineRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Component\ComponentFactory.cs" />
+    <Compile Include="Component\Emitter.cs" />
+    <Compile Include="Math\Vector3.cs" />
+    <Compile Include="Particle\BlendType.cs" />
+    <Compile Include="Particle\CurveParticle.cs" />
+    <Compile Include="Property\BoolPropertyAttribute.cs" />
+    <Compile Include="Property\EnumPropertyAttribute.cs" />
+    <Compile Include="Property\Vector3PropertyAttribute.cs" />
+    <Compile Include="Resource\FileResource.cs" />
+    <Compile Include="Particle\Particle.cs" />
+    <Compile Include="Particle\ParticleType.cs" />
+    <Compile Include="Component\Component.cs" />
+    <Compile Include="Global\AppInfo.cs" />
+    <Compile Include="Particle\ParticleSystem.cs" />
+    <Compile Include="Component\MultiEmitter.cs" />
+    <Compile Include="Component\Force.cs" />
+    <Compile Include="Component\CurveEmitter.cs" />
+    <Compile Include="Component\Mask.cs" />
+    <Compile Include="Component\Rebound.cs" />
+    <Compile Include="File.cs" />
+    <Compile Include="Layer.cs" />
+    <Compile Include="Math\Vector2.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Property\FloatPropertyAttribute.cs" />
+    <Compile Include="Property\IntPropertyAttribute.cs" />
+    <Compile Include="Property\PropertyAttribute.cs" />
+    <Compile Include="Property\PropertyContainer.cs" />
+    <Compile Include="Property\PropertyValue.cs" />
+    <Compile Include="Property\StringPropertyAttribute.cs" />
+    <Compile Include="Property\Vector2PropertyAttribute.cs" />
+    <Compile Include="Resource\Resource.cs" />
+    <Compile Include="Resource\VariableResource.cs" />
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
