@@ -30,13 +30,20 @@ namespace CrazyStorm.Script
                     string lineString = reader.ReadLine().Trim();
                     lineNumber++;
                     List<Token> lineTokens = new List<Token>();
-                    var numberTokens = NumberTokenRegex.Matches(lineString);
-                    foreach (Capture token in numberTokens)
-                        lineTokens.Add(new NumberToken(lineNumber, token.Index, double.Parse(token.Value)));
 
                     var identifierTokens = IdentifierTokenRegex.Matches(lineString);
                     foreach (Capture token in identifierTokens)
+                    {
                         lineTokens.Add(new IdentifierToken(lineNumber, token.Index, token.Value));
+                        string space = "";
+                        for (int i = 0; i < token.Length; ++i)
+                            space += " ";
+                        lineString = lineString.Replace(token.Value, space);
+                    }
+
+                    var numberTokens = NumberTokenRegex.Matches(lineString);
+                    foreach (Capture token in numberTokens)
+                        lineTokens.Add(new NumberToken(lineNumber, token.Index, float.Parse(token.Value)));
 
                     lineTokens.Sort();
                     tokens.AddRange(lineTokens);
@@ -56,7 +63,7 @@ namespace CrazyStorm.Script
 
         public Token Peek(int i )
         {
-            if (i < 0 && i >= tokens.Count)
+            if (i < 0 || i >= tokens.Count)
                 return null;
 
             return tokens[i];

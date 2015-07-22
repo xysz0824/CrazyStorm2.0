@@ -45,6 +45,7 @@
     <Compile Include="Syntax\Call.cs" />
     <Compile Include="Syntax\BinaryExpression.cs" />
     <Compile Include="Syntax\Name.cs" />
+    <Compile Include="Syntax\NegativeExpression.cs" />
     <Compile Include="Syntax\Number.cs" />
     <Compile Include="Syntax\SyntaxTree.cs" />
     <Compile Include="Lexer.cs" />

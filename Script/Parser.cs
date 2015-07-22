@@ -46,11 +46,13 @@ namespace CrazyStorm.Script
             return (token is IdentifierToken && name == (string)token.GetValue());
         }
 
-        void IdentifierToken(string name)
+        Token IdentifierToken(string name)
         {
             Token token = lexer.Read();
             if (!(token is IdentifierToken && name == (string)token.GetValue()))
                 throw new CompileException("Syntax error.");
+
+            return token;
         }
 
         Precedence GetNextOperator()
@@ -92,6 +94,14 @@ namespace CrazyStorm.Script
         }
 
         public SyntaxTree Factor()
+        {
+            if (IsIdentifierToken("-"))
+                return new NegativeExpression(IdentifierToken("-"), Primary());
+
+            return Primary();
+        }
+
+        public SyntaxTree Primary()
         {
             if (IsIdentifierToken("("))
             {

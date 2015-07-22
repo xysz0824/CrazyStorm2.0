@@ -8,8 +8,8 @@ namespace CrazyStorm.Script
 {
     class NumberToken : Token
     {
-        double value;
-        public NumberToken(int lineNumber, int index, double value)
+        float value;
+        public NumberToken(int lineNumber, int index, float value)
             : base(lineNumber, index)
         {
             this.value = value;

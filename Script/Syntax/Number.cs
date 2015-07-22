@@ -13,6 +13,6 @@ namespace CrazyStorm.Script
             Token = token;
         }
 
-        public double GetNumber() { return (double)Token.GetValue(); }
+        public double GetNumber() { return (float)Token.GetValue(); }
     }
 }
