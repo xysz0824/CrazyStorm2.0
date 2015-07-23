@@ -21,6 +21,7 @@ namespace CrazyStorm.Core
             {
                 if (property.DeclaringType.Name != type.Name)
                     continue;
+
                 object[] attributes = property.GetCustomAttributes(false);
                 if (attributes.Length == 1 && attributes[0] is PropertyAttribute)
                 {

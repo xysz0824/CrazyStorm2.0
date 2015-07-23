@@ -64,23 +64,19 @@ namespace CrazyStorm
                             frame.DataContext = layer;
                             icon.DataContext = component;
                             box.Opacity = component.Selected ? 1 : 0;
+                            //Draw component mark.
+                            object marker = Assembly.GetExecutingAssembly().CreateInstance("CrazyStorm.ComponentMarker");
+                            (marker as IComponentMark).Draw(canvas, component, (int)component.X + config.ScreenWidthOver2,
+                                (int)component.Y + config.ScreenHeightOver2);
                             if (component.Selected)
                             {
                                 selectedComponents.Add(component);
                                 //Draw specific mark.
-                                object marker;
                                 if (component is Emitter)
                                     marker = Assembly.GetExecutingAssembly().CreateInstance("CrazyStorm.EmitterMarker");
                                 else
                                     marker = Assembly.GetExecutingAssembly().CreateInstance("CrazyStorm." + component.GetType().Name + "Marker");
 
-                                (marker as IComponentMark).Draw(canvas, component, (int)component.X + config.ScreenWidthOver2,
-                                    (int)component.Y + config.ScreenHeightOver2);
-                            }
-                            else
-                            {
-                                //Draw component mark.
-                                var marker = Assembly.GetExecutingAssembly().CreateInstance("CrazyStorm.ComponentMarker");
                                 (marker as IComponentMark).Draw(canvas, component, (int)component.X + config.ScreenWidthOver2,
                                     (int)component.Y + config.ScreenHeightOver2);
                             }

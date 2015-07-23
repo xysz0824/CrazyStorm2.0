@@ -35,9 +35,13 @@ namespace CrazyStorm.Script
                     foreach (Capture token in identifierTokens)
                     {
                         lineTokens.Add(new IdentifierToken(lineNumber, token.Index, token.Value));
+                        //To ensure that the index of each token is unchanged,
+                        //keep the same length as the original.
                         string space = "";
                         for (int i = 0; i < token.Length; ++i)
                             space += " ";
+                        //To avoid taking influence to next match, 
+                        //use write space for replacement.
                         lineString = lineString.Replace(token.Value, space);
                     }
 
