@@ -85,12 +85,36 @@ namespace CrazyStorm.Script
 
         public SyntaxTree Expression()
         {
-            SyntaxTree left = Factor();
-            Precedence nextOperator;
-            while ((nextOperator = GetNextOperator()) != null)
-                left = PrecedenceShift(left, nextOperator.Level);
+            if (IsIdentifierToken("["))
+            {
+                IdentifierToken("[");
+                SyntaxTree vector = Vector();
+                IdentifierToken("]");
+                return vector;
+            }
+            else
+            {
+                SyntaxTree left = Factor();
+                Precedence nextOperator;
+                while ((nextOperator = GetNextOperator()) != null)
+                    left = PrecedenceShift(left, nextOperator.Level);
 
-            return left;
+                return left;
+            }
+        }
+
+        public SyntaxTree Vector()
+        {
+            SyntaxTree expression = Expression();
+            List<SyntaxTree> coordinateList = new List<SyntaxTree>();
+            coordinateList.Add(expression);
+            while (IsIdentifierToken(","))
+            {
+                IdentifierToken(",");
+                coordinateList.Add(Expression());
+            }
+            Vector vector = new Vector(coordinateList);
+            return vector;
         }
 
         public SyntaxTree Factor()
@@ -115,10 +139,12 @@ namespace CrazyStorm.Script
                 Token token = lexer.Read();
                 if (token is NumberToken)
                     return new Number(token);
-                else if (token is IdentifierToken)
+                else if (token is IdentifierToken && !(token as IdentifierToken).IsOperator)
                 {
                     if (IsIdentifierToken("("))
                         return new Call(token, Call());
+                    else if (IsIdentifierToken("."))
+                        return new Access(Access());
                     else
                         return new Name(token);
                 }
@@ -148,9 +174,26 @@ namespace CrazyStorm.Script
                 IdentifierToken(",");
                 argumentList.Add(Expression());
             }
-
             SyntaxTree arguments = new Arguments(argumentList);
             return arguments;
+        }
+
+        public SyntaxTree Access()
+        {
+            IdentifierToken(".");
+            Token token = lexer.Read();
+            if (token is IdentifierToken && !(token as IdentifierToken).IsOperator)
+            {
+                token = lexer.Read();
+                if (IsIdentifierToken("("))
+                    return new Call(token, Call());
+                else if (IsIdentifierToken("."))
+                    return Access();
+                else
+                    return new Name(token);
+            }
+            else
+                throw new CompileException("Syntax error.");
         }
     }
 }

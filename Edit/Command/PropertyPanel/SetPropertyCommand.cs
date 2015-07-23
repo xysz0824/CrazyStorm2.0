@@ -12,6 +12,7 @@ using System.Windows.Media;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using CrazyStorm.Core;
+using CrazyStorm.Script;
 
 namespace CrazyStorm
 {
@@ -40,7 +41,7 @@ namespace CrazyStorm
             var attribute = Parameter[4] as PropertyAttribute;
             var updateFunc = Parameter[5] as Action;
             SetProperty(container, property.Info, cell, newValue, attribute, updateFunc);
-            //If set invalid value, pop undo stack to avoid for redoing again.
+            //If set invalid value, pop undo stack to prevent for redoing again.
             if (History[1] != null && !(bool)History[1])
                 stack.UndoPop();
         }
@@ -48,16 +49,28 @@ namespace CrazyStorm
             PropertyInfo propertyInfo, DataGridCell cell, string newValue, PropertyAttribute attribute, Action updateFunc)
         {
             object value;
-            //TODO : Expression check.
             if (attribute.IsLegal(newValue, out value))
             {
+                container.Properties[propertyInfo].Expression = false;
                 propertyInfo.GetSetMethod().Invoke(container, new object[] { value });
                 cell.BorderThickness = new Thickness(0);
                 updateFunc();
                 return true;
             }
-            else
+            try
             {
+                var lexer = new Lexer();
+                lexer.Load(newValue);
+                var syntaxTree = new Parser(lexer).Expression();
+                container.Properties[propertyInfo].Expression = true;
+                container.Properties[propertyInfo].Value = newValue;
+                cell.BorderThickness = new Thickness(0);
+                updateFunc();
+                return true;
+            }
+            catch (CompileException e)
+            {
+                e.ToString();
                 cell.BorderBrush = new SolidColorBrush(Colors.Red);
                 cell.BorderThickness = new Thickness(2);
                 return false;

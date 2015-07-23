@@ -172,8 +172,11 @@ namespace CrazyStorm
         {
             foreach (var item in properties)
             {
-                var result = item.Info.GetGetMethod().Invoke(container, null).ToString();
-                container.Properties[item.Info].Value = result;
+                if (!container.Properties[item.Info].Expression)
+                {
+                    var result = item.Info.GetGetMethod().Invoke(container, null).ToString();
+                    container.Properties[item.Info].Value = result;
+                }
                 item.Value = container.Properties[item.Info].Value;
             }
         }

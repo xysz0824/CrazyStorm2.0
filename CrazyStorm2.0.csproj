@@ -66,8 +66,7 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>Core\bin\Debug\Core.dll</HintPath>
     </Reference>
-    <Reference Include="Script, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
+    <Reference Include="Script">
       <HintPath>Script\bin\Debug\Script.dll</HintPath>
     </Reference>
     <Reference Include="System" />

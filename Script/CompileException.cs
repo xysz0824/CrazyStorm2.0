@@ -7,7 +7,7 @@ using System.Runtime.Serialization;
 namespace CrazyStorm.Script
 {
     [Serializable]
-    class CompileException : ApplicationException
+    public class CompileException : ApplicationException
     {
         public CompileException() { }
         public CompileException(string message)

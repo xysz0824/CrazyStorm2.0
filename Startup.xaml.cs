@@ -35,10 +35,10 @@ namespace CrazyStorm
         public MainWindow()
         {
             Script.Lexer lexer = new Script.Lexer();
-            lexer.Load("_12345(0, 10.231123213123, rand(-5, -2), -((x + y) / saturate(z)))");
+            lexer.Load("vector4(0, 10.231232, rand(x, y), 2 + 3 / saturate(z))");
             Script.Parser parser = new Script.Parser(lexer);
             Script.SyntaxTree tree = parser.Expression();
-
+            
             InitializeComponent();
 
             dTimer.Tick += dTimer_Tick;

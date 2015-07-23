@@ -21,7 +21,7 @@ namespace CrazyStorm.Core
         }
         public override string ToString()
         {
-            return "(" + x + "," + y + "," + z + ")";
+            return "[" + x + "," + y + "," + z + "]";
         }
         public override bool Equals(object obj)
         {
@@ -101,7 +101,7 @@ namespace CrazyStorm.Core
         {
             result = Vector3.Zero;
             value = value.Trim();
-            if (value.StartsWith("(") && value.EndsWith(")"))
+            if (value.StartsWith("[") && value.EndsWith("]"))
             {
                 value = value.Substring(1, value.Length - 2);
                 try

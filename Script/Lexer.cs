@@ -14,7 +14,8 @@ namespace CrazyStorm.Script
     public class Lexer
     {
         static Regex NumberTokenRegex = new Regex(@"[-]?([0-9]+\.[0-9]+|[0-9]+)");
-        static Regex IdentifierTokenRegex = new Regex(@"[A-Z_a-z][A-Z_a-z0-9]*|[+\-*/%(,)]");
+        static Regex IdentifierTokenRegex = new Regex(@"[A-Z_a-z][A-Z_a-z0-9]*|[+\-*/%(,)\[\.\]]");
+        static Regex OperatorTokenRegex = new Regex(@"[+\-*/%(,)\[\.\]]");
         List<Token> tokens;
 
         public void Load(string content)
@@ -34,7 +35,11 @@ namespace CrazyStorm.Script
                     var identifierTokens = IdentifierTokenRegex.Matches(lineString);
                     foreach (Capture token in identifierTokens)
                     {
-                        lineTokens.Add(new IdentifierToken(lineNumber, token.Index, token.Value));
+                        if (OperatorTokenRegex.IsMatch(token.Value))
+                            lineTokens.Add(new IdentifierToken(lineNumber, token.Index, token.Value, true));
+                        else
+                            lineTokens.Add(new IdentifierToken(lineNumber, token.Index, token.Value, false));
+
                         //To ensure that the index of each token is unchanged,
                         //keep the same length as the original.
                         string space = "";
@@ -44,7 +49,6 @@ namespace CrazyStorm.Script
                         //use write space for replacement.
                         lineString = lineString.Replace(token.Value, space);
                     }
-
                     var numberTokens = NumberTokenRegex.Matches(lineString);
                     foreach (Capture token in numberTokens)
                         lineTokens.Add(new NumberToken(lineNumber, token.Index, float.Parse(token.Value)));

@@ -41,6 +41,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CompileException.cs" />
+    <Compile Include="Syntax\Access.cs" />
     <Compile Include="Syntax\Arguments.cs" />
     <Compile Include="Syntax\Call.cs" />
     <Compile Include="Syntax\BinaryExpression.cs" />
@@ -50,6 +51,7 @@
     <Compile Include="Syntax\SyntaxTree.cs" />
     <Compile Include="Lexer.cs" />
     <Compile Include="Parser.cs" />
+    <Compile Include="Syntax\Vector.cs" />
     <Compile Include="Token\IdentifierToken.cs" />
     <Compile Include="Token\NumberToken.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
