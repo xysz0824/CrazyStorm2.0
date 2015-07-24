@@ -108,13 +108,19 @@ namespace CrazyStorm.Script
             SyntaxTree expression = Expression();
             List<SyntaxTree> coordinateList = new List<SyntaxTree>();
             coordinateList.Add(expression);
+            int dimension = 1;
             while (IsIdentifierToken(","))
             {
+                dimension++;
                 IdentifierToken(",");
                 coordinateList.Add(Expression());
             }
-            Vector vector = new Vector(coordinateList);
-            return vector;
+            if (dimension == 2)
+                return new Vector2(coordinateList[0], coordinateList[1]);
+            else if (dimension == 3)
+                return new Vector3(coordinateList[0], coordinateList[1], coordinateList[2]);
+            else
+                throw new CompileException("Syntax error.");
         }
 
         public SyntaxTree Factor()
@@ -144,7 +150,7 @@ namespace CrazyStorm.Script
                     if (IsIdentifierToken("("))
                         return new Call(token, Call());
                     else if (IsIdentifierToken("."))
-                        return new Access(Access());
+                        return new Access(token, Access());
                     else
                         return new Name(token);
                 }
@@ -184,11 +190,10 @@ namespace CrazyStorm.Script
             Token token = lexer.Read();
             if (token is IdentifierToken && !(token as IdentifierToken).IsOperator)
             {
-                token = lexer.Read();
                 if (IsIdentifierToken("("))
                     return new Call(token, Call());
                 else if (IsIdentifierToken("."))
-                    return Access();
+                    return new Access(token, Access());
                 else
                     return new Name(token);
             }

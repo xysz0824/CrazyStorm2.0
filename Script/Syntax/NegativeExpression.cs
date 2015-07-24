@@ -7,9 +7,9 @@ namespace CrazyStorm.Script
 {
     class NegativeExpression : SyntaxTree
     {
-        public NegativeExpression(Token negativeToken, SyntaxTree expression)
+        public NegativeExpression(Token negative, SyntaxTree expression)
         {
-            Token = negativeToken;
+            Token = negative;
             AddChild(expression);
         }
 

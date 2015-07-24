@@ -7,10 +7,10 @@ namespace CrazyStorm.Script
 {
     class Call : SyntaxTree
     {
-        public Call(Token token, SyntaxTree arguments)
+        public Call(Token name, SyntaxTree arguments)
             : base()
         {
-            Token = token;
+            Token = name;
             AddChild(arguments);
         }
 

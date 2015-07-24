@@ -7,8 +7,9 @@ namespace CrazyStorm.Script
 {
     class Access : SyntaxTree
     {
-        public Access(SyntaxTree obj)
+        public Access(Token var, SyntaxTree obj)
         {
+            Token = var;
             AddChild(obj);
         }
 

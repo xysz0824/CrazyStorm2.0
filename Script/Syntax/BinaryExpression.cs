@@ -8,10 +8,10 @@ namespace CrazyStorm.Script
 
     class BinaryExpression : SyntaxTree
     {
-        public BinaryExpression(Token operatorToken, SyntaxTree left, SyntaxTree right)
+        public BinaryExpression(Token op, SyntaxTree left, SyntaxTree right)
             : base()
         {
-            Token = operatorToken;
+            Token = op;
             AddChild(left);
             AddChild(right);
         }

@@ -34,11 +34,6 @@ namespace CrazyStorm
         #region Constructor
         public MainWindow()
         {
-            Script.Lexer lexer = new Script.Lexer();
-            lexer.Load("vector4(0, 10.231232, rand(x, y), 2 + 3 / saturate(z))");
-            Script.Parser parser = new Script.Parser(lexer);
-            Script.SyntaxTree tree = parser.Expression();
-            
             InitializeComponent();
 
             dTimer.Tick += dTimer_Tick;

@@ -14,7 +14,7 @@ namespace CrazyStorm.Script
     public class Lexer
     {
         static Regex NumberTokenRegex = new Regex(@"[-]?([0-9]+\.[0-9]+|[0-9]+)");
-        static Regex IdentifierTokenRegex = new Regex(@"[A-Z_a-z][A-Z_a-z0-9]*|[+\-*/%(,)\[\.\]]");
+        static Regex IdentifierTokenRegex = new Regex(@"[A-Z_a-z][A-Z_a-z0-9]*");
         static Regex OperatorTokenRegex = new Regex(@"[+\-*/%(,)\[\.\]]");
         List<Token> tokens;
 
@@ -35,28 +35,36 @@ namespace CrazyStorm.Script
                     var identifierTokens = IdentifierTokenRegex.Matches(lineString);
                     foreach (Capture token in identifierTokens)
                     {
-                        if (OperatorTokenRegex.IsMatch(token.Value))
-                            lineTokens.Add(new IdentifierToken(lineNumber, token.Index, token.Value, true));
-                        else
-                            lineTokens.Add(new IdentifierToken(lineNumber, token.Index, token.Value, false));
-
-                        //To ensure that the index of each token is unchanged,
-                        //keep the same length as the original.
-                        string space = "";
-                        for (int i = 0; i < token.Length; ++i)
-                            space += " ";
-                        //To avoid taking influence to next match, 
-                        //use write space for replacement.
-                        lineString = lineString.Replace(token.Value, space);
+                        lineTokens.Add(new IdentifierToken(lineNumber, token.Index, token.Value, false));
+                        lineString = ReplaceBySpace(lineString, token.Index, token.Length);
                     }
                     var numberTokens = NumberTokenRegex.Matches(lineString);
                     foreach (Capture token in numberTokens)
+                    {
                         lineTokens.Add(new NumberToken(lineNumber, token.Index, float.Parse(token.Value)));
-
+                        lineString = ReplaceBySpace(lineString, token.Index, token.Length);
+                    }
+                    var operatorTokens = OperatorTokenRegex.Matches(lineString);
+                    foreach (Capture token in operatorTokens)
+                    {
+                        lineTokens.Add(new IdentifierToken(lineNumber, token.Index, token.Value, true));
+                        lineString = ReplaceBySpace(lineString, token.Index, token.Length);
+                    }
                     lineTokens.Sort();
                     tokens.AddRange(lineTokens);
                 }
             }
+        }
+
+        string ReplaceBySpace(string origin, int startIndex, int length)
+        {
+            //To avoid taking influence to next match, 
+            //use write space for replacement.
+            char[] charArray = origin.ToCharArray();
+            for (int i = 0; i < length; ++i)
+                charArray[i + startIndex] = ' ';
+
+            return new string(charArray);
         }
 
         public Token Read()

@@ -51,7 +51,8 @@
     <Compile Include="Syntax\SyntaxTree.cs" />
     <Compile Include="Lexer.cs" />
     <Compile Include="Parser.cs" />
-    <Compile Include="Syntax\Vector.cs" />
+    <Compile Include="Syntax\Vector2.cs" />
+    <Compile Include="Syntax\Vector3.cs" />
     <Compile Include="Token\IdentifierToken.cs" />
     <Compile Include="Token\NumberToken.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
