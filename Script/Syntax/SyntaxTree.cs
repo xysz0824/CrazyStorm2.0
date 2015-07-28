@@ -29,5 +29,7 @@ namespace CrazyStorm.Script
         public IList<SyntaxTree> GetChildren() { return children; }
 
         public bool IsLeaf() { return token != null; }
+
+        public abstract object Test(Environment e);
     }
 }

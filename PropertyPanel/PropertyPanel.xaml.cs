@@ -27,15 +27,24 @@ namespace CrazyStorm
     /// </summary>
     public partial class PropertyPanel : UserControl
     {
+        #region Private Members
+        Script.Environment environment;
         CommandStack commandStack;
         ParticleSystem particle;
         Component component;
         Action updateFunc;
         bool initializeType;
         bool invalidVariable;
+        #endregion
+
+        #region Public Members
         public bool InvalidVariable { get { return invalidVariable; } }
+        #endregion
+
+        #region Constructor
         public PropertyPanel(CommandStack commandStack, ParticleSystem particle, Component component, Action updateFunc)
         {
+            LoadEnvironment();
             this.commandStack = commandStack;
             this.particle = particle;
             this.component = component;
@@ -96,7 +105,7 @@ namespace CrazyStorm
                         TypeCombo.SelectedItem = item;
                         break;
                     }
-                //Avoid activing ColorCombo_SelectionChanged(),
+                //Prevent doing ColorCombo_SelectionChanged(),
                 //or it will initialize again after selecting specific type.
                 initializeType = true;
                 //Select specific color.
@@ -112,6 +121,33 @@ namespace CrazyStorm
             VariableGrid.ItemsSource = component.Variables;
             DeleteVariable.IsEnabled = component.Variables.Count > 0 ? true : false;
         }
+        #endregion
+
+        #region Private Methods
+        void LoadEnvironment()
+        {
+            environment = new Script.Environment();
+            //TODO : Load globals.
+            //Add Structs.
+            Script.Struct vector2 = new Script.Struct();
+            vector2.PutField("x", 0.0f);
+            vector2.PutField("y", 0.0f);
+            environment.PutStruct(typeof(Vector2).ToString(), vector2);
+            Script.Struct vector3 = new Script.Struct();
+            vector3.PutField("x", 0.0f);
+            vector3.PutField("y", 0.0f);
+            vector3.PutField("z", 0.0f);
+            environment.PutStruct(typeof(Vector3).ToString(), vector3);
+            //Add Functions.
+            Script.Function rand = new Script.Function(2);
+            environment.PutFunction("rand", rand);
+            Script.Function sin = new Script.Function(1);
+            environment.PutFunction("sin", sin);
+            Script.Function cos = new Script.Function(1);
+            environment.PutFunction("cos", cos);
+            Script.Function tan = new Script.Function(1);
+            environment.PutFunction("tan", tan);
+        }
 
         void LoadProperties(FrameworkElement element, PropertyContainer container, IList<PropertyInfo> infos)
         {
@@ -125,6 +161,8 @@ namespace CrazyStorm
                     Value = container.Properties[item].Value
                 };
                 propertyItems.Add(property);
+                //Put the property into environment.
+                environment.PutLocal(item.Name, item.GetGetMethod().Invoke(container, null));
             }
             element.DataContext = propertyItems;
         }
@@ -142,10 +180,40 @@ namespace CrazyStorm
                     return;
 
                 var attribute = property.Info.GetCustomAttributes(false)[0] as PropertyAttribute;
-                new SetPropertyCommand().Do(commandStack, container, property, cell, newValue, attribute, updateFunc);
+                new SetPropertyCommand().Do(commandStack, environment, container, property, cell, newValue, attribute, updateFunc);
             }
         }
 
+        void UpdateProperty(PropertyContainer container, ObservableCollection<PropertyPanelItem> properties)
+        {
+            foreach (var item in properties)
+            {
+                if (!container.Properties[item.Info].Expression)
+                {
+                    var result = item.Info.GetGetMethod().Invoke(container, null).ToString();
+                    container.Properties[item.Info].Value = result;
+                }
+                item.Value = container.Properties[item.Info].Value;
+            }
+        }
+
+        void InitializeColorCombo()
+        {
+            ColorCombo.Items.Clear();
+            var selectedItem = TypeCombo.SelectedItem as ParticleType;
+            foreach (var item in particle.CustomType)
+            {
+                if (item.Name == selectedItem.Name)
+                {
+                    var color = new ComboBoxItem();
+                    color.Content = item.Color.ToString();
+                    ColorCombo.Items.Add(color);
+                }
+            }
+        }
+        #endregion
+
+        #region Public Methods
         public void UpdateProperty()
         {
             //Update component property.
@@ -167,20 +235,9 @@ namespace CrazyStorm
                 UpdateProperty(curveParticle, particleProperties);
             }
         }
+        #endregion
 
-        void UpdateProperty(PropertyContainer container, ObservableCollection<PropertyPanelItem> properties)
-        {
-            foreach (var item in properties)
-            {
-                if (!container.Properties[item.Info].Expression)
-                {
-                    var result = item.Info.GetGetMethod().Invoke(container, null).ToString();
-                    container.Properties[item.Info].Value = result;
-                }
-                item.Value = container.Properties[item.Info].Value;
-            }
-        }
-
+        #region Windows EventHandlers
         private void ComponentGrid_CellEditEnding(object sender, DataGridCellEditEndingEventArgs e)
         {
             SetProperty(component, e);
@@ -269,21 +326,6 @@ namespace CrazyStorm
             }
         }
 
-        void InitializeColorCombo()
-        {
-            ColorCombo.Items.Clear();
-            var selectedItem = TypeCombo.SelectedItem as ParticleType;
-            foreach (var item in particle.CustomType)
-            {
-                if (item.Name == selectedItem.Name)
-                {
-                    var color = new ComboBoxItem();
-                    color.Content = item.Color.ToString();
-                    ColorCombo.Items.Add(color);
-                }
-            }
-        }
-
         private void TypeCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (TypeCombo.SelectedItem != null && !initializeType)
@@ -313,5 +355,6 @@ namespace CrazyStorm
                 }
             }
         }
+        #endregion
     }
 }

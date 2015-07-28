@@ -93,6 +93,9 @@ namespace CrazyStorm
         private void LayerVisible_MouseUp(object sender, MouseButtonEventArgs e)
         {
             //Set the visibllity of layer.
+            if (selectedLayer == null)
+                return;
+
             var visible = sender as Label;
             selectedLayer.Visible = visible.Opacity == 0 ? true : false;
             Update();
@@ -102,6 +105,7 @@ namespace CrazyStorm
             //Move down selected layer.
             if (selectedLayer == null)
                 return;
+
             int index = selectedParticle.Layers.IndexOf(selectedLayer);
             if (index != selectedParticle.Layers.Count - 1)
             {

@@ -5,7 +5,7 @@ using System.Text;
 
 namespace CrazyStorm.Script
 {
-    class Number : SyntaxTree
+    public class Number : SyntaxTree
     {
         public Number(Token token)
             : base()
@@ -13,6 +13,9 @@ namespace CrazyStorm.Script
             Token = token;
         }
 
-        public double GetNumber() { return (float)Token.GetValue(); }
+        public override object Test(Environment e)
+        {
+            return Token.GetValue();
+        }
     }
 }

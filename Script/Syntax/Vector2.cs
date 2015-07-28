@@ -16,5 +16,15 @@ namespace CrazyStorm.Script
         public SyntaxTree GetX() { return GetChildren()[0]; }
 
         public SyntaxTree GetY() { return GetChildren()[1]; }
+
+        public override object Test(Environment e)
+        {
+            var x = GetX().Test(e);
+            var y = GetY().Test(e);
+            if ((!(x is int) && !(x is float)) || (!(y is int) && !(y is float)))
+                throw new ScriptException("Type error.");
+
+            return new Core.Vector2(Convert.ToSingle(x), Convert.ToSingle(y));
+        }
     }
 }

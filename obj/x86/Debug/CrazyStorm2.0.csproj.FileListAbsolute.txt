@@ -55,7 +55,6 @@ F:\LargeProject\CrazyStorm2.0\obj\x86\Debug\CrazyStorm.exe
 F:\LargeProject\CrazyStorm2.0\obj\x86\Debug\CrazyStorm.pdb
 F:\LargeProject\CrazyStorm2.0\bin\Debug\Script.dll
 F:\LargeProject\CrazyStorm2.0\bin\Debug\Script.pdb
-F:\LargeProject\CrazyStorm2.0\obj\x86\Debug\CrazyStorm2.0.csprojResolveAssemblyReference.cache
 C:\Users\1308hp\Desktop\朱酌乐\GitHub项目\CrazyStorm2.0\obj\x86\Debug\CrazyStorm.exe
 C:\Users\1308hp\Desktop\朱酌乐\GitHub项目\CrazyStorm2.0\obj\x86\Debug\CrazyStorm2.0.csprojResolveAssemblyReference.cache
 C:\Users\1308hp\Desktop\朱酌乐\GitHub项目\CrazyStorm2.0\obj\x86\Debug\Lang\Chinese.baml
@@ -86,3 +85,4 @@ C:\Users\1308hp\Desktop\朱酌乐\GitHub项目\CrazyStorm2.0\obj\x86\Debug\Crazy
 C:\Users\1308hp\Desktop\朱酌乐\GitHub项目\CrazyStorm2.0\obj\x86\Debug\CrazyStorm.Properties.Resources.resources
 C:\Users\1308hp\Desktop\朱酌乐\GitHub项目\CrazyStorm2.0\obj\x86\Debug\CrazyStorm2.0.csproj.GenerateResource.Cache
 C:\Users\1308hp\Desktop\朱酌乐\GitHub项目\CrazyStorm2.0\obj\x86\Debug\CrazyStorm.pdb
+F:\LargeProject\CrazyStorm2.0\obj\x86\Debug\CrazyStorm2.0.csprojResolveAssemblyReference.cache

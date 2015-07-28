@@ -24,6 +24,13 @@ namespace CrazyStorm.Core
                 value = typeValue;
                 return true;
             }
+            float tempValue;
+            result = float.TryParse(newValue, out tempValue);
+            if (result && ((int)tempValue >= minValue && (int)typeValue <= maxValue))
+            {
+                value = (int)tempValue;
+                return true;
+            }
             return false;
         }
     }

@@ -31,6 +31,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Core">
+      <HintPath>..\Core\bin\Debug\Core.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -40,7 +43,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CompileException.cs" />
+    <Compile Include="ScriptException.cs" />
+    <Compile Include="Environment\Environment.cs" />
+    <Compile Include="Environment\Function.cs" />
     <Compile Include="Syntax\Access.cs" />
     <Compile Include="Syntax\Arguments.cs" />
     <Compile Include="Syntax\Call.cs" />
@@ -57,7 +62,9 @@
     <Compile Include="Token\NumberToken.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Token\Token.cs" />
+    <Compile Include="Environment\Struct.cs" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

@@ -50,7 +50,7 @@ namespace CrazyStorm.Script
         {
             Token token = lexer.Read();
             if (!(token is IdentifierToken && name == (string)token.GetValue()))
-                throw new CompileException("Syntax error.");
+                throw new ScriptException("Syntax error.");
 
             return token;
         }
@@ -120,7 +120,7 @@ namespace CrazyStorm.Script
             else if (dimension == 3)
                 return new Vector3(coordinateList[0], coordinateList[1], coordinateList[2]);
             else
-                throw new CompileException("Syntax error.");
+                throw new ScriptException("Syntax error.");
         }
 
         public SyntaxTree Factor()
@@ -155,7 +155,7 @@ namespace CrazyStorm.Script
                         return new Name(token);
                 }
                 else
-                    throw new CompileException("Syntax error.");
+                    throw new ScriptException("Syntax error.");
             }
         }
 
@@ -198,7 +198,7 @@ namespace CrazyStorm.Script
                     return new Name(token);
             }
             else
-                throw new CompileException("Syntax error.");
+                throw new ScriptException("Syntax error.");
         }
     }
 }

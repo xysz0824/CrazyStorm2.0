@@ -7,14 +7,14 @@ using System.Runtime.Serialization;
 namespace CrazyStorm.Script
 {
     [Serializable]
-    public class CompileException : ApplicationException
+    public class ScriptException : ApplicationException
     {
-        public CompileException() { }
-        public CompileException(string message)
+        public ScriptException() { }
+        public ScriptException(string message)
             : base(message) { }
-        public CompileException(string message, Exception inner)
+        public ScriptException(string message, Exception inner)
             : base(message, inner) { }
-        public CompileException(SerializationInfo info, StreamingContext context)
+        public ScriptException(SerializationInfo info, StreamingContext context)
             : base(info, context) { }
     }
 }

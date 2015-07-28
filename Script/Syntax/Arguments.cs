@@ -16,6 +16,16 @@ namespace CrazyStorm.Script
 
         public int Count { get { return GetChildren().Count; } }
 
-        public SyntaxTree GetArgument(int i) { return GetChildren()[i]; }
+        public IList<SyntaxTree> GetArguments() { return GetChildren(); }
+
+        public override object Test(Environment e)
+        {
+            var list = GetArguments();
+            var resultList = new List<object>();
+            foreach (var item in list)
+                resultList.Add(item.Test(e));
+
+            return resultList;
+        }
     }
 }
