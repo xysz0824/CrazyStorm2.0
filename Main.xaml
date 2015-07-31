@@ -405,7 +405,7 @@
                 <DockPanel Background="#FFF9F9F9">
                     <GroupBox DockPanel.Dock="Bottom" Header="已选中" Height="100" BorderBrush="#FFC6C6C6" Name="SelectedGroup" Opacity="0">
                         <GroupBox.Background>
-                            <ImageBrush ImageSource="Images/selectedgroup.png" Stretch="Uniform"/>
+                            <ImageBrush ImageSource="Images/selectedgroup.png"/>
                         </GroupBox.Background>
                         <Canvas ClipToBounds="True">
                             <Canvas.Background>
@@ -640,18 +640,18 @@
                               ScrollViewer.VerticalScrollBarVisibility="Hidden" >
                         <ListView.ItemTemplate>
                             <DataTemplate>
-                                <Label Height="16" Padding="0" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="-1,-2,0,0" >
-                                    <Label.Background>
+                                <Rectangle Height="16" VerticalAlignment="Top" HorizontalAlignment="Left"  >
+                                    <Rectangle.Fill>
                                         <ImageBrush ImageSource="Images/layercolor.png" TileMode="FlipY">
                                             <ImageBrush.Viewbox>
                                                 <Binding Path="Color" Converter="{StaticResource LayerAxisConverter}"/>
                                             </ImageBrush.Viewbox>
                                         </ImageBrush>
-                                    </Label.Background>
-                                    <Label.Width>
+                                    </Rectangle.Fill>
+                                    <Rectangle.Width>
                                         <Binding Path="TotalFrame" Converter="{StaticResource LayerLengthConverter}" />
-                                    </Label.Width>
-                                </Label>
+                                    </Rectangle.Width>
+                                </Rectangle>
                             </DataTemplate>
                         </ListView.ItemTemplate>
                     </ListView>

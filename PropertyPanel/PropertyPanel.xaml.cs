@@ -44,13 +44,45 @@ namespace CrazyStorm
         #region Constructor
         public PropertyPanel(CommandStack commandStack, ParticleSystem particle, Component component, Action updateFunc)
         {
-            LoadEnvironment();
             this.commandStack = commandStack;
             this.particle = particle;
             this.component = component;
             this.updateFunc = updateFunc;
             InitializeComponent();
-           //Load component properties.
+            InitializerEnvironment();
+            LoadContent();
+        }
+        #endregion
+
+        #region Private Methods
+        void InitializerEnvironment()
+        {
+            environment = new Script.Environment();
+            //TODO : Add globals.
+            //Add Structs.
+            Script.Struct vector2 = new Script.Struct();
+            vector2.PutField("x", 0.0f);
+            vector2.PutField("y", 0.0f);
+            environment.PutStruct(typeof(Vector2).ToString(), vector2);
+            Script.Struct vector3 = new Script.Struct();
+            vector3.PutField("x", 0.0f);
+            vector3.PutField("y", 0.0f);
+            vector3.PutField("z", 0.0f);
+            environment.PutStruct(typeof(Vector3).ToString(), vector3);
+            //Add Functions.
+            Script.Function rand = new Script.Function(2);
+            environment.PutFunction("rand", rand);
+            Script.Function sin = new Script.Function(1);
+            environment.PutFunction("sin", sin);
+            Script.Function cos = new Script.Function(1);
+            environment.PutFunction("cos", cos);
+            Script.Function tan = new Script.Function(1);
+            environment.PutFunction("tan", tan);
+        }
+
+        void LoadContent()
+        {
+            //Load component properties.
             var componentList = component.InitializeProperties(typeof(Component));
             LoadProperties(ComponentGrid, component, componentList);
             //Load specific properties.
@@ -79,7 +111,7 @@ namespace CrazyStorm
             foreach (var item in particle.CustomType)
             {
                 bool exist = false;
-                for (int i = 0;i < types.Count; ++i)
+                for (int i = 0; i < types.Count; ++i)
                     if (item.Name == types[i].Name)
                     {
                         exist = true;
@@ -120,33 +152,23 @@ namespace CrazyStorm
             //Load variables.
             VariableGrid.ItemsSource = component.Variables;
             DeleteVariable.IsEnabled = component.Variables.Count > 0 ? true : false;
-        }
-        #endregion
-
-        #region Private Methods
-        void LoadEnvironment()
-        {
-            environment = new Script.Environment();
-            //TODO : Load globals.
-            //Add Structs.
-            Script.Struct vector2 = new Script.Struct();
-            vector2.PutField("x", 0.0f);
-            vector2.PutField("y", 0.0f);
-            environment.PutStruct(typeof(Vector2).ToString(), vector2);
-            Script.Struct vector3 = new Script.Struct();
-            vector3.PutField("x", 0.0f);
-            vector3.PutField("y", 0.0f);
-            vector3.PutField("z", 0.0f);
-            environment.PutStruct(typeof(Vector3).ToString(), vector3);
-            //Add Functions.
-            Script.Function rand = new Script.Function(2);
-            environment.PutFunction("rand", rand);
-            Script.Function sin = new Script.Function(1);
-            environment.PutFunction("sin", sin);
-            Script.Function cos = new Script.Function(1);
-            environment.PutFunction("cos", cos);
-            Script.Function tan = new Script.Function(1);
-            environment.PutFunction("tan", tan);
+            //Load component events.
+            //Load specific events.
+            if (component is MultiEmitter || component is CurveEmitter)
+            {
+                SpecificGroup.Visibility = Visibility.Visible;
+                SpecificGroup.Header = (string)FindResource("ParticleEventList");
+            }
+            else if (component is Mask)
+            {
+                SpecificGroup.Visibility = Visibility.Visible;
+                SpecificGroup.Header = (string)FindResource("MaskEventList");
+            }
+            else if (component is Rebound)
+            {
+                SpecificGroup.Visibility = Visibility.Visible;
+                SpecificGroup.Header = (string)FindResource("ReboundEventList");
+            }   
         }
 
         void LoadProperties(FrameworkElement element, PropertyContainer container, IList<PropertyInfo> infos)

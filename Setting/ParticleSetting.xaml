@@ -7,10 +7,10 @@
     </Window.Resources>
     <DockPanel>
         <GroupBox DockPanel.Dock="Top" Header="基本">
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+            <StackPanel Orientation="Horizontal" >
                 <Label Content="粒子名称"/>
                 <TextBox Name="ParticleName" TextWrapping="Wrap" Text="{Binding Path=Name, Mode=OneTime}" Width="100"/>
-                <Button Content="修改" Width="42" Click="Button_Click"/>
+                <Button Content="修改" Width="42" Click="Button_Click" Margin="4,0"/>
             </StackPanel>
         </GroupBox>
         <TabControl>

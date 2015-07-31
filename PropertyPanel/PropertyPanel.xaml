@@ -82,16 +82,16 @@
             <TreeView Name="ComponentEventList" Padding="-12,1,1,1">
                 <TreeView.ContextMenu>
                     <ContextMenu>
-                        <MenuItem Name="AddComponentEvent" Header="添加组件事件"/>
+                        <MenuItem Name="AddComponentEvent" Header="添加事件"/>
                     </ContextMenu>
                 </TreeView.ContextMenu>
             </TreeView>
         </GroupBox>
-        <GroupBox Header="粒子事件组" Height="130" Margin="0">
-            <TreeView Name="ParticleEventList" Padding="-12,1,1,1">
+        <GroupBox Name="SpecificGroup" Header="具体事件组" Height="130" Margin="0" Visibility="Collapsed">
+            <TreeView Name="SpecificEventList" Padding="-12,1,1,1">
                 <TreeView.ContextMenu>
                     <ContextMenu>
-                        <MenuItem Name="AddParticleEvent" Header="添加粒子事件"/>
+                        <MenuItem Name="AddParticleEvent" Header="添加事件"/>
                     </ContextMenu>
                 </TreeView.ContextMenu>
             </TreeView>
