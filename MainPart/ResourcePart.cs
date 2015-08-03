@@ -25,13 +25,7 @@ namespace CrazyStorm
         #region Window EventHandler
         private void ImageList_PreviewMouseRightButtonDown(object sender, MouseButtonEventArgs e)
         {
-            //Focus pointed item when mouse right-button down.
-            var item = VisualHelper.VisualUpwardSearch<TreeViewItem>(e.OriginalSource as DependencyObject) as TreeViewItem;
-            if (item != null)
-            {
-                item.Focus();
-                e.Handled = true;
-            }
+            VisualHelper.FocusItem<TreeViewItem>(e);
         }
         private void AddImageItem_Click(object sender, RoutedEventArgs e)
         {

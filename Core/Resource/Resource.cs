@@ -11,11 +11,11 @@ using System.ComponentModel;
 
 namespace CrazyStorm.Core
 {
-    public class Resource : INotifyPropertyChanged
+    public abstract class Resource : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
         protected string label;
-        protected bool valid;
+        protected bool isValid;
         public string Label
         {
             get { return label; }
@@ -26,18 +26,18 @@ namespace CrazyStorm.Core
                     PropertyChanged(this, new PropertyChangedEventArgs("Label"));
             }
         }
-        public bool Valid { get { return valid; } }
+        public bool IsValid { get { CheckValid(); return isValid; } }
 
         public Resource(string label)
         {
             this.label = label;
         }
-        public virtual void CheckValid()
-        {
-        }
+
         public override string ToString()
         {
             return label;
         }
+
+        public abstract void CheckValid();
     }
 }

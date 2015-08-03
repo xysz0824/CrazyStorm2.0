@@ -4,6 +4,7 @@
  */
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 
@@ -15,6 +16,7 @@ namespace CrazyStorm.Core
         int length;
         float rotation;
         int collisionTime;
+        ObservableCollection<EventGroup> reboundEventGroups;
         #endregion
 
         #region Public Members
@@ -36,6 +38,7 @@ namespace CrazyStorm.Core
             get { return collisionTime; }
             set { collisionTime = value; }
         }
+        public ObservableCollection<EventGroup> ReboundEventGroups { get { return reboundEventGroups; } }
         #endregion
 
         #region Constructor
@@ -43,6 +46,7 @@ namespace CrazyStorm.Core
             : base()
         {
             Name = "NewRebound";
+            reboundEventGroups = new ObservableCollection<EventGroup>();
         }
         #endregion
     }

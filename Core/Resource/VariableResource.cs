@@ -34,7 +34,7 @@ namespace CrazyStorm.Core
         #region Public Methods
         public override void CheckValid()
         {
-            valid = true;
+            isValid = true;
         }
         #endregion
     }

@@ -212,7 +212,7 @@ namespace CrazyStorm.Core
         #region Constructor
         public ParticleType()
         {
-            name = "Untitled";
+            name = "NewParticleType";
             startPoint = Vector2.Zero;
             centerPoint = Vector2.Zero;
             frames = 1;

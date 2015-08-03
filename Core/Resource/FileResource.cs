@@ -32,7 +32,7 @@ namespace CrazyStorm.Core
         #region Public Methods
         public override void CheckValid()
         {
-            valid = System.IO.File.Exists(absolutePath);
+            isValid = System.IO.File.Exists(absolutePath);
         }
         #endregion
     }

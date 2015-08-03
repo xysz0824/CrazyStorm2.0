@@ -153,21 +153,25 @@ namespace CrazyStorm
             VariableGrid.ItemsSource = component.Variables;
             DeleteVariable.IsEnabled = component.Variables.Count > 0 ? true : false;
             //Load component events.
+            ComponentEventList.ItemsSource = component.ComponentEventGroups;
             //Load specific events.
-            if (component is MultiEmitter || component is CurveEmitter)
+            if (component is Emitter)
             {
                 SpecificGroup.Visibility = Visibility.Visible;
                 SpecificGroup.Header = (string)FindResource("ParticleEventList");
+                SpecificEventList.ItemsSource = (component as Emitter).ParticleEventGroups;
             }
             else if (component is Mask)
             {
                 SpecificGroup.Visibility = Visibility.Visible;
                 SpecificGroup.Header = (string)FindResource("MaskEventList");
+                SpecificEventList.ItemsSource = (component as Mask).MaskEventGroups;
             }
             else if (component is Rebound)
             {
                 SpecificGroup.Visibility = Visibility.Visible;
                 SpecificGroup.Header = (string)FindResource("ReboundEventList");
+                SpecificEventList.ItemsSource = (component as Rebound).ReboundEventGroups;
             }   
         }
 
@@ -264,12 +268,10 @@ namespace CrazyStorm
         {
             SetProperty(component, e);
         }
-
         private void SpecificGrid_CellEditEnding(object sender, DataGridCellEditEndingEventArgs e)
         {
             SetProperty(component, e);
         }
-
         private void ParticleGrid_CellEditEnding(object sender, DataGridCellEditEndingEventArgs e)
         {
             if (component is MultiEmitter)
@@ -277,7 +279,6 @@ namespace CrazyStorm
             else if (component is CurveEmitter)
                 SetProperty((component as CurveEmitter).CurveParticle, e);
         }
-
         private void AddVariable_Click(object sender, RoutedEventArgs e)
         {
             var label = "Untitled_";
@@ -302,7 +303,6 @@ namespace CrazyStorm
                 }
             }
         }
-
         private void DeleteVariable_Click(object sender, RoutedEventArgs e)
         {
             if (VariableGrid.SelectedItem != null)
@@ -311,7 +311,6 @@ namespace CrazyStorm
                 DeleteVariable.IsEnabled = component.Variables.Count > 0 ? true : false;
             }
         }
-
         private void VariableGrid_CellEditEnding(object sender, DataGridCellEditEndingEventArgs e)
         {
             if (e.EditAction == DataGridEditAction.Commit)
@@ -347,7 +346,6 @@ namespace CrazyStorm
                 invalidVariable = false;
             }
         }
-
         private void TypeCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (TypeCombo.SelectedItem != null && !initializeType)
@@ -357,7 +355,6 @@ namespace CrazyStorm
             }
             initializeType = false;
         }
-
         private void ColorCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (ColorCombo.SelectedItem != null)
@@ -376,6 +373,42 @@ namespace CrazyStorm
                     }
                 }
             }
+        }
+        private void AddComponentEvent_Click(object sender, RoutedEventArgs e)
+        {
+            component.ComponentEventGroups.Add(new EventGroup());
+        }
+        private void AddSpecificEvent_Click(object sender, RoutedEventArgs e)
+        {
+            if (component is Emitter)
+                (component as Emitter).ParticleEventGroups.Add(new EventGroup());
+            else if (component is Mask)
+                (component as Mask).MaskEventGroups.Add(new EventGroup());
+            else if (component is Rebound)
+                (component as Rebound).ReboundEventGroups.Add(new EventGroup());
+        }
+        private void DelComponentEvent_Click(object sender, RoutedEventArgs e)
+        {
+            var item = ComponentEventList.SelectedItem as EventGroup;
+            component.ComponentEventGroups.Remove(item);
+        }
+        private void DelSpecificEvent_Click(object sender, RoutedEventArgs e)
+        {
+            var item = SpecificEventList.SelectedItem as EventGroup;
+            if (component is Emitter)
+                (component as Emitter).ParticleEventGroups.Remove(item);
+            else if (component is Mask)
+                (component as Mask).MaskEventGroups.Remove(item);
+            else if (component is Rebound)
+                (component as Rebound).ReboundEventGroups.Remove(item);
+        }
+        private void ComponentEventList_PreviewMouseRightButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            VisualHelper.FocusItem<TreeViewItem>(e);
+        }
+        private void SpecificEventList_PreviewMouseRightButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            VisualHelper.FocusItem<TreeViewItem>(e);
         }
         #endregion
     }

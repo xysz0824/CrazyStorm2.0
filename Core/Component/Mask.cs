@@ -4,6 +4,7 @@
  */
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 
@@ -28,6 +29,7 @@ namespace CrazyStorm.Core
         Shape shape;
         Reach reach;
         string targetName;
+        ObservableCollection<EventGroup> maskEventGroups;
         #endregion
 
         #region Public Members
@@ -61,6 +63,7 @@ namespace CrazyStorm.Core
             get { return targetName; }
             set { targetName = value; }
         }
+        public ObservableCollection<EventGroup> MaskEventGroups { get { return maskEventGroups; } }
         #endregion
 
         #region Constructor
@@ -69,6 +72,7 @@ namespace CrazyStorm.Core
         {
             Name = "NewMask";
             targetName = "";
+            maskEventGroups = new ObservableCollection<EventGroup>();
         }
         #endregion
     }

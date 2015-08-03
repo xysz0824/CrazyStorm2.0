@@ -4,6 +4,7 @@
  */
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 
@@ -17,6 +18,7 @@ namespace CrazyStorm.Core
         int emitCycle;
         float emitAngle;
         float emitRange;
+        ObservableCollection<EventGroup> particleEventGroups;
         #endregion
 
         #region Public Members
@@ -50,6 +52,7 @@ namespace CrazyStorm.Core
             get { return emitRange; }
             set { emitRange = value; }
         }
+        public ObservableCollection<EventGroup> ParticleEventGroups { get { return particleEventGroups; } }
         #endregion
 
         #region Constructor
@@ -58,6 +61,7 @@ namespace CrazyStorm.Core
         {
             emitCount = 1;
             EmitCycle = 1;
+            particleEventGroups = new ObservableCollection<EventGroup>();
         }
         #endregion
     }

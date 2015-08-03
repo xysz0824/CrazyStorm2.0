@@ -506,7 +506,7 @@
                                                     </DockPanel.ContextMenu>
                                                     <TextBlock Text="{Binding Path=Label}">
                                                         <TextBlock.TextDecorations>
-                                                            <Binding Path="Valid" Converter="{StaticResource ResourceValidConverter}"/>
+                                                            <Binding Path="IsValid" Converter="{StaticResource ResourceValidConverter}"/>
                                                         </TextBlock.TextDecorations>
                                                     </TextBlock>
                                                     <DockPanel.ToolTip>

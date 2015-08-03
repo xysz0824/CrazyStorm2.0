@@ -79,21 +79,45 @@
             </StackPanel>
         </GroupBox>
         <GroupBox Header="组件事件组" Height="130" Margin="0">
-            <TreeView Name="ComponentEventList" Padding="-12,1,1,1">
+            <TreeView Name="ComponentEventList" ItemsSource="{Binding ElementName=Name}" Padding="-12,1,1,1" PreviewMouseRightButtonDown="ComponentEventList_PreviewMouseRightButtonDown">
                 <TreeView.ContextMenu>
                     <ContextMenu>
-                        <MenuItem Name="AddComponentEvent" Header="添加事件"/>
+                        <MenuItem Name="AddComponentEvent" Header="添加事件" Click="AddComponentEvent_Click"/>
                     </ContextMenu>
                 </TreeView.ContextMenu>
+                <TreeView.ItemTemplate>
+                    <DataTemplate>
+                        <DockPanel>
+                            <DockPanel.ContextMenu>
+                                <ContextMenu>
+                                    <MenuItem Name="DelComponentEvent" Header="删除" Click="DelComponentEvent_Click" />
+                                </ContextMenu>
+                            </DockPanel.ContextMenu>
+                            <TextBlock Text="{Binding Path=Name}" />
+                        </DockPanel>
+                    </DataTemplate>
+                </TreeView.ItemTemplate>
             </TreeView>
         </GroupBox>
         <GroupBox Name="SpecificGroup" Header="具体事件组" Height="130" Margin="0" Visibility="Collapsed">
-            <TreeView Name="SpecificEventList" Padding="-12,1,1,1">
+            <TreeView Name="SpecificEventList" Padding="-12,1,1,1" PreviewMouseRightButtonDown="SpecificEventList_PreviewMouseRightButtonDown">
                 <TreeView.ContextMenu>
                     <ContextMenu>
-                        <MenuItem Name="AddParticleEvent" Header="添加事件"/>
+                        <MenuItem Name="AddSpecificEvent" Header="添加事件" Click="AddSpecificEvent_Click"/>
                     </ContextMenu>
                 </TreeView.ContextMenu>
+                <TreeView.ItemTemplate>
+                    <DataTemplate>
+                        <DockPanel>
+                            <DockPanel.ContextMenu>
+                                <ContextMenu>
+                                    <MenuItem Name="DelSpecificEvent" Header="删除" Click="DelSpecificEvent_Click" />
+                                </ContextMenu>
+                            </DockPanel.ContextMenu>
+                            <TextBlock Text="{Binding Path=Name}" />
+                        </DockPanel>
+                    </DataTemplate>
+                </TreeView.ItemTemplate>
             </TreeView>
         </GroupBox>
     </StackPanel>

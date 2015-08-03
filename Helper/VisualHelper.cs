@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Windows.Media;
+using System.Windows.Input;
 using System.Windows;
 
 namespace CrazyStorm
@@ -57,6 +58,16 @@ namespace CrazyStorm
                 }
             }
             return childContent;
+        }
+        public static void FocusItem<T>(MouseButtonEventArgs e)
+        {
+            //Focus pointed item when mouse right-button down.
+            var item = VisualHelper.VisualUpwardSearch<T>(e.OriginalSource as DependencyObject) as UIElement;
+            if (item != null)
+            {
+                item.Focus();
+                e.Handled = true;
+            }
         }
     }
 }
