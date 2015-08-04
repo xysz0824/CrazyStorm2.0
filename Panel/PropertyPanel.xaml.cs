@@ -79,7 +79,6 @@ namespace CrazyStorm
             Script.Function tan = new Script.Function(1);
             environment.PutFunction("tan", tan);
         }
-
         void LoadContent()
         {
             //Load component properties.
@@ -138,7 +137,7 @@ namespace CrazyStorm
                         break;
                     }
                 //Prevent doing ColorCombo_SelectionChanged(),
-                //or it will initialize again after selecting specific type.
+                //or it will initialize again after selecting some type.
                 initializeType = true;
                 //Select specific color.
                 InitializeColorCombo();
@@ -174,7 +173,6 @@ namespace CrazyStorm
                 SpecificEventList.ItemsSource = (component as Rebound).ReboundEventGroups;
             }   
         }
-
         void LoadProperties(FrameworkElement element, PropertyContainer container, IList<PropertyInfo> infos)
         {
             var propertyItems = new ObservableCollection<PropertyPanelItem>();
@@ -192,7 +190,6 @@ namespace CrazyStorm
             }
             element.DataContext = propertyItems;
         }
-
         void SetProperty(PropertyContainer container, DataGridCellEditEndingEventArgs e)
         {
             if (e.EditAction == DataGridEditAction.Commit)
@@ -209,7 +206,6 @@ namespace CrazyStorm
                 new SetPropertyCommand().Do(commandStack, environment, container, property, cell, newValue, attribute, updateFunc);
             }
         }
-
         void UpdateProperty(PropertyContainer container, ObservableCollection<PropertyPanelItem> properties)
         {
             foreach (var item in properties)
@@ -222,7 +218,6 @@ namespace CrazyStorm
                 item.Value = container.Properties[item.Info].Value;
             }
         }
-
         void InitializeColorCombo()
         {
             ColorCombo.Items.Clear();
@@ -236,6 +231,11 @@ namespace CrazyStorm
                     ColorCombo.Items.Add(color);
                 }
             }
+        }
+        void OpenEventSetting()
+        {
+            Window window = new EventSetting();
+            window.ShowDialog();
         }
         #endregion
 
@@ -359,11 +359,11 @@ namespace CrazyStorm
         {
             if (ColorCombo.SelectedItem != null)
             {
-                var selectedItem = TypeCombo.SelectedItem as ParticleType;
-                var color = ColorCombo.SelectedItem as ComboBoxItem;
+                var selectedType = TypeCombo.SelectedItem as ParticleType;
+                var selectedColor = ColorCombo.SelectedItem as ComboBoxItem;
                 foreach (var item in particle.CustomType)
                 {
-                    if (item.Name == selectedItem.Name && item.Color.ToString() == (string)color.Content)
+                    if (item.Name == selectedType.Name && item.Color.ToString() == (string)selectedColor.Content)
                     {
                         if (component is MultiEmitter)
                             (component as MultiEmitter).Particle.Type = item;
@@ -409,6 +409,16 @@ namespace CrazyStorm
         private void SpecificEventList_PreviewMouseRightButtonDown(object sender, MouseButtonEventArgs e)
         {
             VisualHelper.FocusItem<TreeViewItem>(e);
+        }
+        private void ComponentEventList_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            if (e.OriginalSource is TextBlock && ComponentEventList.SelectedItem != null)
+                OpenEventSetting();
+        }
+        private void SpecificEventList_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            if (e.OriginalSource is TextBlock && SpecificEventList.SelectedItem != null)
+                OpenEventSetting();
         }
         #endregion
     }

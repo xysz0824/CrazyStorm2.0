@@ -60,7 +60,6 @@ namespace CrazyStorm
         void OpenSelectedParticleSetting()
         {
             ParticleSetting window = new ParticleSetting(file, selectedParticle, ParticleTabControl.SelectedItem as TabItem);
-            window.Owner = this;
             window.ShowDialog();
         }
         #endregion

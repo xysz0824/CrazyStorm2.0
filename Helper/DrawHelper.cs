@@ -11,6 +11,31 @@ namespace CrazyStorm
 {
     class DrawHelper
     {
+        public static void DrawLine(Canvas canvas, int x, int y, int length, int thick, float angle, Color color, float opacity)
+        {
+            var rad = angle / 180 * Math.PI;
+            var arrowLine = new Line();
+            arrowLine.Opacity = opacity;
+            arrowLine.X1 = x;
+            arrowLine.Y1 = y;
+            arrowLine.X2 = x + (length * Math.Cos(rad));
+            arrowLine.Y2 = y + (length * Math.Sin(rad));
+            arrowLine.StrokeThickness = thick;
+            arrowLine.Stroke = new SolidColorBrush(color);
+            canvas.Children.Add(arrowLine);
+        }
+        public static void DrawLine(Canvas canvas, int startX, int startY, int endX, int endY, int thick, Color color, float opacity)
+        {
+            var arrowLine = new Line();
+            arrowLine.Opacity = opacity;
+            arrowLine.X1 = startX;
+            arrowLine.Y1 = startY;
+            arrowLine.X2 = endX;
+            arrowLine.Y2 = endY;
+            arrowLine.StrokeThickness = thick;
+            arrowLine.Stroke = new SolidColorBrush(color);
+            canvas.Children.Add(arrowLine);
+        }
         public static void DrawArrow(Canvas canvas, int x, int y, int length, int thick, float angle, Color color, float opacity)
         {
             var rad = angle / 180 * Math.PI;
@@ -44,6 +69,17 @@ namespace CrazyStorm
             canvas.Children.Add(arrowLine);
             canvas.Children.Add(arrowLeft);
             canvas.Children.Add(arrowRight);
+        }
+        public static void DrawEllipse(Canvas canvas, int x, int y, float radius, Color color, float opacity)
+        {
+            var elipse = new Ellipse();
+            elipse.Width = radius * 2;
+            elipse.Height = radius * 2;
+            elipse.Fill = new SolidColorBrush(color);
+            elipse.Opacity = opacity;
+            elipse.SetValue(Canvas.LeftProperty, (double)x - radius);
+            elipse.SetValue(Canvas.TopProperty, (double)y - radius);
+            canvas.Children.Add(elipse);
         }
         public static void DrawFan(Canvas canvas, int x ,int y, float radius, float startAngle, float endAngle, Color color, float opacity)
         {

@@ -97,9 +97,13 @@
     <Compile Include="Helper\DrawHelper.cs" />
     <Compile Include="Marker\MaskMarker.cs" />
     <Compile Include="Marker\ReboundMarker.cs" />
-    <Compile Include="PropertyPanel\PropertyPanelItem.cs" />
+    <Compile Include="Panel\PropertyPanelItem.cs" />
     <Compile Include="Edit\Command\PropertyPanel\SetPropertyCommand.cs" />
     <Compile Include="Helper\VisualHelper.cs" />
+    <Page Include="Setting\EventSetting.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Setting\ParticleSetting.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -116,7 +120,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="PropertyPanel\PropertyPanel.xaml">
+    <Page Include="Panel\PropertyPanel.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -133,6 +137,9 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="MainPart\ParticlePart.cs" />
+    <Compile Include="Setting\EventSetting.xaml.cs">
+      <DependentUpon>EventSetting.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Setting\ParticleSetting.xaml.cs">
       <DependentUpon>ParticleSetting.xaml</DependentUpon>
     </Compile>
@@ -146,7 +153,7 @@
     <Compile Include="Edit\Command\Component\MoveComponentCommand.cs" />
     <Compile Include="Converter\LayerAxisConverter.cs" />
     <Compile Include="Converter\LayerIconConverter.cs" />
-    <Compile Include="Config\Config.cs" />
+    <Compile Include="Config.cs" />
     <Compile Include="Converter\LayerLengthConverter.cs" />
     <Compile Include="Converter\LayerStartConverter.cs" />
     <Compile Include="Converter\ResourceValidConverter.cs" />
@@ -165,7 +172,7 @@
     <Compile Include="MainPart\LayerPart.cs" />
     <Compile Include="MainPart\ResourcePart.cs" />
     <Compile Include="MainPart\ShortKeyPart.cs" />
-    <Compile Include="PropertyPanel\PropertyPanel.xaml.cs">
+    <Compile Include="Panel\PropertyPanel.xaml.cs">
       <DependentUpon>PropertyPanel.xaml</DependentUpon>
     </Compile>
     <Compile Include="Setting\ScreenSetting.xaml.cs">

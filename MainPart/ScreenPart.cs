@@ -283,7 +283,6 @@ namespace CrazyStorm
         {
             //Open screen setting window.
             ScreenSetting window = new ScreenSetting(config);
-            window.Owner = this;
             window.ShowDialog();
         }
         #endregion

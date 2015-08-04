@@ -10,11 +10,11 @@ none
 false
 DEBUG;TRACE
 F:\LargeProject\CrazyStorm2.0\App.xaml
-7-1297861299
+81099184286
 
-45-1748242897
+46-858016427
 16-684942846
-Setting\ParticleSetting.xaml;Lang\Chinese.xaml;Setting\LayerSetting.xaml;Main.xaml;PropertyPanel\PropertyPanel.xaml;Setting\ScreenSetting.xaml;Startup.xaml;
+Setting\EventSetting.xaml;Setting\ParticleSetting.xaml;Lang\Chinese.xaml;Setting\LayerSetting.xaml;Main.xaml;Panel\PropertyPanel.xaml;Setting\ScreenSetting.xaml;Startup.xaml;
 
-True
+False
 

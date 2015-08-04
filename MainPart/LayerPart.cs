@@ -52,8 +52,7 @@ namespace CrazyStorm
         }
         void OpenSelectedLayerSetting()
         {
-            LayerSetting window = new LayerSetting(commandStacks[selectedParticle], selectedLayer);
-            window.Owner = this;
+            Window window = new LayerSetting(commandStacks[selectedParticle], selectedLayer);
             window.ShowDialog();
         }
         #endregion

@@ -79,7 +79,9 @@
             </StackPanel>
         </GroupBox>
         <GroupBox Header="组件事件组" Height="130" Margin="0">
-            <TreeView Name="ComponentEventList" ItemsSource="{Binding ElementName=Name}" Padding="-12,1,1,1" PreviewMouseRightButtonDown="ComponentEventList_PreviewMouseRightButtonDown">
+            <TreeView Name="ComponentEventList" ItemsSource="{Binding ElementName=Name}" Padding="-12,1,1,1" 
+                      PreviewMouseRightButtonDown="ComponentEventList_PreviewMouseRightButtonDown" 
+                      MouseDoubleClick="ComponentEventList_MouseDoubleClick">
                 <TreeView.ContextMenu>
                     <ContextMenu>
                         <MenuItem Name="AddComponentEvent" Header="添加事件" Click="AddComponentEvent_Click"/>
@@ -100,7 +102,9 @@
             </TreeView>
         </GroupBox>
         <GroupBox Name="SpecificGroup" Header="具体事件组" Height="130" Margin="0" Visibility="Collapsed">
-            <TreeView Name="SpecificEventList" Padding="-12,1,1,1" PreviewMouseRightButtonDown="SpecificEventList_PreviewMouseRightButtonDown">
+            <TreeView Name="SpecificEventList" Padding="-12,1,1,1" 
+                      PreviewMouseRightButtonDown="SpecificEventList_PreviewMouseRightButtonDown" 
+                      MouseDoubleClick="SpecificEventList_MouseDoubleClick">
                 <TreeView.ContextMenu>
                     <ContextMenu>
                         <MenuItem Name="AddSpecificEvent" Header="添加事件" Click="AddSpecificEvent_Click"/>
