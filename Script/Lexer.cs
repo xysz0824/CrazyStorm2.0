@@ -77,12 +77,12 @@ namespace CrazyStorm.Script
             return readToken;
         }
 
-        public Token Peek(int i )
+        public Token Peek(int index)
         {
-            if (i < 0 || i >= tokens.Count)
+            if (index < 0 || index >= tokens.Count)
                 return null;
 
-            return tokens[i];
+            return tokens[index];
         }
     }
 }

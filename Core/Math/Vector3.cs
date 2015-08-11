@@ -106,15 +106,15 @@ namespace CrazyStorm.Core
                 value = value.Substring(1, value.Length - 2);
                 try
                 {
-                    var part = value.Split(',');
-                    if (part.Length != 3)
+                    var splits = value.Split(',');
+                    if (splits.Length != 3)
                         return false;
-                    part[0] = part[0].Trim();
-                    part[1] = part[1].Trim();
-                    part[2] = part[2].Trim();
-                    result.x = float.Parse(part[0]);
-                    result.y = float.Parse(part[1]);
-                    result.z = float.Parse(part[2]);
+                    splits[0] = splits[0].Trim();
+                    splits[1] = splits[1].Trim();
+                    splits[2] = splits[2].Trim();
+                    result.x = float.Parse(splits[0]);
+                    result.y = float.Parse(splits[1]);
+                    result.z = float.Parse(splits[2]);
                     return true;
                 }
                 catch
