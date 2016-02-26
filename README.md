@@ -10,7 +10,7 @@ Wait to work out.
 1. Opensource
 2. New format and old version conversion
 3. Independent player
-4. Universal engine framework to support multiplatforms
+4. Struggle for multiplatforms
 6. Script support
 6. so on
 
