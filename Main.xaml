@@ -242,7 +242,7 @@
             <MenuItem Header="资源">
                 <MenuItem Header="添加图案" Click="AddImageItem_Click"/>
                 <MenuItem Header="添加音效" />
-                <MenuItem Header="添加脚本" />
+                <MenuItem Header="添加全局变量" />
             </MenuItem>
             <MenuItem Name="ParticleMenu" Header="粒子" Click="ParticleMenu_Click" >
                 <MenuItem Name="AddParticleItem" Header="添加粒子" />

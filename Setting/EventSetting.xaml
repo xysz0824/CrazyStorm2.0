@@ -63,11 +63,11 @@
                     <RadioButton Content="减少" VerticalAlignment="Center" Margin="5,0,8,0"></RadioButton>
                     <TextBox Width="100"/>
                 </StackPanel>
-                <Canvas Name="CurveEditor" Width="360" Height="144" RenderOptions.BitmapScalingMode="NearestNeighbor" Margin="0,5" UseLayoutRounding="True">
+                <!--<Canvas Name="CurveEditor" Width="360" Height="144" RenderOptions.BitmapScalingMode="NearestNeighbor" Margin="0,5" UseLayoutRounding="True">
                     <Canvas.Background>
                         <ImageBrush Stretch="Uniform" ImageSource="../Images/rulerscale.png" TileMode="Tile" ViewportUnits="Absolute" Viewport="0,0,30,16"/>
                     </Canvas.Background>
-                </Canvas>
+                </Canvas>-->
                 <StackPanel Orientation="Horizontal" Margin="0,1" HorizontalAlignment="Right">
                     <Label Content="变化时间" Margin="4,0,0,0"/>
                     <TextBox Width="35"></TextBox>

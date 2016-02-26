@@ -66,9 +66,6 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>Core\bin\Debug\Core.dll</HintPath>
     </Reference>
-    <Reference Include="Script">
-      <HintPath>Script\bin\Debug\Script.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Windows.Forms" />
@@ -317,6 +314,12 @@
     <Resource Include="Images\button-MultiEmitter.png" />
     <Resource Include="Images\button-Rebound-on.png" />
     <Resource Include="Images\button-Rebound.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="Script\Script.csproj">
+      <Project>{cea93dc4-9ff2-4d90-b0bf-e1e0d8027223}</Project>
+      <Name>Script</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
