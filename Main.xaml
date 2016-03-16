@@ -570,7 +570,7 @@
                         </Label>
                     </DockPanel>
                     <TreeView x:Name="LayerTree"  BorderBrush="White" 
-                                  ScrollViewer.VerticalScrollBarVisibility="Disabled" MouseUp="LayerTree_MouseUp" MouseDoubleClick="LayerTree_MouseDoubleClick" >
+                                  ScrollViewer.VerticalScrollBarVisibility="Disabled"  MouseUp="LayerTree_MouseUp" MouseDoubleClick="LayerTree_MouseDoubleClick" >
                         <TreeView.ItemTemplate>
                             <DataTemplate>
                                 <DockPanel Name="LayerElement" Width="255" Margin ="-22,0,0,0" Background="{x:Null}" 

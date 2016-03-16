@@ -92,9 +92,13 @@ namespace CrazyStorm
         private void LayerVisible_MouseUp(object sender, MouseButtonEventArgs e)
         {
             //Set the visibllity of layer.
-            if (selectedLayer == null)
+            if (LayerTree.SelectedItem != null)
+                selectedLayer = selectedParticle.Layers[LayerTree.Items.IndexOf(LayerTree.SelectedItem)];
+            else
+            {
+                selectedLayer = null;
                 return;
-
+            }
             var visible = sender as Label;
             selectedLayer.Visible = visible.Opacity == 0 ? true : false;
             Update();
@@ -102,9 +106,13 @@ namespace CrazyStorm
         private void LayerDown_MouseUp(object sender, MouseButtonEventArgs e)
         {
             //Move down selected layer.
-            if (selectedLayer == null)
+            if (LayerTree.SelectedItem != null)
+                selectedLayer = selectedParticle.Layers[LayerTree.Items.IndexOf(LayerTree.SelectedItem)];
+            else
+            {
+                selectedLayer = null;
                 return;
-
+            }
             int index = selectedParticle.Layers.IndexOf(selectedLayer);
             if (index != selectedParticle.Layers.Count - 1)
             {
@@ -116,9 +124,13 @@ namespace CrazyStorm
         private void LayerUp_MouseUp(object sender, MouseButtonEventArgs e)
         {
             //Move up selected layer.
-            if (selectedLayer == null)
+            if (LayerTree.SelectedItem != null)
+                selectedLayer = selectedParticle.Layers[LayerTree.Items.IndexOf(LayerTree.SelectedItem)];
+            else
+            {
+                selectedLayer = null;
                 return;
-
+            }
             int index = selectedParticle.Layers.IndexOf(selectedLayer);
             if (index != 0)
             {
@@ -130,9 +142,13 @@ namespace CrazyStorm
         private void LayerColor_MouseUp(object sender, MouseButtonEventArgs e)
         {
             //Set the color of layer.
-            if (selectedLayer == null)
+            if (LayerTree.SelectedItem != null)
+                selectedLayer = selectedParticle.Layers[LayerTree.Items.IndexOf(LayerTree.SelectedItem)];
+            else
+            {
+                selectedLayer = null;
                 return;
-
+            }
             if (Enum.IsDefined(typeof(LayerColor), selectedLayer.Color + 1))
             {
                 new SetLayerCommand().Do(commandStacks[selectedParticle], selectedLayer,
