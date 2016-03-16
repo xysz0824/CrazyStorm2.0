@@ -636,11 +636,11 @@
                             <ImageBrush ImageSource="Images/ruler.png" Stretch="Uniform" TileMode="Tile" Viewport="0,0,30,30" ViewportUnits="Absolute"  />
                         </Label.Background>
                     </Label>
-                    <ListView Name="LayerAxis" BorderBrush="{x:Null}" Background="{x:Null}" BorderThickness="0" VerticalContentAlignment="Top" Margin="-3,-1,0,0" Foreground="{x:Null}" 
-                              ScrollViewer.VerticalScrollBarVisibility="Hidden" >
-                        <ListView.ItemTemplate>
+                    <TreeView Name="LayerAxis" BorderBrush="{x:Null}" Background="{x:Null}" BorderThickness="0" VerticalContentAlignment="Top" Foreground="{x:Null}" 
+                              ScrollViewer.VerticalScrollBarVisibility="Hidden" Padding="0">
+                        <TreeView.ItemTemplate>
                             <DataTemplate>
-                                <Rectangle Height="16" VerticalAlignment="Top" HorizontalAlignment="Left"  Margin="0,-2,0,0">
+                                <Rectangle Height="16" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="-20,0,0,0">
                                     <Rectangle.Fill>
                                         <ImageBrush ImageSource="Images/layercolor.png" TileMode="FlipY">
                                             <ImageBrush.Viewbox>
@@ -653,8 +653,8 @@
                                     </Rectangle.Width>
                                 </Rectangle>
                             </DataTemplate>
-                        </ListView.ItemTemplate>
-                    </ListView>
+                        </TreeView.ItemTemplate>
+                    </TreeView>
                 </DockPanel>
                 <GridSplitter VerticalAlignment="Stretch" Name="gridSplitter4" Width="1" 
                               HorizontalAlignment="Right" Background="#FFDBDBDB" Grid.Column="1" IsEnabled="False"/>
