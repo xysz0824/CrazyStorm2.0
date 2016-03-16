@@ -25,10 +25,6 @@ namespace CrazyStorm
         public EventSetting()
         {
             InitializeComponent();
-            var color = Color.FromRgb(96,182,236);
-            DrawHelper.DrawEllipse(CurveEditor, 0, 144, 5, color, 1);
-            DrawHelper.DrawEllipse(CurveEditor, 360, 0, 5, color, 1);
-            DrawHelper.DrawLine(CurveEditor, 0, 144, 360, 0, 3, color, 1);
         }
     }
 }

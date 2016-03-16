@@ -133,7 +133,7 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="MainPart\ParticlePart.cs" />
+    <Compile Include="Main\ParticlePart.cs" />
     <Compile Include="Setting\EventSetting.xaml.cs">
       <DependentUpon>EventSetting.xaml</DependentUpon>
     </Compile>
@@ -163,12 +163,12 @@
     <Compile Include="Main.xaml.cs">
       <DependentUpon>Main.xaml</DependentUpon>
     </Compile>
-    <Compile Include="MainPart\ScreenPart.cs" />
-    <Compile Include="MainPart\ComponentPart.cs" />
-    <Compile Include="MainPart\EditPart.cs" />
-    <Compile Include="MainPart\LayerPart.cs" />
-    <Compile Include="MainPart\ResourcePart.cs" />
-    <Compile Include="MainPart\ShortKeyPart.cs" />
+    <Compile Include="Main\ScreenPart.cs" />
+    <Compile Include="Main\ComponentPart.cs" />
+    <Compile Include="Main\EditPart.cs" />
+    <Compile Include="Main\LayerPart.cs" />
+    <Compile Include="Main\ResourcePart.cs" />
+    <Compile Include="Main\ShortKeyPart.cs" />
     <Compile Include="Panel\PropertyPanel.xaml.cs">
       <DependentUpon>PropertyPanel.xaml</DependentUpon>
     </Compile>

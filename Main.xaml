@@ -640,7 +640,7 @@
                               ScrollViewer.VerticalScrollBarVisibility="Hidden" >
                         <ListView.ItemTemplate>
                             <DataTemplate>
-                                <Rectangle Height="16" VerticalAlignment="Top" HorizontalAlignment="Left"  >
+                                <Rectangle Height="16" VerticalAlignment="Top" HorizontalAlignment="Left"  Margin="0,-2,0,0">
                                     <Rectangle.Fill>
                                         <ImageBrush ImageSource="Images/layercolor.png" TileMode="FlipY">
                                             <ImageBrush.Viewbox>

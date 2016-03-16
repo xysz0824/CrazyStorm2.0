@@ -53,7 +53,7 @@
     <Compile Include="Particle\Particle.cs" />
     <Compile Include="Particle\ParticleType.cs" />
     <Compile Include="Component\Component.cs" />
-    <Compile Include="Global\AppInfo.cs" />
+    <Compile Include="Global\VersionInfo.cs" />
     <Compile Include="Particle\ParticleSystem.cs" />
     <Compile Include="Component\MultiEmitter.cs" />
     <Compile Include="Component\Force.cs" />

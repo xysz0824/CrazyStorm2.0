@@ -9,7 +9,7 @@ using System.Text;
 
 namespace CrazyStorm.Core
 {
-    public static class AppInfo
+    public static class VersionInfo
     {
         public const string AppName = "Crazy Storm";
         public const string Version = "2.0";
