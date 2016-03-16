@@ -7,14 +7,14 @@
             <StackPanel>
                 <StackPanel Orientation="Horizontal" Margin="0,1">
                     <Label Content="名称" />
-                    <TextBox Width="150"></TextBox>
+                    <TextBox Width="150" VerticalContentAlignment="Center"/>
                     <RadioButton Content="条件事件" VerticalAlignment="Center" Margin="20,0" IsChecked="True"></RadioButton>
                     <RadioButton Content="周期事件" VerticalAlignment="Center" Margin="10,0"></RadioButton>
                 </StackPanel>
-                <StackPanel Orientation="Horizontal" Margin="0,1">
-                    <Label Content="条件表达式" />
-                    <TextBox Width="290"></TextBox>
-                </StackPanel>
+                <DockPanel Margin="0,1">
+                    <Label Content="条件" />
+                    <TextBox VerticalContentAlignment="Center" />
+                </DockPanel>
             </StackPanel>
         </GroupBox>
         <GroupBox Header="事件列表">
@@ -40,7 +40,7 @@
                     <RadioButton Content="=" />
                     <RadioButton Content="&lt;" />
                 </StackPanel>
-                <TextBox Width="50" VerticalAlignment="Center"/>
+                <TextBox Width="50" VerticalContentAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Center" Height="21"/>
                 <StackPanel Margin="5,0" VerticalAlignment="Center">
                     <RadioButton Content="且" />
                     <RadioButton Content="或" />
@@ -51,18 +51,18 @@
                     <RadioButton Content="=" />
                     <RadioButton Content="&lt;" />
                 </StackPanel>
-                <TextBox Width="50" VerticalAlignment="Center"/>
+                <TextBox Width="50" VerticalContentAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Center" Height="21"/>
             </StackPanel>
         </GroupBox>
         <GroupBox Header="属性事件">
             <StackPanel>
-                <StackPanel Orientation="Horizontal" Margin="0,1">
+                <DockPanel Margin="0,1">
                     <ComboBox Width="100"/>
                     <RadioButton Content="变化到" VerticalAlignment="Center" Margin="8,0,5,0"></RadioButton>
                     <RadioButton Content="增加" VerticalAlignment="Center" Margin="5,0"></RadioButton>
                     <RadioButton Content="减少" VerticalAlignment="Center" Margin="5,0,8,0"></RadioButton>
-                    <TextBox Width="100"/>
-                </StackPanel>
+                    <TextBox VerticalContentAlignment="Center"/>
+                </DockPanel>
                 <!--<Canvas Name="CurveEditor" Width="360" Height="144" RenderOptions.BitmapScalingMode="NearestNeighbor" Margin="0,5" UseLayoutRounding="True">
                     <Canvas.Background>
                         <ImageBrush Stretch="Uniform" ImageSource="../Images/rulerscale.png" TileMode="Tile" ViewportUnits="Absolute" Viewport="0,0,30,16"/>
@@ -70,9 +70,9 @@
                 </Canvas>-->
                 <StackPanel Orientation="Horizontal" Margin="0,1" HorizontalAlignment="Right">
                     <Label Content="变化时间" Margin="4,0,0,0"/>
-                    <TextBox Width="35"></TextBox>
+                    <TextBox Width="35" VerticalContentAlignment="Center" VerticalAlignment="Center" HorizontalAlignment="Center" Height="21"/>
                     <Label Content="执行次数（0代表无限）" />
-                    <TextBox Width="35"></TextBox>
+                    <TextBox Width="35" VerticalContentAlignment="Center" VerticalAlignment="Center" HorizontalAlignment="Center" Height="21"/>
                 </StackPanel>
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,1">
                     <Button Name="AddEvent" Width ="40" Content="添加" Margin="2,0" />
