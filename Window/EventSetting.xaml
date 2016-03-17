@@ -26,7 +26,7 @@
                         <Label Content="周期" />
                         <TextBox Width="40"></TextBox>
                     </StackPanel>
-                    <ListView Name="EventList" ItemsSource="{Binding }" Height="200" SelectionMode="Single">
+                    <ListView Name="EventList" ItemsSource="{Binding }" Height="180" SelectionMode="Single">
                         <ListView.ItemTemplate>
                             <DataTemplate>
                                 <DockPanel>
@@ -75,20 +75,20 @@
                     <TextBox VerticalContentAlignment="Center" Height="25"/>
                 </DockPanel>
                 <StackPanel Orientation="Horizontal" Margin="0,1" HorizontalAlignment="Center">
-                    <StackPanel Margin="10,0">
-                        <Image Source="/CrazyStorm;component/Images/arrow-right-3.ico"></Image>
+                    <StackPanel Margin="1,0">
+                        <Image Source="/CrazyStorm;component/Images/linear.png" Width="96" Height="48"/>
                         <RadioButton Name="Linear"  HorizontalAlignment="Center" Content="线性" Checked="Linear_Checked"></RadioButton>
                     </StackPanel>
-                    <StackPanel Margin="10,0">
-                        <Image Source="/CrazyStorm;component/Images/arrow-right-3.ico"></Image>
+                    <StackPanel Margin="1,0">
+                        <Image Source="/CrazyStorm;component/Images/accelerated.png" Width="96" Height="48"></Image>
                         <RadioButton Name="Accelerated" HorizontalAlignment="Center" Content="加速" Checked="Accelerated_Checked"></RadioButton>
                     </StackPanel>
-                    <StackPanel Margin="10,0">
-                        <Image Source="/CrazyStorm;component/Images/arrow-right-3.ico"></Image>
+                    <StackPanel Margin="1,0">
+                        <Image Source="/CrazyStorm;component/Images/decelerated.png" Width="96" Height="48"></Image>
                         <RadioButton Name="Decelerated" HorizontalAlignment="Center" Content="减速" Checked="Decelerated_Checked"></RadioButton>
                     </StackPanel>
-                    <StackPanel Margin="10,0">
-                        <Image Source="/CrazyStorm;component/Images/arrow-right-3.ico"></Image>
+                    <StackPanel Margin="1,0">
+                        <Image Source="/CrazyStorm;component/Images/fixed.png" Width="96" Height="48"></Image>
                         <RadioButton Name="Fixed" HorizontalAlignment="Center" Content="固定" Checked="Fixed_Checked"></RadioButton>
                     </StackPanel>
                 </StackPanel>
@@ -109,6 +109,7 @@
                     <RadioButton Name="EmitParticleButton" Width="80" Content="发射粒子" Margin="8,0,5,0" Checked="EmitParticleButton_Checked" />
                     <RadioButton Name="PlaySoundButton" Width="80" Content="播放音效" Margin="5,0" Checked="PlaySoundButton_Checked" />
                     <RadioButton Name="LoopButton" Width="80" Content="循环执行" Margin="5,0,8,0" Checked="LoopButton_Checked" />
+                    <RadioButton Name="RecoverButton" Width="80" Content="恢复状态" Margin="5,0,8,0" Checked="RecoverButton_Checked" />
                 </StackPanel>
                 <DockPanel Name="PlaySoundPanel" Margin="0,1" Visibility="Collapsed">
                     <Label Content="音效资源" />

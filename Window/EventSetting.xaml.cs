@@ -86,6 +86,11 @@ namespace CrazyStorm
             PlaySoundPanel.Visibility = Visibility.Collapsed;
             LoopPanel.Visibility = Visibility.Visible;
         }
+        private void RecoverButton_Checked(object sender, RoutedEventArgs e)
+        {
+            PlaySoundPanel.Visibility = Visibility.Collapsed;
+            LoopPanel.Visibility = Visibility.Collapsed;
+        }
         private void AddEvent_Click(object sender, RoutedEventArgs e)
         {
             eventGroup.Events.Add("aaaaaaaaaaaaaa");

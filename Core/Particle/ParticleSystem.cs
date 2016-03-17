@@ -16,7 +16,7 @@ namespace CrazyStorm.Core
         string name;
         ObservableCollection<ParticleType> customType;
         ObservableCollection<Layer> layers;
-        ObservableCollection<Component> components;
+        ObservableCollection<Component> componentTree;
         #endregion
 
         #region Public Members
@@ -27,7 +27,7 @@ namespace CrazyStorm.Core
         }
         public ObservableCollection<ParticleType> CustomType { get { return customType; } }
         public ObservableCollection<Layer> Layers { get { return layers; } }
-        public ObservableCollection<Component> ComponentTree { get { return components; } }
+        public ObservableCollection<Component> ComponentTree { get { return componentTree; } }
         #endregion
 
         #region Constructor
@@ -36,7 +36,7 @@ namespace CrazyStorm.Core
             this.name = name;
             customType = new ObservableCollection<ParticleType>();
             layers = new ObservableCollection<Layer>();
-            components = new ObservableCollection<Component>();
+            componentTree = new ObservableCollection<Component>();
             layers.Add(new Layer("Main"));
         }
         #endregion
@@ -44,7 +44,7 @@ namespace CrazyStorm.Core
         #region Public Methods
         public void AddComponentToLayer(Layer layer, Component component)
         {
-            components.Add(component);
+            componentTree.Add(component);
             foreach (var item in component.GetPosterity())
             {
                 layer.Components.Add(item);
@@ -53,7 +53,7 @@ namespace CrazyStorm.Core
         }
         public void DeleteComponentFromLayer(Layer layer, Component component)
         {
-            components.Remove(component);
+            componentTree.Remove(component);
             foreach (var item in component.GetPosterity())
             {
                 layer.Components.Remove(item);
@@ -63,14 +63,14 @@ namespace CrazyStorm.Core
         public void AddLayer(Layer layer)
         {
             foreach (var component in layer.Components)
-                components.Add(component);
+                componentTree.Add(component);
 
             layers.Add(layer);
         }
         public void DeleteLayer(Layer layer)
         {
             foreach (var component in layer.Components)
-                components.Remove(component);
+                componentTree.Remove(component);
 
             layers.Remove(layer);
         }

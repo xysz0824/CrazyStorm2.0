@@ -137,7 +137,9 @@ namespace CrazyStorm
         }
         void UpdateLayer()
         {
-            InitializeLayer();
+            CopyLayerItem.IsEnabled = false;
+            DeleteLayerItem.IsEnabled = false;
+            SetLayerItem.IsEnabled = false;
         }
         void Update()
         {

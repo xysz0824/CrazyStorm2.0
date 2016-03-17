@@ -95,13 +95,13 @@
     <Compile Include="Marker\MaskMarker.cs" />
     <Compile Include="Marker\ReboundMarker.cs" />
     <Compile Include="Panel\PropertyPanelItem.cs" />
-    <Compile Include="Edit\Command\PropertyPanel\SetPropertyCommand.cs" />
+    <Compile Include="Edit\Command\Property\SetPropertyCommand.cs" />
     <Compile Include="Helper\VisualHelper.cs" />
-    <Page Include="Setting\EventSetting.xaml">
+    <Page Include="Window\EventSetting.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Setting\ParticleSetting.xaml">
+    <Page Include="Window\ParticleSetting.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -109,7 +109,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Setting\LayerSetting.xaml">
+    <Page Include="Window\LayerSetting.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -121,7 +121,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Setting\ScreenSetting.xaml">
+    <Page Include="Window\ScreenSetting.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -134,10 +134,10 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Main\ParticlePart.cs" />
-    <Compile Include="Setting\EventSetting.xaml.cs">
+    <Compile Include="Window\EventSetting.xaml.cs">
       <DependentUpon>EventSetting.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Setting\ParticleSetting.xaml.cs">
+    <Compile Include="Window\ParticleSetting.xaml.cs">
       <DependentUpon>ParticleSetting.xaml</DependentUpon>
     </Compile>
     <Compile Include="Edit\Command\Component\AddComponentCommand.cs" />
@@ -157,7 +157,7 @@
     <Compile Include="Edit\ClipBoard.cs" />
     <Compile Include="Edit\Command\ParameterEmptyException.cs" />
     <Compile Include="Helper\DoubleClickDetector.cs" />
-    <Compile Include="Setting\LayerSetting.xaml.cs">
+    <Compile Include="Window\LayerSetting.xaml.cs">
       <DependentUpon>LayerSetting.xaml</DependentUpon>
     </Compile>
     <Compile Include="Main.xaml.cs">
@@ -172,7 +172,7 @@
     <Compile Include="Panel\PropertyPanel.xaml.cs">
       <DependentUpon>PropertyPanel.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Setting\ScreenSetting.xaml.cs">
+    <Compile Include="Window\ScreenSetting.xaml.cs">
       <DependentUpon>ScreenSetting.xaml</DependentUpon>
     </Compile>
     <Compile Include="Startup.xaml.cs">
@@ -320,6 +320,12 @@
       <Project>{cea93dc4-9ff2-4d90-b0bf-e1e0d8027223}</Project>
       <Name>Script</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\accelerated.png" />
+    <Resource Include="Images\decelerated.png" />
+    <Resource Include="Images\fixed.png" />
+    <Resource Include="Images\linear.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
