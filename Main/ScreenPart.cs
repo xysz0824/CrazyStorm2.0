@@ -64,10 +64,19 @@ namespace CrazyStorm
                             frame.DataContext = layer;
                             icon.DataContext = component;
                             box.Opacity = component.Selected ? 1 : 0;
+                            //If component has parent, caculate the absolute position.
+                            float x = component.X;
+                            float y = component.Y;
+                            if (component.Parent != null)
+                            {
+                                Vector2 parent = component.Parent.GetAbsolutePosition();
+                                x += parent.x;
+                                y += parent.y;
+                            }
                             //Draw component mark.
                             object marker = Assembly.GetExecutingAssembly().CreateInstance("CrazyStorm.ComponentMarker");
-                            (marker as IComponentMark).Draw(canvas, component, (int)component.X + config.ScreenWidthOver2,
-                                (int)component.Y + config.ScreenHeightOver2);
+                            (marker as IComponentMark).Draw(canvas, component, (int)x + config.ScreenWidthOver2,
+                                (int)y + config.ScreenHeightOver2);
                             if (component.Selected)
                             {
                                 selectedComponents.Add(component);
@@ -77,12 +86,12 @@ namespace CrazyStorm
                                 else
                                     marker = Assembly.GetExecutingAssembly().CreateInstance("CrazyStorm." + component.GetType().Name + "Marker");
 
-                                (marker as IComponentMark).Draw(canvas, component, (int)component.X + config.ScreenWidthOver2,
-                                    (int)component.Y + config.ScreenHeightOver2);
+                                (marker as IComponentMark).Draw(canvas, component, (int)x + config.ScreenWidthOver2,
+                                    (int)y + config.ScreenHeightOver2);
                             }
                             icon.Source = new BitmapImage(new Uri(@"Images/button-" + component.GetType().Name + ".png", UriKind.Relative));
-                            item.SetValue(Canvas.LeftProperty, (double)component.X - box.Width / 2 + config.ScreenWidthOver2);
-                            item.SetValue(Canvas.TopProperty, (double)component.Y - box.Height / 2 + config.ScreenHeightOver2);
+                            item.SetValue(Canvas.LeftProperty, (double)x - box.Width / 2 + config.ScreenWidthOver2);
+                            item.SetValue(Canvas.TopProperty, (double)y - box.Height / 2 + config.ScreenHeightOver2);
                             canvas.Children.Add(item as UIElement);
                         }
             }
@@ -96,9 +105,18 @@ namespace CrazyStorm
                 if (layer.Visible)
                     foreach (var component in layer.Components)
                     {
+                        //If component has parent, caculate the absolute position.
+                        float absoluteX = component.X;
+                        float absoluteY = component.Y;
+                        if (component.Parent != null)
+                        {
+                            Vector2 parent = component.Parent.GetAbsolutePosition();
+                            absoluteX += parent.x;
+                            absoluteY += parent.y;
+                        }
                         var selectRect = new Rect(x, y, width, height);
-                        var componentRect = new Rect(component.X - config.GridWidth / 2 + config.ScreenWidthOver2,
-                            component.Y - config.GridHeight / 2 + config.ScreenHeightOver2, config.GridWidth, config.GridHeight);
+                        var componentRect = new Rect(absoluteX - config.GridWidth / 2 + config.ScreenWidthOver2,
+                            absoluteY - config.GridHeight / 2 + config.ScreenHeightOver2, config.GridWidth, config.GridHeight);
                         if (selectRect.IntersectsWith(componentRect))
                         {
                             //Prevent overlay shade from preceding components.

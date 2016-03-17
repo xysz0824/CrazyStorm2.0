@@ -78,7 +78,7 @@ namespace CrazyStorm
         }
         void InitializeFile()
         {
-            Title = AppInfo.AppTitle + " - " + file.FileName;
+            Title = VersionInfo.AppTitle + " - " + file.FileName;
             ImageList.ItemsSource = file.Images;
             SoundList.ItemsSource = file.Sounds;
             GlobalList.ItemsSource = file.Globals;
@@ -89,7 +89,7 @@ namespace CrazyStorm
             ParticleTabControl.DataContext = config;
             InitializeCommandStacks();
             AddNewParticleTab(selectedParticle);
-            ComponentList.ItemsSource = selectedParticle.Components;
+            ComponentTree.ItemsSource = selectedParticle.ComponentTree;
             DeleteComponentItem.IsEnabled = false;
             BindComponentItem.IsEnabled = false;
             UnbindComponentItem.IsEnabled = false;
@@ -130,7 +130,7 @@ namespace CrazyStorm
         }
         void UpdateComponent()
         {
-            ComponentList.ItemsSource = selectedParticle.Components;
+            ComponentTree.ItemsSource = selectedParticle.ComponentTree;
             DeleteComponentItem.IsEnabled = false;
             BindComponentItem.IsEnabled = false;
             UnbindComponentItem.IsEnabled = false;

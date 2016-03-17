@@ -33,8 +33,14 @@ namespace CrazyStorm
         }
         void SelectAll()
         {
-            SelectComponents(selectedParticle.Components.ToList(), false);
+            var set = new List<Component>();
+            foreach (var layer in selectedParticle.Layers)
+                if (layer.Visible)
+                    set.AddRange(layer.Components);
+
+            SelectComponents(set, false);
         }
+
         void Undo()
         {
             var stack = commandStacks[selectedParticle];

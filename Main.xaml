@@ -452,14 +452,14 @@
                                     </StackPanel>
                                 </GroupBox>
                                 <GroupBox Header="组件浏览器" Name="Explorer" VerticalContentAlignment="Stretch" HorizontalContentAlignment="Stretch" >
-                                    <TreeView Name="ComponentList" Padding="-2,1,1,1" VerticalContentAlignment="Stretch" HorizontalContentAlignment="Stretch" 
-                                              AllowDrop="True" MouseMove="ComponentList_MouseMove" 
-                                              DragEnter="ComponentList_CheckDrop" DragOver="ComponentList_CheckDrop" DragLeave="ComponentList_CheckDrop" Drop="ComponentList_Drop">
+                                    <TreeView Name="ComponentTree" Padding="-2,1,1,1" VerticalContentAlignment="Stretch" HorizontalContentAlignment="Stretch" 
+                                              AllowDrop="True" MouseMove="ComponentTree_MouseMove" 
+                                              DragEnter="ComponentTree_CheckDrop" DragOver="ComponentTree_CheckDrop" DragLeave="ComponentTree_CheckDrop" Drop="ComponentTree_Drop">
                                         <TreeView.ItemTemplate >
                                             <HierarchicalDataTemplate ItemsSource="{Binding Children}">
                                                 <TextBlock Text="{Binding Name}" 
-                                                       MouseLeftButtonDown="ComponentList_MouseLeftButtonDown" 
-                                                       PreviewMouseRightButtonDown="ComponentList_PreviewMouseRightButtonDown">
+                                                       MouseLeftButtonDown="ComponentTree_MouseLeftButtonDown" 
+                                                       PreviewMouseRightButtonDown="ComponentTree_PreviewMouseRightButtonDown">
                                                     <TextBlock.ContextMenu>
                                                         <ContextMenu>
                                                             <MenuItem Name="CopyComponent"  Header="复制" Click="CopyComponent_Click"></MenuItem>

@@ -85,6 +85,9 @@ namespace CrazyStorm.Core
                     PropertyChanged(this, new PropertyChangedEventArgs("TotalFrame"));
             }
         }
+        /// <summary>
+        /// This Collection contains all the components that include their childern.
+        /// </summary>
         public ObservableCollection<Component> Components { get { return components; } }
         #endregion
 

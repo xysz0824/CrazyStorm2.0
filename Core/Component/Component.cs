@@ -31,6 +31,7 @@ namespace CrazyStorm.Core
         bool selected;
         ObservableCollection<VariableResource> variables;
         ObservableCollection<EventGroup> componentEventGroups;
+        Component parent;
         ObservableCollection<Component> children;
         #endregion
 
@@ -111,6 +112,11 @@ namespace CrazyStorm.Core
         }
         public ObservableCollection<VariableResource> Variables { get { return variables; } }
         public ObservableCollection<EventGroup> ComponentEventGroups { get { return componentEventGroups; } }
+        public Component Parent 
+        { 
+            get { return parent; }
+            set { parent = value; }
+        }
         public ObservableCollection<Component> Children { get { return children; } }
         #endregion
 
@@ -131,6 +137,38 @@ namespace CrazyStorm.Core
             this.maxFrame = maxFrame;
             beginFrame = minFrame;
             totalFrame = maxFrame;
+        }
+        public void TransPositiontoRelative()
+        {
+            if (parent != null)
+            {
+                position -= parent.GetAbsolutePosition();
+            }
+        }
+        public void TransPositiontoAbsolute()
+        {
+            if (parent != null)
+            {
+                position += parent.GetAbsolutePosition();
+            }
+        }
+        public Vector2 GetAbsolutePosition()
+        {
+            if (parent != null)
+            {
+                return position + parent.GetAbsolutePosition();
+            }
+            return position;
+        }
+        public List<Component> GetPosterity()
+        {
+            List<Component> posterity = new List<Component>();
+            foreach (var item in children)
+            {
+                posterity.Add(item);
+                posterity.AddRange(item.GetPosterity());
+            }
+            return posterity;
         }
         public Component FindParent(Component child)
         {

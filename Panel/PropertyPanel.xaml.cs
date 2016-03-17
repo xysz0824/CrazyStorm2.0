@@ -59,7 +59,7 @@ namespace CrazyStorm
         {
             environment = new Script.Environment();
             //TODO : Add globals.
-            //Add Structs.
+            //Add system structs.
             Script.Struct vector2 = new Script.Struct();
             vector2.PutField("x", 0.0f);
             vector2.PutField("y", 0.0f);
@@ -69,7 +69,7 @@ namespace CrazyStorm
             vector3.PutField("y", 0.0f);
             vector3.PutField("z", 0.0f);
             environment.PutStruct(typeof(Vector3).ToString(), vector3);
-            //Add Functions.
+            //Add system functions.
             Script.Function rand = new Script.Function(2);
             environment.PutFunction("rand", rand);
             Script.Function sin = new Script.Function(1);
@@ -232,9 +232,9 @@ namespace CrazyStorm
                 }
             }
         }
-        void OpenEventSetting()
+        void OpenEventSetting(EventGroup eventGroup)
         {
-            Window window = new EventSetting();
+            Window window = new EventSetting(eventGroup, environment);
             window.ShowDialog();
         }
         #endregion
@@ -413,12 +413,12 @@ namespace CrazyStorm
         private void ComponentEventList_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
             if (e.OriginalSource is TextBlock && ComponentEventList.SelectedItem != null)
-                OpenEventSetting();
+                OpenEventSetting(ComponentEventList.SelectedItem as EventGroup);
         }
         private void SpecificEventList_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
             if (e.OriginalSource is TextBlock && SpecificEventList.SelectedItem != null)
-                OpenEventSetting();
+                OpenEventSetting(SpecificEventList.SelectedItem as EventGroup);
         }
         #endregion
     }

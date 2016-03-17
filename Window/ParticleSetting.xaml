@@ -16,7 +16,7 @@
         <TabControl>
             <TabItem Header="自定义类型">
                 <Canvas>
-                    <ListView Name="TypeList" Height="175" Canvas.Left="10" Canvas.Top="10" Width="120" SelectionChanged="TypeList_SelectionChanged">
+                    <ListView Name="TypeList" Height="175" Canvas.Left="10" Canvas.Top="10" Width="120" SelectionChanged="TypeList_SelectionChanged" SelectionMode="Single">
                         <ListView.ContextMenu>
                             <ContextMenu>
                                 <MenuItem Header="添加类型" Click="AddNewType_Click" />

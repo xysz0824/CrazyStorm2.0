@@ -30,9 +30,14 @@ namespace CrazyStorm
         #region Private Methods
         void UpdateSelectedGroup()
         {
+            //Get all visible components in this particle system.
+            var set = new List<Component>();
+            foreach (var layer in selectedParticle.Layers)
+                if (layer.Visible)
+                    set.AddRange(layer.Components);
             //Clean removed component.
             for (int i = 0; i < selectedComponents.Count; ++i)
-                if (!selectedParticle.Components.Contains(selectedComponents[i]))
+                if (!set.Contains(selectedComponents[i]))
                 {
                     selectedComponents.RemoveAt(i);
                     i--;
@@ -102,11 +107,16 @@ namespace CrazyStorm
         }
         void UpdatePropertyPanel()
         {
+            //Get all visible components in this particle system.
+            var set = new List<Component>();
+            foreach (var layer in selectedParticle.Layers)
+                if (layer.Visible)
+                    set.AddRange(layer.Components);
             //Remove the tab which is not belonging to any component.
             for (int i = 2; i < LeftTabControl.Items.Count; ++i)
             {
                 TabItem item = LeftTabControl.Items[i] as TabItem;
-                if (!selectedParticle.Components.Contains(item.DataContext))
+                if (!set.Contains(item.DataContext))
                 {
                     LeftTabControl.Items.RemoveAt(i);
                     i--;
@@ -138,30 +148,25 @@ namespace CrazyStorm
             var button = VisualHelper.VisualUpwardSearch<Button>(image) as Button;
             image.Source = new BitmapImage(new Uri(@"Images\button-" + button.Name + ".png", UriKind.Relative));
         }
-        private void ComponentList_PreviewMouseRightButtonDown(object sender, MouseButtonEventArgs e)
+        private void ComponentTree_PreviewMouseRightButtonDown(object sender, MouseButtonEventArgs e)
         {
             VisualHelper.FocusItem<TreeViewItem>(e);
         }
-        private void ComponentList_MouseLeftButtonDown(object sender, MouseEventArgs e)
+        private void ComponentTree_MouseLeftButtonDown(object sender, MouseEventArgs e)
         {
-            lastMouseDown = e.GetPosition(ComponentList);
+            lastMouseDown = e.GetPosition(ComponentTree);
             lastSelectedItem = sender as DependencyObject;
             //Select pointed component when mouse left-button down. 
             var textBlock = sender as TextBlock;
             var set = new List<CrazyStorm.Core.Component>();
-            foreach (var component in selectedParticle.Components)
-                if (component == textBlock.DataContext)
-                {
-                    set.Add(component);
-                    SelectComponents(set, true);
-                    break;
-                }
+            set.Add((Component)textBlock.DataContext);
+            SelectComponents(set, true);
         }
-        private void ComponentList_MouseMove(object sender, MouseEventArgs e)
+        private void ComponentTree_MouseMove(object sender, MouseEventArgs e)
         {
             if (e.LeftButton == MouseButtonState.Pressed)
             {
-                Point currentPosition = e.GetPosition(ComponentList);
+                Point currentPosition = e.GetPosition(ComponentTree);
                 if ((Math.Abs(currentPosition.X - lastMouseDown.X) > 2.0) || 
                     (Math.Abs(currentPosition.Y - lastMouseDown.Y) > 2.0))
                 {
@@ -170,52 +175,64 @@ namespace CrazyStorm
                 }
             }
         }
-        private void ComponentList_CheckDrop(object sender, DragEventArgs e)
+        private void ComponentTree_CheckDrop(object sender, DragEventArgs e)
         {
             e.Handled = true;
         }
-        private void ComponentList_Drop(object sender, DragEventArgs e)
+        private void ComponentTree_Drop(object sender, DragEventArgs e)
         {
             var sourceComponent = ((TextBlock)lastSelectedItem).DataContext as Component;
             if (!(e.OriginalSource is TextBlock))
                 return;
 
-            var targetIComponent = ((TextBlock)e.OriginalSource).DataContext as Component;
-            if (sourceComponent == targetIComponent)
+            var targetComponent = ((TextBlock)e.OriginalSource).DataContext as Component;
+            if (sourceComponent == targetComponent)
                 return;
 
-            if (targetIComponent.Children.Contains(sourceComponent))
+            if (targetComponent.Children.Contains(sourceComponent))
             {
                 //A way to change the node from parenthood to brotherhood. 
                 var tree = new Component();
-                foreach (Component item in selectedParticle.Components)
+                foreach (Component item in selectedParticle.ComponentTree)
                     tree.Children.Add(item);
-                var parent = tree.FindParent(targetIComponent);
+
+                var parent = tree.FindParent(targetComponent);
                 if (parent != null)
                 {
                     if (parent == tree)
-                        selectedParticle.Components.Add(sourceComponent);
+                    {
+                        selectedParticle.ComponentTree.Add(sourceComponent);
+                        sourceComponent.TransPositiontoAbsolute();
+                        sourceComponent.Parent = null;
+                    }
                     else
+                    {
                         parent.Children.Add(sourceComponent);
-
-                    targetIComponent.Children.Remove(sourceComponent);
+                        sourceComponent.TransPositiontoAbsolute();
+                        sourceComponent.Parent = parent;
+                        sourceComponent.TransPositiontoRelative();
+                    }
+                    targetComponent.Children.Remove(sourceComponent);
                 }
             }
             else
             {
                 var tree = new Component();
-                foreach (Component item in selectedParticle.Components)
+                foreach (Component item in selectedParticle.ComponentTree)
                     tree.Children.Add(item);
+
                 var parent = tree.FindParent(sourceComponent);
                 if (parent != null)
                 {
                     if (parent == tree)
-                        selectedParticle.Components.Remove(sourceComponent);
+                        selectedParticle.ComponentTree.Remove(sourceComponent);
                     else
                         parent.Children.Remove(sourceComponent);
 
-                    targetIComponent.Children.Add(sourceComponent);
-                    return;
+                    targetComponent.Children.Add(sourceComponent);
+                    sourceComponent.TransPositiontoAbsolute();
+                    sourceComponent.Parent = targetComponent;
+                    sourceComponent.TransPositiontoRelative();
                 }
             }
         }
@@ -225,7 +242,7 @@ namespace CrazyStorm
         }
         private void DeleteComponent_Click(object sender, RoutedEventArgs e)
         {
-            var item = ComponentList.SelectedItem as CrazyStorm.Core.Component; 
+            var item = ComponentTree.SelectedItem as CrazyStorm.Core.Component; 
             var list = new List<CrazyStorm.Core.Component>();
             list.Add(item);
             new DelComponentCommand().Do(commandStacks[selectedParticle], selectedParticle, list);

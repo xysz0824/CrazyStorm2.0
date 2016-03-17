@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Collections.ObjectModel;
 
 namespace CrazyStorm.Core
 {
@@ -14,7 +15,7 @@ namespace CrazyStorm.Core
         #region Private Members
         string name;
         string condition;
-        List<string> events;
+        ObservableCollection<string> events;
         #endregion
 
         #region Public Members
@@ -28,14 +29,14 @@ namespace CrazyStorm.Core
             get { return condition; }
             set { condition = value; }
         }
-        public IList<string> Events { get { return events; } }
+        public ObservableCollection<string> Events { get { return events; } }
         #endregion
 
         #region Constructor
         public EventGroup()
         {
             name = "NewEventGroup";
-            events = new List<string>();
+            events = new ObservableCollection<string>();
         }
         #endregion
     }

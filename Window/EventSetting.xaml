@@ -1,0 +1,129 @@
+﻿<Window x:Class="CrazyStorm.EventSetting"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="事件设置" Height="650" Width="407" WindowStyle="ToolWindow" WindowStartupLocation="CenterScreen" ResizeMode="NoResize">
+    <StackPanel>
+        <GroupBox Name="GroupBox" Header="事件组">
+            <StackPanel>
+                <DockPanel Margin="0,1">
+                    <Label Content="名称" />
+                    <TextBox Text="{Binding Path=Name}" VerticalContentAlignment="Center" />
+                </DockPanel>
+                <DockPanel Name="ConditionPanel" Margin="0,1">
+                    <Label Content="条件" />
+                    <TextBox Text="{Binding Path=Condition}" VerticalContentAlignment="Center" />
+                </DockPanel>
+            </StackPanel>
+        </GroupBox>
+        <GroupBox Header="事件列表">
+            <StackPanel>
+                <StackPanel>
+                    <StackPanel Name="CycleSetting" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,1" Visibility="Collapsed">
+                        <Label Content="起始帧" />
+                        <TextBox Width="40"></TextBox>
+                        <Label Content="持续帧" />
+                        <TextBox Width="40"></TextBox>
+                        <Label Content="周期" />
+                        <TextBox Width="40"></TextBox>
+                    </StackPanel>
+                    <ListView Name="EventList" ItemsSource="{Binding }" Height="200" SelectionMode="Single">
+                        <ListView.ItemTemplate>
+                            <DataTemplate>
+                                <DockPanel>
+                                    <DockPanel.ContextMenu >
+                                        <ContextMenu>
+                                            <MenuItem Name="DeleteEvent" Header="删除" Click="DeleteEvent_Click" />
+                                        </ContextMenu>
+                                    </DockPanel.ContextMenu>
+                                    <TextBlock Text="{Binding}"/>
+                                </DockPanel>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
+                </StackPanel>
+            </StackPanel>
+        </GroupBox>
+        <GroupBox Name="ConditionSetting" Header="事件条件">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                <ComboBox Width="80" VerticalAlignment="Center"/>
+                <StackPanel Margin="5,0">
+                    <RadioButton Content="&gt;" />
+                    <RadioButton Content="=" />
+                    <RadioButton Content="&lt;" />
+                </StackPanel>
+                <TextBox Width="50" VerticalContentAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Center" Height="25"/>
+                <StackPanel Margin="5,0" VerticalAlignment="Center">
+                    <RadioButton Content="且" />
+                    <RadioButton Content="或" />
+                </StackPanel>
+                <ComboBox Width="80" VerticalAlignment="Center"/>
+                <StackPanel Margin="5,0">
+                    <RadioButton Content="&gt;" />
+                    <RadioButton Content="=" />
+                    <RadioButton Content="&lt;" />
+                </StackPanel>
+                <TextBox Width="50" VerticalContentAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Center" Height="25"/>
+            </StackPanel>
+        </GroupBox>
+        <GroupBox Header="属性事件">
+            <StackPanel>
+                <DockPanel Margin="0,1">
+                    <ComboBox Width="80"/>
+                    <RadioButton Content="变化到" VerticalAlignment="Center" Margin="5,0,5,0"></RadioButton>
+                    <RadioButton Content="增加" VerticalAlignment="Center" Margin="5,0"></RadioButton>
+                    <RadioButton Content="减少" VerticalAlignment="Center" Margin="5,0,5,0"></RadioButton>
+                    <TextBox VerticalContentAlignment="Center" Height="25"/>
+                </DockPanel>
+                <StackPanel Orientation="Horizontal" Margin="0,1" HorizontalAlignment="Center">
+                    <StackPanel Margin="10,0">
+                        <Image Source="/CrazyStorm;component/Images/arrow-right-3.ico"></Image>
+                        <RadioButton Name="Linear"  HorizontalAlignment="Center" Content="线性" Checked="Linear_Checked"></RadioButton>
+                    </StackPanel>
+                    <StackPanel Margin="10,0">
+                        <Image Source="/CrazyStorm;component/Images/arrow-right-3.ico"></Image>
+                        <RadioButton Name="Accelerated" HorizontalAlignment="Center" Content="加速" Checked="Accelerated_Checked"></RadioButton>
+                    </StackPanel>
+                    <StackPanel Margin="10,0">
+                        <Image Source="/CrazyStorm;component/Images/arrow-right-3.ico"></Image>
+                        <RadioButton Name="Decelerated" HorizontalAlignment="Center" Content="减速" Checked="Decelerated_Checked"></RadioButton>
+                    </StackPanel>
+                    <StackPanel Margin="10,0">
+                        <Image Source="/CrazyStorm;component/Images/arrow-right-3.ico"></Image>
+                        <RadioButton Name="Fixed" HorizontalAlignment="Center" Content="固定" Checked="Fixed_Checked"></RadioButton>
+                    </StackPanel>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="0,1" HorizontalAlignment="Right">
+                    <Label Content="变化时间" Margin="4,0,0,0"/>
+                    <TextBox Width="50" VerticalContentAlignment="Center" VerticalAlignment="Center" HorizontalAlignment="Center" Height="25"/>
+                    <Label Content="执行次数" />
+                    <TextBox Width="50" VerticalContentAlignment="Center" VerticalAlignment="Center" HorizontalAlignment="Center" Height="25"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,1">
+                    <Button Name="AddEvent" Width ="40" Content="添加" Margin="2,0" Click="AddEvent_Click" />
+                </StackPanel>
+            </StackPanel>
+        </GroupBox>
+        <GroupBox Header="特殊事件">
+            <StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="0,1">
+                    <RadioButton Name="EmitParticleButton" Width="80" Content="发射粒子" Margin="8,0,5,0" Checked="EmitParticleButton_Checked" />
+                    <RadioButton Name="PlaySoundButton" Width="80" Content="播放音效" Margin="5,0" Checked="PlaySoundButton_Checked" />
+                    <RadioButton Name="LoopButton" Width="80" Content="循环执行" Margin="5,0,8,0" Checked="LoopButton_Checked" />
+                </StackPanel>
+                <DockPanel Name="PlaySoundPanel" Margin="0,1" Visibility="Collapsed">
+                    <Label Content="音效资源" />
+                    <ComboBox VerticalContentAlignment="Center" Width="100" />
+                    <Label Content="音量大小" />
+                    <Slider VerticalAlignment="Center" AutoToolTipPlacement="BottomRight" Maximum="100" Value="50"></Slider>
+                </DockPanel>
+                <DockPanel Name="LoopPanel" Margin="0,1" Visibility="Collapsed">
+                    <Label Content="中止条件" />
+                    <TextBox VerticalContentAlignment="Center" />
+                </DockPanel>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,1">
+                    <Button Name="AddSpecialEvent" Width ="40" Content="添加" Margin="2,0" Click="AddSpecialEvent_Click" />
+                </StackPanel>
+            </StackPanel>
+        </GroupBox>
+    </StackPanel>
+</Window>

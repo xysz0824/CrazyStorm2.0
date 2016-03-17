@@ -27,7 +27,7 @@ namespace CrazyStorm.Core
         }
         public ObservableCollection<ParticleType> CustomType { get { return customType; } }
         public ObservableCollection<Layer> Layers { get { return layers; } }
-        public ObservableCollection<Component> Components { get { return components; } }
+        public ObservableCollection<Component> ComponentTree { get { return components; } }
         #endregion
 
         #region Constructor
@@ -45,23 +45,33 @@ namespace CrazyStorm.Core
         public void AddComponentToLayer(Layer layer, Component component)
         {
             components.Add(component);
+            foreach (var item in component.GetPosterity())
+            {
+                layer.Components.Add(item);
+            }
             layer.Components.Add(component);
         }
         public void DeleteComponentFromLayer(Layer layer, Component component)
         {
             components.Remove(component);
+            foreach (var item in component.GetPosterity())
+            {
+                layer.Components.Remove(item);
+            }
             layer.Components.Remove(component);
         }
         public void AddLayer(Layer layer)
         {
             foreach (var component in layer.Components)
                 components.Add(component);
+
             layers.Add(layer);
         }
         public void DeleteLayer(Layer layer)
         {
             foreach (var component in layer.Components)
                 components.Remove(component);
+
             layers.Remove(layer);
         }
         #endregion
