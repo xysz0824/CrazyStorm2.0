@@ -45,7 +45,7 @@
         </GroupBox>
         <GroupBox Name="ConditionSetting" Header="事件条件">
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                <ComboBox Name="LeftConditionComboBox" Width="100" VerticalAlignment="Center"/>
+                <ComboBox Name="LeftConditionComboBox" Width="100" VerticalAlignment="Center" SelectionChanged="LeftConditionComboBox_SelectionChanged"/>
                 <StackPanel Margin="5,0">
                     <RadioButton Content="&gt;" />
                     <RadioButton Content="=" />
@@ -56,7 +56,7 @@
                     <RadioButton Content="且" />
                     <RadioButton Content="或" />
                 </StackPanel>
-                <ComboBox Name="RightConditionComboBox" Width="100" VerticalAlignment="Center"/>
+                <ComboBox Name="RightConditionComboBox" Width="100" VerticalAlignment="Center" SelectionChanged="RightConditionComboBox_SelectionChanged"/>
                 <StackPanel Margin="5,0">
                     <RadioButton Content="&gt;" />
                     <RadioButton Content="=" />

@@ -134,6 +134,14 @@ namespace CrazyStorm
             if (item != null)
                 eventGroup.Events.Remove((string)item);
         }
+        private void LeftConditionComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            //TODO
+        }
+        private void RightConditionComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            //TODO
+        }
         #endregion
     }
 }
