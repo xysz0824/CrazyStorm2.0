@@ -34,11 +34,6 @@ namespace CrazyStorm
         Component component;
         Action updateFunc;
         bool initializeType;
-        bool invalidVariable;
-        #endregion
-
-        #region Public Members
-        public bool InvalidVariable { get { return invalidVariable; } }
         #endregion
 
         #region Constructor
@@ -63,12 +58,12 @@ namespace CrazyStorm
             Script.Struct vector2 = new Script.Struct();
             vector2.PutField("x", 0.0f);
             vector2.PutField("y", 0.0f);
-            environment.PutStruct(typeof(Vector2).ToString(), vector2);
+            environment.PutStruct("Vector2", vector2);
             Script.Struct vector3 = new Script.Struct();
             vector3.PutField("x", 0.0f);
             vector3.PutField("y", 0.0f);
             vector3.PutField("z", 0.0f);
-            environment.PutStruct(typeof(Vector3).ToString(), vector3);
+            environment.PutStruct("Vector3", vector3);
             //Add system functions.
             Script.Function rand = new Script.Function(2);
             environment.PutFunction("rand", rand);
@@ -151,6 +146,9 @@ namespace CrazyStorm
             //Load variables.
             VariableGrid.ItemsSource = component.Variables;
             DeleteVariable.IsEnabled = component.Variables.Count > 0 ? true : false;
+            //Put locals into environment.
+            foreach (var item in component.Variables)
+                environment.PutLocal(item.Label, item.Value);
             //Load component events.
             ComponentEventList.ItemsSource = component.ComponentEventGroups;
             //Load specific events.
@@ -281,7 +279,7 @@ namespace CrazyStorm
         }
         private void AddVariable_Click(object sender, RoutedEventArgs e)
         {
-            var label = "Untitled_";
+            var label = "Local_";
             for (int i = 0;; ++i)
             {
                 //To avoid repeating name, use number.
@@ -299,6 +297,8 @@ namespace CrazyStorm
                     var newVar = new VariableResource(name);
                     component.Variables.Add(newVar);
                     DeleteVariable.IsEnabled = true;
+                    //Put this into environment.
+                    environment.PutLocal(newVar.Label, newVar.Value);
                     return;
                 }
             }
@@ -307,8 +307,11 @@ namespace CrazyStorm
         {
             if (VariableGrid.SelectedItem != null)
             {
-                component.Variables.Remove(VariableGrid.SelectedItem as VariableResource);
+                var item = VariableGrid.SelectedItem as VariableResource;
+                component.Variables.Remove(item);
                 DeleteVariable.IsEnabled = component.Variables.Count > 0 ? true : false;
+                //Remove this from environment.
+                environment.RemoveLocal(item.Label);
             }
         }
         private void VariableGrid_CellEditEnding(object sender, DataGridCellEditEndingEventArgs e)
@@ -326,7 +329,8 @@ namespace CrazyStorm
                         {
                             MessageBox.Show((string)FindResource("NameRepeating"), (string)FindResource("TipTitle"),
                                 MessageBoxButton.OK, MessageBoxImage.Warning);
-                            invalidVariable = true;
+                            e.Cancel = true;
+                            (e.EditingElement as TextBox).Text = editItem.Label;
                             return;
                         }
                 }
@@ -339,11 +343,11 @@ namespace CrazyStorm
                     {
                         MessageBox.Show((string)FindResource("ValueInvalid"), (string)FindResource("TipTitle"),
                             MessageBoxButton.OK, MessageBoxImage.Warning);
-                        invalidVariable = true;
+                        e.Cancel = true;
+                        (e.EditingElement as TextBox).Text = editItem.Value.ToString();
                         return;
                     }
                 }
-                invalidVariable = false;
             }
         }
         private void TypeCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)

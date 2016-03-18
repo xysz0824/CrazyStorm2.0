@@ -28,9 +28,13 @@ namespace CrazyStorm.Script
 
         public object GetGlobal(string name) { return globals.ContainsKey(name) ? globals[name] : null; }
 
+        public void RemoveGlobal(string name) { globals.Remove(name); }
+
         public void PutLocal(string name, object value) { locals[name] = value; }
 
         public object GetLocal(string name) { return locals.ContainsKey(name) ? locals[name] : null; }
+
+        public void RemoveLocal(string name) { locals.Remove(name); }
 
         public void PutStruct(string name, Struct s) { structs[name] = s; }
 

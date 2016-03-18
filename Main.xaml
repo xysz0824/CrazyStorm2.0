@@ -127,7 +127,7 @@
                                 <DockPanel>
                                     <TextBlock Text="{Binding Name}" Margin="8,1" DockPanel.Dock="Left"/>
                                     <Image Name="TabClose" Source="Images/close.png" Width="11" Height="11" Margin="0,0,5,0" 
-                                           VerticalAlignment="Center" DockPanel.Dock="Right" MouseLeftButtonDown="TabClose_MouseLeftButtonDown" HorizontalAlignment="Right" />
+                                           VerticalAlignment="Center" DockPanel.Dock="Right" HorizontalAlignment="Right" />
                                 </DockPanel>
                             </Border>
                         </Grid>
@@ -528,15 +528,26 @@
                                         </TreeView.ContextMenu>
                                     </TreeView>
                                 </GroupBox>
-                                <GroupBox Header="全局变量" Height="130" Margin="0">
-                                    <TreeView Name="GlobalList" Padding="-12,1,1,1">
-                                        <TreeView.ContextMenu>
-                                            <ContextMenu>
-                                                <MenuItem Name="AddGlobal" Header="添加全局变量" Click="AddGlobal_Click" />
-                                            </ContextMenu>
-                                        </TreeView.ContextMenu>
-                                    </TreeView>
-                                </GroupBox>
+                                <GroupBox Header="全局变量" Margin="0">
+                                    <StackPanel>
+                                            <DataGrid Name="VariableGrid" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" GridLinesVisibility="Horizontal" 
+                                                      ColumnWidth="Auto" SelectionMode="Single" CanUserReorderColumns="False" CanUserSortColumns="False" ScrollViewer.CanContentScroll="False" 
+                                                      CanUserResizeRows="False" CanUserAddRows="False" CanUserDeleteRows="False" AutoGenerateColumns="False" 
+                                                      CellEditEnding="VariableGrid_CellEditEnding">
+                                                <DataGrid.HorizontalGridLinesBrush>
+                                                    <SolidColorBrush Color="{DynamicResource {x:Static SystemColors.ControlColorKey}}"/>
+                                                </DataGrid.HorizontalGridLinesBrush>
+                                                <DataGrid.Columns>
+                                                    <DataGridTextColumn x:Name="VariableKey"  Header="变量名" Binding="{Binding Label}"/>
+                                                    <DataGridTextColumn x:Name="VariableValue"  Header="变量值" Binding="{Binding Value}" />
+                                                </DataGrid.Columns>
+                                            </DataGrid>
+                                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" >
+                                            <Button Name="AddVariable" Width ="40" Content="添加" Margin="2,0" Click="AddVariable_Click" />
+                                            <Button Name="DeleteVariable" Width ="40" Content="删除" Click="DeleteVariable_Click" />
+                                        </StackPanel>
+                                        </StackPanel>
+                                    </GroupBox>
                             </StackPanel>
                             </ScrollViewer>
                         </TabItem>

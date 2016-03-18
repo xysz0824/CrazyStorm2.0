@@ -81,7 +81,8 @@ namespace CrazyStorm
             Title = VersionInfo.AppTitle + " - " + file.FileName;
             ImageList.ItemsSource = file.Images;
             SoundList.ItemsSource = file.Sounds;
-            GlobalList.ItemsSource = file.Globals;
+            VariableGrid.ItemsSource = file.Globals;
+            DeleteVariable.IsEnabled = file.Globals.Count > 0 ? true : false;
         }
         void InitializeParticle()
         {

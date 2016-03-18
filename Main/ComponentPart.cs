@@ -253,21 +253,6 @@ namespace CrazyStorm
             new DelComponentCommand().Do(commandStacks[selectedParticle], selectedParticle, selectedComponents);
             Update();
         }
-        private void TabClose_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
-        {
-            var item = VisualHelper.VisualUpwardSearch<TabItem>(sender as DependencyObject) as TabItem;
-            var tab = VisualHelper.VisualUpwardSearch<TabControl>(item) as TabControl;
-            if (tab != null)
-            {
-                var scroll = item.Content as ScrollViewer;
-                var panel = scroll.Content as PropertyPanel;
-                if (!panel.InvalidVariable)
-                    tab.Items.Remove(item);
-                else
-                    MessageBox.Show((string)FindResource("VariableInvalid"), (string)FindResource("TipTitle"),
-                        MessageBoxButton.OK, MessageBoxImage.Warning);
-            }
-        }
         #endregion
     }
 }
