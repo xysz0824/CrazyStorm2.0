@@ -12,12 +12,12 @@ namespace CrazyStorm.Core
         ParticleType type;
         float widthScale;
         int length;
-        Vector3 rgb;
+        RGB rgb;
         float opacity;
-        float speed;
-        float speedAngle;
-        float acspeed;
-        float acspeedAngle;
+        float pspeed;
+        float pspeedAngle;
+        float pacspeed;
+        float pacspeedAngle;
         BlendType blendType;
         bool killOutside;
         bool collision;
@@ -51,7 +51,7 @@ namespace CrazyStorm.Core
             set { length = value; }
         }
         [Vector3Property]
-        public Vector3 RGB
+        public RGB RGB
         {
             get { return rgb; }
             set { rgb = value; }
@@ -63,28 +63,28 @@ namespace CrazyStorm.Core
             set { opacity = value; }
         }
         [FloatProperty(float.MinValue, float.MaxValue)]
-        public float Speed
+        public float PSpeed
         {
-            get { return speed; }
-            set { speed = value; }
+            get { return pspeed; }
+            set { pspeed = value; }
         }
         [FloatProperty(float.MinValue, float.MaxValue)]
-        public float SpeedAngle
+        public float PSpeedAngle
         {
-            get { return speedAngle; }
-            set { speedAngle = value; }
+            get { return pspeedAngle; }
+            set { pspeedAngle = value; }
         }
         [FloatProperty(float.MinValue, float.MaxValue)]
-        public float Acspeed
+        public float PAcspeed
         {
-            get { return acspeed; }
-            set { acspeed = value; }
+            get { return pacspeed; }
+            set { pacspeed = value; }
         }
         [FloatProperty(float.MinValue, float.MaxValue)]
-        public float AcspeedAngle
+        public float PAcspeedAngle
         {
-            get { return acspeedAngle; }
-            set { acspeedAngle = value; }
+            get { return pacspeedAngle; }
+            set { pacspeedAngle = value; }
         }
         [EnumProperty(typeof(BlendType))]
         public BlendType BlendType

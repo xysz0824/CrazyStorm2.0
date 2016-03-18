@@ -118,7 +118,7 @@ namespace CrazyStorm.Script
             if (dimension == 2)
                 return new Vector2(coordinateList[0], coordinateList[1]);
             else if (dimension == 3)
-                return new Vector3(coordinateList[0], coordinateList[1], coordinateList[2]);
+                return new RGB(coordinateList[0], coordinateList[1], coordinateList[2]);
             else
                 throw new ScriptException("Syntax error.");
         }

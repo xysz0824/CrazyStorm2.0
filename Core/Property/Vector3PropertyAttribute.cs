@@ -15,8 +15,8 @@ namespace CrazyStorm.Core
         public override bool IsLegal(string newValue, out object value)
         {
             value = null;
-            Vector3 typeValue;
-            bool result = Vector3.TryParse(newValue, out typeValue);
+            RGB typeValue;
+            bool result = RGB.TryParse(newValue, out typeValue);
             if (result)
             {
                 value = typeValue;

@@ -35,6 +35,7 @@ namespace CrazyStorm
             this.environment = environment;
             InitializeComponent();
             InitializeSetting();
+            LoadContent();
         }
         #endregion
 
@@ -43,6 +44,34 @@ namespace CrazyStorm
         {
             GroupBox.DataContext = eventGroup;
             EventList.ItemsSource = eventGroup.Events;
+        }
+        void LoadContent()
+        {
+            foreach (var item in environment.Locals)
+            {
+                LeftConditionComboBox.Items.Add(item.Key);
+                RightConditionComboBox.Items.Add(item.Key);
+                PropertyComboBox.Items.Add(item.Key);
+                //Split struct into parts for convenience
+                foreach (var structItem in environment.Structs)
+                {
+                    if (structItem.Key == item.Value.GetType().ToString())
+                    {
+                        foreach (var fieldItem in structItem.Value.GetFields())
+                        {
+                            LeftConditionComboBox.Items.Add(item.Key + "." + fieldItem.Key);
+                            RightConditionComboBox.Items.Add(item.Key + "." + fieldItem.Key);
+                            PropertyComboBox.Items.Add(item.Key + "." + fieldItem.Key);
+                        }
+                    }
+                }
+            }
+            foreach (var item in environment.Globals)
+            {
+                LeftConditionComboBox.Items.Add(item.Key);
+                RightConditionComboBox.Items.Add(item.Key);
+                PropertyComboBox.Items.Add(item.Key);
+            }
         }
         #endregion
 

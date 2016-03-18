@@ -63,12 +63,12 @@ namespace CrazyStorm
             Script.Struct vector2 = new Script.Struct();
             vector2.PutField("x", 0.0f);
             vector2.PutField("y", 0.0f);
-            environment.PutStruct("Vector2", vector2);
+            environment.PutStruct(typeof(Vector2).ToString(), vector2);
             Script.Struct vector3 = new Script.Struct();
-            vector3.PutField("x", 0.0f);
-            vector3.PutField("y", 0.0f);
-            vector3.PutField("z", 0.0f);
-            environment.PutStruct("Vector3", vector3);
+            vector3.PutField("r", 0.0f);
+            vector3.PutField("g", 0.0f);
+            vector3.PutField("b", 0.0f);
+            environment.PutStruct(typeof(RGB).ToString(), vector3);
             //Add system functions.
             Script.Function rand = new Script.Function(2);
             environment.PutFunction("rand", rand);
@@ -231,7 +231,7 @@ namespace CrazyStorm
                 }
             }
         }
-        void OpenEventSetting(EventGroup eventGroup)
+        void OpenEventSetting(EventGroup eventGroup, Script.Environment environment)
         {
             Window window = new EventSetting(eventGroup, environment);
             window.ShowDialog();
@@ -418,12 +418,51 @@ namespace CrazyStorm
         private void ComponentEventList_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
             if (e.OriginalSource is TextBlock && ComponentEventList.SelectedItem != null)
-                OpenEventSetting(ComponentEventList.SelectedItem as EventGroup);
+            {
+                Script.Environment environment = new Script.Environment(this.environment);
+                //Remove string property
+                environment.RemoveLocal("Name");
+                OpenEventSetting(ComponentEventList.SelectedItem as EventGroup, environment);
+            }
         }
         private void SpecificEventList_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
             if (e.OriginalSource is TextBlock && SpecificEventList.SelectedItem != null)
-                OpenEventSetting(SpecificEventList.SelectedItem as EventGroup);
+            {
+                if (component is Emitter)
+                {
+                    Script.Environment environment = new Script.Environment(this.environment);
+                    //Remove emitter properties
+                    var componentItems = ComponentGrid.DataContext as IList<PropertyPanelItem>;
+                    var emitterItems = SpecificGrid.DataContext as IList<PropertyPanelItem>;
+                    foreach (var item in componentItems)
+                    {
+                        environment.RemoveLocal(item.Name);
+                    }
+                    foreach (var item in emitterItems)
+                    {
+                        environment.RemoveLocal(item.Name);
+                    }
+                    OpenEventSetting(SpecificEventList.SelectedItem as EventGroup, environment);
+                }
+                else if (component is Mask || component is Rebound)
+                {
+                    Script.Environment environment = new Script.Environment();
+                    //Put particle properties
+                    environment.PutLocal("MaxLife", 0);
+                    environment.PutLocal("Type", new ParticleType());
+                    environment.PutLocal("RGB", RGB.Zero);
+                    environment.PutLocal("Opacity", 0.0f);
+                    environment.PutLocal("PSpeed", 0.0f);
+                    environment.PutLocal("PSpeedAngle", 0.0f);
+                    environment.PutLocal("PAcspeed", 0.0f);
+                    environment.PutLocal("PAcspeedAngle", 0.0f);
+                    environment.PutLocal("BlendType", BlendType.AlphaBlend);
+                    environment.PutLocal("KillOutside", true);
+                    environment.PutLocal("Collision", true);
+                    OpenEventSetting(SpecificEventList.SelectedItem as EventGroup, environment);
+                }
+            }
         }
         #endregion
     }
