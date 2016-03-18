@@ -118,6 +118,8 @@
                     <Slider VerticalAlignment="Center" AutoToolTipPlacement="BottomRight" Maximum="100" Value="50"></Slider>
                 </DockPanel>
                 <DockPanel Name="LoopPanel" Margin="0,1" Visibility="Collapsed">
+                    <Label Content="循环次数" />
+                    <TextBox Width="50" VerticalContentAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Center" Height="25"/>
                     <Label Content="中止条件" />
                     <TextBox VerticalContentAlignment="Center" />
                 </DockPanel>

@@ -393,9 +393,9 @@
                                             </Image.Opacity>
                                         </Image>
                                         <Canvas Name="ComponentLayer" Canvas.Top="0" Canvas.Left="0" Width="{Binding Path=ScreenWidth}" Height="{Binding Path=ScreenHeight}"/>
-                                        <Image Name="SelectingBox" Source="Images/selecting.png" Width="0" Height="0" Stretch="Fill" />
                                     </Canvas>
                                     <Image Name="AimBox" Opacity="0" Source="Images/aimBox.png" Width="32" Height="32" />
+                                    <Image Name="SelectingBox" Source="Images/selecting.png" Width="0" Height="0" Stretch="Fill" />
                                 </Canvas>
                             </DataTemplate>
                         </TabControl.ItemTemplate>

@@ -29,9 +29,9 @@ namespace CrazyStorm.Core
         float acspeedAngle;
         bool enable;
         bool selected;
+        Component parent;
         ObservableCollection<VariableResource> variables;
         ObservableCollection<EventGroup> componentEventGroups;
-        Component parent;
         ObservableCollection<Component> children;
         #endregion
 
@@ -110,13 +110,13 @@ namespace CrazyStorm.Core
             get { return selected; }
             set { selected = value; }
         }
-        public ObservableCollection<VariableResource> Variables { get { return variables; } }
-        public ObservableCollection<EventGroup> ComponentEventGroups { get { return componentEventGroups; } }
-        public Component Parent 
-        { 
+        public Component Parent
+        {
             get { return parent; }
             set { parent = value; }
         }
+        public ObservableCollection<VariableResource> Variables { get { return variables; } }
+        public ObservableCollection<EventGroup> ComponentEventGroups { get { return componentEventGroups; } }
         public ObservableCollection<Component> Children { get { return children; } }
         #endregion
 

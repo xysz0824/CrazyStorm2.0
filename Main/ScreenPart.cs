@@ -177,47 +177,44 @@ namespace CrazyStorm
             Point point = e.GetPosition(sender as IInputElement);
             int x = (int)point.X;
             int y = (int)point.Y;
-            if (x >= 0 && x < config.ScreenWidth && y >= 0 && y < config.ScreenHeight)
+            //Display a rect with red edge to mark the location that component will be put on.
+            if (aimRect != null)
             {
-                //Display a rect with red edge to mark the location that component will be put on.
-                if (aimRect != null)
+                if (config.GridAlignment)
                 {
-                    if (config.GridAlignment)
-                    {
-                        aimRect.SetValue(Canvas.LeftProperty, (double)((x / ((int)config.GridWidth / 2)) * (config.GridWidth / 2)));
-                        aimRect.SetValue(Canvas.TopProperty, (double)((y / ((int)config.GridHeight / 2)) * (config.GridHeight / 2)));
-                    }
-                    else if (x <= config.ScreenWidth - config.GridWidth && y <= config.ScreenHeight - config.GridHeight)
-                    {
-                        aimRect.SetValue(Canvas.LeftProperty, (double)x);
-                        aimRect.SetValue(Canvas.TopProperty, (double)y);
-                    }
+                    aimRect.SetValue(Canvas.LeftProperty, (double)((x / ((int)config.GridWidth / 2)) * (config.GridWidth / 2)));
+                    aimRect.SetValue(Canvas.TopProperty, (double)((y / ((int)config.GridHeight / 2)) * (config.GridHeight / 2)));
                 }
-                //Display a coloured  rect to mark the range that is selecting.
-                if (selectionRect != null)
+                else if (x <= config.ScreenWidth - config.GridWidth && y <= config.ScreenHeight - config.GridHeight)
                 {
-                    var width = x - selectionRectX;
-                    if (width >= 0)
-                    {
-                        selectionRect.SetValue(Canvas.LeftProperty, (double)selectionRectX);
-                        selectionRect.SetValue(WidthProperty, (double)width);
-                    }
-                    else
-                    {
-                        selectionRect.SetValue(Canvas.LeftProperty, (double)x);
-                        selectionRect.SetValue(WidthProperty, (double)-width);
-                    }
-                    var height = y - selectionRectY;
-                    if (height >= 0)
-                    {
-                        selectionRect.SetValue(Canvas.TopProperty, (double)selectionRectY);
-                        selectionRect.SetValue(HeightProperty, (double)height);
-                    }
-                    else
-                    {
-                        selectionRect.SetValue(Canvas.TopProperty, (double)y);
-                        selectionRect.SetValue(HeightProperty, (double)-height);
-                    }
+                    aimRect.SetValue(Canvas.LeftProperty, (double)x);
+                    aimRect.SetValue(Canvas.TopProperty, (double)y);
+                }
+            }
+            //Display a coloured  rect to mark the range that is selecting.
+            if (selectionRect != null)
+            {
+                var width = x - selectionRectX;
+                if (width >= 0)
+                {
+                    selectionRect.SetValue(Canvas.LeftProperty, (double)selectionRectX);
+                    selectionRect.SetValue(WidthProperty, (double)width);
+                }
+                else
+                {
+                    selectionRect.SetValue(Canvas.LeftProperty, (double)x);
+                    selectionRect.SetValue(WidthProperty, (double)-width);
+                }
+                var height = y - selectionRectY;
+                if (height >= 0)
+                {
+                    selectionRect.SetValue(Canvas.TopProperty, (double)selectionRectY);
+                    selectionRect.SetValue(HeightProperty, (double)height);
+                }
+                else
+                {
+                    selectionRect.SetValue(Canvas.TopProperty, (double)y);
+                    selectionRect.SetValue(HeightProperty, (double)-height);
                 }
             }
         }
