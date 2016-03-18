@@ -231,9 +231,9 @@ namespace CrazyStorm
                 }
             }
         }
-        void OpenEventSetting(EventGroup eventGroup, Script.Environment environment)
+        void OpenEventSetting(EventGroup eventGroup, Script.Environment environment, bool aboutParticle)
         {
-            Window window = new EventSetting(eventGroup, environment);
+            Window window = new EventSetting(eventGroup, environment, aboutParticle);
             window.ShowDialog();
         }
         #endregion
@@ -422,7 +422,7 @@ namespace CrazyStorm
                 Script.Environment environment = new Script.Environment(this.environment);
                 //Remove string property
                 environment.RemoveLocal("Name");
-                OpenEventSetting(ComponentEventList.SelectedItem as EventGroup, environment);
+                OpenEventSetting(ComponentEventList.SelectedItem as EventGroup, environment, component is Emitter);
             }
         }
         private void SpecificEventList_MouseDoubleClick(object sender, MouseButtonEventArgs e)
@@ -445,7 +445,6 @@ namespace CrazyStorm
                 {
                     //Put particle properties
                     environment.PutLocal("MaxLife", 0);
-                    environment.PutLocal("Type", new ParticleType());
                     environment.PutLocal("RGB", RGB.Zero);
                     environment.PutLocal("Opacity", 0.0f);
                     environment.PutLocal("PSpeed", 0.0f);
@@ -456,7 +455,7 @@ namespace CrazyStorm
                     environment.PutLocal("KillOutside", true);
                     environment.PutLocal("Collision", true);
                 }
-                OpenEventSetting(SpecificEventList.SelectedItem as EventGroup, environment);
+                OpenEventSetting(SpecificEventList.SelectedItem as EventGroup, environment, true);
             }
         }
         #endregion

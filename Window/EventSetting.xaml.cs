@@ -26,13 +26,15 @@ namespace CrazyStorm
         #region Private Members
         EventGroup eventGroup;
         Script.Environment environment;
+        bool aboutParticle;
         #endregion
 
         #region Constructor
-        public EventSetting(EventGroup eventGroup, Script.Environment environment)
+        public EventSetting(EventGroup eventGroup, Script.Environment environment, bool aboutParticle)
         {
             this.eventGroup = eventGroup;
             this.environment = environment;
+            this.aboutParticle = aboutParticle;
             InitializeComponent();
             InitializeSetting();
             LoadContent();
@@ -44,6 +46,7 @@ namespace CrazyStorm
         {
             GroupBox.DataContext = eventGroup;
             EventList.ItemsSource = eventGroup.Events;
+            ChangeTypeButton.Visibility = aboutParticle ? Visibility.Visible : Visibility.Hidden;
         }
         void LoadContent()
         {
@@ -104,21 +107,31 @@ namespace CrazyStorm
         {
             PlaySoundPanel.Visibility = Visibility.Collapsed;
             LoopPanel.Visibility = Visibility.Collapsed;
+            ChangeTypePanel.Visibility = Visibility.Collapsed;
         }
         private void PlaySoundButton_Checked(object sender, RoutedEventArgs e)
         {
             PlaySoundPanel.Visibility = Visibility.Visible;
             LoopPanel.Visibility = Visibility.Collapsed;
+            ChangeTypePanel.Visibility = Visibility.Collapsed;
         }
         private void LoopButton_Checked(object sender, RoutedEventArgs e)
         {
             PlaySoundPanel.Visibility = Visibility.Collapsed;
             LoopPanel.Visibility = Visibility.Visible;
+            ChangeTypePanel.Visibility = Visibility.Collapsed;
         }
         private void RecoverButton_Checked(object sender, RoutedEventArgs e)
         {
             PlaySoundPanel.Visibility = Visibility.Collapsed;
             LoopPanel.Visibility = Visibility.Collapsed;
+            ChangeTypePanel.Visibility = Visibility.Collapsed;
+        }
+        private void ChangeTypeButton_Checked(object sender, RoutedEventArgs e)
+        {
+            PlaySoundPanel.Visibility = Visibility.Collapsed;
+            LoopPanel.Visibility = Visibility.Collapsed;
+            ChangeTypePanel.Visibility = Visibility.Visible;
         }
         private void AddEvent_Click(object sender, RoutedEventArgs e)
         {
@@ -136,9 +149,45 @@ namespace CrazyStorm
         }
         private void LeftConditionComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            //TODO
+            LeftMoreThan.IsChecked = false;
+            LeftEqual.IsChecked = false;
+            LeftLessThan.IsChecked = false;
+            LeftMoreThan.IsEnabled = true;
+            LeftLessThan.IsEnabled = true;
+            string selection = e.AddedItems[0].ToString();
+            foreach (var item in environment.Locals)
+            {
+                if (selection == item.Key)
+                {
+                    LeftMoreThan.IsEnabled = (item.Value is int || item.Value is float);
+                    LeftLessThan.IsEnabled = (item.Value is int || item.Value is float);
+                    return;
+                }
+            }
         }
         private void RightConditionComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            RightMoreThan.IsChecked = false;
+            RightEqual.IsChecked = false;
+            RightLessThan.IsChecked = false;
+            RightMoreThan.IsEnabled = true;
+            RightLessThan.IsEnabled = true;
+            string selection = e.AddedItems[0].ToString();
+            foreach (var item in environment.Locals)
+            {
+                if (selection == item.Key)
+                {
+                    RightMoreThan.IsEnabled = (item.Value is int || item.Value is float);
+                    RightLessThan.IsEnabled = (item.Value is int || item.Value is float);
+                    return;
+                }
+            }
+        }
+        private void LeftValue_PreviewLostKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
+        {
+            //TODO
+        }
+        private void RightValue_PreviewLostKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
         {
             //TODO
         }

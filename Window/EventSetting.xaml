@@ -11,7 +11,7 @@
                 </DockPanel>
                 <DockPanel Name="ConditionPanel" Margin="0,1">
                     <Label Content="条件" />
-                    <TextBox Text="{Binding Path=Condition}" VerticalContentAlignment="Center" />
+                    <TextBox Name="Condition" Text="{Binding Path=Condition}" VerticalContentAlignment="Center" />
                 </DockPanel>
             </StackPanel>
         </GroupBox>
@@ -47,22 +47,22 @@
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                 <ComboBox Name="LeftConditionComboBox" Width="100" VerticalAlignment="Center" SelectionChanged="LeftConditionComboBox_SelectionChanged"/>
                 <StackPanel Margin="5,0">
-                    <RadioButton Content="&gt;" />
-                    <RadioButton Content="=" />
-                    <RadioButton Content="&lt;" />
+                    <RadioButton Name="LeftMoreThan" Content="&gt;" />
+                    <RadioButton Name="LeftEqual" Content="=" />
+                    <RadioButton Name="LeftLessThan" Content="&lt;" />
                 </StackPanel>
-                <TextBox Width="50" VerticalContentAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Center" Height="25"/>
+                <TextBox Name="LeftValue" Width="50" VerticalContentAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Center" Height="25" PreviewLostKeyboardFocus="LeftValue_PreviewLostKeyboardFocus" />
                 <StackPanel Margin="5,0" VerticalAlignment="Center">
                     <RadioButton Content="且" />
                     <RadioButton Content="或" />
                 </StackPanel>
                 <ComboBox Name="RightConditionComboBox" Width="100" VerticalAlignment="Center" SelectionChanged="RightConditionComboBox_SelectionChanged"/>
                 <StackPanel Margin="5,0">
-                    <RadioButton Content="&gt;" />
-                    <RadioButton Content="=" />
-                    <RadioButton Content="&lt;" />
+                    <RadioButton Name="RightMoreThan"  Content="&gt;" />
+                    <RadioButton Name="RightEqual" Content="=" />
+                    <RadioButton Name="RightLessThan" Content="&lt;" />
                 </StackPanel>
-                <TextBox Width="50" VerticalContentAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Center" Height="25"/>
+                <TextBox Name="RightValue" Width="50" VerticalContentAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Center" Height="25" PreviewLostKeyboardFocus="RightValue_PreviewLostKeyboardFocus"/>
             </StackPanel>
         </GroupBox>
         <GroupBox Header="属性事件">
@@ -72,7 +72,7 @@
                     <RadioButton Content="变化到" VerticalAlignment="Center" Margin="5,0,5,0"></RadioButton>
                     <RadioButton Content="增加" VerticalAlignment="Center" Margin="5,0"></RadioButton>
                     <RadioButton Content="减少" VerticalAlignment="Center" Margin="5,0,5,0"></RadioButton>
-                    <TextBox VerticalContentAlignment="Center" Height="25"/>
+                    <TextBox Name="ResultValue" VerticalContentAlignment="Center" Height="25"/>
                 </DockPanel>
                 <StackPanel Orientation="Horizontal" Margin="0,1" HorizontalAlignment="Center">
                     <StackPanel Margin="6,0">
@@ -94,9 +94,9 @@
                 </StackPanel>
                 <StackPanel Orientation="Horizontal" Margin="0,1" HorizontalAlignment="Right">
                     <Label Content="变化时间" Margin="4,0,0,0"/>
-                    <TextBox Width="50" VerticalContentAlignment="Center" VerticalAlignment="Center" HorizontalAlignment="Center" Height="25"/>
-                    <Label Content="执行次数" />
-                    <TextBox Width="50" VerticalContentAlignment="Center" VerticalAlignment="Center" HorizontalAlignment="Center" Height="25"/>
+                    <TextBox Name="ChangeTime" Width="50" VerticalContentAlignment="Center" VerticalAlignment="Center" HorizontalAlignment="Center" Height="25"/>
+                    <Label  Content="执行次数" />
+                    <TextBox Name="ExecuteTime" Width="50" VerticalContentAlignment="Center" VerticalAlignment="Center" HorizontalAlignment="Center" Height="25"/>
                 </StackPanel>
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,1">
                     <Button Name="AddEvent" Width ="40" Content="添加" Margin="2,0" Click="AddEvent_Click" />
@@ -106,10 +106,11 @@
         <GroupBox Header="特殊事件">
             <StackPanel>
                 <StackPanel Orientation="Horizontal" Margin="0,1">
-                    <RadioButton Name="EmitParticleButton" Width="80" Content="发射粒子" Margin="8,0,5,0" Checked="EmitParticleButton_Checked" />
-                    <RadioButton Name="PlaySoundButton" Width="80" Content="播放音效" Margin="5,0" Checked="PlaySoundButton_Checked" />
-                    <RadioButton Name="LoopButton" Width="80" Content="循环执行" Margin="5,0,8,0" Checked="LoopButton_Checked" />
-                    <RadioButton Name="RecoverButton" Width="80" Content="恢复状态" Margin="5,0,8,0" Checked="RecoverButton_Checked" />
+                    <RadioButton Name="EmitParticleButton" Content="发射粒子" Margin="8,0,5,0" Checked="EmitParticleButton_Checked" />
+                    <RadioButton Name="PlaySoundButton" Content="播放音效" Margin="5,0" Checked="PlaySoundButton_Checked" />
+                    <RadioButton Name="LoopButton" Content="循环执行" Margin="5,0,8,0" Checked="LoopButton_Checked" />
+                    <RadioButton Name="RecoverButton" Content="恢复状态" Margin="5,0,8,0" Checked="RecoverButton_Checked" />
+                    <RadioButton Name="ChangeTypeButton" Content="改变类型" Margin="5,0,8,0" Checked="ChangeTypeButton_Checked" />
                 </StackPanel>
                 <DockPanel Name="PlaySoundPanel" Margin="0,1" Visibility="Collapsed">
                     <Label Content="音效资源" />
@@ -119,10 +120,16 @@
                 </DockPanel>
                 <DockPanel Name="LoopPanel" Margin="0,1" Visibility="Collapsed">
                     <Label Content="循环次数" />
-                    <TextBox Width="50" VerticalContentAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Center" Height="25"/>
+                    <TextBox Name="LoopTime" Width="50" VerticalContentAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Center" Height="25"/>
                     <Label Content="中止条件" />
-                    <TextBox VerticalContentAlignment="Center" />
+                    <TextBox Name="StopCondition" VerticalContentAlignment="Center" />
                 </DockPanel>
+                <StackPanel Name="ChangeTypePanel" Margin="0,1" Orientation="Horizontal" Visibility="Collapsed">
+                    <Label Content="粒子类型" />
+                    <ComboBox Width="150"/>
+                    <Label Content="标识色" />
+                    <ComboBox Width="80" />
+                </StackPanel>
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,1">
                     <Button Name="AddSpecialEvent" Width ="40" Content="添加" Margin="2,0" Click="AddSpecialEvent_Click" />
                 </StackPanel>
