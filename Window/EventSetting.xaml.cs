@@ -26,14 +26,16 @@ namespace CrazyStorm
         #region Private Members
         EventGroup eventGroup;
         Script.Environment environment;
+        bool emitter;
         bool aboutParticle;
         #endregion
 
         #region Constructor
-        public EventSetting(EventGroup eventGroup, Script.Environment environment, bool aboutParticle)
+        public EventSetting(EventGroup eventGroup, Script.Environment environment, bool emitter, bool aboutParticle)
         {
             this.eventGroup = eventGroup;
             this.environment = environment;
+            this.emitter = emitter;
             this.aboutParticle = aboutParticle;
             InitializeComponent();
             InitializeSetting();
@@ -46,7 +48,8 @@ namespace CrazyStorm
         {
             GroupBox.DataContext = eventGroup;
             EventList.ItemsSource = eventGroup.Events;
-            ChangeTypeButton.Visibility = aboutParticle ? Visibility.Visible : Visibility.Hidden;
+            EmitParticleButton.Visibility = emitter ? Visibility.Visible : Visibility.Collapsed;
+            ChangeTypeButton.Visibility = aboutParticle ? Visibility.Visible : Visibility.Collapsed;
         }
         void LoadContent()
         {
