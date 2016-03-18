@@ -122,11 +122,11 @@ namespace CrazyStorm
         }
         private void AddEvent_Click(object sender, RoutedEventArgs e)
         {
-            eventGroup.Events.Add("aaaaaaaaaaaaaa");
+            //TODO : Add event.
         }
         private void AddSpecialEvent_Click(object sender, RoutedEventArgs e)
         {
-            eventGroup.Events.Add("bbbbbbbbbbbbbb");
+            //TODO : Add special event.
         }
         private void DeleteEvent_Click(object sender, RoutedEventArgs e)
         {

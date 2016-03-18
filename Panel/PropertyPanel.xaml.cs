@@ -429,25 +429,20 @@ namespace CrazyStorm
         {
             if (e.OriginalSource is TextBlock && SpecificEventList.SelectedItem != null)
             {
-                if (component is Emitter)
+                Script.Environment environment = new Script.Environment(this.environment);
+                //Remove emitter properties
+                var componentItems = ComponentGrid.DataContext as IList<PropertyPanelItem>;
+                var emitterItems = SpecificGrid.DataContext as IList<PropertyPanelItem>;
+                foreach (var item in componentItems)
                 {
-                    Script.Environment environment = new Script.Environment(this.environment);
-                    //Remove emitter properties
-                    var componentItems = ComponentGrid.DataContext as IList<PropertyPanelItem>;
-                    var emitterItems = SpecificGrid.DataContext as IList<PropertyPanelItem>;
-                    foreach (var item in componentItems)
-                    {
-                        environment.RemoveLocal(item.Name);
-                    }
-                    foreach (var item in emitterItems)
-                    {
-                        environment.RemoveLocal(item.Name);
-                    }
-                    OpenEventSetting(SpecificEventList.SelectedItem as EventGroup, environment);
+                    environment.RemoveLocal(item.Name);
                 }
-                else if (component is Mask || component is Rebound)
+                foreach (var item in emitterItems)
                 {
-                    Script.Environment environment = new Script.Environment();
+                    environment.RemoveLocal(item.Name);
+                }
+                if (component is Mask || component is Rebound)
+                {
                     //Put particle properties
                     environment.PutLocal("MaxLife", 0);
                     environment.PutLocal("Type", new ParticleType());
@@ -460,8 +455,8 @@ namespace CrazyStorm
                     environment.PutLocal("BlendType", BlendType.AlphaBlend);
                     environment.PutLocal("KillOutside", true);
                     environment.PutLocal("Collision", true);
-                    OpenEventSetting(SpecificEventList.SelectedItem as EventGroup, environment);
                 }
+                OpenEventSetting(SpecificEventList.SelectedItem as EventGroup, environment);
             }
         }
         #endregion

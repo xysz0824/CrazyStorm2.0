@@ -1,7 +1,7 @@
 ﻿<Window x:Class="CrazyStorm.EventSetting"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="事件设置" Height="650" Width="407" WindowStyle="ToolWindow" WindowStartupLocation="CenterScreen" ResizeMode="NoResize">
+        Title="事件设置" Height="650" Width="450" WindowStyle="ToolWindow" WindowStartupLocation="CenterScreen" ResizeMode="NoResize">
     <StackPanel>
         <GroupBox Name="GroupBox" Header="事件组">
             <StackPanel>
@@ -45,7 +45,7 @@
         </GroupBox>
         <GroupBox Name="ConditionSetting" Header="事件条件">
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                <ComboBox Name="LeftConditionComboBox" Width="80" VerticalAlignment="Center"/>
+                <ComboBox Name="LeftConditionComboBox" Width="100" VerticalAlignment="Center"/>
                 <StackPanel Margin="5,0">
                     <RadioButton Content="&gt;" />
                     <RadioButton Content="=" />
@@ -56,7 +56,7 @@
                     <RadioButton Content="且" />
                     <RadioButton Content="或" />
                 </StackPanel>
-                <ComboBox Name="RightConditionComboBox" Width="80" VerticalAlignment="Center"/>
+                <ComboBox Name="RightConditionComboBox" Width="100" VerticalAlignment="Center"/>
                 <StackPanel Margin="5,0">
                     <RadioButton Content="&gt;" />
                     <RadioButton Content="=" />
@@ -68,26 +68,26 @@
         <GroupBox Header="属性事件">
             <StackPanel>
                 <DockPanel Margin="0,1">
-                    <ComboBox Name="PropertyComboBox" Width="80"/>
+                    <ComboBox Name="PropertyComboBox" Width="105"/>
                     <RadioButton Content="变化到" VerticalAlignment="Center" Margin="5,0,5,0"></RadioButton>
                     <RadioButton Content="增加" VerticalAlignment="Center" Margin="5,0"></RadioButton>
                     <RadioButton Content="减少" VerticalAlignment="Center" Margin="5,0,5,0"></RadioButton>
                     <TextBox VerticalContentAlignment="Center" Height="25"/>
                 </DockPanel>
                 <StackPanel Orientation="Horizontal" Margin="0,1" HorizontalAlignment="Center">
-                    <StackPanel Margin="1,0">
+                    <StackPanel Margin="6,0">
                         <Image Source="/CrazyStorm;component/Images/linear.png" Width="96" Height="48"/>
                         <RadioButton Name="Linear"  HorizontalAlignment="Center" Content="线性" Checked="Linear_Checked"></RadioButton>
                     </StackPanel>
-                    <StackPanel Margin="1,0">
+                    <StackPanel Margin="6,0">
                         <Image Source="/CrazyStorm;component/Images/accelerated.png" Width="96" Height="48"></Image>
                         <RadioButton Name="Accelerated" HorizontalAlignment="Center" Content="加速" Checked="Accelerated_Checked"></RadioButton>
                     </StackPanel>
-                    <StackPanel Margin="1,0">
+                    <StackPanel Margin="6,0">
                         <Image Source="/CrazyStorm;component/Images/decelerated.png" Width="96" Height="48"></Image>
                         <RadioButton Name="Decelerated" HorizontalAlignment="Center" Content="减速" Checked="Decelerated_Checked"></RadioButton>
                     </StackPanel>
-                    <StackPanel Margin="1,0">
+                    <StackPanel Margin="6,0">
                         <Image Source="/CrazyStorm;component/Images/fixed.png" Width="96" Height="48"></Image>
                         <RadioButton Name="Fixed" HorizontalAlignment="Center" Content="固定" Checked="Fixed_Checked"></RadioButton>
                     </StackPanel>
