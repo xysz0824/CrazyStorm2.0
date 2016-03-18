@@ -30,7 +30,13 @@ namespace CrazyStorm.Script
 
         public void RemoveGlobal(string name) { globals.Remove(name); }
 
-        public void PutLocal(string name, object value) { locals[name] = value; }
+        public void PutLocal(string name, object value) 
+        {
+            if (locals.ContainsKey(name))
+                throw new RedefinitionException();
+
+            locals[name] = value; 
+        }
 
         public object GetLocal(string name) { return locals.ContainsKey(name) ? locals[name] : null; }
 

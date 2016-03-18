@@ -29,6 +29,7 @@ namespace CrazyStorm
     {
         #region Private Members
         Script.Environment environment;
+        IList<Resource> globals;
         CommandStack commandStack;
         ParticleSystem particle;
         Component component;
@@ -37,9 +38,11 @@ namespace CrazyStorm
         #endregion
 
         #region Constructor
-        public PropertyPanel(CommandStack commandStack, ParticleSystem particle, Component component, Action updateFunc)
+        public PropertyPanel(CommandStack commandStack, 
+            IList<Resource> globals, ParticleSystem particle, Component component, Action updateFunc)
         {
             this.commandStack = commandStack;
+            this.globals = globals;
             this.particle = particle;
             this.component = component;
             this.updateFunc = updateFunc;
@@ -53,7 +56,9 @@ namespace CrazyStorm
         void InitializerEnvironment()
         {
             environment = new Script.Environment();
-            //TODO : Add globals.
+            //Add globals.
+            foreach (VariableResource item in globals)
+                environment.PutGlobal(item.Label, item.Value);
             //Add system structs.
             Script.Struct vector2 = new Script.Struct();
             vector2.PutField("x", 0.0f);
@@ -195,11 +200,7 @@ namespace CrazyStorm
                 var property = e.Row.Item as PropertyPanelItem;
                 var presenter = VisualHelper.GetVisualChild<DataGridCellsPresenter>(e.Row);
                 var cell = (DataGridCell)presenter.ItemContainerGenerator.ContainerFromIndex(1);
-                //If the new value is same as before, cancel it.
                 var newValue = (e.EditingElement as TextBox).Text;
-                if (property.Value == newValue)
-                    return;
-
                 var attribute = property.Info.GetCustomAttributes(false)[0] as PropertyAttribute;
                 new SetPropertyCommand().Do(commandStack, environment, container, property, cell, newValue, attribute, updateFunc);
             }
