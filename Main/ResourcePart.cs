@@ -29,6 +29,7 @@ namespace CrazyStorm
         }
         private void AddImageItem_Click(object sender, RoutedEventArgs e)
         {
+            (LeftTabControl.Items[1] as TabItem).Focus();
             //Open file dialog to add a new image.
             using (var open = new System.Windows.Forms.OpenFileDialog())
             {
@@ -49,6 +50,11 @@ namespace CrazyStorm
         private void AddSound_Click(object sender, RoutedEventArgs e)
         {
             //TODO : Add sound.
+        }
+        private void AddGlobalItem_Click(object sender, RoutedEventArgs e)
+        {
+            (LeftTabControl.Items[1] as TabItem).Focus();
+            AddVariable_Click(null, null);
         }
         private void AddVariable_Click(object sender, RoutedEventArgs e)
         {
