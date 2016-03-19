@@ -26,8 +26,8 @@ namespace CrazyStorm.Script
                 throw new ScriptException("Type error.");
 
             //Execute method is just for testing,
-            //which means it doesn't need to call real function.
-            return 0.0f;
+            //which means it doesn't need to calculate result.
+            return num;
         }
     }
 }

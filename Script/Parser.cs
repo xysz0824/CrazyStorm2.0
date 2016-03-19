@@ -33,11 +33,19 @@ namespace CrazyStorm.Script
         {
             this.lexer = lexer;
             operators = new Dictionary<string, Precedence>();
-            operators["+"] = new Precedence(1, true);
-            operators["-"] = new Precedence(1, true);
-            operators["*"] = new Precedence(2, true);
-            operators["/"] = new Precedence(2, true);
-            operators["%"] = new Precedence(2, true);
+            operators["&"] = new Precedence(1, true);
+            operators["|"] = new Precedence(1, true);
+
+            operators[">"] = new Precedence(2, true);
+            operators["<"] = new Precedence(2, true);
+            operators["="] = new Precedence(2, true);
+
+            operators["+"] = new Precedence(3, true);
+            operators["-"] = new Precedence(3, true);
+            
+            operators["*"] = new Precedence(4, true);
+            operators["/"] = new Precedence(4, true);
+            operators["%"] = new Precedence(4, true);
         }
 
         bool IsIdentifierToken(string name)
@@ -85,22 +93,12 @@ namespace CrazyStorm.Script
 
         public SyntaxTree Expression()
         {
-            if (IsIdentifierToken("["))
-            {
-                IdentifierToken("[");
-                SyntaxTree vector = Vector();
-                IdentifierToken("]");
-                return vector;
-            }
-            else
-            {
-                SyntaxTree left = Factor();
-                Precedence nextOperator;
-                while ((nextOperator = GetNextOperator()) != null)
-                    left = PrecedenceShift(left, nextOperator.Level);
+            SyntaxTree left = Factor();
+            Precedence nextOperator;
+            while ((nextOperator = GetNextOperator()) != null)
+                left = PrecedenceShift(left, nextOperator.Level);
 
-                return left;
-            }
+            return left;
         }
 
         public SyntaxTree Vector()
@@ -139,6 +137,13 @@ namespace CrazyStorm.Script
                 SyntaxTree expression = Expression();
                 IdentifierToken(")");
                 return expression;
+            }
+            else if (IsIdentifierToken("["))
+            {
+                IdentifierToken("[");
+                SyntaxTree vector = Vector();
+                IdentifierToken("]");
+                return vector;
             }
             else
             {

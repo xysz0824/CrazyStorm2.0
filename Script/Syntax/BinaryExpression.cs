@@ -28,10 +28,21 @@ namespace CrazyStorm.Script
         {
             var left = GetLeftChild().Test(e);
             var right = GetRightChild().Test(e);
+            var op = (string)Token.GetValue();
+            //Execute method is just for testing,
+            //which means it doesn't need to calculate result.
             if ((!(left is int) && !(left is float)) || (!(right is int) && !(right is float)))
-                return new ScriptException("Type error.");
+            {
+                if (((left is Core.Vector2 && right is Core.Vector2) || (left is Core.RGB && right is Core.RGB))
+                    && (op == "+" || op == "-"))
+                    return left;
 
-            switch ((string)Token.GetValue())
+                if (left is bool && right is bool && (op == "&" || op == "|"))
+                    return left;
+
+                    return new ScriptException("Type error.");
+            }
+            switch (op)
             {
                 case "/":
                     if (Convert.ToSingle(right) == 0)
@@ -41,10 +52,14 @@ namespace CrazyStorm.Script
                     if (Convert.ToSingle(right) == 0)
                         throw new ScriptException("Divided by zero.");
                     break;
+                case ">":
+                    return true;
+                case "<":
+                    return true;
+                case "=":
+                    return true;
             }
-            //Execute method is just for testing,
-            //which means it doesn't need to call real function.
-            return 0.0f;
+            return left;
         }
     }
 }

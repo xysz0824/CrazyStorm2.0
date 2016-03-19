@@ -15,6 +15,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using CrazyStorm.Core;
+using CrazyStorm.Script;
 
 namespace CrazyStorm
 {
@@ -340,6 +341,28 @@ namespace CrazyStorm
             }
             else if (value <= 0)
                 LoopTime.Text = "1";
+        }
+        private void Condition_PreviewLostKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
+        {
+            string input = Condition.Text.Trim();
+            if (input == string.Empty)
+                return;
+
+            try
+            {
+                var lexer = new Lexer();
+                lexer.Load(input);
+                var syntaxTree = new Parser(lexer).Expression();
+                var result = syntaxTree.Test(environment);
+                if (!(result is bool))
+                    throw new ScriptException();
+            }
+            catch (ScriptException ex)
+            {
+                MessageBox.Show((string)FindResource("ExpressionInvalid"), (string)FindResource("TipTitle"),
+                        MessageBoxButton.OK, MessageBoxImage.Warning);
+                Condition.Text = string.Empty;
+            }
         }
         #endregion
     }

@@ -15,7 +15,7 @@ namespace CrazyStorm.Script
     {
         static Regex NumberTokenRegex = new Regex(@"[-]?([0-9]+\.[0-9]+|[0-9]+)");
         static Regex IdentifierTokenRegex = new Regex(@"[A-Z_a-z][A-Z_a-z0-9]*");
-        static Regex OperatorTokenRegex = new Regex(@"[+\-*/%(,)\[\.\]]");
+        static Regex OperatorTokenRegex = new Regex(@"[+\-*/%>=<&|(,)\[\.\]]");
         List<Token> tokens;
 
         public void Load(string content)
@@ -30,8 +30,8 @@ namespace CrazyStorm.Script
                 {
                     string lineString = reader.ReadLine().Trim();
                     lineNumber++;
-                    List<Token> lineTokens = new List<Token>();
 
+                    List<Token> lineTokens = new List<Token>();
                     var identifierTokens = IdentifierTokenRegex.Matches(lineString);
                     foreach (Capture token in identifierTokens)
                     {

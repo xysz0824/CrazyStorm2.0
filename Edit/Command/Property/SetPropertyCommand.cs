@@ -66,8 +66,9 @@ namespace CrazyStorm
                 var syntaxTree = new Parser(lexer).Expression();
                 if (syntaxTree is Number)
                     throw new ScriptException("Illegal input.");
+
                 var result = syntaxTree.Test(environment);
-                if (!IsImplicitFrom(propertyInfo.PropertyType, result.GetType()))
+                if (!IsMatchWith(propertyInfo.PropertyType, result.GetType()))
                     throw new ScriptException("Type error.");
 
                 container.Properties[propertyInfo].Expression = true;
@@ -89,7 +90,7 @@ namespace CrazyStorm
                 return false;
             }
         }
-        static bool IsImplicitFrom(System.Type typeA, System.Type typeB)
+        static bool IsMatchWith(System.Type typeA, System.Type typeB)
         {
             if (typeA.Equals(typeB))
                 return true;

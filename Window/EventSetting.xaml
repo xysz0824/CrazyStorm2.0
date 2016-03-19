@@ -11,7 +11,7 @@
                 </DockPanel>
                 <DockPanel Name="ConditionPanel" Margin="0,1">
                     <Label Content="条件" />
-                    <TextBox Name="Condition" Text="{Binding Path=Condition}" VerticalContentAlignment="Center" />
+                    <TextBox Name="Condition" Text="{Binding Path=Condition}" VerticalContentAlignment="Center" PreviewLostKeyboardFocus="Condition_PreviewLostKeyboardFocus" />
                 </DockPanel>
             </StackPanel>
         </GroupBox>
