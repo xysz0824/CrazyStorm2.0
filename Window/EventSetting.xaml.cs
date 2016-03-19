@@ -26,15 +26,18 @@ namespace CrazyStorm
         #region Private Members
         EventGroup eventGroup;
         Script.Environment environment;
+        IList<PropertyPanelItem>[] properties;
         bool emitter;
         bool aboutParticle;
         #endregion
 
         #region Constructor
-        public EventSetting(EventGroup eventGroup, Script.Environment environment, bool emitter, bool aboutParticle)
+        public EventSetting(EventGroup eventGroup, Script.Environment environment, IList<PropertyPanelItem>[] properties, 
+            bool emitter, bool aboutParticle)
         {
             this.eventGroup = eventGroup;
             this.environment = environment;
+            this.properties = properties;
             this.emitter = emitter;
             this.aboutParticle = aboutParticle;
             InitializeComponent();
@@ -124,12 +127,6 @@ namespace CrazyStorm
             LoopPanel.Visibility = Visibility.Visible;
             ChangeTypePanel.Visibility = Visibility.Collapsed;
         }
-        private void RecoverButton_Checked(object sender, RoutedEventArgs e)
-        {
-            PlaySoundPanel.Visibility = Visibility.Collapsed;
-            LoopPanel.Visibility = Visibility.Collapsed;
-            ChangeTypePanel.Visibility = Visibility.Collapsed;
-        }
         private void ChangeTypeButton_Checked(object sender, RoutedEventArgs e)
         {
             PlaySoundPanel.Visibility = Visibility.Collapsed;
@@ -157,6 +154,7 @@ namespace CrazyStorm
             LeftLessThan.IsChecked = false;
             LeftMoreThan.IsEnabled = true;
             LeftLessThan.IsEnabled = true;
+            LeftValue.Text = string.Empty;
             string selection = e.AddedItems[0].ToString();
             foreach (var item in environment.Locals)
             {
@@ -175,6 +173,7 @@ namespace CrazyStorm
             RightLessThan.IsChecked = false;
             RightMoreThan.IsEnabled = true;
             RightLessThan.IsEnabled = true;
+            RightValue.Text = string.Empty;
             string selection = e.AddedItems[0].ToString();
             foreach (var item in environment.Locals)
             {
@@ -186,13 +185,161 @@ namespace CrazyStorm
                 }
             }
         }
+        private void PropertyComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            ResultValue.Text = string.Empty;
+        }
         private void LeftValue_PreviewLostKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
         {
-            //TODO
+            string input = LeftValue.Text.Trim();
+            if (input == string.Empty)
+                return;
+
+            if (LeftConditionComboBox.SelectedItem != null)
+            {
+                string selection = (string)LeftConditionComboBox.SelectedItem;
+                object value = environment.GetLocal(selection);
+                if (value != null)
+                {
+                    for (int i = 0; i < properties.Length; ++i)
+                    {
+                        foreach (var item in properties[i])
+                        {
+                            if (selection == item.Name)
+                            {
+                                var attribute = item.Info.GetCustomAttributes(false)[0] as PropertyAttribute;
+                                if (!attribute.IsLegal(input, out value))
+                                {
+                                    MessageBox.Show((string)FindResource("ValueInvalid"), (string)FindResource("TipTitle"),
+                                        MessageBoxButton.OK, MessageBoxImage.Warning);
+                                    LeftValue.Text = string.Empty;
+                                    return;
+                                }
+                                LeftValue.Text = value.ToString();
+                                return;
+                            }
+                        }
+                    }
+                }
+                if (value == null)
+                {
+                    value = environment.GetGlobal(selection);
+                }
+                if (value == null && selection.Contains('.'))
+                {
+                    value = 0.0f;
+                }
+                if (value != null)
+                {
+                    float testValue;
+                    if (!float.TryParse(input, out testValue))
+                    {
+                        MessageBox.Show((string)FindResource("ValueInvalid"), (string)FindResource("TipTitle"),
+                            MessageBoxButton.OK, MessageBoxImage.Warning);
+                        LeftValue.Text = string.Empty;
+                    }
+                }
+            }
         }
         private void RightValue_PreviewLostKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
         {
-            //TODO
+            string input = RightValue.Text.Trim();
+            if (input == string.Empty)
+                return;
+
+            if (RightConditionComboBox.SelectedItem != null)
+            {
+                string selection = (string)RightConditionComboBox.SelectedItem;
+                object value = environment.GetLocal(selection);
+                if (value != null)
+                {
+                    for (int i = 0; i < properties.Length; ++i)
+                    {
+                        foreach (var item in properties[i])
+                        {
+                            if (selection == item.Name)
+                            {
+                                var attribute = item.Info.GetCustomAttributes(false)[0] as PropertyAttribute;
+                                if (!attribute.IsLegal(input, out value))
+                                {
+                                    MessageBox.Show((string)FindResource("ValueInvalid"), (string)FindResource("TipTitle"),
+                                        MessageBoxButton.OK, MessageBoxImage.Warning);
+                                    RightValue.Text = string.Empty;
+                                    return;
+                                }
+                                RightValue.Text = value.ToString();
+                                return;
+                            }
+                        }
+                    }
+                }
+                if (value == null)
+                {
+                    value = environment.GetGlobal(selection);
+                }
+                if (value == null && selection.Contains('.'))
+                {
+                    value = 0.0f;
+                }
+                if (value != null)
+                {
+                    float testValue;
+                    if (!float.TryParse(input, out testValue))
+                    {
+                        MessageBox.Show((string)FindResource("ValueInvalid"), (string)FindResource("TipTitle"),
+                            MessageBoxButton.OK, MessageBoxImage.Warning);
+                        RightValue.Text = string.Empty;
+                    }
+                }
+            }
+        }
+        private void ChangeTime_PreviewLostKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
+        {
+            string input = ChangeTime.Text.Trim();
+            if (input == string.Empty)
+                return;
+
+            int value;
+            if (!int.TryParse(input, out value))
+            {
+                MessageBox.Show((string)FindResource("ValueInvalid"), (string)FindResource("TipTitle"),
+                    MessageBoxButton.OK, MessageBoxImage.Warning);
+                ChangeTime.Text = string.Empty;
+            }
+            else if (value <= 0)
+                ChangeTime.Text = "1";
+        }
+        private void ExecuteTime_PreviewLostKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
+        {
+            string input = ExecuteTime.Text.Trim();
+            if (input == string.Empty)
+                return;
+
+            int value;
+            if (!int.TryParse(input, out value))
+            {
+                MessageBox.Show((string)FindResource("ValueInvalid"), (string)FindResource("TipTitle"),
+                    MessageBoxButton.OK, MessageBoxImage.Warning);
+                ExecuteTime.Text = string.Empty;
+            }
+            else if (value < 0)
+                ExecuteTime.Text = "0";
+        }
+        private void LoopTime_PreviewLostKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
+        {
+            string input = LoopTime.Text.Trim();
+            if (input == string.Empty)
+                return;
+
+            int value;
+            if (!int.TryParse(input, out value))
+            {
+                MessageBox.Show((string)FindResource("ValueInvalid"), (string)FindResource("TipTitle"),
+                    MessageBoxButton.OK, MessageBoxImage.Warning);
+                LoopTime.Text = string.Empty;
+            }
+            else if (value <= 0)
+                LoopTime.Text = "1";
         }
         #endregion
     }

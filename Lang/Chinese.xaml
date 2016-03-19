@@ -21,7 +21,7 @@
     <sys:String x:Key="CanNotAddMoreLayer">图层数已达上限，无法继续添加</sys:String>
     <sys:String x:Key="CanNotDeleteAllLayer">不能删除所有图层</sys:String>
     <sys:String x:Key="LayerNameCanNotBeEmpty">图层名称不能为空</sys:String>
-    <sys:String x:Key="ValueInvalid">数值填入有误，请重试</sys:String>
+    <sys:String x:Key="ValueInvalid">填入的值有误，请重试</sys:String>
     <sys:String x:Key="NameRepeating">名称重复，请重新修改</sys:String>
     <sys:String x:Key="VariableInvalid">变量中含有重复名称或无效值，请检查</sys:String>
     <!-- File Window-->

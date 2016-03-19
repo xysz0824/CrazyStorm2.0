@@ -48,7 +48,7 @@
     <Compile Include="Particle\CurveParticle.cs" />
     <Compile Include="Property\BoolPropertyAttribute.cs" />
     <Compile Include="Property\EnumPropertyAttribute.cs" />
-    <Compile Include="Property\Vector3PropertyAttribute.cs" />
+    <Compile Include="Property\RGBPropertyAttribute.cs" />
     <Compile Include="Resource\FileResource.cs" />
     <Compile Include="Particle\Particle.cs" />
     <Compile Include="Particle\ParticleType.cs" />

@@ -50,13 +50,13 @@ namespace CrazyStorm.Core
             get { return length; }
             set { length = value; }
         }
-        [Vector3Property]
+        [RGBProperty]
         public RGB RGB
         {
             get { return rgb; }
             set { rgb = value; }
         }
-        [FloatProperty(0, 255)]
+        [FloatProperty(float.MinValue, float.MaxValue)]
         public float Opacity
         {
             get { return opacity; }

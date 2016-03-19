@@ -64,6 +64,8 @@ namespace CrazyStorm
                 var lexer = new Lexer();
                 lexer.Load(newValue);
                 var syntaxTree = new Parser(lexer).Expression();
+                if (syntaxTree is Number)
+                    throw new ScriptException("Illegal input.");
                 var result = syntaxTree.Test(environment);
                 if (!IsImplicitFrom(propertyInfo.PropertyType, result.GetType()))
                     throw new ScriptException("Type error.");

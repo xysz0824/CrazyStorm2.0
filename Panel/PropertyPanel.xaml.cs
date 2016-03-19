@@ -64,11 +64,11 @@ namespace CrazyStorm
             vector2.PutField("x", 0.0f);
             vector2.PutField("y", 0.0f);
             environment.PutStruct(typeof(Vector2).ToString(), vector2);
-            Script.Struct vector3 = new Script.Struct();
-            vector3.PutField("r", 0.0f);
-            vector3.PutField("g", 0.0f);
-            vector3.PutField("b", 0.0f);
-            environment.PutStruct(typeof(RGB).ToString(), vector3);
+            Script.Struct rgb = new Script.Struct();
+            rgb.PutField("r", 0.0f);
+            rgb.PutField("g", 0.0f);
+            rgb.PutField("b", 0.0f);
+            environment.PutStruct(typeof(RGB).ToString(), rgb);
             //Add system functions.
             Script.Function rand = new Script.Function(2);
             environment.PutFunction("rand", rand);
@@ -233,7 +233,17 @@ namespace CrazyStorm
         }
         void OpenEventSetting(EventGroup eventGroup, Script.Environment environment, bool emitter, bool aboutParticle)
         {
-            Window window = new EventSetting(eventGroup, environment, emitter, aboutParticle);
+            var properties = new IList<PropertyPanelItem>[3]
+            { 
+                ComponentGrid.DataContext as IList<PropertyPanelItem>, 
+                SpecificGrid.DataContext as IList<PropertyPanelItem>, 
+                null
+            };
+            if (component is Emitter)
+            {
+                properties[2] = ParticleGrid.DataContext as IList<PropertyPanelItem>;
+            }
+            Window window = new EventSetting(eventGroup, environment, properties, emitter, aboutParticle);
             window.ShowDialog();
         }
         #endregion

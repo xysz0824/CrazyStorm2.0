@@ -10,7 +10,7 @@ using System.Text;
 namespace CrazyStorm.Core
 {
     [AttributeUsage(AttributeTargets.Property, AllowMultiple = false, Inherited = false)]
-    public sealed class Vector3PropertyAttribute : PropertyAttribute
+    public sealed class RGBPropertyAttribute : PropertyAttribute
     {
         public override bool IsLegal(string newValue, out object value)
         {
