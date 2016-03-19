@@ -20,8 +20,25 @@ using CrazyStorm.Core;
 
 namespace CrazyStorm
 {
+    public enum UpdateType
+    {
+        Add,
+        Delete,
+        Modify
+    }
     public partial class Main
     {
+        #region Private Methods
+        void UpdateGlobals(UpdateType type, VariableResource variable, string newName = "")
+        {
+            for (int i = 2; i < LeftTabControl.Items.Count; ++i)
+            {
+                var panel = ((LeftTabControl.Items[i] as TabItem).Content as ScrollViewer).Content as PropertyPanel;
+                panel.UpdateGlobals(type, variable, newName);
+            }
+        }
+        #endregion
+
         #region Window EventHandler
         private void ImageList_PreviewMouseRightButtonDown(object sender, MouseButtonEventArgs e)
         {
@@ -75,6 +92,7 @@ namespace CrazyStorm
                 {
                     var newVar = new VariableResource(name);
                     file.Globals.Add(newVar);
+                    UpdateGlobals(UpdateType.Add, newVar);
                     DeleteVariable.IsEnabled = true;
                     return;
                 }
@@ -86,6 +104,7 @@ namespace CrazyStorm
             {
                 var item = VariableGrid.SelectedItem as VariableResource;
                 file.Globals.Remove(item);
+                UpdateGlobals(UpdateType.Delete, item);
                 DeleteVariable.IsEnabled = file.Globals.Count > 0 ? true : false;
             }
         }
@@ -108,6 +127,7 @@ namespace CrazyStorm
                             (e.EditingElement as TextBox).Text = editItem.Label;
                             return;
                         }
+                    UpdateGlobals(UpdateType.Modify, editItem, newValue);
                 }
                 else if (e.Column.SortMemberPath == "Value")
                 {

@@ -270,6 +270,22 @@ namespace CrazyStorm
                 UpdateProperty(curveParticle, particleProperties);
             }
         }
+        public void UpdateGlobals(UpdateType type, VariableResource variable, string newName)
+        {
+            switch (type)
+            {
+                case UpdateType.Add:
+                    environment.PutGlobal(variable.Label, variable.Value);
+                    break;
+                case UpdateType.Delete:
+                    environment.RemoveGlobal(variable.Label);
+                    break;
+                case UpdateType.Modify:
+                    environment.RemoveGlobal(variable.Label);
+                    environment.PutGlobal(newName, variable.Value);
+                    break;
+            }
+        }
         #endregion
 
         #region Windows EventHandlers
