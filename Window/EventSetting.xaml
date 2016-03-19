@@ -11,7 +11,7 @@
                 </DockPanel>
                 <DockPanel Name="ConditionPanel" Margin="0,1">
                     <Label Content="条件" />
-                    <TextBox Name="Condition" Text="{Binding Path=Condition}" VerticalContentAlignment="Center" PreviewLostKeyboardFocus="Condition_PreviewLostKeyboardFocus" />
+                    <TextBox Name="Condition" Text="{Binding Path=Condition, Mode=OneWay}" VerticalContentAlignment="Center" PreviewLostKeyboardFocus="Condition_PreviewLostKeyboardFocus" Background="White" />
                 </DockPanel>
             </StackPanel>
         </GroupBox>
@@ -72,7 +72,7 @@
                     <RadioButton Content="变化到" VerticalAlignment="Center" Margin="5,0,5,0"></RadioButton>
                     <RadioButton Content="增加" VerticalAlignment="Center" Margin="5,0"></RadioButton>
                     <RadioButton Content="减少" VerticalAlignment="Center" Margin="5,0,5,0"></RadioButton>
-                    <TextBox Name="ResultValue" VerticalContentAlignment="Center" Height="25"/>
+                    <TextBox Name="ResultValue" VerticalContentAlignment="Center" Height="25" PreviewLostKeyboardFocus="ResultValue_PreviewLostKeyboardFocus"/>
                 </DockPanel>
                 <StackPanel Orientation="Horizontal" Margin="0,1" HorizontalAlignment="Center">
                     <StackPanel Margin="6,0">
@@ -121,7 +121,7 @@
                     <Label Content="循环次数" />
                     <TextBox Name="LoopTime" Width="50" VerticalContentAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Center" Height="25" PreviewLostKeyboardFocus="LoopTime_PreviewLostKeyboardFocus"/>
                     <Label Content="中止条件" />
-                    <TextBox Name="StopCondition" VerticalContentAlignment="Center" />
+                    <TextBox Name="StopCondition" VerticalContentAlignment="Center" PreviewLostKeyboardFocus="StopCondition_PreviewLostKeyboardFocus" />
                 </DockPanel>
                 <StackPanel Name="ChangeTypePanel" Margin="0,1" Orientation="Horizontal" Visibility="Collapsed">
                     <Label Content="粒子类型" />

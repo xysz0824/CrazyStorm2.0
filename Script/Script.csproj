@@ -41,6 +41,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Environment\RedefinitionException.cs" />
+    <Compile Include="Rule.cs" />
     <Compile Include="ScriptException.cs" />
     <Compile Include="Environment\Environment.cs" />
     <Compile Include="Environment\Function.cs" />

@@ -68,7 +68,7 @@ namespace CrazyStorm
                     throw new ScriptException("Illegal input.");
 
                 var result = syntaxTree.Test(environment);
-                if (!IsMatchWith(propertyInfo.PropertyType, result.GetType()))
+                if (!Rule.IsMatchWith(propertyInfo.PropertyType, result.GetType()))
                     throw new ScriptException("Type error.");
 
                 container.Properties[propertyInfo].Expression = true;
@@ -89,19 +89,6 @@ namespace CrazyStorm
                 cell.BorderThickness = new Thickness(2);
                 return false;
             }
-        }
-        static bool IsMatchWith(System.Type typeA, System.Type typeB)
-        {
-            if (typeA.Equals(typeB))
-                return true;
-
-            System.Type intType = typeof(int);
-            System.Type floatType = typeof(float);
-            if ((typeA.Equals(intType) && typeB.Equals(floatType)) ||
-                (typeA.Equals(floatType) && typeB.Equals(intType)))
-                return true;
-
-            return false;
         }
     }
 }
