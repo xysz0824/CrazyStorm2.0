@@ -87,7 +87,7 @@ namespace CrazyStorm
             var scroll = new ScrollViewer();
             scroll.VerticalScrollBarVisibility = ScrollBarVisibility.Auto;
             scroll.Content = new PropertyPanel(commandStacks[selectedParticle], 
-                file.Globals, selectedParticle, component, UpdateProperty);
+                file, selectedParticle.CustomType, component, UpdateProperty);
             item.Content = scroll;
             LeftTabControl.Items.Add(item);
             item.Focus();

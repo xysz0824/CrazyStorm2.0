@@ -27,17 +27,23 @@ namespace CrazyStorm
         #region Private Members
         EventGroup eventGroup;
         Script.Environment environment;
+        IList<Resource> sounds;
+        IList<ParticleType> types;
         IList<PropertyPanelItem>[] properties;
         bool emitter;
         bool aboutParticle;
+        bool isPlaySound;
         #endregion
 
         #region Constructor
-        public EventSetting(EventGroup eventGroup, Script.Environment environment, IList<PropertyPanelItem>[] properties, 
+        public EventSetting(EventGroup eventGroup, Script.Environment environment,
+            IList<Resource> sounds, IList<ParticleType> types, IList<PropertyPanelItem>[] properties, 
             bool emitter, bool aboutParticle)
         {
             this.eventGroup = eventGroup;
             this.environment = environment;
+            this.sounds = sounds;
+            this.types = types;
             this.properties = properties;
             this.emitter = emitter;
             this.aboutParticle = aboutParticle;
@@ -57,6 +63,7 @@ namespace CrazyStorm
         }
         void LoadContent()
         {
+            //Load locals and globals.
             foreach (var item in environment.Locals)
             {
                 LeftConditionComboBox.Items.Add(item.Key);
@@ -82,6 +89,29 @@ namespace CrazyStorm
                 RightConditionComboBox.Items.Add(item.Key);
                 PropertyComboBox.Items.Add(item.Key);
             }
+            //Load sounds.
+            foreach (FileResource item in sounds)
+            {
+                if (item.IsValid)
+                    SoundCombo.Items.Add(item);
+            }
+            //Load particle types.
+            //First needs to merge repeated type name.
+            var typesNorepeat = new List<ParticleType>();
+            foreach (var item in types)
+            {
+                bool exist = false;
+                for (int i = 0; i < typesNorepeat.Count; ++i)
+                    if (item.Name == typesNorepeat[i].Name)
+                    {
+                        exist = true;
+                        break;
+                    }
+
+                if (!exist)
+                    typesNorepeat.Add(item);
+            }
+            TypeCombo.ItemsSource = typesNorepeat;
         }
         void ChangeTextBoxState(TextBox source, bool hasError)
         {
@@ -483,6 +513,43 @@ namespace CrazyStorm
             catch (ScriptException ex)
             {
                 ChangeTextBoxState(StopCondition, true);
+            }
+        }
+        private void TypeCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (TypeCombo.SelectedItem != null)
+            {
+                ColorCombo.Items.Clear();
+                var selectedItem = TypeCombo.SelectedItem as ParticleType;
+                foreach (var item in types)
+                {
+                    if (item.Name == selectedItem.Name)
+                    {
+                        var color = new ComboBoxItem();
+                        color.Content = item.Color.ToString();
+                        ColorCombo.Items.Add(color);
+                    }
+                }
+            }
+        }
+        private void SoundTextButton_Click(object sender, RoutedEventArgs e)
+        {
+            isPlaySound = !isPlaySound;
+            if (SoundCombo.SelectedItem != null)
+            {
+                if (isPlaySound)
+                {
+                    SoundTestButton.Content = "暂停";
+                    MediaPlayer.Source = new Uri(((FileResource)SoundCombo.SelectedItem).AbsolutePath, UriKind.Absolute);
+                    MediaPlayer.Volume = VolumeSlider.Value / 100;
+                    MediaPlayer.LoadedBehavior = MediaState.Manual;
+                    MediaPlayer.Play();
+                }
+                else
+                {
+                    SoundTestButton.Content = "测试";
+                    MediaPlayer.Stop();
+                }
             }
         }
         #endregion

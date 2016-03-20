@@ -44,10 +44,13 @@ namespace CrazyStorm
         {
             VisualHelper.FocusItem<TreeViewItem>(e);
         }
+        private void SoundList_PreviewMouseRightButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            VisualHelper.FocusItem<TreeViewItem>(e);
+        }
         private void AddImageItem_Click(object sender, RoutedEventArgs e)
         {
             (LeftTabControl.Items[1] as TabItem).Focus();
-            //Open file dialog to add a new image.
             using (var open = new System.Windows.Forms.OpenFileDialog())
             {
                 open.Filter = (string)FindResource("ImageType");
@@ -60,13 +63,26 @@ namespace CrazyStorm
         }
         private void DeleteImage_Click(object sender, RoutedEventArgs e)
         {
-            //Delete selected image.
             var item = ImageList.SelectedItem as Resource;
             file.Images.Remove(item);
         }
         private void AddSound_Click(object sender, RoutedEventArgs e)
         {
-            //TODO : Add sound.
+            (LeftTabControl.Items[1] as TabItem).Focus();
+            using (var open = new System.Windows.Forms.OpenFileDialog())
+            {
+                open.Filter = (string)FindResource("SoundType");
+                if (open.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                {
+                    var sound = new FileResource(open.SafeFileName, open.FileName);
+                    file.Sounds.Add(sound);
+                }
+            }
+        }
+        private void DeleteSound_Click(object sender, RoutedEventArgs e)
+        {
+            var item = SoundList.SelectedItem as Resource;
+            file.Sounds.Remove(item);
         }
         private void AddGlobalItem_Click(object sender, RoutedEventArgs e)
         {

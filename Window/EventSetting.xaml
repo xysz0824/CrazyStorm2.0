@@ -113,9 +113,11 @@
                 </StackPanel>
                 <DockPanel Name="PlaySoundPanel" Margin="0,1" Visibility="Collapsed">
                     <Label Content="音效资源" />
-                    <ComboBox VerticalContentAlignment="Center" Width="100" />
+                    <ComboBox Name="SoundCombo" VerticalContentAlignment="Center" Width="100" />
+                    <MediaElement Name="MediaPlayer"></MediaElement>
+                    <Button Margin="1,0" Name="SoundTestButton" Content="测试" Click="SoundTextButton_Click"/>
                     <Label Content="音量大小" />
-                    <Slider VerticalAlignment="Center" AutoToolTipPlacement="BottomRight" Maximum="100" Value="50"></Slider>
+                    <Slider Name="VolumeSlider" VerticalAlignment="Center" AutoToolTipPlacement="BottomRight" Maximum="100" Value="50"></Slider>
                 </DockPanel>
                 <DockPanel Name="LoopPanel" Margin="0,1" Visibility="Collapsed">
                     <Label Content="循环次数" />
@@ -124,10 +126,10 @@
                     <TextBox Name="StopCondition" VerticalContentAlignment="Center" PreviewLostKeyboardFocus="StopCondition_PreviewLostKeyboardFocus" />
                 </DockPanel>
                 <StackPanel Name="ChangeTypePanel" Margin="0,1" Orientation="Horizontal" Visibility="Collapsed">
-                    <Label Content="粒子类型" />
-                    <ComboBox Width="150"/>
-                    <Label Content="标识色" />
-                    <ComboBox Width="80" />
+                    <Label  Content="粒子类型" />
+                    <ComboBox Name="TypeCombo" Width="150" SelectionChanged="TypeCombo_SelectionChanged"/>
+                    <Label  Content="标识色" />
+                    <ComboBox Name="ColorCombo" Width="80"/>
                 </StackPanel>
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,1">
                     <Button Name="AddSpecialEvent" Width ="40" Content="添加" Margin="2,0" Click="AddSpecialEvent_Click" />

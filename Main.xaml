@@ -241,7 +241,7 @@
             </MenuItem>
             <MenuItem Header="资源">
                 <MenuItem Header="添加图案" Click="AddImageItem_Click"/>
-                <MenuItem Header="添加音效" />
+                <MenuItem Header="添加音效" Click="AddSound_Click"/>
                 <MenuItem Header="添加全局变量" Click="AddGlobalItem_Click"/>
             </MenuItem>
             <MenuItem Name="ParticleMenu" Header="粒子" Click="ParticleMenu_Click" >
@@ -489,8 +489,7 @@
                             <ScrollViewer VerticalScrollBarVisibility="Auto">
                                 <StackPanel>
                                 <GroupBox Header="图案" Height="131" Margin="0">
-                                    <TreeView Name="ImageList" Padding="-12,1,1,1" PreviewMouseRightButtonDown="ImageList_PreviewMouseRightButtonDown" 
-                                              ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.HorizontalScrollBarVisibility="Auto">
+                                    <TreeView Name="ImageList" Padding="-12,1,1,1" PreviewMouseRightButtonDown="ImageList_PreviewMouseRightButtonDown">
                                         <TreeView.ContextMenu>
                                             <ContextMenu>
                                                 <MenuItem Name="AddImage" Header="添加图案" Click="AddImageItem_Click" />
@@ -520,13 +519,29 @@
                                     </TreeView>
                                 </GroupBox>
                                 <GroupBox Header="音效" Height="131" Margin="0">
-                                    <TreeView Name="SoundList" Padding="-12,1,1,1">
+                                    <TreeView Name="SoundList" Padding="-12,1,1,1" PreviewMouseRightButtonDown="SoundList_PreviewMouseRightButtonDown">
                                         <TreeView.ContextMenu>
                                             <ContextMenu>
                                                 <MenuItem Name="AddSound" Header="添加音效" Click="AddSound_Click" />
                                             </ContextMenu>
                                         </TreeView.ContextMenu>
-                                    </TreeView>
+                                            <TreeView.ItemTemplate>
+                                                <DataTemplate>
+                                                    <DockPanel>
+                                                        <DockPanel.ContextMenu >
+                                                            <ContextMenu>
+                                                                <MenuItem Name="DeleteSound" Header="删除" Click="DeleteSound_Click"/>
+                                                            </ContextMenu>
+                                                        </DockPanel.ContextMenu>
+                                                        <TextBlock Text="{Binding Path=Label}">
+                                                            <TextBlock.TextDecorations>
+                                                                <Binding Path="IsValid" Converter="{StaticResource ResourceValidConverter}"/>
+                                                            </TextBlock.TextDecorations>
+                                                        </TextBlock>
+                                                    </DockPanel>
+                                                </DataTemplate>
+                                            </TreeView.ItemTemplate>
+                                        </TreeView>
                                 </GroupBox>
                                 <GroupBox Header="全局变量" Margin="0">
                                     <StackPanel>

@@ -29,21 +29,21 @@ namespace CrazyStorm
     {
         #region Private Members
         Script.Environment environment;
-        IList<Resource> globals;
+        File file;
         CommandStack commandStack;
-        ParticleSystem particle;
+        IList<ParticleType> types;
         Component component;
         Action updateFunc;
         bool initializeType;
         #endregion
 
         #region Constructor
-        public PropertyPanel(CommandStack commandStack, 
-            IList<Resource> globals, ParticleSystem particle, Component component, Action updateFunc)
+        public PropertyPanel(CommandStack commandStack,
+            File file, IList<ParticleType> types, Component component, Action updateFunc)
         {
             this.commandStack = commandStack;
-            this.globals = globals;
-            this.particle = particle;
+            this.file = file;
+            this.types = types;
             this.component = component;
             this.updateFunc = updateFunc;
             InitializeComponent();
@@ -57,7 +57,7 @@ namespace CrazyStorm
         {
             environment = new Script.Environment();
             //Add globals.
-            foreach (VariableResource item in globals)
+            foreach (VariableResource item in file.Globals)
                 environment.PutGlobal(item.Label, item.Value);
             //Add system structs.
             Script.Struct vector2 = new Script.Struct();
@@ -106,21 +106,22 @@ namespace CrazyStorm
                 LoadProperties(ParticleGrid, (component as CurveEmitter).CurveParticle, particleList);
             }
             //Load particle types.
-            var types = new List<ParticleType>();
-            foreach (var item in particle.CustomType)
+            //First needs to merge repeated type name.
+            var typesNorepeat = new List<ParticleType>();
+            foreach (var item in types)
             {
                 bool exist = false;
-                for (int i = 0; i < types.Count; ++i)
-                    if (item.Name == types[i].Name)
+                for (int i = 0; i < typesNorepeat.Count; ++i)
+                    if (item.Name == typesNorepeat[i].Name)
                     {
                         exist = true;
                         break;
                     }
 
                 if (!exist)
-                    types.Add(item);
+                    typesNorepeat.Add(item);
             }
-            TypeCombo.ItemsSource = types;
+            TypeCombo.ItemsSource = typesNorepeat;
             ParticleType type = null;
             if (component is MultiEmitter)
                 type = (component as MultiEmitter).Particle.Type;
@@ -130,7 +131,7 @@ namespace CrazyStorm
             if (type != null)
             {
                 //Select specific type.
-                foreach (var item in types)
+                foreach (var item in typesNorepeat)
                     if (item.Name == type.Name)
                     {
                         TypeCombo.SelectedItem = item;
@@ -221,7 +222,7 @@ namespace CrazyStorm
         {
             ColorCombo.Items.Clear();
             var selectedItem = TypeCombo.SelectedItem as ParticleType;
-            foreach (var item in particle.CustomType)
+            foreach (var item in types)
             {
                 if (item.Name == selectedItem.Name)
                 {
@@ -243,7 +244,8 @@ namespace CrazyStorm
             {
                 properties[2] = ParticleGrid.DataContext as IList<PropertyPanelItem>;
             }
-            Window window = new EventSetting(eventGroup, environment, properties, emitter, aboutParticle);
+            file.UpdateResource();
+            Window window = new EventSetting(eventGroup, environment, file.Sounds, types, properties, emitter, aboutParticle);
             window.ShowDialog();
         }
         #endregion
@@ -392,7 +394,7 @@ namespace CrazyStorm
             {
                 var selectedType = TypeCombo.SelectedItem as ParticleType;
                 var selectedColor = ColorCombo.SelectedItem as ComboBoxItem;
-                foreach (var item in particle.CustomType)
+                foreach (var item in types)
                 {
                     if (item.Name == selectedType.Name && item.Color.ToString() == (string)selectedColor.Content)
                     {
