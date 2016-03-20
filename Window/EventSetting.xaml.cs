@@ -539,7 +539,7 @@ namespace CrazyStorm
             {
                 if (isPlaySound)
                 {
-                    SoundTestButton.Content = "暂停";
+                    SoundTestButton.Content = (string)FindResource("Pause");
                     MediaPlayer.Source = new Uri(((FileResource)SoundCombo.SelectedItem).AbsolutePath, UriKind.Absolute);
                     MediaPlayer.Volume = VolumeSlider.Value / 100;
                     MediaPlayer.LoadedBehavior = MediaState.Manual;
@@ -547,10 +547,16 @@ namespace CrazyStorm
                 }
                 else
                 {
-                    SoundTestButton.Content = "测试";
+                    SoundTestButton.Content = (string)FindResource("Test");
                     MediaPlayer.Stop();
                 }
             }
+        }
+        private void MediaPlayer_MediaEnded(object sender, RoutedEventArgs e)
+        {
+            isPlaySound = false;
+            SoundTestButton.Content = (string)FindResource("Test");
+            MediaPlayer.Stop();
         }
         #endregion
     }

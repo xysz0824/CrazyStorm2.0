@@ -99,7 +99,7 @@
                     <TextBox Name="ExecuteTime" Width="50" VerticalContentAlignment="Center" VerticalAlignment="Center" HorizontalAlignment="Center" Height="25" PreviewLostKeyboardFocus="ExecuteTime_PreviewLostKeyboardFocus"/>
                 </StackPanel>
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,1">
-                    <Button Name="AddEvent" Width ="40" Content="添加" Margin="2,0" Click="AddEvent_Click" />
+                    <Button x:Name="AddEvent" Width ="40" Content="添加" Margin="2,0" Click="AddEvent_Click" />
                 </StackPanel>
             </StackPanel>
         </GroupBox>
@@ -114,7 +114,7 @@
                 <DockPanel Name="PlaySoundPanel" Margin="0,1" Visibility="Collapsed">
                     <Label Content="音效资源" />
                     <ComboBox Name="SoundCombo" VerticalContentAlignment="Center" Width="100" />
-                    <MediaElement Name="MediaPlayer"></MediaElement>
+                    <MediaElement Name="MediaPlayer" MediaEnded="MediaPlayer_MediaEnded"></MediaElement>
                     <Button Margin="1,0" Name="SoundTestButton" Content="测试" Click="SoundTextButton_Click"/>
                     <Label Content="音量大小" />
                     <Slider Name="VolumeSlider" VerticalAlignment="Center" AutoToolTipPlacement="BottomRight" Maximum="100" Value="50"></Slider>

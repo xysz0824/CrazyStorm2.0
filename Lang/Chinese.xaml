@@ -35,4 +35,7 @@
     <sys:String x:Key="ReboundEventList">反弹事件组</sys:String>
     <sys:String x:Key="DoubleClickTip">继续双击进入属性面板</sys:String>
     <sys:String x:Key="ComponentUnit">个组件</sys:String>
+    <!-- Event Setting -->
+    <sys:String x:Key="Test">测试</sys:String>
+    <sys:String x:Key="Pause">暂停</sys:String>
 </ResourceDictionary>
