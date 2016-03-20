@@ -448,6 +448,8 @@ namespace CrazyStorm
                 Script.Environment environment = new Script.Environment(this.environment);
                 //Remove string property
                 environment.RemoveLocal("Name");
+                //Add runtime properties
+                environment.PutLocal("CurrentFrame", 0);
                 OpenEventSetting(ComponentEventList.SelectedItem as EventGroup, environment, 
                     component is Emitter, component is Emitter);
             }
@@ -457,7 +459,7 @@ namespace CrazyStorm
             if (e.OriginalSource is TextBlock && SpecificEventList.SelectedItem != null)
             {
                 Script.Environment environment = new Script.Environment(this.environment);
-                //Remove emitter properties
+                //Remove component and emitter properties
                 var componentItems = ComponentGrid.DataContext as IList<PropertyPanelItem>;
                 var emitterItems = SpecificGrid.DataContext as IList<PropertyPanelItem>;
                 foreach (var item in componentItems)
@@ -482,6 +484,9 @@ namespace CrazyStorm
                     environment.PutLocal("KillOutside", true);
                     environment.PutLocal("Collision", true);
                 }
+                //Add runtime properties
+                environment.PutLocal("Position", Vector2.Zero);
+                environment.PutLocal("CurrentFrame", 0);
                 OpenEventSetting(SpecificEventList.SelectedItem as EventGroup, environment, 
                     false, true);
             }

@@ -10,6 +10,8 @@ namespace CrazyStorm.Core
     {
         #region Private Members
         int maxLife;
+        int currentFrame;
+        Vector2 position;
         ParticleType type;
         float widthScale;
         float heightScale;
@@ -39,6 +41,26 @@ namespace CrazyStorm.Core
         {
             get { return maxLife; }
             set { maxLife = value; }
+        }
+        public int CurrentFrame
+        {
+            get { return currentFrame; }
+            set { currentFrame = value >= 0 && value < maxLife ? value : currentFrame; }
+        }
+        public Vector2 Position
+        {
+            get { return position; }
+            set { position = value; }
+        }
+        public float X
+        {
+            get { return position.x; }
+            set { position.x = value; }
+        }
+        public float Y
+        {
+            get { return position.y; }
+            set { position.y = value; }
         }
         public ParticleType Type
         {

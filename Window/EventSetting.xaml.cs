@@ -62,7 +62,7 @@ namespace CrazyStorm
                 LeftConditionComboBox.Items.Add(item.Key);
                 RightConditionComboBox.Items.Add(item.Key);
                 PropertyComboBox.Items.Add(item.Key);
-                //Split struct into parts for convenience
+                //Split fields of struct for convenience
                 foreach (var structItem in environment.Structs)
                 {
                     if (structItem.Key == item.Value.GetType().ToString())
@@ -213,21 +213,22 @@ namespace CrazyStorm
         private void LeftValue_PreviewLostKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
         {
             ChangeTextBoxState(LeftValue, false);
-            string input = LeftValue.Text.Trim();
+            LeftValue.Text = LeftValue.Text.Trim();
+            string input = LeftValue.Text;
             if (input == string.Empty)
                 return;
 
             if (LeftConditionComboBox.SelectedItem != null)
             {
-                string selection = (string)LeftConditionComboBox.SelectedItem;
-                object value = environment.GetLocal(selection);
+                string[] selection = ((string)LeftConditionComboBox.SelectedItem).Split('.');
+                object value = environment.GetLocal(selection[0]);
                 if (value != null)
                 {
                     for (int i = 0; i < properties.Length; ++i)
                     {
                         foreach (var item in properties[i])
                         {
-                            if (selection == item.Name)
+                            if (selection[0] == item.Name && selection.Length <= 1)
                             {
                                 var attribute = item.Info.GetCustomAttributes(false)[0] as PropertyAttribute;
                                 if (!attribute.IsLegal(input, out value))
@@ -238,16 +239,21 @@ namespace CrazyStorm
                                 LeftValue.Text = value.ToString();
                                 return;
                             }
+                            else if (selection[0] == item.Name)
+                            {
+                                value = environment.GetStructs(item.Info.PropertyType.ToString()).GetField(selection[1]);
+                                if (!Rule.IsMatchWith(value, input))
+                                {
+                                    ChangeTextBoxState(LeftValue, true);
+                                }
+                                return;
+                            }
                         }
                     }
                 }
                 if (value == null)
                 {
-                    value = environment.GetGlobal(selection);
-                }
-                if (value == null && selection.Contains('.'))
-                {
-                    value = 0.0f;
+                    value = environment.GetGlobal(selection[0]);
                 }
                 if (value != null)
                 {
@@ -263,21 +269,22 @@ namespace CrazyStorm
         private void RightValue_PreviewLostKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
         {
             ChangeTextBoxState(RightValue, false);
-            string input = RightValue.Text.Trim();
+            RightValue.Text = RightValue.Text.Trim();
+            string input = RightValue.Text;
             if (input == string.Empty)
                 return;
 
             if (RightConditionComboBox.SelectedItem != null)
             {
-                string selection = (string)RightConditionComboBox.SelectedItem;
-                object value = environment.GetLocal(selection);
+                string[] selection = ((string)RightConditionComboBox.SelectedItem).Split('.');
+                object value = environment.GetLocal(selection[0]);
                 if (value != null)
                 {
                     for (int i = 0; i < properties.Length; ++i)
                     {
                         foreach (var item in properties[i])
                         {
-                            if (selection == item.Name)
+                            if (selection[0] == item.Name && selection.Length <= 1)
                             {
                                 var attribute = item.Info.GetCustomAttributes(false)[0] as PropertyAttribute;
                                 if (!attribute.IsLegal(input, out value))
@@ -288,16 +295,20 @@ namespace CrazyStorm
                                 RightValue.Text = value.ToString();
                                 return;
                             }
+                            else if (selection[0] == item.Name)
+                            {
+                                value = environment.GetStructs(item.Info.PropertyType.ToString()).GetField(selection[1]);
+                                if (!Rule.IsMatchWith(value, input))
+                                    ChangeTextBoxState(RightValue, true);
+
+                                return;
+                            }
                         }
                     }
                 }
                 if (value == null)
                 {
-                    value = environment.GetGlobal(selection);
-                }
-                if (value == null && selection.Contains('.'))
-                {
-                    value = 0.0f;
+                    value = environment.GetGlobal(selection[0]);
                 }
                 if (value != null)
                 {
@@ -310,74 +321,11 @@ namespace CrazyStorm
                 }
             }
         }
-        private void ChangeTime_PreviewLostKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
-        {
-            ChangeTextBoxState(ChangeTime, false);
-            string input = ChangeTime.Text.Trim();
-            if (input == string.Empty)
-                return;
-
-            int value;
-            if (!int.TryParse(input, out value))
-                ChangeTextBoxState(ChangeTime, true);
-            else if (value <= 0)
-                ChangeTime.Text = "1";
-        }
-        private void ExecuteTime_PreviewLostKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
-        {
-            ChangeTextBoxState(ExecuteTime, false);
-            string input = ExecuteTime.Text.Trim();
-            if (input == string.Empty)
-                return;
-
-            int value;
-            if (!int.TryParse(input, out value))
-                ChangeTextBoxState(ExecuteTime, true);
-            else if (value < 0)
-                ExecuteTime.Text = "0";
-        }
-        private void LoopTime_PreviewLostKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
-        {
-            ChangeTextBoxState(LoopTime, false);
-            string input = LoopTime.Text.Trim();
-            if (input == string.Empty)
-                return;
-
-            int value;
-            if (!int.TryParse(input, out value))
-                ChangeTextBoxState(LoopTime, true);
-            else if (value <= 0)
-                LoopTime.Text = "1";
-        }
-        private void Condition_PreviewLostKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
-        {
-            ChangeTextBoxState(Condition, false);
-            string input = Condition.Text.Trim();
-            if (input == string.Empty)
-            {
-                eventGroup.Condition = input;
-                return;
-            }
-
-            try
-            {
-                var lexer = new Lexer();
-                lexer.Load(input);
-                var syntaxTree = new Parser(lexer).Expression();
-                var result = syntaxTree.Test(environment);
-                if (!(result is bool))
-                    throw new ScriptException();
-                eventGroup.Condition = input;
-            }
-            catch (ScriptException ex)
-            {
-                ChangeTextBoxState(Condition, true);
-            }
-        }
         private void ResultValue_PreviewLostKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
         {
             ChangeTextBoxState(ResultValue, false);
-            string input = ResultValue.Text.Trim();
+            ResultValue.Text = ResultValue.Text.Trim();
+            string input = ResultValue.Text;
             if (input == string.Empty)
                 return;
 
@@ -385,15 +333,15 @@ namespace CrazyStorm
             {
                 try
                 {
-                    string selection = (string)PropertyComboBox.SelectedItem;
-                    object value = environment.GetLocal(selection);
+                    string[] selection = ((string)PropertyComboBox.SelectedItem).Split('.');
+                    object value = environment.GetLocal(selection[0]);
                     if (value != null)
                     {
                         for (int i = 0; i < properties.Length; ++i)
                         {
                             foreach (var item in properties[i])
                             {
-                                if (selection == item.Name)
+                                if (selection[0] == item.Name && selection.Length <= 1)
                                 {
                                     var attribute = item.Info.GetCustomAttributes(false)[0] as PropertyAttribute;
                                     if (attribute.IsLegal(input, out value))
@@ -413,16 +361,24 @@ namespace CrazyStorm
 
                                     return;
                                 }
+                                else if (selection[0] == item.Name)
+                                {
+                                    value = environment.GetStructs(item.Info.PropertyType.ToString()).GetField(selection[1]);
+                                    var lexer = new Lexer();
+                                    lexer.Load(input);
+                                    var syntaxTree = new Parser(lexer).Expression();
+                                    var result = syntaxTree.Test(environment);
+                                    if (!Rule.IsMatchWith(value.GetType(), result.GetType()))
+                                        throw new ScriptException();
+
+                                    return;
+                                }
                             }
                         }
                     }
                     if (value == null)
                     {
-                        value = environment.GetGlobal(selection);
-                    }
-                    if (value == null && selection.Contains('.'))
-                    {
-                        value = 0.0f;
+                        value = environment.GetGlobal(selection[0]);
                     }
                     if (value != null)
                     {
@@ -440,10 +396,78 @@ namespace CrazyStorm
                 }
             }
         }
+        private void ChangeTime_PreviewLostKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
+        {
+            ChangeTextBoxState(ChangeTime, false);
+            ChangeTime.Text = ChangeTime.Text.Trim();
+            string input = ChangeTime.Text;
+            if (input == string.Empty)
+                return;
+
+            int value;
+            if (!int.TryParse(input, out value))
+                ChangeTextBoxState(ChangeTime, true);
+            else if (value <= 0)
+                ChangeTime.Text = "1";
+        }
+        private void ExecuteTime_PreviewLostKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
+        {
+            ChangeTextBoxState(ExecuteTime, false);
+            ExecuteTime.Text = ExecuteTime.Text.Trim();
+            string input = ExecuteTime.Text;
+            if (input == string.Empty)
+                return;
+
+            int value;
+            if (!int.TryParse(input, out value))
+                ChangeTextBoxState(ExecuteTime, true);
+            else if (value < 0)
+                ExecuteTime.Text = "0";
+        }
+        private void LoopTime_PreviewLostKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
+        {
+            ChangeTextBoxState(LoopTime, false);
+            LoopTime.Text = LoopTime.Text.Trim();
+            string input = LoopTime.Text;
+            if (input == string.Empty)
+                return;
+
+            int value;
+            if (!int.TryParse(input, out value))
+                ChangeTextBoxState(LoopTime, true);
+            else if (value <= 0)
+                LoopTime.Text = "1";
+        }
+        private void Condition_PreviewLostKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
+        {
+            ChangeTextBoxState(Condition, false);
+            Condition.Text = Condition.Text.Trim();
+            string input = Condition.Text;
+            if (input == string.Empty)
+            {
+                eventGroup.Condition = input;
+                return;
+            }
+            try
+            {
+                var lexer = new Lexer();
+                lexer.Load(input);
+                var syntaxTree = new Parser(lexer).Expression();
+                var result = syntaxTree.Test(environment);
+                if (!(result is bool))
+                    throw new ScriptException();
+                eventGroup.Condition = input;
+            }
+            catch (ScriptException ex)
+            {
+                ChangeTextBoxState(Condition, true);
+            }
+        }
         private void StopCondition_PreviewLostKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
         {
             ChangeTextBoxState(StopCondition, false);
-            string input = StopCondition.Text.Trim();
+            StopCondition.Text = StopCondition.Text.Trim();
+            string input = StopCondition.Text;
             if (input == string.Empty)
                 return;
 

@@ -18,6 +18,7 @@ namespace CrazyStorm.Core
 
         #region Private Members
         string name;
+        int currentFrame;
         int beginFrame;
         int totalFrame;
         int minFrame;
@@ -47,6 +48,11 @@ namespace CrazyStorm.Core
                     PropertyChanged(this, new PropertyChangedEventArgs("Name"));
             }
         }
+        public int CurrentFrame
+        {
+            get { return currentFrame; }
+            set { currentFrame = value >= beginFrame && value < beginFrame + totalFrame ? value : currentFrame; }
+        }
         [IntProperty(0, int.MaxValue)]
         public int BeginFrame
         {
@@ -64,6 +70,16 @@ namespace CrazyStorm.Core
         {
             get { return position; }
             set { position = value; }
+        }
+        public float X
+        {
+            get { return position.x; }
+            set { position.x = value; }
+        }
+        public float Y
+        {
+            get { return position.y; }
+            set { position.y = value; }
         }
         [FloatProperty(float.MinValue, float.MaxValue)]
         public float Speed
@@ -88,16 +104,6 @@ namespace CrazyStorm.Core
         {
             get { return acspeedAngle; }
             set { acspeedAngle = value; }
-        }
-        public float X 
-        {
-            get { return position.x; }
-            set { position.x = value; }
-        }
-        public float Y 
-        { 
-            get { return position.y; }
-            set { position.y = value; }
         }
         [BoolProperty]
         public bool Enable
