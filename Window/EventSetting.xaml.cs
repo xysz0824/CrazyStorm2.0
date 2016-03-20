@@ -279,6 +279,10 @@ namespace CrazyStorm
             text = condition + " : " + specialEvent;
             return true;
         }
+        void MapEventText(string text)
+        {
+            //TODO
+        }
         #endregion
 
         #region Window EventHandler
@@ -341,6 +345,13 @@ namespace CrazyStorm
             string text;
             if (BuildSpecialEventText(out text))
                 eventGroup.Events.Add(text);
+        }
+        private void EditEvent_Click(object sender, RoutedEventArgs e)
+        {
+            //TODO
+            var panel = (((e.OriginalSource as FrameworkElement).Parent as ContextMenu).PlacementTarget) as DockPanel;
+            panel.Background = SystemColors.HighlightBrush;
+            EventList.IsEnabled = false;
         }
         private void DeleteEvent_Click(object sender, RoutedEventArgs e)
         {
@@ -424,6 +435,9 @@ namespace CrazyStorm
                 {
                     for (int i = 0; i < properties.Length; ++i)
                     {
+                        if (properties[i] == null)
+                            break;
+
                         foreach (var item in properties[i])
                         {
                             if (selection[0] == item.Name && selection.Length <= 1)
@@ -480,6 +494,9 @@ namespace CrazyStorm
                 {
                     for (int i = 0; i < properties.Length; ++i)
                     {
+                        if (properties[i] == null)
+                            break;
+
                         foreach (var item in properties[i])
                         {
                             if (selection[0] == item.Name && selection.Length <= 1)
@@ -537,6 +554,9 @@ namespace CrazyStorm
                     {
                         for (int i = 0; i < properties.Length; ++i)
                         {
+                            if (properties[i] == null)
+                                break;
+
                             foreach (var item in properties[i])
                             {
                                 if (selection[0] == item.Name && selection.Length <= 1)

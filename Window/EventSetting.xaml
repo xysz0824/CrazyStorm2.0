@@ -32,6 +32,7 @@
                                 <DockPanel>
                                     <DockPanel.ContextMenu >
                                         <ContextMenu>
+                                            <MenuItem Name="EditEvent" Header="编辑" Click="EditEvent_Click" />
                                             <MenuItem Name="DeleteEvent" Header="删除" Click="DeleteEvent_Click" />
                                         </ContextMenu>
                                     </DockPanel.ContextMenu>

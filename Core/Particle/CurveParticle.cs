@@ -38,7 +38,7 @@ namespace CrazyStorm.Core
             get { return type; }
             set { type = value; }
         }
-        [FloatProperty(0, 1)]
+        [FloatProperty(0, float.MaxValue)]
         public float WidthScale
         {
             get { return widthScale; }
