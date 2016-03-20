@@ -1,4 +1,4 @@
-﻿    <Window x:Class="CrazyStorm.Main"
+﻿<Window x:Class="CrazyStorm.Main"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:local="clr-namespace:CrazyStorm"
@@ -215,7 +215,7 @@
             <Menu.Background>
                 <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
                     <GradientStop Color="White" Offset="0" />
-                    <GradientStop Color="#FFE8E8E8" Offset="1" />
+                    <GradientStop Color="Gainsboro" Offset="1" />
                 </LinearGradientBrush>
             </Menu.Background>
             <MenuItem Header="文件">
@@ -279,14 +279,14 @@
         </Menu>
         <!-- Status Bar -->
         <StatusBar Height="23" Width="Auto" DockPanel.Dock="Bottom" Background="#FFE4E4E4" Padding="1,0,6,0">
-            <StatusBarItem Name="StatusText" Content="{Binding Path=Status}" Background="#FFF9F9F9" />
+            <StatusBarItem Name="StatusText" Content="{Binding Path=Status}" Background="Gainsboro" />
         </StatusBar>
         <!-- Tool Bar -->
         <ToolBar Height="34" Name="ToolBar" Width="Auto" DockPanel.Dock="Top" HorizontalAlignment="Stretch" AllowDrop="False">
             <ToolBar.Background>
                 <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
                     <GradientStop Color="White" Offset="0" />
-                    <GradientStop Color="#FFF6F6F6" Offset="1" />
+                    <GradientStop Color="Gainsboro" Offset="1" />
                 </LinearGradientBrush>
             </ToolBar.Background>
             <Button Name="NewButton" IsDefault="False" IsCancel="False" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ToolTip="新建">
@@ -402,7 +402,13 @@
                     </TabControl>
                 </ScrollViewer>
                 <!-- Sidebar -->
-                <DockPanel Background="#FFF9F9F9">
+                <DockPanel>
+                    <DockPanel.Background>
+                        <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                            <GradientStop Color="White" Offset="0"/>
+                            <GradientStop Color="#FFF0F0F0" Offset="1"/>
+                        </LinearGradientBrush>
+                    </DockPanel.Background>
                     <GroupBox DockPanel.Dock="Bottom" Header="已选中" Height="100" BorderBrush="#FFC6C6C6" Name="SelectedGroup" Opacity="0">
                         <GroupBox.Background>
                             <ImageBrush ImageSource="Images/selectedgroup.png"/>
@@ -423,6 +429,12 @@
                         </Canvas>
                     </GroupBox>
                     <TabControl  Margin="0,0,0,0" Name="LeftTabControl" VerticalContentAlignment="Stretch" HorizontalContentAlignment="Stretch">
+                        <TabControl.Background>
+                            <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                                <GradientStop Color="White" Offset="0"/>
+                                <GradientStop Color="#FFF0F0F0" Offset="1"/>
+                            </LinearGradientBrush>
+                        </TabControl.Background>
                         <TabItem Header="组件" Name="Frequent" Padding="6,5,6,1">
                             <DockPanel Name="ComponentPanel">
                                 <GroupBox DockPanel.Dock="Top" Header="组件板" VerticalAlignment="Top" Height="60" HorizontalAlignment="Stretch" 
@@ -488,43 +500,43 @@
                         <TabItem Header="资源" Name="Resource" Padding="6,5,6,1">
                             <ScrollViewer VerticalScrollBarVisibility="Auto">
                                 <StackPanel>
-                                <GroupBox Header="图案" Height="131" Margin="0">
-                                    <TreeView Name="ImageList" Padding="-12,1,1,1" PreviewMouseRightButtonDown="ImageList_PreviewMouseRightButtonDown">
-                                        <TreeView.ContextMenu>
-                                            <ContextMenu>
-                                                <MenuItem Name="AddImage" Header="添加图案" Click="AddImageItem_Click" />
-                                            </ContextMenu>
-                                        </TreeView.ContextMenu>
-                                        <TreeView.ItemTemplate>
-                                            <DataTemplate>
-                                                <DockPanel>
-                                                    <DockPanel.ContextMenu >
-                                                        <ContextMenu>
-                                                            <MenuItem Name="DeleteImage" Header="删除" Click="DeleteImage_Click" />
-                                                        </ContextMenu>
-                                                    </DockPanel.ContextMenu>
-                                                    <TextBlock Text="{Binding Path=Label}">
-                                                        <TextBlock.TextDecorations>
-                                                            <Binding Path="IsValid" Converter="{StaticResource ResourceValidConverter}"/>
-                                                        </TextBlock.TextDecorations>
-                                                    </TextBlock>
-                                                    <DockPanel.ToolTip>
-                                                        <ToolTip>
-                                                            <Image Source="{Binding Path=AbsolutePath}" Stretch="Uniform" Width="128" Height="128" StretchDirection="Both" />
-                                                        </ToolTip>
-                                                    </DockPanel.ToolTip>
-                                                </DockPanel>
-                                            </DataTemplate>
-                                        </TreeView.ItemTemplate>
-                                    </TreeView>
-                                </GroupBox>
-                                <GroupBox Header="音效" Height="131" Margin="0">
-                                    <TreeView Name="SoundList" Padding="-12,1,1,1" PreviewMouseRightButtonDown="SoundList_PreviewMouseRightButtonDown">
-                                        <TreeView.ContextMenu>
-                                            <ContextMenu>
-                                                <MenuItem Name="AddSound" Header="添加音效" Click="AddSound_Click" />
-                                            </ContextMenu>
-                                        </TreeView.ContextMenu>
+                                    <GroupBox Header="图案" Height="131" Margin="0">
+                                        <TreeView Name="ImageList" Padding="-12,1,1,1" PreviewMouseRightButtonDown="ImageList_PreviewMouseRightButtonDown">
+                                            <TreeView.ContextMenu>
+                                                <ContextMenu>
+                                                    <MenuItem Name="AddImage" Header="添加图案" Click="AddImageItem_Click" />
+                                                </ContextMenu>
+                                            </TreeView.ContextMenu>
+                                            <TreeView.ItemTemplate>
+                                                <DataTemplate>
+                                                    <DockPanel>
+                                                        <DockPanel.ContextMenu >
+                                                            <ContextMenu>
+                                                                <MenuItem Name="DeleteImage" Header="删除" Click="DeleteImage_Click" />
+                                                            </ContextMenu>
+                                                        </DockPanel.ContextMenu>
+                                                        <TextBlock Text="{Binding Path=Label}">
+                                                            <TextBlock.TextDecorations>
+                                                                <Binding Path="IsValid" Converter="{StaticResource ResourceValidConverter}"/>
+                                                            </TextBlock.TextDecorations>
+                                                        </TextBlock>
+                                                        <DockPanel.ToolTip>
+                                                            <ToolTip>
+                                                                <Image Source="{Binding Path=AbsolutePath}" Stretch="Uniform" Width="128" Height="128" StretchDirection="Both" />
+                                                            </ToolTip>
+                                                        </DockPanel.ToolTip>
+                                                    </DockPanel>
+                                                </DataTemplate>
+                                            </TreeView.ItemTemplate>
+                                        </TreeView>
+                                    </GroupBox>
+                                    <GroupBox Header="音效" Height="131" Margin="0">
+                                        <TreeView Name="SoundList" Padding="-12,1,1,1" PreviewMouseRightButtonDown="SoundList_PreviewMouseRightButtonDown">
+                                            <TreeView.ContextMenu>
+                                                <ContextMenu>
+                                                    <MenuItem Name="AddSound" Header="添加音效" Click="AddSound_Click" />
+                                                </ContextMenu>
+                                            </TreeView.ContextMenu>
                                             <TreeView.ItemTemplate>
                                                 <DataTemplate>
                                                     <DockPanel>
@@ -542,9 +554,9 @@
                                                 </DataTemplate>
                                             </TreeView.ItemTemplate>
                                         </TreeView>
-                                </GroupBox>
-                                <GroupBox Header="全局变量" Margin="0">
-                                    <StackPanel>
+                                    </GroupBox>
+                                    <GroupBox Header="全局变量" Margin="0">
+                                        <StackPanel>
                                             <DataGrid Name="VariableGrid" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" GridLinesVisibility="Horizontal" 
                                                       ColumnWidth="Auto" SelectionMode="Single" CanUserReorderColumns="False" CanUserSortColumns="False" ScrollViewer.CanContentScroll="False" 
                                                       CanUserResizeRows="False" CanUserAddRows="False" CanUserDeleteRows="False" AutoGenerateColumns="False" 
@@ -558,12 +570,12 @@
                                                 </DataGrid.Columns>
                                             </DataGrid>
                                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" >
-                                            <Button Name="AddVariable" Width ="40" Content="添加" Margin="2,0" Click="AddVariable_Click" />
-                                            <Button Name="DeleteVariable" Width ="40" Content="删除" Click="DeleteVariable_Click" />
-                                        </StackPanel>
+                                                <Button Name="AddVariable" Width ="40" Content="添加" Margin="2,0" Click="AddVariable_Click" />
+                                                <Button Name="DeleteVariable" Width ="40" Content="删除" Click="DeleteVariable_Click" />
+                                            </StackPanel>
                                         </StackPanel>
                                     </GroupBox>
-                            </StackPanel>
+                                </StackPanel>
                             </ScrollViewer>
                         </TabItem>
                     </TabControl>
@@ -581,7 +593,7 @@
                         <DockPanel.Background>
                             <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
                                 <GradientStop Color="White" Offset="0" />
-                                <GradientStop Color="#FFE0E0E0" Offset="1" />
+                                <GradientStop Color="Gainsboro" Offset="1" />
                             </LinearGradientBrush>
                         </DockPanel.Background>
                         <Label  Content="图层" Height="28" Width="228" Name="label1" Padding="5,6,5,5" BorderBrush="{x:Null}" />
@@ -683,7 +695,7 @@
                     </TreeView>
                 </DockPanel>
                 <GridSplitter VerticalAlignment="Stretch" Name="gridSplitter4" Width="1" 
-                              HorizontalAlignment="Right" Background="#FFDBDBDB" Grid.Column="1" IsEnabled="False"/>
+                              HorizontalAlignment="Right" Background="#FFACACAC" Grid.Column="1" IsEnabled="False"/>
             </Grid>
             <GridSplitter Grid.Row="1"  VerticalAlignment="Top" Name="gridSplitter1" Height="1" 
                           HorizontalAlignment="Stretch" Background="White" IsEnabled="False"/>

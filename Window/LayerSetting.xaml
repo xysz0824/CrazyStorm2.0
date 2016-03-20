@@ -1,7 +1,7 @@
 ﻿<Window x:Class="CrazyStorm.LayerSetting"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="图层设置" Height="170" Width="250" WindowStyle="ToolWindow" WindowStartupLocation="CenterScreen" ResizeMode="NoResize">
+        Title="图层设置" Height="170" Width="250" WindowStyle="ToolWindow" WindowStartupLocation="CenterScreen" ResizeMode="NoResize" Background="#FFF0F0F0">
     <Canvas x:Name="Setting">
         <Label Content="图层名称" Canvas.Left="8" Canvas.Top="10"/>
         <Label Content="图层标识" Canvas.Left="8" Canvas.Top="40"/>
