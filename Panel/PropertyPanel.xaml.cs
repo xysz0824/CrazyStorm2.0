@@ -238,12 +238,8 @@ namespace CrazyStorm
             { 
                 ComponentGrid.DataContext as IList<PropertyPanelItem>, 
                 SpecificGrid.DataContext as IList<PropertyPanelItem>, 
-                null
+                ParticleGrid.DataContext as IList<PropertyPanelItem>
             };
-            if (component is Emitter)
-            {
-                properties[2] = ParticleGrid.DataContext as IList<PropertyPanelItem>;
-            }
             file.UpdateResource();
             Window window = new EventSetting(eventGroup, environment, file.Sounds, types, properties, emitter, aboutParticle);
             window.ShowDialog();

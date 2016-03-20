@@ -53,8 +53,8 @@
                 </StackPanel>
                 <TextBox Name="LeftValue" Width="50" VerticalContentAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Center" Height="25" PreviewLostKeyboardFocus="LeftValue_PreviewLostKeyboardFocus" />
                 <StackPanel Margin="5,0" VerticalAlignment="Center">
-                    <RadioButton Content="且" />
-                    <RadioButton Content="或" />
+                    <RadioButton Name="And" Content="且" />
+                    <RadioButton Name="Or" Content="或" />
                 </StackPanel>
                 <ComboBox Name="RightConditionComboBox" Width="100" VerticalAlignment="Center" SelectionChanged="RightConditionComboBox_SelectionChanged"/>
                 <StackPanel Margin="5,0">
@@ -69,9 +69,9 @@
             <StackPanel>
                 <DockPanel Margin="0,1">
                     <ComboBox Name="PropertyComboBox" Width="105" SelectionChanged="PropertyComboBox_SelectionChanged"/>
-                    <RadioButton Content="变化到" VerticalAlignment="Center" Margin="5,0,5,0"></RadioButton>
-                    <RadioButton Content="增加" VerticalAlignment="Center" Margin="5,0"></RadioButton>
-                    <RadioButton Content="减少" VerticalAlignment="Center" Margin="5,0,5,0"></RadioButton>
+                    <RadioButton Name="ChangeTo" Content="变化到" VerticalAlignment="Center" Margin="5,0,5,0"></RadioButton>
+                    <RadioButton Name="Increase" Content="增加" VerticalAlignment="Center" Margin="5,0"></RadioButton>
+                    <RadioButton Name="Decrease" Content="减少" VerticalAlignment="Center" Margin="5,0,5,0"></RadioButton>
                     <TextBox Name="ResultValue" VerticalContentAlignment="Center" Height="25" PreviewLostKeyboardFocus="ResultValue_PreviewLostKeyboardFocus"/>
                 </DockPanel>
                 <StackPanel Orientation="Horizontal" Margin="0,1" HorizontalAlignment="Center">
@@ -106,10 +106,10 @@
         <GroupBox Header="特殊事件">
             <StackPanel>
                 <StackPanel Orientation="Horizontal" Margin="0,1">
-                    <RadioButton Name="EmitParticleButton" Content="发射粒子" Margin="8,0,5,0" Checked="EmitParticleButton_Checked" />
-                    <RadioButton Name="PlaySoundButton" Content="播放音效" Margin="5,0" Checked="PlaySoundButton_Checked" />
-                    <RadioButton Name="LoopButton" Content="循环执行" Margin="5,0,8,0" Checked="LoopButton_Checked" />
-                    <RadioButton Name="ChangeTypeButton" Content="改变类型" Margin="5,0,8,0" Checked="ChangeTypeButton_Checked" />
+                    <RadioButton Name="EmitParticle" Content="发射粒子" Margin="8,0,5,0" Checked="EmitParticleButton_Checked" />
+                    <RadioButton Name="PlaySound" Content="播放音效" Margin="5,0" Checked="PlaySoundButton_Checked" />
+                    <RadioButton Name="Loop" Content="循环执行" Margin="5,0,8,0" Checked="LoopButton_Checked" />
+                    <RadioButton Name="ChangeType" Content="改变类型" Margin="5,0,8,0" Checked="ChangeTypeButton_Checked" />
                 </StackPanel>
                 <DockPanel Name="PlaySoundPanel" Margin="0,1" Visibility="Collapsed">
                     <Label Content="音效资源" />

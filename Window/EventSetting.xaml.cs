@@ -58,8 +58,8 @@ namespace CrazyStorm
         {
             GroupBox.DataContext = eventGroup;
             EventList.ItemsSource = eventGroup.Events;
-            EmitParticleButton.Visibility = emitter ? Visibility.Visible : Visibility.Collapsed;
-            ChangeTypeButton.Visibility = aboutParticle ? Visibility.Visible : Visibility.Collapsed;
+            EmitParticle.Visibility = emitter ? Visibility.Visible : Visibility.Collapsed;
+            ChangeType.Visibility = aboutParticle ? Visibility.Visible : Visibility.Collapsed;
         }
         void LoadContent()
         {
@@ -130,6 +130,155 @@ namespace CrazyStorm
                 source.Background = new SolidColorBrush(Colors.White);
             }
         }
+        bool BuildCondition(out string text)
+        {
+            text = string.Empty;
+            //Check if there have errors
+            if (LeftValue.ToolTip != null || RightValue.ToolTip != null)
+                return false;
+
+            //Build left condition
+            string leftCondition = string.Empty;
+            string leftCompare = string.Empty;
+            if (LeftLessThan.IsChecked == true)
+                leftCompare = " < ";
+            else if (LeftEqual.IsChecked == true)
+                leftCompare = " = ";
+            else if (LeftMoreThan.IsChecked == true)
+                leftCompare = " > ";
+
+            if (LeftConditionComboBox.SelectedItem != null && LeftValue.Text != string.Empty &&
+                leftCompare != string.Empty)
+            {
+                leftCondition = LeftConditionComboBox.SelectedItem + leftCompare + LeftValue.Text;
+            }
+            //Build right condition
+            string rightCondition = string.Empty;
+            string rightCompare = string.Empty;
+            if (RightLessThan.IsChecked == true)
+                rightCompare = " < ";
+            else if (RightEqual.IsChecked == true)
+                rightCompare = " = ";
+            else if (RightMoreThan.IsChecked == true)
+                rightCompare = " > ";
+
+            if (RightConditionComboBox.SelectedItem != null && RightValue.Text != string.Empty &&
+                rightCompare != string.Empty)
+            {
+                rightCondition = RightConditionComboBox.SelectedItem + rightCompare + RightValue.Text;
+            }
+            if (leftCondition == string.Empty && rightCondition == string.Empty)
+                return false;
+
+            //Build condition
+            text = leftCondition != string.Empty ? leftCondition : rightCondition;
+            string concat = string.Empty;
+            if (And.IsChecked == true)
+                concat = " & ";
+            else if (Or.IsChecked == true)
+                concat = " | ";
+
+            if (concat != string.Empty && leftCondition != string.Empty && rightCondition != string.Empty)
+            {
+                text = leftCondition + concat + rightCondition;
+            }
+            return true;
+        }
+        bool BuildEventText(out string text)
+        {
+            text = string.Empty;
+            //Check if there have errors
+            if (ResultValue.ToolTip != null || ChangeTime.ToolTip != null || ExecuteTime.ToolTip != null)
+                return false;
+
+            //Build condition
+            string condition = string.Empty;
+            if (!BuildCondition(out condition))
+                return false;
+            //Build property event
+            string propertyEvent = string.Empty;
+            string changeType = string.Empty;
+            if (ChangeTo.IsChecked == true)
+                changeType = " == ";
+            else if (Increase.IsChecked == true)
+                changeType = " += ";
+            else if (Decrease.IsChecked == true)
+                changeType = " -= ";
+
+            string changeMode = string.Empty;
+            if (Linear.IsChecked == true)
+                changeMode = "Linear";
+            else if (Accelerated.IsChecked == true)
+                changeMode = "Accelerated";
+            else if (Decelerated.IsChecked == true)
+                changeMode = "Decelerated";
+            else if (Fixed.IsChecked == true)
+                changeMode = "Fixed";
+
+            if (PropertyComboBox.SelectedItem != null && ResultValue.Text != string.Empty &&
+                changeType != string.Empty && changeMode != string.Empty && ChangeTime.Text != string.Empty)
+            {
+                propertyEvent = PropertyComboBox.SelectedItem + changeType + ResultValue.Text + ", " +
+                    changeMode + ", " + ChangeTime.Text;
+                if (ExecuteTime.Text != string.Empty)
+                    propertyEvent += ", " + ExecuteTime.Text;
+            }
+            if (propertyEvent == string.Empty)
+                return false;
+
+            text = condition + " : " + propertyEvent;
+            return true;
+        }
+        bool BuildSpecialEventText(out string text)
+        {
+            text = string.Empty;
+            //Build condition
+            string condition = string.Empty;
+            if (!BuildCondition(out condition))
+                return false;
+            //Build special event
+            string specialEvent = string.Empty;
+            if (EmitParticle.IsChecked == true)
+            {
+                specialEvent = "EmitParticle()";
+            }
+            else if (PlaySound.IsChecked == true)
+            {
+                if (SoundCombo.SelectedItem == null)
+                    return false;
+
+                specialEvent = "PlaySound(" + SoundCombo.SelectedItem + ", " + VolumeSlider.Value + ")";
+            }
+            else if (Loop.IsChecked == true)
+            {
+                //Check if there have errors
+                if (LoopTime.ToolTip != null || StopCondition.ToolTip != null)
+                    return false;
+
+                if (LoopTime.Text == string.Empty && StopCondition.Text == string.Empty)
+                    return false;
+
+                string arguments = LoopTime.Text != string.Empty ? LoopTime.Text : StopCondition.Text;
+                if (LoopTime.Text != string.Empty && StopCondition.Text != string.Empty)
+                {
+                    arguments = LoopTime.Text + ", " + StopCondition.Text;
+                }
+                specialEvent = "Loop(" + arguments + ")";
+            }
+            else if (ChangeType.IsChecked == true)
+            {
+                if (TypeCombo.SelectedItem == null || ColorCombo.SelectedItem == null)
+                    return false;
+
+                specialEvent = "ChangeType(" + TypeCombo.SelectedItem + ", " + 
+                    ((ComboBoxItem)ColorCombo.SelectedItem).Content + ")";
+            }
+            if (specialEvent == string.Empty)
+                return false;
+
+            text = condition + " : " + specialEvent;
+            return true;
+        }
         #endregion
 
         #region Window EventHandler
@@ -183,11 +332,15 @@ namespace CrazyStorm
         }
         private void AddEvent_Click(object sender, RoutedEventArgs e)
         {
-            //TODO : Add event.
+            string text;
+            if (BuildEventText(out text))
+                eventGroup.Events.Add(text);
         }
         private void AddSpecialEvent_Click(object sender, RoutedEventArgs e)
         {
-            //TODO : Add special event.
+            string text;
+            if (BuildSpecialEventText(out text))
+                eventGroup.Events.Add(text);
         }
         private void DeleteEvent_Click(object sender, RoutedEventArgs e)
         {
@@ -237,8 +390,23 @@ namespace CrazyStorm
         }
         private void PropertyComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
+            ChangeTo.IsChecked = false;
+            Increase.IsChecked = false;
+            Decrease.IsChecked = false;
+            Increase.IsEnabled = true;
+            Decrease.IsEnabled = true;
             ResultValue.Text = string.Empty;
             ChangeTextBoxState(ResultValue, false);
+            string selection = e.AddedItems[0].ToString();
+            foreach (var item in environment.Locals)
+            {
+                if (selection == item.Key)
+                {
+                    Increase.IsEnabled = !(item.Value is Enum);
+                    Decrease.IsEnabled = !(item.Value is Enum);
+                    return;
+                }
+            }
         }
         private void LeftValue_PreviewLostKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
         {
@@ -534,9 +702,9 @@ namespace CrazyStorm
         }
         private void SoundTextButton_Click(object sender, RoutedEventArgs e)
         {
-            isPlaySound = !isPlaySound;
             if (SoundCombo.SelectedItem != null)
             {
+                isPlaySound = !isPlaySound;
                 if (isPlaySound)
                 {
                     SoundTestButton.Content = (string)FindResource("Pause");
