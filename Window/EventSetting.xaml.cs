@@ -33,6 +33,7 @@ namespace CrazyStorm
         bool emitter;
         bool aboutParticle;
         bool isPlaySound;
+        bool isEditing;
         #endregion
 
         #region Constructor
@@ -167,8 +168,9 @@ namespace CrazyStorm
             {
                 rightCondition = RightConditionComboBox.SelectedItem + rightCompare + RightValue.Text;
             }
+            //Allow empty condition
             if (leftCondition == string.Empty && rightCondition == string.Empty)
-                return false;
+                return true;
 
             //Build condition
             text = leftCondition != string.Empty ? leftCondition : rightCondition;
@@ -226,7 +228,11 @@ namespace CrazyStorm
             if (propertyEvent == string.Empty)
                 return false;
 
-            text = condition + " : " + propertyEvent;
+            if (condition == string.Empty)
+                text = propertyEvent;
+            else
+                text = condition + " : " + propertyEvent;
+
             return true;
         }
         bool BuildSpecialEventText(out string text)
@@ -276,12 +282,94 @@ namespace CrazyStorm
             if (specialEvent == string.Empty)
                 return false;
 
-            text = condition + " : " + specialEvent;
+            if (condition == string.Empty)
+                text = specialEvent;
+            else
+                text = condition + " : " + specialEvent;
+
             return true;
+        }
+        void ResetAll()
+        {
+            LeftConditionComboBox.SelectedIndex = -1;
+            LeftMoreThan.IsChecked = false;
+            LeftEqual.IsChecked = false;
+            LeftLessThan.IsChecked = false;
+            LeftValue.Text = string.Empty;
+            And.IsChecked = false;
+            Or.IsChecked = false;
+            RightConditionComboBox.SelectedIndex = -1;
+            RightMoreThan.IsChecked = false;
+            RightEqual.IsChecked = false;
+            RightLessThan.IsChecked = false;
+            RightValue.Text = string.Empty;
+            PropertyComboBox.SelectedIndex = -1;
+            ChangeTo.IsChecked = false;
+            Increase.IsChecked = false;
+            Decrease.IsChecked = false;
+            ResultValue.Text = string.Empty;
+            Linear.IsChecked = false;
+            Accelerated.IsChecked = false;
+            Decelerated.IsChecked = false;
+            Fixed.IsChecked = false;
+            ChangeTime.Text = string.Empty;
+            ExecuteTime.Text = string.Empty;
+            EmitParticle.IsChecked = false;
+            PlaySound.IsChecked = false;
+            Loop.IsChecked = false;
+            ChangeType.IsChecked = false;
         }
         void MapEventText(string text)
         {
-            //TODO
+            ResetAll();
+            Dictionary<string, RadioButton> buttonMap = new Dictionary<string, RadioButton>();
+            buttonMap[">"] = LeftMoreThan;
+            buttonMap["="] = LeftEqual;
+            buttonMap["<"] = LeftLessThan;
+            buttonMap["&"] = And;
+            buttonMap["|"] = Or;
+            string[] split = text.Split(':');
+            string condition = string.Empty;
+            string eventText = string.Empty;
+            //Backfill condition
+            if (split.Length == 2)
+            {
+                condition = split[0];
+                split = condition.Split(' ');
+                if (split.Length == 8)
+                {
+                    LeftConditionComboBox.SelectedIndex = LeftConditionComboBox.Items.IndexOf(split[0]);
+                    buttonMap[split[1]].IsChecked = true;
+                    LeftValue.Text = split[2];
+                    buttonMap[split[3]].IsChecked = true;
+                    RightConditionComboBox.SelectedIndex = RightConditionComboBox.Items.IndexOf(split[4]);
+                    buttonMap[">"] = RightMoreThan;
+                    buttonMap["="] = RightEqual;
+                    buttonMap["<"] = RightLessThan;
+                    buttonMap[split[5]].IsChecked = true;
+                    RightValue.Text = split[6];
+                }
+                else
+                {
+                    LeftConditionComboBox.SelectedIndex = LeftConditionComboBox.Items.IndexOf(split[0]);
+                    buttonMap[split[1]].IsChecked = true;
+                    LeftValue.Text = split[2];
+                }
+                eventText = split[1];
+            }
+            else
+            {
+                eventText = split[0];
+            }
+            //Backfill event
+            if (eventText.Contains('='))
+            {
+                //TODO
+            }
+            else
+            {
+                //TODO
+            }
         }
         #endregion
 
@@ -348,10 +436,11 @@ namespace CrazyStorm
         }
         private void EditEvent_Click(object sender, RoutedEventArgs e)
         {
-            //TODO
             var panel = (((e.OriginalSource as FrameworkElement).Parent as ContextMenu).PlacementTarget) as DockPanel;
             panel.Background = SystemColors.HighlightBrush;
+            MapEventText((string)EventList.SelectedItem);
             EventList.IsEnabled = false;
+            isEditing = true;
         }
         private void DeleteEvent_Click(object sender, RoutedEventArgs e)
         {
@@ -368,6 +457,9 @@ namespace CrazyStorm
             LeftLessThan.IsEnabled = true;
             LeftValue.Text = string.Empty;
             ChangeTextBoxState(LeftValue, false);
+            if (e.AddedItems.Count == 0)
+                return;
+
             string selection = e.AddedItems[0].ToString();
             foreach (var item in environment.Locals)
             {
@@ -388,6 +480,9 @@ namespace CrazyStorm
             RightLessThan.IsEnabled = true;
             RightValue.Text = string.Empty;
             ChangeTextBoxState(RightValue, false);
+            if (e.AddedItems.Count == 0)
+                return;
+
             string selection = e.AddedItems[0].ToString();
             foreach (var item in environment.Locals)
             {
@@ -408,6 +503,9 @@ namespace CrazyStorm
             Decrease.IsEnabled = true;
             ResultValue.Text = string.Empty;
             ChangeTextBoxState(ResultValue, false);
+            if (e.AddedItems.Count == 0)
+                return;
+
             string selection = e.AddedItems[0].ToString();
             foreach (var item in environment.Locals)
             {
