@@ -26,7 +26,7 @@
                         <Label Content="周期" />
                         <TextBox Width="40"></TextBox>
                     </StackPanel>
-                    <ListView Name="EventList" ItemsSource="{Binding }" Height="180" SelectionMode="Single">
+                    <ListView Name="EventList" ItemsSource="{Binding }" Height="180" SelectionMode="Single" PreviewMouseRightButtonDown="EventList_PreviewMouseRightButtonDown">
                         <ListView.ItemTemplate>
                             <DataTemplate>
                                 <DockPanel>
@@ -66,7 +66,7 @@
                 <TextBox Name="RightValue" Width="50" VerticalContentAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Center" Height="25" PreviewLostKeyboardFocus="RightValue_PreviewLostKeyboardFocus"/>
             </StackPanel>
         </GroupBox>
-        <GroupBox Header="属性事件">
+        <GroupBox Name="PropertyEventPanel" Header="属性事件">
             <StackPanel>
                 <DockPanel Margin="0,1">
                     <ComboBox Name="PropertyComboBox" Width="105" SelectionChanged="PropertyComboBox_SelectionChanged"/>
@@ -104,7 +104,7 @@
                 </StackPanel>
             </StackPanel>
         </GroupBox>
-        <GroupBox Header="特殊事件">
+        <GroupBox Name="SpecialEventPanel" Header="特殊事件">
             <StackPanel>
                 <StackPanel Orientation="Horizontal" Margin="0,1">
                     <RadioButton Name="EmitParticle" Content="发射粒子" Margin="8,0,5,0" Checked="EmitParticleButton_Checked" />
@@ -116,9 +116,9 @@
                     <Label Content="音效资源" />
                     <ComboBox Name="SoundCombo" VerticalContentAlignment="Center" Width="100" />
                     <MediaElement Name="MediaPlayer" MediaEnded="MediaPlayer_MediaEnded"></MediaElement>
-                    <Button Margin="1,0" Name="SoundTestButton" Content="测试" Click="SoundTextButton_Click"/>
+                    <Button Margin="1,0" Name="SoundTestButton" Content="测试" Click="SoundTestButton_Click"/>
                     <Label Content="音量大小" />
-                    <Slider Name="VolumeSlider" VerticalAlignment="Center" AutoToolTipPlacement="BottomRight" Maximum="100" Value="50"></Slider>
+                    <Slider Name="VolumeSlider" VerticalAlignment="Center" AutoToolTipPlacement="BottomRight" Maximum="100" Value="50" IsSnapToTickEnabled="True" SmallChange="1"></Slider>
                 </DockPanel>
                 <DockPanel Name="LoopPanel" Margin="0,1" Visibility="Collapsed">
                     <Label Content="循环次数" />

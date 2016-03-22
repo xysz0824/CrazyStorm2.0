@@ -39,4 +39,5 @@
     <sys:String x:Key="Test">测试</sys:String>
     <sys:String x:Key="Pause">暂停</sys:String>
     <sys:String x:Key="Modify">修改</sys:String>
+    <sys:String x:Key="Add">添加</sys:String>
 </ResourceDictionary>

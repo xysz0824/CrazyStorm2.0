@@ -3,6 +3,7 @@
  * Copyright (c) StarX 2015 
  */
 using System;
+using System.Text.RegularExpressions;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -34,6 +35,7 @@ namespace CrazyStorm
         bool aboutParticle;
         bool isPlaySound;
         bool isEditing;
+        DockPanel editingPanel;
         #endregion
 
         #region Constructor
@@ -315,9 +317,20 @@ namespace CrazyStorm
             ChangeTime.Text = string.Empty;
             ExecuteTime.Text = string.Empty;
             EmitParticle.IsChecked = false;
+            PlaySoundPanel.Visibility = Visibility.Collapsed;
             PlaySound.IsChecked = false;
+            SoundCombo.SelectedIndex = -1;
+            isPlaySound = false;
+            SoundTestButton.Content = (string)FindResource("Test");
+            VolumeSlider.Value = 50;
+            LoopPanel.Visibility = Visibility.Collapsed;
             Loop.IsChecked = false;
+            LoopTime.Text = string.Empty;
+            StopCondition.Text = string.Empty;
+            ChangeTypePanel.Visibility = Visibility.Collapsed;
             ChangeType.IsChecked = false;
+            TypeCombo.SelectedIndex = -1;
+            ColorCombo.SelectedIndex = -1;
         }
         void MapEventText(string text)
         {
@@ -328,14 +341,25 @@ namespace CrazyStorm
             buttonMap["<"] = LeftLessThan;
             buttonMap["&"] = And;
             buttonMap["|"] = Or;
-            string[] split = text.Split(':');
+            buttonMap["=="] = ChangeTo;
+            buttonMap["+="] = Increase;
+            buttonMap["-="] = Decrease;
+            buttonMap["Linear"] = Linear;
+            buttonMap["Accelerated"] = Accelerated;
+            buttonMap["Decelerated"] = Decelerated;
+            buttonMap["Fixed"] = Fixed;
+            buttonMap["EmitParticle"] = EmitParticle;
+            buttonMap["PlaySound"] = PlaySound;
+            buttonMap["Loop"] = Loop;
+            buttonMap["ChangeType"] = ChangeType;
+            string[] parts = text.Split(':');
             string condition = string.Empty;
             string eventText = string.Empty;
             //Backfill condition
-            if (split.Length == 2)
+            if (parts.Length == 2)
             {
-                condition = split[0];
-                split = condition.Split(' ');
+                condition = parts[0];
+                string[] split = condition.Split(' ');
                 if (split.Length == 8)
                 {
                     LeftConditionComboBox.SelectedIndex = LeftConditionComboBox.Items.IndexOf(split[0]);
@@ -355,25 +379,103 @@ namespace CrazyStorm
                     buttonMap[split[1]].IsChecked = true;
                     LeftValue.Text = split[2];
                 }
-                eventText = split[1];
+                eventText = parts[1].Trim();
             }
             else
             {
-                eventText = split[0];
+                eventText = parts[0].Trim();
             }
             //Backfill event
             if (eventText.Contains('='))
             {
-                //TODO
+                string[] split = eventText.Split(' ');
+                PropertyComboBox.SelectedIndex = PropertyComboBox.Items.IndexOf(split[0]);
+                buttonMap[split[1]].IsChecked = true;
+                split = Regex.Split(eventText, "\\" + split[1])[1].Split(',');
+                string resultValue = string.Empty;
+                for (int i = 0; i < split.Length; ++i)
+                {
+                    split[i] = split[i].Trim();
+                    if (buttonMap.ContainsKey(split[i]))
+                    {
+                        buttonMap[split[i]].IsChecked = true;
+                        ChangeTime.Text = split[i + 1].Trim();
+                        if (split.Length > i + 2)
+                            ExecuteTime.Text = split[i + 2].Trim();
+
+                        break;
+                    }
+                    else
+                    {
+                        resultValue += split[i] + ",";
+                    }
+                }
+                resultValue = resultValue.Remove(resultValue.Length - 1);
+                ResultValue.Text = resultValue.Trim();
+                //Prevent from setting special event
+                SpecialEventPanel.IsEnabled = false;
             }
             else
             {
-                //TODO
+                string[] split = eventText.Split('(');
+                buttonMap[split[0]].IsChecked = true;
+                if (split[0] == "PlaySound")
+                {
+                    split = split[1].Split(')')[0].Split(',');
+                    for (int i = 0; i < SoundCombo.Items.Count;++i)
+                    {
+                        if ((SoundCombo.Items[i] as FileResource).Label == split[0])
+                        {
+                            SoundCombo.SelectedIndex = i;
+                            break;
+                        }
+                    }
+                    VolumeSlider.Value = int.Parse(split[1]);
+                }
+                else if (split[0] == "Loop")
+                {
+                    split = split[1].Split(')')[0].Split(',');
+                    LoopTime.Text = split[0];
+                    if (split.Length > 1)
+                    {
+                        StopCondition.Text = split[1].Trim();
+                    }
+                }
+                else if (split[0] == "ChangeType")
+                {
+                    split = split[1].Split(')')[0].Split(',');
+                    for (int i = 0; i < TypeCombo.Items.Count; ++i)
+                    {
+                        if ((TypeCombo.Items[i] as ParticleType).Name == split[0])
+                        {
+                            TypeCombo.SelectedIndex = i;
+                            break;
+                        }
+                    }
+                    if (TypeCombo.SelectedItem != null)
+                    {
+                        for (int i = 0; i < ColorCombo.Items.Count; ++i)
+                        {
+                            if ((string)(ColorCombo.Items[i] as ComboBoxItem).Content == split[1].Trim())
+                            {
+                                ColorCombo.SelectedIndex = i;
+                                break;
+                            }
+                        }
+                    }
+                }
+                //Prevent from setting property event
+                PropertyEventPanel.IsEnabled = false;
             }
         }
         #endregion
 
         #region Window EventHandler
+        private void EventList_PreviewMouseRightButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            var item = VisualHelper.VisualUpwardSearch<ListViewItem>(e.OriginalSource as DependencyObject);
+            EventList.SelectedItem = item;
+        }
         private void Linear_Checked(object sender, RoutedEventArgs e)
         {
             Accelerated.IsChecked = false;
@@ -425,28 +527,61 @@ namespace CrazyStorm
         private void AddEvent_Click(object sender, RoutedEventArgs e)
         {
             string text;
-            if (BuildEventText(out text))
+            if (isEditing)
+            {
+                if (BuildEventText(out text))
+                {
+                    eventGroup.Events[EventList.SelectedIndex] = text;
+                    editingPanel.Background = null;
+                    EventList.IsEnabled = true;
+                    AddEvent.Content = (string)FindResource("Add");
+                    PropertyEventPanel.IsEnabled = true;
+                    AddSpecialEvent.Content = AddEvent.Content;
+                    SpecialEventPanel.IsEnabled = true;
+                    isEditing = false;
+                }
+            }
+            else if (BuildEventText(out text))
                 eventGroup.Events.Add(text);
         }
         private void AddSpecialEvent_Click(object sender, RoutedEventArgs e)
         {
             string text;
-            if (BuildSpecialEventText(out text))
+            if (isEditing)
+            {
+                if (BuildSpecialEventText(out text))
+                {
+                    eventGroup.Events[EventList.SelectedIndex] = text;
+                    editingPanel.Background = null;
+                    EventList.IsEnabled = true;
+                    AddEvent.Content = (string)FindResource("Add");
+                    PropertyEventPanel.IsEnabled = true;
+                    AddSpecialEvent.Content = AddEvent.Content;
+                    SpecialEventPanel.IsEnabled = true;
+                    isEditing = false;
+                }
+            }
+            else if (BuildSpecialEventText(out text))
                 eventGroup.Events.Add(text);
         }
         private void EditEvent_Click(object sender, RoutedEventArgs e)
         {
-            var panel = (((e.OriginalSource as FrameworkElement).Parent as ContextMenu).PlacementTarget) as DockPanel;
-            panel.Background = SystemColors.HighlightBrush;
+            editingPanel = (((e.OriginalSource as FrameworkElement).Parent as ContextMenu).PlacementTarget) as DockPanel;
+            editingPanel.Background = SystemColors.HighlightBrush;
             MapEventText((string)EventList.SelectedItem);
             EventList.IsEnabled = false;
+            AddEvent.Content = (string)FindResource("Modify");
+            AddSpecialEvent.Content = AddEvent.Content;
             isEditing = true;
         }
         private void DeleteEvent_Click(object sender, RoutedEventArgs e)
         {
             var item = EventList.SelectedItem;
             if (item != null)
+            {
                 eventGroup.Events.Remove((string)item);
+                EventList.ItemsSource = eventGroup.Events;
+            }
         }
         private void LeftConditionComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
@@ -818,7 +953,7 @@ namespace CrazyStorm
                 }
             }
         }
-        private void SoundTextButton_Click(object sender, RoutedEventArgs e)
+        private void SoundTestButton_Click(object sender, RoutedEventArgs e)
         {
             if (SoundCombo.SelectedItem != null)
             {
