@@ -37,9 +37,6 @@ namespace CrazyStorm.Script
                     && (op == "+" || op == "-"))
                     return left;
 
-                if (left is Enum && right is Enum && (op == "="))
-                    return true;
-
                 if (left is bool && right is bool && (op == "&" || op == "|"))
                     return left;
 

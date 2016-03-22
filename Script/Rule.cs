@@ -38,9 +38,9 @@ namespace CrazyStorm.Script
                 float value;
                 return float.TryParse(text, out value);
             }
-            else if (target is System.Enum)
+            else if (target is Enum)
             {
-                return System.Enum.IsDefined(target.GetType(), text);
+                return Enum.IsDefined(target.GetType(), text);
             }
             else if (target is Core.Vector2)
             {
