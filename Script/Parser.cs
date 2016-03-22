@@ -48,6 +48,12 @@ namespace CrazyStorm.Script
             operators["%"] = new Precedence(4, true);
         }
 
+        bool IsBool(IdentifierToken token)
+        {
+            return (string)token.GetValue() == "True" ||
+                (string)token.GetValue() == "False";
+        }
+
         bool IsIdentifierToken(string name)
         {
             Token token = lexer.Peek(0);
@@ -156,6 +162,8 @@ namespace CrazyStorm.Script
                         return new Call(token, Call());
                     else if (IsIdentifierToken("."))
                         return new Access(token, Access());
+                    else if (IsBool(token as IdentifierToken))
+                        return new Bool(token);
                     else
                         return new Name(token);
                 }

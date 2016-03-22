@@ -50,7 +50,6 @@
     <Compile Include="Syntax\Bool.cs" />
     <Compile Include="Syntax\Call.cs" />
     <Compile Include="Syntax\BinaryExpression.cs" />
-    <Compile Include="Syntax\Enum.cs" />
     <Compile Include="Syntax\Name.cs" />
     <Compile Include="Syntax\NegativeExpression.cs" />
     <Compile Include="Syntax\Number.cs" />

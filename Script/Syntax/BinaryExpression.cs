@@ -37,7 +37,7 @@ namespace CrazyStorm.Script
                     && (op == "+" || op == "-"))
                     return left;
 
-                if (left is bool && right is bool && (op == "&" || op == "|"))
+                if (left is bool && right is bool && (op == "&" || op == "|" || op == "="))
                     return left;
 
                     return new ScriptException("Type error.");
