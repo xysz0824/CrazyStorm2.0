@@ -93,16 +93,21 @@ namespace CrazyStorm
 
             LoadProperties(SpecificGrid, component, specificList);
             //Load particle properties.
+            //Only emitter have particles, but special event of mask or rebound need it.
+            //So there use stub to load particle properties.
+            var stub = new MultiEmitter();
+            var particleList = stub.Particle.InitializeProperties(typeof(Particle));
+            LoadProperties(ParticleGrid, stub.Particle, particleList);
             if (component is MultiEmitter)
             {
                 ParticleGroup.Visibility = Visibility.Visible;
-                var particleList = (component as MultiEmitter).Particle.InitializeProperties(typeof(Particle));
+                particleList = (component as MultiEmitter).Particle.InitializeProperties(typeof(Particle));
                 LoadProperties(ParticleGrid, (component as MultiEmitter).Particle, particleList);
             }
             else if (component is CurveEmitter)
             {
                 ParticleGroup.Visibility = Visibility.Visible;
-                var particleList = (component as CurveEmitter).CurveParticle.InitializeProperties(typeof(CurveParticle));
+                particleList = (component as CurveEmitter).CurveParticle.InitializeProperties(typeof(CurveParticle));
                 LoadProperties(ParticleGrid, (component as CurveEmitter).CurveParticle, particleList);
             }
             //Load particle types.
