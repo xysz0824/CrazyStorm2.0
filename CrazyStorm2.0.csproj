@@ -87,6 +87,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Edit\Command\Component\BindComponentCommand.cs" />
     <Compile Include="Marker\ComponentMarker.cs" />
     <Compile Include="Marker\ForceMarker.cs" />
     <Compile Include="Marker\IComponentMark.cs" />

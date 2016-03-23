@@ -20,7 +20,7 @@ namespace CrazyStorm
         {
             e.ContinueRouting = true;
             e.CanExecute = true;
-            //Check if didn't select component the relevant command will be prohibited.
+            //Check if it didn't select component the relevant command will be prohibited.
             var command = (RoutedUICommand)e.Command;
             if (command.Text.EndsWith("Component"))
                 if (selectedComponents.Count == 0)

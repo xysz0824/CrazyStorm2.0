@@ -265,6 +265,14 @@ namespace CrazyStorm
                 tab.Items.Remove(item);
             }
         }
+        private void BindComponentItem_Click(object sender, RoutedEventArgs e)
+        {
+            //TODO
+        }
+        private void UnbindComponentItem_Click(object sender, RoutedEventArgs e)
+        {
+            //TODO
+        }
         #endregion
     }
 }

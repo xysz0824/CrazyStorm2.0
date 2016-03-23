@@ -263,8 +263,8 @@
             <MenuItem Header="组件" >
                 <MenuItem Name="DeleteComponentItem" Header="删除组件" InputGestureText="Del" Click="DeleteComponentItem_Click" />
                 <Separator/>
-                <MenuItem Name="BindComponentItem" Header="组件绑定" InputGestureText="Ctrl+B"/>
-                <MenuItem Name="UnbindComponentItem" Header="组件解绑" InputGestureText="Ctrl+N"/>
+                <MenuItem Name="BindComponentItem" Header="组件绑定" InputGestureText="Ctrl+B" Click="BindComponentItem_Click"/>
+                <MenuItem Name="UnbindComponentItem" Header="组件解绑" InputGestureText="Ctrl+U" Click="UnbindComponentItem_Click"/>
             </MenuItem>
             <MenuItem Header="测试" >
                 <MenuItem Header="测试当前粒子" InputGestureText="F5"/>
