@@ -44,6 +44,29 @@ namespace CrazyStorm
             }
             return null;
         }
+        public static DependencyObject VisualDownwardSearch<T>(DependencyObject source)
+        {
+            if (source == null)
+                return null;
+
+            var count = VisualTreeHelper.GetChildrenCount(source);
+            if (count == 0)
+                return null;
+
+            for (int i = 0; i < count; ++i)
+            {
+                var child = VisualTreeHelper.GetChild(source, i);
+                if (child.GetType() == typeof(T))
+                    return child;
+                else
+                {
+                    child = VisualHelper.VisualDownwardSearch<T>(child);
+                    if (child != null)
+                        return child;
+                }
+            }
+            return null;
+        }
         public static T GetVisualChild<T>(Visual parent) where T : Visual
         {
             T childContent = default(T);

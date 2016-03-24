@@ -24,12 +24,13 @@ namespace CrazyStorm
     {
         #region Private Members
         Layer selectedLayer;
+        ScrollViewer axisScroll;
         #endregion
 
         #region Private Methods
         void CreateNewLayer()
         {
-            if (selectedParticle.Layers.Count < 6)
+            if (selectedParticle.Layers.Count < 5)
                 new AddLayerCommand().Do(commandStacks[selectedParticle], selectedParticle);
             else
                 MessageBox.Show((string)FindResource("CanNotAddMoreLayer"), (string)FindResource("TipTitle"),
@@ -202,6 +203,22 @@ namespace CrazyStorm
         private void LayerElement_PreviewMouseRightButtonDown(object sender, MouseButtonEventArgs e)
         {
             VisualHelper.FocusItem<TreeViewItem>(e);
+        }
+        private void LayerAxis_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            axisScroll = VisualHelper.VisualDownwardSearch<ScrollViewer>(sender as DependencyObject) as ScrollViewer;
+        }
+        private void LayerAxis_PreviewMouseMove(object sender, MouseEventArgs e)
+        {
+            if (axisScroll != null)
+            {
+                var imageBruch = TimeAxis.Background as ImageBrush;
+                imageBruch.Viewport = new Rect(-axisScroll.HorizontalOffset, imageBruch.Viewport.Y,
+                    imageBruch.Viewport.Width, imageBruch.Viewport.Height);
+                imageBruch = TimeScale.Background as ImageBrush;
+                imageBruch.Viewport = new Rect(-axisScroll.HorizontalOffset, imageBruch.Viewport.Y,
+                    imageBruch.Viewport.Width, imageBruch.Viewport.Height);
+            }
         }
         #endregion
     }

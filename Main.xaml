@@ -675,7 +675,7 @@
                         </Label.Background>
                     </Label>
                     <TreeView Name="LayerAxis" BorderBrush="{x:Null}" Background="{x:Null}" BorderThickness="0" VerticalContentAlignment="Top" Foreground="{x:Null}" 
-                              ScrollViewer.VerticalScrollBarVisibility="Hidden" Padding="0">
+                              ScrollViewer.VerticalScrollBarVisibility="Hidden" Padding="0" PreviewMouseLeftButtonDown="LayerAxis_PreviewMouseLeftButtonDown" PreviewMouseMove="LayerAxis_PreviewMouseMove">
                         <TreeView.ItemTemplate>
                             <DataTemplate>
                                 <Rectangle Height="16" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="-20,0,0,0">
