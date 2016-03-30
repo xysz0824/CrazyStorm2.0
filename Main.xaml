@@ -678,7 +678,7 @@
                               ScrollViewer.VerticalScrollBarVisibility="Hidden" Padding="0" PreviewMouseLeftButtonDown="LayerAxis_PreviewMouseLeftButtonDown" PreviewMouseMove="LayerAxis_PreviewMouseMove">
                         <TreeView.ItemTemplate>
                             <DataTemplate>
-                                <Rectangle Height="16" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="-20,0,0,0">
+                                <Rectangle Height="16" VerticalAlignment="Top" HorizontalAlignment="Left">
                                     <Rectangle.Fill>
                                         <ImageBrush ImageSource="Images/layercolor.png" TileMode="FlipY">
                                             <ImageBrush.Viewbox>
@@ -689,6 +689,9 @@
                                     <Rectangle.Width>
                                         <Binding Path="TotalFrame" Converter="{StaticResource LayerLengthConverter}" />
                                     </Rectangle.Width>
+                                    <Rectangle.Margin>
+                                        <Binding Path="BeginFrame" Converter="{StaticResource LayerStartConverter}" />
+                                    </Rectangle.Margin>
                                 </Rectangle>
                             </DataTemplate>
                         </TreeView.ItemTemplate>

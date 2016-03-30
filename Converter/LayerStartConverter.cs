@@ -15,7 +15,7 @@ namespace CrazyStorm
     {
         public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
         {
-            return new Thickness((int)value * 3, 0, 0, 0);
+            return new Thickness(-20 + (int)value * 3, 0, 0, 0);
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
