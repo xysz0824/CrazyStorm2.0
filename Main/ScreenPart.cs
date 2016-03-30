@@ -29,6 +29,7 @@ namespace CrazyStorm
         DependencyObject selectionRect;
         int selectionRectX, selectionRectY;
         bool selectingComponent;
+        bool bindingComponent;
         readonly List<Component> selectedComponents = new List<Component>();
         readonly DoubleClickDetector dclickDetector = new DoubleClickDetector();
         #endregion
@@ -150,8 +151,8 @@ namespace CrazyStorm
             Update();
             //Enable delection if selected one or more.
             DeleteComponentItem.IsEnabled = selectedComponents.Count > 0;
-            //Enable binding if selected one.
-            BindComponentItem.IsEnabled = selectedComponents.Count == 1;
+            //Enable binding if selected one or more.
+            BindComponentItem.IsEnabled = DeleteComponentItem.IsEnabled;
             UnbindComponentItem.IsEnabled = BindComponentItem.IsEnabled;
             //Check double click.
             if (!canDoubleClick || set == null)

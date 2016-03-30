@@ -267,7 +267,7 @@ namespace CrazyStorm
         }
         private void BindComponentItem_Click(object sender, RoutedEventArgs e)
         {
-            //TODO
+            bindingComponent = true;
         }
         private void UnbindComponentItem_Click(object sender, RoutedEventArgs e)
         {
