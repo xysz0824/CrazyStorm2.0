@@ -16,7 +16,7 @@ Wait to work out.
 
 ## Runtime Environment
 - Windows XP/Vista/7 or above
-- .NET Framework 4.0
+- .NET Framework 4.0 Client Profile
 
 ## License
 The MIT License (MIT)
