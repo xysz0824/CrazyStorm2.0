@@ -28,7 +28,7 @@ namespace CrazyStorm.Core
         float speedAngle;
         float acspeed;
         float acspeedAngle;
-        bool enable;
+        bool visibility;
         bool selected;
         Component parent;
         ObservableCollection<VariableResource> variables;
@@ -106,10 +106,10 @@ namespace CrazyStorm.Core
             set { acspeedAngle = value; }
         }
         [BoolProperty]
-        public bool Enable
+        public bool Visibility
         {
-            get { return enable; }
-            set { enable = value; }
+            get { return visibility; }
+            set { visibility = value; }
         }
         public bool Selected
         {
@@ -129,7 +129,7 @@ namespace CrazyStorm.Core
         #region Constructor
         public Component()
         {
-            enable = true;
+            visibility = true;
             variables = new ObservableCollection<VariableResource>();
             componentEventGroups = new ObservableCollection<EventGroup>();
             children = new ObservableCollection<Component>();
