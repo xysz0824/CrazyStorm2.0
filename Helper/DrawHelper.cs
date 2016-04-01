@@ -15,20 +15,7 @@ namespace CrazyStorm
 {
     class DrawHelper
     {
-        public static void DrawLine(Canvas canvas, int x, int y, int length, int thick, float angle, Color color, float opacity)
-        {
-            var rad = angle / 180 * Math.PI;
-            var arrowLine = new Line();
-            arrowLine.Opacity = opacity;
-            arrowLine.X1 = x;
-            arrowLine.Y1 = y;
-            arrowLine.X2 = x + (length * Math.Cos(rad));
-            arrowLine.Y2 = y + (length * Math.Sin(rad));
-            arrowLine.StrokeThickness = thick;
-            arrowLine.Stroke = new SolidColorBrush(color);
-            canvas.Children.Add(arrowLine);
-        }
-        public static void DrawLine(Canvas canvas, int startX, int startY, int endX, int endY, int thick, Color color, float opacity)
+        public static Line GetLine(int startX, int startY, int endX, int endY, int thick, bool dash, Color color, float opacity)
         {
             var arrowLine = new Line();
             arrowLine.Opacity = opacity;
@@ -37,8 +24,25 @@ namespace CrazyStorm
             arrowLine.X2 = endX;
             arrowLine.Y2 = endY;
             arrowLine.StrokeThickness = thick;
+            double[] a = {1, 1};
+            arrowLine.StrokeDashArray = dash ? new DoubleCollection(a) : null;
             arrowLine.Stroke = new SolidColorBrush(color);
-            canvas.Children.Add(arrowLine);
+            return arrowLine;
+        }
+        public static Line GetLine(int x, int y, int length, int thick, bool dash, float angle, Color color, float opacity)
+        {
+            var rad = angle / 180 * Math.PI;
+            return GetLine(x, y, x + (int)(length * Math.Cos(rad)), y + (int)(length * Math.Sin(rad)), thick, dash, color, opacity);
+        }
+        public static void DrawLine(Canvas canvas, int startX, int startY, int endX, int endY, int thick, bool dash, Color color, float opacity)
+        {
+           var line = GetLine(startX, startY, endX, endY, thick, dash, color, opacity);
+            canvas.Children.Add(line);
+        }
+        public static void DrawLine(Canvas canvas, int x, int y, int length, int thick, bool dash, float angle, Color color, float opacity)
+        {
+            var line = GetLine(x, y, length, thick, dash, angle, color, opacity);
+            canvas.Children.Add(line);
         }
         public static void DrawArrow(Canvas canvas, int x, int y, int length, int thick, float angle, Color color, float opacity)
         {

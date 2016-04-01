@@ -23,13 +23,14 @@ namespace CrazyStorm
     public partial class Main
     {
         #region Private Members
+        Point screenMousePos;
         ParticleSystem selectedParticle;
         DependencyObject aimRect;
         Component aimComponent;
         DependencyObject selectionRect;
         int selectionRectX, selectionRectY;
         bool selectingComponent;
-        bool bindingComponent;
+        List<Line> bindingLines;
         readonly List<Component> selectedComponents = new List<Component>();
         readonly DoubleClickDetector dclickDetector = new DoubleClickDetector();
         #endregion
@@ -50,12 +51,22 @@ namespace CrazyStorm
             }
             if (canvas != null)
             {
-                //Update components on current screen.
                 selectedComponents.Clear();
                 canvas.Children.Clear();
+                //Update binding lines
+                if (bindingLines != null)
+                {
+                    foreach (var line in bindingLines)
+                    {
+                        canvas.Children.Add(line);
+                    }
+                }
+                //Update components on current screen.
                 var itemTemplate = FindResource("ComponentItem") as DataTemplate;
                 foreach (var layer in selectedParticle.Layers)
+                {
                     if (layer.Visible)
+                    {
                         foreach (var component in layer.Components)
                         {
                             var item = itemTemplate.LoadContent() as Canvas;
@@ -95,6 +106,8 @@ namespace CrazyStorm
                             item.SetValue(Canvas.TopProperty, (double)y - box.Height / 2 + config.ScreenHeightOver2);
                             canvas.Children.Add(item as UIElement);
                         }
+                    }
+                }
             }
         }
         void SelectComponents(int x, int y, int width, int height)
@@ -175,9 +188,9 @@ namespace CrazyStorm
         #region Window EventHandler
         private void Screen_MouseMove(object sender, MouseEventArgs e)
         {
-            Point point = e.GetPosition(sender as IInputElement);
-            int x = (int)point.X;
-            int y = (int)point.Y;
+            screenMousePos = e.GetPosition(sender as IInputElement);
+            int x = (int)screenMousePos.X;
+            int y = (int)screenMousePos.Y;
             //Display a rect with red edge to mark the location that component will be put on.
             if (aimRect != null)
             {
@@ -192,7 +205,7 @@ namespace CrazyStorm
                     aimRect.SetValue(Canvas.TopProperty, (double)y);
                 }
             }
-            //Display a coloured  rect to mark the range that is selecting.
+            //Display a coloured rect to mark the range that is selecting.
             if (selectionRect != null)
             {
                 var width = x - selectionRectX;
@@ -218,6 +231,14 @@ namespace CrazyStorm
                     selectionRect.SetValue(HeightProperty, (double)-height);
                 }
             }
+            if (bindingLines != null)
+            {
+                foreach (var line in bindingLines)
+                {
+                    line.X2 = (int)screenMousePos.X;
+                    line.Y2 = (int)screenMousePos.Y;
+                }
+            }
         }
         private void Screen_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
         {
@@ -241,7 +262,7 @@ namespace CrazyStorm
             selectionRect.SetValue(Canvas.TopProperty, (double)y);
             selectionRectX = x;
             selectionRectY = y;
-            //When aimed then add component to the place mouse down with left-button.
+            //Add component to the place mouse down with left-button.
             if (aimRect != null)
             {
                 aimRect.SetValue(OpacityProperty, 0.0d);
@@ -254,6 +275,13 @@ namespace CrazyStorm
                 Update();
                 aimComponent = null;
                 aimRect = null;
+            }
+            //
+            if (bindingLines != null)
+            {
+
+                bindingLines = null;
+                Update();
             }
         }
         private void ParticleTabControl_MouseLeave(object sender, MouseEventArgs e)

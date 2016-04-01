@@ -267,7 +267,23 @@ namespace CrazyStorm
         }
         private void BindComponentItem_Click(object sender, RoutedEventArgs e)
         {
-            bindingComponent = true;
+            bindingLines = new List<Line>();
+            foreach (var component in selectedComponents)
+            {
+                //If component has parent, caculate the absolute position.
+                float x = component.X;
+                float y = component.Y;
+                if (component.Parent != null)
+                {
+                    Vector2 parent = component.Parent.GetAbsolutePosition();
+                    x += parent.x;
+                    y += parent.y;
+                }
+                var line = DrawHelper.GetLine((int)x + config.ScreenWidthOver2, (int)y + config.ScreenHeightOver2, 
+                    (int)screenMousePos.X, (int)screenMousePos.Y, 2, true, Colors.DarkOrange, 1);
+                bindingLines.Add(line);
+            }
+            SelectComponents(null, true);
         }
         private void UnbindComponentItem_Click(object sender, RoutedEventArgs e)
         {
