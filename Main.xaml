@@ -172,6 +172,8 @@
         <RoutedUICommand x:Key="SelectAll" Text="SelectAll"/>
         <RoutedUICommand x:Key="Undo" Text="Undo"/>
         <RoutedUICommand x:Key="Redo" Text="Redo"/>
+        <RoutedUICommand x:Key="BindComponent" Text="BindComponent"/>
+        <RoutedUICommand x:Key="UnbindComponent" Text="UnbindComponent"/>
     </Window.Resources>
     <Window.InputBindings>
         <KeyBinding  Key="Delete" Command="{StaticResource DelComponent}" />
@@ -182,6 +184,8 @@
         <KeyBinding   Modifiers="Control"  Key="A" Command="{StaticResource SelectAll}" />
         <KeyBinding   Modifiers="Control"  Key="Z" Command="{StaticResource Undo}" />
         <KeyBinding   Modifiers="Control"  Key="Y" Command="{StaticResource Redo}" />
+        <KeyBinding   Modifiers="Control"  Key="B" Command="{StaticResource BindComponent}" />
+        <KeyBinding   Modifiers="Control"  Key="U" Command="{StaticResource UnbindComponent}" />
     </Window.InputBindings>
     <Window.CommandBindings>
         <CommandBinding Command="{StaticResource DelComponent}"
@@ -206,6 +210,12 @@
                                             CanExecute="CommandBinding_CanExecute"
                                             Executed="CommandBinding_Executed" />
         <CommandBinding Command="{StaticResource Redo}"
+                                            CanExecute="CommandBinding_CanExecute"
+                                            Executed="CommandBinding_Executed" />
+        <CommandBinding Command="{StaticResource BindComponent}"
+                                            CanExecute="CommandBinding_CanExecute"
+                                            Executed="CommandBinding_Executed" />
+        <CommandBinding Command="{StaticResource UnbindComponent}"
                                             CanExecute="CommandBinding_CanExecute"
                                             Executed="CommandBinding_Executed" />
     </Window.CommandBindings>
@@ -440,26 +450,26 @@
                                 <GroupBox DockPanel.Dock="Top" Header="组件板" VerticalAlignment="Top" Height="60" HorizontalAlignment="Stretch" 
                                       HorizontalContentAlignment="Center" VerticalContentAlignment="Center" BorderBrush="#FFC6C6C6">
                                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
-                                        <Button Name="MultiEmitter" Width="32" Height="32" Padding="0" Margin="1,1,2,1" Background="{x:Null}" Click="Component_Click">
+                                        <Button Name="MultiEmitter" Width="32" Height="32" Padding="0" Margin="1,1,2,1" Background="{x:Null}" Click="ComponentButton_Click">
                                             <Image RenderOptions.BitmapScalingMode="NearestNeighbor" Source="Images/button-MultiEmitter.png" Stretch="Uniform" ToolTip="多向发射器" 
-                                               MouseEnter="Component_MouseEnter" MouseLeave="Component_MouseLeave" Width="28" Height="28"  UseLayoutRounding="True"/>
+                                               MouseEnter="ComponentButton_MouseEnter" MouseLeave="ComponentButton_MouseLeave" Width="28" Height="28"  UseLayoutRounding="True"/>
                                         </Button>
-                                        <Button Name="CurveEmitter" Width="32" Height="32" Background="{x:Null}" Padding="0" Margin="1,1,2,1" Click="Component_Click">
+                                        <Button Name="CurveEmitter" Width="32" Height="32" Background="{x:Null}" Padding="0" Margin="1,1,2,1" Click="ComponentButton_Click">
                                             <Image RenderOptions.BitmapScalingMode="NearestNeighbor" Source="Images/button-CurveEmitter.png" Stretch="Uniform" ToolTip="曲线发射器" 
-                                               MouseEnter="Component_MouseEnter" MouseLeave="Component_MouseLeave" Width="28" Height="28"  UseLayoutRounding="True"/>
+                                               MouseEnter="ComponentButton_MouseEnter" MouseLeave="ComponentButton_MouseLeave" Width="28" Height="28"  UseLayoutRounding="True"/>
                                         </Button>
-                                        <Button Name="Mask" Background="{x:Null}" Padding="0" Margin="1,1,2,1" Click="Component_Click" Width="32" Height="32">
+                                        <Button Name="Mask" Background="{x:Null}" Padding="0" Margin="1,1,2,1" Click="ComponentButton_Click" Width="32" Height="32">
                                             <Image  RenderOptions.BitmapScalingMode="NearestNeighbor" Source="Images/button-Mask.png" ToolTip="遮罩" 
-                                               MouseEnter="Component_MouseEnter" MouseLeave="Component_MouseLeave" Width="28" Height="28" UseLayoutRounding="True">
+                                               MouseEnter="ComponentButton_MouseEnter" MouseLeave="ComponentButton_MouseLeave" Width="28" Height="28" UseLayoutRounding="True">
                                             </Image>
                                         </Button>
-                                        <Button Name="Rebound" Width="32" Height="32" Background="{x:Null}" Padding="0" Margin="1,1,2,1" Click="Component_Click">
+                                        <Button Name="Rebound" Width="32" Height="32" Background="{x:Null}" Padding="0" Margin="1,1,2,1" Click="ComponentButton_Click">
                                             <Image RenderOptions.BitmapScalingMode="NearestNeighbor" Source="Images/button-Rebound.png" Stretch="Uniform" ToolTip="反弹板" 
-                                               MouseEnter="Component_MouseEnter" MouseLeave="Component_MouseLeave" Width="28" Height="28"  UseLayoutRounding="True"/>
+                                               MouseEnter="ComponentButton_MouseEnter" MouseLeave="ComponentButton_MouseLeave" Width="28" Height="28"  UseLayoutRounding="True"/>
                                         </Button>
-                                        <Button Name="Force" Width="32" Height="32" Background="{x:Null}" Padding="0" Margin="1,1,2,1" Click="Component_Click">
+                                        <Button Name="Force" Width="32" Height="32" Background="{x:Null}" Padding="0" Margin="1,1,2,1" Click="ComponentButton_Click">
                                             <Image RenderOptions.BitmapScalingMode="NearestNeighbor" Source="Images/button-Force.png" Stretch="Uniform" ToolTip="力场" 
-                                               MouseEnter="Component_MouseEnter" MouseLeave="Component_MouseLeave" Width="28" Height="28"  UseLayoutRounding="True"/>
+                                               MouseEnter="ComponentButton_MouseEnter" MouseLeave="ComponentButton_MouseLeave" Width="28" Height="28"  UseLayoutRounding="True"/>
                                         </Button>
                                     </StackPanel>
                                 </GroupBox>

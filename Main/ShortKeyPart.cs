@@ -34,6 +34,12 @@ namespace CrazyStorm
                 case "Redo":
                     e.CanExecute = RedoButton.IsEnabled;
                     break;
+                case "BindComponent":
+                    e.CanExecute = BindComponentItem.IsEnabled;
+                    break;
+                case "UnbindComponent":
+                    e.CanExecute = UnbindComponentItem.IsEnabled;
+                    break;
             }
         }
         private void CommandBinding_Executed(object sender, ExecutedRoutedEventArgs e)
@@ -70,6 +76,12 @@ namespace CrazyStorm
                     break;
                 case "Redo":
                     Redo();
+                    break;
+                case "BindComponent":
+                    BindComponent();
+                    break;
+                case "UnbindComponent":
+                    UnbindComponent();
                     break;
             }
             Update();

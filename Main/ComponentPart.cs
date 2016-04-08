@@ -124,10 +124,35 @@ namespace CrazyStorm
                 }
             }
         }
+        void BindComponent()
+        {
+            bindingLines = new List<Line>();
+            foreach (var component in selectedComponents)
+            {
+                //If component has parent, caculate the absolute position.
+                float x = component.X;
+                float y = component.Y;
+                if (component.Parent != null)
+                {
+                    Vector2 parent = component.Parent.GetAbsolutePosition();
+                    x += parent.x;
+                    y += parent.y;
+                }
+                var line = DrawHelper.GetLine((int)x + config.ScreenWidthOver2, (int)y + config.ScreenHeightOver2,
+                    (int)screenMousePos.X, (int)screenMousePos.Y, 2, true, Colors.DarkOrange, 1);
+                line.DataContext = component;
+                bindingLines.Add(line);
+            }
+            SelectComponents(null, true);
+        }
+        void UnbindComponent()
+        {
+            //TODO
+        }
         #endregion
 
         #region Window EventHandler
-        private void Component_Click(object sender, RoutedEventArgs e)
+        private void ComponentButton_Click(object sender, RoutedEventArgs e)
         {
             //Create corresponding component according to different button.
             var button = sender as Button;
@@ -135,14 +160,14 @@ namespace CrazyStorm
             aimRect.SetValue(OpacityProperty, 1.0d);
             aimComponent = ComponentFactory.Create(button.Name);
         }
-        private void Component_MouseEnter(object sender, MouseEventArgs e)
+        private void ComponentButton_MouseEnter(object sender, MouseEventArgs e)
         {
             //Light up button when mouse enter.
             var image = sender as Image;
             var button = VisualHelper.VisualUpwardSearch<Button>(image) as Button;
             image.Source = new BitmapImage(new Uri(@"Images\button-" + button.Name + "-on.png", UriKind.Relative));
         }
-        private void Component_MouseLeave(object sender, MouseEventArgs e)
+        private void ComponentButton_MouseLeave(object sender, MouseEventArgs e)
         {
             //Reset button when mouse leave.
             var image = sender as Image;
@@ -218,6 +243,7 @@ namespace CrazyStorm
             }
             else
             {
+                //Add source component to target component as child
                 var tree = new Component();
                 foreach (Component item in selectedParticle.ComponentTree)
                     tree.Children.Add(item);
@@ -267,27 +293,11 @@ namespace CrazyStorm
         }
         private void BindComponentItem_Click(object sender, RoutedEventArgs e)
         {
-            bindingLines = new List<Line>();
-            foreach (var component in selectedComponents)
-            {
-                //If component has parent, caculate the absolute position.
-                float x = component.X;
-                float y = component.Y;
-                if (component.Parent != null)
-                {
-                    Vector2 parent = component.Parent.GetAbsolutePosition();
-                    x += parent.x;
-                    y += parent.y;
-                }
-                var line = DrawHelper.GetLine((int)x + config.ScreenWidthOver2, (int)y + config.ScreenHeightOver2, 
-                    (int)screenMousePos.X, (int)screenMousePos.Y, 2, true, Colors.DarkOrange, 1);
-                bindingLines.Add(line);
-            }
-            SelectComponents(null, true);
+            BindComponent();
         }
         private void UnbindComponentItem_Click(object sender, RoutedEventArgs e)
         {
-            //TODO
+            UnbindComponent();
         }
         #endregion
     }

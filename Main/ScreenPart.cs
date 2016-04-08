@@ -116,7 +116,9 @@ namespace CrazyStorm
             //Select those involved in selection rect. 
             int index = 0;
             foreach (var layer in selectedParticle.Layers)
+            {
                 if (layer.Visible)
+                {
                     foreach (var component in layer.Components)
                     {
                         //If component has parent, caculate the absolute position.
@@ -141,6 +143,8 @@ namespace CrazyStorm
                         }
                         index++;
                     }
+                }
+            }
             SelectComponents(set, width == 0 && height == 0);
         }
         void SelectComponents(List<Component> set, bool canDoubleClick)
@@ -231,6 +235,7 @@ namespace CrazyStorm
                     selectionRect.SetValue(HeightProperty, (double)-height);
                 }
             }
+            //Update binding lines
             if (bindingLines != null)
             {
                 foreach (var line in bindingLines)
@@ -276,12 +281,15 @@ namespace CrazyStorm
                 aimComponent = null;
                 aimRect = null;
             }
-            //
+            //Binding selected component
             if (bindingLines != null)
             {
-
                 bindingLines = null;
-                Update();
+                SelectComponents((int)screenMousePos.X, (int)screenMousePos.Y, 1, 1);
+                if (selectedComponents.Count == 1)
+                {
+                    //TODO
+                }
             }
         }
         private void ParticleTabControl_MouseLeave(object sender, MouseEventArgs e)
