@@ -150,8 +150,8 @@ namespace CrazyStorm
             else if (LeftMoreThan.IsChecked == true)
                 leftCompare = " > ";
 
-            if (LeftConditionComboBox.SelectedItem != null && LeftValue.Text != string.Empty &&
-                leftCompare != string.Empty)
+            if (LeftConditionComboBox.SelectedItem != null && !String.IsNullOrEmpty(LeftValue.Text) &&
+                !String.IsNullOrEmpty(leftCompare))
             {
                 leftCondition = LeftConditionComboBox.SelectedItem + leftCompare + LeftValue.Text;
             }
@@ -165,24 +165,24 @@ namespace CrazyStorm
             else if (RightMoreThan.IsChecked == true)
                 rightCompare = " > ";
 
-            if (RightConditionComboBox.SelectedItem != null && RightValue.Text != string.Empty &&
-                rightCompare != string.Empty)
+            if (RightConditionComboBox.SelectedItem != null && !String.IsNullOrEmpty(RightValue.Text) &&
+                !String.IsNullOrEmpty(rightCompare))
             {
                 rightCondition = RightConditionComboBox.SelectedItem + rightCompare + RightValue.Text;
             }
             //Allow empty condition
-            if (leftCondition == string.Empty && rightCondition == string.Empty)
+            if (String.IsNullOrEmpty(leftCondition) && String.IsNullOrEmpty(rightCondition))
                 return true;
 
             //Build condition
-            text = leftCondition != string.Empty ? leftCondition : rightCondition;
+            text = !String.IsNullOrEmpty(leftCondition) ? leftCondition : rightCondition;
             string concat = string.Empty;
             if (And.IsChecked == true)
                 concat = " & ";
             else if (Or.IsChecked == true)
                 concat = " | ";
 
-            if (concat != string.Empty && leftCondition != string.Empty && rightCondition != string.Empty)
+            if (!String.IsNullOrEmpty(concat) && !String.IsNullOrEmpty(leftCondition) && !String.IsNullOrEmpty(rightCondition))
             {
                 text = leftCondition + concat + rightCondition;
             }
@@ -219,18 +219,18 @@ namespace CrazyStorm
             else if (Fixed.IsChecked == true)
                 changeMode = "Fixed";
 
-            if (PropertyComboBox.SelectedItem != null && ResultValue.Text != string.Empty &&
-                changeType != string.Empty && changeMode != string.Empty && ChangeTime.Text != string.Empty)
+            if (PropertyComboBox.SelectedItem != null && !String.IsNullOrEmpty(ResultValue.Text) &&
+                !String.IsNullOrEmpty(changeType) && !String.IsNullOrEmpty(changeMode) && !String.IsNullOrEmpty(ChangeTime.Text))
             {
                 propertyEvent = PropertyComboBox.SelectedItem + changeType + ResultValue.Text + ", " +
                     changeMode + ", " + ChangeTime.Text;
-                if (ExecuteTime.Text != string.Empty)
+                if (!String.IsNullOrEmpty(ExecuteTime.Text))
                     propertyEvent += ", " + ExecuteTime.Text;
             }
-            if (propertyEvent == string.Empty)
+            if (String.IsNullOrEmpty(propertyEvent))
                 return false;
 
-            if (condition == string.Empty)
+            if (String.IsNullOrEmpty(condition))
                 text = propertyEvent;
             else
                 text = condition + " : " + propertyEvent;
@@ -263,11 +263,11 @@ namespace CrazyStorm
                 if (LoopTime.ToolTip != null || StopCondition.ToolTip != null)
                     return false;
 
-                if (LoopTime.Text == string.Empty && StopCondition.Text == string.Empty)
+                if (String.IsNullOrEmpty(LoopTime.Text) && String.IsNullOrEmpty(StopCondition.Text))
                     return false;
 
-                string arguments = LoopTime.Text != string.Empty ? LoopTime.Text : StopCondition.Text;
-                if (LoopTime.Text != string.Empty && StopCondition.Text != string.Empty)
+                string arguments = !String.IsNullOrEmpty(LoopTime.Text) ? LoopTime.Text : StopCondition.Text;
+                if (!String.IsNullOrEmpty(LoopTime.Text) && !String.IsNullOrEmpty(StopCondition.Text))
                 {
                     arguments = LoopTime.Text + ", " + StopCondition.Text;
                 }
@@ -281,10 +281,10 @@ namespace CrazyStorm
                 specialEvent = "ChangeType(" + TypeCombo.SelectedItem + ", " + 
                     ((ComboBoxItem)ColorCombo.SelectedItem).Content + ")";
             }
-            if (specialEvent == string.Empty)
+            if (String.IsNullOrEmpty(specialEvent))
                 return false;
 
-            if (condition == string.Empty)
+            if (String.IsNullOrEmpty(condition))
                 text = specialEvent;
             else
                 text = condition + " : " + specialEvent;
@@ -657,7 +657,7 @@ namespace CrazyStorm
             ChangeTextBoxState(LeftValue, false);
             LeftValue.Text = LeftValue.Text.Trim();
             string input = LeftValue.Text;
-            if (input == string.Empty)
+            if (String.IsNullOrEmpty(input))
                 return;
 
             if (LeftConditionComboBox.SelectedItem != null)
@@ -716,7 +716,7 @@ namespace CrazyStorm
             ChangeTextBoxState(RightValue, false);
             RightValue.Text = RightValue.Text.Trim();
             string input = RightValue.Text;
-            if (input == string.Empty)
+            if (String.IsNullOrEmpty(input))
                 return;
 
             if (RightConditionComboBox.SelectedItem != null)
@@ -774,7 +774,7 @@ namespace CrazyStorm
             ChangeTextBoxState(ResultValue, false);
             ResultValue.Text = ResultValue.Text.Trim();
             string input = ResultValue.Text;
-            if (input == string.Empty)
+            if (String.IsNullOrEmpty(input))
                 return;
 
             if (PropertyComboBox.SelectedItem != null)
@@ -852,7 +852,7 @@ namespace CrazyStorm
             ChangeTextBoxState(ChangeTime, false);
             ChangeTime.Text = ChangeTime.Text.Trim();
             string input = ChangeTime.Text;
-            if (input == string.Empty)
+            if (String.IsNullOrEmpty(input))
                 return;
 
             int value;
@@ -866,7 +866,7 @@ namespace CrazyStorm
             ChangeTextBoxState(ExecuteTime, false);
             ExecuteTime.Text = ExecuteTime.Text.Trim();
             string input = ExecuteTime.Text;
-            if (input == string.Empty)
+            if (String.IsNullOrEmpty(input))
                 return;
 
             int value;
@@ -880,7 +880,7 @@ namespace CrazyStorm
             ChangeTextBoxState(LoopTime, false);
             LoopTime.Text = LoopTime.Text.Trim();
             string input = LoopTime.Text;
-            if (input == string.Empty)
+            if (String.IsNullOrEmpty(input))
                 return;
 
             int value;
@@ -894,7 +894,7 @@ namespace CrazyStorm
             ChangeTextBoxState(Condition, false);
             Condition.Text = Condition.Text.Trim();
             string input = Condition.Text;
-            if (input == string.Empty)
+            if (String.IsNullOrEmpty(input))
             {
                 eventGroup.Condition = input;
                 return;
@@ -919,7 +919,7 @@ namespace CrazyStorm
             ChangeTextBoxState(StopCondition, false);
             StopCondition.Text = StopCondition.Text.Trim();
             string input = StopCondition.Text;
-            if (input == string.Empty)
+            if (String.IsNullOrEmpty(input))
                 return;
 
             try
