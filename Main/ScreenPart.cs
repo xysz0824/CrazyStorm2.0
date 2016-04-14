@@ -153,15 +153,22 @@ namespace CrazyStorm
                 if (layer.Visible)
                     foreach (var component in layer.Components)
                     {
-                        component.Selected = false;
+                        if (Keyboard.Modifiers != ModifierKeys.Control)
+                            component.Selected = false;
+                        
                         if (set != null)
                         {
                             foreach (var target in set)
+                            {
                                 if (component == target)
                                 {
-                                    component.Selected = true;
+                                    component.Selected = 
+                                        Keyboard.Modifiers != ModifierKeys.Control ? 
+                                        true :
+                                        !component.Selected;
                                     break;
                                 }
+                            }
                         }
                     }
 
