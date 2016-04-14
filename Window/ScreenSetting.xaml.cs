@@ -23,8 +23,7 @@ namespace CrazyStorm
         #endregion
 
         #region Public Members
-        public delegate void onButtonClick();
-        public event onButtonClick OnButtonClick;
+        public event Action OnButtonClick;
         #endregion
 
         #region Constructor
@@ -82,7 +81,9 @@ namespace CrazyStorm
                 else
                     config.CenterDisplay = false;
 
-                OnButtonClick();
+                if (OnButtonClick != null)
+                    OnButtonClick();
+
                 this.Close();
             }
             else

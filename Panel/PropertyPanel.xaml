@@ -13,7 +13,7 @@
         <GroupBox Header="基本" Background="#FFF9F9F9">
             <DataGrid Name="ComponentGrid" ItemsSource="{Binding}" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" 
                           GridLinesVisibility="Horizontal" ColumnWidth="Auto" SelectionMode="Single" AutoGenerateColumns="False"  CanUserAddRows="False" CanUserReorderColumns="False" CanUserSortColumns="False" 
-                      ScrollViewer.CanContentScroll="False" CanUserResizeRows="False" CellEditEnding="ComponentGrid_CellEditEnding" CanUserDeleteRows="False">
+                      ScrollViewer.CanContentScroll="False" CanUserResizeRows="False" CellEditEnding="ComponentGrid_CellEditEnding" CanUserDeleteRows="False" BeginningEdit="Grid_BeginningEdit">
                 <DataGrid.HorizontalGridLinesBrush>
                     <SolidColorBrush Color="{DynamicResource {x:Static SystemColors.ControlColorKey}}"/>
                 </DataGrid.HorizontalGridLinesBrush>
@@ -26,7 +26,7 @@
         <GroupBox Header="组件" Background="#FFF9F9F9">
             <DataGrid Name="SpecificGrid" ItemsSource="{Binding}" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" 
                           GridLinesVisibility="Horizontal" ColumnWidth="Auto" SelectionMode="Single" AutoGenerateColumns="False"  CanUserAddRows="False" CanUserReorderColumns="False" CanUserSortColumns="False" 
-                      ScrollViewer.CanContentScroll="False" CanUserResizeRows="False" CellEditEnding="SpecificGrid_CellEditEnding" CanUserDeleteRows="False">
+                      ScrollViewer.CanContentScroll="False" CanUserResizeRows="False" CellEditEnding="SpecificGrid_CellEditEnding" CanUserDeleteRows="False" BeginningEdit="Grid_BeginningEdit">
                 <DataGrid.HorizontalGridLinesBrush>
                     <SolidColorBrush Color="{DynamicResource {x:Static SystemColors.ControlColorKey}}"/>
                 </DataGrid.HorizontalGridLinesBrush>
@@ -64,7 +64,7 @@
                 <DataGrid Name="VariableGrid" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" 
                           GridLinesVisibility="Horizontal" ColumnWidth="Auto" SelectionMode="Single" CanUserReorderColumns="False" CanUserSortColumns="False" 
                       ScrollViewer.CanContentScroll="False" CanUserResizeRows="False" CanUserAddRows="False" CanUserDeleteRows="False" AutoGenerateColumns="False" 
-                          CellEditEnding="VariableGrid_CellEditEnding">
+                          CellEditEnding="VariableGrid_CellEditEnding" BeginningEdit="Grid_BeginningEdit">
                     <DataGrid.HorizontalGridLinesBrush>
                         <SolidColorBrush Color="{DynamicResource {x:Static SystemColors.ControlColorKey}}"/>
                     </DataGrid.HorizontalGridLinesBrush>

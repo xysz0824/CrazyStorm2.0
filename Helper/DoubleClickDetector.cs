@@ -20,18 +20,21 @@ namespace CrazyStorm
 
         public void Start()
         {
-            count++;
-            if (timer != null)
-                timer.IsEnabled = false;
-
-            timer = new DispatcherTimer();
-            timer.Interval = new TimeSpan(0, 0, 0, 0, (int)GetDoubleClickTime());
-            timer.Tick += (s, e1) =>
-                {
+            if (count == 0)
+            {
+                if (timer != null)
                     timer.IsEnabled = false;
-                    count = 0;
-                };
-            timer.IsEnabled = true;
+
+                timer = new DispatcherTimer();
+                timer.Interval = new TimeSpan(0, 0, 0, 0, (int)GetDoubleClickTime());
+                timer.Tick += (s, e1) =>
+                    {
+                        timer.IsEnabled = false;
+                        count = 0;
+                    };
+                timer.IsEnabled = true;
+            }
+            count++;
         }
 
         public bool IsDetected()

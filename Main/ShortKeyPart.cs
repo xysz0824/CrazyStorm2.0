@@ -15,12 +15,22 @@ namespace CrazyStorm
 {
     partial class Main
     {
+        #region Private Members
+        bool editingProperties;
+        #endregion
+
         #region Window EventHandler
         private void CommandBinding_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
             e.ContinueRouting = true;
             e.CanExecute = true;
-            //Check if it didn't select component the relevant command will be prohibited.
+            //Check if properties are being edited.
+            if (editingProperties)
+            {
+                e.CanExecute = false;
+                return;
+            }
+            //Check if it didn't have components selected.
             var command = (RoutedUICommand)e.Command;
             if (command.Text.EndsWith("Component"))
                 if (selectedComponents.Count == 0)

@@ -37,6 +37,11 @@ namespace CrazyStorm
         bool initializeType;
         #endregion
 
+        #region Public Members
+        public event Action OnBeginEditing;
+        public event Action OnEndEditing;
+        #endregion
+
         #region Constructor
         public PropertyPanel(CommandStack commandStack,
             File file, IList<ParticleType> types, Component component, Action updateFunc)
@@ -292,13 +297,22 @@ namespace CrazyStorm
         #endregion
 
         #region Windows EventHandlers
+        private void Grid_BeginningEdit(object sender, DataGridBeginningEditEventArgs e)
+        {
+            if (OnBeginEditing != null)
+                OnBeginEditing();
+        }
         private void ComponentGrid_CellEditEnding(object sender, DataGridCellEditEndingEventArgs e)
         {
             SetProperty(component, e);
+            if (OnEndEditing != null)
+                OnEndEditing();
         }
         private void SpecificGrid_CellEditEnding(object sender, DataGridCellEditEndingEventArgs e)
         {
             SetProperty(component, e);
+            if (OnEndEditing != null)
+                OnEndEditing();
         }
         private void ParticleGrid_CellEditEnding(object sender, DataGridCellEditEndingEventArgs e)
         {
@@ -306,6 +320,9 @@ namespace CrazyStorm
                 SetProperty((component as MultiEmitter).Particle, e);
             else if (component is CurveEmitter)
                 SetProperty((component as CurveEmitter).CurveParticle, e);
+
+            if (OnEndEditing != null)
+                OnEndEditing();
         }
         private void AddVariable_Click(object sender, RoutedEventArgs e)
         {

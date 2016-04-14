@@ -31,8 +31,8 @@ namespace CrazyStorm
         int selectionRectX, selectionRectY;
         bool selectingComponent;
         List<Line> bindingLines;
-        readonly List<Component> selectedComponents = new List<Component>();
-        readonly DoubleClickDetector dclickDetector = new DoubleClickDetector();
+        List<Component> selectedComponents;
+        DoubleClickDetector dclickDetector;
         #endregion
 
         #region Private Methods
@@ -51,7 +51,11 @@ namespace CrazyStorm
             }
             if (canvas != null)
             {
-                selectedComponents.Clear();
+                if (selectedComponents == null)
+                    selectedComponents = new List<Component>();
+                else
+                    selectedComponents.Clear();
+
                 canvas.Children.Clear();
                 //Update binding lines
                 if (bindingLines != null)
@@ -179,8 +183,11 @@ namespace CrazyStorm
             BindComponentItem.IsEnabled = DeleteComponentItem.IsEnabled;
             UnbindComponentItem.IsEnabled = BindComponentItem.IsEnabled;
             //Check double click.
-            if (!canDoubleClick || set == null)
+            if (!(canDoubleClick && set != null && Keyboard.Modifiers != ModifierKeys.Control))
                 return;
+
+            if (dclickDetector == null)
+                dclickDetector = new DoubleClickDetector();
 
             dclickDetector.Start();
             if (set.Count > 0 && dclickDetector.IsDetected())

@@ -69,7 +69,6 @@ namespace CrazyStorm
         }
         void CreatePropertyPanel(Component component)
         {
-            SelectComponents(null, true);
             TabItem item;
             //Prevent from repeating tab of components.  
             for (int i = 2; i < LeftTabControl.Items.Count; ++i)
@@ -86,8 +85,17 @@ namespace CrazyStorm
             item.Style = (Style)FindResource("CanCloseStyle");
             var scroll = new ScrollViewer();
             scroll.VerticalScrollBarVisibility = ScrollBarVisibility.Auto;
-            scroll.Content = new PropertyPanel(commandStacks[selectedParticle], 
+            var panel = new PropertyPanel(commandStacks[selectedParticle],
                 file, selectedParticle.CustomType, component, UpdateProperty);
+            scroll.Content = panel;
+            panel.OnBeginEditing += () =>
+            {
+                editingProperties = true;
+            };
+            panel.OnEndEditing += () =>
+            {
+                editingProperties = false;
+            };
             item.Content = scroll;
             LeftTabControl.Items.Add(item);
             item.Focus();
