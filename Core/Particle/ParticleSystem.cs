@@ -17,6 +17,7 @@ namespace CrazyStorm.Core
         ObservableCollection<ParticleType> customType;
         ObservableCollection<Layer> layers;
         ObservableCollection<Component> componentTree;
+        int layerIndex;
         #endregion
 
         #region Public Members
@@ -28,6 +29,7 @@ namespace CrazyStorm.Core
         public ObservableCollection<ParticleType> CustomType { get { return customType; } }
         public ObservableCollection<Layer> Layers { get { return layers; } }
         public ObservableCollection<Component> ComponentTree { get { return componentTree; } }
+        public int LayerIndex { get { return layerIndex++; } }
         #endregion
 
         #region Constructor

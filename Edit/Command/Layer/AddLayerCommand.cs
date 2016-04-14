@@ -12,16 +12,15 @@ namespace CrazyStorm
 {
     class AddLayerCommand : Command
     {
-        static int colorIndex = 0;
-
         public override void Redo(CommandStack stack)
         {
             base.Redo(stack);
             var selectedParticle = Parameter[0] as ParticleSystem;
             if (History[0] == null)
             {
-                var newLayer = new Layer("NewLayer");
-                newLayer.Color = (LayerColor)((++colorIndex) % 7);
+                var index = selectedParticle.LayerIndex;
+                var newLayer = new Layer("Layer" + index);
+                newLayer.Color = (LayerColor)((index + 1) % 7);
                 History[0] = newLayer;
                 selectedParticle.AddLayer(newLayer);
             }

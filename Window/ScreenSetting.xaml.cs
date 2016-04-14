@@ -22,6 +22,11 @@ namespace CrazyStorm
         Config config;
         #endregion
 
+        #region Public Members
+        public delegate void onButtonClick();
+        public event onButtonClick OnButtonClick;
+        #endregion
+
         #region Constructor
         public ScreenSetting(Config config)
         {
@@ -77,6 +82,7 @@ namespace CrazyStorm
                 else
                     config.CenterDisplay = false;
 
+                OnButtonClick();
                 this.Close();
             }
             else

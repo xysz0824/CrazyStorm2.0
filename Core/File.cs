@@ -19,6 +19,7 @@ namespace CrazyStorm.Core
         ObservableCollection<Resource> sounds;
         ObservableCollection<Resource> globals;
         Collection<ParticleSystem> particles;
+        int particleIndex;
         #endregion
 
         #region Public Members
@@ -28,6 +29,7 @@ namespace CrazyStorm.Core
         public ObservableCollection<Resource> Sounds { get { return sounds; } }
         public ObservableCollection<Resource> Globals { get { return globals; } }
         public Collection<ParticleSystem> Particles { get { return particles; } }
+        public int ParticleIndex { get { return particleIndex++; } }
         #endregion
 
         #region Constructor

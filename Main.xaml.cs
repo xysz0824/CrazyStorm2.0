@@ -138,6 +138,8 @@ namespace CrazyStorm
         }
         void UpdateLayer()
         {
+            LayerTree.ItemsSource = selectedParticle.Layers;
+            LayerAxis.ItemsSource = selectedParticle.Layers;
             CopyLayerItem.IsEnabled = false;
             DeleteLayerItem.IsEnabled = false;
             SetLayerItem.IsEnabled = false;

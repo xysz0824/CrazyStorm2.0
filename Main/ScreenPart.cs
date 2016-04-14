@@ -318,7 +318,7 @@ namespace CrazyStorm
         }
         private void ParticleTabControl_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            //Maintain selected Particle.
+            //Switch to selected Particle.
             if (e.AddedItems.Count > 0)
             {
                 var tabItem = e.AddedItems[0] as TabItem;
@@ -335,6 +335,7 @@ namespace CrazyStorm
         {
             //Open screen setting window.
             ScreenSetting window = new ScreenSetting(config);
+            window.OnButtonClick += () => Update();
             window.ShowDialog();
         }
         #endregion
