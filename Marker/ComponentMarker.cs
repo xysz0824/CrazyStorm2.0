@@ -20,7 +20,7 @@ namespace CrazyStorm
             if (component.Speed != 0)
                 DrawHelper.DrawArrow(canvas, x, y, 60, 2, component.SpeedAngle, Colors.Red, 1);
             if (component.Acspeed != 0)
-                DrawHelper.DrawArrow(canvas, x, y, 50, 2, component.AcspeedAngle, Colors.Purple, 1);
+                DrawHelper.DrawArrow(canvas, x, y, 50, 2, component.AcspeedAngle, Colors.Violet, 1);
         }
     }
 }

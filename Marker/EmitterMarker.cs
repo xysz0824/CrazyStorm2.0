@@ -20,13 +20,13 @@ namespace CrazyStorm
             var multiEmitter = component as Emitter;
             var left = multiEmitter.EmitAngle - multiEmitter.EmitRange / 2;
             var right = multiEmitter.EmitAngle + multiEmitter.EmitRange / 2;
-            DrawHelper.DrawFan(canvas, x, y, 60, right, left, Colors.Red, 0.5f);
+            DrawHelper.DrawFan(canvas, x, y, 60, right, left, Colors.Red, 1);
             var step = multiEmitter.EmitRange / (multiEmitter.EmitCount);
             var angle = left - step / 2;
             for (float i = 0; i < multiEmitter.EmitCount; ++i)
             {
                 angle += step;
-                DrawHelper.DrawArrow(canvas, x, y, 60, 2, angle, Colors.Aqua, 1);
+                DrawHelper.DrawArrow(canvas, x, y, 40, 2, angle, Colors.Aqua, 1);
             }
         }
     }

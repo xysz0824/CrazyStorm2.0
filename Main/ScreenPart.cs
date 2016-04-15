@@ -80,7 +80,7 @@ namespace CrazyStorm
                             frame.DataContext = layer;
                             icon.DataContext = component;
                             box.Opacity = component.Selected ? 1 : 0;
-                            //If component has parent, caculate the absolute position.
+                            //If component has a parent, caculate the absolute position.
                             float x = component.X;
                             float y = component.Y;
                             if (component.Parent != null)
@@ -298,12 +298,12 @@ namespace CrazyStorm
             //Binding selected component
             if (bindingLines != null)
             {
-                bindingLines = null;
                 SelectComponents((int)screenMousePos.X, (int)screenMousePos.Y, 1, 1);
                 if (selectedComponents.Count == 1)
                 {
                     //TODO
                 }
+                bindingLines = null;
             }
         }
         private void ParticleTabControl_MouseLeave(object sender, MouseEventArgs e)
