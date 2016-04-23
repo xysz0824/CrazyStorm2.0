@@ -31,6 +31,7 @@ namespace CrazyStorm.Core
         bool visibility;
         bool selected;
         Component parent;
+        Component bindingTarget;
         ObservableCollection<VariableResource> variables;
         ObservableCollection<EventGroup> componentEventGroups;
         ObservableCollection<Component> children;
@@ -120,6 +121,11 @@ namespace CrazyStorm.Core
         {
             get { return parent; }
             set { parent = value; }
+        }
+        public Component BindingTarget
+        {
+            get { return bindingTarget; }
+            set { bindingTarget = value; }
         }
         public ObservableCollection<VariableResource> Variables { get { return variables; } }
         public ObservableCollection<EventGroup> ComponentEventGroups { get { return componentEventGroups; } }

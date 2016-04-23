@@ -61,9 +61,7 @@ namespace CrazyStorm
                 if (bindingLines != null)
                 {
                     foreach (var line in bindingLines)
-                    {
                         canvas.Children.Add(line);
-                    }
                 }
                 //Update components on current screen.
                 var itemTemplate = FindResource("ComponentItem") as DataTemplate;
@@ -88,6 +86,24 @@ namespace CrazyStorm
                                 Vector2 parent = component.Parent.GetAbsolutePosition();
                                 x += parent.x;
                                 y += parent.y;
+                            }
+                            //Draw binding line.
+                            if (component.BindingTarget != null)
+                            {
+                                float tx = component.BindingTarget.X;
+                                float ty = component.BindingTarget.Y;
+                                if (component.BindingTarget.Parent != null)
+                                {
+                                    Vector2 parent = component.BindingTarget.Parent.GetAbsolutePosition();
+                                    tx += parent.x;
+                                    ty += parent.y;
+                                }
+                                if (!component.Selected)
+                                    DrawHelper.DrawLine(canvas, (int)x + config.ScreenWidthOver2, (int)y + config.ScreenHeightOver2,
+                                        (int)tx + config.ScreenWidthOver2, (int)ty + config.ScreenHeightOver2, 2, true, Colors.White, 0.5f);
+                                else
+                                    DrawHelper.DrawLine(canvas, (int)x + config.ScreenWidthOver2, (int)y + config.ScreenHeightOver2,
+                                        (int)tx + config.ScreenWidthOver2, (int)ty + config.ScreenHeightOver2, 2, false, Colors.White, 0.5f);
                             }
                             //Draw component mark.
                             object marker = Assembly.GetExecutingAssembly().CreateInstance("CrazyStorm.ComponentMarker");
@@ -290,8 +306,7 @@ namespace CrazyStorm
                 aimComponent.Name = aimComponent.GetType().Name + selectedParticle.GetComponentIndex(aimComponent.GetType());
                 aimComponent.X = (int)(boxX + (double)aimRect.GetValue(Canvas.WidthProperty) / 2 - config.ScreenWidthOver2);
                 aimComponent.Y = (int)(boxY + (double)aimRect.GetValue(Canvas.HeightProperty) / 2 - config.ScreenHeightOver2);
-                new AddComponentCommand().Do(commandStacks[selectedParticle],
-                    selectedParticle, selectedLayer, aimComponent);
+                new AddComponentCommand().Do(commandStacks[selectedParticle], selectedParticle, selectedLayer, aimComponent);
                 UpdateSelectedStatus();
                 aimComponent = null;
                 aimRect = null;
@@ -301,9 +316,8 @@ namespace CrazyStorm
             {
                 SelectComponents((int)screenMousePos.X, (int)screenMousePos.Y, 1, 1);
                 if (selectedComponents.Count == 1)
-                {
-                    //TODO
-                }
+                    new BindComponentCommand().Do(commandStacks[selectedParticle], bindingLines, selectedComponents.First());
+
                 bindingLines = null;
             }
         }

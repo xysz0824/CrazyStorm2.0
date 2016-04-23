@@ -147,7 +147,7 @@ namespace CrazyStorm
                     y += parent.y;
                 }
                 var line = DrawHelper.GetLine((int)x + config.ScreenWidthOver2, (int)y + config.ScreenHeightOver2,
-                    (int)screenMousePos.X, (int)screenMousePos.Y, 2, true, Colors.DarkOrange, 1);
+                    (int)screenMousePos.X, (int)screenMousePos.Y, 2, true, Colors.White, 0.5f);
                 line.DataContext = component;
                 bindingLines.Add(line);
             }
@@ -155,7 +155,8 @@ namespace CrazyStorm
         }
         void UnbindComponent()
         {
-            //TODO
+            if (selectedComponents.Count > 0)
+                new UnbindComponentCommand().Do(commandStacks[selectedParticle], selectedComponents);
         }
         #endregion
 
