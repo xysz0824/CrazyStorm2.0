@@ -25,16 +25,13 @@ namespace CrazyStorm
         #region Private Members
         Layer selectedLayer;
         ScrollViewer axisScroll;
+        ScrollViewer layerScroll;
         #endregion
 
         #region Private Methods
         void CreateNewLayer()
         {
-            if (selectedParticle.Layers.Count < 5)
                 new AddLayerCommand().Do(commandStacks[selectedParticle], selectedParticle);
-            else
-                MessageBox.Show((string)FindResource("CanNotAddMoreLayer"), (string)FindResource("TipTitle"),
-                    MessageBoxButton.OK, MessageBoxImage.Warning);
         }
         void DeleteSelectedLayer()
         {
@@ -206,9 +203,13 @@ namespace CrazyStorm
         }
         private void LayerAxis_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            axisScroll = VisualHelper.VisualDownwardSearch<ScrollViewer>(sender as DependencyObject) as ScrollViewer;
+            if (axisScroll == null)
+            {
+                axisScroll = VisualHelper.VisualDownwardSearch<ScrollViewer>(LayerAxis) as ScrollViewer;
+                layerScroll = VisualHelper.VisualDownwardSearch<ScrollViewer>(LayerTree) as ScrollViewer;
+            }
         }
-        private void LayerAxis_PreviewMouseMove(object sender, MouseEventArgs e)
+        private void LayerAxis_LayoutUpdated(object sender, EventArgs e)
         {
             if (axisScroll != null)
             {
@@ -218,6 +219,10 @@ namespace CrazyStorm
                 imageBruch = TimeScale.Background as ImageBrush;
                 imageBruch.Viewport = new Rect(-axisScroll.HorizontalOffset, imageBruch.Viewport.Y,
                     imageBruch.Viewport.Width, imageBruch.Viewport.Height);
+                layerScroll.ScrollToVerticalOffset(axisScroll.VerticalOffset);
+                layerScroll.RenderTransform = new TranslateTransform(0, 0);
+                if (layerScroll.ScrollableHeight < axisScroll.VerticalOffset)
+                    layerScroll.RenderTransform = new TranslateTransform(0, layerScroll.ScrollableHeight - axisScroll.VerticalOffset);
             }
         }
         #endregion

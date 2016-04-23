@@ -476,7 +476,7 @@
                                 <GroupBox Header="组件浏览器" Name="Explorer" VerticalContentAlignment="Stretch" HorizontalContentAlignment="Stretch" >
                                     <TreeView Name="ComponentTree" Padding="-2,1,1,1" VerticalContentAlignment="Stretch" HorizontalContentAlignment="Stretch" 
                                               AllowDrop="True" MouseMove="ComponentTree_MouseMove" 
-                                              DragEnter="ComponentTree_CheckDrop" DragOver="ComponentTree_CheckDrop" DragLeave="ComponentTree_CheckDrop" Drop="ComponentTree_Drop">
+                                              DragEnter="ComponentTree_CheckDrop" DragOver="ComponentTree_CheckDrop" DragLeave="ComponentTree_CheckDrop" Drop="ComponentTree_Drop" IsTextSearchEnabled="True">
                                         <TreeView.ItemTemplate >
                                             <HierarchicalDataTemplate ItemsSource="{Binding Children}">
                                                 <TextBlock Text="{Binding Name}" 
@@ -617,8 +617,8 @@
                             </Label.ToolTip>
                         </Label>
                     </DockPanel>
-                    <TreeView x:Name="LayerTree"  BorderBrush="White" 
-                                  ScrollViewer.VerticalScrollBarVisibility="Disabled"  MouseUp="LayerTree_MouseUp" MouseDoubleClick="LayerTree_MouseDoubleClick" >
+                    <TreeView x:Name="LayerTree"  BorderBrush="White" ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                                  ScrollViewer.VerticalScrollBarVisibility="Hidden"  MouseUp="LayerTree_MouseUp" MouseDoubleClick="LayerTree_MouseDoubleClick" Margin="0" RenderTransformOrigin="0.5,0.5" Panel.ZIndex="-1000">
                         <TreeView.ItemTemplate>
                             <DataTemplate>
                                 <DockPanel Name="LayerElement" Width="255" Margin ="-22,0,0,0" Background="{x:Null}" 
@@ -685,7 +685,7 @@
                         </Label.Background>
                     </Label>
                     <TreeView Name="LayerAxis" BorderBrush="{x:Null}" Background="{x:Null}" BorderThickness="0" VerticalContentAlignment="Top" Foreground="{x:Null}" 
-                              ScrollViewer.VerticalScrollBarVisibility="Hidden" Padding="0" PreviewMouseLeftButtonDown="LayerAxis_PreviewMouseLeftButtonDown" PreviewMouseMove="LayerAxis_PreviewMouseMove">
+                              Padding="0" PreviewMouseLeftButtonDown="LayerAxis_PreviewMouseLeftButtonDown" LayoutUpdated="LayerAxis_LayoutUpdated">
                         <TreeView.ItemTemplate>
                             <DataTemplate>
                                 <Rectangle Height="16" VerticalAlignment="Top" HorizontalAlignment="Left">
