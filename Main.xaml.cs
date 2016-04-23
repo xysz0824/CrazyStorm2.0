@@ -63,18 +63,17 @@ namespace CrazyStorm
         #region Private Methods
         void InitializeSystem()
         {
-            LoadConfig();
+            InitializeConfig();
             InitializeFile();
             InitializeParticle();
-            InitializeLayer();
             InitializeEdit();
             InitializeStatus();
-            Update();
             status = (string)FindResource("Ready");
         }
-        void LoadConfig()
+        void InitializeConfig()
         {
             //TODO : Load config.
+            ParticleTabControl.DataContext = config;
         }
         void InitializeFile()
         {
@@ -87,22 +86,9 @@ namespace CrazyStorm
         void InitializeParticle()
         {
             selectedParticle = file.Particles.First();
-            ParticleTabControl.DataContext = config;
             InitializeCommandStacks();
             AddNewParticleTab(selectedParticle);
-            ComponentTree.ItemsSource = selectedParticle.ComponentTree;
-            DeleteComponentItem.IsEnabled = false;
-            BindComponentItem.IsEnabled = false;
-            UnbindComponentItem.IsEnabled = false;
-        }
-        void InitializeLayer()
-        {
-            selectedLayer = selectedParticle.Layers.First();
-            LayerTree.ItemsSource = selectedParticle.Layers;
-            LayerAxis.ItemsSource = selectedParticle.Layers;
-            CopyLayerItem.IsEnabled = false;
-            DeleteLayerItem.IsEnabled = false;
-            SetLayerItem.IsEnabled = false;
+            InitializeLayerAndComponent();
         }
         void InitializeCommandStacks()
         {
@@ -129,25 +115,21 @@ namespace CrazyStorm
         {
             StatusText.DataContext = this;
         }
-        void UpdateComponent()
+        void InitializeLayerAndComponent()
         {
-            ComponentTree.ItemsSource = selectedParticle.ComponentTree;
-            DeleteComponentItem.IsEnabled = false;
-            BindComponentItem.IsEnabled = false;
-            UnbindComponentItem.IsEnabled = false;
-        }
-        void UpdateLayer()
-        {
+            selectedLayer = selectedParticle.Layers.First();
             LayerTree.ItemsSource = selectedParticle.Layers;
             LayerAxis.ItemsSource = selectedParticle.Layers;
             CopyLayerItem.IsEnabled = false;
             DeleteLayerItem.IsEnabled = false;
             SetLayerItem.IsEnabled = false;
+            ComponentTree.ItemsSource = selectedParticle.ComponentTree;
+            DeleteComponentItem.IsEnabled = false;
+            BindComponentItem.IsEnabled = false;
+            UnbindComponentItem.IsEnabled = false;
         }
-        void Update()
+        void UpdateSelectedStatus()
         {
-            UpdateComponent();
-            UpdateLayer();
             UpdatePropertyPanel();
             UpdateScreen();
             UpdateSelectedGroup();

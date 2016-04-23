@@ -176,7 +176,7 @@ namespace CrazyStorm
                         }
                     }
 
-            Update();
+            UpdateSelectedStatus();
             //Enable delection if selected one or more.
             DeleteComponentItem.IsEnabled = selectedComponents.Count > 0;
             //Enable binding if selected one or more.
@@ -292,7 +292,7 @@ namespace CrazyStorm
                 aimComponent.Y = (int)(boxY + (double)aimRect.GetValue(Canvas.HeightProperty) / 2 - config.ScreenHeightOver2);
                 new AddComponentCommand().Do(commandStacks[selectedParticle],
                     selectedParticle, selectedLayer, aimComponent);
-                Update();
+                UpdateSelectedStatus();
                 aimComponent = null;
                 aimRect = null;
             }
@@ -338,19 +338,22 @@ namespace CrazyStorm
             {
                 var tabItem = e.AddedItems[0] as TabItem;
                 foreach (var item in file.Particles)
+                {
                     if (item.Name == (string)tabItem.Header)
                     {
                         selectedParticle = item;
                         break;
                     }
-                Update();
+                }
+                InitializeLayerAndComponent();
+                UpdateSelectedStatus();
             }
         }
         private void ScreenSettingItem_Click(object sender, RoutedEventArgs e)
         {
             //Open screen setting window.
             ScreenSetting window = new ScreenSetting(config);
-            window.OnButtonClick += () => Update();
+            window.OnButtonClick += () => UpdateScreen();
             window.ShowDialog();
         }
         #endregion

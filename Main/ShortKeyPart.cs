@@ -94,7 +94,7 @@ namespace CrazyStorm
                     UnbindComponent();
                     break;
             }
-            Update();
+            UpdateSelectedStatus();
         }
         #endregion
     }

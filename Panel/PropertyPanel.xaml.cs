@@ -174,17 +174,17 @@ namespace CrazyStorm
                 SpecificGroup.Header = (string)FindResource("ParticleEventList");
                 SpecificEventList.ItemsSource = (component as Emitter).ParticleEventGroups;
             }
-            else if (component is Mask)
+            else if (component is EventField)
             {
                 SpecificGroup.Visibility = Visibility.Visible;
-                SpecificGroup.Header = (string)FindResource("MaskEventList");
-                SpecificEventList.ItemsSource = (component as Mask).MaskEventGroups;
+                SpecificGroup.Header = (string)FindResource("EventFieldEventList");
+                SpecificEventList.ItemsSource = (component as EventField).EventFieldEventGroups;
             }
-            else if (component is Rebound)
+            else if (component is Rebounder)
             {
                 SpecificGroup.Visibility = Visibility.Visible;
-                SpecificGroup.Header = (string)FindResource("ReboundEventList");
-                SpecificEventList.ItemsSource = (component as Rebound).ReboundEventGroups;
+                SpecificGroup.Header = (string)FindResource("RebounderEventList");
+                SpecificEventList.ItemsSource = (component as Rebounder).RebounderEventGroups;
             }   
         }
         void LoadProperties(FrameworkElement element, PropertyContainer container, IList<PropertyInfo> infos)
@@ -433,10 +433,10 @@ namespace CrazyStorm
         {
             if (component is Emitter)
                 (component as Emitter).ParticleEventGroups.Add(new EventGroup());
-            else if (component is Mask)
-                (component as Mask).MaskEventGroups.Add(new EventGroup());
-            else if (component is Rebound)
-                (component as Rebound).ReboundEventGroups.Add(new EventGroup());
+            else if (component is EventField)
+                (component as EventField).EventFieldEventGroups.Add(new EventGroup());
+            else if (component is Rebounder)
+                (component as Rebounder).RebounderEventGroups.Add(new EventGroup());
         }
         private void DelComponentEvent_Click(object sender, RoutedEventArgs e)
         {
@@ -448,10 +448,10 @@ namespace CrazyStorm
             var item = SpecificEventList.SelectedItem as EventGroup;
             if (component is Emitter)
                 (component as Emitter).ParticleEventGroups.Remove(item);
-            else if (component is Mask)
-                (component as Mask).MaskEventGroups.Remove(item);
-            else if (component is Rebound)
-                (component as Rebound).ReboundEventGroups.Remove(item);
+            else if (component is EventField)
+                (component as EventField).EventFieldEventGroups.Remove(item);
+            else if (component is Rebounder)
+                (component as Rebounder).RebounderEventGroups.Remove(item);
         }
         private void ComponentEventList_PreviewMouseRightButtonDown(object sender, MouseButtonEventArgs e)
         {
@@ -490,7 +490,7 @@ namespace CrazyStorm
                 {
                     environment.RemoveLocal(item.Name);
                 }
-                if (component is Mask || component is Rebound)
+                if (component is EventField || component is Rebounder)
                 {
                     //Put particle properties
                     environment.PutLocal("MaxLife", 0);

@@ -281,12 +281,12 @@ namespace CrazyStorm
             var list = new List<CrazyStorm.Core.Component>();
             list.Add(item);
             new DelComponentCommand().Do(commandStacks[selectedParticle], selectedParticle, list);
-            Update();
+            UpdateSelectedStatus();
         }
         private void DeleteComponentItem_Click(object sender, RoutedEventArgs e)
         {
             new DelComponentCommand().Do(commandStacks[selectedParticle], selectedParticle, selectedComponents);
-            Update();
+            UpdateSelectedStatus();
         }
         private void TabClose_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {

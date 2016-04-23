@@ -38,7 +38,7 @@ namespace CrazyStorm
             if (selectedParticle.Layers.Count > 1)
             {
                 new DelLayerCommand().Do(commandStacks[selectedParticle], selectedParticle, selectedLayer);
-                Update();
+                UpdateSelectedStatus();
             }
             else
                 MessageBox.Show((string)FindResource("CanNotDeleteAllLayer"), (string)FindResource("TipTitle"),
@@ -99,7 +99,7 @@ namespace CrazyStorm
             }
             var visible = sender as Label;
             selectedLayer.Visible = visible.Opacity == 0 ? true : false;
-            Update();
+            UpdateSelectedStatus();
         }
         private void LayerDown_MouseUp(object sender, MouseButtonEventArgs e)
         {
