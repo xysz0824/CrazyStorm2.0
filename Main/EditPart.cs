@@ -30,6 +30,7 @@ namespace CrazyStorm
             //Update edit items
             CutItem.IsEnabled = CutButton.IsEnabled;
             CopyItem.IsEnabled = CopyButton.IsEnabled;
+            DelItem.IsEnabled = CutItem.IsEnabled;
         }
         void SelectAll()
         {
@@ -40,7 +41,6 @@ namespace CrazyStorm
 
             SelectComponents(set, false);
         }
-
         void Undo()
         {
             var stack = commandStacks[selectedParticle];
@@ -94,26 +94,6 @@ namespace CrazyStorm
             Copy();
         }
         private void PasteItem_Click(object sender, RoutedEventArgs e)
-        {
-            Paste();
-        }
-        private void UndoButton_Click(object sender, RoutedEventArgs e)
-        {
-            Undo();
-        }
-        private void RedoButton_Click(object sender, RoutedEventArgs e)
-        {
-            Redo();
-        }
-        private void CutButton_Click(object sender, RoutedEventArgs e)
-        {
-            Cut();
-        }
-        private void CopyButton_Click(object sender, RoutedEventArgs e)
-        {
-            Copy();
-        }
-        private void PasteButton_Click(object sender, RoutedEventArgs e)
         {
             Paste();
         }

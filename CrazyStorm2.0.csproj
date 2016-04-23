@@ -88,6 +88,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Edit\Command\Component\BindComponentCommand.cs" />
+    <Compile Include="Edit\Command\Component\PasteComponentCommand.cs" />
     <Compile Include="Edit\Command\Component\UnbindComponentCommand.cs" />
     <Compile Include="Marker\ComponentMarker.cs" />
     <Compile Include="Marker\ForceFieldMarker.cs" />

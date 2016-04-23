@@ -245,6 +245,7 @@
                 <MenuItem Name="CutItem" Header="剪切" InputGestureText="Ctrl+X" Click="CutItem_Click"/>
                 <MenuItem Name="CopyItem" Header="复制" InputGestureText="Ctrl+C" Click="CopyItem_Click"/>
                 <MenuItem Name="PasteItem" Header="粘贴" InputGestureText="Ctrl+V" Click="PasteItem_Click"/>
+                <MenuItem Name="DelItem" Header="删除" InputGestureText="Del" Click="DeleteComponentItem_Click"/>
                 <Separator/>
                 <MenuItem Header="查找" InputGestureText="Ctrl+F"/>
                 <MenuItem Header="选中全部" InputGestureText="Ctrl+A" Click="SelectAllItem_Click"/>
@@ -309,23 +310,23 @@
                 <Image Source="Images/document-export.ico" Stretch="None" />
             </Button>
             <Separator/>
-            <Button Name="CutButton" IsDefault="False" IsCancel="False" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ToolTip="剪切" Click="CutButton_Click">
+            <Button Name="CutButton" IsDefault="False" IsCancel="False" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ToolTip="剪切" Click="CutItem_Click">
                 <Image Source="Images/edit-cut-3.ico" Stretch="None" />
             </Button>
-            <Button Name="CopyButton" IsDefault="False" IsCancel="False" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ToolTip="复制" Click="CopyButton_Click">
+            <Button Name="CopyButton" IsDefault="False" IsCancel="False" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ToolTip="复制" Click="CopyItem_Click">
                 <Image Source="Images/edit-copy-3.ico" Stretch="None" />
             </Button>
-            <Button Name="PasteButton" IsDefault="False" IsCancel="False" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ToolTip="粘贴" Click="PasteButton_Click">
+            <Button Name="PasteButton" IsDefault="False" IsCancel="False" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ToolTip="粘贴" Click="PasteItem_Click">
                 <Image Source="Images/edit-paste-3.ico" Stretch="None" />
             </Button>
             <Button Name="FindButton" IsDefault="False" IsCancel="False" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ToolTip="查找" >
                 <Image Source="Images/edit-find-5.ico" Stretch="None" />
             </Button>
             <Separator/>
-            <Button Name="UndoButton" IsDefault="False" IsCancel="False" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ToolTip="撤销" Click="UndoButton_Click">
+            <Button Name="UndoButton" IsDefault="False" IsCancel="False" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ToolTip="撤销" Click="UndoItem_Click">
                 <Image Source="Images/edit-undo-3.ico" Stretch="None" />
             </Button>
-            <Button Name="RedoButton" IsDefault="False" IsCancel="False" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ToolTip="恢复" Click="RedoButton_Click">
+            <Button Name="RedoButton" IsDefault="False" IsCancel="False" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ToolTip="恢复" Click="RedoItem_Click">
                 <Image Source="Images/edit-redo-3.ico" Stretch="None" />
             </Button>
             <Separator/>
@@ -480,14 +481,7 @@
                                         <TreeView.ItemTemplate >
                                             <HierarchicalDataTemplate ItemsSource="{Binding Children}">
                                                 <TextBlock Text="{Binding Name}" 
-                                                       MouseLeftButtonDown="ComponentTree_MouseLeftButtonDown" 
-                                                       PreviewMouseRightButtonDown="ComponentTree_PreviewMouseRightButtonDown">
-                                                    <TextBlock.ContextMenu>
-                                                        <ContextMenu>
-                                                            <MenuItem Name="CopyComponent"  Header="复制" Click="CopyComponent_Click"></MenuItem>
-                                                            <MenuItem Name="DeleteComponent" Header="删除" Click="DeleteComponent_Click"></MenuItem>
-                                                        </ContextMenu>
-                                                    </TextBlock.ContextMenu>
+                                                       MouseLeftButtonDown="ComponentTree_MouseLeftButtonDown">
                                                     <TextBlock.Style >
                                                         <Style TargetType="TextBlock">
                                                             <Style.Triggers>

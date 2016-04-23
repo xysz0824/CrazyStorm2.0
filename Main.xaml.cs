@@ -105,6 +105,7 @@ namespace CrazyStorm
             PasteItem.IsEnabled = false;
             UndoItem.IsEnabled = false;
             RedoItem.IsEnabled = false;
+            DelItem.IsEnabled = false;
             CutButton.IsEnabled = false;
             CopyButton.IsEnabled = false;
             PasteButton.IsEnabled = false;

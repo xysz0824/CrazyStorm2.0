@@ -841,7 +841,7 @@ namespace CrazyStorm
                             throw new ScriptException();
                     }
                 }
-                catch (ScriptException ex)
+                catch
                 {
                     ChangeTextBoxState(ResultValue, true);
                 }
@@ -909,7 +909,7 @@ namespace CrazyStorm
                     throw new ScriptException();
                 eventGroup.Condition = input;
             }
-            catch (ScriptException ex)
+            catch
             {
                 ChangeTextBoxState(Condition, true);
             }
@@ -931,7 +931,7 @@ namespace CrazyStorm
                 if (!(result is bool))
                     throw new ScriptException();
             }
-            catch (ScriptException ex)
+            catch
             {
                 ChangeTextBoxState(StopCondition, true);
             }

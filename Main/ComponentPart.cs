@@ -183,10 +183,6 @@ namespace CrazyStorm
             var button = VisualHelper.VisualUpwardSearch<Button>(image) as Button;
             image.Source = new BitmapImage(new Uri(@"Images\button-" + button.Name + ".png", UriKind.Relative));
         }
-        private void ComponentTree_PreviewMouseRightButtonDown(object sender, MouseButtonEventArgs e)
-        {
-            VisualHelper.FocusItem<TreeViewItem>(e);
-        }
         private void ComponentTree_MouseLeftButtonDown(object sender, MouseEventArgs e)
         {
             lastMouseDown = e.GetPosition(ComponentTree);
@@ -271,18 +267,6 @@ namespace CrazyStorm
                     sourceComponent.TransPositiontoRelative();
                 }
             }
-        }
-        private void CopyComponent_Click(object sender, RoutedEventArgs e)
-        {
-            //TODO : Copy function.
-        }
-        private void DeleteComponent_Click(object sender, RoutedEventArgs e)
-        {
-            var item = ComponentTree.SelectedItem as CrazyStorm.Core.Component; 
-            var list = new List<CrazyStorm.Core.Component>();
-            list.Add(item);
-            new DelComponentCommand().Do(commandStacks[selectedParticle], selectedParticle, list);
-            UpdateSelectedStatus();
         }
         private void DeleteComponentItem_Click(object sender, RoutedEventArgs e)
         {
