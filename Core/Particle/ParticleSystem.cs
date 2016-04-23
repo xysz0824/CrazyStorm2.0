@@ -18,6 +18,7 @@ namespace CrazyStorm.Core
         ObservableCollection<Layer> layers;
         ObservableCollection<Component> componentTree;
         int layerIndex;
+        Dictionary<Type, int> componentIndex;
         #endregion
 
         #region Public Members
@@ -39,11 +40,19 @@ namespace CrazyStorm.Core
             customType = new ObservableCollection<ParticleType>();
             layers = new ObservableCollection<Layer>();
             componentTree = new ObservableCollection<Component>();
+            componentIndex = new Dictionary<Type, int>();
             layers.Add(new Layer("Main"));
         }
         #endregion
 
         #region Public Methods
+        public int GetComponentIndex(Type componentType)
+        {
+            if (!componentIndex.ContainsKey(componentType))
+                componentIndex[componentType] = 0;
+
+            return componentIndex[componentType]++;
+        }
         public void AddComponentToLayer(Layer layer, Component component)
         {
             if (component.Parent == null)

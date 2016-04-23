@@ -13,31 +13,31 @@ using CrazyStorm.Core;
 
 namespace CrazyStorm
 {
-    class MaskMarker : IComponentMark
+    class EventFieldMarker : IComponentMark
     {
         public void Draw(Canvas canvas, Component component, int x, int y)
         {
-            var mask = component as Mask;
-            if (mask.Shape == Core.Shape.Rectangle)
+            var EventField = component as EventField;
+            if (EventField.Shape == Core.Shape.Rectangle)
             {
                 var rect = new Rectangle();
-                rect.Width = mask.HalfWidth * 2;
-                rect.Height = mask.HalfHeight * 2;
+                rect.Width = EventField.HalfWidth * 2;
+                rect.Height = EventField.HalfHeight * 2;
                 rect.Fill = new SolidColorBrush(Colors.Red);
                 rect.Opacity = 0.5f;
-                rect.SetValue(Canvas.LeftProperty, (double)x - mask.HalfWidth);
-                rect.SetValue(Canvas.TopProperty, (double)y - mask.HalfHeight);
+                rect.SetValue(Canvas.LeftProperty, (double)x - EventField.HalfWidth);
+                rect.SetValue(Canvas.TopProperty, (double)y - EventField.HalfHeight);
                 canvas.Children.Add(rect);
             }
-            else if (mask.Shape == Core.Shape.Ellipse)
+            else if (EventField.Shape == Core.Shape.Ellipse)
             {
                 var rect = new Ellipse();
-                rect.Width = mask.HalfWidth * 2;
-                rect.Height = mask.HalfHeight * 2;
+                rect.Width = EventField.HalfWidth * 2;
+                rect.Height = EventField.HalfHeight * 2;
                 rect.Fill = new SolidColorBrush(Colors.Red);
                 rect.Opacity = 0.5f;
-                rect.SetValue(Canvas.LeftProperty, (double)x - mask.HalfWidth);
-                rect.SetValue(Canvas.TopProperty, (double)y - mask.HalfHeight);
+                rect.SetValue(Canvas.LeftProperty, (double)x - EventField.HalfWidth);
+                rect.SetValue(Canvas.TopProperty, (double)y - EventField.HalfHeight);
                 canvas.Children.Add(rect);
             }
         }

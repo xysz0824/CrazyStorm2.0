@@ -23,7 +23,6 @@ namespace CrazyStorm.Core
         public MultiEmitter()
             : base()
         {
-            Name = "NewMultiEmitter";
             particle = new Particle();
         }
         #endregion

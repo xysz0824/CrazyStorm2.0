@@ -13,19 +13,19 @@ using CrazyStorm.Core;
 
 namespace CrazyStorm
 {
-    class ReboundMarker : IComponentMark
+    class RebounderMarker : IComponentMark
     {
         public void Draw(Canvas canvas, Component component, int x, int y)
         {
-            var rebound = component as Rebound;
+            var Rebounder = component as Rebounder;
             var line = new Line();
             line.Stroke = new SolidColorBrush(Colors.Red);
             line.StrokeThickness = 6;
             line.Opacity = 0.5f;
-            line.X1 = x + rebound.Length * Math.Cos(rebound.Rotation / 180 * Math.PI);
-            line.Y1 = y + rebound.Length * Math.Sin(rebound.Rotation / 180 * Math.PI);
-            line.X2 = x + rebound.Length * Math.Cos((rebound.Rotation + 180) / 180 * Math.PI);
-            line.Y2 = y + rebound.Length * Math.Sin((rebound.Rotation + 180) / 180 * Math.PI);
+            line.X1 = x + Rebounder.Length * Math.Cos(Rebounder.Rotation / 180 * Math.PI);
+            line.Y1 = y + Rebounder.Length * Math.Sin(Rebounder.Rotation / 180 * Math.PI);
+            line.X2 = x + Rebounder.Length * Math.Cos((Rebounder.Rotation + 180) / 180 * Math.PI);
+            line.Y2 = y + Rebounder.Length * Math.Sin((Rebounder.Rotation + 180) / 180 * Math.PI);
             canvas.Children.Add(line);
         }
     }

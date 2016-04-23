@@ -21,7 +21,7 @@ namespace CrazyStorm.Core
         Layer,
         Name
     }
-    public class Mask : Component
+    public class EventField : Component
     {
         #region Private Members
         float halfWidth;
@@ -29,7 +29,7 @@ namespace CrazyStorm.Core
         Shape shape;
         Reach reach;
         string targetName;
-        ObservableCollection<EventGroup> maskEventGroups;
+        ObservableCollection<EventGroup> eventFieldEventGroups;
         #endregion
 
         #region Public Members
@@ -63,16 +63,15 @@ namespace CrazyStorm.Core
             get { return targetName; }
             set { targetName = value; }
         }
-        public ObservableCollection<EventGroup> MaskEventGroups { get { return maskEventGroups; } }
+        public ObservableCollection<EventGroup> EventFieldEventGroups { get { return eventFieldEventGroups; } }
         #endregion
 
         #region Constructor
-        public Mask()
+        public EventField()
             : base()
         {
-            Name = "NewMask";
             targetName = "";
-            maskEventGroups = new ObservableCollection<EventGroup>();
+            eventFieldEventGroups = new ObservableCollection<EventGroup>();
         }
         #endregion
     }

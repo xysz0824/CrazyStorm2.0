@@ -10,13 +10,13 @@ using System.Text;
 
 namespace CrazyStorm.Core
 {
-    public class Rebound : Component
+    public class Rebounder : Component
     {
         #region Private Members
         int length;
         float rotation;
         int collisionTime;
-        ObservableCollection<EventGroup> reboundEventGroups;
+        ObservableCollection<EventGroup> rebounderEventGroups;
         #endregion
 
         #region Public Members
@@ -38,15 +38,14 @@ namespace CrazyStorm.Core
             get { return collisionTime; }
             set { collisionTime = value; }
         }
-        public ObservableCollection<EventGroup> ReboundEventGroups { get { return reboundEventGroups; } }
+        public ObservableCollection<EventGroup> RebounderEventGroups { get { return rebounderEventGroups; } }
         #endregion
 
         #region Constructor
-        public Rebound()
+        public Rebounder()
             : base()
         {
-            Name = "NewRebound";
-            reboundEventGroups = new ObservableCollection<EventGroup>();
+            rebounderEventGroups = new ObservableCollection<EventGroup>();
         }
         #endregion
     }

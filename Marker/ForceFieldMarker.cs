@@ -13,11 +13,11 @@ using CrazyStorm.Core;
 
 namespace CrazyStorm
 {
-    class ForceMarker : IComponentMark
+    class ForceFieldMarker : IComponentMark
     {
         public void Draw(Canvas canvas, Component component, int x, int y)
         {
-            var force = component as Force;
+            var force = component as ForceField;
             if (force.Shape == Core.Shape.Rectangle)
             {
                 var rect = new Rectangle();

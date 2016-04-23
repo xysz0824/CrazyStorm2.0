@@ -23,7 +23,6 @@ namespace CrazyStorm.Core
         public CurveEmitter()
             : base()
         {
-            Name = "NewCurveEmitter";
             curveParticle = new CurveParticle();
         }
         #endregion

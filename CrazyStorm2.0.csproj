@@ -89,12 +89,12 @@
     </ApplicationDefinition>
     <Compile Include="Edit\Command\Component\BindComponentCommand.cs" />
     <Compile Include="Marker\ComponentMarker.cs" />
-    <Compile Include="Marker\ForceMarker.cs" />
+    <Compile Include="Marker\ForceFieldMarker.cs" />
     <Compile Include="Marker\IComponentMark.cs" />
     <Compile Include="Marker\EmitterMarker.cs" />
     <Compile Include="Helper\DrawHelper.cs" />
-    <Compile Include="Marker\MaskMarker.cs" />
-    <Compile Include="Marker\ReboundMarker.cs" />
+    <Compile Include="Marker\EventFieldMarker.cs" />
+    <Compile Include="Marker\RebounderMarker.cs" />
     <Compile Include="Panel\PropertyPanelItem.cs" />
     <Compile Include="Edit\Command\Property\SetPropertyCommand.cs" />
     <Compile Include="Helper\VisualHelper.cs" />
@@ -307,14 +307,14 @@
   <ItemGroup>
     <Resource Include="Images\button-CurveEmitter-on.png" />
     <Resource Include="Images\button-CurveEmitter.png" />
-    <Resource Include="Images\button-Force-on.png" />
-    <Resource Include="Images\button-Force.png" />
-    <Resource Include="Images\button-Mask-on.png" />
-    <Resource Include="Images\button-Mask.png" />
+    <Resource Include="Images\button-ForceField-on.png" />
+    <Resource Include="Images\button-ForceField.png" />
+    <Resource Include="Images\button-EventField-on.png" />
+    <Resource Include="Images\button-EventField.png" />
     <Resource Include="Images\button-MultiEmitter-on.png" />
     <Resource Include="Images\button-MultiEmitter.png" />
-    <Resource Include="Images\button-Rebound-on.png" />
-    <Resource Include="Images\button-Rebound.png" />
+    <Resource Include="Images\button-Rebounder-on.png" />
+    <Resource Include="Images\button-Rebounder.png" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="Script\Script.csproj">

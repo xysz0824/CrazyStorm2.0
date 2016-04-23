@@ -31,8 +31,8 @@
     <sys:String x:Key="BackGroundImageType">JPEG图像(*.jpg)|*.jpg|PNG图像(*.png)|*.png|BMP图像(*.bmp)|*.bmp</sys:String>
     <!-- Component Sidebar -->
     <sys:String x:Key="ParticleEventList">粒子事件组</sys:String>
-    <sys:String x:Key="MaskEventList">遮罩事件组</sys:String>
-    <sys:String x:Key="ReboundEventList">反弹事件组</sys:String>
+    <sys:String x:Key="EventFieldEventList">事件场事件组</sys:String>
+    <sys:String x:Key="RebounderEventList">反弹板事件组</sys:String>
     <sys:String x:Key="DoubleClickTip">继续双击进入属性面板</sys:String>
     <sys:String x:Key="ComponentUnit">个组件</sys:String>
     <!-- Event Setting -->

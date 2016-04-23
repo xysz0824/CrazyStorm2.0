@@ -56,10 +56,10 @@
     <Compile Include="Global\VersionInfo.cs" />
     <Compile Include="Particle\ParticleSystem.cs" />
     <Compile Include="Component\MultiEmitter.cs" />
-    <Compile Include="Component\Force.cs" />
+    <Compile Include="Component\ForceField.cs" />
     <Compile Include="Component\CurveEmitter.cs" />
-    <Compile Include="Component\Mask.cs" />
-    <Compile Include="Component\Rebound.cs" />
+    <Compile Include="Component\EventField.cs" />
+    <Compile Include="Component\Rebounder.cs" />
     <Compile Include="File.cs" />
     <Compile Include="Layer.cs" />
     <Compile Include="Math\Vector2.cs" />

@@ -458,17 +458,17 @@
                                             <Image RenderOptions.BitmapScalingMode="NearestNeighbor" Source="Images/button-CurveEmitter.png" Stretch="Uniform" ToolTip="曲线发射器" 
                                                MouseEnter="ComponentButton_MouseEnter" MouseLeave="ComponentButton_MouseLeave" Width="28" Height="28"  UseLayoutRounding="True"/>
                                         </Button>
-                                        <Button Name="Mask" Background="{x:Null}" Padding="0" Margin="1,1,2,1" Click="ComponentButton_Click" Width="32" Height="32">
-                                            <Image  RenderOptions.BitmapScalingMode="NearestNeighbor" Source="Images/button-Mask.png" ToolTip="遮罩" 
+                                        <Button Name="EventField" Background="{x:Null}" Padding="0" Margin="1,1,2,1" Click="ComponentButton_Click" Width="32" Height="32">
+                                            <Image  RenderOptions.BitmapScalingMode="NearestNeighbor" Source="Images/button-EventField.png" ToolTip="事件场" 
                                                MouseEnter="ComponentButton_MouseEnter" MouseLeave="ComponentButton_MouseLeave" Width="28" Height="28" UseLayoutRounding="True">
                                             </Image>
                                         </Button>
-                                        <Button Name="Rebound" Width="32" Height="32" Background="{x:Null}" Padding="0" Margin="1,1,2,1" Click="ComponentButton_Click">
-                                            <Image RenderOptions.BitmapScalingMode="NearestNeighbor" Source="Images/button-Rebound.png" Stretch="Uniform" ToolTip="反弹板" 
+                                        <Button Name="Rebounder" Width="32" Height="32" Background="{x:Null}" Padding="0" Margin="1,1,2,1" Click="ComponentButton_Click">
+                                            <Image RenderOptions.BitmapScalingMode="NearestNeighbor" Source="Images/button-Rebounder.png" Stretch="Uniform" ToolTip="反弹板" 
                                                MouseEnter="ComponentButton_MouseEnter" MouseLeave="ComponentButton_MouseLeave" Width="28" Height="28"  UseLayoutRounding="True"/>
                                         </Button>
-                                        <Button Name="Force" Width="32" Height="32" Background="{x:Null}" Padding="0" Margin="1,1,2,1" Click="ComponentButton_Click">
-                                            <Image RenderOptions.BitmapScalingMode="NearestNeighbor" Source="Images/button-Force.png" Stretch="Uniform" ToolTip="力场" 
+                                        <Button Name="ForceField" Width="32" Height="32" Background="{x:Null}" Padding="0" Margin="1,1,2,1" Click="ComponentButton_Click">
+                                            <Image RenderOptions.BitmapScalingMode="NearestNeighbor" Source="Images/button-ForceField.png" Stretch="Uniform" ToolTip="力场" 
                                                MouseEnter="ComponentButton_MouseEnter" MouseLeave="ComponentButton_MouseLeave" Width="28" Height="28"  UseLayoutRounding="True"/>
                                         </Button>
                                     </StackPanel>

@@ -15,7 +15,7 @@ namespace CrazyStorm.Core
         Inner,
         Outer
     }
-    public class Force : Component
+    public class ForceField : Component
     {
         #region Private Members
         float halfWidth;
@@ -80,10 +80,9 @@ namespace CrazyStorm.Core
         #endregion
 
         #region Constructor
-        public Force()
+        public ForceField()
             : base()
         {
-            Name = "NewForce";
             targetName = "";
         }
         #endregion
