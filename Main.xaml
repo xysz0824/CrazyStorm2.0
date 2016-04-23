@@ -685,7 +685,7 @@
                         </Label.Background>
                     </Label>
                     <TreeView Name="LayerAxis" BorderBrush="{x:Null}" Background="{x:Null}" BorderThickness="0" VerticalContentAlignment="Top" Foreground="{x:Null}" 
-                              Padding="0" PreviewMouseLeftButtonDown="LayerAxis_PreviewMouseLeftButtonDown" LayoutUpdated="LayerAxis_LayoutUpdated">
+                              Padding="0" PreviewMouseLeftButtonDown="LayerAxis_PreviewMouseLeftButtonDown">
                         <TreeView.ItemTemplate>
                             <DataTemplate>
                                 <Rectangle Height="16" VerticalAlignment="Top" HorizontalAlignment="Left">

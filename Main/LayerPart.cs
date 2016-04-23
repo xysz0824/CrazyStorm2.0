@@ -207,22 +207,22 @@ namespace CrazyStorm
             {
                 axisScroll = VisualHelper.VisualDownwardSearch<ScrollViewer>(LayerAxis) as ScrollViewer;
                 layerScroll = VisualHelper.VisualDownwardSearch<ScrollViewer>(LayerTree) as ScrollViewer;
-            }
-        }
-        private void LayerAxis_LayoutUpdated(object sender, EventArgs e)
-        {
-            if (axisScroll != null)
-            {
-                var imageBruch = TimeAxis.Background as ImageBrush;
-                imageBruch.Viewport = new Rect(-axisScroll.HorizontalOffset, -1 - axisScroll.VerticalOffset,
-                    imageBruch.Viewport.Width, imageBruch.Viewport.Height);
-                imageBruch = TimeScale.Background as ImageBrush;
-                imageBruch.Viewport = new Rect(-axisScroll.HorizontalOffset, imageBruch.Viewport.Y,
-                    imageBruch.Viewport.Width, imageBruch.Viewport.Height);
-                layerScroll.ScrollToVerticalOffset(axisScroll.VerticalOffset);
-                layerScroll.RenderTransform = new TranslateTransform(0, 0);
-                if (layerScroll.ScrollableHeight < axisScroll.VerticalOffset)
-                    layerScroll.RenderTransform = new TranslateTransform(0, layerScroll.ScrollableHeight - axisScroll.VerticalOffset);
+                axisScroll.ScrollChanged += (object s, ScrollChangedEventArgs args) =>
+                {
+                    if (axisScroll != null)
+                    {
+                        var imageBruch = TimeAxis.Background as ImageBrush;
+                        imageBruch.Viewport = new Rect(-axisScroll.HorizontalOffset, -1 - axisScroll.VerticalOffset,
+                            imageBruch.Viewport.Width, imageBruch.Viewport.Height);
+                        imageBruch = TimeScale.Background as ImageBrush;
+                        imageBruch.Viewport = new Rect(-axisScroll.HorizontalOffset, imageBruch.Viewport.Y,
+                            imageBruch.Viewport.Width, imageBruch.Viewport.Height);
+                        layerScroll.ScrollToVerticalOffset(axisScroll.VerticalOffset);
+                        layerScroll.RenderTransform = new TranslateTransform(0, 0);
+                        if (layerScroll.ScrollableHeight < axisScroll.VerticalOffset)
+                            layerScroll.RenderTransform = new TranslateTransform(0, layerScroll.ScrollableHeight - axisScroll.VerticalOffset);
+                    }
+                };
             }
         }
         #endregion
