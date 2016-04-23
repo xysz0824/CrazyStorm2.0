@@ -711,7 +711,7 @@
                               HorizontalAlignment="Right" Background="#FFACACAC" Grid.Column="1" IsEnabled="False"/>
             </Grid>
             <GridSplitter Grid.Row="1"  VerticalAlignment="Top" Name="gridSplitter1" Height="1" 
-                          HorizontalAlignment="Stretch" Background="White" IsEnabled="False"/>
+                          HorizontalAlignment="Stretch" Background="White" />
         </Grid>
     </DockPanel>
 </Window>
