@@ -30,6 +30,14 @@ namespace CrazyStorm
             InitializeCommandStacks();
             AddNewParticleTab(particle);
         }
+        void AddNewParticleTab(ParticleSystem particle)
+        {
+            var tabItem = new TabItem();
+            tabItem.Header = particle.Name;
+            tabItem.Content = ParticleTabControl.ItemTemplate.LoadContent() as Canvas;
+            ParticleTabControl.Items.Add(tabItem);
+            ParticleTabControl.SelectedItem = tabItem;
+        }
         void DeleteSeletedParticle()
         {
             if (file.Particles.Count > 1)
@@ -64,7 +72,7 @@ namespace CrazyStorm
         }
         #endregion
 
-        #region Window EventHandler
+        #region Window EventHandlers
         private void ParticleMenu_Click(object sender, RoutedEventArgs e)
         {
             //Navigate to the corresponding function of Particle menu.

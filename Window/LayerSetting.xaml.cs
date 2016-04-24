@@ -49,7 +49,7 @@ namespace CrazyStorm
         }
         #endregion
 
-        #region Window EventHandler
+        #region Window EventHandlers
         private void Label_MouseUp(object sender, MouseButtonEventArgs e)
         {
             selectedColor = ColorPalette.Children.IndexOf(sender as UIElement);

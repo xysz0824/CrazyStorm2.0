@@ -114,22 +114,25 @@ namespace CrazyStorm
             }
             UpdateScreen();
         }
-        void UpdatePropertyPanel()
+        void UpdatePanels()
         {
             //Get all visible components in this particle system.
             var set = new List<Component>();
             foreach (var layer in selectedParticle.Layers)
                 if (layer.Visible)
                     set.AddRange(layer.Components);
-            //Remove the tab which is not belonging to any component.
             for (int i = 2; i < LeftTabControl.Items.Count; ++i)
             {
                 TabItem item = LeftTabControl.Items[i] as TabItem;
-                if (!set.Contains(item.DataContext))
+                //Remove the property panel which is not belonging to any component.
+                if (item.DataContext is Component && !set.Contains(item.DataContext))
                 {
                     LeftTabControl.Items.RemoveAt(i);
                     i--;
                 }
+                //Update finder panel
+                if (item.Content is FinderPanel)
+                    (item.Content as FinderPanel).Update(selectedParticle);
             }
         }
         void BindComponent()
@@ -160,7 +163,7 @@ namespace CrazyStorm
         }
         #endregion
 
-        #region Window EventHandler
+        #region Window EventHandlers
         private void ComponentButton_Click(object sender, RoutedEventArgs e)
         {
             //Create corresponding component according to different button.
@@ -278,11 +281,7 @@ namespace CrazyStorm
             var item = VisualHelper.VisualUpwardSearch<TabItem>(sender as DependencyObject) as TabItem;
             var tab = VisualHelper.VisualUpwardSearch<TabControl>(item) as TabControl;
             if (tab != null)
-            {
-                var scroll = item.Content as ScrollViewer;
-                var panel = scroll.Content as PropertyPanel;
                 tab.Items.Remove(item);
-            }
         }
         private void BindComponentItem_Click(object sender, RoutedEventArgs e)
         {

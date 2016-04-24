@@ -62,7 +62,7 @@ namespace CrazyStorm
         }
         #endregion
 
-        #region Window EventHandlers
+        #region Window EventHandlerss
         private void Button_Click(object sender, RoutedEventArgs e)
         {
             if (string.IsNullOrWhiteSpace(ParticleName.Text))

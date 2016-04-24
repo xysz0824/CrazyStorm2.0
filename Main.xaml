@@ -174,6 +174,7 @@
         <RoutedUICommand x:Key="Redo" Text="Redo"/>
         <RoutedUICommand x:Key="BindComponent" Text="BindComponent"/>
         <RoutedUICommand x:Key="UnbindComponent" Text="UnbindComponent"/>
+        <RoutedUICommand x:Key="Find" Text="Find"/>
     </Window.Resources>
     <Window.InputBindings>
         <KeyBinding  Key="Delete" Command="{StaticResource DelComponent}" />
@@ -186,6 +187,7 @@
         <KeyBinding   Modifiers="Control"  Key="Y" Command="{StaticResource Redo}" />
         <KeyBinding   Modifiers="Control"  Key="B" Command="{StaticResource BindComponent}" />
         <KeyBinding   Modifiers="Control"  Key="U" Command="{StaticResource UnbindComponent}" />
+        <KeyBinding   Modifiers="Control"  Key="F" Command="{StaticResource Find}" />
     </Window.InputBindings>
     <Window.CommandBindings>
         <CommandBinding Command="{StaticResource DelComponent}"
@@ -218,6 +220,9 @@
         <CommandBinding Command="{StaticResource UnbindComponent}"
                                             CanExecute="CommandBinding_CanExecute"
                                             Executed="CommandBinding_Executed" />
+        <CommandBinding Command="{StaticResource Find}"
+                                            CanExecute="CommandBinding_CanExecute"
+                                            Executed="CommandBinding_Executed" />
     </Window.CommandBindings>
     <DockPanel Height="Auto" Name="dockPanel1" Width="Auto">
         <!-- Top Menu -->
@@ -247,7 +252,7 @@
                 <MenuItem Name="PasteItem" Header="粘贴" InputGestureText="Ctrl+V" Click="PasteItem_Click"/>
                 <MenuItem Name="DelItem" Header="删除" InputGestureText="Del" Click="DeleteComponentItem_Click"/>
                 <Separator/>
-                <MenuItem Header="查找" InputGestureText="Ctrl+F"/>
+                <MenuItem Name="FindItem" Header="查找" InputGestureText="Ctrl+F" Click="FindItem_Click"  />
                 <MenuItem Header="选中全部" InputGestureText="Ctrl+A" Click="SelectAllItem_Click"/>
             </MenuItem>
             <MenuItem Header="资源">
@@ -319,7 +324,7 @@
             <Button Name="PasteButton" IsDefault="False" IsCancel="False" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ToolTip="粘贴" Click="PasteItem_Click">
                 <Image Source="Images/edit-paste-3.ico" Stretch="None" />
             </Button>
-            <Button Name="FindButton" IsDefault="False" IsCancel="False" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ToolTip="查找" >
+            <Button Name="FindButton" IsDefault="False" IsCancel="False" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ToolTip="查找" Click="FindItem_Click" >
                 <Image Source="Images/edit-find-5.ico" Stretch="None" />
             </Button>
             <Separator/>
@@ -480,8 +485,7 @@
                                               DragEnter="ComponentTree_CheckDrop" DragOver="ComponentTree_CheckDrop" DragLeave="ComponentTree_CheckDrop" Drop="ComponentTree_Drop" IsTextSearchEnabled="True">
                                         <TreeView.ItemTemplate >
                                             <HierarchicalDataTemplate ItemsSource="{Binding Children}">
-                                                <TextBlock Text="{Binding Name}" 
-                                                       MouseLeftButtonDown="ComponentTree_MouseLeftButtonDown">
+                                                <TextBlock Text="{Binding Name}" MouseLeftButtonDown="ComponentTree_MouseLeftButtonDown">
                                                     <TextBlock.Style >
                                                         <Style TargetType="TextBlock">
                                                             <Style.Triggers>

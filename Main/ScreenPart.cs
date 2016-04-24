@@ -209,17 +209,9 @@ namespace CrazyStorm
             if (set.Count > 0 && dclickDetector.IsDetected())
                 CreatePropertyPanel(set.First());
         }
-        void AddNewParticleTab(ParticleSystem particle)
-        {
-            var tabItem = new TabItem();
-            tabItem.Header = particle.Name;
-            tabItem.Content = ParticleTabControl.ItemTemplate.LoadContent() as Canvas;
-            ParticleTabControl.Items.Add(tabItem);
-            ParticleTabControl.SelectedItem = tabItem;
-        }
         #endregion
 
-        #region Window EventHandler
+        #region Window EventHandlers
         private void Screen_MouseMove(object sender, MouseEventArgs e)
         {
             screenMousePos = e.GetPosition(sender as IInputElement);

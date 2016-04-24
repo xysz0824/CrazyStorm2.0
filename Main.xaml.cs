@@ -131,7 +131,7 @@ namespace CrazyStorm
         }
         void UpdateSelectedStatus()
         {
-            UpdatePropertyPanel();
+            UpdatePanels();
             UpdateScreen();
             UpdateSelectedGroup();
             UpdateEdit();

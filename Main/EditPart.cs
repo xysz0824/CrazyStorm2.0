@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Windows;
+using System.Windows.Controls;
 using CrazyStorm.Core;
 
 namespace CrazyStorm
@@ -67,12 +68,42 @@ namespace CrazyStorm
         }
         void Paste()
         {
-            //TODO : Paste;
+            //TODO : Paste.
             UpdateSelectedStatus();
+        }
+        void Find()
+        {
+            TabItem item;
+            //Prevent from repeating tab of finder.  
+            for (int i = 2; i < LeftTabControl.Items.Count; ++i)
+            {
+                item = LeftTabControl.Items[i] as TabItem;
+                if (item.Content is FinderPanel)
+                {
+                    item.Focus();
+                    return;
+                }
+            }
+            //Clear selection of components.
+            SelectComponents(null, true);
+            //Create finder panel.
+            item = new TabItem();
+            item.Style = (Style)FindResource("CanCloseStyle");
+            var panel = new FinderPanel(selectedParticle);
+            panel.OnSelectComponent += (Component component) =>
+            {
+                var set = new List<CrazyStorm.Core.Component>();
+                set.Add(component);
+                SelectComponents(set, true);
+            };
+            item.DataContext = panel;
+            item.Content = panel;
+            LeftTabControl.Items.Add(item);
+            item.Focus();
         }
         #endregion
 
-        #region Window EventHandler
+        #region Window EventHandlers
         private void SelectAllItem_Click(object sender, RoutedEventArgs e)
         {
             SelectAll();
@@ -96,6 +127,10 @@ namespace CrazyStorm
         private void PasteItem_Click(object sender, RoutedEventArgs e)
         {
             Paste();
+        }
+        private void FindItem_Click(object sender, RoutedEventArgs e)
+        {
+            Find();
         }
         #endregion
     }

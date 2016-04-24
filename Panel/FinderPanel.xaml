@@ -1,0 +1,60 @@
+﻿<UserControl x:Class="CrazyStorm.FinderPanel"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             mc:Ignorable="d" Name="查找">
+    <DockPanel>
+        <GroupBox DockPanel.Dock="Top" Header="条件">
+            <StackPanel>
+                <UniformGrid Columns="2" Rows="1" >
+                    <DockPanel>
+                        <CheckBox Name="LayerCheckBox" DockPanel.Dock="Left" Content="图层" VerticalAlignment="Center" Margin="6,0,5,0" Click="LayerCheckBox_Click"/>
+                        <ComboBox Name="LayerComboBox" SelectedIndex="0" VerticalAlignment="Center" Margin="0,1" SelectionChanged="LayerComboBox_SelectionChanged">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding Name}" />
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
+                    </DockPanel>
+                    <DockPanel>
+                        <CheckBox Name="TypeCheckBox" DockPanel.Dock="Left" Content="类型" VerticalAlignment="Center" Margin="6,0,5,0" Click="TypeCheckBox_Click"/>
+                        <ComboBox Name="TypeComboBox" SelectedIndex="0" VerticalAlignment="Center" Margin="0,1" SelectionChanged="TypeComboBox_SelectionChanged">
+                        </ComboBox>
+                    </DockPanel>
+                </UniformGrid>
+                <DockPanel Margin="0,1">
+                    <Label DockPanel.Dock="Left" Content="名称" />
+                    <TextBox Name="InputName" VerticalContentAlignment="Center" TextChanged="InputName_TextChanged"/>
+                </DockPanel>
+            </StackPanel>
+        </GroupBox>
+        <GroupBox Header="结果">
+            <DockPanel>
+                <TextBlock Margin="5,1" DockPanel.Dock="Top" Name="ResultCount" HorizontalAlignment="Right" />
+                <TreeView Name="ComponentTree" Padding="-2,1,1,1" VerticalContentAlignment="Stretch" HorizontalContentAlignment="Stretch" 
+                      IsTextSearchEnabled="True">
+                    <TreeView.ItemTemplate >
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Name}" PreviewMouseLeftButtonDown="TextBlock_PreviewMouseLeftButtonDown" >
+                                <TextBlock.Style>
+                                    <Style TargetType="TextBlock">
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding HasOutStandingTask}" Value="true">
+                                                <Setter Property="Foreground" Value="DarkOrange" />
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding HasOutStandingTask}" Value="false">
+                                                <Setter Property="Foreground" Value="Aqua" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                        </DataTemplate>
+                    </TreeView.ItemTemplate>
+                </TreeView>
+            </DockPanel>
+        </GroupBox>
+    </DockPanel>
+</UserControl>

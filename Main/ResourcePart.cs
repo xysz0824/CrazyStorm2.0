@@ -39,7 +39,7 @@ namespace CrazyStorm
         }
         #endregion
 
-        #region Window EventHandler
+        #region Window EventHandlers
         private void ImageList_PreviewMouseRightButtonDown(object sender, MouseButtonEventArgs e)
         {
             VisualHelper.FocusItem<TreeViewItem>(e);

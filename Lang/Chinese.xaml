@@ -22,8 +22,8 @@
     <sys:String x:Key="LayerNameCanNotBeEmpty">图层名称不能为空</sys:String>
     <sys:String x:Key="ValueInvalid">填入的值有误，请检查</sys:String>
     <sys:String x:Key="ExpressionInvalid">填入的表达式有误，请检查</sys:String>
-    <sys:String x:Key="NameRepeating">名字重复，请重新修改</sys:String>
-    <sys:String x:Key="VariableInvalid">变量中含有重复名字或无效值，请检查</sys:String>
+    <sys:String x:Key="NameRepeating">名称重复，请重新修改</sys:String>
+    <sys:String x:Key="VariableInvalid">变量中含有重复名称或无效值，请检查</sys:String>
     <!-- File Window-->
     <sys:String x:Key="ImageType">PNG图像(*.png)|*.png</sys:String>
     <sys:String x:Key="SoundType">WAV音效(*.wav)|*.wav</sys:String>
@@ -34,9 +34,16 @@
     <sys:String x:Key="RebounderEventList">反弹板事件组</sys:String>
     <sys:String x:Key="DoubleClickTip">继续双击进入属性面板</sys:String>
     <sys:String x:Key="ComponentUnit">个组件</sys:String>
+    <sys:String x:Key="ResultCount">查找到 {0} 个</sys:String>
     <!-- Event Setting -->
     <sys:String x:Key="Test">测试</sys:String>
     <sys:String x:Key="Pause">暂停</sys:String>
     <sys:String x:Key="Modify">修改</sys:String>
     <sys:String x:Key="Add">添加</sys:String>
+    <!-- Component -->
+    <sys:String x:Key="MultiEmitter">多向发射器</sys:String>
+    <sys:String x:Key="CurveEmitter">曲线发射器</sys:String>
+    <sys:String x:Key="EventField">事件场</sys:String>
+    <sys:String x:Key="Rebounder">反弹板</sys:String>
+    <sys:String x:Key="ForceField">力场</sys:String>
 </ResourceDictionary>

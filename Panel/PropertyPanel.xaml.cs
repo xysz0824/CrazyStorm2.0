@@ -296,7 +296,7 @@ namespace CrazyStorm
         }
         #endregion
 
-        #region Windows EventHandlers
+        #region Window EventHandlers
         private void Grid_BeginningEdit(object sender, DataGridBeginningEditEventArgs e)
         {
             if (OnBeginEditing != null)

@@ -470,7 +470,7 @@ namespace CrazyStorm
         }
         #endregion
 
-        #region Window EventHandler
+        #region Window EventHandlers
         private void EventList_PreviewMouseRightButtonDown(object sender, MouseButtonEventArgs e)
         {
             var item = VisualHelper.VisualUpwardSearch<ListViewItem>(e.OriginalSource as DependencyObject);

@@ -55,7 +55,7 @@ namespace CrazyStorm
         }
         #endregion
 
-        #region Window EventHandler
+        #region Window EventHandlers
         private void TimeAxis_MouseMove(object sender, MouseEventArgs e)
         {
             var scrollviewer = VisualHelper.GetVisualChild<ScrollViewer>(TimeAxis);

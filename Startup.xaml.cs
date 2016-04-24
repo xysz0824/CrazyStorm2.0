@@ -25,9 +25,8 @@ namespace CrazyStorm
     public partial class MainWindow : Window
     {
         #region Private Members
-        //Control the startup
         Main mainWindow;
-        DispatcherTimer dTimer = new DispatcherTimer();
+        DispatcherTimer dTimer;
         short frame = 0;
         #endregion
 
@@ -36,6 +35,7 @@ namespace CrazyStorm
         {
             InitializeComponent();
 
+            dTimer = new DispatcherTimer();
             dTimer.Tick += dTimer_Tick;
             dTimer.Interval = new TimeSpan(0, 0, 0, 0, 16);
             dTimer.Start();
@@ -47,7 +47,7 @@ namespace CrazyStorm
         #region Private Methods
         private void dTimer_Tick(object sender, EventArgs e)
         {
-            //a frame approximately equal to 16ms(because 60 frames equals one second)
+            //A frame approximately equal to 16ms(60 frames equal to one second)
             frame++;
             if (Opacity < 1.0f) 
                 Opacity += 0.1f;

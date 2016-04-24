@@ -97,9 +97,16 @@
     <Compile Include="Helper\DrawHelper.cs" />
     <Compile Include="Marker\EventFieldMarker.cs" />
     <Compile Include="Marker\RebounderMarker.cs" />
+    <Compile Include="Panel\FinderPanel.xaml.cs">
+      <DependentUpon>FinderPanel.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Panel\PropertyPanelItem.cs" />
     <Compile Include="Edit\Command\Property\SetPropertyCommand.cs" />
     <Compile Include="Helper\VisualHelper.cs" />
+    <Page Include="Panel\FinderPanel.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Window\EventSetting.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

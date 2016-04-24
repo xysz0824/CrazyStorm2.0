@@ -19,7 +19,7 @@ namespace CrazyStorm
         bool editingProperties;
         #endregion
 
-        #region Window EventHandler
+        #region Window EventHandlers
         private void CommandBinding_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
             e.ContinueRouting = true;
@@ -92,6 +92,9 @@ namespace CrazyStorm
                     break;
                 case "UnbindComponent":
                     UnbindComponent();
+                    break;
+                case "Find":
+                    Find();
                     break;
             }
             UpdateSelectedStatus();
