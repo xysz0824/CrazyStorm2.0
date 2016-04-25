@@ -11,7 +11,7 @@ namespace CrazyStorm.Script
 {
     public class Struct
     {
-        Dictionary<string, object> fields;
+        IDictionary<string, object> fields;
         public Struct()
         {
             fields = new Dictionary<string, object>();
@@ -24,6 +24,6 @@ namespace CrazyStorm.Script
 
         public object GetField(string name) { return fields.ContainsKey(name) ? fields[name] : null; }
 
-        public Dictionary<string, object> GetFields() { return fields; }
+        public IDictionary<string, object> GetFields() { return fields; }
     }
 }

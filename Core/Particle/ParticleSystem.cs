@@ -14,11 +14,11 @@ namespace CrazyStorm.Core
     {
         #region Private Members
         string name;
-        ObservableCollection<ParticleType> customType;
-        ObservableCollection<Layer> layers;
-        ObservableCollection<Component> componentTree;
+        IList<ParticleType> customType;
+        IList<Layer> layers;
+        IList<Component> componentTree;
         int layerIndex;
-        Dictionary<Type, int> componentIndex;
+        IDictionary<Type, int> componentIndex;
         #endregion
 
         #region Public Members
@@ -27,9 +27,9 @@ namespace CrazyStorm.Core
             get { return name; }
             set { name = value; }
         }
-        public ObservableCollection<ParticleType> CustomType { get { return customType; } }
-        public ObservableCollection<Layer> Layers { get { return layers; } }
-        public ObservableCollection<Component> ComponentTree { get { return componentTree; } }
+        public IList<ParticleType> CustomType { get { return customType; } }
+        public IList<Layer> Layers { get { return layers; } }
+        public IList<Component> ComponentTree { get { return componentTree; } }
         public int LayerIndex { get { return layerIndex++; } }
         #endregion
 

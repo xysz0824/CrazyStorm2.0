@@ -114,7 +114,13 @@ namespace CrazyStorm
             }
             UpdateScreen();
         }
-        void UpdatePanels()
+        void UpdateComponentMenu()
+        {
+            //Enable binding if selected one or more.
+            BindComponentItem.IsEnabled = selectedComponents != null && selectedComponents.Count > 0;
+            UnbindComponentItem.IsEnabled = BindComponentItem.IsEnabled;
+        }
+        void UpdateComponentPanels()
         {
             //Get all visible components in this particle system.
             var set = new List<Component>();
@@ -154,7 +160,7 @@ namespace CrazyStorm
                 line.DataContext = component;
                 bindingLines.Add(line);
             }
-            SelectComponents(null, true);
+            CancelAllSelection();
         }
         void UnbindComponent()
         {
@@ -270,11 +276,6 @@ namespace CrazyStorm
                     sourceComponent.TransPositiontoRelative();
                 }
             }
-        }
-        private void DeleteComponentItem_Click(object sender, RoutedEventArgs e)
-        {
-            new DelComponentCommand().Do(commandStacks[selectedParticle], selectedParticle, selectedComponents);
-            UpdateSelectedStatus();
         }
         private void TabClose_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {

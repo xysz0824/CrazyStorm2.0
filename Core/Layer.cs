@@ -31,7 +31,7 @@ namespace CrazyStorm.Core
         LayerColor color;
         int beginFrame;
         int totalFrame;
-        ObservableCollection<Component> components;
+        IList<Component> components;
         #endregion
 
         #region Public Members
@@ -85,7 +85,7 @@ namespace CrazyStorm.Core
                     PropertyChanged(this, new PropertyChangedEventArgs("TotalFrame"));
             }
         }
-        public ObservableCollection<Component> Components { get { return components; } }
+        public IList<Component> Components { get { return components; } }
         #endregion
 
         #region Constructor

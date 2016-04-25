@@ -12,10 +12,10 @@ namespace CrazyStorm.Script
     public class Environment
     {
         #region Private Members
-        Dictionary<string, object> globals;
-        Dictionary<string, object> locals;
-        Dictionary<string, Struct> structs;
-        Dictionary<string, Function> functions;
+        IDictionary<string, object> globals;
+        IDictionary<string, object> locals;
+        IDictionary<string, Struct> structs;
+        IDictionary<string, Function> functions;
         #endregion
 
         #region Public Members

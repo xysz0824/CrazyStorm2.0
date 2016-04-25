@@ -26,5 +26,14 @@ namespace CrazyStorm.Core
             curveParticle = new CurveParticle();
         }
         #endregion
+
+        #region Public Methods
+        public override object Clone()
+        {
+            var clone = base.Clone() as CurveEmitter;
+            clone.curveParticle = curveParticle.Clone() as CurveParticle;
+            return clone;
+        }
+        #endregion
     }
 }

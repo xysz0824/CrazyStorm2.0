@@ -31,7 +31,7 @@ namespace CrazyStorm
         Config config;
         File file;
         Dictionary<ParticleSystem, CommandStack> commandStacks;
-        ClipBoard clipBoard;
+        List<Core.Component> clipBoard;
         string status = String.Empty;
         #endregion
 
@@ -54,7 +54,7 @@ namespace CrazyStorm
             config = new Config();
             file = new File("Untitled");
             commandStacks = new Dictionary<ParticleSystem, CommandStack>();
-            clipBoard = new ClipBoard();
+            clipBoard = new List<Core.Component>();
             InitializeComponent();
             InitializeSystem();
         }
@@ -67,7 +67,7 @@ namespace CrazyStorm
             InitializeFile();
             InitializeParticle();
             InitializeEdit();
-            InitializeStatus();
+            InitializeStatusBar();
             status = (string)FindResource("Ready");
         }
         void InitializeConfig()
@@ -95,7 +95,7 @@ namespace CrazyStorm
             commandStacks[selectedParticle] = new CommandStack();
             commandStacks[selectedParticle].StackChanged += () =>
             {
-                UpdateEdit();
+                UpdateEditStatus();
             };
         }
         void InitializeEdit()
@@ -112,7 +112,7 @@ namespace CrazyStorm
             UndoButton.IsEnabled = false;
             RedoButton.IsEnabled = false;
         }
-        void InitializeStatus()
+        void InitializeStatusBar()
         {
             StatusText.DataContext = this;
         }
@@ -121,20 +121,19 @@ namespace CrazyStorm
             selectedLayer = selectedParticle.Layers.First();
             LayerTree.ItemsSource = selectedParticle.Layers;
             LayerAxis.ItemsSource = selectedParticle.Layers;
-            CopyLayerItem.IsEnabled = false;
-            DeleteLayerItem.IsEnabled = false;
-            SetLayerItem.IsEnabled = false;
             ComponentTree.ItemsSource = selectedParticle.ComponentTree;
-            DeleteComponentItem.IsEnabled = false;
             BindComponentItem.IsEnabled = false;
             UnbindComponentItem.IsEnabled = false;
         }
         void UpdateSelectedStatus()
         {
-            UpdatePanels();
+            //Be careful that UpdateScreen() needs to update first,
+            //because it will refresh selectedComponents set.
             UpdateScreen();
+            UpdateComponentPanels();
             UpdateSelectedGroup();
-            UpdateEdit();
+            UpdateComponentMenu();
+            UpdateEditStatus();
         }
         #endregion
     }

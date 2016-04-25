@@ -105,13 +105,14 @@ namespace CrazyStorm
                                     DrawHelper.DrawLine(canvas, (int)x + config.ScreenWidthOver2, (int)y + config.ScreenHeightOver2,
                                         (int)tx + config.ScreenWidthOver2, (int)ty + config.ScreenHeightOver2, 2, false, Colors.White, 0.5f);
                             }
-                            //Draw component mark.
-                            object marker = Assembly.GetExecutingAssembly().CreateInstance("CrazyStorm.ComponentMarker");
-                            (marker as IComponentMark).Draw(canvas, component, (int)x + config.ScreenWidthOver2,
-                                (int)y + config.ScreenHeightOver2);
                             if (component.Selected)
-                            {
                                 selectedComponents.Add(component);
+                            else
+                            {
+                                //Draw component mark.
+                                object marker = Assembly.GetExecutingAssembly().CreateInstance("CrazyStorm.ComponentMarker");
+                                (marker as IComponentMark).Draw(canvas, component, (int)x + config.ScreenWidthOver2,
+                                    (int)y + config.ScreenHeightOver2);
                                 //Draw specific mark.
                                 if (component is Emitter)
                                     marker = Assembly.GetExecutingAssembly().CreateInstance("CrazyStorm.EmitterMarker");
@@ -125,6 +126,33 @@ namespace CrazyStorm
                             item.SetValue(Canvas.LeftProperty, (double)x - box.Width / 2 + config.ScreenWidthOver2);
                             item.SetValue(Canvas.TopProperty, (double)y - box.Height / 2 + config.ScreenHeightOver2);
                             canvas.Children.Add(item as UIElement);
+                        }
+                        foreach (var component in layer.Components)
+                        {
+                            if (component.Selected)
+                            {
+                                //If component has a parent, caculate the absolute position.
+                                float x = component.X;
+                                float y = component.Y;
+                                if (component.Parent != null)
+                                {
+                                    Vector2 parent = component.Parent.GetAbsolutePosition();
+                                    x += parent.x;
+                                    y += parent.y;
+                                }
+                                //Draw component mark.
+                                object marker = Assembly.GetExecutingAssembly().CreateInstance("CrazyStorm.ComponentMarker");
+                                (marker as IComponentMark).Draw(canvas, component, (int)x + config.ScreenWidthOver2,
+                                    (int)y + config.ScreenHeightOver2);
+                                //Draw specific mark.
+                                if (component is Emitter)
+                                    marker = Assembly.GetExecutingAssembly().CreateInstance("CrazyStorm.EmitterMarker");
+                                else
+                                    marker = Assembly.GetExecutingAssembly().CreateInstance("CrazyStorm." + component.GetType().Name + "Marker");
+
+                                (marker as IComponentMark).Draw(canvas, component, (int)x + config.ScreenWidthOver2,
+                                    (int)y + config.ScreenHeightOver2);
+                            }
                         }
                     }
                 }
@@ -193,13 +221,8 @@ namespace CrazyStorm
                     }
 
             UpdateSelectedStatus();
-            //Enable delection if selected one or more.
-            DeleteComponentItem.IsEnabled = selectedComponents.Count > 0;
-            //Enable binding if selected one or more.
-            BindComponentItem.IsEnabled = DeleteComponentItem.IsEnabled;
-            UnbindComponentItem.IsEnabled = BindComponentItem.IsEnabled;
             //Check double click.
-            if (!(canDoubleClick && set != null && Keyboard.Modifiers != ModifierKeys.Control))
+            if (!(canDoubleClick && set != null && set.Count > 0 && Keyboard.Modifiers != ModifierKeys.Control))
                 return;
 
             if (dclickDetector == null)
@@ -208,6 +231,14 @@ namespace CrazyStorm
             dclickDetector.Start();
             if (set.Count > 0 && dclickDetector.IsDetected())
                 CreatePropertyPanel(set.First());
+        }
+        void CancelAllSelection()
+        {
+            foreach (var layer in selectedParticle.Layers)
+                foreach (var component in layer.Components)
+                    component.Selected = false;
+
+            UpdateSelectedStatus();
         }
         #endregion
 
@@ -335,7 +366,7 @@ namespace CrazyStorm
                 selectionRect = null;
             }
             else
-                SelectComponents(null, true);
+                CancelAllSelection();
         }
         private void ParticleTabControl_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {

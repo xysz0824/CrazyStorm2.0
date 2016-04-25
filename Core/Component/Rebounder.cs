@@ -16,7 +16,7 @@ namespace CrazyStorm.Core
         int length;
         float rotation;
         int collisionTime;
-        ObservableCollection<EventGroup> rebounderEventGroups;
+        IList<EventGroup> rebounderEventGroups;
         #endregion
 
         #region Public Members
@@ -38,7 +38,7 @@ namespace CrazyStorm.Core
             get { return collisionTime; }
             set { collisionTime = value; }
         }
-        public ObservableCollection<EventGroup> RebounderEventGroups { get { return rebounderEventGroups; } }
+        public IList<EventGroup> RebounderEventGroups { get { return rebounderEventGroups; } }
         #endregion
 
         #region Constructor
@@ -46,6 +46,18 @@ namespace CrazyStorm.Core
             : base()
         {
             rebounderEventGroups = new ObservableCollection<EventGroup>();
+        }
+        #endregion
+
+        #region Public Methods
+        public override object Clone()
+        {
+            var clone = base.Clone() as Rebounder;
+            clone.rebounderEventGroups = new ObservableCollection<EventGroup>();
+            foreach (var item in rebounderEventGroups)
+                clone.rebounderEventGroups.Add(item.Clone() as EventGroup);
+
+            return clone;
         }
         #endregion
     }

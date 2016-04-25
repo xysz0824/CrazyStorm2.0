@@ -15,20 +15,20 @@ namespace CrazyStorm.Core
         #region Private Members
         string name;
         string absolutePath;
-        ObservableCollection<Resource> images;
-        ObservableCollection<Resource> sounds;
-        ObservableCollection<Resource> globals;
-        Collection<ParticleSystem> particles;
+        IList<Resource> images;
+        IList<Resource> sounds;
+        IList<Resource> globals;
+        IList<ParticleSystem> particles;
         int particleIndex;
         #endregion
 
         #region Public Members
         public string FileName { get { return name + ".bgp"; } }
         public string AbsolutePath { get { return absolutePath; } }
-        public ObservableCollection<Resource> Images { get { return images; } }
-        public ObservableCollection<Resource> Sounds { get { return sounds; } }
-        public ObservableCollection<Resource> Globals { get { return globals; } }
-        public Collection<ParticleSystem> Particles { get { return particles; } }
+        public IList<Resource> Images { get { return images; } }
+        public IList<Resource> Sounds { get { return sounds; } }
+        public IList<Resource> Globals { get { return globals; } }
+        public IList<ParticleSystem> Particles { get { return particles; } }
         public int ParticleIndex { get { return particleIndex++; } }
         #endregion
 
@@ -40,7 +40,7 @@ namespace CrazyStorm.Core
             images = new ObservableCollection<Resource>();
             sounds = new ObservableCollection<Resource>();
             globals = new ObservableCollection<Resource>();
-            particles = new Collection<ParticleSystem>();
+            particles = new List<ParticleSystem>();
             particles.Add(new ParticleSystem("Untitled"));
         }
         #endregion

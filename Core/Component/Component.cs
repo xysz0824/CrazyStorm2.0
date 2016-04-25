@@ -32,9 +32,9 @@ namespace CrazyStorm.Core
         bool selected;
         Component parent;
         Component bindingTarget;
-        ObservableCollection<VariableResource> variables;
-        ObservableCollection<EventGroup> componentEventGroups;
-        ObservableCollection<Component> children;
+        IList<VariableResource> variables;
+        IList<EventGroup> componentEventGroups;
+        IList<Component> children;
         #endregion
 
         #region Public Members
@@ -127,9 +127,9 @@ namespace CrazyStorm.Core
             get { return bindingTarget; }
             set { bindingTarget = value; }
         }
-        public ObservableCollection<VariableResource> Variables { get { return variables; } }
-        public ObservableCollection<EventGroup> ComponentEventGroups { get { return componentEventGroups; } }
-        public ObservableCollection<Component> Children { get { return children; } }
+        public IList<VariableResource> Variables { get { return variables; } }
+        public IList<EventGroup> ComponentEventGroups { get { return componentEventGroups; } }
+        public IList<Component> Children { get { return children; } }
         #endregion
 
         #region Constructor
@@ -172,7 +172,7 @@ namespace CrazyStorm.Core
             }
             return position;
         }
-        public List<Component> GetPosterity()
+        public IList<Component> GetPosterity()
         {
             List<Component> posterity = new List<Component>();
             foreach (var item in children)
@@ -204,6 +204,22 @@ namespace CrazyStorm.Core
             this.maxFrame = maxFrame;
             beginFrame = beginFrame <= minFrame ? minFrame : beginFrame;
             totalFrame = totalFrame >= maxFrame ? maxFrame : totalFrame;
+        }
+        public override object Clone()
+        {
+            var clone = base.Clone() as Component;
+            clone.parent = null;
+            clone.bindingTarget = null;
+            clone.variables = new ObservableCollection<VariableResource>();
+            foreach (var item in variables)
+                clone.variables.Add(item.Clone() as VariableResource);
+
+            clone.componentEventGroups = new ObservableCollection<EventGroup>();
+            foreach (var item in componentEventGroups)
+                clone.componentEventGroups.Add(item.Clone() as EventGroup);
+
+            clone.children = new ObservableCollection<Component>();
+            return clone;
         }
         #endregion
     }

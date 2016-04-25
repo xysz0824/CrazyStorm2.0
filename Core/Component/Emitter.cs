@@ -18,7 +18,7 @@ namespace CrazyStorm.Core
         int emitCycle;
         float emitAngle;
         float emitRange;
-        ObservableCollection<EventGroup> particleEventGroups;
+        IList<EventGroup> particleEventGroups;
         #endregion
 
         #region Public Members
@@ -52,7 +52,7 @@ namespace CrazyStorm.Core
             get { return emitRange; }
             set { emitRange = value; }
         }
-        public ObservableCollection<EventGroup> ParticleEventGroups { get { return particleEventGroups; } }
+        public IList<EventGroup> ParticleEventGroups { get { return particleEventGroups; } }
         #endregion
 
         #region Constructor
@@ -62,6 +62,18 @@ namespace CrazyStorm.Core
             emitCount = 1;
             EmitCycle = 1;
             particleEventGroups = new ObservableCollection<EventGroup>();
+        }
+        #endregion
+
+        #region Public Methods
+        public override object Clone()
+        {
+            var clone = base.Clone() as Emitter;
+            clone.particleEventGroups = new ObservableCollection<EventGroup>();
+            foreach (var item in particleEventGroups)
+                clone.particleEventGroups.Add(item.Clone() as EventGroup);
+
+            return clone;
         }
         #endregion
     }

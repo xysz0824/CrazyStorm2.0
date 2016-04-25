@@ -164,7 +164,6 @@
     <Compile Include="Converter\LayerLengthConverter.cs" />
     <Compile Include="Converter\LayerStartConverter.cs" />
     <Compile Include="Converter\ResourceValidConverter.cs" />
-    <Compile Include="Edit\ClipBoard.cs" />
     <Compile Include="Edit\Command\ParameterEmptyException.cs" />
     <Compile Include="Helper\DoubleClickDetector.cs" />
     <Compile Include="Window\LayerSetting.xaml.cs">

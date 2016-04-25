@@ -175,6 +175,9 @@
         <RoutedUICommand x:Key="BindComponent" Text="BindComponent"/>
         <RoutedUICommand x:Key="UnbindComponent" Text="UnbindComponent"/>
         <RoutedUICommand x:Key="Find" Text="Find"/>
+        <RoutedUICommand x:Key="CutComponent" Text="CutComponent"/>
+        <RoutedUICommand x:Key="CopyComponent" Text="CopyComponent"/>
+        <RoutedUICommand x:Key="Paste" Text="Paste"/>
     </Window.Resources>
     <Window.InputBindings>
         <KeyBinding  Key="Delete" Command="{StaticResource DelComponent}" />
@@ -188,6 +191,9 @@
         <KeyBinding   Modifiers="Control"  Key="B" Command="{StaticResource BindComponent}" />
         <KeyBinding   Modifiers="Control"  Key="U" Command="{StaticResource UnbindComponent}" />
         <KeyBinding   Modifiers="Control"  Key="F" Command="{StaticResource Find}" />
+        <KeyBinding   Modifiers="Control"  Key="X" Command="{StaticResource CutComponent}" />
+        <KeyBinding   Modifiers="Control"  Key="C" Command="{StaticResource CopyComponent}" />
+        <KeyBinding   Modifiers="Control"  Key="V" Command="{StaticResource Paste}" />
     </Window.InputBindings>
     <Window.CommandBindings>
         <CommandBinding Command="{StaticResource DelComponent}"
@@ -223,6 +229,15 @@
         <CommandBinding Command="{StaticResource Find}"
                                             CanExecute="CommandBinding_CanExecute"
                                             Executed="CommandBinding_Executed" />
+        <CommandBinding Command="{StaticResource CutComponent}"
+                                            CanExecute="CommandBinding_CanExecute"
+                                            Executed="CommandBinding_Executed" />
+        <CommandBinding Command="{StaticResource CopyComponent}"
+                                            CanExecute="CommandBinding_CanExecute"
+                                            Executed="CommandBinding_Executed" />
+        <CommandBinding Command="{StaticResource Paste}"
+                                            CanExecute="CommandBinding_CanExecute"
+                                            Executed="CommandBinding_Executed" />
     </Window.CommandBindings>
     <DockPanel Height="Auto" Name="dockPanel1" Width="Auto">
         <!-- Top Menu -->
@@ -234,14 +249,14 @@
                 </LinearGradientBrush>
             </Menu.Background>
             <MenuItem Header="文件">
-                <MenuItem Header="新建" />
-                <MenuItem Header="打开" />
+                <MenuItem Header="新建" InputGestureText="Ctrl+N"/>
+                <MenuItem Header="打开" InputGestureText="Ctrl+O"/>
                 <MenuItem Header="保存" InputGestureText="Ctrl+S"/>
                 <MenuItem Header="另存为..." InputGestureText="Ctrl+Shift+S"/>
                 <Separator/>
                 <MenuItem Header="屏幕设置" Click="ScreenSettingItem_Click" />
                 <Separator/>
-                <MenuItem Header="退出" />
+                <MenuItem Header="退出" InputGestureText="Alt+F4"/>
             </MenuItem>
             <MenuItem Header="编辑">
                 <MenuItem Name="UndoItem" Header="撤销" InputGestureText="Ctrl+Z" Click="UndoItem_Click"/>
@@ -250,7 +265,7 @@
                 <MenuItem Name="CutItem" Header="剪切" InputGestureText="Ctrl+X" Click="CutItem_Click"/>
                 <MenuItem Name="CopyItem" Header="复制" InputGestureText="Ctrl+C" Click="CopyItem_Click"/>
                 <MenuItem Name="PasteItem" Header="粘贴" InputGestureText="Ctrl+V" Click="PasteItem_Click"/>
-                <MenuItem Name="DelItem" Header="删除" InputGestureText="Del" Click="DeleteComponentItem_Click"/>
+                <MenuItem Name="DelItem" Header="删除" InputGestureText="Del" Click="DelItem_Click"/>
                 <Separator/>
                 <MenuItem Name="FindItem" Header="查找" InputGestureText="Ctrl+F" Click="FindItem_Click"  />
                 <MenuItem Header="选中全部" InputGestureText="Ctrl+A" Click="SelectAllItem_Click"/>
@@ -277,8 +292,6 @@
                 <MenuItem Name="SetLayerItem" Header="图层设置" />
             </MenuItem>
             <MenuItem Header="组件" >
-                <MenuItem Name="DeleteComponentItem" Header="删除组件" InputGestureText="Del" Click="DeleteComponentItem_Click" />
-                <Separator/>
                 <MenuItem Name="BindComponentItem" Header="组件绑定" InputGestureText="Ctrl+B" Click="BindComponentItem_Click"/>
                 <MenuItem Name="UnbindComponentItem" Header="组件解绑" InputGestureText="Ctrl+U" Click="UnbindComponentItem_Click"/>
             </MenuItem>

@@ -27,7 +27,7 @@ namespace CrazyStorm.Script
     public class Parser
     {
         Lexer lexer;
-        Dictionary<string, Precedence> operators;
+        IDictionary<string, Precedence> operators;
 
         public Parser(Lexer lexer)
         {

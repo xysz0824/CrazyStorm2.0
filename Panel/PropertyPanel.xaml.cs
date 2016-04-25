@@ -216,7 +216,7 @@ namespace CrazyStorm
                 new SetPropertyCommand().Do(commandStack, environment, container, property, cell, newValue, attribute, updateFunc);
             }
         }
-        void UpdateProperty(PropertyContainer container, ObservableCollection<PropertyPanelItem> properties)
+        void UpdateProperty(PropertyContainer container, IList<PropertyPanelItem> properties)
         {
             foreach (var item in properties)
             {
@@ -260,13 +260,13 @@ namespace CrazyStorm
         public void UpdateProperty()
         {
             //Update component property.
-            var componentProperties = ComponentGrid.DataContext as ObservableCollection<PropertyPanelItem>;
+            var componentProperties = ComponentGrid.DataContext as IList<PropertyPanelItem>;
             UpdateProperty(component, componentProperties);
             //Update specific property.
-            var specificProperties = SpecificGrid.DataContext as ObservableCollection<PropertyPanelItem>;
+            var specificProperties = SpecificGrid.DataContext as IList<PropertyPanelItem>;
             UpdateProperty(component, specificProperties);
             //Update particle property.
-            var particleProperties = ParticleGrid.DataContext as ObservableCollection<PropertyPanelItem>;
+            var particleProperties = ParticleGrid.DataContext as IList<PropertyPanelItem>;
             if (component is MultiEmitter)
             {
                 var particle = (component as MultiEmitter).Particle;

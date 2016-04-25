@@ -10,10 +10,14 @@ using System.Reflection;
 
 namespace CrazyStorm.Core
 {
-    public abstract class PropertyContainer
+    public class PropertyContainer : ICloneable
     {
-        Dictionary<PropertyInfo, PropertyValue> properties = new Dictionary<PropertyInfo, PropertyValue>();
-        public Dictionary<PropertyInfo, PropertyValue> Properties { get { return properties; } }
+        IDictionary<PropertyInfo, PropertyValue> properties;
+        public IDictionary<PropertyInfo, PropertyValue> Properties { get { return properties; } }
+        public PropertyContainer()
+        {
+            properties = new Dictionary<PropertyInfo, PropertyValue>();
+        }
         public IList<PropertyInfo> InitializeProperties(Type type)
         {
             var propertiesInfo = new List<PropertyInfo>();
@@ -26,14 +30,22 @@ namespace CrazyStorm.Core
                 if (attributes.Length == 1 && attributes[0] is PropertyAttribute)
                 {
                     propertiesInfo.Add(property);
-                    if (!Properties.ContainsKey(property))
+                    if (!properties.ContainsKey(property))
                     {
                         var value = new PropertyValue { Value = property.GetGetMethod().Invoke(this, null).ToString() };
-                        Properties[property] = value;
+                        properties[property] = value;
                     }
                 }
             }
             return propertiesInfo;
+        }
+        public virtual object Clone()
+        {
+            var clone = MemberwiseClone() as PropertyContainer;
+            clone.properties = new Dictionary<PropertyInfo, PropertyValue>();
+            foreach (var pair in properties)
+                clone.properties[pair.Key] = pair.Value.Clone() as PropertyValue;
+            return clone;
         }
     }
 }

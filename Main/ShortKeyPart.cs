@@ -30,12 +30,11 @@ namespace CrazyStorm
                 e.CanExecute = false;
                 return;
             }
-            //Check if it didn't have components selected.
+            //If the name of command end with "Component", it need to check if it didn't have components selected.
             var command = (RoutedUICommand)e.Command;
             if (command.Text.EndsWith("Component"))
-                if (selectedComponents.Count == 0)
-                    e.CanExecute = false;
-            //Determine if these can execute by the status of relevant buttons. 
+                e.CanExecute = selectedComponents.Count > 0;
+            //Determine if these can execute according to the status of relevant buttons. 
             switch (command.Text)
             {
                 case "Undo":
@@ -44,11 +43,8 @@ namespace CrazyStorm
                 case "Redo":
                     e.CanExecute = RedoButton.IsEnabled;
                     break;
-                case "BindComponent":
-                    e.CanExecute = BindComponentItem.IsEnabled;
-                    break;
-                case "UnbindComponent":
-                    e.CanExecute = UnbindComponentItem.IsEnabled;
+                case "Paste":
+                    e.CanExecute = PasteButton.IsEnabled;
                     break;
             }
         }
@@ -60,7 +56,7 @@ namespace CrazyStorm
             switch (command.Text)
             {
                 case "DelComponent":
-                    new DelComponentCommand().Do(stack, selectedParticle, selectedComponents);
+                    Del();
                     break;
                 case "UpComponent":
                     new MoveComponentCommand(MoveStatus.Up, gridSize, config.GridAlignment).Do(stack, selectedComponents, 
@@ -96,8 +92,16 @@ namespace CrazyStorm
                 case "Find":
                     Find();
                     break;
+                case "CutComponent":
+                    Cut();
+                    break;
+                case "CopyComponent":
+                    Copy();
+                    break;
+                case "Paste":
+                    Paste();
+                    break;
             }
-            UpdateSelectedStatus();
         }
         #endregion
     }

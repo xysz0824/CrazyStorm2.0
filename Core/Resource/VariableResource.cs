@@ -10,7 +10,7 @@ using System.ComponentModel;
 
 namespace CrazyStorm.Core
 {
-    public class VariableResource : Resource
+    public class VariableResource : Resource, ICloneable
     {
         #region Private Members
         float value;
@@ -35,6 +35,10 @@ namespace CrazyStorm.Core
         public override void CheckValid()
         {
             isValid = true;
+        }
+        public object Clone()
+        {
+            return MemberwiseClone();
         }
         #endregion
     }

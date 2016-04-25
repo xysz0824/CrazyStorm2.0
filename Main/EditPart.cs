@@ -15,7 +15,7 @@ namespace CrazyStorm
     public partial class Main
     {
         #region Private Methods
-        void UpdateEdit()
+        void UpdateEditStatus()
         {
             var redoPeek = commandStacks[selectedParticle].RedoPeek();
             var undoPeek = commandStacks[selectedParticle].UndoPeek();
@@ -28,10 +28,12 @@ namespace CrazyStorm
             //Update edit buttons
             CutButton.IsEnabled = selectedComponents.Count > 0;
             CopyButton.IsEnabled = CutButton.IsEnabled;
+            PasteButton.IsEnabled = clipBoard.Count > 0;
             //Update edit items
             CutItem.IsEnabled = CutButton.IsEnabled;
             CopyItem.IsEnabled = CopyButton.IsEnabled;
-            DelItem.IsEnabled = CutItem.IsEnabled;
+            PasteItem.IsEnabled = PasteButton.IsEnabled;
+            DelItem.IsEnabled = CutButton.IsEnabled;
         }
         void SelectAll()
         {
@@ -58,17 +60,25 @@ namespace CrazyStorm
         }
         void Cut()
         {
-            //TODO : Cut.
-            UpdateSelectedStatus();
+            clipBoard.Clear();
+            clipBoard.AddRange(selectedComponents);
+            Del();
         }
         void Copy()
         {
-            //TODO : Copy.
+            clipBoard.Clear();
+            clipBoard.AddRange(selectedComponents);
             UpdateSelectedStatus();
         }
         void Paste()
         {
-            //TODO : Paste.
+            CancelAllSelection();
+            new PasteComponentCommand().Do(commandStacks[selectedParticle], selectedParticle, selectedLayer, clipBoard);
+            UpdateSelectedStatus();
+        }
+        void Del()
+        {
+            new DelComponentCommand().Do(commandStacks[selectedParticle], selectedParticle, selectedComponents);
             UpdateSelectedStatus();
         }
         void Find()
@@ -84,8 +94,8 @@ namespace CrazyStorm
                     return;
                 }
             }
-            //Clear selection of components.
-            SelectComponents(null, true);
+            //Cancel selection of components.
+            CancelAllSelection();
             //Create finder panel.
             item = new TabItem();
             item.Style = (Style)FindResource("CanCloseStyle");
@@ -127,6 +137,10 @@ namespace CrazyStorm
         private void PasteItem_Click(object sender, RoutedEventArgs e)
         {
             Paste();
+        }
+        private void DelItem_Click(object sender, RoutedEventArgs e)
+        {
+            Del();
         }
         private void FindItem_Click(object sender, RoutedEventArgs e)
         {

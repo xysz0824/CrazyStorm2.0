@@ -29,7 +29,7 @@ namespace CrazyStorm.Core
         Shape shape;
         Reach reach;
         string targetName;
-        ObservableCollection<EventGroup> eventFieldEventGroups;
+        IList<EventGroup> eventFieldEventGroups;
         #endregion
 
         #region Public Members
@@ -63,7 +63,7 @@ namespace CrazyStorm.Core
             get { return targetName; }
             set { targetName = value; }
         }
-        public ObservableCollection<EventGroup> EventFieldEventGroups { get { return eventFieldEventGroups; } }
+        public IList<EventGroup> EventFieldEventGroups { get { return eventFieldEventGroups; } }
         #endregion
 
         #region Constructor
@@ -72,6 +72,18 @@ namespace CrazyStorm.Core
         {
             targetName = "";
             eventFieldEventGroups = new ObservableCollection<EventGroup>();
+        }
+        #endregion
+
+        #region Public Methods
+        public override object Clone()
+        {
+            var clone = base.Clone() as EventField;
+            clone.eventFieldEventGroups = new ObservableCollection<EventGroup>();
+            foreach (var item in eventFieldEventGroups)
+                clone.eventFieldEventGroups.Add(item.Clone() as EventGroup);
+
+            return clone;
         }
         #endregion
     }

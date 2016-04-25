@@ -9,7 +9,7 @@ using System.Text;
 
 namespace CrazyStorm.Core
 {
-    public class PropertyValue
+    public class PropertyValue : ICloneable
     {
         bool expression;
         string value;
@@ -22,6 +22,10 @@ namespace CrazyStorm.Core
         {
             get { return value; }
             set { this.value = value; }
+        }
+        public object Clone()
+        {
+            return MemberwiseClone();
         }
     }
 }

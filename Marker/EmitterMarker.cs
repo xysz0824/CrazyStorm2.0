@@ -20,7 +20,7 @@ namespace CrazyStorm
             var multiEmitter = component as Emitter;
             var left = multiEmitter.EmitAngle - multiEmitter.EmitRange / 2;
             var right = multiEmitter.EmitAngle + multiEmitter.EmitRange / 2;
-            DrawHelper.DrawFan(canvas, x, y, 60, right, left, Colors.Red, 1);
+            DrawHelper.DrawFan(canvas, x, y, 60, right, left, Colors.Red, 0.5f);
             var step = multiEmitter.EmitRange / (multiEmitter.EmitCount);
             var angle = left - step / 2;
             for (float i = 0; i < multiEmitter.EmitCount; ++i)

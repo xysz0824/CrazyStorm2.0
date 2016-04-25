@@ -50,17 +50,21 @@ namespace CrazyStorm
         static bool SetProperty(Script.Environment environment, PropertyContainer container, 
             PropertyInfo propertyInfo, DataGridCell cell, string newValue, PropertyAttribute attribute, Action updateFunc)
         {
-            object value;
-            if (attribute.IsLegal(newValue, out value))
-            {
-                container.Properties[propertyInfo].Expression = false;
-                propertyInfo.GetSetMethod().Invoke(container, new object[] { value });
-                cell.BorderThickness = new Thickness(0);
-                updateFunc();
-                return true;
-            }
             try
             {
+                object value;
+                if (attribute.IsLegal(newValue, out value))
+                {
+                    container.Properties[propertyInfo].Expression = false;
+                    propertyInfo.GetSetMethod().Invoke(container, new object[] { value });
+                    cell.ToolTip = null;
+                    cell.BorderThickness = new Thickness(0);
+                    updateFunc();
+                    return true;
+                }
+                if (attribute is StringPropertyAttribute)
+                    throw new ScriptException("Illegal string.");
+
                 var lexer = new Lexer();
                 lexer.Load(newValue);
                 var syntaxTree = new Parser(lexer).Expression();

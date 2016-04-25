@@ -26,5 +26,14 @@ namespace CrazyStorm.Core
             particle = new Particle();
         }
         #endregion
+
+        #region Public Methods
+        public override object Clone()
+        {
+            var clone = base.Clone() as MultiEmitter;
+            clone.particle = particle.Clone() as Particle;
+            return clone;
+        }
+        #endregion
     }
 }

@@ -10,12 +10,12 @@ using System.Collections.ObjectModel;
 
 namespace CrazyStorm.Core
 {
-    public class EventGroup
+    public class EventGroup : ICloneable
     {
         #region Private Members
         string name;
         string condition;
-        ObservableCollection<string> events;
+        IList<string> events;
         #endregion
 
         #region Public Members
@@ -29,7 +29,7 @@ namespace CrazyStorm.Core
             get { return condition; }
             set { condition = value; }
         }
-        public ObservableCollection<string> Events { get { return events; } }
+        public IList<string> Events { get { return events; } }
         #endregion
 
         #region Constructor
@@ -37,6 +37,18 @@ namespace CrazyStorm.Core
         {
             name = "NewEventGroup";
             events = new ObservableCollection<string>();
+        }
+        #endregion
+
+        #region Public Methods
+        public object Clone()
+        {
+            var clone = MemberwiseClone() as EventGroup;
+            clone.events = new ObservableCollection<string>();
+            foreach (var item in events)
+                clone.events.Add(item);
+
+            return clone;
         }
         #endregion
     }

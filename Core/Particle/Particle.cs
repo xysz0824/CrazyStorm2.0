@@ -194,8 +194,5 @@ namespace CrazyStorm.Core
         {
         }
         #endregion
-
-        #region Public Methods
-        #endregion
     }
 }
