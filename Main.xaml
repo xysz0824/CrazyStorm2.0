@@ -495,7 +495,8 @@
                                 <GroupBox Header="组件浏览器" Name="Explorer" VerticalContentAlignment="Stretch" HorizontalContentAlignment="Stretch" >
                                     <TreeView Name="ComponentTree" Padding="-2,1,1,1" VerticalContentAlignment="Stretch" HorizontalContentAlignment="Stretch" 
                                               AllowDrop="True" MouseMove="ComponentTree_MouseMove" 
-                                              DragEnter="ComponentTree_CheckDrop" DragOver="ComponentTree_CheckDrop" DragLeave="ComponentTree_CheckDrop" Drop="ComponentTree_Drop" IsTextSearchEnabled="True">
+                                              DragEnter="ComponentTree_CheckDrop" DragOver="ComponentTree_CheckDrop" DragLeave="ComponentTree_CheckDrop" Drop="ComponentTree_Drop" 
+                                              IsTextSearchEnabled="True">
                                         <TreeView.ItemTemplate >
                                             <HierarchicalDataTemplate ItemsSource="{Binding Children}">
                                                 <TextBlock Text="{Binding Name}" MouseLeftButtonDown="ComponentTree_MouseLeftButtonDown">
@@ -629,7 +630,17 @@
                         </Label>
                     </DockPanel>
                     <TreeView x:Name="LayerTree"  BorderBrush="White" ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-                                  ScrollViewer.VerticalScrollBarVisibility="Hidden"  MouseUp="LayerTree_MouseUp" MouseDoubleClick="LayerTree_MouseDoubleClick" Margin="0" RenderTransformOrigin="0.5,0.5" Panel.ZIndex="-1000">
+                                  ScrollViewer.VerticalScrollBarVisibility="Hidden"  MouseUp="LayerTree_MouseUp" MouseDoubleClick="LayerTree_MouseDoubleClick" Margin="0" 
+                              RenderTransformOrigin="0.5,0.5" Panel.ZIndex="-1000">
+                        <TreeView.ItemContainerStyle>
+                            <Style TargetType="{x:Type TreeViewItem}">
+                                <Style.Triggers>
+                                    <Trigger Property="IsSelected" Value="true" >
+                                        <Setter Property="FontWeight" Value="ExtraBold" />
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TreeView.ItemContainerStyle>
                         <TreeView.ItemTemplate>
                             <DataTemplate>
                                 <DockPanel Name="LayerElement" Width="255" Margin ="-22,0,0,0" Background="{x:Null}" 
