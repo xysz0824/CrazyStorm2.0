@@ -46,7 +46,8 @@ namespace CrazyStorm
         }
         void CopySelectedLayer()
         {
-            //TODO : Copy function.
+            new CopyLayerCommand().Do(commandStacks[selectedParticle], selectedParticle, selectedLayer);
+            UpdateScreen();
         }
         void OpenSelectedLayerSetting()
         {

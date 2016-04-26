@@ -10,7 +10,7 @@ using System.Collections.ObjectModel;
 
 namespace CrazyStorm.Core
 {
-    public class ParticleSystem
+    public class ParticleSystem : ICloneable
     {
         #region Private Members
         string name;
@@ -94,6 +94,24 @@ namespace CrazyStorm.Core
                     componentTree.Remove(component);
 
             layers.Remove(layer);
+        }
+        public object Clone()
+        {
+            var clone = MemberwiseClone() as ParticleSystem;
+            clone.customType = new ObservableCollection<ParticleType>();
+            foreach (var type in customType)
+                clone.customType.Add(type.Clone() as ParticleType);
+
+            clone.layers = new ObservableCollection<Layer>();
+            clone.componentTree = new ObservableCollection<Component>();
+            foreach (var layer in layers)
+                clone.AddLayer(layer.Clone() as Layer);
+
+            clone.componentIndex = new Dictionary<Type, int>();
+            foreach (var index in componentIndex)
+                clone.componentIndex[index.Key] = index.Value;
+
+            return clone;
         }
         #endregion
     }

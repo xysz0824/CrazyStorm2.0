@@ -22,13 +22,13 @@ namespace CrazyStorm.Core
         Orange,
         Gray
     }
-    public class ParticleType : INotifyPropertyChanged
+    public class ParticleType : INotifyPropertyChanged, ICloneable
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
         #region Private Members
         string name;
-        Resource image;
+        FileResource image;
         Vector2 startPoint;
         int width;
         int height;
@@ -50,7 +50,7 @@ namespace CrazyStorm.Core
                     PropertyChanged(this, new PropertyChangedEventArgs("Name"));
             }
         }
-        public Resource Image
+        public FileResource Image
         {
             get { return image; }
             set
@@ -223,6 +223,10 @@ namespace CrazyStorm.Core
         public override string ToString()
         {
             return Name;
+        }
+        public object Clone()
+        {
+            return MemberwiseClone();
         }
         #endregion
     }

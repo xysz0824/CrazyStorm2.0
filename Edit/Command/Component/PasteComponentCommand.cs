@@ -17,9 +17,9 @@ namespace CrazyStorm
             base.Redo(stack);
             var selectedParticle = Parameter[0] as ParticleSystem;
             var selectedLayer = Parameter[1] as Layer;
-            var clipBoard = Parameter[2] as List<Component>;
             if (History[0] == null)
             {
+                var clipBoard = Parameter[2] as List<Component>;
                 var clones = new List<Component>();
                 foreach (var component in clipBoard)
                 {

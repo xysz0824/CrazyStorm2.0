@@ -21,7 +21,7 @@ namespace CrazyStorm.Core
         Orange,
         Gray
     }
-    public class Layer : INotifyPropertyChanged
+    public class Layer : INotifyPropertyChanged, ICloneable
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -97,6 +97,18 @@ namespace CrazyStorm.Core
             beginFrame = 0;
             totalFrame = 200;
             components = new ObservableCollection<Component>();
+        }
+        #endregion
+
+        #region Public Methods
+        public object Clone()
+        {
+            var clone = MemberwiseClone() as Layer;
+            clone.components = new ObservableCollection<Component>();
+            foreach (var component in components)
+                clone.components.Add(component.Clone() as Component);
+            
+            return clone;
         }
         #endregion
     }

@@ -52,9 +52,9 @@ namespace CrazyStorm
         public Main()
         {
             config = new Config();
-            file = new File("Untitled");
             commandStacks = new Dictionary<ParticleSystem, CommandStack>();
             clipBoard = new List<Core.Component>();
+            file = new File("Untitled");
             InitializeComponent();
             InitializeSystem();
         }
@@ -88,7 +88,6 @@ namespace CrazyStorm
             selectedParticle = file.Particles.First();
             InitializeCommandStacks();
             AddNewParticleTab(selectedParticle);
-            InitializeLayerAndComponent();
         }
         void InitializeCommandStacks()
         {
@@ -119,7 +118,7 @@ namespace CrazyStorm
         void InitializeLayerAndComponent()
         {
             selectedLayer = selectedParticle.Layers.First();
-            LayerTree.ItemsSource = selectedParticle.Layers;
+            LayerTree.ItemsSource = selectedParticle.Layers;            
             LayerAxis.ItemsSource = selectedParticle.Layers;
             ComponentTree.ItemsSource = selectedParticle.ComponentTree;
             BindComponentItem.IsEnabled = false;
@@ -133,6 +132,15 @@ namespace CrazyStorm
             UpdateComponentPanels();
             UpdateSelectedGroup();
             UpdateComponentMenu();
+        }
+        #endregion
+
+        #region Window EventHandlers
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+            //Highlight selected layer.
+            TreeViewItem item = (TreeViewItem)LayerTree.ItemContainerGenerator.ContainerFromItem(selectedLayer);
+            item.IsSelected = true;
         }
         #endregion
     }

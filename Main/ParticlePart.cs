@@ -34,6 +34,7 @@ namespace CrazyStorm
         {
             var tabItem = new TabItem();
             tabItem.Header = particle.Name;
+            tabItem.Tag = particle;
             tabItem.Content = ParticleTabControl.ItemTemplate.LoadContent() as Canvas;
             ParticleTabControl.Items.Add(tabItem);
             ParticleTabControl.SelectedItem = tabItem;
@@ -63,7 +64,11 @@ namespace CrazyStorm
         }
         void CopySeletedParticle()
         {
-            //TODO : Copy function.
+            var particle = selectedParticle.Clone() as ParticleSystem;
+            file.Particles.Add(particle);
+            selectedParticle = particle;
+            InitializeCommandStacks();
+            AddNewParticleTab(particle);
         }
         void OpenSelectedParticleSetting()
         {

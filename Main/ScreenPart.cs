@@ -43,7 +43,7 @@ namespace CrazyStorm
             foreach (TabItem item in ParticleTabControl.Items)
             {
                 var content = item.Content as Canvas;
-                if ((string)item.Header == selectedParticle.Name)
+                if (item.Tag == selectedParticle)
                 {
                     canvas = VisualHelper.VisualDownwardSearch(content, "ComponentLayer") as Canvas;
                     break;
@@ -376,7 +376,7 @@ namespace CrazyStorm
                 var tabItem = e.AddedItems[0] as TabItem;
                 foreach (var item in file.Particles)
                 {
-                    if (item.Name == (string)tabItem.Header)
+                    if (item == tabItem.Tag)
                     {
                         selectedParticle = item;
                         break;

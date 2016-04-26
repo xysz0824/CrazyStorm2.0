@@ -7,7 +7,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
         xmlns:ef="http://schemas.microsoft.com/expression/2010/effects" 
         DataContext="{Binding}" WindowStartupLocation="CenterScreen" WindowState="Normal" Icon="icon.ico" IsEnabled="True" 
-        Width="1024" Height="768">
+        Width="1024" Height="768" Loaded="Window_Loaded">
     <Window.Resources>
         <local:LayerIconConverter x:Key="LayerIconConverter"/>
         <local:LayerAxisConverter x:Key="LayerAxisConverter"/>
