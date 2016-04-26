@@ -38,6 +38,7 @@ namespace CrazyStorm
             this.selectedTab = selectedTab;
             InitializeComponent();
             InitializeDataBinding();
+            UpdatePreview();
         }
         #endregion
 
@@ -60,9 +61,40 @@ namespace CrazyStorm
                     item.BorderThickness = new Thickness(0);
             }
         }
+        void UpdatePreview()
+        {
+            var type = Setting.DataContext as ParticleType;
+            if (type == null)
+                return;
+
+            int frame;
+            if (!int.TryParse(Frames.Text, out frame))
+                return;
+
+            for (int i = 0; i < Preview.Children.Count;++i)
+            {
+                if (((FrameworkElement)Preview.Children[i]).Name == "FrameRect")
+                {
+                    Preview.Children.RemoveAt(i);
+                    i--;
+                }
+            }
+            for (int i = 1;i < frame;++i)
+            {
+                var rect = new Rectangle();
+                rect.Name = "FrameRect";
+                rect.Width = type.Width;
+                rect.Height = type.Height;
+                rect.Stroke = new SolidColorBrush(Colors.Red);
+                Preview.Children.Add(rect);
+                Canvas.SetLeft(rect, type.StartPointX + i * type.Width);
+                Canvas.SetTop(rect, type.StartPointY);
+                rect.Opacity = 0.8f;
+            }
+        }
         #endregion
 
-        #region Window EventHandlerss
+        #region Window EventHandlers
         private void Button_Click(object sender, RoutedEventArgs e)
         {
             if (string.IsNullOrWhiteSpace(ParticleName.Text))
@@ -112,6 +144,10 @@ namespace CrazyStorm
         private void DeleteType_Click(object sender, RoutedEventArgs e)
         {
             selectedParticle.CustomType.Remove(selectedType);
+        }
+        private void Frames_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            UpdatePreview();
         }
         #endregion
     }

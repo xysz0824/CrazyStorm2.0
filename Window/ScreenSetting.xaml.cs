@@ -51,7 +51,7 @@ namespace CrazyStorm
         }
         #endregion
 
-        #region Window EventHandlerss
+        #region Window EventHandlers
         private void Browse_Click(object sender, RoutedEventArgs e)
         {
             using (var open = new System.Windows.Forms.OpenFileDialog())

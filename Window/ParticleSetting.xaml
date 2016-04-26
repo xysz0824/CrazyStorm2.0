@@ -2,7 +2,7 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
         xmlns:local ="clr-namespace:CrazyStorm"
-        Title="粒子设置" Height="440" Width="410" WindowStyle="ToolWindow" WindowStartupLocation="CenterScreen" ResizeMode="NoResize" Background="#FFF0F0F0">
+        Title="粒子设置" Height="440" Width="410" WindowStyle="ToolWindow" WindowStartupLocation="CenterScreen" ResizeMode="CanResize" Background="#FFF0F0F0">
     <Window.Resources>
     </Window.Resources>
     <DockPanel>
@@ -15,46 +15,8 @@
         </GroupBox>
         <TabControl>
             <TabItem Header="自定义类型">
-                <Canvas>
-                    <ListView Name="TypeList" Height="175" Canvas.Left="10" Canvas.Top="10" Width="120" SelectionChanged="TypeList_SelectionChanged" SelectionMode="Single">
-                        <ListView.ContextMenu>
-                            <ContextMenu>
-                                <MenuItem Header="添加类型" Click="AddNewType_Click" />
-                            </ContextMenu>
-                        </ListView.ContextMenu>
-                        <ListView.ItemTemplate>
-                            <DataTemplate>
-                                <DockPanel>
-                                    <DockPanel.ContextMenu>
-                                        <ContextMenu>
-                                            <MenuItem Name="DeleteType" Header="删除" Click="DeleteType_Click" />
-                                        </ContextMenu>
-                                    </DockPanel.ContextMenu>
-                                    <TextBlock Text="{Binding Path=Name}"/>
-                                </DockPanel>
-                            </DataTemplate>
-                        </ListView.ItemTemplate>
-                    </ListView>
-                    <ScrollViewer Height="175" Width="253" Canvas.Left="135" Canvas.Top="10" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
-                        <Canvas Height="{Binding ElementName=Image, Path=ActualHeight}" Width="{Binding ElementName=Image, Path=ActualWidth}">
-                            <Image Name="Image" DataContext="{Binding ElementName=ImageCombo,Path=SelectedItem}" Source="{Binding Path=AbsolutePath}" Canvas.Left="0" Canvas.Top="0"/>
-                            <Rectangle 
-                            Fill="Blue" 
-                            Width="{Binding ElementName=RectWidth, Path=Text}" Height="{Binding ElementName=RectHeight, Path=Text}" 
-                            Canvas.Left="{Binding ElementName=StartPointX, Path=Text}" Canvas.Top="{Binding ElementName=StartPointY, Path=Text}" 
-                            Stroke="Black" Opacity="0.5"/>
-                            <Rectangle 
-                            Width="{Binding ElementName=RectWidth, Path=Text}" Height="{Binding ElementName=RectHeight, Path=Text}" 
-                            Canvas.Left="{Binding ElementName=StartPointX, Path=Text}" Canvas.Top="{Binding ElementName=StartPointY, Path=Text}" 
-                            Stroke="Red" Opacity="0.8"/>
-                            <Ellipse 
-                            Fill="Red"
-                            Width="{Binding ElementName=Diameter, Path=Text}" Height="{Binding ElementName=Diameter, Path=Text}"
-                            Canvas.Left="{Binding ElementName=CircleBoxX, Path=Text}" Canvas.Top="{Binding ElementName=CircleBoxY, Path=Text}" 
-                            Stroke="Red" Opacity="0.5"/>
-                        </Canvas>
-                    </ScrollViewer>
-                    <GroupBox Name="Setting"  IsEnabled="False" Header="设置" Canvas.Left="10" Canvas.Top="193" Width="378" Height="135">
+                <DockPanel>
+                    <GroupBox DockPanel.Dock="Bottom" Name="Setting"  IsEnabled="False" Header="设置" Canvas.Left="10" Canvas.Top="193" Width="378" Height="135">
                         <StackPanel>
                             <WrapPanel Margin="0">
                                 <Label Content="名称" Margin="0,1,7,1"/>
@@ -76,7 +38,7 @@
                                 <Label Content="中心Y" Margin="0,1" />
                                 <TextBox Name="CenterPointY" Text="{Binding Path=CenterPointY}" Width="50" Margin="0,1" VerticalContentAlignment="Center"/>
                                 <Label Content="帧数" Margin="0,1" />
-                                <TextBox Name="Frames" Text="{Binding Path=Frames}" Width="50" Margin="0,1" VerticalContentAlignment="Center"/>
+                                <TextBox Name="Frames" Text="{Binding Path=Frames}" Width="50" Margin="0,1" VerticalContentAlignment="Center" TextChanged="Frames_TextChanged" />
                                 <Label Content="延迟" Margin="0,1" />
                                 <TextBox Text="{Binding Path=Delay}" Width="50" Margin="0,1" VerticalContentAlignment="Center"/>
                                 <Label Content="包围盒半径" Margin="0,1" />
@@ -108,7 +70,45 @@
                             </WrapPanel>
                         </StackPanel>
                     </GroupBox>
-                </Canvas>
+                        <ListView Name="TypeList" DockPanel.Dock="Left" Width="120" SelectionChanged="TypeList_SelectionChanged" SelectionMode="Single">
+                            <ListView.ContextMenu>
+                                <ContextMenu>
+                                    <MenuItem Header="添加类型" Click="AddNewType_Click" />
+                                </ContextMenu>
+                            </ListView.ContextMenu>
+                            <ListView.ItemTemplate>
+                                <DataTemplate>
+                                    <DockPanel>
+                                        <DockPanel.ContextMenu>
+                                            <ContextMenu>
+                                                <MenuItem Name="DeleteType" Header="删除" Click="DeleteType_Click" />
+                                            </ContextMenu>
+                                        </DockPanel.ContextMenu>
+                                        <TextBlock Text="{Binding Path=Name}"/>
+                                    </DockPanel>
+                                </DataTemplate>
+                            </ListView.ItemTemplate>
+                        </ListView>
+                    <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+                        <Canvas Name="Preview" Height="{Binding ElementName=Image, Path=ActualHeight}" Width="{Binding ElementName=Image, Path=ActualWidth}">
+                            <Image Name="Image" DataContext="{Binding ElementName=ImageCombo,Path=SelectedItem}" Source="{Binding Path=AbsolutePath}" Canvas.Left="0" Canvas.Top="0"/>
+                            <Rectangle 
+                            Fill="Blue" 
+                            Width="{Binding ElementName=RectWidth, Path=Text}" Height="{Binding ElementName=RectHeight, Path=Text}" 
+                            Canvas.Left="{Binding ElementName=StartPointX, Path=Text}" Canvas.Top="{Binding ElementName=StartPointY, Path=Text}" 
+                            Stroke="Black" Opacity="0.5"/>
+                            <Rectangle 
+                            Width="{Binding ElementName=RectWidth, Path=Text}" Height="{Binding ElementName=RectHeight, Path=Text}" 
+                            Canvas.Left="{Binding ElementName=StartPointX, Path=Text}" Canvas.Top="{Binding ElementName=StartPointY, Path=Text}" 
+                            Stroke="Red" Opacity="0.8"/>
+                            <Ellipse 
+                            Fill="Red"
+                            Width="{Binding ElementName=Diameter, Path=Text}" Height="{Binding ElementName=Diameter, Path=Text}"
+                            Canvas.Left="{Binding ElementName=CircleBoxX, Path=Text}" Canvas.Top="{Binding ElementName=CircleBoxY, Path=Text}" 
+                            Stroke="Red" Opacity="0.5"/>
+                        </Canvas>
+                    </ScrollViewer>
+                </DockPanel>
             </TabItem>
         </TabControl>
     </DockPanel>
