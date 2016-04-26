@@ -21,8 +21,6 @@ namespace CrazyStorm.Core
         int currentFrame;
         int beginFrame;
         int totalFrame;
-        int minFrame;
-        int maxFrame;
         Vector2 position;
         float speed;
         float speedAngle;
@@ -52,19 +50,19 @@ namespace CrazyStorm.Core
         public int CurrentFrame
         {
             get { return currentFrame; }
-            set { currentFrame = value >= beginFrame && value < beginFrame + totalFrame ? value : currentFrame; }
+            set { currentFrame = value; }
         }
         [IntProperty(0, int.MaxValue)]
         public int BeginFrame
         {
             get { return beginFrame; }
-            set { beginFrame = value >= minFrame ? value : minFrame; }
+            set { beginFrame = value; }
         }
         [IntProperty(0, int.MaxValue)]
         public int TotalFrame
         {
             get { return totalFrame; }
-            set { totalFrame = value <= maxFrame ? value : maxFrame; }
+            set { totalFrame = value; }
         }
         [Vector2Property]
         public Vector2 Position
@@ -143,13 +141,6 @@ namespace CrazyStorm.Core
         #endregion
 
         #region Public Methods
-        public void InitializeFrameRange(int minFrame, int maxFrame)
-        {
-            this.minFrame = minFrame;
-            this.maxFrame = maxFrame;
-            beginFrame = minFrame;
-            totalFrame = maxFrame;
-        }
         public void TransPositiontoRelative()
         {
             if (parent != null)
@@ -197,13 +188,6 @@ namespace CrazyStorm.Core
                     return parent;
             }
             return null;
-        }
-        public void SetFrameRange(int minFrame, int maxFrame)
-        {
-            this.minFrame = minFrame;
-            this.maxFrame = maxFrame;
-            beginFrame = beginFrame <= minFrame ? minFrame : beginFrame;
-            totalFrame = totalFrame >= maxFrame ? maxFrame : totalFrame;
         }
         public override object Clone()
         {

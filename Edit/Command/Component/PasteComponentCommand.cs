@@ -18,15 +18,24 @@ namespace CrazyStorm
             var selectedParticle = Parameter[0] as ParticleSystem;
             var selectedLayer = Parameter[1] as Layer;
             var clipBoard = Parameter[2] as List<Component>;
-            var clones = new List<Component>();
-            foreach (var component in clipBoard)
+            if (History[0] == null)
             {
-                var clone = component.Clone() as Component;
-                clone.Selected = true;
-                selectedParticle.AddComponentToLayer(selectedLayer, clone);
-                clones.Add(clone);
+                var clones = new List<Component>();
+                foreach (var component in clipBoard)
+                {
+                    var clone = component.Clone() as Component;
+                    clone.Selected = true;
+                    selectedParticle.AddComponentToLayer(selectedLayer, clone);
+                    clones.Add(clone);
+                }
+                History[0] = clones;
             }
-            History[0] = clones;
+            else
+            {
+                var clones = History[0] as List<Component>;
+                foreach (var clone in clones)
+                    selectedParticle.AddComponentToLayer(selectedLayer, clone);
+            }
         }
         public override void Undo(CommandStack stack)
         {
@@ -36,8 +45,6 @@ namespace CrazyStorm
             var clones = History[0] as List<Component>;
             foreach (var clone in clones)
                 selectedParticle.DeleteComponentFromLayer(selectedLayer, clone);
-            
-            History[0] = null;
         }
     }
 }

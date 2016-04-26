@@ -77,9 +77,20 @@ namespace CrazyStorm
         }
         private void LayerTree_MouseUp(object sender, MouseButtonEventArgs e)
         {
-            //Get selected layer.
+            //Select layer.
             if (LayerTree.SelectedItem != null)
+            {
                 selectedLayer = selectedParticle.Layers[LayerTree.Items.IndexOf(LayerTree.SelectedItem)];
+                //Press Ctrl key to select all components in this layer.
+                if (Keyboard.Modifiers == ModifierKeys.Control && selectedLayer.Visible)
+                {
+                    var set = new List<Component>();
+                    foreach (var component in selectedLayer.Components)
+                        set.Add(component);
+
+                    SelectComponents(set, false);
+                }
+            }
         }
         private void LayerVisible_MouseUp(object sender, MouseButtonEventArgs e)
         {
@@ -87,10 +98,8 @@ namespace CrazyStorm
             if (LayerTree.SelectedItem != null)
                 selectedLayer = selectedParticle.Layers[LayerTree.Items.IndexOf(LayerTree.SelectedItem)];
             else
-            {
-                selectedLayer = null;
                 return;
-            }
+
             var visible = sender as Label;
             selectedLayer.Visible = visible.Opacity == 0 ? true : false;
             UpdateSelectedStatus();
@@ -100,6 +109,8 @@ namespace CrazyStorm
             //Move down selected layer.
             if (LayerTree.SelectedItem != null)
                 selectedLayer = selectedParticle.Layers[LayerTree.Items.IndexOf(LayerTree.SelectedItem)];
+            else
+                return;
 
             int index = selectedParticle.Layers.IndexOf(selectedLayer);
             if (index != selectedParticle.Layers.Count - 1)
@@ -114,6 +125,8 @@ namespace CrazyStorm
             //Move up selected layer.
             if (LayerTree.SelectedItem != null)
                 selectedLayer = selectedParticle.Layers[LayerTree.Items.IndexOf(LayerTree.SelectedItem)];
+            else
+                return;
 
             int index = selectedParticle.Layers.IndexOf(selectedLayer);
             if (index != 0)
@@ -128,6 +141,8 @@ namespace CrazyStorm
             //Set the color of layer.
             if (LayerTree.SelectedItem != null)
                 selectedLayer = selectedParticle.Layers[LayerTree.Items.IndexOf(LayerTree.SelectedItem)];
+            else
+                return;
 
             if (Enum.IsDefined(typeof(LayerColor), selectedLayer.Color + 1))
             {

@@ -160,12 +160,22 @@ namespace CrazyStorm
                 line.DataContext = component;
                 bindingLines.Add(line);
             }
-            CancelAllSelection();
+            UpdateScreen();
         }
         void UnbindComponent()
         {
             if (selectedComponents.Count > 0)
-                new UnbindComponentCommand().Do(commandStacks[selectedParticle], selectedComponents);
+            {
+                foreach (var component in selectedComponents)
+                {
+                    if (component.BindingTarget != null)
+                    {
+                        new UnbindComponentCommand().Do(commandStacks[selectedParticle], selectedComponents);
+                        UpdateScreen();
+                        break;
+                    }
+                }
+            }
         }
         #endregion
 
@@ -276,6 +286,7 @@ namespace CrazyStorm
                     sourceComponent.TransPositiontoRelative();
                 }
             }
+            UpdateProperty();
         }
         private void TabClose_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {

@@ -133,7 +133,6 @@ namespace CrazyStorm
             UpdateComponentPanels();
             UpdateSelectedGroup();
             UpdateComponentMenu();
-            UpdateEditStatus();
         }
         #endregion
     }

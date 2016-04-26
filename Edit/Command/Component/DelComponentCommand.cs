@@ -29,20 +29,20 @@ namespace CrazyStorm
             }
             else
                 temp = History[0] as List<Component>;
-
-            var temp2 = new Dictionary<Layer, List<Component>>();
+            
+            var layers = new Dictionary<Layer, List<Component>>();
             foreach (var component in temp)
                 foreach (var layer in selectedParticle.Layers)
                     if (layer.Components.Contains(component))
                     {
-                        if (!temp2.ContainsKey(layer))
-                            temp2[layer] = new List<Component>();
-                        temp2[layer].Add(component);
+                        if (!layers.ContainsKey(layer))
+                            layers[layer] = new List<Component>();
+                        layers[layer].Add(component);
                         selectedParticle.DeleteComponentFromLayer(layer, component);
                         break;
                     }
 
-            History[1] = temp2;
+            History[1] = layers;
             selectedComponents.Clear();
         }
         public override void Undo(CommandStack stack)
