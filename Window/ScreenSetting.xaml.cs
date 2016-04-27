@@ -56,10 +56,10 @@ namespace CrazyStorm
         {
             using (var open = new System.Windows.Forms.OpenFileDialog())
             {
+                open.InitialDirectory = AppDomain.CurrentDomain.BaseDirectory;
                 open.Filter = (string)FindResource("BackGroundImageType");
                 if (open.ShowDialog() == System.Windows.Forms.DialogResult.OK)
                     ImagePath.Text = open.FileName;
-
             }
         }
         private void Button_Click(object sender, RoutedEventArgs e)
@@ -84,6 +84,7 @@ namespace CrazyStorm
                 if (OnButtonClick != null)
                     OnButtonClick();
 
+                config.Save();
                 this.Close();
             }
             else

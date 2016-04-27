@@ -53,6 +53,7 @@ namespace CrazyStorm
             (LeftTabControl.Items[1] as TabItem).Focus();
             using (var open = new System.Windows.Forms.OpenFileDialog())
             {
+                open.InitialDirectory = AppDomain.CurrentDomain.BaseDirectory;
                 open.Filter = (string)FindResource("ImageType");
                 if (open.ShowDialog() == System.Windows.Forms.DialogResult.OK)
                 {
@@ -71,6 +72,7 @@ namespace CrazyStorm
             (LeftTabControl.Items[1] as TabItem).Focus();
             using (var open = new System.Windows.Forms.OpenFileDialog())
             {
+                open.InitialDirectory = AppDomain.CurrentDomain.BaseDirectory;
                 open.Filter = (string)FindResource("SoundType");
                 if (open.ShowDialog() == System.Windows.Forms.DialogResult.OK)
                 {

@@ -8,7 +8,7 @@
         <Label Content="背景高度" Canvas.Left="120" Canvas.Top="10"/>
         <TextBox Name="ScreenHeight" Text="{Binding Path=ScreenHeight, Mode=OneTime}" Height="23" Canvas.Left="183" TextWrapping="Wrap" Canvas.Top="13" Width="42" VerticalContentAlignment="Center"/>
         <Label Content="背景图案" Canvas.Left="10" Canvas.Top="40"/>
-        <TextBox Name="ImagePath" Text="{Binding Path=ImagePath, Mode=OneTime}" Height="23" Canvas.Left="73" TextWrapping="Wrap" Canvas.Top="43" Width="152" VerticalContentAlignment="Center"/>
+        <TextBox Name="ImagePath" Text="{Binding Path=ImagePath, Mode=OneTime}" Height="23" Canvas.Left="73" Canvas.Top="43" Width="152" VerticalContentAlignment="Center"/>
         <Label Content="网格对齐" Canvas.Left="10" Canvas.Top="70"/>
         <Label Content="显示中心" Canvas.Left="10" Canvas.Top="100"/>
         <Button Name="Browse"  Content="浏览" Canvas.Left="230" Canvas.Top="43" Width="42" Click="Browse_Click"/>

@@ -3,6 +3,7 @@
  * Copyright (c) StarX 2015 
  */
 using System;
+using System.IO;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -16,11 +17,9 @@ namespace CrazyStorm
         public event PropertyChangedEventHandler PropertyChanged;
 
         #region Private Members
-        int screenWidth = 640;
-        int screenHeight = 480;
-        int gridWidth = 32;
-        int gridHeight = 32;
-
+        IniHelper iniHelper;
+        int screenWidth;
+        int screenHeight;
         string imagePath = string.Empty;
         bool gridAlignment = true;
         bool centerDisplay = true;
@@ -65,9 +64,9 @@ namespace CrazyStorm
                     PropertyChanged(this, new PropertyChangedEventArgs("ImagePath"));
             }
         }
-        public Vector2 GridSize { get { return new Vector2(gridWidth, gridHeight); } }
-        public int GridWidth { get { return gridWidth; } }
-        public int GridHeight { get { return gridHeight; } }
+        public Vector2 GridSize { get { return new Vector2(32, 32); } }
+        public int GridWidth { get { return 32; } }
+        public int GridHeight { get { return 32; } }
         public bool GridAlignment
         {
             get { return gridAlignment; }
@@ -87,6 +86,36 @@ namespace CrazyStorm
                 if (PropertyChanged != null)
                     PropertyChanged(this, new PropertyChangedEventArgs("CenterDisplay"));
             }
+        }
+        #endregion
+
+        #region Constructor
+        public Config(string filePath)
+        {
+            iniHelper = new IniHelper(filePath);
+            if (!iniHelper.ExistINIFile())
+                throw new FileNotFoundException("Check Config.ini existence.");
+
+            Load();
+        }
+        #endregion
+
+        #region Public Members
+        public void Load()
+        {
+            screenWidth = iniHelper.ReadValue("Screen", "ScreenWidth", 640);
+            screenHeight = iniHelper.ReadValue("Screen", "ScreenHeight", 480);
+            imagePath = iniHelper.ReadValue("Screen", "ImagePath", string.Empty);
+            gridAlignment = iniHelper.ReadValue("Screen", "GridAlignment", true);
+            centerDisplay = iniHelper.ReadValue("Screen", "CenterDisplay", true);
+        }
+        public void Save()
+        {
+            iniHelper.WriteValue("Screen", "ScreenWidth", screenWidth);
+            iniHelper.WriteValue("Screen", "ScreenHeight", screenHeight);
+            iniHelper.WriteValue("Screen", "ImagePath", imagePath);
+            iniHelper.WriteValue("Screen", "GridAlignment", gridAlignment);
+            iniHelper.WriteValue("Screen", "CenterDisplay", centerDisplay);
         }
         #endregion
     }

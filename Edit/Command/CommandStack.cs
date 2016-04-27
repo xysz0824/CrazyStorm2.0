@@ -14,7 +14,7 @@ namespace CrazyStorm
         public event Action StackChanged;
 
         #region Private Members
-        const int MaxSize = 512;
+        const int MaxSize = 32;
         List<Command> redoCommands;
         List<Command> undoCommands;
         #endregion

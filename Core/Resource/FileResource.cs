@@ -15,10 +15,12 @@ namespace CrazyStorm.Core
     {
         #region Private Members
         string absolutePath;
+        string relativePath;
         #endregion
 
         #region Public Members
         public string AbsolutePath { get { return absolutePath; } }
+        public string RelatviePath { get { return relativePath; } }
         #endregion
 
         #region Constructor
@@ -26,12 +28,16 @@ namespace CrazyStorm.Core
             : base(label)
         {
             this.absolutePath = absolutePath;
+            relativePath = absolutePath.Replace(AppDomain.CurrentDomain.BaseDirectory, "");
         }
         #endregion
 
         #region Public Methods
         public override void CheckValid()
         {
+            if (relativePath != absolutePath)
+                absolutePath = AppDomain.CurrentDomain.BaseDirectory + relativePath;
+            
             isValid = System.IO.File.Exists(absolutePath);
         }
         #endregion

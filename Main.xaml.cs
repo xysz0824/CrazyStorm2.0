@@ -51,7 +51,7 @@ namespace CrazyStorm
         #region Constructor
         public Main()
         {
-            config = new Config();
+            config = new Config("Config.ini");
             commandStacks = new Dictionary<ParticleSystem, CommandStack>();
             clipBoard = new List<Core.Component>();
             file = new File("Untitled");
@@ -68,11 +68,9 @@ namespace CrazyStorm
             InitializeParticle();
             InitializeEdit();
             InitializeStatusBar();
-            status = (string)FindResource("Ready");
         }
         void InitializeConfig()
         {
-            //TODO : Load config.
             ParticleTabControl.DataContext = config;
         }
         void InitializeFile()
@@ -113,6 +111,7 @@ namespace CrazyStorm
         }
         void InitializeStatusBar()
         {
+            status = (string)FindResource("Ready");
             StatusText.DataContext = this;
         }
         void InitializeLayerAndComponent()
