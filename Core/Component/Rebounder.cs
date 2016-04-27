@@ -10,12 +10,24 @@ using System.Text;
 
 namespace CrazyStorm.Core
 {
+    public struct RebounderData : IFieldData
+    {
+        public int length;
+        public float rotation;
+        public int collisionTime;
+        public void SetField(int fieldIndex, ValueType value)
+        {
+            throw new NotImplementedException();
+        }
+        public ValueType GetField(int fieldIndex)
+        {
+            throw new NotImplementedException();
+        }
+    }
     public class Rebounder : Component
     {
         #region Private Members
-        int length;
-        float rotation;
-        int collisionTime;
+        RebounderData rebounderData;
         IList<EventGroup> rebounderEventGroups;
         #endregion
 
@@ -23,20 +35,20 @@ namespace CrazyStorm.Core
         [IntProperty(0, int.MaxValue)]
         public int Length
         {
-            get { return length; }
-            set { length = value; }
+            get { return rebounderData.length; }
+            set { rebounderData.length = value; }
         }
         [FloatProperty(float.MinValue, float.MaxValue)]
         public float Rotation
         {
-            get { return rotation; }
-            set { rotation = value; }
+            get { return rebounderData.rotation; }
+            set { rebounderData.rotation = value; }
         }
         [IntProperty(0, int.MaxValue)]
         public int CollisionTime
         {
-            get { return collisionTime; }
-            set { collisionTime = value; }
+            get { return rebounderData.collisionTime; }
+            set { rebounderData.collisionTime = value; }
         }
         public IList<EventGroup> RebounderEventGroups { get { return rebounderEventGroups; } }
         #endregion

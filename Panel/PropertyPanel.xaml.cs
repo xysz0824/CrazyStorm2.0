@@ -466,9 +466,9 @@ namespace CrazyStorm
             if (e.OriginalSource is TextBlock && ComponentEventList.SelectedItem != null)
             {
                 Script.Environment environment = new Script.Environment(this.environment);
-                //Remove string property
+                //Remove unnecessary properties
                 environment.RemoveLocal("Name");
-                //Add runtime properties
+                //Add runtime component properties
                 environment.PutLocal("CurrentFrame", 0);
                 OpenEventSetting(ComponentEventList.SelectedItem as EventGroup, environment, 
                     component is Emitter, component is Emitter);
@@ -492,19 +492,11 @@ namespace CrazyStorm
                 }
                 if (component is EventField || component is Rebounder)
                 {
-                    //Put particle properties
-                    environment.PutLocal("MaxLife", 0);
-                    environment.PutLocal("RGB", RGB.Zero);
-                    environment.PutLocal("Opacity", 0.0f);
-                    environment.PutLocal("PSpeed", 0.0f);
-                    environment.PutLocal("PSpeedAngle", 0.0f);
-                    environment.PutLocal("PAcspeed", 0.0f);
-                    environment.PutLocal("PAcspeedAngle", 0.0f);
-                    environment.PutLocal("BlendType", BlendType.AlphaBlend);
-                    environment.PutLocal("KillOutside", true);
-                    environment.PutLocal("Collision", true);
+                    //For compatibility between particle and curveparticle, 
+                    //Put uncommon particle properties
+                    environment.PutLocal("Length", 0);
                 }
-                //Add runtime properties
+                //Add runtime particle properties
                 environment.PutLocal("Position", Vector2.Zero);
                 environment.PutLocal("CurrentFrame", 0);
                 OpenEventSetting(SpecificEventList.SelectedItem as EventGroup, environment, 

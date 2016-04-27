@@ -10,14 +10,26 @@ using System.Text;
 
 namespace CrazyStorm.Core
 {
+    public struct EmitterData : IFieldData
+    {
+        public Vector2 emitPosition;
+        public int emitCount;
+        public int emitCycle;
+        public float emitAngle;
+        public float emitRange;
+        public void SetField(int fieldIndex, ValueType value)
+        {
+            throw new NotImplementedException();
+        }
+        public ValueType GetField(int fieldIndex)
+        {
+            throw new NotImplementedException();
+        }
+    }
     public class Emitter : Component
     {
         #region Private Members
-        Vector2 emitPosition;
-        int emitCount;
-        int emitCycle;
-        float emitAngle;
-        float emitRange;
+        EmitterData emitterData;
         IList<EventGroup> particleEventGroups;
         #endregion
 
@@ -25,32 +37,32 @@ namespace CrazyStorm.Core
         [Vector2Property]
         public Vector2 EmitPosition
         {
-            get { return emitPosition; }
-            set { emitPosition = value; }
+            get { return emitterData.emitPosition; }
+            set { emitterData.emitPosition = value; }
         }
         [IntProperty(1, int.MaxValue)]
         public int EmitCount
         {
-            get { return emitCount; }
-            set { emitCount = value; }
+            get { return emitterData.emitCount; }
+            set { emitterData.emitCount = value; }
         }
         [IntProperty(1, int.MaxValue)]
         public int EmitCycle
         {
-            get { return emitCycle; }
-            set { emitCycle = value; }
+            get { return emitterData.emitCycle; }
+            set { emitterData.emitCycle = value; }
         }
         [FloatProperty(float.MinValue, float.MaxValue)]
         public float EmitAngle
         {
-            get { return emitAngle; }
-            set { emitAngle = value; }
+            get { return emitterData.emitAngle; }
+            set { emitterData.emitAngle = value; }
         }
         [FloatProperty(float.MinValue, float.MaxValue)]
         public float EmitRange
         {
-            get { return emitRange; }
-            set { emitRange = value; }
+            get { return emitterData.emitRange; }
+            set { emitterData.emitRange = value; }
         }
         public IList<EventGroup> ParticleEventGroups { get { return particleEventGroups; } }
         #endregion
@@ -59,8 +71,8 @@ namespace CrazyStorm.Core
         public Emitter()
             : base()
         {
-            emitCount = 1;
-            EmitCycle = 1;
+            emitterData.emitCount = 1;
+            emitterData.emitCycle = 1;
             particleEventGroups = new ObservableCollection<EventGroup>();
         }
         #endregion

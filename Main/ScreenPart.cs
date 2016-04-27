@@ -384,7 +384,6 @@ namespace CrazyStorm
                 }
                 InitializeLayerAndComponent();
                 UpdateSelectedStatus();
-                UpdateEditStatus();
             }
         }
         private void ScreenSettingItem_Click(object sender, RoutedEventArgs e)

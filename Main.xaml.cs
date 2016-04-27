@@ -92,7 +92,7 @@ namespace CrazyStorm
             commandStacks[selectedParticle] = new CommandStack();
             commandStacks[selectedParticle].StackChanged += () =>
             {
-                UpdateEditStatus();
+                UpdateCommandStackStatus();
             };
         }
         void InitializeEdit()
@@ -131,6 +131,7 @@ namespace CrazyStorm
             UpdateComponentPanels();
             UpdateSelectedGroup();
             UpdateComponentMenu();
+            UpdateEditStatus();
         }
         #endregion
 

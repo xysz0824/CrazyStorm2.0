@@ -15,21 +15,20 @@ namespace CrazyStorm
     public partial class Main
     {
         #region Private Methods
-        void UpdateEditStatus()
+        void UpdateCommandStackStatus()
         {
             var redoPeek = commandStacks[selectedParticle].RedoPeek();
             var undoPeek = commandStacks[selectedParticle].UndoPeek();
-            //Update command buttons
             UndoButton.IsEnabled = redoPeek != null ? true : false;
             RedoButton.IsEnabled = undoPeek != null ? true : false;
-            //Update command items
             UndoItem.IsEnabled = UndoButton.IsEnabled;
             RedoItem.IsEnabled = RedoButton.IsEnabled;
-            //Update edit buttons
+        }
+        void UpdateEditStatus()
+        {
             CutButton.IsEnabled = selectedComponents.Count > 0;
             CopyButton.IsEnabled = CutButton.IsEnabled;
             PasteButton.IsEnabled = clipBoard.Count > 0;
-            //Update edit items
             CutItem.IsEnabled = CutButton.IsEnabled;
             CopyItem.IsEnabled = CopyButton.IsEnabled;
             PasteItem.IsEnabled = PasteButton.IsEnabled;

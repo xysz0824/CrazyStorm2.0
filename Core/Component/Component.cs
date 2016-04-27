@@ -12,21 +12,33 @@ using System.ComponentModel;
 
 namespace CrazyStorm.Core
 {
+    public struct ComponentData : IFieldData
+    {
+        public int currentFrame;
+        public int beginFrame;
+        public int totalFrame;
+        public Vector2 position;
+        public float speed;
+        public float speedAngle;
+        public float acspeed;
+        public float acspeedAngle;
+        public bool visibility;
+        public void SetField(int fieldIndex, ValueType value)
+        {
+            throw new NotImplementedException();
+        }
+        public ValueType GetField(int fieldIndex)
+        {
+            throw new NotImplementedException();
+        }
+    }
     public class Component : PropertyContainer, INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
         #region Private Members
+        ComponentData componentData;
         string name;
-        int currentFrame;
-        int beginFrame;
-        int totalFrame;
-        Vector2 position;
-        float speed;
-        float speedAngle;
-        float acspeed;
-        float acspeedAngle;
-        bool visibility;
         bool selected;
         Component parent;
         Component bindingTarget;
@@ -49,66 +61,66 @@ namespace CrazyStorm.Core
         }
         public int CurrentFrame
         {
-            get { return currentFrame; }
-            set { currentFrame = value; }
+            get { return componentData.currentFrame; }
+            set { componentData.currentFrame = value; }
         }
         [IntProperty(0, int.MaxValue)]
         public int BeginFrame
         {
-            get { return beginFrame; }
-            set { beginFrame = value; }
+            get { return componentData.beginFrame; }
+            set { componentData.beginFrame = value; }
         }
         [IntProperty(0, int.MaxValue)]
         public int TotalFrame
         {
-            get { return totalFrame; }
-            set { totalFrame = value; }
+            get { return componentData.totalFrame; }
+            set { componentData.totalFrame = value; }
         }
         [Vector2Property]
         public Vector2 Position
         {
-            get { return position; }
-            set { position = value; }
+            get { return componentData.position; }
+            set { componentData.position = value; }
         }
         public float X
         {
-            get { return position.x; }
-            set { position.x = value; }
+            get { return componentData.position.x; }
+            set { componentData.position.x = value; }
         }
         public float Y
         {
-            get { return position.y; }
-            set { position.y = value; }
+            get { return componentData.position.y; }
+            set { componentData.position.y = value; }
         }
         [FloatProperty(float.MinValue, float.MaxValue)]
         public float Speed
         {
-            get { return speed; }
-            set { speed = value; }
+            get { return componentData.speed; }
+            set { componentData.speed = value; }
         }
         [FloatProperty(float.MinValue, float.MaxValue)]
         public float SpeedAngle
         {
-            get { return speedAngle; }
-            set { speedAngle = value; }
+            get { return componentData.speedAngle; }
+            set { componentData.speedAngle = value; }
         }
         [FloatProperty(float.MinValue, float.MaxValue)]
         public float Acspeed
         {
-            get { return acspeed; }
-            set { acspeed = value; }
+            get { return componentData.acspeed; }
+            set { componentData.acspeed = value; }
         }
         [FloatProperty(float.MinValue, float.MaxValue)]
         public float AcspeedAngle
         {
-            get { return acspeedAngle; }
-            set { acspeedAngle = value; }
+            get { return componentData.acspeedAngle; }
+            set { componentData.acspeedAngle = value; }
         }
         [BoolProperty]
         public bool Visibility
         {
-            get { return visibility; }
-            set { visibility = value; }
+            get { return componentData.visibility; }
+            set { componentData.visibility = value; }
         }
         public bool Selected
         {
@@ -133,7 +145,7 @@ namespace CrazyStorm.Core
         #region Constructor
         public Component()
         {
-            visibility = true;
+            componentData.visibility = true;
             variables = new ObservableCollection<VariableResource>();
             componentEventGroups = new ObservableCollection<EventGroup>();
             children = new ObservableCollection<Component>();
@@ -145,23 +157,23 @@ namespace CrazyStorm.Core
         {
             if (parent != null)
             {
-                position -= parent.GetAbsolutePosition();
+                componentData.position -= parent.GetAbsolutePosition();
             }
         }
         public void TransPositiontoAbsolute()
         {
             if (parent != null)
             {
-                position += parent.GetAbsolutePosition();
+                componentData.position += parent.GetAbsolutePosition();
             }
         }
         public Vector2 GetAbsolutePosition()
         {
             if (parent != null)
             {
-                return position + parent.GetAbsolutePosition();
+                return componentData.position + parent.GetAbsolutePosition();
             }
-            return position;
+            return componentData.position;
         }
         public IList<Component> GetPosterity()
         {
