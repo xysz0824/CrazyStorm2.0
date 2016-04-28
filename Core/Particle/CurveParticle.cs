@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Xml;
+using System.Xml.Serialization;
 
 namespace CrazyStorm.Core
 {
@@ -17,11 +19,11 @@ namespace CrazyStorm.Core
             throw new NotImplementedException();
         }
     }
-    public class CurveParticle : PropertyContainer
+    public class CurveParticle : PropertyContainer, IXmlData
     {
         #region Private Members
+        ParticleType type;
         ParticleBaseData particleBaseData;
-        //////////////////////////////////
         CurveParticleData curveParticleData;
         #endregion
 
@@ -44,8 +46,8 @@ namespace CrazyStorm.Core
         }
         public ParticleType Type
         {
-            get { return particleBaseData.type; }
-            set { particleBaseData.type = value; }
+            get { return type; }
+            set { type = value; }
         }
         [FloatProperty(0, float.MaxValue)]
         public float WidthScale
@@ -140,6 +142,29 @@ namespace CrazyStorm.Core
         #endregion
 
         #region Public Methods
+        public XmlElement BuildFromXml(XmlDocument doc, XmlElement node)
+        {
+            throw new NotImplementedException();
+        }
+        public XmlElement StoreAsXml(XmlDocument doc, XmlElement node)
+        {
+            var curveParticleNode = doc.CreateElement("CurveParticle");
+            //properties
+            curveParticleNode.AppendChild(base.GetXmlElement(doc));
+            //type
+            if (type != null)
+            {
+                var typeAttribute = doc.CreateAttribute("type");
+                typeAttribute.Value = type.ID.ToString();
+                curveParticleNode.Attributes.Append(typeAttribute);
+            }
+            //particleBaseData
+            XmlHelper.StoreStruct(particleBaseData, doc, curveParticleNode, "ParticleBaseData");
+            //curveParticleData
+            XmlHelper.StoreStruct(curveParticleData, doc, curveParticleNode, "CurveParticleData");
+            node.AppendChild(curveParticleNode);
+            return node;
+        }
         #endregion
     }
 }

@@ -54,8 +54,9 @@ namespace CrazyStorm
             config = new Config("Config.ini");
             commandStacks = new Dictionary<ParticleSystem, CommandStack>();
             clipBoard = new List<Core.Component>();
-            file = new File("Untitled");
+            file = new File();
             InitializeComponent();
+            InitializeConfig();
             InitializeSystem();
         }
         #endregion
@@ -63,7 +64,6 @@ namespace CrazyStorm
         #region Private Methods
         void InitializeSystem()
         {
-            InitializeConfig();
             InitializeFile();
             InitializeParticle();
             InitializeEdit();
@@ -75,7 +75,7 @@ namespace CrazyStorm
         }
         void InitializeFile()
         {
-            Title = VersionInfo.AppTitle + " - " + file.FileName;
+            Title = VersionInfo.AppTitle + " - " + fileName + VersionInfo.Extension;
             ImageList.ItemsSource = file.Images;
             SoundList.ItemsSource = file.Sounds;
             VariableGrid.ItemsSource = file.Globals;
@@ -83,14 +83,18 @@ namespace CrazyStorm
         }
         void InitializeParticle()
         {
-            selectedParticle = file.Particles.First();
-            InitializeCommandStacks();
-            AddNewParticleTab(selectedParticle);
+            DeleteAllParticle();
+            selectedParticle = file.ParticleSystems.First();
+            foreach (var item in file.ParticleSystems)
+            {
+                InitializeCommandStack(item);
+                AddNewParticleTab(item);
+            }
         }
-        void InitializeCommandStacks()
+        void InitializeCommandStack(ParticleSystem particle)
         {
-            commandStacks[selectedParticle] = new CommandStack();
-            commandStacks[selectedParticle].StackChanged += () =>
+            commandStacks[particle] = new CommandStack();
+            commandStacks[particle].StackChanged += () =>
             {
                 UpdateCommandStackStatus();
             };

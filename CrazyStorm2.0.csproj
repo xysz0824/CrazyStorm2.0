@@ -92,6 +92,7 @@
     <Compile Include="Edit\Command\Component\PasteComponentCommand.cs" />
     <Compile Include="Edit\Command\Component\UnbindComponentCommand.cs" />
     <Compile Include="Helper\IniHelper.cs" />
+    <Compile Include="Main\FilePart.cs" />
     <Compile Include="Marker\ComponentMarker.cs" />
     <Compile Include="Marker\ForceFieldMarker.cs" />
     <Compile Include="Marker\IComponentMark.cs" />

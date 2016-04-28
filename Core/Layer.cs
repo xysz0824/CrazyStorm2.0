@@ -8,6 +8,8 @@ using System.Linq;
 using System.Text;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Xml;
+using System.Xml.Serialization;
 
 namespace CrazyStorm.Core
 {
@@ -21,15 +23,20 @@ namespace CrazyStorm.Core
         Orange,
         Gray
     }
-    public class Layer : INotifyPropertyChanged, ICloneable
+    public class Layer : INotifyPropertyChanged, ICloneable, IXmlData
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
         #region Private Members
+        [XmlAttribute]
         string name;
+        [XmlAttribute]
         bool visible;
+        [XmlAttribute]
         LayerColor color;
+        [XmlAttribute]
         int beginFrame;
+        [XmlAttribute]
         int totalFrame;
         IList<Component> components;
         #endregion
@@ -109,6 +116,19 @@ namespace CrazyStorm.Core
                 clone.components.Add(component.Clone() as Component);
             
             return clone;
+        }
+        public XmlElement BuildFromXml(XmlDocument doc, XmlElement node)
+        {
+            throw new NotImplementedException();
+        }
+        public XmlElement StoreAsXml(XmlDocument doc, XmlElement node)
+        {
+            var layerNode = doc.CreateElement("Layer");
+            XmlHelper.StoreFields(this, doc, layerNode);
+            //components
+            XmlHelper.StoreObjectList(components, doc, layerNode, "Components");
+            node.AppendChild(layerNode);
+            return node;
         }
         #endregion
     }

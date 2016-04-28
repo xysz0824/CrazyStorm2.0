@@ -8,12 +8,15 @@ using System.Linq;
 using System.Text;
 using System.IO;
 using System.ComponentModel;
+using System.Xml;
+using System.Xml.Serialization;
 
 namespace CrazyStorm.Core
 {
-    public abstract class Resource : INotifyPropertyChanged
+    public abstract class Resource : INotifyPropertyChanged, IXmlData
     {
         public event PropertyChangedEventHandler PropertyChanged;
+        [XmlAttribute]
         protected string label;
         protected bool isValid;
         public string Label
@@ -39,5 +42,18 @@ namespace CrazyStorm.Core
         }
 
         public abstract void CheckValid();
+
+        public virtual XmlElement BuildFromXml(XmlDocument doc, XmlElement node)
+        {
+            throw new NotImplementedException();
+        }
+
+        public virtual XmlElement StoreAsXml(XmlDocument doc, XmlElement node)
+        {
+            var resourceNode = doc.CreateElement("Resource");
+            XmlHelper.StoreFields(typeof(Resource), this, doc, resourceNode);
+            node.AppendChild(resourceNode);
+            return resourceNode;
+        }
     }
 }

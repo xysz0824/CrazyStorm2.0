@@ -6,6 +6,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Xml;
+using System.Xml.Serialization;
 
 namespace CrazyStorm.Core
 {
@@ -21,7 +23,6 @@ namespace CrazyStorm.Core
 
         #region Constructor
         public MultiEmitter()
-            : base()
         {
             particle = new Particle();
         }
@@ -33,6 +34,18 @@ namespace CrazyStorm.Core
             var clone = base.Clone() as MultiEmitter;
             clone.particle = particle.Clone() as Particle;
             return clone;
+        }
+        public override XmlElement BuildFromXml(XmlDocument doc, XmlElement node)
+        {
+            throw new NotImplementedException();
+        }
+        public override XmlElement StoreAsXml(XmlDocument doc, XmlElement node)
+        {
+            node = base.StoreAsXml(doc, node);
+            var multiEmitterNode = doc.CreateElement("MultiEmitter");
+            particle.StoreAsXml(doc, multiEmitterNode);
+            node.AppendChild(multiEmitterNode);
+            return multiEmitterNode;
         }
         #endregion
     }

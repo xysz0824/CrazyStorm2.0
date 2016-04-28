@@ -46,7 +46,7 @@ namespace CrazyStorm
         void InitializeDataBinding()
         {
             ParticleName.DataContext = selectedParticle;
-            TypeList.ItemsSource = selectedParticle.CustomType;
+            TypeList.ItemsSource = selectedParticle.CustomTypes;
             file.UpdateResource();
             ImageCombo.ItemsSource = file.Images;
         }
@@ -126,7 +126,7 @@ namespace CrazyStorm
         }
         private void AddNewType_Click(object sender, RoutedEventArgs e)
         {
-            selectedParticle.CustomType.Add(new ParticleType());
+            selectedParticle.CustomTypes.Add(new ParticleType(selectedParticle.CustomTypeIndex));
         }
         private void ColorPanel_MouseUp(object sender, MouseButtonEventArgs e)
         {
@@ -143,7 +143,7 @@ namespace CrazyStorm
         }
         private void DeleteType_Click(object sender, RoutedEventArgs e)
         {
-            selectedParticle.CustomType.Remove(selectedType);
+            selectedParticle.CustomTypes.Remove(selectedType);
         }
         private void Frames_TextChanged(object sender, TextChangedEventArgs e)
         {

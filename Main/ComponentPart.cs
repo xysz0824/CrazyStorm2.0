@@ -86,7 +86,7 @@ namespace CrazyStorm
             var scroll = new ScrollViewer();
             scroll.VerticalScrollBarVisibility = ScrollBarVisibility.Auto;
             var panel = new PropertyPanel(commandStacks[selectedParticle],
-                file, selectedParticle.CustomType, component, UpdateProperty);
+                file, selectedParticle.CustomTypes, component, UpdateProperty);
             scroll.Content = panel;
             panel.OnBeginEditing += () =>
             {

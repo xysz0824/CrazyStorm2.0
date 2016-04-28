@@ -7,41 +7,41 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Collections.ObjectModel;
+using System.Xml;
+using System.Xml.Serialization;
 
 namespace CrazyStorm.Core
 {
-    public class File
+    public class File : IXmlData
     {
         #region Private Members
-        string name;
-        string absolutePath;
         IList<Resource> images;
         IList<Resource> sounds;
         IList<Resource> globals;
-        IList<ParticleSystem> particles;
+        IList<ParticleSystem> particleSystems;
+        [XmlAttribute]
+        int fileResourceIndex;
+        [XmlAttribute]
         int particleIndex;
         #endregion
 
         #region Public Members
-        public string FileName { get { return name + ".bgp"; } }
-        public string AbsolutePath { get { return absolutePath; } }
         public IList<Resource> Images { get { return images; } }
         public IList<Resource> Sounds { get { return sounds; } }
         public IList<Resource> Globals { get { return globals; } }
-        public IList<ParticleSystem> Particles { get { return particles; } }
+        public IList<ParticleSystem> ParticleSystems { get { return particleSystems; } }
+        public int FileResourceIndex { get { return fileResourceIndex++; } }
         public int ParticleIndex { get { return particleIndex++; } }
         #endregion
 
         #region Constructor
-        public File(string name)
+        public File()
         {
-            this.name = name;
-            absolutePath = String.Empty;
             images = new ObservableCollection<Resource>();
             sounds = new ObservableCollection<Resource>();
             globals = new ObservableCollection<Resource>();
-            particles = new List<ParticleSystem>();
-            particles.Add(new ParticleSystem("Untitled"));
+            particleSystems = new List<ParticleSystem>();
+            particleSystems.Add(new ParticleSystem("Untitled"));
         }
         #endregion
 
@@ -56,6 +56,23 @@ namespace CrazyStorm.Core
 
             foreach (var item in globals)
                 item.CheckValid();
+        }
+        public XmlElement BuildFromXml(XmlDocument doc, XmlElement node)
+        {
+            throw new NotImplementedException();
+        }
+        public XmlElement StoreAsXml(XmlDocument doc, XmlElement node)
+        {
+            XmlHelper.StoreFields(this, doc, node);
+            //images
+            XmlHelper.StoreObjectList(images, doc, node, "Images");
+            //sounds
+            XmlHelper.StoreObjectList(sounds, doc, node, "Sounds");
+            //globals
+            XmlHelper.StoreObjectList(globals, doc, node, "Globals");            
+            //particleSystems
+            XmlHelper.StoreObjectList(particleSystems, doc, node, "ParticleSystems");
+            return node;
         }
         #endregion
     }

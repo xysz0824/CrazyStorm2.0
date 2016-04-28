@@ -24,11 +24,11 @@ namespace CrazyStorm
         #region Private Methods
         void CreateNewParticle()
         {
-            var particle = new ParticleSystem("Particle" + file.ParticleIndex);
-            file.Particles.Add(particle);
-            selectedParticle = particle;
-            InitializeCommandStacks();
-            AddNewParticleTab(particle);
+            var particleSystem = new ParticleSystem("Particle" + file.ParticleIndex);
+            file.ParticleSystems.Add(particleSystem);
+            selectedParticle = particleSystem;
+            InitializeCommandStack(particleSystem);
+            AddNewParticleTab(particleSystem);
         }
         void AddNewParticleTab(ParticleSystem particle)
         {
@@ -39,22 +39,36 @@ namespace CrazyStorm
             ParticleTabControl.Items.Add(tabItem);
             ParticleTabControl.SelectedItem = tabItem;
         }
+        void DeleteAllParticle()
+        {
+            for (int i = 0; i < ParticleTabControl.Items.Count; ++i)
+            {
+                var item = ParticleTabControl.Items[i] as TabItem;
+                var particle = item.Tag as ParticleSystem;
+                commandStacks.Remove(particle);
+                file.ParticleSystems.Remove(particle);
+                ParticleTabControl.Items.Remove(item);
+                i--;
+            }
+        }
         void DeleteSeletedParticle()
         {
-            if (file.Particles.Count > 1)
+            if (file.ParticleSystems.Count > 1)
             {
                 TabItem selected = null;
                 foreach (TabItem item in ParticleTabControl.Items)
-                    if (selectedParticle.Name == (string)item.Header)
+                {
+                    if (item.Tag == selectedParticle)
                     {
                         selected = item;
                         break;
                     }
+                }
                 if (MessageBox.Show((string)FindResource("ConfirmDeleteParticle"), (string)FindResource("TipTitle"),
                     MessageBoxButton.YesNo, MessageBoxImage.Warning) == MessageBoxResult.Yes)
                 {
                     commandStacks.Remove(selectedParticle);
-                    file.Particles.Remove(selectedParticle);
+                    file.ParticleSystems.Remove(selectedParticle);
                     ParticleTabControl.Items.Remove(selected);
                 }
             }
@@ -65,9 +79,9 @@ namespace CrazyStorm
         void CopySeletedParticle()
         {
             var particle = selectedParticle.Clone() as ParticleSystem;
-            file.Particles.Add(particle);
+            file.ParticleSystems.Add(particle);
             selectedParticle = particle;
-            InitializeCommandStacks();
+            InitializeCommandStack(particle);
             AddNewParticleTab(particle);
         }
         void OpenSelectedParticleSetting()

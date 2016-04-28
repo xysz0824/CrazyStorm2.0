@@ -178,6 +178,10 @@
         <RoutedUICommand x:Key="CutComponent" Text="CutComponent"/>
         <RoutedUICommand x:Key="CopyComponent" Text="CopyComponent"/>
         <RoutedUICommand x:Key="Paste" Text="Paste"/>
+        <RoutedUICommand x:Key="New" Text="New"/>
+        <RoutedUICommand x:Key="Open" Text="Open"/>
+        <RoutedUICommand x:Key="Save" Text="Save"/>
+        <RoutedUICommand x:Key="SaveTo" Text="SaveTo"/>
     </Window.Resources>
     <Window.InputBindings>
         <KeyBinding  Key="Delete" Command="{StaticResource DelComponent}" />
@@ -194,6 +198,10 @@
         <KeyBinding   Modifiers="Control"  Key="X" Command="{StaticResource CutComponent}" />
         <KeyBinding   Modifiers="Control"  Key="C" Command="{StaticResource CopyComponent}" />
         <KeyBinding   Modifiers="Control"  Key="V" Command="{StaticResource Paste}" />
+        <KeyBinding   Modifiers="Control"  Key="N" Command="{StaticResource New}" />
+        <KeyBinding   Modifiers="Control"  Key="O" Command="{StaticResource Open}" />
+        <KeyBinding   Modifiers="Control"  Key="S" Command="{StaticResource Save}" />
+        <KeyBinding   Modifiers="Control+Shift"  Key="S" Command="{StaticResource SaveTo}" />
     </Window.InputBindings>
     <Window.CommandBindings>
         <CommandBinding Command="{StaticResource DelComponent}"
@@ -238,6 +246,18 @@
         <CommandBinding Command="{StaticResource Paste}"
                                             CanExecute="CommandBinding_CanExecute"
                                             Executed="CommandBinding_Executed" />
+        <CommandBinding Command="{StaticResource New}"
+                                            CanExecute="CommandBinding_CanExecute"
+                                            Executed="CommandBinding_Executed" />
+        <CommandBinding Command="{StaticResource Open}"
+                                            CanExecute="CommandBinding_CanExecute"
+                                            Executed="CommandBinding_Executed" />
+        <CommandBinding Command="{StaticResource Save}"
+                                            CanExecute="CommandBinding_CanExecute"
+                                            Executed="CommandBinding_Executed" />
+        <CommandBinding Command="{StaticResource SaveTo}"
+                                            CanExecute="CommandBinding_CanExecute"
+                                            Executed="CommandBinding_Executed" />
     </Window.CommandBindings>
     <DockPanel Height="Auto" Name="dockPanel1" Width="Auto">
         <!-- Top Menu -->
@@ -249,10 +269,10 @@
                 </LinearGradientBrush>
             </Menu.Background>
             <MenuItem Header="文件">
-                <MenuItem Header="新建" InputGestureText="Ctrl+N"/>
-                <MenuItem Header="打开" InputGestureText="Ctrl+O"/>
-                <MenuItem Header="保存" InputGestureText="Ctrl+S"/>
-                <MenuItem Header="另存为..." InputGestureText="Ctrl+Shift+S"/>
+                <MenuItem Name="NewItem" Header="新建" InputGestureText="Ctrl+N" Click="NewItem_Click" />
+                <MenuItem Name="OpenItem" Header="打开" InputGestureText="Ctrl+O" Click="OpenItem_Click" />
+                <MenuItem Name="SaveItem" Header="保存" InputGestureText="Ctrl+S" Click="SaveItem_Click" />
+                <MenuItem Name="SaveToItem" Header="另存为..." InputGestureText="Ctrl+Shift+S" Click="SaveToItem_Click" />
                 <Separator/>
                 <MenuItem Header="屏幕设置" Click="ScreenSettingItem_Click" />
                 <Separator/>
@@ -318,13 +338,13 @@
                     <GradientStop Color="Gainsboro" Offset="1" />
                 </LinearGradientBrush>
             </ToolBar.Background>
-            <Button Name="NewButton" IsDefault="False" IsCancel="False" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ToolTip="新建">
+            <Button Name="NewButton" IsDefault="False" IsCancel="False" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ToolTip="新建" Click="NewItem_Click">
                 <Image Source="Images/document-new-3.ico" Stretch="None" />
             </Button>
-            <Button Name="OpenButton" IsDefault="False" IsCancel="False" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ToolTip="打开">
+            <Button Name="OpenButton" IsDefault="False" IsCancel="False" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ToolTip="打开"  Click="OpenItem_Click">
                 <Image Source="Images/document-open-2.ico" Stretch="None" />
             </Button>
-            <Button Name="SaveButton" IsDefault="False" IsCancel="False" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ToolTip="保存">
+            <Button Name="SaveButton" IsDefault="False" IsCancel="False" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ToolTip="保存"  Click="SaveItem_Click">
                 <Image Source="Images/document-export.ico" Stretch="None" />
             </Button>
             <Separator/>

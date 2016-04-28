@@ -6,6 +6,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Xml;
+using System.Xml.Serialization;
 
 namespace CrazyStorm.Core
 {
@@ -93,9 +95,24 @@ namespace CrazyStorm.Core
 
         #region Constructor
         public ForceField()
-            : base()
         {
             forceFieldData.targetName = "";
+        }
+        #endregion
+
+        #region Public Methods
+        public override XmlElement BuildFromXml(XmlDocument doc, XmlElement node)
+        {
+            throw new NotImplementedException();
+        }
+        public override XmlElement StoreAsXml(XmlDocument doc, XmlElement node)
+        {
+            node = base.StoreAsXml(doc, node);
+            var forceFieldNode = doc.CreateElement("ForveField");
+            //forceFieldData
+            XmlHelper.StoreStruct(forceFieldData, doc, forceFieldNode, "ForceFieldData");
+            node.AppendChild(forceFieldNode);
+            return forceFieldNode;
         }
         #endregion
     }

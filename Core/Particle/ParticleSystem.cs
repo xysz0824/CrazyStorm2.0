@@ -7,18 +7,24 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Collections.ObjectModel;
+using System.Xml;
+using System.Xml.Serialization;
 
 namespace CrazyStorm.Core
 {
-    public class ParticleSystem : ICloneable
+    public class ParticleSystem : ICloneable, IXmlData
     {
         #region Private Members
+        [XmlAttribute]
         string name;
-        IList<ParticleType> customType;
+        IList<ParticleType> customTypes;
+        [XmlAttribute]
+        int customTypeIndex;
         IList<Layer> layers;
         IList<Component> componentTree;
+        [XmlAttribute]
         int layerIndex;
-        IDictionary<Type, int> componentIndex;
+        IDictionary<string, int> componentIndex;
         #endregion
 
         #region Public Members
@@ -27,7 +33,8 @@ namespace CrazyStorm.Core
             get { return name; }
             set { name = value; }
         }
-        public IList<ParticleType> CustomType { get { return customType; } }
+        public IList<ParticleType> CustomTypes { get { return customTypes; } }
+        public int CustomTypeIndex { get { return customTypeIndex++; } }
         public IList<Layer> Layers { get { return layers; } }
         public IList<Component> ComponentTree { get { return componentTree; } }
         public int LayerIndex { get { return layerIndex++; } }
@@ -37,16 +44,24 @@ namespace CrazyStorm.Core
         public ParticleSystem(string name)
         {
             this.name = name;
-            customType = new ObservableCollection<ParticleType>();
+            customTypes = new ObservableCollection<ParticleType>();
             layers = new ObservableCollection<Layer>();
             componentTree = new ObservableCollection<Component>();
-            componentIndex = new Dictionary<Type, int>();
+            componentIndex = new Dictionary<string, int>();
             layers.Add(new Layer("Main"));
         }
         #endregion
 
         #region Public Methods
-        public int GetComponentIndex(Type componentType)
+        public int GetComponentIndex()
+        {
+            int count = 0;
+            foreach (var pair in componentIndex)
+                count += pair.Value;
+
+            return count;
+        }
+        public int GetComponentIndex(string componentType)
         {
             if (!componentIndex.ContainsKey(componentType))
                 componentIndex[componentType] = 0;
@@ -98,20 +113,37 @@ namespace CrazyStorm.Core
         public object Clone()
         {
             var clone = MemberwiseClone() as ParticleSystem;
-            clone.customType = new ObservableCollection<ParticleType>();
-            foreach (var type in customType)
-                clone.customType.Add(type.Clone() as ParticleType);
+            clone.customTypes = new ObservableCollection<ParticleType>();
+            foreach (var type in customTypes)
+                clone.customTypes.Add(type.Clone() as ParticleType);
 
             clone.layers = new ObservableCollection<Layer>();
             clone.componentTree = new ObservableCollection<Component>();
             foreach (var layer in layers)
                 clone.AddLayer(layer.Clone() as Layer);
 
-            clone.componentIndex = new Dictionary<Type, int>();
+            clone.componentIndex = new Dictionary<string, int>();
             foreach (var index in componentIndex)
                 clone.componentIndex[index.Key] = index.Value;
 
             return clone;
+        }
+        public XmlElement BuildFromXml(XmlDocument doc, XmlElement node)
+        {
+            throw new NotImplementedException();
+        }
+        public XmlElement StoreAsXml(XmlDocument doc, XmlElement node)
+        {;
+            var particleSystemNode = doc.CreateElement("ParticleSystem");
+            XmlHelper.StoreFields(this, doc, particleSystemNode);
+            //customTypes
+            XmlHelper.StoreObjectList(customTypes, doc, particleSystemNode, "CustomTypes");
+            //layers
+            XmlHelper.StoreObjectList(layers, doc, particleSystemNode, "Layers");
+            //componentIndex
+            XmlHelper.StoreDictionary(componentIndex, doc, particleSystemNode, "ComponentIndex");
+            node.AppendChild(particleSystemNode);
+            return node;
         }
         #endregion
     }

@@ -6,6 +6,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Xml;
+using System.Xml.Serialization;
 
 namespace CrazyStorm.Core
 {
@@ -21,7 +23,6 @@ namespace CrazyStorm.Core
 
         #region Constructor
         public CurveEmitter()
-            : base()
         {
             curveParticle = new CurveParticle();
         }
@@ -33,6 +34,18 @@ namespace CrazyStorm.Core
             var clone = base.Clone() as CurveEmitter;
             clone.curveParticle = curveParticle.Clone() as CurveParticle;
             return clone;
+        }
+        public override XmlElement BuildFromXml(XmlDocument doc, XmlElement node)
+        {
+            throw new NotImplementedException();
+        }
+        public override XmlElement StoreAsXml(XmlDocument doc, XmlElement node)
+        {
+            node = base.StoreAsXml(doc, node);
+            var curveEmitterNode = doc.CreateElement("CurveEmitter");
+            curveParticle.StoreAsXml(doc, curveEmitterNode);
+            node.AppendChild(curveEmitterNode);
+            return curveEmitterNode;
         }
         #endregion
     }

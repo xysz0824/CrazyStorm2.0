@@ -7,6 +7,8 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
+using System.Xml;
+using System.Xml.Serialization;
 
 namespace CrazyStorm.Core
 {
@@ -55,7 +57,6 @@ namespace CrazyStorm.Core
 
         #region Constructor
         public Rebounder()
-            : base()
         {
             rebounderEventGroups = new ObservableCollection<EventGroup>();
         }
@@ -70,6 +71,21 @@ namespace CrazyStorm.Core
                 clone.rebounderEventGroups.Add(item.Clone() as EventGroup);
 
             return clone;
+        }
+        public override XmlElement BuildFromXml(XmlDocument doc, XmlElement node)
+        {
+            throw new NotImplementedException();
+        }
+        public override XmlElement StoreAsXml(XmlDocument doc, XmlElement node)
+        {
+            node = base.StoreAsXml(doc, node);
+            var rebounderNode = doc.CreateElement("Rebounder");
+            //rebounderData
+            XmlHelper.StoreStruct(rebounderData, doc, rebounderNode, "RebounderData");
+            //rebounderEventGroups
+            XmlHelper.StoreObjectList(rebounderEventGroups, doc, rebounderNode, "RebounderEventGroups");
+            node.AppendChild(rebounderNode);
+            return rebounderNode;
         }
         #endregion
     }

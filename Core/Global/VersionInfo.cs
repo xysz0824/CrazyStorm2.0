@@ -13,6 +13,7 @@ namespace CrazyStorm.Core
     {
         public const string AppName = "Crazy Storm";
         public const string Version = "2.0";
+        public const string Extension = ".bgp";
         public static string AppTitle { get { return AppName + " " + Version; } }
     }
 }

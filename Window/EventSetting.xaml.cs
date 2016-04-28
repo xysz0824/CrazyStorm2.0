@@ -646,8 +646,11 @@ namespace CrazyStorm
             {
                 if (selection == item.Key)
                 {
-                    Increase.IsEnabled = !(item.Value is Enum);
-                    Decrease.IsEnabled = !(item.Value is Enum);
+                    Increase.IsEnabled = !(item.Value is Enum) && !(item.Value is Boolean);
+                    Decrease.IsEnabled = Increase.IsEnabled;
+                    Linear.IsEnabled = Increase.IsEnabled;
+                    Accelerated.IsEnabled = Increase.IsEnabled;
+                    Decelerated.IsEnabled = Increase.IsEnabled;
                     return;
                 }
             }

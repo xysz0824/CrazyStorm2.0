@@ -101,6 +101,18 @@ namespace CrazyStorm
                 case "Paste":
                     Paste();
                     break;
+                case "New":
+                    New();
+                    break;
+                case "Open":
+                    Open();
+                    break;
+                case "Save":
+                    Save();
+                    break;
+                case "SaveTo":
+                    SaveTo();
+                    break;
             }
         }
         #endregion

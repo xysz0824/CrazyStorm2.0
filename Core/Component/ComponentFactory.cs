@@ -14,7 +14,8 @@ namespace CrazyStorm.Core
     {
         public static Component Create(string name)
         {
-            return Assembly.GetExecutingAssembly().CreateInstance("CrazyStorm.Core." + name, false) as Component;
+            var namespacePrefix = MethodBase.GetCurrentMethod().DeclaringType.Namespace;
+            return Assembly.GetExecutingAssembly().CreateInstance(namespacePrefix + "." + name, false) as Component;
         }
     }
 }

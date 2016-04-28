@@ -7,6 +7,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.ComponentModel;
+using System.Xml;
+using System.Xml.Serialization;
 
 namespace CrazyStorm.Core
 {
@@ -22,24 +24,40 @@ namespace CrazyStorm.Core
         Orange,
         Gray
     }
-    public class ParticleType : INotifyPropertyChanged, ICloneable
+    public class ParticleType : INotifyPropertyChanged, ICloneable, IXmlData
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
         #region Private Members
-        string name;
         FileResource image;
+        [XmlAttribute]
+        int id;
+        [XmlAttribute]
+        string name;
+        [XmlAttribute]
         Vector2 startPoint;
+        [XmlAttribute]
         int width;
+        [XmlAttribute]
         int height;
+        [XmlAttribute]
         Vector2 centerPoint;
+        [XmlAttribute]
         int frames;
+        [XmlAttribute]
         int delay;
+        [XmlAttribute]
         int radius;
+        [XmlAttribute]
         ParticleColor color;
         #endregion
 
         #region Public Members
+        public int ID
+        {
+            get { return id; }
+            set { id = value; }
+        }
         public string Name
         {
             get { return name; }
@@ -210,9 +228,10 @@ namespace CrazyStorm.Core
         #endregion
 
         #region Constructor
-        public ParticleType()
+        public ParticleType(int id)
         {
-            name = "NewParticleType";
+            this.id = id;
+            name = "ParticleType" + id;
             startPoint = Vector2.Zero;
             centerPoint = Vector2.Zero;
             frames = 1;
@@ -227,6 +246,23 @@ namespace CrazyStorm.Core
         public object Clone()
         {
             return MemberwiseClone();
+        }
+        public XmlElement BuildFromXml(XmlDocument doc, XmlElement node)
+        {
+            throw new NotImplementedException();
+        }
+        public XmlElement StoreAsXml(XmlDocument doc, XmlElement node)
+        {
+            var particleTypeNode = doc.CreateElement("ParticleType");
+            if (image != null)
+            {
+                var fileResourceAttribute = doc.CreateAttribute("image");
+                fileResourceAttribute.Value = image.ID.ToString();
+                particleTypeNode.Attributes.Append(fileResourceAttribute);
+            }
+            XmlHelper.StoreFields(this, doc, particleTypeNode);
+            node.AppendChild(particleTypeNode);
+            return node;
         }
         #endregion
     }

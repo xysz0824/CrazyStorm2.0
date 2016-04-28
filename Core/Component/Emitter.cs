@@ -7,6 +7,8 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
+using System.Xml;
+using System.Xml.Serialization;
 
 namespace CrazyStorm.Core
 {
@@ -69,7 +71,6 @@ namespace CrazyStorm.Core
 
         #region Constructor
         public Emitter()
-            : base()
         {
             emitterData.emitCount = 1;
             emitterData.emitCycle = 1;
@@ -86,6 +87,21 @@ namespace CrazyStorm.Core
                 clone.particleEventGroups.Add(item.Clone() as EventGroup);
 
             return clone;
+        }
+        public override XmlElement BuildFromXml(XmlDocument doc, XmlElement node)
+        {
+            throw new NotImplementedException();
+        }
+        public override XmlElement StoreAsXml(XmlDocument doc, XmlElement node)
+        {
+            node = base.StoreAsXml(doc, node);
+            var emitterNode = doc.CreateElement("Emitter");
+            //emitterData
+            XmlHelper.StoreStruct(emitterData, doc, emitterNode, "EmitterData");
+            //particleEventGroups
+            XmlHelper.StoreObjectList(particleEventGroups, doc, emitterNode, "ParticleEventGroups");
+            node.AppendChild(emitterNode);
+            return emitterNode;
         }
         #endregion
     }

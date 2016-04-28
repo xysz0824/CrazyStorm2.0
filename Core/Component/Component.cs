@@ -9,6 +9,8 @@ using System.Text;
 using System.Reflection;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Xml;
+using System.Xml.Serialization;
 
 namespace CrazyStorm.Core
 {
@@ -32,12 +34,15 @@ namespace CrazyStorm.Core
             throw new NotImplementedException();
         }
     }
-    public class Component : PropertyContainer, INotifyPropertyChanged
+    public class Component : PropertyContainer, INotifyPropertyChanged, IXmlData
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
         #region Private Members
         ComponentData componentData;
+        [XmlAttribute]
+        int id;
+        [XmlAttribute]
         string name;
         bool selected;
         Component parent;
@@ -48,6 +53,11 @@ namespace CrazyStorm.Core
         #endregion
 
         #region Public Members
+        public int ID
+        {
+            get { return id; }
+            set { id = value; }
+        }
         [StringProperty(1, 15, true, true, false, false)]
         public string Name
         {
@@ -216,6 +226,50 @@ namespace CrazyStorm.Core
 
             clone.children = new ObservableCollection<Component>();
             return clone;
+        }
+        public virtual XmlElement BuildFromXml(XmlDocument doc, XmlElement node)
+        {
+            throw new NotImplementedException();
+        }
+        public virtual XmlElement StoreAsXml(XmlDocument doc, XmlElement node)
+        {
+            var componentNode = doc.CreateElement("Component");
+            XmlHelper.StoreFields(typeof(Component), this, doc, componentNode);
+            //properties
+            componentNode.AppendChild(base.GetXmlElement(doc));
+            //componentData
+            XmlHelper.StoreStruct(componentData, doc, componentNode, "ComponentData");
+            //parent
+            if (parent != null)
+            {
+                var parentAttribute = doc.CreateAttribute("parent");
+                parentAttribute.Value = parent.ID.ToString();
+                componentNode.Attributes.Append(parentAttribute);
+            }
+            //bindingTarget
+            if (bindingTarget != null)
+            {
+                var bindingTargetAttribute = doc.CreateAttribute("bindingTarget");
+                bindingTargetAttribute.Value = bindingTarget.ID.ToString();
+                componentNode.Attributes.Append(bindingTargetAttribute);
+            }
+            //variables
+            XmlHelper.StoreObjectList(variables, doc, componentNode, "Variables");
+            //componentEventGroups
+            XmlHelper.StoreObjectList(componentEventGroups, doc, componentNode, "ComponentEventGroups");
+            //children
+            var childrenNode = doc.CreateElement("Children");
+            foreach (var component in children)
+            {
+                var childNode = doc.CreateElement("Component");
+                var idAttribute = doc.CreateAttribute("id");
+                idAttribute.Value = component.ID.ToString();
+                childNode.Attributes.Append(idAttribute);
+                childrenNode.AppendChild(childNode);
+            }
+            componentNode.AppendChild(childrenNode);
+            node.AppendChild(componentNode);
+            return componentNode;
         }
         #endregion
     }

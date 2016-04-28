@@ -6,12 +6,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Xml;
 
 namespace CrazyStorm.Core
 {
-    interface IFieldData
+    interface IXmlData
     {
-        void SetField(int fieldIndex, ValueType value);
-        ValueType GetField(int fieldIndex);
+        XmlElement  BuildFromXml(XmlDocument doc, XmlElement node);
+        XmlElement  StoreAsXml(XmlDocument doc, XmlElement node);
     }
 }

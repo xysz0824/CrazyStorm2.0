@@ -57,7 +57,7 @@ namespace CrazyStorm
                 open.Filter = (string)FindResource("ImageType");
                 if (open.ShowDialog() == System.Windows.Forms.DialogResult.OK)
                 {
-                    var image = new FileResource(open.SafeFileName, open.FileName);
+                    var image = new FileResource(file.FileResourceIndex, open.SafeFileName, open.FileName);
                     file.Images.Add(image);
                 }
             }
@@ -76,7 +76,7 @@ namespace CrazyStorm
                 open.Filter = (string)FindResource("SoundType");
                 if (open.ShowDialog() == System.Windows.Forms.DialogResult.OK)
                 {
-                    var sound = new FileResource(open.SafeFileName, open.FileName);
+                    var sound = new FileResource(file.FileResourceIndex,open.SafeFileName, open.FileName);
                     file.Sounds.Add(sound);
                 }
             }

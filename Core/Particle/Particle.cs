@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Reflection;
+using System.Xml;
+using System.Xml.Serialization;
 
 namespace CrazyStorm.Core
 {
@@ -11,7 +13,6 @@ namespace CrazyStorm.Core
         public int maxLife;
         public int currentFrame;
         public Vector2 position;
-        public ParticleType type;
         public float widthScale;
         public RGB rgb;
         public float opacity;
@@ -52,11 +53,11 @@ namespace CrazyStorm.Core
             throw new NotImplementedException();
         }
     }
-    public class Particle : PropertyContainer
+    public class Particle : PropertyContainer, IXmlData
     {
         #region Private Members
+        ParticleType type;
         ParticleBaseData particleBaseData;
-        //////////////////////////////////
         ParticleData particleData;
         #endregion
 
@@ -89,8 +90,8 @@ namespace CrazyStorm.Core
         }
         public ParticleType Type
         {
-            get { return particleBaseData.type; }
-            set { particleBaseData.type = value; }
+            get { return type; }
+            set { type = value; }
         }
         [FloatProperty(0, float.MaxValue)]
         public float WidthScale
@@ -217,6 +218,32 @@ namespace CrazyStorm.Core
         #region Constructor
         public Particle()
         {
+        }
+        #endregion
+
+        #region Public Methods
+        public XmlElement BuildFromXml(XmlDocument doc, XmlElement node)
+        {
+            throw new NotImplementedException();
+        }
+        public XmlElement StoreAsXml(XmlDocument doc, XmlElement node)
+        {
+            var particleNode = doc.CreateElement("Particle");
+            //properties
+            particleNode.AppendChild(base.GetXmlElement(doc));
+            //type
+            if (type != null)
+            {
+                var typeAttribute = doc.CreateAttribute("type");
+                typeAttribute.Value = type.ID.ToString();
+                particleNode.Attributes.Append(typeAttribute);
+            }
+            //particleBaseData
+            XmlHelper.StoreStruct(particleBaseData, doc, particleNode, "ParticleBaseData");
+            //particleData
+            XmlHelper.StoreStruct(particleData, doc, particleNode, "ParticleData");
+            node.AppendChild(particleNode);
+            return node;
         }
         #endregion
     }

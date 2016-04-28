@@ -7,6 +7,8 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
+using System.Xml;
+using System.Xml.Serialization;
 
 namespace CrazyStorm.Core
 {
@@ -80,7 +82,6 @@ namespace CrazyStorm.Core
 
         #region Constructor
         public EventField()
-            : base()
         {
             eventFieldData.targetName = "";
             eventFieldEventGroups = new ObservableCollection<EventGroup>();
@@ -96,6 +97,21 @@ namespace CrazyStorm.Core
                 clone.eventFieldEventGroups.Add(item.Clone() as EventGroup);
 
             return clone;
+        }
+        public override XmlElement BuildFromXml(XmlDocument doc, XmlElement node)
+        {
+            throw new NotImplementedException();
+        }
+        public override XmlElement StoreAsXml(XmlDocument doc, XmlElement node)
+        {
+            node = base.StoreAsXml(doc, node);
+            var eventFieldNode = doc.CreateElement("EventField");
+            //eventFieldData
+            XmlHelper.StoreStruct(eventFieldData, doc, eventFieldNode, "EventFieldData");
+            //eventFieldEventGroups
+            XmlHelper.StoreObjectList(eventFieldEventGroups, doc, eventFieldNode, "EventFieldEventGroups");
+            node.AppendChild(eventFieldNode);
+            return eventFieldNode;
         }
         #endregion
     }

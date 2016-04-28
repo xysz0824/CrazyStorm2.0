@@ -38,11 +38,14 @@
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
+    <Reference Include="System.XML" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Component\ComponentFactory.cs" />
     <Compile Include="Component\Emitter.cs" />
     <Compile Include="Event\EventGroup.cs" />
+    <Compile Include="IO\IXmlData.cs" />
+    <Compile Include="IO\XmlHelper.cs" />
     <Compile Include="Math\RGB.cs" />
     <Compile Include="Particle\BlendType.cs" />
     <Compile Include="Particle\CurveParticle.cs" />

@@ -24,10 +24,12 @@
     <sys:String x:Key="ExpressionInvalid">填入的表达式有误，请检查</sys:String>
     <sys:String x:Key="NameRepeating">名称重复，请重新修改</sys:String>
     <sys:String x:Key="VariableInvalid">变量中含有重复名称或无效值，请检查</sys:String>
+    <sys:String x:Key="SaveTip">要保存当前文件吗？</sys:String>
     <!-- File Window-->
     <sys:String x:Key="ImageType">PNG图像(*.png)|*.png</sys:String>
     <sys:String x:Key="SoundType">WAV音效(*.wav)|*.wav</sys:String>
     <sys:String x:Key="BackGroundImageType">JPEG图像(*.jpg)|*.jpg|PNG图像(*.png)|*.png|BMP图像(*.bmp)|*.bmp</sys:String>
+    <sys:String x:Key="FileExtension">弹幕工程文件(*.bgp)|*.bgp</sys:String>
     <!-- Component Sidebar -->
     <sys:String x:Key="ParticleEventList">粒子事件组</sys:String>
     <sys:String x:Key="EventFieldEventList">事件场事件组</sys:String>
