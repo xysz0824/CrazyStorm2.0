@@ -72,9 +72,15 @@ namespace CrazyStorm.Core
 
             return clone;
         }
-        public override XmlElement BuildFromXml(XmlDocument doc, XmlElement node)
+        public override XmlElement BuildFromXml(XmlElement node)
         {
-            throw new NotImplementedException();
+            node = base.BuildFromXml(node);
+            var rebounderNode = (XmlElement)node.SelectSingleNode("Rebounder");
+            //rebounderData
+            XmlHelper.BuildStruct(ref rebounderData, rebounderNode, "RebounderData");
+            //rebounderEventGroups
+            XmlHelper.BuildObjectList(rebounderEventGroups, new EventGroup(), rebounderNode, "RebounderEventGroups");
+            return rebounderNode;
         }
         public override XmlElement StoreAsXml(XmlDocument doc, XmlElement node)
         {

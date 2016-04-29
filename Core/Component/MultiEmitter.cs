@@ -35,9 +35,12 @@ namespace CrazyStorm.Core
             clone.particle = particle.Clone() as Particle;
             return clone;
         }
-        public override XmlElement BuildFromXml(XmlDocument doc, XmlElement node)
+        public override XmlElement BuildFromXml(XmlElement node)
         {
-            throw new NotImplementedException();
+            node = base.BuildFromXml(node);
+            var multiEmitterNode = (XmlElement)node.SelectSingleNode("MultiEmitter");
+            particle.BuildFromXml(multiEmitterNode);
+            return multiEmitterNode;
         }
         public override XmlElement StoreAsXml(XmlDocument doc, XmlElement node)
         {

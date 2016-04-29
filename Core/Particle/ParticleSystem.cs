@@ -12,16 +12,16 @@ using System.Xml.Serialization;
 
 namespace CrazyStorm.Core
 {
-    public class ParticleSystem : ICloneable, IXmlData
+    public class ParticleSystem : IXmlData
     {
         #region Private Members
         [XmlAttribute]
         string name;
         IList<ParticleType> customTypes;
-        [XmlAttribute]
-        int customTypeIndex;
         IList<Layer> layers;
         IList<Component> componentTree;
+        [XmlAttribute]
+        int customTypeIndex;
         [XmlAttribute]
         int layerIndex;
         IDictionary<string, int> componentIndex;
@@ -34,9 +34,9 @@ namespace CrazyStorm.Core
             set { name = value; }
         }
         public IList<ParticleType> CustomTypes { get { return customTypes; } }
-        public int CustomTypeIndex { get { return customTypeIndex++; } }
         public IList<Layer> Layers { get { return layers; } }
         public IList<Component> ComponentTree { get { return componentTree; } }
+        public int CustomTypeIndex { get { return customTypeIndex++; } }
         public int LayerIndex { get { return layerIndex++; } }
         #endregion
 
@@ -55,13 +55,13 @@ namespace CrazyStorm.Core
         #region Public Methods
         public int GetComponentIndex()
         {
-            int count = 0;
+            int index = 0;
             foreach (var pair in componentIndex)
-                count += pair.Value;
-
-            return count;
+                index += pair.Value;
+            
+            return index;
         }
-        public int GetComponentIndex(string componentType)
+        public int GetAndIncreaseComponentIndex(string componentType)
         {
             if (!componentIndex.ContainsKey(componentType))
                 componentIndex[componentType] = 0;
@@ -120,7 +120,7 @@ namespace CrazyStorm.Core
             clone.layers = new ObservableCollection<Layer>();
             clone.componentTree = new ObservableCollection<Component>();
             foreach (var layer in layers)
-                clone.AddLayer(layer.Clone() as Layer);
+                clone.layers.Add(layer.Clone() as Layer);
 
             clone.componentIndex = new Dictionary<string, int>();
             foreach (var index in componentIndex)
@@ -128,9 +128,21 @@ namespace CrazyStorm.Core
 
             return clone;
         }
-        public XmlElement BuildFromXml(XmlDocument doc, XmlElement node)
+        public XmlElement BuildFromXml(XmlElement node)
         {
-            throw new NotImplementedException();
+            var nodeName = "ParticleSystem";
+            var particleSystemNode = (XmlElement)node.SelectSingleNode(nodeName);
+            if (node.Name == nodeName)
+                particleSystemNode = node;
+
+            XmlHelper.BuildFields(this, particleSystemNode);
+            //customTypes
+            XmlHelper.BuildObjectList(customTypes, new ParticleType(0), particleSystemNode, "CustomTypes");
+            //layers
+            XmlHelper.BuildObjectList(layers, new Layer(""), particleSystemNode, "Layers");
+            //componentIndex
+            XmlHelper.BuildDictionary(componentIndex, particleSystemNode, "ComponentIndex");
+            return particleSystemNode;
         }
         public XmlElement StoreAsXml(XmlDocument doc, XmlElement node)
         {;
@@ -143,7 +155,7 @@ namespace CrazyStorm.Core
             //componentIndex
             XmlHelper.StoreDictionary(componentIndex, doc, particleSystemNode, "ComponentIndex");
             node.AppendChild(particleSystemNode);
-            return node;
+            return particleSystemNode;
         }
         #endregion
     }

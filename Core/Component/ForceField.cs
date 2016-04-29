@@ -101,14 +101,18 @@ namespace CrazyStorm.Core
         #endregion
 
         #region Public Methods
-        public override XmlElement BuildFromXml(XmlDocument doc, XmlElement node)
+        public override XmlElement BuildFromXml(XmlElement node)
         {
-            throw new NotImplementedException();
+            node = base.BuildFromXml(node);
+            var forceFieldNode = (XmlElement)node.SelectSingleNode("ForceField");
+            //forceFieldData
+            XmlHelper.BuildStruct(ref forceFieldData, forceFieldNode, "ForceFieldData");
+            return forceFieldNode;
         }
         public override XmlElement StoreAsXml(XmlDocument doc, XmlElement node)
         {
             node = base.StoreAsXml(doc, node);
-            var forceFieldNode = doc.CreateElement("ForveField");
+            var forceFieldNode = doc.CreateElement("ForceField");
             //forceFieldData
             XmlHelper.StoreStruct(forceFieldData, doc, forceFieldNode, "ForceFieldData");
             node.AppendChild(forceFieldNode);

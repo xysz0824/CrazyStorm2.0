@@ -48,7 +48,12 @@ namespace CrazyStorm
             ParticleName.DataContext = selectedParticle;
             TypeList.ItemsSource = selectedParticle.CustomTypes;
             file.UpdateResource();
-            ImageCombo.ItemsSource = file.Images;
+            //Load images.
+            foreach (FileResource item in file.Images)
+            {
+                if (item.IsValid)
+                    ImageCombo.Items.Add(item);
+            }
         }
         void UpdateColor()
         {

@@ -79,6 +79,14 @@ namespace CrazyStorm
         void CopySeletedParticle()
         {
             var particle = selectedParticle.Clone() as ParticleSystem;
+            var components = new List<Component>();
+            foreach (var layer in particle.Layers)
+                components.AddRange(layer.Components);
+
+            foreach (var component in components)
+                component.RebuildReferenceFromCollection(components);
+
+            RebuildComponentTree(particle);
             file.ParticleSystems.Add(particle);
             selectedParticle = particle;
             InitializeCommandStack(particle);

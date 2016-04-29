@@ -24,12 +24,13 @@ namespace CrazyStorm.Core
         Orange,
         Gray
     }
-    public class ParticleType : INotifyPropertyChanged, ICloneable, IXmlData
+    public class ParticleType : INotifyPropertyChanged, IXmlData, IRebuildReference<FileResource>
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
         #region Private Members
         FileResource image;
+        int imageID = -1;
         [XmlAttribute]
         int id;
         [XmlAttribute]
@@ -213,8 +214,7 @@ namespace CrazyStorm.Core
                 }
             }
         }
-        public int Diameter
-        { get { return radius * 2; }}
+        public int Diameter { get { return radius * 2; }}
         public ParticleColor Color
         {
             get { return color; }
@@ -247,9 +247,24 @@ namespace CrazyStorm.Core
         {
             return MemberwiseClone();
         }
-        public XmlElement BuildFromXml(XmlDocument doc, XmlElement node)
+        public XmlElement BuildFromXml(XmlElement node)
         {
-            throw new NotImplementedException();
+            var nodeName = "ParticleType";
+            var particleTypeNode = (XmlElement)node.SelectSingleNode(nodeName);
+            if (node.Name == nodeName)
+                particleTypeNode = node;
+
+            if (particleTypeNode.HasAttribute("image"))
+            {
+                string fileResourceAttribute = particleTypeNode.GetAttribute("image");
+                int parsedID;
+                if (int.TryParse(fileResourceAttribute, out parsedID))
+                    imageID = parsedID;
+                else
+                    throw new System.IO.FileLoadException("FileLoadError");
+            }
+            XmlHelper.BuildFields(this, particleTypeNode);
+            return particleTypeNode;
         }
         public XmlElement StoreAsXml(XmlDocument doc, XmlElement node)
         {
@@ -262,7 +277,23 @@ namespace CrazyStorm.Core
             }
             XmlHelper.StoreFields(this, doc, particleTypeNode);
             node.AppendChild(particleTypeNode);
-            return node;
+            return particleTypeNode;
+        }
+        public void RebuildReferenceFromCollection(IList<FileResource> collection)
+        {
+            //image
+            if (imageID != -1)
+            {
+                foreach (var target in collection)
+                {
+                    if (imageID == target.ID)
+                    {
+                        image = target;
+                        break;
+                    }
+                }
+                imageID = -1;
+            }
         }
         #endregion
     }

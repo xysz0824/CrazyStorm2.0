@@ -53,10 +53,11 @@ namespace CrazyStorm.Core
             throw new NotImplementedException();
         }
     }
-    public class Particle : PropertyContainer, IXmlData
+    public class Particle : PropertyContainer, IXmlData, IRebuildReference<ParticleType>
     {
         #region Private Members
         ParticleType type;
+        int typeID = -1;
         ParticleBaseData particleBaseData;
         ParticleData particleData;
         #endregion
@@ -222,9 +223,30 @@ namespace CrazyStorm.Core
         #endregion
 
         #region Public Methods
-        public XmlElement BuildFromXml(XmlDocument doc, XmlElement node)
+        public XmlElement BuildFromXml(XmlElement node)
         {
-            throw new NotImplementedException();
+            var nodeName = "Particle";
+            var particleNode = (XmlElement)node.SelectSingleNode(nodeName);
+            if (node.Name == nodeName)
+                particleNode = node;
+
+            //properties
+            base.BuildFromXmlElement(particleNode);
+            //type
+            if (particleNode.HasAttribute("type"))
+            {
+                string typeAttribute = particleNode.GetAttribute("type");
+                int parsedID;
+                if (int.TryParse(typeAttribute, out parsedID))
+                    typeID = parsedID;
+                else
+                    throw new System.IO.FileLoadException("FileLoadError");
+            }
+            //particleBaseData
+            XmlHelper.BuildStruct(ref particleBaseData, particleNode, "ParticleBaseData");
+            //particleData
+            XmlHelper.BuildStruct(ref particleData, particleNode, "ParticleData");
+            return particleNode;
         }
         public XmlElement StoreAsXml(XmlDocument doc, XmlElement node)
         {
@@ -243,7 +265,23 @@ namespace CrazyStorm.Core
             //particleData
             XmlHelper.StoreStruct(particleData, doc, particleNode, "ParticleData");
             node.AppendChild(particleNode);
-            return node;
+            return particleNode;
+        }
+        public void RebuildReferenceFromCollection(IList<ParticleType> collection)
+        {
+            //type
+            if (typeID != -1)
+            {
+                foreach (var target in collection)
+                {
+                    if (typeID == target.ID)
+                    {
+                        type = target;
+                        break;
+                    }
+                }
+                typeID = -1;
+            }
         }
         #endregion
     }

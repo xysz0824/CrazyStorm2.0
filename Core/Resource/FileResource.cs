@@ -18,8 +18,8 @@ namespace CrazyStorm.Core
         #region Private Members
         [XmlAttribute]
         int id;
-        [XmlAttribute]
         string absolutePath;
+        [XmlAttribute]
         string relativePath;
         #endregion
 
@@ -39,21 +39,33 @@ namespace CrazyStorm.Core
         {
             this.id = id;
             this.absolutePath = absolutePath;
-            relativePath = absolutePath.Replace(AppDomain.CurrentDomain.BaseDirectory, "");
+            relativePath = absolutePath;
         }
         #endregion
 
         #region Public Methods
         public override void CheckValid()
         {
-            if (relativePath != absolutePath)
-                absolutePath = AppDomain.CurrentDomain.BaseDirectory + relativePath;
+            if (!string.IsNullOrWhiteSpace(File.CurrentDirectory))
+                relativePath = relativePath.Replace(File.CurrentDirectory, "");
+            
+            if (relativePath.Contains(':'))
+                absolutePath = relativePath;
+            else
+                absolutePath = File.CurrentDirectory + relativePath;
             
             isValid = System.IO.File.Exists(absolutePath);
         }
-        public override XmlElement BuildFromXml(XmlDocument doc, XmlElement node)
+        public override object Clone()
         {
-            throw new NotImplementedException();
+            return MemberwiseClone();
+        }
+        public override XmlElement BuildFromXml(XmlElement node)
+        {
+            node = base.BuildFromXml(node);
+            var fileResourceNode = (XmlElement)node.SelectSingleNode("FileResource");
+            XmlHelper.BuildFields(typeof(FileResource), this, fileResourceNode);
+            return fileResourceNode;
         }
         public override XmlElement StoreAsXml(XmlDocument doc, XmlElement node)
         {
@@ -61,7 +73,7 @@ namespace CrazyStorm.Core
             var fileResourceNode = doc.CreateElement("FileResource");
             XmlHelper.StoreFields(typeof(FileResource), this, doc, fileResourceNode);
             node.AppendChild(fileResourceNode);
-            return node;
+            return fileResourceNode;
         }
         #endregion
     }

@@ -23,7 +23,7 @@ namespace CrazyStorm.Core
         Orange,
         Gray
     }
-    public class Layer : INotifyPropertyChanged, ICloneable, IXmlData
+    public class Layer : INotifyPropertyChanged, IXmlData
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -117,9 +117,32 @@ namespace CrazyStorm.Core
             
             return clone;
         }
-        public XmlElement BuildFromXml(XmlDocument doc, XmlElement node)
+        public XmlElement BuildFromXml(XmlElement node)
         {
-            throw new NotImplementedException();
+            var nodeName = "Layer";
+            var layerNode = (XmlElement)node.SelectSingleNode(nodeName);
+            if (node.Name == nodeName)
+                layerNode = node;
+
+            XmlHelper.BuildFields(this, layerNode);
+            //components
+            var componentsNode = layerNode.SelectSingleNode("Components");
+            if (componentsNode == null)
+                throw new System.IO.FileLoadException("FileLoadError");
+
+            foreach (XmlElement componentNode in componentsNode.ChildNodes)
+            {
+                string specificType = componentNode.GetAttribute("specificType");
+                if (XmlHelper.FindNode(componentNode, specificType) != null)
+                {
+                    Component component = ComponentFactory.Create(specificType);
+                    component.BuildFromXml(componentNode);
+                    components.Add(component);
+                }
+                else
+                    throw new System.IO.FileLoadException("FileLoadError");
+            }
+            return layerNode;
         }
         public XmlElement StoreAsXml(XmlDocument doc, XmlElement node)
         {
@@ -128,7 +151,7 @@ namespace CrazyStorm.Core
             //components
             XmlHelper.StoreObjectList(components, doc, layerNode, "Components");
             node.AppendChild(layerNode);
-            return node;
+            return layerNode;
         }
         #endregion
     }

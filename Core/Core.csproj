@@ -44,6 +44,7 @@
     <Compile Include="Component\ComponentFactory.cs" />
     <Compile Include="Component\Emitter.cs" />
     <Compile Include="Event\EventGroup.cs" />
+    <Compile Include="IO\IRebuildReference.cs" />
     <Compile Include="IO\IXmlData.cs" />
     <Compile Include="IO\XmlHelper.cs" />
     <Compile Include="Math\RGB.cs" />
@@ -77,6 +78,7 @@
     <Compile Include="Property\Vector2PropertyAttribute.cs" />
     <Compile Include="Resource\Resource.cs" />
     <Compile Include="Resource\VariableResource.cs" />
+    <Compile Include="Type\TypeRule.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

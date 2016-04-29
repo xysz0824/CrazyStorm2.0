@@ -14,6 +14,10 @@
     <sys:String x:Key="SetParticle">粒子设置</sys:String>
     <!-- Message Box -->
     <sys:String x:Key="TipTitle">提示</sys:String>
+    <sys:String x:Key="ErrorTitle">错误</sys:String>
+    <sys:String x:Key="FileTypeError">该文件格式不正确，无法打开</sys:String>
+    <sys:String x:Key="FileDataError">该文件数据已损坏，无法打开</sys:String>
+    <sys:String x:Key="DifferentVersion">该文件版本与当前版本不一致，确认要打开吗？</sys:String>
     <sys:String x:Key="ConfirmDeleteParticle">确定要删除此粒子吗（删除后无法撤销）？</sys:String>
     <sys:String x:Key="CanNotDeleteAllParticle">不能删除所有粒子</sys:String>
     <sys:String x:Key="ParticleNameCanNotBeEmpty">粒子名称不能为空</sys:String>

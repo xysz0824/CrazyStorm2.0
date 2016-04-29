@@ -15,9 +15,9 @@ namespace CrazyStorm.Core
     public class File : IXmlData
     {
         #region Private Members
-        IList<Resource> images;
-        IList<Resource> sounds;
-        IList<Resource> globals;
+        IList<FileResource> images;
+        IList<FileResource> sounds;
+        IList<VariableResource> globals;
         IList<ParticleSystem> particleSystems;
         [XmlAttribute]
         int fileResourceIndex;
@@ -26,20 +26,21 @@ namespace CrazyStorm.Core
         #endregion
 
         #region Public Members
-        public IList<Resource> Images { get { return images; } }
-        public IList<Resource> Sounds { get { return sounds; } }
-        public IList<Resource> Globals { get { return globals; } }
+        public static string CurrentDirectory = "";
+        public IList<FileResource> Images { get { return images; } }
+        public IList<FileResource> Sounds { get { return sounds; } }
+        public IList<VariableResource> Globals { get { return globals; } }
         public IList<ParticleSystem> ParticleSystems { get { return particleSystems; } }
-        public int FileResourceIndex { get { return fileResourceIndex++; } }
         public int ParticleIndex { get { return particleIndex++; } }
+        public int FileResourceIndex { get { return fileResourceIndex++; } }
         #endregion
 
         #region Constructor
         public File()
         {
-            images = new ObservableCollection<Resource>();
-            sounds = new ObservableCollection<Resource>();
-            globals = new ObservableCollection<Resource>();
+            images = new ObservableCollection<FileResource>();
+            sounds = new ObservableCollection<FileResource>();
+            globals = new ObservableCollection<VariableResource>();
             particleSystems = new List<ParticleSystem>();
             particleSystems.Add(new ParticleSystem("Untitled"));
         }
@@ -57,9 +58,22 @@ namespace CrazyStorm.Core
             foreach (var item in globals)
                 item.CheckValid();
         }
-        public XmlElement BuildFromXml(XmlDocument doc, XmlElement node)
+        public object Clone()
         {
             throw new NotImplementedException();
+        }
+        public XmlElement BuildFromXml(XmlElement node)
+        {
+            XmlHelper.BuildFields(this, node);
+            //images
+            XmlHelper.BuildObjectList(images, new FileResource(0, "", ""), node, "Images");
+            //sounds
+            XmlHelper.BuildObjectList(sounds, new FileResource(0, "", ""), node, "Sounds");
+            //globals
+            XmlHelper.BuildObjectList(globals, new VariableResource(""), node, "Globals");
+            //particleSystems
+            XmlHelper.BuildObjectList(particleSystems, new ParticleSystem(""), node, "ParticleSystems");
+            return node;
         }
         public XmlElement StoreAsXml(XmlDocument doc, XmlElement node)
         {

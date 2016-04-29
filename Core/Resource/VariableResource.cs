@@ -12,7 +12,7 @@ using System.Xml.Serialization;
 
 namespace CrazyStorm.Core
 {
-    public class VariableResource : Resource, ICloneable
+    public class VariableResource : Resource
     {
         #region Private Members
         [XmlAttribute]
@@ -39,13 +39,16 @@ namespace CrazyStorm.Core
         {
             isValid = true;
         }
-        public object Clone()
+        public override object Clone()
         {
             return MemberwiseClone();
         }
-        public override XmlElement BuildFromXml(XmlDocument doc, XmlElement node)
+        public override XmlElement BuildFromXml(XmlElement node)
         {
-            throw new NotImplementedException();
+            node = base.BuildFromXml(node);
+            var variableResourceNode = (XmlElement)node.SelectSingleNode("VariableResource");
+            XmlHelper.BuildFields(typeof(VariableResource), this, variableResourceNode);
+            return variableResourceNode;
         }
         public override XmlElement StoreAsXml(XmlDocument doc, XmlElement node)
         {
@@ -53,7 +56,7 @@ namespace CrazyStorm.Core
             var variableResourceNode = doc.CreateElement("VariableResource");
             XmlHelper.StoreFields(typeof(VariableResource), this, doc, variableResourceNode);
             node.AppendChild(variableResourceNode);
-            return node;
+            return variableResourceNode;
         }
         #endregion
     }

@@ -53,7 +53,7 @@ namespace CrazyStorm
             (LeftTabControl.Items[1] as TabItem).Focus();
             using (var open = new System.Windows.Forms.OpenFileDialog())
             {
-                open.InitialDirectory = AppDomain.CurrentDomain.BaseDirectory;
+                open.InitialDirectory = File.CurrentDirectory;
                 open.Filter = (string)FindResource("ImageType");
                 if (open.ShowDialog() == System.Windows.Forms.DialogResult.OK)
                 {
@@ -64,7 +64,7 @@ namespace CrazyStorm
         }
         private void DeleteImage_Click(object sender, RoutedEventArgs e)
         {
-            var item = ImageList.SelectedItem as Resource;
+            var item = ImageList.SelectedItem as FileResource;
             file.Images.Remove(item);
         }
         private void AddSound_Click(object sender, RoutedEventArgs e)
@@ -72,7 +72,7 @@ namespace CrazyStorm
             (LeftTabControl.Items[1] as TabItem).Focus();
             using (var open = new System.Windows.Forms.OpenFileDialog())
             {
-                open.InitialDirectory = AppDomain.CurrentDomain.BaseDirectory;
+                open.InitialDirectory = File.CurrentDirectory;
                 open.Filter = (string)FindResource("SoundType");
                 if (open.ShowDialog() == System.Windows.Forms.DialogResult.OK)
                 {
@@ -83,7 +83,7 @@ namespace CrazyStorm
         }
         private void DeleteSound_Click(object sender, RoutedEventArgs e)
         {
-            var item = SoundList.SelectedItem as Resource;
+            var item = SoundList.SelectedItem as FileResource;
             file.Sounds.Remove(item);
         }
         private void AddGlobalItem_Click(object sender, RoutedEventArgs e)

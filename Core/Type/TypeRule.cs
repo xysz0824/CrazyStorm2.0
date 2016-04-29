@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace CrazyStorm.Script
+namespace CrazyStorm.Core
 {
-    public class Rule
+    public class TypeRule
     {
         public static bool IsMatchWith(System.Type typeA, System.Type typeB)
         {
@@ -20,43 +20,59 @@ namespace CrazyStorm.Script
 
             return false;
         }
-        public static bool IsMatchWith(object target, string text)
+        public static bool IsMatchWith(object target, string text, out object output)
         {
             //Check if the text is match with target type.
+            bool result = false;
             if (target is bool)
             {
                 bool value;
-                return bool.TryParse(text, out value);
+                result = bool.TryParse(text, out value);
+                output = value;
             }
             else if (target is int)
             {
                 int value;
-                return int.TryParse(text, out value);
+                result = int.TryParse(text, out value);
+                output = value;
             }
             else if (target is float)
             {
                 float value;
-                return float.TryParse(text, out value);
+                result = float.TryParse(text, out value);
+                output = value;
             }
             else if (target is Enum)
             {
-                return Enum.IsDefined(target.GetType(), text);
+                result = Enum.IsDefined(target.GetType(), text);
+                output = result ? Enum.Parse(target.GetType(), text) : null;
             }
             else if (target is Core.Vector2)
             {
                 Core.Vector2 value;
-                return Core.Vector2.TryParse(text, out value);
+                result = Core.Vector2.TryParse(text, out value);
+                output = value;
             }
             else if (target is Core.RGB)
             {
                 Core.RGB value;
-                return Core.RGB.TryParse(text, out value);
+                result = Core.RGB.TryParse(text, out value);
+                output = value;
             }
             else if (target is string)
             {
-                return true;
+                output = text;
+                result = true;
             }
-            return false;
+            else
+                output = null;
+
+            return result;
+        }
+        public static bool IsMatchWith(object target, string text)
+        {
+            object value;
+            return IsMatchWith(target, text, out value);
         }
     }
 }

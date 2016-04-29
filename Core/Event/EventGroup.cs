@@ -12,7 +12,7 @@ using System.Xml.Serialization;
 
 namespace CrazyStorm.Core
 {
-    public class EventGroup : ICloneable, IXmlData
+    public class EventGroup : IXmlData
     {
         #region Private Members
         [XmlAttribute]
@@ -40,6 +40,7 @@ namespace CrazyStorm.Core
         public EventGroup()
         {
             name = "NewEventGroup";
+            condition = "";
             events = new ObservableCollection<string>();
         }
         #endregion
@@ -54,9 +55,17 @@ namespace CrazyStorm.Core
 
             return clone;
         }
-        public XmlElement BuildFromXml(XmlDocument doc, XmlElement node)
+        public XmlElement BuildFromXml(XmlElement node)
         {
-            throw new NotImplementedException();
+            var nodeName = "EventGroup";
+            var eventGroupNode = (XmlElement)node.SelectSingleNode(nodeName);
+            if (node.Name == nodeName)
+                eventGroupNode = node;
+
+            XmlHelper.BuildFields(this, eventGroupNode);
+            //events
+            XmlHelper.BuildList(events, eventGroupNode, "Events");
+            return eventGroupNode;
         }
         public XmlElement StoreAsXml(XmlDocument doc, XmlElement node)
         {
@@ -65,7 +74,7 @@ namespace CrazyStorm.Core
             //events
             XmlHelper.StoreList(events, doc, eventGroupNode, "Events");
             node.AppendChild(eventGroupNode);
-            return node;
+            return eventGroupNode;
         }
         #endregion
     }

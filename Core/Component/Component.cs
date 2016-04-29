@@ -34,7 +34,7 @@ namespace CrazyStorm.Core
             throw new NotImplementedException();
         }
     }
-    public class Component : PropertyContainer, INotifyPropertyChanged, IXmlData
+    public class Component : PropertyContainer, INotifyPropertyChanged, IXmlData, IRebuildReference<Component>
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -46,10 +46,13 @@ namespace CrazyStorm.Core
         string name;
         bool selected;
         Component parent;
+        int parentID = -1;
         Component bindingTarget;
+        int bindingTargetID = -1;
         IList<VariableResource> variables;
         IList<EventGroup> componentEventGroups;
         IList<Component> children;
+        IList<int> childrenIDs;
         #endregion
 
         #region Public Members
@@ -155,6 +158,7 @@ namespace CrazyStorm.Core
         #region Constructor
         public Component()
         {
+            name = "";
             componentData.visibility = true;
             variables = new ObservableCollection<VariableResource>();
             componentEventGroups = new ObservableCollection<EventGroup>();
@@ -215,25 +219,86 @@ namespace CrazyStorm.Core
         {
             var clone = base.Clone() as Component;
             clone.parent = null;
+            if (parent != null)
+                clone.parentID = parent.id;
+
             clone.bindingTarget = null;
+            if (bindingTarget != null)
+                clone.bindingTargetID = bindingTarget.id;
+
             clone.variables = new ObservableCollection<VariableResource>();
-            foreach (var item in variables)
-                clone.variables.Add(item.Clone() as VariableResource);
+            foreach (var variable in variables)
+                clone.variables.Add(variable.Clone() as VariableResource);
 
             clone.componentEventGroups = new ObservableCollection<EventGroup>();
-            foreach (var item in componentEventGroups)
-                clone.componentEventGroups.Add(item.Clone() as EventGroup);
+            foreach (var componentEventGroup in componentEventGroups)
+                clone.componentEventGroups.Add(componentEventGroup.Clone() as EventGroup);
 
             clone.children = new ObservableCollection<Component>();
+            if (children.Count > 0)
+            {
+                clone.childrenIDs = new List<int>();
+                foreach (var child in children)
+                    clone.childrenIDs.Add(child.ID);
+            }
             return clone;
         }
-        public virtual XmlElement BuildFromXml(XmlDocument doc, XmlElement node)
+        public virtual XmlElement BuildFromXml(XmlElement node)
         {
-            throw new NotImplementedException();
+            var nodeName = "Component";
+            var componentNode = (XmlElement)node.SelectSingleNode(nodeName);
+            if (node.Name == nodeName)
+                componentNode = node;
+
+            XmlHelper.BuildFields(typeof(Component), this, componentNode);
+            //properties
+            base.BuildFromXmlElement(componentNode);
+            //componentData
+            XmlHelper.BuildStruct(ref componentData, componentNode, "ComponentData");
+            //parent
+            if (componentNode.HasAttribute("parent"))
+            {
+                string parentAttribute = componentNode.GetAttribute("parent");
+                int parsedID;
+                if (int.TryParse(parentAttribute, out parsedID))
+                    parentID = parsedID;
+                else
+                    throw new System.IO.FileLoadException("FileLoadError");
+            }
+            //bindingTarget
+            if (componentNode.HasAttribute("bindingTarget"))
+            {
+                string bindingTargetAttribute = componentNode.GetAttribute("bindingTarget");
+                int parsedID;
+                if (int.TryParse(bindingTargetAttribute, out parsedID))
+                    bindingTargetID = parsedID;
+                else
+                    throw new System.IO.FileLoadException("FileLoadError");
+            }
+            //variables
+            XmlHelper.BuildObjectList(variables, new VariableResource(""), componentNode, "Variables");
+            //componentEventGroups
+            XmlHelper.BuildObjectList(componentEventGroups, new EventGroup(), componentNode, "ComponentEventGroups");
+            //children
+            childrenIDs = new List<int>();
+            var childrenNode = componentNode.SelectSingleNode("Children");
+            foreach (XmlElement childNode in childrenNode.ChildNodes)
+            {
+                string idAttribute = childNode.GetAttribute("id");
+                int parsedID;
+                if (int.TryParse(idAttribute, out parsedID))
+                    childrenIDs.Add(parsedID);
+                else
+                    throw new System.IO.FileLoadException("FileLoadError");
+            }
+            return componentNode;
         }
         public virtual XmlElement StoreAsXml(XmlDocument doc, XmlElement node)
         {
             var componentNode = doc.CreateElement("Component");
+            var specificTypeAttribute = doc.CreateAttribute("specificType");
+            specificTypeAttribute.Value = GetType().Name;
+            componentNode.Attributes.Append(specificTypeAttribute);
             XmlHelper.StoreFields(typeof(Component), this, doc, componentNode);
             //properties
             componentNode.AppendChild(base.GetXmlElement(doc));
@@ -270,6 +335,51 @@ namespace CrazyStorm.Core
             componentNode.AppendChild(childrenNode);
             node.AppendChild(componentNode);
             return componentNode;
+        }
+        public void RebuildReferenceFromCollection(IList<Component> collection)
+        {
+            //parent
+            if (parentID != -1)
+            {
+                foreach (var target in collection)
+                {
+                    if (parentID == target.ID)
+                    {
+                        parent = target;
+                        break;
+                    }
+                }
+                parentID = -1;
+            }
+            //bindingTarget
+            if (bindingTargetID != -1)
+            {
+                foreach (var target in collection)
+                {
+                    if (bindingTargetID == target.ID)
+                    {
+                        bindingTarget = target;
+                        break;
+                    }
+                }
+                bindingTargetID = -1;
+            }
+            //children
+            if (childrenIDs != null)
+            {
+                foreach (var childrenID in childrenIDs)
+                {
+                    foreach (var target in collection)
+                    {
+                        if (childrenID == target.ID)
+                        {
+                            children.Add(target);
+                            break;
+                        }
+                    }
+                }
+                childrenIDs = null;
+            }
         }
         #endregion
     }

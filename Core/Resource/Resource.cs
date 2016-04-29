@@ -43,9 +43,17 @@ namespace CrazyStorm.Core
 
         public abstract void CheckValid();
 
-        public virtual XmlElement BuildFromXml(XmlDocument doc, XmlElement node)
+        public abstract object Clone();
+
+        public virtual XmlElement BuildFromXml(XmlElement node)
         {
-            throw new NotImplementedException();
+            var nodeName = "Resource";
+            var resourceNode = (XmlElement)node.SelectSingleNode(nodeName);
+            if (node.Name == nodeName)
+                resourceNode = node;
+
+            XmlHelper.BuildFields(typeof(Resource), this, resourceNode);
+            return resourceNode;
         }
 
         public virtual XmlElement StoreAsXml(XmlDocument doc, XmlElement node)

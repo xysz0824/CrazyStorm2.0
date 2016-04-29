@@ -14,16 +14,16 @@ namespace CrazyStorm.Core
 {
     public class PropertyContainer : ICloneable
     {
-        IDictionary<PropertyInfo, PropertyValue> properties;
-        public IDictionary<PropertyInfo, PropertyValue> Properties { get { return properties; } }
+        IDictionary<string, PropertyValue> properties;
+        public IDictionary<string, PropertyValue> Properties { get { return properties; } }
         public PropertyContainer()
         {
-            properties = new Dictionary<PropertyInfo, PropertyValue>();
+            properties = new Dictionary<string, PropertyValue>();
         }
         public IList<PropertyInfo> InitializeProperties(Type type)
         {
             var propertiesInfo = new List<PropertyInfo>();
-            foreach (var property in type.GetProperties())
+            foreach (PropertyInfo property in type.GetProperties())
             {
                 if (property.DeclaringType.Name != type.Name)
                     continue;
@@ -32,10 +32,10 @@ namespace CrazyStorm.Core
                 if (attributes.Length > 0 && attributes[0] is PropertyAttribute)
                 {
                     propertiesInfo.Add(property);
-                    if (!properties.ContainsKey(property))
+                    if (!properties.ContainsKey(property.Name))
                     {
                         var value = new PropertyValue { Value = property.GetGetMethod().Invoke(this, null).ToString() };
-                        properties[property] = value;
+                        properties[property.Name] = value;
                     }
                 }
             }
@@ -44,10 +44,34 @@ namespace CrazyStorm.Core
         public virtual object Clone()
         {
             var clone = MemberwiseClone() as PropertyContainer;
-            clone.properties = new Dictionary<PropertyInfo, PropertyValue>();
+            clone.properties = new Dictionary<string, PropertyValue>();
             foreach (var pair in properties)
                 clone.properties[pair.Key] = pair.Value.Clone() as PropertyValue;
             return clone;
+        }
+        public void BuildFromXmlElement(XmlElement node)
+        {
+            var propertiesNode = node.SelectSingleNode("Properties");
+            if (propertiesNode == null)
+                throw new System.IO.FileLoadException("FileDataError");
+
+            foreach (XmlElement childNode in propertiesNode.ChildNodes)
+            {
+                if (!childNode.HasAttribute("Key"))
+                    throw new System.IO.FileLoadException("FileDataError");
+
+                string key = childNode.GetAttribute("Key");
+                if (!childNode.HasAttribute("Value"))
+                    throw new System.IO.FileLoadException("FileDataError");
+
+                string expression = childNode.GetAttribute("Value");
+                PropertyInfo property = GetType().GetProperty(key);
+                if (property == null)
+                    throw new System.IO.FileLoadException("FileDataError");
+
+                var value = new PropertyValue { Expression = true, Value = expression };
+                properties[property.Name] = value;
+            }
         }
         public XmlElement GetXmlElement(XmlDocument doc)
         {
@@ -58,7 +82,7 @@ namespace CrazyStorm.Core
                 {
                     var pairNode = doc.CreateElement("Dictionary");
                     var keyAttribute = doc.CreateAttribute("Key");
-                    keyAttribute.Value = pair.Key.Name;
+                    keyAttribute.Value = pair.Key;
                     pairNode.Attributes.Append(keyAttribute);
                     var valueAttribute = doc.CreateAttribute("Value");
                     valueAttribute.Value = pair.Value.Value;

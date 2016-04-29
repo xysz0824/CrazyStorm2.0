@@ -35,9 +35,12 @@ namespace CrazyStorm.Core
             clone.curveParticle = curveParticle.Clone() as CurveParticle;
             return clone;
         }
-        public override XmlElement BuildFromXml(XmlDocument doc, XmlElement node)
+        public override XmlElement BuildFromXml(XmlElement node)
         {
-            throw new NotImplementedException();
+            node = base.BuildFromXml(node);
+            var curveEmitterNode = (XmlElement)node.SelectSingleNode("CurveEmitter");
+            curveParticle.BuildFromXml(curveEmitterNode);
+            return curveEmitterNode;
         }
         public override XmlElement StoreAsXml(XmlDocument doc, XmlElement node)
         {

@@ -25,9 +25,18 @@ namespace CrazyStorm
                 {
                     var clone = component.Clone() as Component;
                     clone.Selected = true;
-                    selectedParticle.AddComponentToLayer(selectedLayer, clone);
                     clones.Add(clone);
                 }
+                foreach (var clone in clones)
+                {
+                    clone.RebuildReferenceFromCollection(clones);
+                    selectedParticle.AddComponentToLayer(selectedLayer, clone);
+                }
+                foreach (var clone in clones)
+                {
+                    clone.ID = selectedParticle.GetComponentIndex();
+                    selectedParticle.GetAndIncreaseComponentIndex(clone.GetType().ToString());
+                }   
                 History[0] = clones;
             }
             else

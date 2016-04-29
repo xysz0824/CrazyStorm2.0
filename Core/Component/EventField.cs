@@ -98,9 +98,15 @@ namespace CrazyStorm.Core
 
             return clone;
         }
-        public override XmlElement BuildFromXml(XmlDocument doc, XmlElement node)
+        public override XmlElement BuildFromXml(XmlElement node)
         {
-            throw new NotImplementedException();
+            node = base.BuildFromXml(node);
+            var eventFieldNode = (XmlElement)node.SelectSingleNode("EventField");
+            //eventFieldData
+            XmlHelper.BuildStruct(ref eventFieldData, eventFieldNode, "EventFieldData");
+            //eventFieldEventGroups
+            XmlHelper.BuildObjectList(eventFieldEventGroups, new EventGroup(), eventFieldNode, "EventFieldEventGroups");
+            return eventFieldNode;
         }
         public override XmlElement StoreAsXml(XmlDocument doc, XmlElement node)
         {

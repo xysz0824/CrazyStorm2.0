@@ -196,7 +196,7 @@ namespace CrazyStorm
                 {
                     Info = item,
                     Name = item.Name,
-                    Value = container.Properties[item].Value
+                    Value = container.Properties[item.Name].Value
                 };
                 propertyItems.Add(property);
                 //Put the property into environment.
@@ -220,12 +220,12 @@ namespace CrazyStorm
         {
             foreach (var item in properties)
             {
-                if (!container.Properties[item.Info].Expression)
+                if (!container.Properties[item.Info.Name].Expression)
                 {
                     var result = item.Info.GetGetMethod().Invoke(container, null).ToString();
-                    container.Properties[item.Info].Value = result;
+                    container.Properties[item.Info.Name].Value = result;
                 }
-                item.Value = container.Properties[item.Info].Value;
+                item.Value = container.Properties[item.Info.Name].Value;
             }
         }
         void InitializeColorCombo()

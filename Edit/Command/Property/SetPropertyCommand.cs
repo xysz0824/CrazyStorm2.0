@@ -55,7 +55,7 @@ namespace CrazyStorm
                 object value;
                 if (attribute.IsLegal(newValue, out value))
                 {
-                    container.Properties[propertyInfo].Expression = false;
+                    container.Properties[propertyInfo.Name].Expression = false;
                     propertyInfo.GetSetMethod().Invoke(container, new object[] { value });
                     cell.ToolTip = null;
                     cell.BorderThickness = new Thickness(0);
@@ -72,11 +72,11 @@ namespace CrazyStorm
                     throw new ScriptException("Illegal input.");
 
                 var result = syntaxTree.Test(environment);
-                if (!Rule.IsMatchWith(propertyInfo.PropertyType, result.GetType()))
+                if (!TypeRule.IsMatchWith(propertyInfo.PropertyType, result.GetType()))
                     throw new ScriptException("Type error.");
 
-                container.Properties[propertyInfo].Expression = true;
-                container.Properties[propertyInfo].Value = newValue;
+                container.Properties[propertyInfo.Name].Expression = true;
+                container.Properties[propertyInfo.Name].Value = newValue;
                 cell.ToolTip = null;
                 cell.BorderThickness = new Thickness(0);
                 updateFunc();

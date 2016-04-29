@@ -28,7 +28,7 @@ namespace CrazyStorm
         #region Private Members
         EventGroup eventGroup;
         Script.Environment environment;
-        IList<Resource> sounds;
+        IList<FileResource> sounds;
         IList<ParticleType> types;
         IList<PropertyPanelItem>[] properties;
         bool emitter;
@@ -40,7 +40,7 @@ namespace CrazyStorm
 
         #region Constructor
         public EventSetting(EventGroup eventGroup, Script.Environment environment,
-            IList<Resource> sounds, IList<ParticleType> types, IList<PropertyPanelItem>[] properties, 
+            IList<FileResource> sounds, IList<ParticleType> types, IList<PropertyPanelItem>[] properties, 
             bool emitter, bool aboutParticle)
         {
             this.eventGroup = eventGroup;
@@ -690,7 +690,7 @@ namespace CrazyStorm
                             else if (selection[0] == item.Name)
                             {
                                 value = environment.GetStructs(item.Info.PropertyType.ToString()).GetField(selection[1]);
-                                if (!Rule.IsMatchWith(value, input))
+                                if (!TypeRule.IsMatchWith(value, input))
                                 {
                                     ChangeTextBoxState(LeftValue, true);
                                 }
@@ -749,7 +749,7 @@ namespace CrazyStorm
                             else if (selection[0] == item.Name)
                             {
                                 value = environment.GetStructs(item.Info.PropertyType.ToString()).GetField(selection[1]);
-                                if (!Rule.IsMatchWith(value, input))
+                                if (!TypeRule.IsMatchWith(value, input))
                                     ChangeTextBoxState(RightValue, true);
 
                                 return;
@@ -810,7 +810,7 @@ namespace CrazyStorm
                                         throw new ScriptException();
 
                                     var result = syntaxTree.Test(environment);
-                                    if (!(Rule.IsMatchWith(item.Info.PropertyType, result.GetType())))
+                                    if (!(TypeRule.IsMatchWith(item.Info.PropertyType, result.GetType())))
                                         throw new ScriptException();
 
                                     return;
@@ -822,7 +822,7 @@ namespace CrazyStorm
                                     lexer.Load(input);
                                     var syntaxTree = new Parser(lexer).Expression();
                                     var result = syntaxTree.Test(environment);
-                                    if (!Rule.IsMatchWith(value.GetType(), result.GetType()))
+                                    if (!TypeRule.IsMatchWith(value.GetType(), result.GetType()))
                                         throw new ScriptException();
 
                                     return;
