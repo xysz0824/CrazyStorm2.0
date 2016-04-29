@@ -33,6 +33,9 @@ namespace CrazyStorm
         #region Constructor
         public MainWindow()
         {
+            AppDomain.CurrentDomain.UnhandledException += 
+                new UnhandledExceptionEventHandler(CurrentDomain_UnhandledException);
+            LogHelper.Clear();
             InitializeComponent();
 
             dTimer = new DispatcherTimer();
@@ -45,6 +48,12 @@ namespace CrazyStorm
         #endregion
 
         #region Private Methods
+        private void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
+        {
+            string exceptionMessage = e.ExceptionObject.ToString();
+            LogHelper.Error(exceptionMessage);
+            MessageBox.Show(exceptionMessage, string.Empty, MessageBoxButton.OK, MessageBoxImage.Error);
+        }
         private void dTimer_Tick(object sender, EventArgs e)
         {
             //A frame approximately equal to 16ms(60 frames equal to one second)
