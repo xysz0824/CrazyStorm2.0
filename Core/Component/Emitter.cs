@@ -72,8 +72,13 @@ namespace CrazyStorm.Core
         #region Constructor
         public Emitter()
         {
+            Properties["EmitPosition"] = new PropertyValue
+            {
+                Expression = true,
+                Value = "[Position.x,Position.y]"
+            };
             emitterData.emitCount = 1;
-            emitterData.emitCycle = 1;
+            emitterData.emitCycle = 10;
             particleEventGroups = new ObservableCollection<EventGroup>();
         }
         #endregion

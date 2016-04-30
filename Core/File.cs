@@ -26,7 +26,7 @@ namespace CrazyStorm.Core
         #endregion
 
         #region Public Members
-        public static string CurrentDirectory = "";
+        public static string CurrentDirectory = string.Empty;
         public IList<FileResource> Images { get { return images; } }
         public IList<FileResource> Sounds { get { return sounds; } }
         public IList<VariableResource> Globals { get { return globals; } }

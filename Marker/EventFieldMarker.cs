@@ -18,7 +18,7 @@ namespace CrazyStorm
         public void Draw(Canvas canvas, Component component, int x, int y)
         {
             var EventField = component as EventField;
-            if (EventField.Shape == Core.Shape.Rectangle)
+            if (EventField.Shape == FieldShape.Rectangle)
             {
                 var rect = new Rectangle();
                 rect.Width = EventField.HalfWidth * 2;
@@ -29,16 +29,16 @@ namespace CrazyStorm
                 rect.SetValue(Canvas.TopProperty, (double)y - EventField.HalfHeight);
                 canvas.Children.Add(rect);
             }
-            else if (EventField.Shape == Core.Shape.Ellipse)
+            else if (EventField.Shape == FieldShape.Ellipse)
             {
-                var rect = new Ellipse();
-                rect.Width = EventField.HalfWidth * 2;
-                rect.Height = EventField.HalfHeight * 2;
-                rect.Fill = new SolidColorBrush(Colors.Red);
-                rect.Opacity = 0.5f;
-                rect.SetValue(Canvas.LeftProperty, (double)x - EventField.HalfWidth);
-                rect.SetValue(Canvas.TopProperty, (double)y - EventField.HalfHeight);
-                canvas.Children.Add(rect);
+                var ellipse = new Ellipse();
+                ellipse.Width = EventField.HalfWidth * 2;
+                ellipse.Height = EventField.HalfHeight * 2;
+                ellipse.Fill = new SolidColorBrush(Colors.Red);
+                ellipse.Opacity = 0.5f;
+                ellipse.SetValue(Canvas.LeftProperty, (double)x - EventField.HalfWidth);
+                ellipse.SetValue(Canvas.TopProperty, (double)y - EventField.HalfHeight);
+                canvas.Children.Add(ellipse);
             }
         }
     }

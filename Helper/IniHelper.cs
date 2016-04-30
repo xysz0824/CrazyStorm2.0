@@ -5,15 +5,15 @@ using System.Runtime.InteropServices;
 
 public class IniHelper
 {
-    protected string IniFileName;
+    private string fileName;
     public string FileName
     {
-        get { return IniFileName; }
+        get { return fileName; }
         set 
         {
-            if (value != IniFileName)
+            if (value != fileName)
             {
-                IniFileName = value;
+                fileName = value;
             }
         }
     }
@@ -25,21 +25,21 @@ public class IniHelper
 
     public IniHelper(string FileName)
     {
-        IniFileName = Path.GetFullPath(FileName);
+        fileName = Path.GetFullPath(FileName);
     }
     public void WriteValue(string Section, string Key, string Value)
     {
-        WritePrivateProfileString(Section, Key, Value, this.IniFileName);
+        WritePrivateProfileString(Section, Key, Value, this.fileName);
     }
     public string ReadValue(string Section, string Key, string Default)
     {
         StringBuilder temp = new StringBuilder(256);
-        int i = GetPrivateProfileString(Section, Key, Default, temp, 256, this.IniFileName);
+        int i = GetPrivateProfileString(Section, Key, Default, temp, 256, this.fileName);
         return temp.ToString();
     }
     public bool ExistINIFile()
     {
-        return File.Exists(IniFileName);
+        return File.Exists(fileName);
     }
     public void WriteValue(string Section, string Key, int Value)
     {
@@ -71,6 +71,6 @@ public class IniHelper
     }
     public string ReadValue(string Section, string Key)
     {
-        return ReadValue(Section, Key, "");
+        return ReadValue(Section, Key, string.Empty);
     }
 }

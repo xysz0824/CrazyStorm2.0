@@ -20,9 +20,9 @@ using System.Windows.Threading;
 namespace CrazyStorm
 {
     /// <summary>
-    /// MainWindow.xaml 的交互逻辑
+    /// StartupWindow.xaml 的交互逻辑
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class StartupWindow : Window
     {
         #region Private Members
         Main mainWindow;
@@ -31,19 +31,17 @@ namespace CrazyStorm
         #endregion
 
         #region Constructor
-        public MainWindow()
+        public StartupWindow()
         {
             AppDomain.CurrentDomain.UnhandledException += 
                 new UnhandledExceptionEventHandler(CurrentDomain_UnhandledException);
-            LogHelper.Clear();
+
             InitializeComponent();
 
             dTimer = new DispatcherTimer();
             dTimer.Tick += dTimer_Tick;
             dTimer.Interval = new TimeSpan(0, 0, 0, 0, 16);
             dTimer.Start();
-
-            mainWindow = new Main();
         }
         #endregion
 
@@ -56,17 +54,18 @@ namespace CrazyStorm
         }
         private void dTimer_Tick(object sender, EventArgs e)
         {
-            //A frame approximately equal to 16ms(60 frames equal to one second)
+            //A frame approximately equals to 16ms(60 frames equal to one second)
             frame++;
             if (Opacity < 1.0f) 
                 Opacity += 0.1f;
-
-            if (frame >= 60)
+            else
             {
-                dTimer.Stop();
-                //Enter main ui
+                LogHelper.Clear();
+                mainWindow = new Main();
+                mainWindow.Initailize();
                 mainWindow.Show();
                 this.Close();
+                dTimer.Stop();
             }
         }
         #endregion

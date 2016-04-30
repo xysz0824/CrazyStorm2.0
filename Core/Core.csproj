@@ -47,7 +47,7 @@
     <Compile Include="IO\IRebuildReference.cs" />
     <Compile Include="IO\IXmlData.cs" />
     <Compile Include="IO\XmlHelper.cs" />
-    <Compile Include="Math\RGB.cs" />
+    <Compile Include="Struct\RGB.cs" />
     <Compile Include="Particle\BlendType.cs" />
     <Compile Include="Particle\CurveParticle.cs" />
     <Compile Include="Property\BoolPropertyAttribute.cs" />
@@ -67,7 +67,7 @@
     <Compile Include="Component\Rebounder.cs" />
     <Compile Include="File.cs" />
     <Compile Include="Layer.cs" />
-    <Compile Include="Math\Vector2.cs" />
+    <Compile Include="Struct\Vector2.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Property\FloatPropertyAttribute.cs" />
     <Compile Include="Property\IntPropertyAttribute.cs" />

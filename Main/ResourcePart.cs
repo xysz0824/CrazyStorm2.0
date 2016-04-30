@@ -29,7 +29,7 @@ namespace CrazyStorm
     public partial class Main
     {
         #region Private Methods
-        void UpdateGlobals(UpdateType type, VariableResource variable, string newName = "")
+        void UpdateGlobals(UpdateType type, VariableResource variable, string newName = string.Empty)
         {
             for (int i = 2; i < LeftTabControl.Items.Count; ++i)
             {

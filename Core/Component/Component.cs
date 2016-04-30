@@ -158,7 +158,8 @@ namespace CrazyStorm.Core
         #region Constructor
         public Component()
         {
-            name = "";
+            name = string.Empty;
+            componentData.totalFrame = 200;
             componentData.visibility = true;
             variables = new ObservableCollection<VariableResource>();
             componentEventGroups = new ObservableCollection<EventGroup>();

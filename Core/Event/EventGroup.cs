@@ -40,7 +40,7 @@ namespace CrazyStorm.Core
         public EventGroup()
         {
             name = "NewEventGroup";
-            condition = "";
+            condition = string.Empty;
             events = new ObservableCollection<string>();
         }
         #endregion

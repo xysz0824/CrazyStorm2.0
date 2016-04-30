@@ -219,6 +219,18 @@ namespace CrazyStorm.Core
         #region Constructor
         public Particle()
         {
+            particleBaseData.maxLife = 200;
+            particleBaseData.widthScale = 1;
+            particleBaseData.rgb = new RGB(255, 255, 255);
+            particleBaseData.opacity = 100;
+            particleBaseData.pspeed = 5;
+            particleBaseData.killOutside = true;
+            particleBaseData.collision = true;
+            particleBaseData.fogEffect = true;
+            particleBaseData.fadeEffect = true;
+            particleData.heightScale = 1;
+            particleData.retainScale = true;
+            particleData.stickToSpeedAngle = true;
         }
         #endregion
 

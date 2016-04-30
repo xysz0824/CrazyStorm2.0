@@ -139,6 +139,16 @@ namespace CrazyStorm.Core
         #region Constructor
         public CurveParticle()
         {
+            particleBaseData.maxLife = 200;
+            particleBaseData.widthScale = 1;
+            particleBaseData.rgb = new RGB(255, 255, 255);
+            particleBaseData.opacity = 100;
+            particleBaseData.pspeed = 5;
+            particleBaseData.killOutside = true;
+            particleBaseData.collision = true;
+            particleBaseData.fogEffect = true;
+            particleBaseData.fadeEffect = true;
+            curveParticleData.length = 10;
         }
         #endregion
 

@@ -12,7 +12,7 @@ using System.Xml.Serialization;
 
 namespace CrazyStorm.Core
 {
-    public enum Shape
+    public enum FieldShape
     {
         Rectangle,
         Ellipse
@@ -27,7 +27,7 @@ namespace CrazyStorm.Core
     {
         public float halfWidth;
         public float halfHeight;
-        public Shape shape;
+        public FieldShape shape;
         public Reach reach;
         public string targetName;
         public void SetField(int fieldIndex, ValueType value)
@@ -59,8 +59,8 @@ namespace CrazyStorm.Core
             get { return eventFieldData.halfHeight; }
             set { eventFieldData.halfHeight = value; }
         }
-        [EnumProperty(typeof(Shape))]
-        public Shape Shape
+        [EnumProperty(typeof(FieldShape))]
+        public FieldShape Shape
         {
             get { return eventFieldData.shape; }
             set { eventFieldData.shape = value; }
@@ -83,7 +83,9 @@ namespace CrazyStorm.Core
         #region Constructor
         public EventField()
         {
-            eventFieldData.targetName = "";
+            eventFieldData.targetName = string.Empty;
+            eventFieldData.halfWidth = 50;
+            eventFieldData.halfHeight = 50;
             eventFieldEventGroups = new ObservableCollection<EventGroup>();
         }
         #endregion

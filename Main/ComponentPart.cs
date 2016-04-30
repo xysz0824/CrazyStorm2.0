@@ -85,8 +85,11 @@ namespace CrazyStorm
             item.Style = (Style)FindResource("CanCloseStyle");
             var scroll = new ScrollViewer();
             scroll.VerticalScrollBarVisibility = ScrollBarVisibility.Auto;
+            var particleTypes = new List<ParticleType>();
+            particleTypes.AddRange(defaultParticleTypes);
+            particleTypes.AddRange(selectedParticle.CustomTypes);
             var panel = new PropertyPanel(commandStacks[selectedParticle],
-                file, selectedParticle.CustomTypes, component, UpdateProperty);
+                file, particleTypes, component, UpdateProperty);
             scroll.Content = panel;
             panel.OnBeginEditing += () =>
             {
@@ -290,10 +293,8 @@ namespace CrazyStorm
         }
         private void TabClose_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            var item = VisualHelper.VisualUpwardSearch<TabItem>(sender as DependencyObject) as TabItem;
-            var tab = VisualHelper.VisualUpwardSearch<TabControl>(item) as TabControl;
-            if (tab != null)
-                tab.Items.Remove(item);
+            TabItem item = VisualHelper.VisualUpwardSearch<TabItem>(sender as DependencyObject) as TabItem;
+            LeftTabControl.Items.Remove(item);
         }
         private void BindComponentItem_Click(object sender, RoutedEventArgs e)
         {

@@ -12,9 +12,15 @@ using System.Xml.Serialization;
 
 namespace CrazyStorm.Core
 {
+    public enum RebounderShape
+    {
+        Line,
+        Circle
+    }
     public struct RebounderData : IFieldData
     {
-        public int length;
+        public int size;
+        public RebounderShape shape;
         public float rotation;
         public int collisionTime;
         public void SetField(int fieldIndex, ValueType value)
@@ -35,10 +41,16 @@ namespace CrazyStorm.Core
 
         #region Public Members
         [IntProperty(0, int.MaxValue)]
-        public int Length
+        public int Size
         {
-            get { return rebounderData.length; }
-            set { rebounderData.length = value; }
+            get { return rebounderData.size; }
+            set { rebounderData.size = value; }
+        }
+        [EnumProperty(typeof(RebounderShape))]
+        public RebounderShape Shape
+        {
+            get { return rebounderData.shape; }
+            set { rebounderData.shape = value; }
         }
         [FloatProperty(float.MinValue, float.MaxValue)]
         public float Rotation
@@ -58,6 +70,7 @@ namespace CrazyStorm.Core
         #region Constructor
         public Rebounder()
         {
+            rebounderData.size = 50;
             rebounderEventGroups = new ObservableCollection<EventGroup>();
         }
         #endregion

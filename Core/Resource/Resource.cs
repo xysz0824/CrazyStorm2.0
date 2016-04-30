@@ -17,7 +17,7 @@ namespace CrazyStorm.Core
     {
         public event PropertyChangedEventHandler PropertyChanged;
         [XmlAttribute]
-        protected string label;
+        private string label;
         protected bool isValid;
         public string Label
         {

@@ -100,8 +100,6 @@ namespace CrazyStorm.Core
         {
             this.name = name;
             visible = true;
-            color = LayerColor.Blue;
-            beginFrame = 0;
             totalFrame = 200;
             components = new ObservableCollection<Component>();
         }

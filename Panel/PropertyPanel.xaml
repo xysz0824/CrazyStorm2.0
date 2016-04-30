@@ -44,7 +44,17 @@
                         <Label Content="标识色" HorizontalContentAlignment="Center" Margin="0,0,1,1"/>
                         <ComboBox Name="ColorCombo" Width = "60" Margin="0,1" SelectionChanged="ColorCombo_SelectionChanged" />
                     </StackPanel>
-                    <ComboBox Name="TypeCombo" ItemsSource="{Binding}" Margin="0,1" SelectionChanged="TypeCombo_SelectionChanged" />
+                    <ComboBox Name="TypeCombo" ItemsSource="{Binding}" Margin="0,1" SelectionChanged="TypeCombo_SelectionChanged">
+                        <ComboBox.ToolTip>
+                            <ToolTip Name="TypeComboTip" Visibility="Hidden">
+                                <Rectangle Name="TypeImageRect">
+                                    <Rectangle.Fill>
+                                        <ImageBrush ImageSource="../Images/barrages.png" TileMode="FlipY" />
+                                    </Rectangle.Fill>
+                                </Rectangle>
+                            </ToolTip>
+                        </ComboBox.ToolTip>
+                    </ComboBox>
                 </DockPanel>
                 <DataGrid Name="ParticleGrid" ItemsSource="{Binding}" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" 
                           GridLinesVisibility="Horizontal" ColumnWidth="Auto" SelectionMode="Single" AutoGenerateColumns="False"  CanUserAddRows="False" CanUserReorderColumns="False" CanUserSortColumns="False" 

@@ -21,7 +21,7 @@ namespace CrazyStorm.Core
     {
         public float halfWidth;
         public float halfHeight;
-        public Shape shape;
+        public FieldShape shape;
         public Reach reach;
         public string targetName;
         public float intensity;
@@ -55,8 +55,8 @@ namespace CrazyStorm.Core
             get { return forceFieldData.halfHeight; }
             set { forceFieldData.halfHeight = value; }
         }
-        [EnumProperty(typeof(Shape))]
-        public Shape Shape
+        [EnumProperty(typeof(FieldShape))]
+        public FieldShape Shape
         {
             get { return forceFieldData.shape; }
             set { forceFieldData.shape = value; }
@@ -96,7 +96,10 @@ namespace CrazyStorm.Core
         #region Constructor
         public ForceField()
         {
-            forceFieldData.targetName = "";
+            forceFieldData.targetName = string.Empty;
+            forceFieldData.halfWidth = 50;
+            forceFieldData.halfHeight = 50;
+            forceFieldData.intensity = 0.1f;
         }
         #endregion
 

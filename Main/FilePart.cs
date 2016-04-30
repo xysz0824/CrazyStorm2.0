@@ -128,6 +128,7 @@ namespace CrazyStorm
                     customType.RebuildReferenceFromCollection(file.Images);
                 //Collect all particle types
                 var particleTypes = new List<ParticleType>();
+                particleTypes.AddRange(defaultParticleTypes);
                 particleTypes.AddRange(particleSystem.CustomTypes);
                 //Collect all components
                 var components = new List<Component>();

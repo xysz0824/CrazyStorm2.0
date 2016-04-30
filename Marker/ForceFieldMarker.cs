@@ -18,7 +18,7 @@ namespace CrazyStorm
         public void Draw(Canvas canvas, Component component, int x, int y)
         {
             var force = component as ForceField;
-            if (force.Shape == Core.Shape.Rectangle)
+            if (force.Shape == FieldShape.Rectangle)
             {
                 var rect = new Rectangle();
                 rect.Width = force.HalfWidth * 2;
@@ -29,16 +29,16 @@ namespace CrazyStorm
                 rect.SetValue(Canvas.TopProperty, (double)y - force.HalfHeight);
                 canvas.Children.Add(rect);
             }
-            else if (force.Shape == Core.Shape.Ellipse)
+            else if (force.Shape == FieldShape.Ellipse)
             {
-                var rect = new Ellipse();
-                rect.Width = force.HalfWidth * 2;
-                rect.Height = force.HalfHeight * 2;
-                rect.Fill = new SolidColorBrush(Colors.Red);
-                rect.Opacity = 0.5f;
-                rect.SetValue(Canvas.LeftProperty, (double)x - force.HalfWidth);
-                rect.SetValue(Canvas.TopProperty, (double)y - force.HalfHeight);
-                canvas.Children.Add(rect);
+                var ellipse = new Ellipse();
+                ellipse.Width = force.HalfWidth * 2;
+                ellipse.Height = force.HalfHeight * 2;
+                ellipse.Fill = new SolidColorBrush(Colors.Red);
+                ellipse.Opacity = 0.5f;
+                ellipse.SetValue(Canvas.LeftProperty, (double)x - force.HalfWidth);
+                ellipse.SetValue(Canvas.TopProperty, (double)y - force.HalfHeight);
+                canvas.Children.Add(ellipse);
             }
             switch (force.ForceType)
             {

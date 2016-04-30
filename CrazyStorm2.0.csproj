@@ -41,6 +41,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <CodeAnalysisRuleSet>BasicDesignGuidelineRules.ruleset</CodeAnalysisRuleSet>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
     <PlatformTarget>x86</PlatformTarget>
@@ -68,6 +69,7 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Management" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
@@ -91,6 +93,7 @@
     <Compile Include="Edit\Command\Layer\CopyLayerCommand.cs" />
     <Compile Include="Edit\Command\Component\PasteComponentCommand.cs" />
     <Compile Include="Edit\Command\Component\UnbindComponentCommand.cs" />
+    <Compile Include="Helper\HardwareInfoHelper.cs" />
     <Compile Include="Helper\IniHelper.cs" />
     <Compile Include="Helper\LogHelper.cs" />
     <Compile Include="Main\FilePart.cs" />
@@ -339,6 +342,12 @@
     <Resource Include="Images\decelerated.png" />
     <Resource Include="Images\fixed.png" />
     <Resource Include="Images\linear.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="set.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\barrages.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

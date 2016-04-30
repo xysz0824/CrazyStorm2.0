@@ -401,8 +401,24 @@ namespace CrazyStorm
         {
             if (TypeCombo.SelectedItem != null && !initializeType)
             {
+                var selectedType = TypeCombo.SelectedItem as ParticleType;
                 //Refresh color combobox.
                 InitializeColorCombo();
+                //Show default type preview
+                if (selectedType.ID >= 1000)
+                {
+                    TypeComboTip.Visibility = Visibility.Visible;
+                    TypeImageRect.Width = selectedType.Width;
+                    TypeImageRect.Height = selectedType.Height;
+                    var imageBrush = TypeImageRect.Fill as ImageBrush;
+                    var bitmap = imageBrush.ImageSource as BitmapFrame;
+                    imageBrush.Viewbox = new Rect(selectedType.StartPointX / bitmap.PixelWidth,
+                        selectedType.StartPointY / bitmap.PixelHeight,
+                        (float)selectedType.Width / bitmap.PixelWidth,
+                        (float)selectedType.Height / bitmap.PixelHeight);
+                }
+                else
+                    TypeComboTip.Visibility = Visibility.Hidden;
             }
             initializeType = false;
         }
