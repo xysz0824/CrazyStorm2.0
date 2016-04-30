@@ -253,6 +253,7 @@ namespace CrazyStorm
             file.UpdateResource();
             Window window = new EventSetting(eventGroup, environment, file.Sounds, types, properties, emitter, aboutParticle);
             window.ShowDialog();
+            window.Close();
         }
         #endregion
 
@@ -482,6 +483,13 @@ namespace CrazyStorm
             if (e.OriginalSource is TextBlock && ComponentEventList.SelectedItem != null)
             {
                 Script.Environment environment = new Script.Environment(this.environment);
+                //Remove particle properties
+                if (!(component is Emitter))
+                {
+                    var particleItems = ParticleGrid.DataContext as IList<PropertyPanelItem>;
+                    foreach (var item in particleItems)
+                        environment.RemoveLocal(item.Name);
+                }
                 //Remove unnecessary properties
                 environment.RemoveLocal("Name");
                 //Add runtime component properties
@@ -499,13 +507,11 @@ namespace CrazyStorm
                 var componentItems = ComponentGrid.DataContext as IList<PropertyPanelItem>;
                 var emitterItems = SpecificGrid.DataContext as IList<PropertyPanelItem>;
                 foreach (var item in componentItems)
-                {
                     environment.RemoveLocal(item.Name);
-                }
+
                 foreach (var item in emitterItems)
-                {
                     environment.RemoveLocal(item.Name);
-                }
+                
                 if (component is EventField || component is Rebounder)
                 {
                     //For compatibility between particle and curveparticle, 

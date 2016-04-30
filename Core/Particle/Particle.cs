@@ -40,7 +40,7 @@ namespace CrazyStorm.Core
     public struct ParticleData : IFieldData
     {
         public float heightScale;
-        public float rotation;
+        public float protation;
         public bool stickToSpeedAngle;
         public bool retainScale;
         public bool afterimageEffect;
@@ -119,10 +119,10 @@ namespace CrazyStorm.Core
             set { particleBaseData.opacity = value; }
         }
         [FloatProperty(float.MinValue, float.MaxValue)]
-        public float Rotation
+        public float PRotation
         {
-            get { return particleData.rotation; }
-            set { particleData.rotation = value; }
+            get { return particleData.protation; }
+            set { particleData.protation = value; }
         }
         [BoolProperty]
         public bool StickToSpeedAngle
