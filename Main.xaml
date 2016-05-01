@@ -268,62 +268,62 @@
                     <GradientStop Color="Gainsboro" Offset="1" />
                 </LinearGradientBrush>
             </Menu.Background>
-            <MenuItem Header="文件">
-                <MenuItem Name="NewItem" Header="新建" InputGestureText="Ctrl+N" Click="NewItem_Click" />
-                <MenuItem Name="OpenItem" Header="打开" InputGestureText="Ctrl+O" Click="OpenItem_Click" />
-                <MenuItem Name="SaveItem" Header="保存" InputGestureText="Ctrl+S" Click="SaveItem_Click" />
-                <MenuItem Name="SaveToItem" Header="另存为..." InputGestureText="Ctrl+Shift+S" Click="SaveToItem_Click" />
+            <MenuItem Header="{StaticResource FileStr}">
+                <MenuItem Name="NewItem" Header="{StaticResource NewStr}" InputGestureText="Ctrl+N" Click="NewItem_Click" />
+                <MenuItem Name="OpenItem" Header="{StaticResource OpenStr}" InputGestureText="Ctrl+O" Click="OpenItem_Click" />
+                <MenuItem Name="SaveItem" Header="{StaticResource SaveStr}" InputGestureText="Ctrl+S" Click="SaveItem_Click" />
+                <MenuItem Name="SaveToItem" Header="{StaticResource SaveToStr}" InputGestureText="Ctrl+Shift+S" Click="SaveToItem_Click" />
                 <Separator/>
-                <MenuItem Header="屏幕设置" Click="ScreenSettingItem_Click" />
+                <MenuItem Header="{StaticResource SetScreenStr}" Click="ScreenSettingItem_Click" />
                 <Separator/>
-                <MenuItem Header="退出" InputGestureText="Alt+F4"/>
+                <MenuItem Header="{StaticResource ExitStr}" InputGestureText="Alt+F4"/>
             </MenuItem>
-            <MenuItem Header="编辑">
-                <MenuItem Name="UndoItem" Header="撤销" InputGestureText="Ctrl+Z" Click="UndoItem_Click"/>
-                <MenuItem Name="RedoItem" Header="恢复" InputGestureText="Ctrl+Y" Click="RedoItem_Click"/>
+            <MenuItem Header="{StaticResource EditStr}">
+                <MenuItem Name="UndoItem" Header="{StaticResource UndoStr}" InputGestureText="Ctrl+Z" Click="UndoItem_Click"/>
+                <MenuItem Name="RedoItem" Header="{StaticResource RedoStr}" InputGestureText="Ctrl+Y" Click="RedoItem_Click"/>
                 <Separator/>
-                <MenuItem Name="CutItem" Header="剪切" InputGestureText="Ctrl+X" Click="CutItem_Click"/>
-                <MenuItem Name="CopyItem" Header="复制" InputGestureText="Ctrl+C" Click="CopyItem_Click"/>
-                <MenuItem Name="PasteItem" Header="粘贴" InputGestureText="Ctrl+V" Click="PasteItem_Click"/>
-                <MenuItem Name="DelItem" Header="删除" InputGestureText="Del" Click="DelItem_Click"/>
+                <MenuItem Name="CutItem" Header="{StaticResource CutStr}" InputGestureText="Ctrl+X" Click="CutItem_Click"/>
+                <MenuItem Name="CopyItem" Header="{StaticResource CopyStr}" InputGestureText="Ctrl+C" Click="CopyItem_Click"/>
+                <MenuItem Name="PasteItem" Header="{StaticResource PasteStr}" InputGestureText="Ctrl+V" Click="PasteItem_Click"/>
+                <MenuItem Name="DelItem" Header="{StaticResource DelStr}" InputGestureText="Del" Click="DelItem_Click"/>
                 <Separator/>
-                <MenuItem Name="FindItem" Header="查找" InputGestureText="Ctrl+F" Click="FindItem_Click"  />
-                <MenuItem Header="选中全部" InputGestureText="Ctrl+A" Click="SelectAllItem_Click"/>
+                <MenuItem Name="FindItem" Header="{StaticResource FindStr}" InputGestureText="Ctrl+F" Click="FindItem_Click"  />
+                <MenuItem Header="{StaticResource SelectAllStr}" InputGestureText="Ctrl+A" Click="SelectAllItem_Click"/>
             </MenuItem>
-            <MenuItem Header="资源">
-                <MenuItem Header="添加图案" Click="AddImageItem_Click"/>
-                <MenuItem Header="添加音效" Click="AddSound_Click"/>
-                <MenuItem Header="添加全局变量" Click="AddGlobalItem_Click"/>
+            <MenuItem Header="{StaticResource ResourceStr}">
+                <MenuItem Header="{StaticResource AddImageStr}" Click="AddImageItem_Click"/>
+                <MenuItem Header="{StaticResource AddSoundStr}" Click="AddSound_Click"/>
+                <MenuItem Header="{StaticResource AddGlobalStr}" Click="AddGlobalItem_Click"/>
             </MenuItem>
-            <MenuItem Name="ParticleMenu" Header="粒子" Click="ParticleMenu_Click" >
-                <MenuItem Name="AddParticleItem" Header="添加粒子" />
-                <MenuItem Name="DeleteParticleItem" Header="删除粒子" />
+            <MenuItem Name="ParticleMenu" Header="{StaticResource ParticleStr}" Click="ParticleMenu_Click" >
+                <MenuItem Name="AddParticleItem" Header="{StaticResource AddParticleStr}" />
+                <MenuItem Name="DeleteParticleItem" Header="{StaticResource DeleteParticleStr}" />
                 <Separator/>
-                <MenuItem Name="CopyParticleItem" Header="复制粒子" />
+                <MenuItem Name="CopyParticleItem" Header="{StaticResource CopyParticleStr}" />
                 <Separator/>
-                <MenuItem Name="SetParticleItem" Header="粒子设置" />
+                <MenuItem Name="SetParticleItem" Header="{StaticResource SetParticleStr}" />
             </MenuItem>
-            <MenuItem Name="LayerMenu"  Header="图层" Click="LayerMenu_Click">
-                <MenuItem Name ="AddLayerItem" Header="添加图层" />
-                <MenuItem Name="DeleteLayerItem" Header="删除图层" />
+            <MenuItem Name="LayerMenu"  Header="{StaticResource LayerStr}" Click="LayerMenu_Click">
+                <MenuItem Name ="AddLayerItem" Header="{StaticResource AddLayerStr}" />
+                <MenuItem Name="DeleteLayerItem" Header="{StaticResource DeleteLayerStr}" />
                 <Separator/>
-                <MenuItem Name="CopyLayerItem"  Header="复制图层" />
+                <MenuItem Name="CopyLayerItem"  Header="{StaticResource CopyLayerStr}" />
                 <Separator/>
-                <MenuItem Name="SetLayerItem" Header="图层设置" />
+                <MenuItem Name="SetLayerItem" Header="{StaticResource SetLayerStr}" />
             </MenuItem>
-            <MenuItem Header="组件" >
-                <MenuItem Name="BindComponentItem" Header="组件绑定" InputGestureText="Ctrl+B" Click="BindComponentItem_Click"/>
-                <MenuItem Name="UnbindComponentItem" Header="组件解绑" InputGestureText="Ctrl+U" Click="UnbindComponentItem_Click"/>
+            <MenuItem Header="{StaticResource ComponentStr}" >
+                <MenuItem Name="BindComponentItem" Header="{StaticResource BindComponentStr}" InputGestureText="Ctrl+B" Click="BindComponentItem_Click"/>
+                <MenuItem Name="UnbindComponentItem" Header="{StaticResource UnbindComponentStr}" InputGestureText="Ctrl+U" Click="UnbindComponentItem_Click"/>
             </MenuItem>
-            <MenuItem Header="测试" >
-                <MenuItem Header="测试当前粒子" InputGestureText="F5"/>
-                <MenuItem Header="测试所有粒子" InputGestureText="F10"/>
+            <MenuItem Header="{StaticResource TestStr}" >
+                <MenuItem Header="{StaticResource TestCurrentStr}" InputGestureText="F5"/>
+                <MenuItem Header="{StaticResource TestAllStr}" InputGestureText="F10"/>
                 <Separator/>
-                <MenuItem Header="测试设置" />
+                <MenuItem Header="{StaticResource SetTestStr}" />
             </MenuItem>
-            <MenuItem Header="帮助" >
-                <MenuItem Header="教程" InputGestureText="F1"/>
-                <MenuItem Header="关于" />
+            <MenuItem Header="{StaticResource HelpStr}" >
+                <MenuItem Header="{StaticResource TutorialStr}" InputGestureText="F1"/>
+                <MenuItem Header="{StaticResource AboutStr}" />
             </MenuItem>
         </Menu>
         <!-- Status Bar -->
@@ -338,40 +338,51 @@
                     <GradientStop Color="Gainsboro" Offset="1" />
                 </LinearGradientBrush>
             </ToolBar.Background>
-            <Button Name="NewButton" IsDefault="False" IsCancel="False" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ToolTip="新建" Click="NewItem_Click">
+            <Button Name="NewButton" IsDefault="False" IsCancel="False" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" 
+                    ToolTip="{StaticResource NewStr}" Click="NewItem_Click">
                 <Image Source="Images/document-new-3.ico" Stretch="None" />
             </Button>
-            <Button Name="OpenButton" IsDefault="False" IsCancel="False" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ToolTip="打开"  Click="OpenItem_Click">
+            <Button Name="OpenButton" IsDefault="False" IsCancel="False" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" 
+                    ToolTip="{StaticResource OpenStr}"  Click="OpenItem_Click">
                 <Image Source="Images/document-open-2.ico" Stretch="None" />
             </Button>
-            <Button Name="SaveButton" IsDefault="False" IsCancel="False" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ToolTip="保存"  Click="SaveItem_Click">
+            <Button Name="SaveButton" IsDefault="False" IsCancel="False" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" 
+                    ToolTip="{StaticResource SaveStr}"  Click="SaveItem_Click">
                 <Image Source="Images/document-export.ico" Stretch="None" />
             </Button>
             <Separator/>
-            <Button Name="CutButton" IsDefault="False" IsCancel="False" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ToolTip="剪切" Click="CutItem_Click">
+            <Button Name="CutButton" IsDefault="False" IsCancel="False" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" 
+                    ToolTip="{StaticResource CutStr}" Click="CutItem_Click">
                 <Image Source="Images/edit-cut-3.ico" Stretch="None" />
             </Button>
-            <Button Name="CopyButton" IsDefault="False" IsCancel="False" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ToolTip="复制" Click="CopyItem_Click">
+            <Button Name="CopyButton" IsDefault="False" IsCancel="False" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" 
+                    ToolTip="{StaticResource CopyStr}" Click="CopyItem_Click">
                 <Image Source="Images/edit-copy-3.ico" Stretch="None" />
             </Button>
-            <Button Name="PasteButton" IsDefault="False" IsCancel="False" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ToolTip="粘贴" Click="PasteItem_Click">
+            <Button Name="PasteButton" IsDefault="False" IsCancel="False" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" 
+                    ToolTip="{StaticResource PasteStr}" Click="PasteItem_Click">
                 <Image Source="Images/edit-paste-3.ico" Stretch="None" />
             </Button>
-            <Button Name="FindButton" IsDefault="False" IsCancel="False" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ToolTip="查找" Click="FindItem_Click" >
+            <Button Name="FindButton" IsDefault="False" IsCancel="False" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" 
+                    ToolTip="{StaticResource FindStr}" Click="FindItem_Click" >
                 <Image Source="Images/edit-find-5.ico" Stretch="None" />
             </Button>
             <Separator/>
-            <Button Name="UndoButton" IsDefault="False" IsCancel="False" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ToolTip="撤销" Click="UndoItem_Click">
+            <Button Name="UndoButton" IsDefault="False" IsCancel="False" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" 
+                    ToolTip="{StaticResource UndoStr}" Click="UndoItem_Click">
                 <Image Source="Images/edit-undo-3.ico" Stretch="None" />
             </Button>
-            <Button Name="RedoButton" IsDefault="False" IsCancel="False" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ToolTip="恢复" Click="RedoItem_Click">
+            <Button Name="RedoButton" IsDefault="False" IsCancel="False" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" 
+                    ToolTip="{StaticResource RedoStr}" Click="RedoItem_Click">
                 <Image Source="Images/edit-redo-3.ico" Stretch="None" />
             </Button>
             <Separator/>
-            <Button Name="PlayButton" IsDefault="False" IsCancel="False" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ToolTip="测试">
+            <Button Name="PlayButton" IsDefault="False" IsCancel="False" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" 
+                    ToolTip="{StaticResource TestStr}">
                 <Image Source="Images/arrow-right-3.ico" Stretch="None" />
             </Button>
-            <Button Name="SettingButton" IsDefault="False" IsCancel="False" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ToolTip="设置">
+            <Button Name="SettingButton" IsDefault="False" IsCancel="False" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" 
+                    ToolTip="{StaticResource SetTestStr}">
                 <Image Source="Images/configure-5.ico" Stretch="None" />
             </Button>
         </ToolBar>
@@ -458,7 +469,7 @@
                             <GradientStop Color="#FFF0F0F0" Offset="1"/>
                         </LinearGradientBrush>
                     </DockPanel.Background>
-                    <GroupBox DockPanel.Dock="Bottom" Header="已选中" Height="100" BorderBrush="#FFC6C6C6" Name="SelectedGroup" Opacity="0">
+                    <GroupBox DockPanel.Dock="Bottom" Header="{StaticResource SelectedStr}" Height="100" BorderBrush="#FFC6C6C6" Name="SelectedGroup" Opacity="0">
                         <GroupBox.Background>
                             <ImageBrush ImageSource="Images/selectedgroup.png"/>
                         </GroupBox.Background>
@@ -484,35 +495,35 @@
                                 <GradientStop Color="#FFF0F0F0" Offset="1"/>
                             </LinearGradientBrush>
                         </TabControl.Background>
-                        <TabItem Header="组件" Name="Frequent" Padding="6,5,6,1">
+                        <TabItem Header="{StaticResource ComponentStr}" Name="Frequent" Padding="6,5,6,1">
                             <DockPanel Name="ComponentPanel">
-                                <GroupBox DockPanel.Dock="Top" Header="组件板" VerticalAlignment="Top" Height="60" HorizontalAlignment="Stretch" 
+                                <GroupBox DockPanel.Dock="Top" Header="{StaticResource ComponentBoardStr}" VerticalAlignment="Top" Height="60" HorizontalAlignment="Stretch" 
                                       HorizontalContentAlignment="Center" VerticalContentAlignment="Center" BorderBrush="#FFC6C6C6">
                                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
                                         <Button Name="MultiEmitter" Width="32" Height="32" Padding="0" Margin="1,1,2,1" Background="{x:Null}" Click="ComponentButton_Click">
-                                            <Image RenderOptions.BitmapScalingMode="NearestNeighbor" Source="Images/button-MultiEmitter.png" Stretch="Uniform" ToolTip="多向发射器" 
+                                            <Image RenderOptions.BitmapScalingMode="NearestNeighbor" Source="Images/button-MultiEmitter.png" Stretch="Uniform" ToolTip="{StaticResource MultiEmitterStr}" 
                                                MouseEnter="ComponentButton_MouseEnter" MouseLeave="ComponentButton_MouseLeave" Width="28" Height="28"  UseLayoutRounding="True"/>
                                         </Button>
                                         <Button Name="CurveEmitter" Width="32" Height="32" Background="{x:Null}" Padding="0" Margin="1,1,2,1" Click="ComponentButton_Click">
-                                            <Image RenderOptions.BitmapScalingMode="NearestNeighbor" Source="Images/button-CurveEmitter.png" Stretch="Uniform" ToolTip="曲线发射器" 
+                                            <Image RenderOptions.BitmapScalingMode="NearestNeighbor" Source="Images/button-CurveEmitter.png" Stretch="Uniform" ToolTip="{StaticResource CurveEmitterStr}" 
                                                MouseEnter="ComponentButton_MouseEnter" MouseLeave="ComponentButton_MouseLeave" Width="28" Height="28"  UseLayoutRounding="True"/>
                                         </Button>
                                         <Button Name="EventField" Background="{x:Null}" Padding="0" Margin="1,1,2,1" Click="ComponentButton_Click" Width="32" Height="32">
-                                            <Image  RenderOptions.BitmapScalingMode="NearestNeighbor" Source="Images/button-EventField.png" ToolTip="事件场" 
+                                            <Image  RenderOptions.BitmapScalingMode="NearestNeighbor" Source="Images/button-EventField.png" ToolTip="{StaticResource EventFieldStr}" 
                                                MouseEnter="ComponentButton_MouseEnter" MouseLeave="ComponentButton_MouseLeave" Width="28" Height="28" UseLayoutRounding="True">
                                             </Image>
                                         </Button>
                                         <Button Name="Rebounder" Width="32" Height="32" Background="{x:Null}" Padding="0" Margin="1,1,2,1" Click="ComponentButton_Click">
-                                            <Image RenderOptions.BitmapScalingMode="NearestNeighbor" Source="Images/button-Rebounder.png" Stretch="Uniform" ToolTip="反弹板" 
+                                            <Image RenderOptions.BitmapScalingMode="NearestNeighbor" Source="Images/button-Rebounder.png" Stretch="Uniform" ToolTip="{StaticResource RebounderStr}" 
                                                MouseEnter="ComponentButton_MouseEnter" MouseLeave="ComponentButton_MouseLeave" Width="28" Height="28"  UseLayoutRounding="True"/>
                                         </Button>
                                         <Button Name="ForceField" Width="32" Height="32" Background="{x:Null}" Padding="0" Margin="1,1,2,1" Click="ComponentButton_Click">
-                                            <Image RenderOptions.BitmapScalingMode="NearestNeighbor" Source="Images/button-ForceField.png" Stretch="Uniform" ToolTip="力场" 
+                                            <Image RenderOptions.BitmapScalingMode="NearestNeighbor" Source="Images/button-ForceField.png" Stretch="Uniform" ToolTip="{StaticResource ForceFieldStr}" 
                                                MouseEnter="ComponentButton_MouseEnter" MouseLeave="ComponentButton_MouseLeave" Width="28" Height="28"  UseLayoutRounding="True"/>
                                         </Button>
                                     </StackPanel>
                                 </GroupBox>
-                                <GroupBox Header="组件浏览器" Name="Explorer" VerticalContentAlignment="Stretch" HorizontalContentAlignment="Stretch" >
+                                <GroupBox Header="{StaticResource ComponentTreeStr}" Name="Explorer" VerticalContentAlignment="Stretch" HorizontalContentAlignment="Stretch" >
                                     <TreeView Name="ComponentTree" Padding="-2,1,1,1" VerticalContentAlignment="Stretch" HorizontalContentAlignment="Stretch" 
                                               AllowDrop="True" MouseMove="ComponentTree_MouseMove" 
                                               DragEnter="ComponentTree_CheckDrop" DragOver="ComponentTree_CheckDrop" DragLeave="ComponentTree_CheckDrop" Drop="ComponentTree_Drop" 
@@ -539,14 +550,14 @@
                                 </GroupBox>
                             </DockPanel>
                         </TabItem>
-                        <TabItem Header="资源" Name="Resource" Padding="6,5,6,1">
+                        <TabItem Header="{StaticResource ResourceStr}" Name="Resource" Padding="6,5,6,1">
                             <ScrollViewer VerticalScrollBarVisibility="Auto">
                                 <StackPanel>
-                                    <GroupBox Header="图案" Height="131" Margin="0">
+                                    <GroupBox Header="{StaticResource ImageStr}" Height="131" Margin="0">
                                         <TreeView Name="ImageList" Padding="-12,1,1,1" PreviewMouseRightButtonDown="ImageList_PreviewMouseRightButtonDown">
                                             <TreeView.ContextMenu>
                                                 <ContextMenu>
-                                                    <MenuItem Name="AddImage" Header="添加图案" Click="AddImageItem_Click" />
+                                                    <MenuItem Name="AddImage" Header="{StaticResource AddImageStr}" Click="AddImageItem_Click" />
                                                 </ContextMenu>
                                             </TreeView.ContextMenu>
                                             <TreeView.ItemTemplate>
@@ -554,7 +565,7 @@
                                                     <DockPanel>
                                                         <DockPanel.ContextMenu >
                                                             <ContextMenu>
-                                                                <MenuItem Name="DeleteImage" Header="删除" Click="DeleteImage_Click" />
+                                                                <MenuItem Name="DeleteImage" Header="{StaticResource DelStr}" Click="DeleteImage_Click" />
                                                             </ContextMenu>
                                                         </DockPanel.ContextMenu>
                                                         <TextBlock Text="{Binding Path=Label}">
@@ -572,11 +583,11 @@
                                             </TreeView.ItemTemplate>
                                         </TreeView>
                                     </GroupBox>
-                                    <GroupBox Header="音效" Height="131" Margin="0">
+                                    <GroupBox Header="{StaticResource SoundStr}" Height="131" Margin="0">
                                         <TreeView Name="SoundList" Padding="-12,1,1,1" PreviewMouseRightButtonDown="SoundList_PreviewMouseRightButtonDown">
                                             <TreeView.ContextMenu>
                                                 <ContextMenu>
-                                                    <MenuItem Name="AddSound" Header="添加音效" Click="AddSound_Click" />
+                                                    <MenuItem Name="AddSound" Header="{StaticResource AddSoundStr}" Click="AddSound_Click" />
                                                 </ContextMenu>
                                             </TreeView.ContextMenu>
                                             <TreeView.ItemTemplate>
@@ -584,7 +595,7 @@
                                                     <DockPanel>
                                                         <DockPanel.ContextMenu >
                                                             <ContextMenu>
-                                                                <MenuItem Name="DeleteSound" Header="删除" Click="DeleteSound_Click"/>
+                                                                <MenuItem Name="DeleteSound" Header="{StaticResource DelStr}" Click="DeleteSound_Click"/>
                                                             </ContextMenu>
                                                         </DockPanel.ContextMenu>
                                                         <TextBlock Text="{Binding Path=Label}">
@@ -597,7 +608,7 @@
                                             </TreeView.ItemTemplate>
                                         </TreeView>
                                     </GroupBox>
-                                    <GroupBox Header="全局变量" Margin="0">
+                                    <GroupBox Header="{StaticResource GlobalStr}" Margin="0">
                                         <StackPanel>
                                             <DataGrid Name="VariableGrid" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" GridLinesVisibility="Horizontal" 
                                                       ColumnWidth="Auto" SelectionMode="Single" CanUserReorderColumns="False" CanUserSortColumns="False" ScrollViewer.CanContentScroll="False" 
@@ -607,13 +618,13 @@
                                                     <SolidColorBrush Color="{DynamicResource {x:Static SystemColors.ControlColorKey}}"/>
                                                 </DataGrid.HorizontalGridLinesBrush>
                                                 <DataGrid.Columns>
-                                                    <DataGridTextColumn x:Name="VariableKey"  Header="变量名" Binding="{Binding Label}"/>
-                                                    <DataGridTextColumn x:Name="VariableValue"  Header="变量值" Binding="{Binding Value}" />
+                                                    <DataGridTextColumn x:Name="VariableKey"  Header="{StaticResource VariableKeyStr}" Binding="{Binding Label}"/>
+                                                    <DataGridTextColumn x:Name="VariableValue"  Header="{StaticResource VariableValueStr}" Binding="{Binding Value}" />
                                                 </DataGrid.Columns>
                                             </DataGrid>
                                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" >
-                                                <Button Name="AddVariable" Width ="40" Content="添加" Margin="2,0" Click="AddVariable_Click" />
-                                                <Button Name="DeleteVariable" Width ="40" Content="删除" Click="DeleteVariable_Click" />
+                                                <Button Name="AddVariable" Width ="40" Content="{StaticResource AddStr}" Margin="2,0" Click="AddVariable_Click" />
+                                                <Button Name="DeleteVariable" Width ="40" Content="{StaticResource DelStr}" Click="DeleteVariable_Click" />
                                             </StackPanel>
                                         </StackPanel>
                                     </GroupBox>
@@ -638,14 +649,14 @@
                                 <GradientStop Color="Gainsboro" Offset="1" />
                             </LinearGradientBrush>
                         </DockPanel.Background>
-                        <Label  Content="图层" Height="28" Width="228" Name="label1" Padding="5,6,5,5" BorderBrush="{x:Null}" />
+                        <Label  Content="{StaticResource LayerStr}" Height="28" Width="228" Name="label1" Padding="5,6,5,5" BorderBrush="{x:Null}" />
                         <Label Name="NewLayer" Width="12" Height="12" DockPanel.Dock="Right" MouseLeftButtonUp="NewLayer_MouseUp">
                             <Label.Background>
                                 <ImageBrush ImageSource="Images/layernew.png" Stretch="Uniform" AlignmentX="Left" AlignmentY="Top">
                                 </ImageBrush>
                             </Label.Background>
                             <Label.ToolTip>
-                                <TextBlock Text="新建"/>
+                                <TextBlock Text="{StaticResource NewStr}"/>
                             </Label.ToolTip>
                         </Label>
                     </DockPanel>
@@ -667,9 +678,9 @@
                                                PreviewMouseRightButtonDown="LayerElement_PreviewMouseRightButtonDown" >
                                     <DockPanel.ContextMenu >
                                         <ContextMenu>
-                                            <MenuItem x:Name="LayerShortSetting" Header="设置" Click="LayerShortSetting_Click" />
-                                            <MenuItem x:Name="LayerShortCopy" Header="复制" Click="LayerShortCopy_Click"/>
-                                            <MenuItem x:Name="LayerShortDelete" Header="删除" Click="LayerShortDelete_Click"/>
+                                            <MenuItem x:Name="LayerShortSetting" Header="{StaticResource SettingStr}" Click="LayerShortSetting_Click" />
+                                            <MenuItem x:Name="LayerShortCopy" Header="{StaticResource CopyStr}" Click="LayerShortCopy_Click"/>
+                                            <MenuItem x:Name="LayerShortDelete" Header="{StaticResource DelStr}" Click="LayerShortDelete_Click"/>
                                         </ContextMenu>
                                     </DockPanel.ContextMenu>
                                     <Label x:Name="LayerDown" Height="12" Width="12" DockPanel.Dock="Right" MouseLeftButtonUp="LayerDown_MouseUp" >

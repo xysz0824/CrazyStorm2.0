@@ -31,7 +31,7 @@ namespace CrazyStorm.Core
 
                     var text = node.GetAttribute(info.Name);
                     object value;
-                    if (TypeRule.IsMatchWith(info.GetValue(source), text, out value))
+                    if (PropertyTypeRule.TryMatchWith(info.GetValue(source), text, out value))
                         info.SetValue(source, value);
                     else
                         throw new System.IO.FileLoadException("FileDataError");
@@ -75,7 +75,7 @@ namespace CrazyStorm.Core
 
                 var text = structNode.GetAttribute(info.Name);
                 object value;
-                if (TypeRule.IsMatchWith(info.GetValue(source), text, out value))
+                if (PropertyTypeRule.TryMatchWith(info.GetValue(source), text, out value))
                     info.SetValueDirect(__makeref(source), value);
                 else
                     throw new System.IO.FileLoadException("FileDataError");
@@ -165,7 +165,7 @@ namespace CrazyStorm.Core
                 string valueStr = childNode.GetAttribute("Value");
                 K temp = new K();
                 object value;
-                if (TypeRule.IsMatchWith(temp, valueStr, out value))
+                if (PropertyTypeRule.TryMatchWith(temp, valueStr, out value))
                     source[key] = (K)value;
                 else
                     throw new System.IO.FileLoadException("FileDataError");

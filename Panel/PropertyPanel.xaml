@@ -57,8 +57,9 @@
                     </ComboBox>
                 </DockPanel>
                 <DataGrid Name="ParticleGrid" ItemsSource="{Binding}" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" 
-                          GridLinesVisibility="Horizontal" ColumnWidth="Auto" SelectionMode="Single" AutoGenerateColumns="False"  CanUserAddRows="False" CanUserReorderColumns="False" CanUserSortColumns="False" 
-                      ScrollViewer.CanContentScroll="False" CanUserResizeRows="False" CellEditEnding="ParticleGrid_CellEditEnding" CanUserDeleteRows="False">
+                          GridLinesVisibility="Horizontal" ColumnWidth="Auto" SelectionMode="Single" AutoGenerateColumns="False"  CanUserAddRows="False" 
+                          CanUserReorderColumns="False" CanUserSortColumns="False" ScrollViewer.CanContentScroll="False" CanUserResizeRows="False" 
+                          CellEditEnding="ParticleGrid_CellEditEnding" CanUserDeleteRows="False" BeginningEdit="Grid_BeginningEdit">
                     <DataGrid.HorizontalGridLinesBrush>
                         <SolidColorBrush Color="{DynamicResource {x:Static SystemColors.ControlColorKey}}"/>
                     </DataGrid.HorizontalGridLinesBrush>

@@ -104,13 +104,13 @@ namespace CrazyStorm
         {
             if (string.IsNullOrWhiteSpace(ParticleName.Text))
             {
-                MessageBox.Show((string)FindResource("ParticleNameCanNotBeEmpty"), (string)FindResource("TipTitle"),
+                MessageBox.Show((string)FindResource("ParticleNameCanNotBeEmptyStr"), (string)FindResource("TipTitleStr"),
                     MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
             selectedParticle.Name = ParticleName.Text;
             selectedTab.Header = ParticleName.Text;
-            MessageBox.Show((string)FindResource("ParticleNameSuccessfullyChanged"), (string)FindResource("TipTitle"),
+            MessageBox.Show((string)FindResource("ParticleNameSuccessfullyChangedStr"), (string)FindResource("TipTitleStr"),
                 MessageBoxButton.OK, MessageBoxImage.Information);
         }
         private void TypeList_SelectionChanged(object sender, SelectionChangedEventArgs e)

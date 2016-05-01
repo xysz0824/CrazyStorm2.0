@@ -52,7 +52,7 @@ namespace CrazyStorm
                     SelectedGroupType.Text = component.GetType().Name;
                     SelectedGroupName.DataContext = component;
                     SelectedGroupName.SetBinding(TextBlock.TextProperty, "Name");
-                    SelectedGroupTip.Text = (string)FindResource("DoubleClickTip");
+                    SelectedGroupTip.Text = (string)FindResource("DoubleClickTipStr");
                     SelectedGroupImage.Source = new BitmapImage(
                         new Uri(@"Images/button-" + component.GetType().Name + ".png", UriKind.Relative));
                 }
@@ -60,7 +60,7 @@ namespace CrazyStorm
                 {
                     SelectedGroupImage.Source = new BitmapImage(new Uri(@"Images/group.png", UriKind.Relative));
                     SelectedGroupType.Text = "Group";
-                    SelectedGroupName.Text = selectedComponents.Count + (string)FindResource("ComponentUnit");
+                    SelectedGroupName.Text = selectedComponents.Count + (string)FindResource("ComponentUnitStr");
                     SelectedGroupTip.Text = string.Empty;
                 }
             }
@@ -102,6 +102,7 @@ namespace CrazyStorm
             item.Content = scroll;
             LeftTabControl.Items.Add(item);
             item.Focus();
+            saved = false;
         }
         void UpdateProperty()
         {

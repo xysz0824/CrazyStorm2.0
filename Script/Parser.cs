@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace CrazyStorm.Script
+namespace CrazyStorm.Expression
 {
     class Precedence
     {
@@ -64,7 +64,7 @@ namespace CrazyStorm.Script
         {
             Token token = lexer.Read();
             if (!(token is IdentifierToken && name == (string)token.GetValue()))
-                throw new ScriptException("Syntax error.");
+                throw new ExpressionException("Syntax error.");
 
             return token;
         }
@@ -124,7 +124,7 @@ namespace CrazyStorm.Script
             else if (dimension == 3)
                 return new RGB(coordinateList[0], coordinateList[1], coordinateList[2]);
             else
-                throw new ScriptException("Syntax error.");
+                throw new ExpressionException("Syntax error.");
         }
 
         public SyntaxTree Factor()
@@ -160,15 +160,13 @@ namespace CrazyStorm.Script
                 {
                     if (IsIdentifierToken("("))
                         return new Call(token, Call());
-                    else if (IsIdentifierToken("."))
-                        return new Access(token, Access());
                     else if (IsBool(token as IdentifierToken))
                         return new Bool(token);
                     else
                         return new Name(token);
                 }
                 else
-                    throw new ScriptException("Syntax error.");
+                    throw new ExpressionException("Syntax error.");
             }
         }
 
@@ -195,23 +193,6 @@ namespace CrazyStorm.Script
             }
             SyntaxTree arguments = new Arguments(argumentList);
             return arguments;
-        }
-
-        public SyntaxTree Access()
-        {
-            IdentifierToken(".");
-            Token token = lexer.Read();
-            if (token is IdentifierToken && !(token as IdentifierToken).IsOperator)
-            {
-                if (IsIdentifierToken("("))
-                    return new Call(token, Call());
-                else if (IsIdentifierToken("."))
-                    return new Access(token, Access());
-                else
-                    return new Name(token);
-            }
-            else
-                throw new ScriptException("Syntax error.");
         }
     }
 }

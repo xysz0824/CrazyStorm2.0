@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace CrazyStorm.Script
+namespace CrazyStorm.Expression
 {
     class RGB : SyntaxTree
     {
@@ -30,7 +30,7 @@ namespace CrazyStorm.Script
             var g = GetG().Test(e);
             var b = GetB().Test(e);
             if ((!(r is int) && !(r is float)) || (!(g is int) && !(g is float)) || (!(b is int) && !(b is float)))
-                throw new ScriptException("Type error.");
+                throw new ExpressionException("Type error.");
 
             return new Core.RGB(Convert.ToSingle(r), Convert.ToSingle(g), Convert.ToSingle(b));
         }

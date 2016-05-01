@@ -394,6 +394,7 @@ namespace CrazyStorm
             ScreenSetting window = new ScreenSetting(config);
             window.OnButtonClick += () => UpdateScreen();
             window.ShowDialog();
+            window.Close();
         }
         #endregion
     }

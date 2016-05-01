@@ -64,7 +64,7 @@ namespace CrazyStorm
                         break;
                     }
                 }
-                if (MessageBox.Show((string)FindResource("ConfirmDeleteParticle"), (string)FindResource("TipTitle"),
+                if (MessageBox.Show((string)FindResource("ConfirmDeleteParticleStr"), (string)FindResource("TipTitleStr"),
                     MessageBoxButton.YesNo, MessageBoxImage.Warning) == MessageBoxResult.Yes)
                 {
                     commandStacks.Remove(selectedParticle);
@@ -73,7 +73,7 @@ namespace CrazyStorm
                 }
             }
             else
-                MessageBox.Show((string)FindResource("CanNotDeleteAllParticle"), (string)FindResource("TipTitle"),
+                MessageBox.Show((string)FindResource("CanNotDeleteAllParticleStr"), (string)FindResource("TipTitleStr"),
                     MessageBoxButton.OK, MessageBoxImage.Warning);
         }
         void CopySeletedParticle()
@@ -96,6 +96,7 @@ namespace CrazyStorm
         {
             ParticleSetting window = new ParticleSetting(file, selectedParticle, ParticleTabControl.SelectedItem as TabItem);
             window.ShowDialog();
+            window.Close();
         }
         #endregion
 
@@ -119,6 +120,7 @@ namespace CrazyStorm
                     OpenSelectedParticleSetting();
                     break;
             }
+            saved = false;
         }
         #endregion
     }

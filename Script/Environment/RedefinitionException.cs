@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Runtime.Serialization;
 
-namespace CrazyStorm.Script
+namespace CrazyStorm.Expression
 {
     [Serializable]
     public class RedefinitionException : ApplicationException

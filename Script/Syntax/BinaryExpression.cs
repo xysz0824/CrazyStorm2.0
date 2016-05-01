@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace CrazyStorm.Script
+namespace CrazyStorm.Expression
 {
 
     class BinaryExpression : SyntaxTree
@@ -40,17 +40,17 @@ namespace CrazyStorm.Script
                 if (left is bool && right is bool && (op == "&" || op == "|" || op == "="))
                     return left;
 
-                    return new ScriptException("Type error.");
+                    return new ExpressionException("Type error.");
             }
             switch (op)
             {
                 case "/":
                     if (Convert.ToSingle(right) == 0)
-                        throw new ScriptException("Divided by zero.");
+                        throw new ExpressionException("Divided by zero.");
                     break;
                 case "%":
                     if (Convert.ToSingle(right) == 0)
-                        throw new ScriptException("Divided by zero.");
+                        throw new ExpressionException("Divided by zero.");
                     break;
                 case ">":
                     return true;

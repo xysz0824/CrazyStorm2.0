@@ -7,38 +7,34 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace CrazyStorm.Script
+namespace CrazyStorm.Expression
 {
     public class Environment
     {
         #region Private Members
-        IDictionary<string, object> globals;
-        IDictionary<string, object> locals;
-        IDictionary<string, Struct> structs;
+        IDictionary<string, float> globals;
+        IDictionary<string, float> locals;
         IDictionary<string, Function> functions;
         #endregion
 
         #region Public Members
-        public IDictionary<string, object> Globals { get { return globals; } }
-        public IDictionary<string, object> Locals { get { return locals; } }
-        public IDictionary<string, Struct> Structs { get { return structs; } }
+        public IDictionary<string, float> Globals { get { return globals; } }
+        public IDictionary<string, float> Locals { get { return locals; } }
         public IDictionary<string, Function> Functions { get { return functions; } }
         #endregion
 
         #region Constructor
         public Environment()
         {
-            globals = new Dictionary<string, object>();
-            locals = new Dictionary<string, object>();
-            structs = new Dictionary<string, Struct>();
+            globals = new Dictionary<string, float>();
+            locals = new Dictionary<string, float>();
             functions = new Dictionary<string, Function>();
         }
 
         public Environment(Environment environment)
         {
-            globals = new Dictionary<string, object>();
-            locals = new Dictionary<string, object>();
-            structs = new Dictionary<string, Struct>();
+            globals = new Dictionary<string, float>();
+            locals = new Dictionary<string, float>();
             functions = new Dictionary<string, Function>();
             if (environment != null)
             {
@@ -50,10 +46,6 @@ namespace CrazyStorm.Script
                 {
                     locals.Add(item.Key, item.Value);
                 }
-                foreach (var item in environment.structs)
-                {
-                    structs.Add(item.Key, item.Value);
-                }
                 foreach (var item in environment.functions)
                 {
                     functions.Add(item.Key, item.Value);
@@ -62,22 +54,57 @@ namespace CrazyStorm.Script
         }
         #endregion
 
-        #region Public Members
-        public void PutGlobal(string name, object value) { globals[name] = value; }
+        #region Private Methods
+        bool TryPutVariable(IDictionary<string, float> map, string name, object value)
+        {
+            if (value is int || value is float || value is bool || value is Enum)
+            {
+                map[name] = Convert.ToSingle(value);
+                return true;
+            }
+            else if (value is Core.Vector2)
+            {
+                var vector2 = (Core.Vector2)value;
+                map[name + ".x"] = vector2.x;
+                map[name + ".y"] = vector2.y;
+                return true;
+            }
+            else if (value is Core.RGB)
+            {
+                var rgb = (Core.RGB)value;
+                map[name + ".r"] = rgb.r;
+                map[name + ".g"] = rgb.g;
+                map[name + ".b"] = rgb.b;
+                return true;
+            }
+            else
+                return false;
+        }
+        #endregion
 
-        public object GetGlobal(string name) { return globals.ContainsKey(name) ? globals[name] : null; }
+        #region Public Methods
+        public bool TryPutGlobal(string name, object value) { return TryPutVariable(globals, name, value); }
 
+        public float? GetGlobal(string name) 
+        {
+            if (globals.ContainsKey(name))
+                return globals[name];
+            else
+                return null;
+        }
         public void RemoveGlobal(string name) { globals.Remove(name); }
 
-        public void PutLocal(string name, object value) { locals[name] = value; }
+        public bool TryPutLocal(string name, object value) { return TryPutVariable(locals, name, value); }
 
-        public object GetLocal(string name) { return locals.ContainsKey(name) ? locals[name] : null; }
+        public float? GetLocal(string name)
+        {
+            if (locals.ContainsKey(name))
+                return locals[name];
+            else
+                return null;
+        }
 
         public void RemoveLocal(string name) { locals.Remove(name); }
-
-        public void PutStruct(string name, Struct s) { structs[name] = s; }
-
-        public Struct GetStructs(string name) { return structs.ContainsKey(name) ? structs[name] : null; }
 
         public void PutFunction(string name, Function function) { functions[name] = function; }
 

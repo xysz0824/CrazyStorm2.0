@@ -57,7 +57,7 @@ namespace CrazyStorm
             using (var open = new System.Windows.Forms.OpenFileDialog())
             {
                 open.InitialDirectory = AppDomain.CurrentDomain.BaseDirectory;
-                open.Filter = (string)FindResource("BackGroundImageType");
+                open.Filter = (string)FindResource("BackGroundImageTypeStr");
                 if (open.ShowDialog() == System.Windows.Forms.DialogResult.OK)
                     ImagePath.Text = open.FileName;
             }
@@ -88,7 +88,7 @@ namespace CrazyStorm
                 this.Close();
             }
             else
-                MessageBox.Show((string)FindResource("ValueInvalid"), (string)FindResource("TipTitle"),
+                MessageBox.Show((string)FindResource("ValueInvalidStr"), (string)FindResource("TipTitleStr"),
                     MessageBoxButton.OK, MessageBoxImage.Warning);
         }
         #endregion

@@ -28,7 +28,7 @@ namespace CrazyStorm
     public partial class PropertyPanel : UserControl
     {
         #region Private Members
-        Script.Environment environment;
+        Expression.Environment environment;
         File file;
         CommandStack commandStack;
         IList<ParticleType> types;
@@ -60,28 +60,18 @@ namespace CrazyStorm
         #region Private Methods
         void InitializerEnvironment()
         {
-            environment = new Script.Environment();
+            environment = new Expression.Environment();
             //Add globals.
             foreach (VariableResource item in file.Globals)
-                environment.PutGlobal(item.Label, item.Value);
-            //Add system structs.
-            Script.Struct vector2 = new Script.Struct();
-            vector2.PutField("x", 0.0f);
-            vector2.PutField("y", 0.0f);
-            environment.PutStruct(typeof(Vector2).ToString(), vector2);
-            Script.Struct rgb = new Script.Struct();
-            rgb.PutField("r", 0.0f);
-            rgb.PutField("g", 0.0f);
-            rgb.PutField("b", 0.0f);
-            environment.PutStruct(typeof(RGB).ToString(), rgb);
+                environment.TryPutGlobal(item.Label, item.Value);
             //Add system functions.
-            Script.Function rand = new Script.Function(2);
+            Expression.Function rand = new Expression.Function(2);
             environment.PutFunction("rand", rand);
-            Script.Function sin = new Script.Function(1);
+            Expression.Function sin = new Expression.Function(1);
             environment.PutFunction("sin", sin);
-            Script.Function cos = new Script.Function(1);
+            Expression.Function cos = new Expression.Function(1);
             environment.PutFunction("cos", cos);
-            Script.Function tan = new Script.Function(1);
+            Expression.Function tan = new Expression.Function(1);
             environment.PutFunction("tan", tan);
         }
         void LoadContent()
@@ -97,23 +87,26 @@ namespace CrazyStorm
                 specificList = component.InitializeProperties(component.GetType());
 
             LoadProperties(SpecificGrid, component, specificList);
-            //Load particle properties.
-            //Only emitter have particles, but special event of mask or rebound need it.
-            //So there use stub to load particle properties.
-            var stub = new MultiEmitter();
-            var particleList = stub.Particle.InitializeProperties(typeof(Particle));
-            LoadProperties(ParticleGrid, stub.Particle, particleList);
             if (component is MultiEmitter)
             {
                 ParticleGroup.Visibility = Visibility.Visible;
-                particleList = (component as MultiEmitter).Particle.InitializeProperties(typeof(Particle));
+                var particleList = (component as MultiEmitter).Particle.InitializeProperties(typeof(Particle));
                 LoadProperties(ParticleGrid, (component as MultiEmitter).Particle, particleList);
             }
             else if (component is CurveEmitter)
             {
                 ParticleGroup.Visibility = Visibility.Visible;
-                particleList = (component as CurveEmitter).CurveParticle.InitializeProperties(typeof(CurveParticle));
+                var particleList = (component as CurveEmitter).CurveParticle.InitializeProperties(typeof(CurveParticle));
                 LoadProperties(ParticleGrid, (component as CurveEmitter).CurveParticle, particleList);
+            }
+            else if (component is EventField || component is Rebounder)
+            {
+                //Load particle properties.
+                //Only emitter have particles, but special event of event field or rebounder need it.
+                //So there use stub to load particle properties.
+                var stub = new MultiEmitter();
+                var particleList = stub.Particle.InitializeProperties(typeof(Particle));
+                LoadProperties(ParticleGrid, stub.Particle, particleList);
             }
             //Load particle types.
             //First needs to merge repeated type name.
@@ -164,26 +157,26 @@ namespace CrazyStorm
             DeleteVariable.IsEnabled = component.Variables.Count > 0 ? true : false;
             //Put locals into environment.
             foreach (var item in component.Variables)
-                environment.PutLocal(item.Label, item.Value);
+                environment.TryPutLocal(item.Label, item.Value);
             //Load component events.
             ComponentEventList.ItemsSource = component.ComponentEventGroups;
             //Load specific events.
             if (component is Emitter)
             {
                 SpecificGroup.Visibility = Visibility.Visible;
-                SpecificGroup.Header = (string)FindResource("ParticleEventList");
+                SpecificGroup.Header = (string)FindResource("ParticleEventListStr");
                 SpecificEventList.ItemsSource = (component as Emitter).ParticleEventGroups;
             }
             else if (component is EventField)
             {
                 SpecificGroup.Visibility = Visibility.Visible;
-                SpecificGroup.Header = (string)FindResource("EventFieldEventList");
+                SpecificGroup.Header = (string)FindResource("EventFieldEventListStr");
                 SpecificEventList.ItemsSource = (component as EventField).EventFieldEventGroups;
             }
             else if (component is Rebounder)
             {
                 SpecificGroup.Visibility = Visibility.Visible;
-                SpecificGroup.Header = (string)FindResource("RebounderEventList");
+                SpecificGroup.Header = (string)FindResource("RebounderEventListStr");
                 SpecificEventList.ItemsSource = (component as Rebounder).RebounderEventGroups;
             }   
         }
@@ -200,7 +193,7 @@ namespace CrazyStorm
                 };
                 propertyItems.Add(property);
                 //Put the property into environment.
-                environment.PutLocal(item.Name, item.GetGetMethod().Invoke(container, null));
+                environment.TryPutLocal(item.Name, item.GetGetMethod().Invoke(container, null));
             }
             element.DataContext = propertyItems;
         }
@@ -242,7 +235,7 @@ namespace CrazyStorm
                 }
             }
         }
-        void OpenEventSetting(EventGroup eventGroup, Script.Environment environment, bool emitter, bool aboutParticle)
+        void OpenEventSetting(EventGroup eventGroup, Expression.Environment environment, bool emitter, bool aboutParticle)
         {
             var properties = new IList<PropertyPanelItem>[3]
             { 
@@ -284,14 +277,14 @@ namespace CrazyStorm
             switch (type)
             {
                 case UpdateType.Add:
-                    environment.PutGlobal(variable.Label, variable.Value);
+                    environment.TryPutGlobal(variable.Label, variable.Value);
                     break;
                 case UpdateType.Delete:
                     environment.RemoveGlobal(variable.Label);
                     break;
                 case UpdateType.Modify:
                     environment.RemoveGlobal(variable.Label);
-                    environment.PutGlobal(newName, variable.Value);
+                    environment.TryPutGlobal(newName, variable.Value);
                     break;
             }
         }
@@ -346,7 +339,7 @@ namespace CrazyStorm
                     component.Variables.Add(newVar);
                     DeleteVariable.IsEnabled = true;
                     //Put this into environment.
-                    environment.PutLocal(newVar.Label, newVar.Value);
+                    environment.TryPutLocal(newVar.Label, newVar.Value);
                     return;
                 }
             }
@@ -375,7 +368,7 @@ namespace CrazyStorm
                     foreach (var item in component.Variables)
                         if (item != editItem && item.Label == newValue)
                         {
-                            MessageBox.Show((string)FindResource("NameRepeating"), (string)FindResource("TipTitle"),
+                            MessageBox.Show((string)FindResource("NameRepeatingStr"), (string)FindResource("TipTitleStr"),
                                 MessageBoxButton.OK, MessageBoxImage.Warning);
                             e.Cancel = true;
                             (e.EditingElement as TextBox).Text = editItem.Label;
@@ -389,7 +382,7 @@ namespace CrazyStorm
                     bool result = float.TryParse(newValue, out value);
                     if (!result)
                     {
-                        MessageBox.Show((string)FindResource("ValueInvalid"), (string)FindResource("TipTitle"),
+                        MessageBox.Show((string)FindResource("ValueInvalidStr"), (string)FindResource("TipTitleStr"),
                             MessageBoxButton.OK, MessageBoxImage.Warning);
                         e.Cancel = true;
                         (e.EditingElement as TextBox).Text = editItem.Value.ToString();
@@ -482,7 +475,7 @@ namespace CrazyStorm
         {
             if (e.OriginalSource is TextBlock && ComponentEventList.SelectedItem != null)
             {
-                Script.Environment environment = new Script.Environment(this.environment);
+                Expression.Environment environment = new Expression.Environment(this.environment);
                 //Remove particle properties
                 if (!(component is Emitter))
                 {
@@ -493,7 +486,7 @@ namespace CrazyStorm
                 //Remove unnecessary properties
                 environment.RemoveLocal("Name");
                 //Add runtime component properties
-                environment.PutLocal("CurrentFrame", 0);
+                environment.TryPutLocal("CurrentFrame", 0);
                 OpenEventSetting(ComponentEventList.SelectedItem as EventGroup, environment, 
                     component is Emitter, component is Emitter);
             }
@@ -502,7 +495,7 @@ namespace CrazyStorm
         {
             if (e.OriginalSource is TextBlock && SpecificEventList.SelectedItem != null)
             {
-                Script.Environment environment = new Script.Environment(this.environment);
+                Expression.Environment environment = new Expression.Environment(this.environment);
                 //Remove component and emitter properties
                 var componentItems = ComponentGrid.DataContext as IList<PropertyPanelItem>;
                 var emitterItems = SpecificGrid.DataContext as IList<PropertyPanelItem>;
@@ -516,11 +509,11 @@ namespace CrazyStorm
                 {
                     //For compatibility between particle and curveparticle, 
                     //Put uncommon particle properties
-                    environment.PutLocal("Length", 0);
+                    environment.TryPutLocal("Length", 0);
                 }
                 //Add runtime particle properties
-                environment.PutLocal("Position", Vector2.Zero);
-                environment.PutLocal("CurrentFrame", 0);
+                environment.TryPutLocal("Position", Core.Vector2.Zero);
+                environment.TryPutLocal("CurrentFrame", 0);
                 OpenEventSetting(SpecificEventList.SelectedItem as EventGroup, environment, 
                     false, true);
             }

@@ -41,7 +41,7 @@ namespace CrazyStorm
                 UpdateSelectedStatus();
             }
             else
-                MessageBox.Show((string)FindResource("CanNotDeleteAllLayer"), (string)FindResource("TipTitle"),
+                MessageBox.Show((string)FindResource("CanNotDeleteAllLayerStr"), (string)FindResource("TipTitleStr"),
                     MessageBoxButton.OK, MessageBoxImage.Warning);
         }
         void CopySelectedLayer()
@@ -53,6 +53,7 @@ namespace CrazyStorm
         {
             Window window = new LayerSetting(commandStacks[selectedParticle], selectedLayer);
             window.ShowDialog();
+            window.Close();
         }
         #endregion
 

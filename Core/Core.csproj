@@ -78,7 +78,7 @@
     <Compile Include="Property\Vector2PropertyAttribute.cs" />
     <Compile Include="Resource\Resource.cs" />
     <Compile Include="Resource\VariableResource.cs" />
-    <Compile Include="Type\TypeRule.cs" />
+    <Compile Include="Property\PropertyTypeRule.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

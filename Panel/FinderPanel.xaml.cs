@@ -53,7 +53,7 @@ namespace CrazyStorm
             {
                 var item = new ComboBoxItem();
                 item.DataContext = type[i];
-                item.Content = (string)FindResource(type[i].Name);
+                item.Content = (string)FindResource(type[i].Name + "Str");
                 TypeComboBox.Items.Add(item);
             }
         }
@@ -70,7 +70,7 @@ namespace CrazyStorm
             else
                 results = SearchTree(selectedParticle.ComponentTree);
 
-            ResultCount.Text = string.Format((string)FindResource("ResultCount"),results.Count.ToString());
+            ResultCount.Text = string.Format((string)FindResource("ResultCountStr"), results.Count.ToString());
             return results;
         }
         private List<Component> SearchLayer()

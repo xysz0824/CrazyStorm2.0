@@ -7,8 +7,8 @@
     <ProjectGuid>{CEA93DC4-9FF2-4D90-B0BF-E1E0D8027223}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>CrazyStorm.Script</RootNamespace>
-    <AssemblyName>Script</AssemblyName>
+    <RootNamespace>CrazyStorm.Expression</RootNamespace>
+    <AssemblyName>Expression</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile>Client</TargetFrameworkProfile>
@@ -41,10 +41,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Environment\RedefinitionException.cs" />
-    <Compile Include="ScriptException.cs" />
+    <Compile Include="ExpressionException.cs" />
     <Compile Include="Environment\Environment.cs" />
     <Compile Include="Environment\Function.cs" />
-    <Compile Include="Syntax\Access.cs" />
     <Compile Include="Syntax\Arguments.cs" />
     <Compile Include="Syntax\Bool.cs" />
     <Compile Include="Syntax\Call.cs" />
@@ -61,7 +60,6 @@
     <Compile Include="Token\NumberToken.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Token\Token.cs" />
-    <Compile Include="Environment\Struct.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Core\Core.csproj">

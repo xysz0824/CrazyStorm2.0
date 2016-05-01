@@ -61,7 +61,7 @@ namespace CrazyStorm
             int beginFrame, totalFrame;
             if (string.IsNullOrWhiteSpace(LayerName.Text))
             {
-                MessageBox.Show((string)FindResource("LayerNameCanNotBeEmpty"), (string)FindResource("TipTitle"), 
+                MessageBox.Show((string)FindResource("LayerNameCanNotBeEmptyStr"), (string)FindResource("TipTitleStr"), 
                     MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
@@ -75,7 +75,7 @@ namespace CrazyStorm
                 this.Close();
             }
             else
-                MessageBox.Show((string)FindResource("ValueInvalid"), (string)FindResource("TipTitle"), 
+                MessageBox.Show((string)FindResource("ValueInvalidStr"), (string)FindResource("TipTitleStr"), 
                     MessageBoxButton.OK, MessageBoxImage.Warning);
         }
         #endregion

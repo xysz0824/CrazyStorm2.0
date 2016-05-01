@@ -8,7 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace CrazyStorm.Script
+namespace CrazyStorm.Expression
 {
     public abstract class Token : IComparable
     {

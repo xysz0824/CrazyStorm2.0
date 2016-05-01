@@ -21,7 +21,7 @@ namespace CrazyStorm
         {
             if (!saved)
             {
-                switch (MessageBox.Show((string)FindResource("SaveTip"), (string)FindResource("TipTitle"), 
+                switch (MessageBox.Show((string)FindResource("SaveTipStr"), (string)FindResource("TipTitleStr"), 
                     MessageBoxButton.YesNoCancel, MessageBoxImage.Warning))
                 {
                     case MessageBoxResult.Yes:
@@ -51,7 +51,7 @@ namespace CrazyStorm
             using (var open = new System.Windows.Forms.OpenFileDialog())
             {
                 open.InitialDirectory = File.CurrentDirectory;
-                open.Filter = (string)FindResource("FileExtension");
+                open.Filter = (string)FindResource("FileExtensionStr");
                 if (open.ShowDialog() == System.Windows.Forms.DialogResult.OK)
                 {
                     try
@@ -66,12 +66,12 @@ namespace CrazyStorm
                     }
                     catch (XmlException)
                     {
-                        MessageBox.Show((string)FindResource("FileTypeError"), (string)FindResource("ErrorTitle"),
+                        MessageBox.Show((string)FindResource("FileTypeErrorStr"), (string)FindResource("ErrorTitleStr"),
                             MessageBoxButton.OK, MessageBoxImage.Error);
                     }
                     catch (System.IO.FileLoadException ex)
                     {
-                        MessageBox.Show((string)FindResource(ex.Message), (string)FindResource("ErrorTitle"),
+                        MessageBox.Show((string)FindResource(ex.Message + "Str"), (string)FindResource("ErrorTitleStr"),
                             MessageBoxButton.OK, MessageBoxImage.Error);
                     }
                 }
@@ -92,7 +92,7 @@ namespace CrazyStorm
                 
                 string version = root.GetAttribute("version");
                 if (VersionInfo.Version != version &&
-                    MessageBox.Show((string)FindResource("DifferentVersion"), (string)FindResource("TipTitle"),
+                    MessageBox.Show((string)FindResource("DifferentVersionStr"), (string)FindResource("TipTitleStr"),
                     MessageBoxButton.OKCancel, MessageBoxImage.Warning) != MessageBoxResult.OK)
                     return false;
                 else
@@ -172,7 +172,7 @@ namespace CrazyStorm
             using (var save = new System.Windows.Forms.SaveFileDialog())
             {
                 save.InitialDirectory = File.CurrentDirectory;
-                save.Filter = (string)FindResource("FileExtension");
+                save.Filter = (string)FindResource("FileExtensionStr");
                 if (save.ShowDialog() == System.Windows.Forms.DialogResult.OK)
                 {
                     filePath = save.FileName;

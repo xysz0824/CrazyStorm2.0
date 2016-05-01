@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace CrazyStorm.Script
+namespace CrazyStorm.Expression
 {
     class NegativeExpression : SyntaxTree
     {
@@ -23,7 +23,7 @@ namespace CrazyStorm.Script
         {
             var num = GetExpression().Test(e);
             if ((!(num is int) && !(num is float)))
-                throw new ScriptException("Type error.");
+                throw new ExpressionException("Type error.");
 
             //Execute method is just for testing,
             //which means it doesn't need to calculate result.

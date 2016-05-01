@@ -332,9 +332,9 @@
     <Resource Include="Images\button-Rebounder.png" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="Script\Script.csproj">
+    <ProjectReference Include="Script\Expression.csproj">
       <Project>{cea93dc4-9ff2-4d90-b0bf-e1e0d8027223}</Project>
-      <Name>Script</Name>
+      <Name>Expression</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

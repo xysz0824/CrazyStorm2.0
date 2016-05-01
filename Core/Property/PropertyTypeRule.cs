@@ -5,24 +5,23 @@ using System.Text;
 
 namespace CrazyStorm.Core
 {
-    public class TypeRule
+    public class PropertyTypeRule
     {
-        public static bool IsMatchWith(System.Type typeA, System.Type typeB)
+        public static bool IsMatchWith(Type typeA, Type typeB)
         {
             if (typeA.Equals(typeB))
                 return true;
 
-            System.Type intType = typeof(int);
-            System.Type floatType = typeof(float);
+            Type intType = typeof(int);
+            Type floatType = typeof(float);
             if ((typeA.Equals(intType) && typeB.Equals(floatType)) ||
                 (typeA.Equals(floatType) && typeB.Equals(intType)))
                 return true;
 
             return false;
         }
-        public static bool IsMatchWith(object target, string text, out object output)
+        public static bool TryMatchWith(object target, string text, out object output)
         {
-            //Check if the text is match with target type.
             bool result = false;
             if (target is bool)
             {
@@ -72,7 +71,7 @@ namespace CrazyStorm.Core
         public static bool IsMatchWith(object target, string text)
         {
             object value;
-            return IsMatchWith(target, text, out value);
+            return TryMatchWith(target, text, out value);
         }
     }
 }

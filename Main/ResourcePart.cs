@@ -54,7 +54,7 @@ namespace CrazyStorm
             using (var open = new System.Windows.Forms.OpenFileDialog())
             {
                 open.InitialDirectory = File.CurrentDirectory;
-                open.Filter = (string)FindResource("ImageType");
+                open.Filter = (string)FindResource("ImageTypeStr");
                 if (open.ShowDialog() == System.Windows.Forms.DialogResult.OK)
                 {
                     var image = new FileResource(file.FileResourceIndex, open.SafeFileName, open.FileName);
@@ -73,7 +73,7 @@ namespace CrazyStorm
             using (var open = new System.Windows.Forms.OpenFileDialog())
             {
                 open.InitialDirectory = File.CurrentDirectory;
-                open.Filter = (string)FindResource("SoundType");
+                open.Filter = (string)FindResource("SoundTypeStr");
                 if (open.ShowDialog() == System.Windows.Forms.DialogResult.OK)
                 {
                     var sound = new FileResource(file.FileResourceIndex,open.SafeFileName, open.FileName);
@@ -139,7 +139,7 @@ namespace CrazyStorm
                     foreach (var item in file.Globals)
                         if (item != editItem && item.Label == newValue)
                         {
-                            MessageBox.Show((string)FindResource("NameRepeating"), (string)FindResource("TipTitle"),
+                            MessageBox.Show((string)FindResource("NameRepeatingStr"), (string)FindResource("TipTitleStr"),
                                 MessageBoxButton.OK, MessageBoxImage.Warning);
                             e.Cancel = true;
                             (e.EditingElement as TextBox).Text = editItem.Label;
@@ -154,7 +154,7 @@ namespace CrazyStorm
                     bool result = float.TryParse(newValue, out value);
                     if (!result)
                     {
-                        MessageBox.Show((string)FindResource("ValueInvalid"), (string)FindResource("TipTitle"),
+                        MessageBox.Show((string)FindResource("ValueInvalidStr"), (string)FindResource("TipTitleStr"),
                             MessageBoxButton.OK, MessageBoxImage.Warning);
                         e.Cancel = true;
                         (e.EditingElement as TextBox).Text = editItem.Value.ToString();

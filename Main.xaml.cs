@@ -123,6 +123,7 @@ namespace CrazyStorm
             commandStacks[particle].StackChanged += () =>
             {
                 UpdateCommandStackStatus();
+                saved = false;
             };
         }
         void InitializeEdit()
@@ -141,7 +142,7 @@ namespace CrazyStorm
         }
         void InitializeStatusBar()
         {
-            status = (string)FindResource("Ready");
+            status = (string)FindResource("ReadyStr");
             StatusText.DataContext = this;
         }
         void InitializeLayerAndComponent()

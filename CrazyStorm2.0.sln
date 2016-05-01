@@ -10,7 +10,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CrazyStorm2.0", "CrazyStorm
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core", "Core\Core.csproj", "{1FED6550-8156-45BA-ABD3-7C400FD86A03}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Script", "Script\Script.csproj", "{CEA93DC4-9FF2-4D90-B0BF-E1E0D8027223}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Expression", "Script\Expression.csproj", "{CEA93DC4-9FF2-4D90-B0BF-E1E0D8027223}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
