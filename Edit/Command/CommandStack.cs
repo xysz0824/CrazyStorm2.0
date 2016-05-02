@@ -30,7 +30,7 @@ namespace CrazyStorm
         #region Private Methods
         static void CheckLimit(List<Command> list)
         {
-            if (list.Count > MaxSize)
+            if (list.Count >= MaxSize)
                 list.RemoveAt(0);
         }
         static void DoCompact(List<Command> list, Command command)

@@ -34,6 +34,7 @@ namespace CrazyStorm
         IList<ParticleType> types;
         Component component;
         Action updateFunc;
+        string editText;
         bool initializeType;
         #endregion
 
@@ -296,26 +297,33 @@ namespace CrazyStorm
         #region Window EventHandlers
         private void Grid_BeginningEdit(object sender, DataGridBeginningEditEventArgs e)
         {
+            editText = (e.EditingEventArgs.OriginalSource as TextBlock).Text;
             if (OnBeginEditing != null)
                 OnBeginEditing();
         }
         private void ComponentGrid_CellEditEnding(object sender, DataGridCellEditEndingEventArgs e)
         {
-            SetProperty(component, e);
+            if ((e.EditingElement as TextBox).Text != editText)
+                SetProperty(component, e);
+
             if (OnEndEditing != null)
                 OnEndEditing();
         }
         private void SpecificGrid_CellEditEnding(object sender, DataGridCellEditEndingEventArgs e)
         {
-            SetProperty(component, e);
+            if ((e.EditingElement as TextBox).Text != editText)
+                SetProperty(component, e);
+
             if (OnEndEditing != null)
                 OnEndEditing();
         }
         private void ParticleGrid_CellEditEnding(object sender, DataGridCellEditEndingEventArgs e)
         {
-            if (component is Emitter)
-                SetProperty((component as Emitter).Particle, e);
-
+            if ((e.EditingElement as TextBox).Text != editText)
+            {
+                if (component is Emitter)
+                    SetProperty((component as Emitter).Particle, e);
+            }
             if (OnEndEditing != null)
                 OnEndEditing();
         }
