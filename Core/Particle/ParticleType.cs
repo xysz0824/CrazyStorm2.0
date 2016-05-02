@@ -261,7 +261,7 @@ namespace CrazyStorm.Core
                 if (int.TryParse(fileResourceAttribute, out parsedID))
                     imageID = parsedID;
                 else
-                    throw new System.IO.FileLoadException("FileLoadError");
+                    throw new System.IO.FileLoadException("FileDataError");
             }
             XmlHelper.BuildFields(this, particleTypeNode);
             return particleTypeNode;

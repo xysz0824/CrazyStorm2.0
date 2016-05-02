@@ -72,6 +72,7 @@ namespace CrazyStorm.Core
                     PropertyChanged(this, new PropertyChangedEventArgs("Name"));
             }
         }
+        [RuntimeProperty]
         public int CurrentFrame
         {
             get { return componentData.currentFrame; }
@@ -264,7 +265,7 @@ namespace CrazyStorm.Core
                 if (int.TryParse(parentAttribute, out parsedID))
                     parentID = parsedID;
                 else
-                    throw new System.IO.FileLoadException("FileLoadError");
+                    throw new System.IO.FileLoadException("FileDataError");
             }
             //bindingTarget
             if (componentNode.HasAttribute("bindingTarget"))
@@ -274,7 +275,7 @@ namespace CrazyStorm.Core
                 if (int.TryParse(bindingTargetAttribute, out parsedID))
                     bindingTargetID = parsedID;
                 else
-                    throw new System.IO.FileLoadException("FileLoadError");
+                    throw new System.IO.FileLoadException("FileDataError");
             }
             //variables
             XmlHelper.BuildObjectList(variables, new VariableResource(""), componentNode, "Variables");
@@ -290,7 +291,7 @@ namespace CrazyStorm.Core
                 if (int.TryParse(idAttribute, out parsedID))
                     childrenIDs.Add(parsedID);
                 else
-                    throw new System.IO.FileLoadException("FileLoadError");
+                    throw new System.IO.FileLoadException("FileDataError");
             }
             return componentNode;
         }

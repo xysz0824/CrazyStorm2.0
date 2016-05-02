@@ -126,7 +126,7 @@ namespace CrazyStorm.Core
             //components
             var componentsNode = layerNode.SelectSingleNode("Components");
             if (componentsNode == null)
-                throw new System.IO.FileLoadException("FileLoadError");
+                throw new System.IO.FileLoadException("FileDataError");
 
             foreach (XmlElement componentNode in componentsNode.ChildNodes)
             {
@@ -138,7 +138,7 @@ namespace CrazyStorm.Core
                     components.Add(component);
                 }
                 else
-                    throw new System.IO.FileLoadException("FileLoadError");
+                    throw new System.IO.FileLoadException("FileDataError");
             }
             return layerNode;
         }

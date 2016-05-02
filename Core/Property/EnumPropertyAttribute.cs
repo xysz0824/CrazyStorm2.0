@@ -9,6 +9,7 @@ using System.Text;
 
 namespace CrazyStorm.Core
 {
+    [AttributeUsage(AttributeTargets.Property, AllowMultiple = false, Inherited = false)]
     sealed class EnumPropertyAttribute : PropertyAttribute
     {
         Type type;

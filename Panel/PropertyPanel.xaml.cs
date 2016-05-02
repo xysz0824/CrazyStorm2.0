@@ -63,7 +63,7 @@ namespace CrazyStorm
             environment = new Expression.Environment();
             //Add globals.
             foreach (VariableResource item in file.Globals)
-                environment.TryPutGlobal(item.Label, item.Value);
+                environment.PutGlobal(item.Label, item.Value);
             //Add system functions.
             Expression.Function rand = new Expression.Function(2);
             environment.PutFunction("rand", rand);
@@ -80,37 +80,37 @@ namespace CrazyStorm
             var componentList = component.InitializeProperties(typeof(Component));
             LoadProperties(ComponentGrid, component, componentList);
             //Load specific properties.
-            IList<PropertyInfo> specificList;
+            List<PropertyInfo> specificList;
             if (component is Emitter)
                 specificList = component.InitializeProperties(typeof(Emitter));
             else
                 specificList = component.InitializeProperties(component.GetType());
 
             LoadProperties(SpecificGrid, component, specificList);
-            if (component is MultiEmitter)
+            //Load particle properties.
+            if (component is Emitter)
             {
                 ParticleGroup.Visibility = Visibility.Visible;
-                var particleList = (component as MultiEmitter).Particle.InitializeProperties(typeof(Particle));
-                LoadProperties(ParticleGrid, (component as MultiEmitter).Particle, particleList);
-            }
-            else if (component is CurveEmitter)
-            {
-                ParticleGroup.Visibility = Visibility.Visible;
-                var particleList = (component as CurveEmitter).CurveParticle.InitializeProperties(typeof(CurveParticle));
-                LoadProperties(ParticleGrid, (component as CurveEmitter).CurveParticle, particleList);
-            }
-            else if (component is EventField || component is Rebounder)
-            {
-                ParticleGroup.Visibility = Visibility.Collapsed;
-                //Load particle properties.
-                //Only emitter have particles, but special event of event field or rebounder need it.
-                //So there use stub to load particle properties.
-                var stub = new MultiEmitter();
-                var particleList = stub.Particle.InitializeProperties(typeof(Particle));
-                LoadProperties(ParticleGrid, stub.Particle, particleList);
+                var particleList = (component as Emitter).Particle.InitializeProperties(typeof(ParticleBase));
+                if (component is MultiEmitter)
+                    particleList.AddRange((component as Emitter).Particle.InitializeProperties(typeof(Particle)));
+                else
+                    particleList.AddRange((component as Emitter).Particle.InitializeProperties(typeof(CurveParticle)));
+
+                LoadProperties(ParticleGrid, (component as Emitter).Particle, particleList);
             }
             else
+            {
                 ParticleGroup.Visibility = Visibility.Collapsed;
+                if (component is EventField || component is Rebounder)
+                {
+                    //Only emitter have particles, but special event of event field or rebounder need it.
+                    var stub = new MultiEmitter();
+                    var particleList = stub.Particle.InitializeProperties(typeof(ParticleBase));
+                    particleList.AddRange(stub.Particle.InitializeProperties(typeof(Particle)));
+                    LoadProperties(ParticleGrid, stub.Particle, particleList);
+                }
+            }
             //Load particle types.
             //First needs to merge repeated type name.
             var typesNorepeat = new List<ParticleType>();
@@ -129,10 +129,8 @@ namespace CrazyStorm
             }
             TypeCombo.ItemsSource = typesNorepeat;
             ParticleType type = null;
-            if (component is MultiEmitter)
-                type = (component as MultiEmitter).Particle.Type;
-            else if (component is CurveEmitter)
-                type = (component as CurveEmitter).CurveParticle.Type;
+            if (component is Emitter)
+                type = (component as Emitter).Particle.Type;
 
             if (type != null)
             {
@@ -190,14 +188,18 @@ namespace CrazyStorm
             var propertyItems = new ObservableCollection<PropertyGridItem>();
             foreach (var item in infos)
             {
-                var property = new PropertyGridItem()
+                var attributes = item.GetCustomAttributes(false);
+                if (!(attributes.Length > 0 && attributes[0] is RuntimePropertyAttribute))
                 {
-                    Info = item,
-                    Name = item.Name,
-                    DisplayName = (string)FindResource(item.Name + "Str"),
-                    Value = container.Properties[item.Name].Value
-                };
-                propertyItems.Add(property);
+                    var property = new PropertyGridItem()
+                    {
+                        Info = item,
+                        Name = item.Name,
+                        DisplayName = (string)FindResource(item.Name + "Str"),
+                        Value = container.Properties[item.Name].Value
+                    };
+                    propertyItems.Add(property);
+                }
                 //Put the property into environment.
                 environment.TryPutLocal(item.Name, item.GetGetMethod().Invoke(container, null));
             }
@@ -267,15 +269,10 @@ namespace CrazyStorm
             UpdateProperty(component, specificProperties);
             //Update particle property.
             var particleProperties = ParticleGrid.DataContext as IList<PropertyGridItem>;
-            if (component is MultiEmitter)
+            if (component is Emitter)
             {
-                var particle = (component as MultiEmitter).Particle;
+                var particle = (component as Emitter).Particle;
                 UpdateProperty(particle, particleProperties);
-            }
-            else if (component is CurveEmitter)
-            {
-                var curveParticle = (component as CurveEmitter).CurveParticle;
-                UpdateProperty(curveParticle, particleProperties);
             }
         }
         public void UpdateGlobals(UpdateType type, VariableResource variable, string newName)
@@ -283,14 +280,14 @@ namespace CrazyStorm
             switch (type)
             {
                 case UpdateType.Add:
-                    environment.TryPutGlobal(variable.Label, variable.Value);
+                    environment.PutGlobal(variable.Label, variable.Value);
                     break;
                 case UpdateType.Delete:
                     environment.RemoveGlobal(variable.Label);
                     break;
                 case UpdateType.Modify:
                     environment.RemoveGlobal(variable.Label);
-                    environment.TryPutGlobal(newName, variable.Value);
+                    environment.PutGlobal(newName, variable.Value);
                     break;
             }
         }
@@ -316,10 +313,8 @@ namespace CrazyStorm
         }
         private void ParticleGrid_CellEditEnding(object sender, DataGridCellEditEndingEventArgs e)
         {
-            if (component is MultiEmitter)
-                SetProperty((component as MultiEmitter).Particle, e);
-            else if (component is CurveEmitter)
-                SetProperty((component as CurveEmitter).CurveParticle, e);
+            if (component is Emitter)
+                SetProperty((component as Emitter).Particle, e);
 
             if (OnEndEditing != null)
                 OnEndEditing();
@@ -432,10 +427,7 @@ namespace CrazyStorm
                 {
                     if (item.Name == selectedType.Name && item.Color.ToString() == (string)selectedColor.Content)
                     {
-                        if (component is MultiEmitter)
-                            (component as MultiEmitter).Particle.Type = item;
-                        else if (component is CurveEmitter)
-                            (component as CurveEmitter).CurveParticle.Type = item;
+                        (component as Emitter).Particle.Type = item;
                         break;
                     }
                 }
@@ -494,8 +486,6 @@ namespace CrazyStorm
                 }
                 //Remove unnecessary properties
                 environment.RemoveLocal("Name");
-                //Add runtime component properties
-                environment.TryPutLocal("CurrentFrame", 0);
                 OpenEventSetting(ComponentEventList.SelectedItem as EventGroup, environment, 
                     component is Emitter, component is Emitter);
             }
@@ -520,9 +510,6 @@ namespace CrazyStorm
                     //Put uncommon particle properties
                     environment.TryPutLocal("Length", 0);
                 }
-                //Add runtime particle properties
-                environment.TryPutLocal("Position", Core.Vector2.Zero);
-                environment.TryPutLocal("CurrentFrame", 0);
                 OpenEventSetting(SpecificEventList.SelectedItem as EventGroup, environment, 
                     false, true);
             }

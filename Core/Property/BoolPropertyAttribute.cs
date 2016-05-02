@@ -9,6 +9,7 @@ using System.Text;
 
 namespace CrazyStorm.Core
 {
+    [AttributeUsage(AttributeTargets.Property, AllowMultiple = false, Inherited = false)]
     sealed class BoolPropertyAttribute : PropertyAttribute
     {
         public override bool IsLegal(string newValue, out object value)

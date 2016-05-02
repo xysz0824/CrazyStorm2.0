@@ -83,7 +83,7 @@ namespace CrazyStorm.Expression
         #endregion
 
         #region Public Methods
-        public bool TryPutGlobal(string name, object value) { return TryPutVariable(globals, name, value); }
+        public void PutGlobal(string name, float value) { globals[name] = value; }
 
         public float? GetGlobal(string name) 
         {
@@ -104,7 +104,20 @@ namespace CrazyStorm.Expression
                 return null;
         }
 
-        public void RemoveLocal(string name) { locals.Remove(name); }
+        public void RemoveLocal(string name) 
+        {
+            if (!locals.Remove(name))
+            {
+                List<string> removeKeys = new List<string>();
+                foreach (var pair in locals)
+                {
+                    if (pair.Key.StartsWith(name + "."))
+                        removeKeys.Add(pair.Key);
+                }
+                for (int i = 0; i < removeKeys.Count; ++i)
+                    locals.Remove(removeKeys[i]);
+            }
+        }
 
         public void PutFunction(string name, Function function) { functions[name] = function; }
 

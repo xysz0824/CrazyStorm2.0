@@ -139,10 +139,8 @@ namespace CrazyStorm
                 {
                     component.RebuildReferenceFromCollection(components);
                     //Rebuild particles reference
-                    if (component is MultiEmitter)
-                        (component as MultiEmitter).Particle.RebuildReferenceFromCollection(particleTypes);
-                    else if (component is CurveEmitter)
-                        (component as CurveEmitter).CurveParticle.RebuildReferenceFromCollection(particleTypes);
+                    if (component is Emitter)
+                        (component as Emitter).Particle.RebuildReferenceFromCollection(particleTypes);
                 }
             }
         }

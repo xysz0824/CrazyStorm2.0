@@ -20,7 +20,7 @@ namespace CrazyStorm.Core
         {
             properties = new Dictionary<string, PropertyValue>();
         }
-        public IList<PropertyInfo> InitializeProperties(Type type)
+        public List<PropertyInfo> InitializeProperties(Type type)
         {
             var propertiesInfo = new List<PropertyInfo>();
             foreach (PropertyInfo property in type.GetProperties())

@@ -28,11 +28,15 @@ namespace CrazyStorm.Core
             throw new NotImplementedException();
         }
     }
-    public class Emitter : Component
+    public abstract class Emitter : Component
     {
         #region Private Members
         EmitterData emitterData;
         IList<EventGroup> particleEventGroups;
+        #endregion
+
+        #region Protected Members
+        protected ParticleBase particle;
         #endregion
 
         #region Public Members
@@ -66,6 +70,7 @@ namespace CrazyStorm.Core
             get { return emitterData.emitRange; }
             set { emitterData.emitRange = value; }
         }
+        public ParticleBase Particle { get { return particle; } }
         public IList<EventGroup> ParticleEventGroups { get { return particleEventGroups; } }
         #endregion
 
@@ -87,6 +92,7 @@ namespace CrazyStorm.Core
         public override object Clone()
         {
             var clone = base.Clone() as Emitter;
+            clone.particle = particle.Clone() as ParticleBase;
             clone.particleEventGroups = new ObservableCollection<EventGroup>();
             foreach (var item in particleEventGroups)
                 clone.particleEventGroups.Add(item.Clone() as EventGroup);
@@ -99,6 +105,8 @@ namespace CrazyStorm.Core
             var emitterNode = (XmlElement)node.SelectSingleNode("Emitter");
             //emitterData
             XmlHelper.BuildStruct(ref emitterData, emitterNode, "EmitterData");
+            //particle
+            particle.BuildFromXml(emitterNode);
             //particleEventGroups
             XmlHelper.BuildObjectList(particleEventGroups, new EventGroup(), emitterNode, "ParticleEventGroups");
             return emitterNode;
@@ -109,6 +117,8 @@ namespace CrazyStorm.Core
             var emitterNode = doc.CreateElement("Emitter");
             //emitterData
             XmlHelper.StoreStruct(emitterData, doc, emitterNode, "EmitterData");
+            //particle
+            particle.StoreAsXml(doc, emitterNode);
             //particleEventGroups
             XmlHelper.StoreObjectList(particleEventGroups, doc, emitterNode, "ParticleEventGroups");
             node.AppendChild(emitterNode);

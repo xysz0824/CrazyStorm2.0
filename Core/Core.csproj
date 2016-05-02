@@ -47,6 +47,8 @@
     <Compile Include="IO\IRebuildReference.cs" />
     <Compile Include="IO\IXmlData.cs" />
     <Compile Include="IO\XmlHelper.cs" />
+    <Compile Include="Particle\ParticleBase.cs" />
+    <Compile Include="Property\RuntimePropertyAttribute.cs" />
     <Compile Include="Struct\RGB.cs" />
     <Compile Include="Particle\BlendType.cs" />
     <Compile Include="Particle\CurveParticle.cs" />
