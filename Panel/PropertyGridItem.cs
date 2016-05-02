@@ -11,12 +11,13 @@ using System.ComponentModel;
 
 namespace CrazyStorm
 {
-    public class PropertyPanelItem : INotifyPropertyChanged
+    public class PropertyGridItem : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
         private PropertyInfo info;
         private string name;
+        private string displayName;
         private string value;
 
         public PropertyInfo Info
@@ -28,6 +29,11 @@ namespace CrazyStorm
         {
             get { return name; }
             set { name = value; }
+        }
+        public string DisplayName
+        {
+            get { return displayName; }
+            set { displayName = value; }
         }
         public string Value
         {

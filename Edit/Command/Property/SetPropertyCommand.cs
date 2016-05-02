@@ -23,7 +23,7 @@ namespace CrazyStorm
             base.Redo(stack);
             var environment = Parameter[0] as Expression.Environment;
             var container = Parameter[1] as PropertyContainer;
-            var property = Parameter[2] as PropertyPanelItem;
+            var property = Parameter[2] as PropertyGridItem;
             var cell = Parameter[3] as DataGridCell;
             var newValue = Parameter[4] as string;
             var attribute = Parameter[5] as PropertyAttribute;
@@ -37,7 +37,7 @@ namespace CrazyStorm
             base.Undo(stack);
             var environment = Parameter[0] as Expression.Environment;
             var container = Parameter[1] as PropertyContainer;
-            var property = Parameter[2] as PropertyPanelItem;
+            var property = Parameter[2] as PropertyGridItem;
             var cell = Parameter[3] as DataGridCell;
             var newValue = History[0] as string;
             var attribute = Parameter[5] as PropertyAttribute;

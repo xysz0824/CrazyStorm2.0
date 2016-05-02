@@ -24,8 +24,8 @@ namespace CrazyStorm.Core
         public FieldShape shape;
         public Reach reach;
         public string targetName;
-        public float intensity;
-        public float directionAngle;
+        public float force;
+        public float direction;
         public ForceType forceType;
         public void SetField(int fieldIndex, ValueType value)
         {
@@ -55,6 +55,24 @@ namespace CrazyStorm.Core
             get { return forceFieldData.halfHeight; }
             set { forceFieldData.halfHeight = value; }
         }
+        [FloatProperty(float.MinValue, float.MaxValue)]
+        public float Force
+        {
+            get { return forceFieldData.force; }
+            set { forceFieldData.force = value; }
+        }
+        [FloatProperty(float.MinValue, float.MaxValue)]
+        public float Direction
+        {
+            get { return forceFieldData.direction; }
+            set { forceFieldData.direction = value; }
+        }
+        [EnumProperty(typeof(ForceType))]
+        public ForceType ForceType
+        {
+            get { return forceFieldData.forceType; }
+            set { forceFieldData.forceType = value; }
+        }
         [EnumProperty(typeof(FieldShape))]
         public FieldShape Shape
         {
@@ -73,24 +91,6 @@ namespace CrazyStorm.Core
             get { return forceFieldData.targetName; }
             set { forceFieldData.targetName = value; }
         }
-        [FloatProperty(float.MinValue, float.MaxValue)]
-        public float Intensity
-        {
-            get { return forceFieldData.intensity; }
-            set { forceFieldData.intensity = value; }
-        }
-        [FloatProperty(float.MinValue, float.MaxValue)]
-        public float DirectionAngle
-        {
-            get { return forceFieldData.directionAngle; }
-            set { forceFieldData.directionAngle = value; }
-        }
-        [EnumProperty(typeof(ForceType))]
-        public ForceType ForceType
-        {
-            get { return forceFieldData.forceType; }
-            set { forceFieldData.forceType = value; }
-        }
         #endregion
 
         #region Constructor
@@ -99,7 +99,7 @@ namespace CrazyStorm.Core
             forceFieldData.targetName = string.Empty;
             forceFieldData.halfWidth = 50;
             forceFieldData.halfHeight = 50;
-            forceFieldData.intensity = 0.1f;
+            forceFieldData.force = 0.1f;
         }
         #endregion
 

@@ -62,7 +62,7 @@
                                 <Setter Property="Panel.Background" TargetName="Bd" Value="#00FFFFFF" />
                                 <Setter Property="TextElement.Foreground">
                                     <Setter.Value>
-                                        <DynamicResource ResourceKey="{x:Static SystemColors.HighlightTextBrushKey}" />
+                                        <StaticResource ResourceKey="{x:Static SystemColors.HighlightTextBrushKey}" />
                                     </Setter.Value>
                                 </Setter>
                             </Trigger>
@@ -74,14 +74,14 @@
                                 <Setter Property="Panel.Background" TargetName="Bd" Value="#00FFFFFF" />
                                 <Setter Property="TextElement.Foreground">
                                     <Setter.Value>
-                                        <DynamicResource ResourceKey="{x:Static SystemColors.ControlTextBrushKey}" />
+                                        <StaticResource ResourceKey="{x:Static SystemColors.ControlTextBrushKey}" />
                                     </Setter.Value>
                                 </Setter>
                             </MultiTrigger>
                             <Trigger Property="UIElement.IsEnabled" Value="False">
                                 <Setter Property="TextElement.Foreground">
                                     <Setter.Value>
-                                        <DynamicResource ResourceKey="{x:Static SystemColors.GrayTextBrushKey}" />
+                                        <StaticResource ResourceKey="{x:Static SystemColors.GrayTextBrushKey}" />
                                     </Setter.Value>
                                 </Setter>
                             </Trigger>
@@ -615,7 +615,7 @@
                                                       CanUserResizeRows="False" CanUserAddRows="False" CanUserDeleteRows="False" AutoGenerateColumns="False" 
                                                       CellEditEnding="VariableGrid_CellEditEnding">
                                                 <DataGrid.HorizontalGridLinesBrush>
-                                                    <SolidColorBrush Color="{DynamicResource {x:Static SystemColors.ControlColorKey}}"/>
+                                                    <SolidColorBrush Color="{StaticResource {x:Static SystemColors.ControlColorKey}}"/>
                                                 </DataGrid.HorizontalGridLinesBrush>
                                                 <DataGrid.Columns>
                                                     <DataGridTextColumn x:Name="VariableKey"  Header="{StaticResource VariableKeyStr}" Binding="{Binding Label}"/>

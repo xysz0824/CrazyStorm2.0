@@ -101,6 +101,7 @@ namespace CrazyStorm
             }
             else if (component is EventField || component is Rebounder)
             {
+                ParticleGroup.Visibility = Visibility.Collapsed;
                 //Load particle properties.
                 //Only emitter have particles, but special event of event field or rebounder need it.
                 //So there use stub to load particle properties.
@@ -108,6 +109,8 @@ namespace CrazyStorm
                 var particleList = stub.Particle.InitializeProperties(typeof(Particle));
                 LoadProperties(ParticleGrid, stub.Particle, particleList);
             }
+            else
+                ParticleGroup.Visibility = Visibility.Collapsed;
             //Load particle types.
             //First needs to merge repeated type name.
             var typesNorepeat = new List<ParticleType>();
@@ -178,17 +181,20 @@ namespace CrazyStorm
                 SpecificGroup.Visibility = Visibility.Visible;
                 SpecificGroup.Header = (string)FindResource("RebounderEventListStr");
                 SpecificEventList.ItemsSource = (component as Rebounder).RebounderEventGroups;
-            }   
+            }
+            else
+                SpecificGroup.Visibility = Visibility.Collapsed;
         }
         void LoadProperties(FrameworkElement element, PropertyContainer container, IList<PropertyInfo> infos)
         {
-            var propertyItems = new ObservableCollection<PropertyPanelItem>();
+            var propertyItems = new ObservableCollection<PropertyGridItem>();
             foreach (var item in infos)
             {
-                var property = new PropertyPanelItem()
+                var property = new PropertyGridItem()
                 {
                     Info = item,
                     Name = item.Name,
+                    DisplayName = (string)FindResource(item.Name + "Str"),
                     Value = container.Properties[item.Name].Value
                 };
                 propertyItems.Add(property);
@@ -201,7 +207,7 @@ namespace CrazyStorm
         {
             if (e.EditAction == DataGridEditAction.Commit)
             {
-                var property = e.Row.Item as PropertyPanelItem;
+                var property = e.Row.Item as PropertyGridItem;
                 var presenter = VisualHelper.GetVisualChild<DataGridCellsPresenter>(e.Row);
                 var cell = (DataGridCell)presenter.ItemContainerGenerator.ContainerFromIndex(1);
                 var newValue = (e.EditingElement as TextBox).Text;
@@ -209,7 +215,7 @@ namespace CrazyStorm
                 new SetPropertyCommand().Do(commandStack, environment, container, property, cell, newValue, attribute, updateFunc);
             }
         }
-        void UpdateProperty(PropertyContainer container, IList<PropertyPanelItem> properties)
+        void UpdateProperty(PropertyContainer container, IList<PropertyGridItem> properties)
         {
             foreach (var item in properties)
             {
@@ -237,11 +243,11 @@ namespace CrazyStorm
         }
         void OpenEventSetting(EventGroup eventGroup, Expression.Environment environment, bool emitter, bool aboutParticle)
         {
-            var properties = new IList<PropertyPanelItem>[3]
+            var properties = new IList<PropertyGridItem>[3]
             { 
-                ComponentGrid.DataContext as IList<PropertyPanelItem>, 
-                SpecificGrid.DataContext as IList<PropertyPanelItem>, 
-                ParticleGrid.DataContext as IList<PropertyPanelItem>
+                ComponentGrid.DataContext as IList<PropertyGridItem>, 
+                SpecificGrid.DataContext as IList<PropertyGridItem>, 
+                ParticleGrid.DataContext as IList<PropertyGridItem>
             };
             file.UpdateResource();
             Window window = new EventSetting(eventGroup, environment, file.Sounds, types, properties, emitter, aboutParticle);
@@ -254,13 +260,13 @@ namespace CrazyStorm
         public void UpdateProperty()
         {
             //Update component property.
-            var componentProperties = ComponentGrid.DataContext as IList<PropertyPanelItem>;
+            var componentProperties = ComponentGrid.DataContext as IList<PropertyGridItem>;
             UpdateProperty(component, componentProperties);
             //Update specific property.
-            var specificProperties = SpecificGrid.DataContext as IList<PropertyPanelItem>;
+            var specificProperties = SpecificGrid.DataContext as IList<PropertyGridItem>;
             UpdateProperty(component, specificProperties);
             //Update particle property.
-            var particleProperties = ParticleGrid.DataContext as IList<PropertyPanelItem>;
+            var particleProperties = ParticleGrid.DataContext as IList<PropertyGridItem>;
             if (component is MultiEmitter)
             {
                 var particle = (component as MultiEmitter).Particle;
@@ -479,9 +485,12 @@ namespace CrazyStorm
                 //Remove particle properties
                 if (!(component is Emitter))
                 {
-                    var particleItems = ParticleGrid.DataContext as IList<PropertyPanelItem>;
-                    foreach (var item in particleItems)
-                        environment.RemoveLocal(item.Name);
+                    var particleItems = ParticleGrid.DataContext as IList<PropertyGridItem>;
+                    if (particleItems != null)
+                    {
+                        foreach (var item in particleItems)
+                            environment.RemoveLocal(item.Name);
+                    }
                 }
                 //Remove unnecessary properties
                 environment.RemoveLocal("Name");
@@ -497,8 +506,8 @@ namespace CrazyStorm
             {
                 Expression.Environment environment = new Expression.Environment(this.environment);
                 //Remove component and emitter properties
-                var componentItems = ComponentGrid.DataContext as IList<PropertyPanelItem>;
-                var emitterItems = SpecificGrid.DataContext as IList<PropertyPanelItem>;
+                var componentItems = ComponentGrid.DataContext as IList<PropertyGridItem>;
+                var emitterItems = SpecificGrid.DataContext as IList<PropertyGridItem>;
                 foreach (var item in componentItems)
                     environment.RemoveLocal(item.Name);
 

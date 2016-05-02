@@ -30,7 +30,7 @@ namespace CrazyStorm
         Expression.Environment environment;
         IList<FileResource> sounds;
         IList<ParticleType> types;
-        IList<PropertyPanelItem>[] properties;
+        IList<PropertyGridItem>[] properties;
         bool isPlaySound;
         bool isEditing;
         DockPanel editingPanel;
@@ -38,7 +38,7 @@ namespace CrazyStorm
 
         #region Constructor
         public EventSetting(EventGroup eventGroup, Expression.Environment environment,
-            IList<FileResource> sounds, IList<ParticleType> types, IList<PropertyPanelItem>[] properties, 
+            IList<FileResource> sounds, IList<ParticleType> types, IList<PropertyGridItem>[] properties, 
             bool emitter, bool aboutParticle)
         {
             this.eventGroup = eventGroup;
@@ -63,23 +63,34 @@ namespace CrazyStorm
         void LoadContent()
         {
             //Load locals and globals.
-            foreach (var item in environment.Locals)
+            foreach (var local in environment.Locals)
             {
-                LeftConditionComboBox.Items.Add(item.Key);
-                RightConditionComboBox.Items.Add(item.Key);
-                PropertyComboBox.Items.Add(item.Key);
+                var item = new VariableComboBoxItem();
+                item.Name = local.Key;
+                string[] split = local.Key.Split('.');
+                var displayName = (string)TryFindResource(split[0] + "Str");
+                if (displayName != null && split.Length > 1)
+                    displayName += "." + split[1];
+
+                item.DisplayName = displayName != null ? displayName : local.Key;
+                LeftConditionComboBox.Items.Add(item);
+                RightConditionComboBox.Items.Add(item);
+                PropertyComboBox.Items.Add(item);
             }
-            foreach (var item in environment.Globals)
+            foreach (var global in environment.Globals)
             {
-                LeftConditionComboBox.Items.Add(item.Key);
-                RightConditionComboBox.Items.Add(item.Key);
-                PropertyComboBox.Items.Add(item.Key);
+                var item = new VariableComboBoxItem();
+                item.Name = global.Key;
+                item.DisplayName = item.Name;
+                LeftConditionComboBox.Items.Add(item);
+                RightConditionComboBox.Items.Add(item);
+                PropertyComboBox.Items.Add(item);
             }
             //Load sounds.
-            foreach (FileResource item in sounds)
+            foreach (FileResource sound in sounds)
             {
-                if (item.IsValid)
-                    SoundCombo.Items.Add(item);
+                if (sound.IsValid)
+                    SoundCombo.Items.Add(sound);
             }
             //Load particle types.
             //First needs to merge repeated type name.
@@ -129,14 +140,15 @@ namespace CrazyStorm
             if (LeftLessThan.IsChecked == true)
                 leftCompare = " < ";
             else if (LeftEqual.IsChecked == true)
-                leftCompare = " = ";
+                leftCompare = " == ";
             else if (LeftMoreThan.IsChecked == true)
                 leftCompare = " > ";
 
             if (LeftConditionComboBox.SelectedItem != null && !String.IsNullOrEmpty(LeftValue.Text) &&
                 !String.IsNullOrEmpty(leftCompare))
             {
-                leftCondition = LeftConditionComboBox.SelectedItem + leftCompare + LeftValue.Text;
+                var selectedItem = LeftConditionComboBox.SelectedItem as VariableComboBoxItem;
+                leftCondition = selectedItem.DisplayName + leftCompare + LeftValue.Text;
             }
             //Build right condition
             string rightCondition = string.Empty;
@@ -144,14 +156,15 @@ namespace CrazyStorm
             if (RightLessThan.IsChecked == true)
                 rightCompare = " < ";
             else if (RightEqual.IsChecked == true)
-                rightCompare = " = ";
+                rightCompare = " == ";
             else if (RightMoreThan.IsChecked == true)
                 rightCompare = " > ";
 
             if (RightConditionComboBox.SelectedItem != null && !String.IsNullOrEmpty(RightValue.Text) &&
                 !String.IsNullOrEmpty(rightCompare))
             {
-                rightCondition = RightConditionComboBox.SelectedItem + rightCompare + RightValue.Text;
+                var selectedItem = RightConditionComboBox.SelectedItem as VariableComboBoxItem;
+                rightCondition = selectedItem.DisplayName + rightCompare + RightValue.Text;
             }
             //Allow empty condition
             if (String.IsNullOrEmpty(leftCondition) && String.IsNullOrEmpty(rightCondition))
@@ -186,7 +199,7 @@ namespace CrazyStorm
             string propertyEvent = string.Empty;
             string changeType = string.Empty;
             if (ChangeTo.IsChecked == true)
-                changeType = " == ";
+                changeType = " = ";
             else if (Increase.IsChecked == true)
                 changeType = " += ";
             else if (Decrease.IsChecked == true)
@@ -205,7 +218,8 @@ namespace CrazyStorm
             if (PropertyComboBox.SelectedItem != null && !String.IsNullOrEmpty(ResultValue.Text) &&
                 !String.IsNullOrEmpty(changeType) && !String.IsNullOrEmpty(changeMode) && !String.IsNullOrEmpty(ChangeTime.Text))
             {
-                propertyEvent = PropertyComboBox.SelectedItem + changeType + ResultValue.Text + ", " +
+                var selectedItem = PropertyComboBox.SelectedItem as VariableComboBoxItem;
+                propertyEvent = selectedItem.DisplayName + changeType + ResultValue.Text + ", " +
                     changeMode + ", " + ChangeTime.Text;
                 if (!String.IsNullOrEmpty(ExecuteTime.Text))
                     propertyEvent += ", " + ExecuteTime.Text;
@@ -320,11 +334,11 @@ namespace CrazyStorm
             ResetAll();
             Dictionary<string, RadioButton> buttonMap = new Dictionary<string, RadioButton>();
             buttonMap[">"] = LeftMoreThan;
-            buttonMap["="] = LeftEqual;
+            buttonMap["=="] = LeftEqual;
             buttonMap["<"] = LeftLessThan;
             buttonMap["&"] = And;
             buttonMap["|"] = Or;
-            buttonMap["=="] = ChangeTo;
+            buttonMap["="] = ChangeTo;
             buttonMap["+="] = Increase;
             buttonMap["-="] = Decrease;
             buttonMap["Linear"] = Linear;
@@ -345,20 +359,35 @@ namespace CrazyStorm
                 string[] split = condition.Split(' ');
                 if (split.Length == 8)
                 {
-                    LeftConditionComboBox.SelectedIndex = LeftConditionComboBox.Items.IndexOf(split[0]);
+                    for (int i = 0;i < LeftConditionComboBox.Items.Count;++i)
+                    {
+                        var item = LeftConditionComboBox.Items[i] as VariableComboBoxItem;
+                        if (item.DisplayName == split[0])
+                            LeftConditionComboBox.SelectedIndex = i;
+                    }
                     buttonMap[split[1]].IsChecked = true;
                     LeftValue.Text = split[2];
                     buttonMap[split[3]].IsChecked = true;
-                    RightConditionComboBox.SelectedIndex = RightConditionComboBox.Items.IndexOf(split[4]);
+                    for (int i = 0; i < RightConditionComboBox.Items.Count; ++i)
+                    {
+                        var item = RightConditionComboBox.Items[i] as VariableComboBoxItem;
+                        if (item.DisplayName == split[4])
+                            RightConditionComboBox.SelectedIndex = i;
+                    }
                     buttonMap[">"] = RightMoreThan;
-                    buttonMap["="] = RightEqual;
+                    buttonMap["=="] = RightEqual;
                     buttonMap["<"] = RightLessThan;
                     buttonMap[split[5]].IsChecked = true;
                     RightValue.Text = split[6];
                 }
                 else
                 {
-                    LeftConditionComboBox.SelectedIndex = LeftConditionComboBox.Items.IndexOf(split[0]);
+                    for (int i = 0; i < LeftConditionComboBox.Items.Count; ++i)
+                    {
+                        var item = LeftConditionComboBox.Items[i] as VariableComboBoxItem;
+                        if (item.DisplayName == split[0])
+                            LeftConditionComboBox.SelectedIndex = i;
+                    }
                     buttonMap[split[1]].IsChecked = true;
                     LeftValue.Text = split[2];
                 }
@@ -372,7 +401,12 @@ namespace CrazyStorm
             if (eventText.Contains('='))
             {
                 string[] split = eventText.Split(' ');
-                PropertyComboBox.SelectedIndex = PropertyComboBox.Items.IndexOf(split[0]);
+                for (int i = 0; i < PropertyComboBox.Items.Count; ++i)
+                {
+                    var item = PropertyComboBox.Items[i] as VariableComboBoxItem;
+                    if (item.DisplayName == split[0])
+                        PropertyComboBox.SelectedIndex = i;
+                }
                 buttonMap[split[1]].IsChecked = true;
                 split = Regex.Split(eventText, "\\" + split[1])[1].Split(',');
                 string resultValue = string.Empty;
@@ -600,8 +634,9 @@ namespace CrazyStorm
 
             if (LeftConditionComboBox.SelectedItem != null)
             {
-                string[] selection = ((string)LeftConditionComboBox.SelectedItem).Split('.');
-                object value = environment.GetLocal((string)LeftConditionComboBox.SelectedItem);
+                var item = LeftConditionComboBox.SelectedItem as VariableComboBoxItem;
+                string[] selection = item.Name.Split('.');
+                object value = environment.GetLocal(item.Name);
                 if (value != null)
                 {
                     for (int i = 0; i < properties.Length; ++i)
@@ -609,11 +644,11 @@ namespace CrazyStorm
                         if (properties[i] == null)
                             break;
 
-                        foreach (var item in properties[i])
+                        foreach (var property in properties[i])
                         {
-                            if (selection[0] == item.Name && selection.Length <= 1)
+                            if (selection[0] == property.Name && selection.Length <= 1)
                             {
-                                var attribute = item.Info.GetCustomAttributes(false)[0] as PropertyAttribute;
+                                var attribute = property.Info.GetCustomAttributes(false)[0] as PropertyAttribute;
                                 if (!attribute.IsLegal(input, out value))
                                 {
                                     ChangeTextBoxState(LeftValue, true);
@@ -622,9 +657,9 @@ namespace CrazyStorm
                                 LeftValue.Text = value.ToString();
                                 return;
                             }
-                            else if (selection[0] == item.Name)
+                            else if (selection[0] == property.Name)
                             {
-                                //Fields of specific struct must be float type.
+                                //Fields of support struct must be float type.
                                 float testValue;
                                 if (!float.TryParse(input, out testValue))
                                 {
@@ -660,8 +695,9 @@ namespace CrazyStorm
 
             if (RightConditionComboBox.SelectedItem != null)
             {
-                string[] selection = ((string)RightConditionComboBox.SelectedItem).Split('.');
-                object value = environment.GetLocal((string)RightConditionComboBox.SelectedItem);
+                var item = RightConditionComboBox.SelectedItem as VariableComboBoxItem;
+                string[] selection = item.Name.Split('.');
+                object value = environment.GetLocal(item.Name);
                 if (value != null)
                 {
                     for (int i = 0; i < properties.Length; ++i)
@@ -669,11 +705,11 @@ namespace CrazyStorm
                         if (properties[i] == null)
                             break;
 
-                        foreach (var item in properties[i])
+                        foreach (var property in properties[i])
                         {
-                            if (selection[0] == item.Name && selection.Length <= 1)
+                            if (selection[0] == property.Name && selection.Length <= 1)
                             {
-                                var attribute = item.Info.GetCustomAttributes(false)[0] as PropertyAttribute;
+                                var attribute = property.Info.GetCustomAttributes(false)[0] as PropertyAttribute;
                                 if (!attribute.IsLegal(input, out value))
                                 {
                                     ChangeTextBoxState(RightValue, true);
@@ -682,9 +718,9 @@ namespace CrazyStorm
                                 RightValue.Text = value.ToString();
                                 return;
                             }
-                            else if (selection[0] == item.Name)
+                            else if (selection[0] == property.Name)
                             {
-                                //Fields of specific struct must be float type.
+                                //Fields of support struct must be float type.
                                 float testValue;
                                 if (!float.TryParse(input, out testValue))
                                 {
@@ -722,8 +758,9 @@ namespace CrazyStorm
             {
                 try
                 {
-                    string[] selection = ((string)PropertyComboBox.SelectedItem).Split('.');
-                    object value = environment.GetLocal((string)PropertyComboBox.SelectedItem);
+                    var item = PropertyComboBox.SelectedItem as VariableComboBoxItem;
+                    string[] selection = item.Name.Split('.');
+                    object value = environment.GetLocal(item.Name);
                     if (value != null)
                     {
                         for (int i = 0; i < properties.Length; ++i)
@@ -731,11 +768,11 @@ namespace CrazyStorm
                             if (properties[i] == null)
                                 break;
 
-                            foreach (var item in properties[i])
+                            foreach (var property in properties[i])
                             {
-                                if (selection[0] == item.Name && selection.Length <= 1)
+                                if (selection[0] == property.Name && selection.Length <= 1)
                                 {
-                                    var attribute = item.Info.GetCustomAttributes(false)[0] as PropertyAttribute;
+                                    var attribute = property.Info.GetCustomAttributes(false)[0] as PropertyAttribute;
                                     if (attribute.IsLegal(input, out value))
                                     {
                                         ResultValue.Text = value.ToString();
@@ -748,12 +785,12 @@ namespace CrazyStorm
                                         throw new ExpressionException();
 
                                     var result = syntaxTree.Test(environment);
-                                    if (!(PropertyTypeRule.IsMatchWith(item.Info.PropertyType, result.GetType())))
+                                    if (!(PropertyTypeRule.IsMatchWith(property.Info.PropertyType, result.GetType())))
                                         throw new ExpressionException();
 
                                     return;
                                 }
-                                else if (selection[0] == item.Name)
+                                else if (selection[0] == property.Name)
                                 {
                                     var lexer = new Lexer();
                                     lexer.Load(input);
@@ -773,6 +810,7 @@ namespace CrazyStorm
                     }
                     if (value != null)
                     {
+                        //Fields of support struct must be float type.
                         var lexer = new Lexer();
                         lexer.Load(input);
                         var syntaxTree = new Parser(lexer).Expression();

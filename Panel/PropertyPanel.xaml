@@ -15,10 +15,16 @@
                           GridLinesVisibility="Horizontal" ColumnWidth="Auto" SelectionMode="Single" AutoGenerateColumns="False"  CanUserAddRows="False" CanUserReorderColumns="False" CanUserSortColumns="False" 
                       ScrollViewer.CanContentScroll="False" CanUserResizeRows="False" CellEditEnding="ComponentGrid_CellEditEnding" CanUserDeleteRows="False" BeginningEdit="Grid_BeginningEdit">
                 <DataGrid.HorizontalGridLinesBrush>
-                    <SolidColorBrush Color="{DynamicResource {x:Static SystemColors.ControlColorKey}}"/>
+                    <SolidColorBrush Color="{StaticResource {x:Static SystemColors.ControlColorKey}}"/>
                 </DataGrid.HorizontalGridLinesBrush>
                 <DataGrid.Columns>
-                    <DataGridTextColumn x:Name="ComponentKey" Header="属性名" IsReadOnly="True" Binding="{Binding Name}" CanUserResize="False"/>
+                    <DataGridTextColumn x:Name="ComponentKey" Header="属性名" IsReadOnly="True" Binding="{Binding DisplayName}" CanUserResize="False">
+                        <DataGridTextColumn.CellStyle>
+                            <Style TargetType="DataGridCell">
+                                <Setter Property="ToolTip" Value="{Binding Name}" />
+                            </Style>
+                        </DataGridTextColumn.CellStyle>
+                    </DataGridTextColumn>
                     <DataGridTextColumn x:Name="ComponentValue" Header="属性值" Binding="{Binding Value}" />
                 </DataGrid.Columns>
             </DataGrid>
@@ -28,15 +34,21 @@
                           GridLinesVisibility="Horizontal" ColumnWidth="Auto" SelectionMode="Single" AutoGenerateColumns="False"  CanUserAddRows="False" CanUserReorderColumns="False" CanUserSortColumns="False" 
                       ScrollViewer.CanContentScroll="False" CanUserResizeRows="False" CellEditEnding="SpecificGrid_CellEditEnding" CanUserDeleteRows="False" BeginningEdit="Grid_BeginningEdit">
                 <DataGrid.HorizontalGridLinesBrush>
-                    <SolidColorBrush Color="{DynamicResource {x:Static SystemColors.ControlColorKey}}"/>
+                    <SolidColorBrush Color="{StaticResource {x:Static SystemColors.ControlColorKey}}"/>
                 </DataGrid.HorizontalGridLinesBrush>
                 <DataGrid.Columns>
-                    <DataGridTextColumn x:Name="SpecificKey" Header="属性名" IsReadOnly="True" Binding="{Binding Name}" CanUserResize="False"/>
+                    <DataGridTextColumn x:Name="SpecificKey" Header="属性名" IsReadOnly="True" Binding="{Binding DisplayName}" CanUserResize="False">
+                        <DataGridTextColumn.CellStyle>
+                            <Style TargetType="DataGridCell">
+                                <Setter Property="ToolTip" Value="{Binding Name}" />
+                            </Style>
+                        </DataGridTextColumn.CellStyle>
+                    </DataGridTextColumn>
                     <DataGridTextColumn x:Name="SepcificValue" Header="属性值" Binding="{Binding Value}" />
                 </DataGrid.Columns>
             </DataGrid>
         </GroupBox>
-        <GroupBox Name="ParticleGroup"  Header="粒子" Background="#FFF9F9F9" Visibility="Collapsed">
+        <GroupBox Name="ParticleGroup"  Header="粒子" Background="#FFF9F9F9">
             <StackPanel>
                 <DockPanel>
                     <Label Content="类型" HorizontalContentAlignment="Center" Margin="0,0,1,1" DockPanel.Dock="Left"/>
@@ -61,10 +73,16 @@
                           CanUserReorderColumns="False" CanUserSortColumns="False" ScrollViewer.CanContentScroll="False" CanUserResizeRows="False" 
                           CellEditEnding="ParticleGrid_CellEditEnding" CanUserDeleteRows="False" BeginningEdit="Grid_BeginningEdit">
                     <DataGrid.HorizontalGridLinesBrush>
-                        <SolidColorBrush Color="{DynamicResource {x:Static SystemColors.ControlColorKey}}"/>
+                        <SolidColorBrush Color="{StaticResource {x:Static SystemColors.ControlColorKey}}"/>
                     </DataGrid.HorizontalGridLinesBrush>
                     <DataGrid.Columns>
-                        <DataGridTextColumn x:Name="ParticleKey"  Header="属性名" IsReadOnly="True" Binding="{Binding Name}" CanUserResize="False"/>
+                        <DataGridTextColumn x:Name="ParticleKey"  Header="属性名" IsReadOnly="True" Binding="{Binding DisplayName}" CanUserResize="False">
+                            <DataGridTextColumn.CellStyle>
+                                <Style TargetType="DataGridCell">
+                                    <Setter Property="ToolTip" Value="{Binding Name}" />
+                                </Style>
+                            </DataGridTextColumn.CellStyle>
+                        </DataGridTextColumn>
                         <DataGridTextColumn x:Name="ParticleValue"  Header="属性值" Binding="{Binding Value}" />
                     </DataGrid.Columns>
                 </DataGrid>
@@ -77,7 +95,7 @@
                       ScrollViewer.CanContentScroll="False" CanUserResizeRows="False" CanUserAddRows="False" CanUserDeleteRows="False" AutoGenerateColumns="False" 
                           CellEditEnding="VariableGrid_CellEditEnding" BeginningEdit="Grid_BeginningEdit">
                     <DataGrid.HorizontalGridLinesBrush>
-                        <SolidColorBrush Color="{DynamicResource {x:Static SystemColors.ControlColorKey}}"/>
+                        <SolidColorBrush Color="{StaticResource {x:Static SystemColors.ControlColorKey}}"/>
                     </DataGrid.HorizontalGridLinesBrush>
                     <DataGrid.Columns>
                         <DataGridTextColumn x:Name="VariableKey"  Header="变量名" Binding="{Binding Label}"/>
@@ -113,7 +131,7 @@
                 </TreeView.ItemTemplate>
             </TreeView>
         </GroupBox>
-        <GroupBox Name="SpecificGroup" Header="具体事件组" Height="130" Margin="0" Visibility="Collapsed">
+        <GroupBox Name="SpecificGroup" Header="具体事件组" Height="130" Margin="0" >
             <TreeView Name="SpecificEventList" Padding="-12,1,1,1" 
                       PreviewMouseRightButtonDown="SpecificEventList_PreviewMouseRightButtonDown" 
                       MouseDoubleClick="SpecificEventList_MouseDoubleClick">

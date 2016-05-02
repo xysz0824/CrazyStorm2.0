@@ -107,9 +107,10 @@
     <Compile Include="Panel\FinderPanel.xaml.cs">
       <DependentUpon>FinderPanel.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Panel\PropertyPanelItem.cs" />
+    <Compile Include="Panel\PropertyGridItem.cs" />
     <Compile Include="Edit\Command\Property\SetPropertyCommand.cs" />
     <Compile Include="Helper\VisualHelper.cs" />
+    <Compile Include="Window\VariableComboBoxItem.cs" />
     <Page Include="Panel\FinderPanel.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
