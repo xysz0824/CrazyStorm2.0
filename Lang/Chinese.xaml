@@ -2,6 +2,8 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:sys="clr-namespace:System;assembly=mscorlib">
     <sys:String x:Key="ReadyStr">已就绪</sys:String>
+    <sys:String x:Key="OpeningFileStr">正在打开</sys:String>
+    <sys:String x:Key="SavingFileStr">正在保存</sys:String>
     <sys:String x:Key="FileStr">文件</sys:String>
     <sys:String x:Key="NewStr">新建</sys:String>
     <sys:String x:Key="OpenStr">打开</sys:String>
@@ -82,6 +84,7 @@
     <sys:String x:Key="WidthScaleStr">宽比</sys:String>
     <sys:String x:Key="HeightScaleStr">高比</sys:String>
     <sys:String x:Key="RGBStr">颜色</sys:String>
+    <sys:String x:Key="MassStr">质量</sys:String>
     <sys:String x:Key="OpacityStr">不透明度</sys:String>
     <sys:String x:Key="PRotationStr">旋转角</sys:String>
     <sys:String x:Key="StickToSpeedAngleStr">跟随速度角</sys:String>

@@ -7,7 +7,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
         xmlns:ef="http://schemas.microsoft.com/expression/2010/effects" 
         DataContext="{Binding}" WindowStartupLocation="CenterScreen" WindowState="Normal" Icon="icon.ico" IsEnabled="True" 
-        Width="1024" Height="768" Loaded="Window_Loaded">
+        Width="1024" Height="768" Loaded="Window_Loaded" Closing="Window_Closing">
     <Window.Resources>
         <local:LayerIconConverter x:Key="LayerIconConverter"/>
         <local:LayerAxisConverter x:Key="LayerAxisConverter"/>
@@ -328,7 +328,8 @@
         </Menu>
         <!-- Status Bar -->
         <StatusBar Height="23" Width="Auto" DockPanel.Dock="Bottom" Background="#FFE4E4E4" Padding="1,0,6,0">
-            <StatusBarItem Name="StatusText" Content="{Binding Path=Status}" Background="Gainsboro" />
+            <StatusBarItem Name="StatusText" Content="{Binding Path=Status}" />
+            <StatusBarItem Name="MousePosTip" HorizontalAlignment="Right" />
         </StatusBar>
         <!-- Tool Bar -->
         <ToolBar Height="34" Name="ToolBar" Width="Auto" DockPanel.Dock="Top" HorizontalAlignment="Stretch" AllowDrop="False">
@@ -417,7 +418,7 @@
                         <TabControl.ItemTemplate>
                             <DataTemplate>
                                 <Canvas Name="Screen" Width="{Binding Path=ScreenWidth}" Height="{Binding Path=ScreenHeight}" PreviewMouseLeftButtonDown="Screen_MouseLeftButtonDown" 
-                                        PreviewMouseMove="Screen_MouseMove" PreviewMouseRightButtonDown="Screen_MouseRightButtonDown">
+                                        PreviewMouseMove="Screen_MouseMove" PreviewMouseRightButtonDown="Screen_MouseRightButtonDown" MouseEnter="Screen_MouseEnter" MouseLeave="Screen_MouseLeave" MouseMove="Screen_MouseMove">
                                     <Canvas.Background>
                                         <SolidColorBrush Color="Black"/>
                                     </Canvas.Background>

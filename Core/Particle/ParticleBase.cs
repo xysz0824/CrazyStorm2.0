@@ -13,6 +13,7 @@ namespace CrazyStorm.Core
         public Vector2 pposition;
         public float widthScale;
         public RGB rgb;
+        public float mass;
         public float opacity;
         public float pspeed;
         public float pspeedAngle;
@@ -80,7 +81,13 @@ namespace CrazyStorm.Core
             get { return particleBaseData.rgb; }
             set { particleBaseData.rgb = value; }
         }
-        [FloatProperty(float.MinValue, float.MaxValue)]
+        [FloatProperty(0, float.MaxValue)]
+        public float Mass
+        {
+            get { return particleBaseData.mass; }
+            set { particleBaseData.mass = value; }
+        }
+        [FloatProperty(0, float.MaxValue)]
         public float Opacity
         {
             get { return particleBaseData.opacity; }
@@ -160,6 +167,7 @@ namespace CrazyStorm.Core
             particleBaseData.maxLife = 200;
             particleBaseData.widthScale = 1;
             particleBaseData.rgb = new RGB(255, 255, 255);
+            particleBaseData.mass = 1;
             particleBaseData.opacity = 100;
             particleBaseData.pspeed = 5;
             particleBaseData.killOutside = true;

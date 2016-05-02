@@ -46,7 +46,7 @@ namespace CrazyStorm
         #endregion
 
         #region Private Methods
-        private void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
+        private static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
         {
             string exceptionMessage = e.ExceptionObject.ToString();
             LogHelper.Error(exceptionMessage);
@@ -60,9 +60,16 @@ namespace CrazyStorm
                 Opacity += 0.1f;
             else
             {
+                string[] args = Environment.GetCommandLineArgs();
+                Environment.CurrentDirectory = System.IO.Path.GetDirectoryName(args[0]);
                 LogHelper.Clear();
                 mainWindow = new Main();
                 mainWindow.Initailize();
+                if (args.Length >= 2)
+                    mainWindow.OpenFile(args[1]);
+                else
+                    mainWindow.StartNewFile();
+
                 mainWindow.Show();
                 this.Close();
                 dTimer.Stop();

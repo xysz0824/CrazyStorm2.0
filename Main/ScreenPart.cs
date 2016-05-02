@@ -243,11 +243,20 @@ namespace CrazyStorm
         #endregion
 
         #region Window EventHandlers
+        private void Screen_MouseEnter(object sender, MouseEventArgs e)
+        {
+            MousePosTip.Visibility = Visibility.Visible;
+        }
+        private void Screen_MouseLeave(object sender, MouseEventArgs e)
+        {
+            MousePosTip.Visibility = Visibility.Hidden;
+        }
         private void Screen_MouseMove(object sender, MouseEventArgs e)
         {
             screenMousePos = e.GetPosition(sender as IInputElement);
             int x = (int)screenMousePos.X;
             int y = (int)screenMousePos.Y;
+            MousePosTip.Content = (x - config.ScreenWidthOver2) + "," + (y - config.ScreenHeightOver2);
             //Display a rect with red edge to mark the location that component will be put on.
             if (aimRect != null)
             {

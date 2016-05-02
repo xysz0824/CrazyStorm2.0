@@ -18,6 +18,8 @@ using System.Windows.Shapes;
 using System.ComponentModel;
 using CrazyStorm.Core;
 using System.Windows.Resources;
+using System.Threading.Tasks;
+using System.Threading;
 
 namespace CrazyStorm
 {
@@ -34,27 +36,12 @@ namespace CrazyStorm
         List<ParticleType> defaultParticleTypes;
         Dictionary<ParticleSystem, CommandStack> commandStacks;
         List<Core.Component> clipBoard;
-        string status = String.Empty;
-        #endregion
-
-        #region Public Members
-        public string Status
-        {
-            get { return status; }
-            set
-            {
-                status = value;
-                if (PropertyChanged != null)
-                    PropertyChanged(this, new PropertyChangedEventArgs("Status"));
-            }
-        }
         #endregion
 
         #region Constructor
         public Main()
         {
             config = new Config("Config.ini");
-            file = new File();
             defaultParticleTypes = new List<ParticleType>();
             commandStacks = new Dictionary<ParticleSystem, CommandStack>();
             clipBoard = new List<Core.Component>();
@@ -97,7 +84,6 @@ namespace CrazyStorm
             InitializeFile();
             InitializeParticle();
             InitializeEdit();
-            InitializeStatusBar();
         }
         void InitializeFile()
         {
@@ -140,11 +126,6 @@ namespace CrazyStorm
             UndoButton.IsEnabled = false;
             RedoButton.IsEnabled = false;
         }
-        void InitializeStatusBar()
-        {
-            status = (string)FindResource("ReadyStr");
-            StatusText.DataContext = this;
-        }
         void InitializeLayerAndComponent()
         {
             selectedLayer = selectedParticle.Layers.First();
@@ -171,7 +152,15 @@ namespace CrazyStorm
         {
             LoadDefaultParticleTypes();
             InitializeConfig();
-            InitializeSystem();
+        }
+        public void StartNewFile()
+        {
+            saved = true;
+            New();
+        }
+        public void OpenFile(string openPath)
+        {
+            Open(openPath);
         }
         #endregion
 

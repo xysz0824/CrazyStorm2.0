@@ -9,7 +9,7 @@ namespace CrazyStorm
 {
     class LogHelper
     {
-        static readonly string logFilePath = "log.txt";
+        static readonly string logFilePath = "Log.txt";
         public static void Clear()
         {
             using (StreamWriter writer = new StreamWriter(logFilePath, false, Encoding.UTF8))

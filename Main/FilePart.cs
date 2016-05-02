@@ -5,6 +5,7 @@ using System.Text;
 using System.Windows;
 using CrazyStorm.Core;
 using System.Xml;
+using System.ComponentModel;
 
 namespace CrazyStorm
 {
@@ -13,7 +14,7 @@ namespace CrazyStorm
         #region Private Members
         bool saved;
         string filePath;
-        string fileName = "Untitled";
+        string fileName;
         #endregion
         
         #region Private Methods
@@ -41,7 +42,7 @@ namespace CrazyStorm
             file = new File();
             fileName = "Untitled";
             InitializeSystem();
-            saved = false;
+            saved = true;
         }
         void Open()
         {
@@ -53,58 +54,54 @@ namespace CrazyStorm
                 open.InitialDirectory = File.CurrentDirectory;
                 open.Filter = (string)FindResource("FileExtensionStr");
                 if (open.ShowDialog() == System.Windows.Forms.DialogResult.OK)
-                {
-                    try
-                    {
-                        if (Open(open.FileName))
-                        {
-                            filePath = open.FileName;
-                            fileName = System.IO.Path.GetFileNameWithoutExtension(filePath);
-                            File.CurrentDirectory = System.IO.Path.GetDirectoryName(filePath) + '\\';
-                            InitializeSystem();
-                        }
-                    }
-                    catch (XmlException)
-                    {
-                        MessageBox.Show((string)FindResource("FileTypeErrorStr"), (string)FindResource("ErrorTitleStr"),
-                            MessageBoxButton.OK, MessageBoxImage.Error);
-                    }
-                    catch (System.IO.FileLoadException ex)
-                    {
-                        MessageBox.Show((string)FindResource(ex.Message + "Str"), (string)FindResource("ErrorTitleStr"),
-                            MessageBoxButton.OK, MessageBoxImage.Error);
-                    }
-                }
+                    Open(open.FileName);
             }
-
         }
         bool Open(string openPath)
         {
-            var doc = new XmlDocument();
-            doc.Load(openPath);
-            XmlElement root = (XmlElement)doc.SelectSingleNode(VersionInfo.AppName.Replace(" ", ""));
-            if (root == null)
-                throw new XmlException();
-            else
+            try
             {
-                if (!root.HasAttribute("version"))
-                    throw new System.IO.FileLoadException("FileDataError");
-                
-                string version = root.GetAttribute("version");
-                if (VersionInfo.Version != version &&
-                    MessageBox.Show((string)FindResource("DifferentVersionStr"), (string)FindResource("TipTitleStr"),
-                    MessageBoxButton.OKCancel, MessageBoxImage.Warning) != MessageBoxResult.OK)
-                    return false;
+                var doc = new XmlDocument();
+                doc.Load(openPath);
+                XmlElement root = (XmlElement)doc.SelectSingleNode(VersionInfo.AppName.Replace(" ", ""));
+                if (root == null)
+                    throw new XmlException();
                 else
                 {
-                    file = new File();
-                    file.BuildFromXml(root);
-                    RebuildObjectReference();
-                    RebuildComponentTree();
-                    saved = true;
-                    return true;
+                    if (!root.HasAttribute("version"))
+                        throw new System.IO.FileLoadException("FileDataError");
+
+                    string version = root.GetAttribute("version");
+                    if (VersionInfo.Version != version &&
+                        MessageBox.Show((string)FindResource("DifferentVersionStr"), (string)FindResource("TipTitleStr"),
+                        MessageBoxButton.OKCancel, MessageBoxImage.Warning) != MessageBoxResult.OK)
+                        return false;
+                    else
+                    {
+                        file = new File();
+                        file.BuildFromXml(root);
+                        RebuildObjectReference();
+                        RebuildComponentTree();
+                        filePath = openPath;
+                        fileName = System.IO.Path.GetFileNameWithoutExtension(openPath);
+                        File.CurrentDirectory = System.IO.Path.GetDirectoryName(openPath) + '\\';
+                        InitializeSystem();
+                        saved = true;
+                        return true;
+                    }
                 }
             }
+            catch (XmlException)
+            {
+                MessageBox.Show((string)FindResource("FileTypeErrorStr"), (string)FindResource("ErrorTitleStr"),
+                    MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            catch (System.IO.FileLoadException ex)
+            {
+                MessageBox.Show((string)FindResource(ex.Message + "Str"), (string)FindResource("ErrorTitleStr"),
+                    MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            return false;
         }
         void RebuildComponentTree(ParticleSystem particleSystem)
         {
@@ -131,7 +128,7 @@ namespace CrazyStorm
                 particleTypes.AddRange(defaultParticleTypes);
                 particleTypes.AddRange(particleSystem.CustomTypes);
                 //Collect all components
-                var components = new List<Component>();
+                var components = new List<Core.Component>();
                 foreach (var layer in particleSystem.Layers)
                     components.AddRange(layer.Components);
                 //Rebuild components reference
@@ -153,6 +150,10 @@ namespace CrazyStorm
         }
         void Save(string savedPath)
         {
+            filePath = savedPath;
+            fileName = System.IO.Path.GetFileNameWithoutExtension(savedPath);
+            File.CurrentDirectory = System.IO.Path.GetDirectoryName(savedPath) + '\\';
+            file.UpdateResource();
             var doc = new XmlDocument();
             var declaration = doc.CreateXmlDeclaration("1.0", "UTF-8", null);
             doc.AppendChild(declaration);
@@ -163,6 +164,7 @@ namespace CrazyStorm
             file.StoreAsXml(doc, root);
             doc.AppendChild(root);
             doc.Save(savedPath);
+            InitializeFile();
             saved = true;
         }
         void SaveTo()
@@ -172,14 +174,7 @@ namespace CrazyStorm
                 save.InitialDirectory = File.CurrentDirectory;
                 save.Filter = (string)FindResource("FileExtensionStr");
                 if (save.ShowDialog() == System.Windows.Forms.DialogResult.OK)
-                {
-                    filePath = save.FileName;
-                    fileName = System.IO.Path.GetFileNameWithoutExtension(filePath);
-                    File.CurrentDirectory = System.IO.Path.GetDirectoryName(filePath) + '\\';
-                    file.UpdateResource();
-                    Save(filePath);
-                    InitializeFile();
-                }
+                    Save(save.FileName);
             }
         }
         #endregion
@@ -200,6 +195,10 @@ namespace CrazyStorm
         private void SaveToItem_Click(object sender, RoutedEventArgs e)
         {
             SaveTo();
+        }
+        private void Window_Closing(object sender, CancelEventArgs e)
+        {
+            e.Cancel = !SaveTip();
         }
         #endregion
     }
