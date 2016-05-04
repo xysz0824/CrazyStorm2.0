@@ -37,11 +37,11 @@ namespace CrazyStorm
         {
             //As for move command, it's better to merge them to reduce occupation of command stack.
             if (list.Count > 0
-                && list[list.Count - 1]  is MoveComponentCommand 
-                && command             is MoveComponentCommand)
+                && list[list.Count - 1] is MoveComponentCommand 
+                && command              is MoveComponentCommand)
             {
-                var last   = list[list.Count - 1]   as MoveComponentCommand;
-                var now = command              as MoveComponentCommand;
+                var last = list[list.Count - 1] as MoveComponentCommand;
+                var now = command as MoveComponentCommand;
                 if (last.IsSameTarget(now))
                 {
                     last.Move += now.Move;
