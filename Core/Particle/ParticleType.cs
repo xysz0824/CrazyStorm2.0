@@ -24,31 +24,41 @@ namespace CrazyStorm.Core
         Orange,
         Gray
     }
-    public class ParticleType : INotifyPropertyChanged, IXmlData, IRebuildReference<FileResource>
+    public class ParticleType : INotifyPropertyChanged, IXmlData, IRebuildReference<FileResource>, IPlayData
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
         #region Private Members
         FileResource image;
         int imageID = -1;
+        [PlayData]
         [XmlAttribute]
         int id;
+        [PlayData]
         [XmlAttribute]
         string name;
+        [PlayData]
         [XmlAttribute]
         Vector2 startPoint;
+        [PlayData]
         [XmlAttribute]
         int width;
+        [PlayData]
         [XmlAttribute]
         int height;
+        [PlayData]
         [XmlAttribute]
         Vector2 centerPoint;
+        [PlayData]
         [XmlAttribute]
         int frames;
+        [PlayData]
         [XmlAttribute]
         int delay;
+        [PlayData]
         [XmlAttribute]
         int radius;
+        [PlayData]
         [XmlAttribute]
         ParticleColor color;
         #endregion
@@ -263,7 +273,7 @@ namespace CrazyStorm.Core
                 else
                     throw new System.IO.FileLoadException("FileDataError");
             }
-            XmlHelper.BuildFields(this, particleTypeNode);
+            XmlHelper.BuildFromFields(this, particleTypeNode);
             return particleTypeNode;
         }
         public XmlElement StoreAsXml(XmlDocument doc, XmlElement node)
@@ -294,6 +304,17 @@ namespace CrazyStorm.Core
                 }
                 imageID = -1;
             }
+        }
+        public List<byte> GeneratePlayData()
+        {
+            var particleTypeBytes = new List<byte>();
+            if (image != null)
+                particleTypeBytes.AddRange(PlayDataHelper.GetBytes(image.ID));
+            else
+                particleTypeBytes.AddRange(PlayDataHelper.GetBytes(-1));
+
+            PlayDataHelper.GenerateFields(this, particleTypeBytes);
+            return PlayDataHelper.CreateTrunk(particleTypeBytes);
         }
         #endregion
     }

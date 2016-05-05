@@ -71,7 +71,7 @@ namespace CrazyStorm.Core
             node = base.BuildFromXml(node);
             var particleNode = (XmlElement)node.SelectSingleNode("Particle");
             //particleData
-            XmlHelper.BuildStruct(ref particleData, particleNode, "ParticleData");
+            XmlHelper.BuildFromStruct(ref particleData, particleNode, "ParticleData");
             return particleNode;
         }
         public override XmlElement StoreAsXml(XmlDocument doc, XmlElement node)
@@ -82,6 +82,15 @@ namespace CrazyStorm.Core
             XmlHelper.StoreStruct(particleData, doc, particleNode, "ParticleData");
             node.AppendChild(particleNode);
             return particleNode;
+        }
+        public override List<byte> GeneratePlayData()
+        {
+            var bytes = base.GeneratePlayData();
+            var particleBytes = new List<byte>();
+            //particleData
+            PlayDataHelper.GenerateStruct(particleData, particleBytes);
+            bytes.AddRange(PlayDataHelper.CreateTrunk(particleBytes));
+            return bytes;
         }
         #endregion
     }

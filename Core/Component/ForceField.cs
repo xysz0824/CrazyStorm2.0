@@ -109,7 +109,7 @@ namespace CrazyStorm.Core
             node = base.BuildFromXml(node);
             var forceFieldNode = (XmlElement)node.SelectSingleNode("ForceField");
             //forceFieldData
-            XmlHelper.BuildStruct(ref forceFieldData, forceFieldNode, "ForceFieldData");
+            XmlHelper.BuildFromStruct(ref forceFieldData, forceFieldNode, "ForceFieldData");
             return forceFieldNode;
         }
         public override XmlElement StoreAsXml(XmlDocument doc, XmlElement node)
@@ -120,6 +120,15 @@ namespace CrazyStorm.Core
             XmlHelper.StoreStruct(forceFieldData, doc, forceFieldNode, "ForceFieldData");
             node.AppendChild(forceFieldNode);
             return forceFieldNode;
+        }
+        public override List<byte> GeneratePlayData()
+        {
+            var bytes = base.GeneratePlayData();
+            var forceFieldBytes = new List<byte>();
+            //forceFieldData
+            PlayDataHelper.GenerateStruct(forceFieldData, forceFieldBytes);
+            bytes.AddRange(PlayDataHelper.CreateTrunk(forceFieldBytes));
+            return bytes;
         }
         #endregion
     }

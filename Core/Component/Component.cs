@@ -34,14 +34,16 @@ namespace CrazyStorm.Core
             throw new NotImplementedException();
         }
     }
-    public class Component : PropertyContainer, INotifyPropertyChanged, IXmlData, IRebuildReference<Component>
+    public class Component : PropertyContainer, INotifyPropertyChanged, IXmlData, IRebuildReference<Component>, IPlayData
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
         #region Private Members
         ComponentData componentData;
+        [PlayData]
         [XmlAttribute]
         int id;
+        [PlayData]
         [XmlAttribute]
         string name;
         bool selected;
@@ -252,11 +254,11 @@ namespace CrazyStorm.Core
             if (node.Name == nodeName)
                 componentNode = node;
 
-            XmlHelper.BuildFields(typeof(Component), this, componentNode);
+            XmlHelper.BuildFromFields(typeof(Component), this, componentNode);
             //properties
             base.BuildFromXmlElement(componentNode);
             //componentData
-            XmlHelper.BuildStruct(ref componentData, componentNode, "ComponentData");
+            XmlHelper.BuildFromStruct(ref componentData, componentNode, "ComponentData");
             //parent
             if (componentNode.HasAttribute("parent"))
             {
@@ -278,9 +280,9 @@ namespace CrazyStorm.Core
                     throw new System.IO.FileLoadException("FileDataError");
             }
             //variables
-            XmlHelper.BuildObjectList(variables, new VariableResource(""), componentNode, "Variables");
+            XmlHelper.BuildFromObjectList(variables, new VariableResource(""), componentNode, "Variables");
             //componentEventGroups
-            XmlHelper.BuildObjectList(componentEventGroups, new EventGroup(), componentNode, "ComponentEventGroups");
+            XmlHelper.BuildFromObjectList(componentEventGroups, new EventGroup(), componentNode, "ComponentEventGroups");
             //children
             childrenIDs = new List<int>();
             var childrenNode = componentNode.SelectSingleNode("Children");
@@ -382,6 +384,31 @@ namespace CrazyStorm.Core
                 }
                 childrenIDs = null;
             }
+        }
+        public virtual List<byte> GeneratePlayData()
+        {
+            var componentBytes = new List<byte>();
+            componentBytes.AddRange(PlayDataHelper.GetStringBytes(GetType().Name));
+            PlayDataHelper.GenerateFields(typeof(Component), this, componentBytes);
+            //properties
+            //TODO
+            //componentData
+            PlayDataHelper.GenerateStruct(componentData, componentBytes);
+            //parent
+            if (parent != null)
+                componentBytes.AddRange(PlayDataHelper.GetBytes(parent.ID));
+            else
+                componentBytes.AddRange(PlayDataHelper.GetBytes(-1));
+            //bindingTarget
+            if (bindingTarget != null)
+                componentBytes.AddRange(PlayDataHelper.GetBytes(bindingTarget.ID));
+            else
+                componentBytes.AddRange(PlayDataHelper.GetBytes(-1));
+            //variables
+            PlayDataHelper.GenerateObjectList(variables, componentBytes);
+            //componentEventGroups
+            //TODO
+            return PlayDataHelper.CreateTrunk(componentBytes);
         }
         #endregion
     }

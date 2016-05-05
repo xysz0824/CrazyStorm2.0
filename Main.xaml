@@ -315,11 +315,12 @@
                 <MenuItem Name="BindComponentItem" Header="{StaticResource BindComponentStr}" InputGestureText="Ctrl+B" Click="BindComponentItem_Click"/>
                 <MenuItem Name="UnbindComponentItem" Header="{StaticResource UnbindComponentStr}" InputGestureText="Ctrl+U" Click="UnbindComponentItem_Click"/>
             </MenuItem>
-            <MenuItem Header="{StaticResource TestStr}" >
-                <MenuItem Header="{StaticResource TestCurrentStr}" InputGestureText="F5"/>
-                <MenuItem Header="{StaticResource TestAllStr}" InputGestureText="F10"/>
+            <MenuItem Header="{StaticResource PlayStr}" >
+                <MenuItem Header="{StaticResource GeneratePlayFileStr}" Click="GeneratePlayFile_Click" />
+                <MenuItem Header="{StaticResource PlayCurrentStr}" InputGestureText="F5"/>
+                <MenuItem Header="{StaticResource PlayAllStr}" InputGestureText="F10"/>
                 <Separator/>
-                <MenuItem Header="{StaticResource SetTestStr}" />
+                <MenuItem Header="{StaticResource SetPlayStr}" />
             </MenuItem>
             <MenuItem Header="{StaticResource HelpStr}" >
                 <MenuItem Header="{StaticResource TutorialStr}" InputGestureText="F1"/>
@@ -379,11 +380,11 @@
             </Button>
             <Separator/>
             <Button Name="PlayButton" IsDefault="False" IsCancel="False" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" 
-                    ToolTip="{StaticResource TestStr}">
+                    ToolTip="{StaticResource PlayStr}">
                 <Image Source="Images/arrow-right-3.ico" Stretch="None" />
             </Button>
             <Button Name="SettingButton" IsDefault="False" IsCancel="False" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" 
-                    ToolTip="{StaticResource SetTestStr}">
+                    ToolTip="{StaticResource SetPlayStr}">
                 <Image Source="Images/configure-5.ico" Stretch="None" />
             </Button>
         </ToolBar>

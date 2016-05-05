@@ -76,7 +76,7 @@ namespace CrazyStorm.Core
         public XmlElement GetXmlElement(XmlDocument doc)
         {
             var propertiesNode = doc.CreateElement("Properties");
-            foreach (var pair in Properties)
+            foreach (var pair in properties)
             {
                 if (pair.Value.Expression)
                 {

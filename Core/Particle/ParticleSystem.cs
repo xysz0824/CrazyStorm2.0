@@ -12,9 +12,10 @@ using System.Xml.Serialization;
 
 namespace CrazyStorm.Core
 {
-    public class ParticleSystem : IXmlData
+    public class ParticleSystem : IXmlData, IPlayData
     {
         #region Private Members
+        [PlayData]
         [XmlAttribute]
         string name;
         IList<ParticleType> customTypes;
@@ -135,13 +136,13 @@ namespace CrazyStorm.Core
             if (node.Name == nodeName)
                 particleSystemNode = node;
 
-            XmlHelper.BuildFields(this, particleSystemNode);
+            XmlHelper.BuildFromFields(this, particleSystemNode);
             //customTypes
-            XmlHelper.BuildObjectList(customTypes, new ParticleType(0), particleSystemNode, "CustomTypes");
+            XmlHelper.BuildFromObjectList(customTypes, new ParticleType(0), particleSystemNode, "CustomTypes");
             //layers
-            XmlHelper.BuildObjectList(layers, new Layer(""), particleSystemNode, "Layers");
+            XmlHelper.BuildFromObjectList(layers, new Layer(""), particleSystemNode, "Layers");
             //componentIndex
-            XmlHelper.BuildDictionary(componentIndex, particleSystemNode, "ComponentIndex");
+            XmlHelper.BuildFromDictionary(componentIndex, particleSystemNode, "ComponentIndex");
             return particleSystemNode;
         }
         public XmlElement StoreAsXml(XmlDocument doc, XmlElement node)
@@ -156,6 +157,16 @@ namespace CrazyStorm.Core
             XmlHelper.StoreDictionary(componentIndex, doc, particleSystemNode, "ComponentIndex");
             node.AppendChild(particleSystemNode);
             return particleSystemNode;
+        }
+        public List<byte> GeneratePlayData()
+        {
+            var particleSystemBytes = new List<Byte>();
+            PlayDataHelper.GenerateFields(this, particleSystemBytes);
+            //customTypes
+            PlayDataHelper.GenerateObjectList(customTypes, particleSystemBytes);
+            //layers
+            PlayDataHelper.GenerateObjectList(layers, particleSystemBytes);
+            return PlayDataHelper.CreateTrunk(particleSystemBytes);
         }
         #endregion
     }

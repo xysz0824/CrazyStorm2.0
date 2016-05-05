@@ -9,10 +9,11 @@ using System.Text;
 using System.Collections.ObjectModel;
 using System.Xml;
 using System.Xml.Serialization;
+using System.IO;
 
 namespace CrazyStorm.Core
 {
-    public class File : IXmlData
+    public class File : IXmlData, IPlayData
     {
         #region Private Members
         IList<FileResource> images;
@@ -64,15 +65,15 @@ namespace CrazyStorm.Core
         }
         public XmlElement BuildFromXml(XmlElement node)
         {
-            XmlHelper.BuildFields(this, node);
+            XmlHelper.BuildFromFields(this, node);
             //images
-            XmlHelper.BuildObjectList(images, new FileResource(0, "", ""), node, "Images");
+            XmlHelper.BuildFromObjectList(images, new FileResource(0, "", ""), node, "Images");
             //sounds
-            XmlHelper.BuildObjectList(sounds, new FileResource(0, "", ""), node, "Sounds");
+            XmlHelper.BuildFromObjectList(sounds, new FileResource(0, "", ""), node, "Sounds");
             //globals
-            XmlHelper.BuildObjectList(globals, new VariableResource(""), node, "Globals");
+            XmlHelper.BuildFromObjectList(globals, new VariableResource(""), node, "Globals");
             //particleSystems
-            XmlHelper.BuildObjectList(particleSystems, new ParticleSystem(""), node, "ParticleSystems");
+            XmlHelper.BuildFromObjectList(particleSystems, new ParticleSystem(""), node, "ParticleSystems");
             return node;
         }
         public XmlElement StoreAsXml(XmlDocument doc, XmlElement node)
@@ -87,6 +88,20 @@ namespace CrazyStorm.Core
             //particleSystems
             XmlHelper.StoreObjectList(particleSystems, doc, node, "ParticleSystems");
             return node;
+        }
+        public List<byte> GeneratePlayData()
+        {
+            var fileBytes = new List<byte>();
+            PlayDataHelper.GenerateFields(this, fileBytes);
+            //images
+            PlayDataHelper.GenerateObjectList(images, fileBytes);
+            //sounds
+            PlayDataHelper.GenerateObjectList(sounds, fileBytes);
+            //globals
+            PlayDataHelper.GenerateObjectList(globals, fileBytes);
+            //particleSystems
+            PlayDataHelper.GenerateObjectList(particleSystems, fileBytes);
+            return fileBytes;
         }
         #endregion
     }

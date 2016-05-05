@@ -16,9 +16,11 @@ namespace CrazyStorm.Core
     public class FileResource : Resource
     {
         #region Private Members
+        [PlayData]
         [XmlAttribute]
         int id;
         string absolutePath;
+        [PlayData]
         [XmlAttribute]
         string relativePath;
         #endregion
@@ -64,7 +66,7 @@ namespace CrazyStorm.Core
         {
             node = base.BuildFromXml(node);
             var fileResourceNode = (XmlElement)node.SelectSingleNode("FileResource");
-            XmlHelper.BuildFields(typeof(FileResource), this, fileResourceNode);
+            XmlHelper.BuildFromFields(typeof(FileResource), this, fileResourceNode);
             return fileResourceNode;
         }
         public override XmlElement StoreAsXml(XmlDocument doc, XmlElement node)
@@ -74,6 +76,14 @@ namespace CrazyStorm.Core
             XmlHelper.StoreFields(typeof(FileResource), this, doc, fileResourceNode);
             node.AppendChild(fileResourceNode);
             return fileResourceNode;
+        }
+        public override List<byte> GeneratePlayData()
+        {
+            var bytes = base.GeneratePlayData();
+            var fileResourceBytes = new List<byte>();
+            PlayDataHelper.GenerateFields(typeof(FileResource), this, fileResourceBytes);
+            bytes.AddRange(PlayDataHelper.CreateTrunk(fileResourceBytes));
+            return bytes;
         }
         #endregion
     }

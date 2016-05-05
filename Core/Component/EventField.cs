@@ -105,9 +105,9 @@ namespace CrazyStorm.Core
             node = base.BuildFromXml(node);
             var eventFieldNode = (XmlElement)node.SelectSingleNode("EventField");
             //eventFieldData
-            XmlHelper.BuildStruct(ref eventFieldData, eventFieldNode, "EventFieldData");
+            XmlHelper.BuildFromStruct(ref eventFieldData, eventFieldNode, "EventFieldData");
             //eventFieldEventGroups
-            XmlHelper.BuildObjectList(eventFieldEventGroups, new EventGroup(), eventFieldNode, "EventFieldEventGroups");
+            XmlHelper.BuildFromObjectList(eventFieldEventGroups, new EventGroup(), eventFieldNode, "EventFieldEventGroups");
             return eventFieldNode;
         }
         public override XmlElement StoreAsXml(XmlDocument doc, XmlElement node)
@@ -120,6 +120,17 @@ namespace CrazyStorm.Core
             XmlHelper.StoreObjectList(eventFieldEventGroups, doc, eventFieldNode, "EventFieldEventGroups");
             node.AppendChild(eventFieldNode);
             return eventFieldNode;
+        }
+        public override List<byte> GeneratePlayData()
+        {
+            var bytes = base.GeneratePlayData();
+            var eventFieldBytes = new List<byte>();
+            //eventFieldData
+            PlayDataHelper.GenerateStruct(eventFieldData, eventFieldBytes);
+            //eventFieldEventGroups
+            //TODO
+            bytes.AddRange(PlayDataHelper.CreateTrunk(eventFieldBytes));
+            return bytes;
         }
         #endregion
     }

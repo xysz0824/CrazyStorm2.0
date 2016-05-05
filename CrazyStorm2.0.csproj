@@ -42,6 +42,7 @@
     <WarningLevel>4</WarningLevel>
     <CodeAnalysisRuleSet>BasicDesignGuidelineRules.ruleset</CodeAnalysisRuleSet>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <UseVSHostingProcess>true</UseVSHostingProcess>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
     <PlatformTarget>x86</PlatformTarget>
@@ -97,6 +98,7 @@
     <Compile Include="Helper\IniHelper.cs" />
     <Compile Include="Helper\LogHelper.cs" />
     <Compile Include="Main\FilePart.cs" />
+    <Compile Include="Main\PlayPart.cs" />
     <Compile Include="Marker\ComponentMarker.cs" />
     <Compile Include="Marker\ForceFieldMarker.cs" />
     <Compile Include="Marker\IComponentMark.cs" />

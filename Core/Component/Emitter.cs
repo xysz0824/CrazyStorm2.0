@@ -104,11 +104,11 @@ namespace CrazyStorm.Core
             node = base.BuildFromXml(node);
             var emitterNode = (XmlElement)node.SelectSingleNode("Emitter");
             //emitterData
-            XmlHelper.BuildStruct(ref emitterData, emitterNode, "EmitterData");
+            XmlHelper.BuildFromStruct(ref emitterData, emitterNode, "EmitterData");
             //particle
             particle.BuildFromXml(emitterNode);
             //particleEventGroups
-            XmlHelper.BuildObjectList(particleEventGroups, new EventGroup(), emitterNode, "ParticleEventGroups");
+            XmlHelper.BuildFromObjectList(particleEventGroups, new EventGroup(), emitterNode, "ParticleEventGroups");
             return emitterNode;
         }
         public override XmlElement StoreAsXml(XmlDocument doc, XmlElement node)
@@ -123,6 +123,19 @@ namespace CrazyStorm.Core
             XmlHelper.StoreObjectList(particleEventGroups, doc, emitterNode, "ParticleEventGroups");
             node.AppendChild(emitterNode);
             return emitterNode;
+        }
+        public override List<byte> GeneratePlayData()
+        {
+            var bytes = base.GeneratePlayData();
+            var emitterBytes = new List<byte>();
+            //emitterData
+            PlayDataHelper.GenerateStruct(emitterData, emitterBytes);
+            //particle
+            emitterBytes.AddRange(particle.GeneratePlayData());
+            //particleEventGroups
+            //TODO
+            bytes.AddRange(PlayDataHelper.CreateTrunk(emitterBytes));
+            return bytes;
         }
         #endregion
     }

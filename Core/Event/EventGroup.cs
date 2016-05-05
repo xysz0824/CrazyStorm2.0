@@ -62,9 +62,9 @@ namespace CrazyStorm.Core
             if (node.Name == nodeName)
                 eventGroupNode = node;
 
-            XmlHelper.BuildFields(this, eventGroupNode);
+            XmlHelper.BuildFromFields(this, eventGroupNode);
             //events
-            XmlHelper.BuildList(events, eventGroupNode, "Events");
+            XmlHelper.BuildFromList(events, eventGroupNode, "Events");
             return eventGroupNode;
         }
         public XmlElement StoreAsXml(XmlDocument doc, XmlElement node)

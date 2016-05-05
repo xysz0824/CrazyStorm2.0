@@ -14,7 +14,7 @@ namespace CrazyStorm.Core
 {
     class XmlHelper
     {
-        public static void BuildFields(Type type, object source, XmlElement node)
+        public static void BuildFromFields(Type type, object source, XmlElement node)
         {
             if (node == null)
                 throw new System.IO.FileLoadException("FileDataError");
@@ -24,23 +24,28 @@ namespace CrazyStorm.Core
             foreach (var info in fieldInfos)
             {
                 object[] attributes = info.GetCustomAttributes(false);
-                if (attributes.Length > 0 && attributes[0] is XmlAttributeAttribute)
+                for (int i = 0; i < attributes.Length; ++i)
                 {
-                    if (!node.HasAttribute(info.Name))
-                        throw new System.IO.FileLoadException("FileDataError");
+                    if (attributes[i] is XmlAttributeAttribute)
+                    {
+                        if (!node.HasAttribute(info.Name))
+                            throw new System.IO.FileLoadException("FileDataError");
 
-                    var text = node.GetAttribute(info.Name);
-                    object value;
-                    if (PropertyTypeRule.TryMatchWith(info.GetValue(source), text, out value))
-                        info.SetValue(source, value);
-                    else
-                        throw new System.IO.FileLoadException("FileDataError");
+                        var text = node.GetAttribute(info.Name);
+                        object value;
+                        if (PropertyTypeRule.TryMatchWith(info.GetValue(source), text, out value))
+                            info.SetValue(source, value);
+                        else
+                            throw new System.IO.FileLoadException("FileDataError");
+
+                        break;
+                    }
                 }
             }
         }
-        public static void BuildFields(object source, XmlElement node)
+        public static void BuildFromFields(object source, XmlElement node)
         {
-            BuildFields(source.GetType(), source, node);
+            BuildFromFields(source.GetType(), source, node);
         }
         public static void StoreFields(Type type, object source, XmlDocument doc, XmlElement node)
         {
@@ -49,11 +54,15 @@ namespace CrazyStorm.Core
             foreach (var info in fieldInfos)
             {
                 object[] attributes = info.GetCustomAttributes(false);
-                if (attributes.Length > 0 && attributes[0] is XmlAttributeAttribute)
+                for (int i = 0; i < attributes.Length; ++i)
                 {
-                    var xmlAttribute = doc.CreateAttribute(info.Name);
-                    xmlAttribute.Value = info.GetValue(source).ToString();
-                    node.Attributes.Append(xmlAttribute);
+                    if (attributes[i] is XmlAttributeAttribute)
+                    {
+                        var xmlAttribute = doc.CreateAttribute(info.Name);
+                        xmlAttribute.Value = info.GetValue(source).ToString();
+                        node.Attributes.Append(xmlAttribute);
+                        break;
+                    }
                 }
             }
         }
@@ -61,7 +70,7 @@ namespace CrazyStorm.Core
         {
             StoreFields(source.GetType(), source, doc, node);
         }
-        public static void BuildStruct<T>(ref T source, XmlElement node, string name)
+        public static void BuildFromStruct<T>(ref T source, XmlElement node, string name)
         {
             XmlElement structNode = (XmlElement)node.SelectSingleNode(name);
             if (structNode == null)
@@ -93,7 +102,7 @@ namespace CrazyStorm.Core
             }
             node.AppendChild(structNode);
         }
-        public static void BuildList(IList<string> source, XmlElement node, string name)
+        public static void BuildFromList(IList<string> source, XmlElement node, string name)
         {
             var listNode = node.SelectSingleNode(name);
             if (listNode == null)
@@ -121,7 +130,7 @@ namespace CrazyStorm.Core
             }
             node.AppendChild(listNode);
         }
-        public static void BuildObjectList<T>(IList<T> source, object prototype, XmlElement node, string name)
+        public static void BuildFromObjectList<T>(IList<T> source, object prototype, XmlElement node, string name)
             where T : IXmlData
         {
             source.Clear();
@@ -145,7 +154,7 @@ namespace CrazyStorm.Core
 
             node.AppendChild(objectListNode);
         }
-        public static void BuildDictionary<K>(IDictionary<string, K> source, XmlElement node, string name)
+        public static void BuildFromDictionary<K>(IDictionary<string, K> source, XmlElement node, string name)
             where K : new()
         {
             source.Clear();

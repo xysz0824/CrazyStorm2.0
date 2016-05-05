@@ -26,10 +26,8 @@ namespace CrazyStorm
     /// <summary>
     /// Main.xaml 的交互逻辑
     /// </summary>
-    public partial class Main : Window, INotifyPropertyChanged
+    public partial class Main : Window
     {
-        public event PropertyChangedEventHandler PropertyChanged;
-
         #region Private Members
         Config config;
         File file;
@@ -87,7 +85,7 @@ namespace CrazyStorm
         }
         void InitializeFile()
         {
-            Title = VersionInfo.AppTitle + " - " + fileName + VersionInfo.Extension;
+            Title = VersionInfo.AppTitle + " - " + fileName;
             ImageList.ItemsSource = file.Images;
             SoundList.ItemsSource = file.Sounds;
             VariableGrid.ItemsSource = file.Globals;

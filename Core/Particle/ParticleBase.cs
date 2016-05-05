@@ -37,7 +37,7 @@ namespace CrazyStorm.Core
             throw new NotImplementedException();
         }
     }
-    public abstract class ParticleBase : PropertyContainer, IXmlData, IRebuildReference<ParticleType>
+    public abstract class ParticleBase : PropertyContainer, IXmlData, IRebuildReference<ParticleType>, IPlayData
     {
         #region Private Members
         ParticleType type;
@@ -198,7 +198,7 @@ namespace CrazyStorm.Core
                     throw new System.IO.FileLoadException("FileDataError");
             }
             //particleBaseData
-            XmlHelper.BuildStruct(ref particleBaseData, particleBaseNode, "ParticleBaseData");
+            XmlHelper.BuildFromStruct(ref particleBaseData, particleBaseNode, "ParticleBaseData");
             return particleBaseNode;
         }
         public virtual XmlElement StoreAsXml(XmlDocument doc, XmlElement node)
@@ -233,6 +233,21 @@ namespace CrazyStorm.Core
                 }
                 typeID = -1;
             }
+        }
+        public virtual List<byte> GeneratePlayData()
+        {
+            var particleBaseBytes = new List<byte>();
+            //properties
+            //TODO
+            //type
+            if (type != null)
+                particleBaseBytes.AddRange(PlayDataHelper.GetBytes(type.ID));
+            else
+                particleBaseBytes.AddRange(PlayDataHelper.GetBytes(-1));
+
+            //particleBaseData
+            PlayDataHelper.GenerateStruct(particleBaseData, particleBaseBytes);
+            return PlayDataHelper.CreateTrunk(particleBaseBytes);
         }
         #endregion
     }

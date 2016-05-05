@@ -52,7 +52,7 @@ namespace CrazyStorm
             using (var open = new System.Windows.Forms.OpenFileDialog())
             {
                 open.InitialDirectory = File.CurrentDirectory;
-                open.Filter = (string)FindResource("FileExtensionStr");
+                open.Filter = (string)FindResource("ProjectFileExtensionStr");
                 if (open.ShowDialog() == System.Windows.Forms.DialogResult.OK)
                     Open(open.FileName);
             }
@@ -172,7 +172,7 @@ namespace CrazyStorm
             using (var save = new System.Windows.Forms.SaveFileDialog())
             {
                 save.InitialDirectory = File.CurrentDirectory;
-                save.Filter = (string)FindResource("FileExtensionStr");
+                save.Filter = (string)FindResource("ProjectFileExtensionStr");
                 if (save.ShowDialog() == System.Windows.Forms.DialogResult.OK)
                     Save(save.FileName);
             }

@@ -23,19 +23,23 @@ namespace CrazyStorm.Core
         Orange,
         Gray
     }
-    public class Layer : INotifyPropertyChanged, IXmlData
+    public class Layer : INotifyPropertyChanged, IXmlData, IPlayData
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
         #region Private Members
+        [PlayData]
         [XmlAttribute]
         string name;
+        [PlayData]
         [XmlAttribute]
         bool visible;
         [XmlAttribute]
         LayerColor color;
+        [PlayData]
         [XmlAttribute]
         int beginFrame;
+        [PlayData]
         [XmlAttribute]
         int totalFrame;
         IList<Component> components;
@@ -122,7 +126,7 @@ namespace CrazyStorm.Core
             if (node.Name == nodeName)
                 layerNode = node;
 
-            XmlHelper.BuildFields(this, layerNode);
+            XmlHelper.BuildFromFields(this, layerNode);
             //components
             var componentsNode = layerNode.SelectSingleNode("Components");
             if (componentsNode == null)
@@ -150,6 +154,14 @@ namespace CrazyStorm.Core
             XmlHelper.StoreObjectList(components, doc, layerNode, "Components");
             node.AppendChild(layerNode);
             return layerNode;
+        }
+        public List<byte> GeneratePlayData()
+        {
+            var layerBytes = new List<byte>();
+            PlayDataHelper.GenerateFields(this, layerBytes);
+            //components
+            PlayDataHelper.GenerateObjectList(components, layerBytes);
+            return PlayDataHelper.CreateTrunk(layerBytes);
         }
         #endregion
     }

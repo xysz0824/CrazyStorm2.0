@@ -45,8 +45,12 @@
     <Compile Include="Component\ComponentFactory.cs" />
     <Compile Include="Component\Emitter.cs" />
     <Compile Include="Event\EventGroup.cs" />
+    <Compile Include="IO\IPlayData.cs" />
     <Compile Include="IO\IRebuildReference.cs" />
     <Compile Include="IO\IXmlData.cs" />
+    <Compile Include="IO\PlayDataAttribute.cs" />
+    <Compile Include="IO\PlayDataException.cs" />
+    <Compile Include="IO\PlayDataHelper.cs" />
     <Compile Include="IO\XmlHelper.cs" />
     <Compile Include="Particle\ParticleBase.cs" />
     <Compile Include="Property\RuntimePropertyAttribute.cs" />

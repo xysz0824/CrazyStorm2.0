@@ -90,9 +90,9 @@ namespace CrazyStorm.Core
             node = base.BuildFromXml(node);
             var rebounderNode = (XmlElement)node.SelectSingleNode("Rebounder");
             //rebounderData
-            XmlHelper.BuildStruct(ref rebounderData, rebounderNode, "RebounderData");
+            XmlHelper.BuildFromStruct(ref rebounderData, rebounderNode, "RebounderData");
             //rebounderEventGroups
-            XmlHelper.BuildObjectList(rebounderEventGroups, new EventGroup(), rebounderNode, "RebounderEventGroups");
+            XmlHelper.BuildFromObjectList(rebounderEventGroups, new EventGroup(), rebounderNode, "RebounderEventGroups");
             return rebounderNode;
         }
         public override XmlElement StoreAsXml(XmlDocument doc, XmlElement node)
@@ -105,6 +105,17 @@ namespace CrazyStorm.Core
             XmlHelper.StoreObjectList(rebounderEventGroups, doc, rebounderNode, "RebounderEventGroups");
             node.AppendChild(rebounderNode);
             return rebounderNode;
+        }
+        public override List<byte> GeneratePlayData()
+        {
+            var bytes = base.GeneratePlayData();
+            var rebounderBytes = new List<byte>();
+            //rebounderData
+            PlayDataHelper.GenerateStruct(rebounderData, rebounderBytes);
+            //rebounderEventGroups
+            //TODO
+            bytes.AddRange(PlayDataHelper.CreateTrunk(rebounderBytes));
+            return bytes;
         }
         #endregion
     }

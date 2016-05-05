@@ -13,9 +13,10 @@ using System.Xml.Serialization;
 
 namespace CrazyStorm.Core
 {
-    public abstract class Resource : INotifyPropertyChanged, IXmlData
+    public abstract class Resource : INotifyPropertyChanged, IXmlData, IPlayData
     {
         public event PropertyChangedEventHandler PropertyChanged;
+        [PlayData]
         [XmlAttribute]
         private string label;
         protected bool isValid;
@@ -52,7 +53,7 @@ namespace CrazyStorm.Core
             if (node.Name == nodeName)
                 resourceNode = node;
 
-            XmlHelper.BuildFields(typeof(Resource), this, resourceNode);
+            XmlHelper.BuildFromFields(typeof(Resource), this, resourceNode);
             return resourceNode;
         }
 
@@ -62,6 +63,13 @@ namespace CrazyStorm.Core
             XmlHelper.StoreFields(typeof(Resource), this, doc, resourceNode);
             node.AppendChild(resourceNode);
             return resourceNode;
+        }
+
+        public virtual List<byte> GeneratePlayData()
+        {
+            var resourceBytes = new List<byte>();
+            PlayDataHelper.GenerateFields(typeof(Resource), this, resourceBytes);
+            return PlayDataHelper.CreateTrunk(resourceBytes);
         }
     }
 }

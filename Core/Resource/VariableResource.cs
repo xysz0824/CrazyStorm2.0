@@ -15,6 +15,7 @@ namespace CrazyStorm.Core
     public class VariableResource : Resource
     {
         #region Private Members
+        [PlayData]
         [XmlAttribute]
         float value;
         #endregion
@@ -47,7 +48,7 @@ namespace CrazyStorm.Core
         {
             node = base.BuildFromXml(node);
             var variableResourceNode = (XmlElement)node.SelectSingleNode("VariableResource");
-            XmlHelper.BuildFields(typeof(VariableResource), this, variableResourceNode);
+            XmlHelper.BuildFromFields(typeof(VariableResource), this, variableResourceNode);
             return variableResourceNode;
         }
         public override XmlElement StoreAsXml(XmlDocument doc, XmlElement node)
@@ -57,6 +58,14 @@ namespace CrazyStorm.Core
             XmlHelper.StoreFields(typeof(VariableResource), this, doc, variableResourceNode);
             node.AppendChild(variableResourceNode);
             return variableResourceNode;
+        }
+        public override List<byte> GeneratePlayData()
+        {
+            var bytes = base.GeneratePlayData();
+            var variableResourceBytes = new List<byte>();
+            PlayDataHelper.GenerateFields(typeof(VariableResource), this, variableResourceBytes);
+            bytes.AddRange(PlayDataHelper.CreateTrunk(variableResourceBytes));
+            return bytes;
         }
         #endregion
     }
