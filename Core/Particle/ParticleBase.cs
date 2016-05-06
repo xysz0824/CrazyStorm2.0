@@ -6,7 +6,14 @@ using System.Xml;
 
 namespace CrazyStorm.Core
 {
-    public struct ParticleBaseData : IFieldData
+    public enum BlendType
+    {
+        AlphaBlend,
+        Additive,
+        Substraction,
+        Multiply
+    }
+    public struct ParticleBaseData
     {
         public int maxLife;
         public int currentFrame;
@@ -28,14 +35,6 @@ namespace CrazyStorm.Core
         public bool ignoreForce;
         public bool fogEffect;
         public bool fadeEffect;
-        public void SetField(int fieldIndex, ValueType value)
-        {
-            throw new NotImplementedException();
-        }
-        public ValueType GetField(int fieldIndex)
-        {
-            throw new NotImplementedException();
-        }
     }
     public abstract class ParticleBase : PropertyContainer, IXmlData, IRebuildReference<ParticleType>, IPlayData
     {
@@ -210,7 +209,7 @@ namespace CrazyStorm.Core
             if (type != null)
             {
                 var typeAttribute = doc.CreateAttribute("type");
-                typeAttribute.Value = type.ID.ToString();
+                typeAttribute.Value = type.Id.ToString();
                 particleBaseNode.Attributes.Append(typeAttribute);
             }
             //particleBaseData
@@ -225,7 +224,7 @@ namespace CrazyStorm.Core
             {
                 foreach (var target in collection)
                 {
-                    if (typeID == target.ID)
+                    if (typeID == target.Id)
                     {
                         type = target;
                         break;
@@ -241,13 +240,13 @@ namespace CrazyStorm.Core
             //TODO
             //type
             if (type != null)
-                particleBaseBytes.AddRange(PlayDataHelper.GetBytes(type.ID));
+                particleBaseBytes.AddRange(PlayDataHelper.GetBytes(type.Id));
             else
                 particleBaseBytes.AddRange(PlayDataHelper.GetBytes(-1));
 
             //particleBaseData
             PlayDataHelper.GenerateStruct(particleBaseData, particleBaseBytes);
-            return PlayDataHelper.CreateTrunk(particleBaseBytes);
+            return PlayDataHelper.CreateBlock(particleBaseBytes);
         }
         #endregion
     }

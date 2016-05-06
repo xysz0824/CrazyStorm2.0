@@ -64,7 +64,7 @@ namespace CrazyStorm.Core
             var bytes = base.GeneratePlayData();
             var variableResourceBytes = new List<byte>();
             PlayDataHelper.GenerateFields(typeof(VariableResource), this, variableResourceBytes);
-            bytes.AddRange(PlayDataHelper.CreateTrunk(variableResourceBytes));
+            bytes.AddRange(PlayDataHelper.CreateBlock(variableResourceBytes));
             return bytes;
         }
         #endregion

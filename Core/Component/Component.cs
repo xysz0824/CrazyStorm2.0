@@ -11,10 +11,11 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Xml;
 using System.Xml.Serialization;
+using System.Runtime.InteropServices;
 
 namespace CrazyStorm.Core
 {
-    public struct ComponentData : IFieldData
+    public struct ComponentData
     {
         public int currentFrame;
         public int beginFrame;
@@ -25,14 +26,6 @@ namespace CrazyStorm.Core
         public float acspeed;
         public float acspeedAngle;
         public bool visibility;
-        public void SetField(int fieldIndex, ValueType value)
-        {
-            throw new NotImplementedException();
-        }
-        public ValueType GetField(int fieldIndex)
-        {
-            throw new NotImplementedException();
-        }
     }
     public class Component : PropertyContainer, INotifyPropertyChanged, IXmlData, IRebuildReference<Component>, IPlayData
     {
@@ -58,7 +51,7 @@ namespace CrazyStorm.Core
         #endregion
 
         #region Public Members
-        public int ID
+        public int Id
         {
             get { return id; }
             set { id = value; }
@@ -243,7 +236,7 @@ namespace CrazyStorm.Core
             {
                 clone.childrenIDs = new List<int>();
                 foreach (var child in children)
-                    clone.childrenIDs.Add(child.ID);
+                    clone.childrenIDs.Add(child.Id);
             }
             return clone;
         }
@@ -312,14 +305,14 @@ namespace CrazyStorm.Core
             if (parent != null)
             {
                 var parentAttribute = doc.CreateAttribute("parent");
-                parentAttribute.Value = parent.ID.ToString();
+                parentAttribute.Value = parent.Id.ToString();
                 componentNode.Attributes.Append(parentAttribute);
             }
             //bindingTarget
             if (bindingTarget != null)
             {
                 var bindingTargetAttribute = doc.CreateAttribute("bindingTarget");
-                bindingTargetAttribute.Value = bindingTarget.ID.ToString();
+                bindingTargetAttribute.Value = bindingTarget.Id.ToString();
                 componentNode.Attributes.Append(bindingTargetAttribute);
             }
             //variables
@@ -332,7 +325,7 @@ namespace CrazyStorm.Core
             {
                 var childNode = doc.CreateElement("Component");
                 var idAttribute = doc.CreateAttribute("id");
-                idAttribute.Value = component.ID.ToString();
+                idAttribute.Value = component.Id.ToString();
                 childNode.Attributes.Append(idAttribute);
                 childrenNode.AppendChild(childNode);
             }
@@ -347,7 +340,7 @@ namespace CrazyStorm.Core
             {
                 foreach (var target in collection)
                 {
-                    if (parentID == target.ID)
+                    if (parentID == target.Id)
                     {
                         parent = target;
                         break;
@@ -360,7 +353,7 @@ namespace CrazyStorm.Core
             {
                 foreach (var target in collection)
                 {
-                    if (bindingTargetID == target.ID)
+                    if (bindingTargetID == target.Id)
                     {
                         bindingTarget = target;
                         break;
@@ -375,7 +368,7 @@ namespace CrazyStorm.Core
                 {
                     foreach (var target in collection)
                     {
-                        if (childrenID == target.ID)
+                        if (childrenID == target.Id)
                         {
                             children.Add(target);
                             break;
@@ -396,19 +389,19 @@ namespace CrazyStorm.Core
             PlayDataHelper.GenerateStruct(componentData, componentBytes);
             //parent
             if (parent != null)
-                componentBytes.AddRange(PlayDataHelper.GetBytes(parent.ID));
+                componentBytes.AddRange(PlayDataHelper.GetBytes(parent.Id));
             else
                 componentBytes.AddRange(PlayDataHelper.GetBytes(-1));
             //bindingTarget
             if (bindingTarget != null)
-                componentBytes.AddRange(PlayDataHelper.GetBytes(bindingTarget.ID));
+                componentBytes.AddRange(PlayDataHelper.GetBytes(bindingTarget.Id));
             else
                 componentBytes.AddRange(PlayDataHelper.GetBytes(-1));
             //variables
             PlayDataHelper.GenerateObjectList(variables, componentBytes);
             //componentEventGroups
             //TODO
-            return PlayDataHelper.CreateTrunk(componentBytes);
+            return PlayDataHelper.CreateBlock(componentBytes);
         }
         #endregion
     }

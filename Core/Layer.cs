@@ -161,7 +161,7 @@ namespace CrazyStorm.Core
             PlayDataHelper.GenerateFields(this, layerBytes);
             //components
             PlayDataHelper.GenerateObjectList(components, layerBytes);
-            return PlayDataHelper.CreateTrunk(layerBytes);
+            return PlayDataHelper.CreateBlock(layerBytes);
         }
         #endregion
     }

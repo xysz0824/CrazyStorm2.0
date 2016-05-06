@@ -9,9 +9,9 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>CrazyStorm_Player</RootNamespace>
     <AssemblyName>CrazyStorm Player</AssemblyName>
-    <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile />
+    <TargetFrameworkProfile>Client</TargetFrameworkProfile>
     <PublishUrl>publish\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Disk</InstallFrom>
@@ -87,10 +87,32 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Framework\DeviceContext.cs" />
-    <Compile Include="Framework\DeviceSettings.cs" />
-    <Compile Include="Framework\DirectXFramework.cs" />
-    <Compile Include="Framework\WindowConfig.cs" />
+    <Compile Include="CrazyStorm\Component\Component.cs" />
+    <Compile Include="CrazyStorm\Component\CurveEmitter.cs" />
+    <Compile Include="CrazyStorm\Component\Emitter.cs" />
+    <Compile Include="CrazyStorm\Component\EventField.cs" />
+    <Compile Include="CrazyStorm\Component\ForceField.cs" />
+    <Compile Include="CrazyStorm\Component\MultiEmitter.cs" />
+    <Compile Include="CrazyStorm\Component\Rebounder.cs" />
+    <Compile Include="CrazyStorm\Event\EventGroup.cs" />
+    <Compile Include="CrazyStorm\File.cs" />
+    <Compile Include="CrazyStorm\IPlayData.cs" />
+    <Compile Include="CrazyStorm\Layer.cs" />
+    <Compile Include="CrazyStorm\Particle\CurveParticle.cs" />
+    <Compile Include="CrazyStorm\Particle\Particle.cs" />
+    <Compile Include="CrazyStorm\Particle\ParticleBase.cs" />
+    <Compile Include="CrazyStorm\Particle\ParticleSystem.cs" />
+    <Compile Include="CrazyStorm\Particle\ParticleType.cs" />
+    <Compile Include="CrazyStorm\PlayDataHelper.cs" />
+    <Compile Include="CrazyStorm\Resource\FileResource.cs" />
+    <Compile Include="CrazyStorm\Resource\Resource.cs" />
+    <Compile Include="CrazyStorm\Resource\VariableResource.cs" />
+    <Compile Include="CrazyStorm\Struct\RGB.cs" />
+    <Compile Include="CrazyStorm\Struct\Vector2.cs" />
+    <Compile Include="DirectX\DeviceContext.cs" />
+    <Compile Include="DirectX\DeviceSettings.cs" />
+    <Compile Include="DirectX\DirectXFramework.cs" />
+    <Compile Include="DirectX\WindowConfig.cs" />
     <Compile Include="Global\VersionInfo.cs" />
     <Compile Include="Player.cs" />
     <Compile Include="Program.cs" />

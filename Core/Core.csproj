@@ -55,11 +55,9 @@
     <Compile Include="Particle\ParticleBase.cs" />
     <Compile Include="Property\RuntimePropertyAttribute.cs" />
     <Compile Include="Struct\RGB.cs" />
-    <Compile Include="Particle\BlendType.cs" />
     <Compile Include="Particle\CurveParticle.cs" />
     <Compile Include="Property\BoolPropertyAttribute.cs" />
     <Compile Include="Property\EnumPropertyAttribute.cs" />
-    <Compile Include="Property\IFieldData.cs" />
     <Compile Include="Property\RGBPropertyAttribute.cs" />
     <Compile Include="Resource\FileResource.cs" />
     <Compile Include="Particle\Particle.cs" />

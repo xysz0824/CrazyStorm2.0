@@ -11,7 +11,7 @@ using System.Reflection;
 
 namespace CrazyStorm.Core
 {
-    public class PlayDataHelper
+    class PlayDataHelper
     {
         public static byte[] GetBytes(object obj)
         {
@@ -54,15 +54,15 @@ namespace CrazyStorm.Core
             bytes.Add(0);
             return bytes.ToArray();
         }
-        internal static List<byte> CreateTrunk(List<byte> content)
+        public static List<byte> CreateBlock(List<byte> content)
         {
-            List<byte> trunk = new List<byte>();
-            //The header is a integer representing length of trunk.
-            trunk.AddRange(BitConverter.GetBytes(content.Count));
-            trunk.AddRange(content);
-            return trunk;
+            List<byte> block = new List<byte>();
+            //The header is a integer representing block size.
+            block.AddRange(BitConverter.GetBytes(content.Count));
+            block.AddRange(content);
+            return block;
         }
-        internal static void GenerateFields(Type type, object source, List<byte> data)
+        public static void GenerateFields(Type type, object source, List<byte> data)
         {
             BindingFlags flags = BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly;
             FieldInfo[] fieldInfos = type.GetFields(flags);
@@ -79,27 +79,27 @@ namespace CrazyStorm.Core
                 }
             }
         }
-        internal static void GenerateFields(object source, List<byte> data)
+        public static void GenerateFields(object source, List<byte> data)
         {
             GenerateFields(source.GetType(), source, data);
         }
-        internal static void GenerateStruct<T>(T source, List<byte> data)
+        public static void GenerateStruct<T>(T source, List<byte> data)
         {
             var structBytes = new List<byte>();
             FieldInfo[] fieldInfos = source.GetType().GetFields();
             foreach (var info in fieldInfos)
                 structBytes.AddRange(GetBytes(info.GetValue(source)));
             
-            data.AddRange(CreateTrunk(structBytes));
+            data.AddRange(CreateBlock(structBytes));
         }
-        internal static void GenerateObjectList<T>(IList<T> source, List<byte> data)
+        public static void GenerateObjectList<T>(IList<T> source, List<byte> data)
             where T : IPlayData
         {
             var objectListBytes = new List<byte>();
             foreach (var obj in source)
                 objectListBytes.AddRange((obj as IPlayData).GeneratePlayData());
 
-            data.AddRange(CreateTrunk(objectListBytes));
+            data.AddRange(CreateBlock(objectListBytes));
         }
     }
 }

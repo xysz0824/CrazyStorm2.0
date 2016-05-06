@@ -17,20 +17,12 @@ namespace CrazyStorm.Core
         Line,
         Circle
     }
-    public struct RebounderData : IFieldData
+    public struct RebounderData
     {
         public int size;
         public RebounderShape shape;
         public float rotation;
         public int collisionTime;
-        public void SetField(int fieldIndex, ValueType value)
-        {
-            throw new NotImplementedException();
-        }
-        public ValueType GetField(int fieldIndex)
-        {
-            throw new NotImplementedException();
-        }
     }
     public class Rebounder : Component
     {
@@ -114,7 +106,7 @@ namespace CrazyStorm.Core
             PlayDataHelper.GenerateStruct(rebounderData, rebounderBytes);
             //rebounderEventGroups
             //TODO
-            bytes.AddRange(PlayDataHelper.CreateTrunk(rebounderBytes));
+            bytes.AddRange(PlayDataHelper.CreateBlock(rebounderBytes));
             return bytes;
         }
         #endregion

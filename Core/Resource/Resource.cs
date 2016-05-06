@@ -69,7 +69,7 @@ namespace CrazyStorm.Core
         {
             var resourceBytes = new List<byte>();
             PlayDataHelper.GenerateFields(typeof(Resource), this, resourceBytes);
-            return PlayDataHelper.CreateTrunk(resourceBytes);
+            return PlayDataHelper.CreateBlock(resourceBytes);
         }
     }
 }

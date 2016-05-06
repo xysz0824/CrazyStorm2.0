@@ -7,17 +7,9 @@ using System.Xml.Serialization;
 
 namespace CrazyStorm.Core
 {
-    public struct CurveParticleData : IFieldData
+    public struct CurveParticleData
     {
         public int length;
-        public void SetField(int fieldIndex, ValueType value)
-        {
-            throw new NotImplementedException();
-        }
-        public ValueType GetField(int fieldIndex)
-        {
-            throw new NotImplementedException();
-        }
     }
     public class CurveParticle : ParticleBase
     {
@@ -65,7 +57,7 @@ namespace CrazyStorm.Core
             var curveParticleBytes = new List<byte>();
             //curveParticleData
             PlayDataHelper.GenerateStruct(curveParticleData, curveParticleBytes);
-            bytes.AddRange(PlayDataHelper.CreateTrunk(curveParticleBytes));
+            bytes.AddRange(PlayDataHelper.CreateBlock(curveParticleBytes));
             return bytes;
         }
         #endregion

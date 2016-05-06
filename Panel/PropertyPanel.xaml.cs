@@ -408,7 +408,7 @@ namespace CrazyStorm
                 //Refresh color combobox.
                 InitializeColorCombo();
                 //Show default type preview
-                if (selectedType.ID >= 1000)
+                if (selectedType.Id >= 1000)
                 {
                     TypeComboTip.Visibility = Visibility.Visible;
                     TypeImageRect.Width = selectedType.Width;

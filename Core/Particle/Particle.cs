@@ -8,20 +8,12 @@ using System.Xml.Serialization;
 
 namespace CrazyStorm.Core
 {
-    public struct ParticleData : IFieldData
+    public struct ParticleData
     {
         public bool stickToSpeedAngle;
         public float heightScale;
         public bool retainScale;
         public bool afterimageEffect;
-        public void SetField(int fieldIndex, ValueType value)
-        {
-            throw new NotImplementedException();
-        }
-        public ValueType GetField(int fieldIndex)
-        {
-            throw new NotImplementedException();
-        }
     }
     public class Particle : ParticleBase
     {
@@ -89,7 +81,7 @@ namespace CrazyStorm.Core
             var particleBytes = new List<byte>();
             //particleData
             PlayDataHelper.GenerateStruct(particleData, particleBytes);
-            bytes.AddRange(PlayDataHelper.CreateTrunk(particleBytes));
+            bytes.AddRange(PlayDataHelper.CreateBlock(particleBytes));
             return bytes;
         }
         #endregion

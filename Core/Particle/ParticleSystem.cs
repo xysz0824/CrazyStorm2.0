@@ -166,7 +166,7 @@ namespace CrazyStorm.Core
             PlayDataHelper.GenerateObjectList(customTypes, particleSystemBytes);
             //layers
             PlayDataHelper.GenerateObjectList(layers, particleSystemBytes);
-            return PlayDataHelper.CreateTrunk(particleSystemBytes);
+            return PlayDataHelper.CreateBlock(particleSystemBytes);
         }
         #endregion
     }

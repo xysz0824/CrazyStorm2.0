@@ -17,7 +17,7 @@ namespace CrazyStorm.Core
         Inner,
         Outer
     }
-    public struct ForceFieldData : IFieldData
+    public struct ForceFieldData
     {
         public float halfWidth;
         public float halfHeight;
@@ -27,14 +27,6 @@ namespace CrazyStorm.Core
         public float force;
         public float direction;
         public ForceType forceType;
-        public void SetField(int fieldIndex, ValueType value)
-        {
-            throw new NotImplementedException();
-        }
-        public ValueType GetField(int fieldIndex)
-        {
-            throw new NotImplementedException();
-        }
     }
     public class ForceField : Component
     {
@@ -127,7 +119,7 @@ namespace CrazyStorm.Core
             var forceFieldBytes = new List<byte>();
             //forceFieldData
             PlayDataHelper.GenerateStruct(forceFieldData, forceFieldBytes);
-            bytes.AddRange(PlayDataHelper.CreateTrunk(forceFieldBytes));
+            bytes.AddRange(PlayDataHelper.CreateBlock(forceFieldBytes));
             return bytes;
         }
         #endregion

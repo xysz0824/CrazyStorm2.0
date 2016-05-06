@@ -12,21 +12,13 @@ using System.Xml.Serialization;
 
 namespace CrazyStorm.Core
 {
-    public struct EmitterData : IFieldData
+    public struct EmitterData
     {
         public Vector2 emitPosition;
         public int emitCount;
         public int emitCycle;
         public float emitAngle;
         public float emitRange;
-        public void SetField(int fieldIndex, ValueType value)
-        {
-            throw new NotImplementedException();
-        }
-        public ValueType GetField(int fieldIndex)
-        {
-            throw new NotImplementedException();
-        }
     }
     public abstract class Emitter : Component
     {
@@ -134,7 +126,7 @@ namespace CrazyStorm.Core
             emitterBytes.AddRange(particle.GeneratePlayData());
             //particleEventGroups
             //TODO
-            bytes.AddRange(PlayDataHelper.CreateTrunk(emitterBytes));
+            bytes.AddRange(PlayDataHelper.CreateBlock(emitterBytes));
             return bytes;
         }
         #endregion

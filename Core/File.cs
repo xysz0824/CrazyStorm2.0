@@ -92,7 +92,6 @@ namespace CrazyStorm.Core
         public List<byte> GeneratePlayData()
         {
             var fileBytes = new List<byte>();
-            PlayDataHelper.GenerateFields(this, fileBytes);
             //images
             PlayDataHelper.GenerateObjectList(images, fileBytes);
             //sounds

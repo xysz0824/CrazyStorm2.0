@@ -5,6 +5,8 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using CrazyStorm.Core;
+using System.Runtime.InteropServices;
 
 namespace CrazyStorm_Player
 {

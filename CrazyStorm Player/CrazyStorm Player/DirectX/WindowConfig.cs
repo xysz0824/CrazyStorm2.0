@@ -6,7 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace CrazyStorm_Player.Framework
+namespace CrazyStorm_Player.DirectX
 {
     struct FormConfig
     {

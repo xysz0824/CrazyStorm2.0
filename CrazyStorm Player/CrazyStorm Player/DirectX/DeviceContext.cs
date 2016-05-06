@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using System.Text;
 using SlimDX.Direct3D9;
 
-namespace CrazyStorm_Player.Framework
+namespace CrazyStorm_Player.DirectX
 {
     class DeviceContext : IDisposable
     {

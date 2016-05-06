@@ -26,7 +26,7 @@ namespace CrazyStorm.Core
         #endregion
 
         #region Public Members
-        public int ID
+        public int Id
         {
             get { return id; }
             set { id = value; }
@@ -82,7 +82,7 @@ namespace CrazyStorm.Core
             var bytes = base.GeneratePlayData();
             var fileResourceBytes = new List<byte>();
             PlayDataHelper.GenerateFields(typeof(FileResource), this, fileResourceBytes);
-            bytes.AddRange(PlayDataHelper.CreateTrunk(fileResourceBytes));
+            bytes.AddRange(PlayDataHelper.CreateBlock(fileResourceBytes));
             return bytes;
         }
         #endregion

@@ -335,7 +335,7 @@ namespace CrazyStorm
                 aimRect.SetValue(OpacityProperty, 0.0d);
                 var boxX = (double)aimRect.GetValue(Canvas.LeftProperty);
                 var boxY = (double)aimRect.GetValue(Canvas.TopProperty);
-                aimComponent.ID = selectedParticle.GetComponentIndex();
+                aimComponent.Id = selectedParticle.GetComponentIndex();
                 var index = selectedParticle.GetAndIncreaseComponentIndex(aimComponent.GetType().ToString());
                 aimComponent.Name = aimComponent.GetType().Name + index;
                 aimComponent.X = (int)(boxX + (double)aimRect.GetValue(Canvas.WidthProperty) / 2 - config.ScreenWidthOver2);

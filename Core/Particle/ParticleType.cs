@@ -34,7 +34,6 @@ namespace CrazyStorm.Core
         [PlayData]
         [XmlAttribute]
         int id;
-        [PlayData]
         [XmlAttribute]
         string name;
         [PlayData]
@@ -58,13 +57,12 @@ namespace CrazyStorm.Core
         [PlayData]
         [XmlAttribute]
         int radius;
-        [PlayData]
         [XmlAttribute]
         ParticleColor color;
         #endregion
 
         #region Public Members
-        public int ID
+        public int Id
         {
             get { return id; }
             set { id = value; }
@@ -282,7 +280,7 @@ namespace CrazyStorm.Core
             if (image != null)
             {
                 var fileResourceAttribute = doc.CreateAttribute("image");
-                fileResourceAttribute.Value = image.ID.ToString();
+                fileResourceAttribute.Value = image.Id.ToString();
                 particleTypeNode.Attributes.Append(fileResourceAttribute);
             }
             XmlHelper.StoreFields(this, doc, particleTypeNode);
@@ -296,7 +294,7 @@ namespace CrazyStorm.Core
             {
                 foreach (var target in collection)
                 {
-                    if (imageID == target.ID)
+                    if (imageID == target.Id)
                     {
                         image = target;
                         break;
@@ -309,12 +307,12 @@ namespace CrazyStorm.Core
         {
             var particleTypeBytes = new List<byte>();
             if (image != null)
-                particleTypeBytes.AddRange(PlayDataHelper.GetBytes(image.ID));
+                particleTypeBytes.AddRange(PlayDataHelper.GetBytes(image.Id));
             else
                 particleTypeBytes.AddRange(PlayDataHelper.GetBytes(-1));
 
             PlayDataHelper.GenerateFields(this, particleTypeBytes);
-            return PlayDataHelper.CreateTrunk(particleTypeBytes);
+            return PlayDataHelper.CreateBlock(particleTypeBytes);
         }
         #endregion
     }

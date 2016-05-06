@@ -13,7 +13,7 @@ using System.Drawing;
 using System.Threading;
 using System.Diagnostics;
 
-namespace CrazyStorm_Player.Framework
+namespace CrazyStorm_Player.DirectX
 {
     abstract class DirectXFramework : IDisposable
     {

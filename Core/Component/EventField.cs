@@ -23,21 +23,13 @@ namespace CrazyStorm.Core
         Layer,
         Name
     }
-    public struct EventFieldData : IFieldData
+    public struct EventFieldData
     {
         public float halfWidth;
         public float halfHeight;
         public FieldShape shape;
         public Reach reach;
         public string targetName;
-        public void SetField(int fieldIndex, ValueType value)
-        {
-            throw new NotImplementedException();
-        }
-        public ValueType GetField(int fieldIndex)
-        {
-            throw new NotImplementedException();
-        }
     }
     public class EventField : Component
     {
@@ -129,7 +121,7 @@ namespace CrazyStorm.Core
             PlayDataHelper.GenerateStruct(eventFieldData, eventFieldBytes);
             //eventFieldEventGroups
             //TODO
-            bytes.AddRange(PlayDataHelper.CreateTrunk(eventFieldBytes));
+            bytes.AddRange(PlayDataHelper.CreateBlock(eventFieldBytes));
             return bytes;
         }
         #endregion

@@ -34,7 +34,7 @@ namespace CrazyStorm
                 }
                 foreach (var clone in clones)
                 {
-                    clone.ID = selectedParticle.GetComponentIndex();
+                    clone.Id = selectedParticle.GetComponentIndex();
                     selectedParticle.GetAndIncreaseComponentIndex(clone.GetType().ToString());
                 }   
                 History[0] = clones;
