@@ -14,7 +14,7 @@ namespace CrazyStorm_Player.CrazyStorm
         Substraction,
         Multiply
     }
-    abstract class ParticleBase : IPlayData
+    abstract class ParticleBase : IPlayData, IRebuildReference<ParticleType>
     {
         public ParticleType Type { get; set; }
         public int TypeID { get; set; }
@@ -71,6 +71,20 @@ namespace CrazyStorm_Player.CrazyStorm
                     IgnoreForce = dataReader.ReadBoolean();
                     FogEffect = dataReader.ReadBoolean();
                     FadeEffect = dataReader.ReadBoolean();
+                }
+            }
+        }
+        public void RebuildReferenceFromCollection(IList<ParticleType> collection)
+        {
+            if (TypeID != -1)
+            {
+                foreach (var target in collection)
+                {
+                    if (TypeID == target.Id)
+                    {
+                        Type = target;
+                        break;
+                    }
                 }
             }
         }

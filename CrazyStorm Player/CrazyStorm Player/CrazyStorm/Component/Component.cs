@@ -7,7 +7,7 @@ using CrazyStorm.Core;
 
 namespace CrazyStorm_Player.CrazyStorm
 {
-    class Component : IPlayData
+    class Component : IPlayData, IRebuildReference<Component>
     {
         public int Id { get; set; }
         public string Name { get; set; }
@@ -62,6 +62,31 @@ namespace CrazyStorm_Player.CrazyStorm
                 PlayDataHelper.LoadObjectList(Variables, componentReader);
                 //componentEventGroups
                 //TODO
+            }
+        }
+        public void RebuildReferenceFromCollection(IList<Component> collection)
+        {
+            if (ParentID != -1)
+            {
+                foreach (var target in collection)
+                {
+                    if (ParentID == target.Id)
+                    {
+                        Parent = target;
+                        break;
+                    }
+                }
+            }
+            if (BindingTargetID != -1)
+            {
+                foreach (var target in collection)
+                {
+                    if (BindingTargetID == target.Id)
+                    {
+                        BindingTarget = target;
+                        break;
+                    }
+                }
             }
         }
     }

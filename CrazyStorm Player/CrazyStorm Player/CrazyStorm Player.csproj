@@ -96,7 +96,9 @@
     <Compile Include="CrazyStorm\Component\Rebounder.cs" />
     <Compile Include="CrazyStorm\Event\EventGroup.cs" />
     <Compile Include="CrazyStorm\File.cs" />
+    <Compile Include="CrazyStorm\FileHelper.cs" />
     <Compile Include="CrazyStorm\IPlayData.cs" />
+    <Compile Include="CrazyStorm\IRebuildReference.cs" />
     <Compile Include="CrazyStorm\Layer.cs" />
     <Compile Include="CrazyStorm\Particle\CurveParticle.cs" />
     <Compile Include="CrazyStorm\Particle\Particle.cs" />

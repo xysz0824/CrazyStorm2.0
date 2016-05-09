@@ -66,6 +66,8 @@ namespace CrazyStorm
             foreach (VariableResource item in file.Globals)
                 environment.PutGlobal(item.Label, item.Value);
             //Add system functions.
+            Expression.Function angle = new Expression.Function(2);
+            environment.PutFunction("angle", angle);
             Expression.Function rand = new Expression.Function(2);
             environment.PutFunction("rand", rand);
             Expression.Function sin = new Expression.Function(1);

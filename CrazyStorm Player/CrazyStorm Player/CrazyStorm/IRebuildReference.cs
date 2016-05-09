@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace CrazyStorm.Core
+namespace CrazyStorm_Player.CrazyStorm
 {
     interface IRebuildReference<T>
     {

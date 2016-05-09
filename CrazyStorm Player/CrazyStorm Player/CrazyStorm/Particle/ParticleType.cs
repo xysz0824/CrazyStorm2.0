@@ -7,7 +7,7 @@ using CrazyStorm.Core;
 
 namespace CrazyStorm_Player.CrazyStorm
 {
-    class ParticleType : IPlayData
+    class ParticleType : IPlayData, IRebuildReference<FileResource>
     {
         public FileResource Image { get; set; }
         public int ImageID { get; private set; }
@@ -36,6 +36,20 @@ namespace CrazyStorm_Player.CrazyStorm
                 Frames = particleTypeReader.ReadInt32();
                 Delay = particleTypeReader.ReadInt32();
                 Radius = particleTypeReader.ReadInt32();
+            }
+        }
+        public void RebuildReferenceFromCollection(IList<FileResource> collection)
+        {
+            if (ImageID != -1)
+            {
+                foreach (var target in collection)
+                {
+                    if (ImageID == target.Id)
+                    {
+                        Image = target;
+                        break;
+                    }
+                }
             }
         }
     }

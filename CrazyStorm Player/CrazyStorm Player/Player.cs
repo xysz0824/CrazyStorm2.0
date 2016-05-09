@@ -22,12 +22,13 @@ namespace CrazyStorm_Player
             using (FileStream stream = new FileStream("a.bg", FileMode.Open))
             {
                 var reader = new BinaryReader(stream);
-                //Play file using UTF-8 encoding
+                //Play file use UTF-8 encoding
                 string header = PlayDataHelper.ReadString(reader);
                 if (header == "BG")
                 {
                     string version = PlayDataHelper.ReadString(reader);
                     file.LoadPlayData(reader);
+                    FileHelper.RebuildObjectReference(file);
                 }
             }
         }
