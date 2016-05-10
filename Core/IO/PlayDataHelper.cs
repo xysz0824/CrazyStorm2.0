@@ -11,7 +11,7 @@ using System.Reflection;
 
 namespace CrazyStorm.Core
 {
-    class PlayDataHelper
+    public class PlayDataHelper
     {
         public static byte[] GetBytes(object obj)
         {

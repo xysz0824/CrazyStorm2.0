@@ -16,23 +16,23 @@ namespace CrazyStorm
         {
             base.Redo(stack);
             var selectedComponents = Parameter[0] as IList<Component>;
-            var boundComponents = new List<Component>();
+            var boundEmitters = new List<Component>();
             foreach (var component in selectedComponents)
             {
-                boundComponents.Add(component.BindingTarget);
+                boundEmitters.Add(component.BindingTarget);
                 component.BindingTarget = null;
             }
-            History[0] = boundComponents;
+            History[0] = boundEmitters;
         }
         public override void Undo(CommandStack stack)
         {
             base.Undo(stack);
             var selectedComponents = Parameter[0] as IList<Component>;
-            var boundComponents = History[0] as IList<Component>;
+            var boundEmitters = History[0] as IList<Component>;
             foreach (var component in selectedComponents)
             {
-                component.BindingTarget = boundComponents.First();
-                boundComponents.RemoveAt(0);
+                component.BindingTarget = boundEmitters.First();
+                boundEmitters.RemoveAt(0);
             }
         }
     }

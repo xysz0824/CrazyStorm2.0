@@ -17,16 +17,16 @@ namespace CrazyStorm
         {
             base.Redo(stack);
             var bindingLines = Parameter[0] as IList<Line>;
-            var boundComponents = new List<Component>();
-            var selectedComponent = Parameter[1] as Component;
+            var boundEmitters = new List<Component>();
+            var selectedEmitter = Parameter[1] as Component;
             foreach (var line in bindingLines)
             {
                 var component = line.DataContext as Component;
-                boundComponents.Add(component.BindingTarget);
-                if (component != selectedComponent)
-                    component.BindingTarget = selectedComponent;
+                boundEmitters.Add(component.BindingTarget);
+                if (component != selectedEmitter)
+                    component.BindingTarget = selectedEmitter;
             }
-            History[0] = boundComponents;
+            History[0] = boundEmitters;
         }
         public override void Undo(CommandStack stack)
         {

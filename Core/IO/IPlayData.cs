@@ -10,7 +10,7 @@ using System.Text;
 
 namespace CrazyStorm.Core
 {
-    interface IPlayData
+    public interface IPlayData
     {
         List<byte> GeneratePlayData();
     }

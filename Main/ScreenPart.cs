@@ -345,11 +345,11 @@ namespace CrazyStorm
                 aimComponent = null;
                 aimRect = null;
             }
-            //Binding selected component
+            //Binding to selected emitter
             if (bindingLines != null)
             {
                 SelectComponents((int)screenMousePos.X, (int)screenMousePos.Y, 1, 1);
-                if (selectedComponents.Count == 1)
+                if (selectedComponents.Count == 1 && selectedComponents[0] is Emitter)
                     new BindComponentCommand().Do(commandStacks[selectedParticle], bindingLines, selectedComponents.First());
 
                 bindingLines = null;
