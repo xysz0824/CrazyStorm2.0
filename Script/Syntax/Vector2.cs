@@ -21,10 +21,10 @@ namespace CrazyStorm.Expression
 
         public SyntaxTree GetY() { return GetChildren()[1]; }
 
-        public override object Test(Environment e)
+        public override object Eval(Environment e)
         {
-            var x = GetX().Test(e);
-            var y = GetY().Test(e);
+            var x = GetX().Eval(e);
+            var y = GetY().Eval(e);
             if ((!(x is int) && !(x is float)) || (!(y is int) && !(y is float)))
                 throw new ExpressionException("Type error.");
 

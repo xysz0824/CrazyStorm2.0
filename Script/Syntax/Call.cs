@@ -20,13 +20,14 @@ namespace CrazyStorm.Expression
 
         public SyntaxTree GetArguments() { return GetChildren()[0]; }
 
-        public override object Test(Environment e)
+        public override object Eval(Environment e)
         {
-            var function = e.GetFunction((string)Token.GetValue());
+            var functionName = (string)Token.GetValue();
+            var function = e.GetFunction(functionName);
             if (function == null)
                 throw new ExpressionException("Undefination error.");
 
-            var argumentList = (List<object>)GetArguments().Test(e);
+            var argumentList = GetArguments().Eval(e) as List<object>;
             if (argumentList.Count != function.ArgumentCount)
                 throw new ExpressionException("Argument error.");
 
@@ -34,8 +35,8 @@ namespace CrazyStorm.Expression
                 if (!(item is int) && !(item is float))
                     throw new ExpressionException("Type error.");
 
-            //Execute method is just for testing,
-            //which means it doesn't need to call real function.
+            //Calling function is a runtime operation so it can't be evaluated right here.
+            //Return a false value.
             return 0.0f;
         }
     }

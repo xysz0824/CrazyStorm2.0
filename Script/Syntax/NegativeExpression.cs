@@ -19,15 +19,15 @@ namespace CrazyStorm.Expression
 
         public SyntaxTree GetExpression() { return GetChildren()[0]; }
 
-        public override object Test(Environment e)
+        public override object Eval(Environment e)
         {
-            var num = GetExpression().Test(e);
-            if ((!(num is int) && !(num is float)))
+            var num = GetExpression().Eval(e);
+            if (num is int)
+                return -(int)num;
+            else if (num is float)
+                return -(float)num;
+            else
                 throw new ExpressionException("Type error.");
-
-            //Execute method is just for testing,
-            //which means it doesn't need to calculate result.
-            return num;
         }
     }
 }

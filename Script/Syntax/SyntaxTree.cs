@@ -34,6 +34,6 @@ namespace CrazyStorm.Expression
 
         public bool IsLeaf() { return token != null; }
 
-        public abstract object Test(Environment e);
+        public abstract object Eval(Environment e);
     }
 }

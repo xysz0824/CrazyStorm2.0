@@ -22,12 +22,12 @@ namespace CrazyStorm.Expression
 
         public IList<SyntaxTree> GetArguments() { return GetChildren(); }
 
-        public override object Test(Environment e)
+        public override object Eval(Environment e)
         {
             var list = GetArguments();
             var resultList = new List<object>();
             foreach (var item in list)
-                resultList.Add(item.Test(e));
+                resultList.Add(item.Eval(e));
 
             return resultList;
         }

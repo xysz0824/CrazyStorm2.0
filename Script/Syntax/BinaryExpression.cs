@@ -24,42 +24,77 @@ namespace CrazyStorm.Expression
 
         public SyntaxTree GetRightChild() { return GetChildren()[1]; }
 
-        public override object Test(Environment e)
+        public override object Eval(Environment e)
         {
-            var left = GetLeftChild().Test(e);
-            var right = GetRightChild().Test(e);
+            var left = GetLeftChild().Eval(e);
+            var right = GetRightChild().Eval(e);
             var op = (string)Token.GetValue();
-            //Execute method is just for testing,
-            //which means it doesn't need to calculate result.
             if ((!(left is int) && !(left is float)) || (!(right is int) && !(right is float)))
             {
-                if (((left is Core.Vector2 && right is Core.Vector2) || (left is Core.RGB && right is Core.RGB))
-                    && (op == "+" || op == "-"))
-                    return left;
-
-                if (left is bool && right is bool && (op == "&" || op == "|" || op == "="))
-                    return left;
-
-                    return new ExpressionException("Type error.");
+                if (left is bool && right is bool)
+                {
+                    switch (op)
+                    {
+                        case "&":
+                            return (bool)left && (bool)right;
+                        case "|":
+                            return (bool)left || (bool)right;
+                        case "=":
+                            return (bool)left == (bool)right;
+                    }
+                }
+                return new ExpressionException("Type error.");
             }
             switch (op)
             {
+                case "+":
+                    if (left is int && right is int)
+                        return (int)left + (int)right;
+                    else
+                        return (float)left + (float)right;
+                case "-":
+                    if (left is int && right is int)
+                        return (int)left - (int)right;
+                    else
+                        return (float)left - (float)right;
+                case "*":
+                    if (left is int && right is int)
+                        return (int)left * (int)right;
+                    else
+                        return (float)left * (float)right;
                 case "/":
                     if (Convert.ToSingle(right) == 0)
                         throw new ExpressionException("Divided by zero.");
-                    break;
+
+                    if (left is int && right is int)
+                        return (int)left / (int)right;
+                    else
+                        return (float)left / (float)right;
                 case "%":
                     if (Convert.ToSingle(right) == 0)
                         throw new ExpressionException("Divided by zero.");
-                    break;
+
+                    if (left is int && right is int)
+                        return (int)left % (int)right;
+                    else
+                        return (float)left % (float)right;
                 case ">":
-                    return true;
+                    if (left is int && right is int)
+                        return (int)left > (int)right;
+                    else
+                        return (float)left > (float)right;
                 case "<":
-                    return true;
+                    if (left is int && right is int)
+                        return (int)left < (int)right;
+                    else
+                        return (float)left < (float)right;
                 case "=":
-                    return true;
+                    if (left is int && right is int)
+                        return (int)left == (int)right;
+                    else
+                        return (float)left == (float)right;
             }
-            return left;
+            return new ExpressionException("Type error.");
         }
     }
 }

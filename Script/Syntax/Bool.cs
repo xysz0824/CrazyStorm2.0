@@ -17,7 +17,7 @@ namespace CrazyStorm.Expression
             Token = token;
         }
 
-        public override object Test(Environment e)
+        public override object Eval(Environment e)
         {
             return bool.Parse((string)Token.GetValue());
         }

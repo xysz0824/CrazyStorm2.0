@@ -71,7 +71,7 @@ namespace CrazyStorm
                 if (syntaxTree is Number)
                     throw new ExpressionException("Illegal input.");
 
-                var result = syntaxTree.Test(environment);
+                var result = syntaxTree.Eval(environment);
                 if (!PropertyTypeRule.IsMatchWith(propertyInfo.PropertyType, result.GetType()))
                     throw new ExpressionException("Type error.");
 

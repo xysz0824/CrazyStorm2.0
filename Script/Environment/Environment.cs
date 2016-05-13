@@ -20,7 +20,6 @@ namespace CrazyStorm.Expression
         #region Public Members
         public IDictionary<string, float> Globals { get { return globals; } }
         public IDictionary<string, float> Locals { get { return locals; } }
-        public IDictionary<string, Function> Functions { get { return functions; } }
         #endregion
 
         #region Constructor
@@ -29,6 +28,7 @@ namespace CrazyStorm.Expression
             globals = new Dictionary<string, float>();
             locals = new Dictionary<string, float>();
             functions = new Dictionary<string, Function>();
+            InitializeSystemFunctions();
         }
 
         public Environment(Environment environment)
@@ -55,6 +55,14 @@ namespace CrazyStorm.Expression
         #endregion
 
         #region Private Methods
+        void InitializeSystemFunctions()
+        {
+            PutFunction("angle", new Expression.Function(2));
+            PutFunction("rand", new Expression.Function(2));
+            PutFunction("sin", new Expression.Function(1));
+            PutFunction("cos", new Expression.Function(1));
+            PutFunction("tan", new Expression.Function(1));
+        }
         bool TryPutVariable(IDictionary<string, float> map, string name, object value)
         {
             if (value is int || value is float || value is bool || value is Enum)
@@ -80,11 +88,17 @@ namespace CrazyStorm.Expression
             else
                 return false;
         }
+        void PutFunction(string name, Function function)
+        {
+            functions[name] = function;
+        }
         #endregion
 
         #region Public Methods
-        public void PutGlobal(string name, float value) { globals[name] = value; }
-
+        public void PutGlobal(string name, float value) 
+        {
+            globals[name] = value; 
+        }
         public float? GetGlobal(string name) 
         {
             if (globals.ContainsKey(name))
@@ -92,10 +106,14 @@ namespace CrazyStorm.Expression
             else
                 return null;
         }
-        public void RemoveGlobal(string name) { globals.Remove(name); }
-
-        public bool TryPutLocal(string name, object value) { return TryPutVariable(locals, name, value); }
-
+        public void RemoveGlobal(string name) 
+        {
+            globals.Remove(name); 
+        }
+        public bool TryPutLocal(string name, object value) 
+        { 
+            return TryPutVariable(locals, name, value); 
+        }
         public float? GetLocal(string name)
         {
             if (locals.ContainsKey(name))
@@ -103,7 +121,6 @@ namespace CrazyStorm.Expression
             else
                 return null;
         }
-
         public void RemoveLocal(string name) 
         {
             if (!locals.Remove(name))
@@ -118,10 +135,10 @@ namespace CrazyStorm.Expression
                     locals.Remove(removeKeys[i]);
             }
         }
-
-        public void PutFunction(string name, Function function) { functions[name] = function; }
-
-        public Function GetFunction(string name) { return functions.ContainsKey(name) ? functions[name] : null; }
+        public Function GetFunction(string name)
+        {
+            return functions.ContainsKey(name) ? functions[name] : null;
+        }
         #endregion
     }
 }

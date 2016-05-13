@@ -784,7 +784,7 @@ namespace CrazyStorm
                                     if (syntaxTree is Number)
                                         throw new ExpressionException();
 
-                                    var result = syntaxTree.Test(environment);
+                                    var result = syntaxTree.Eval(environment);
                                     if (!(PropertyTypeRule.IsMatchWith(property.Info.PropertyType, result.GetType())))
                                         throw new ExpressionException();
 
@@ -795,7 +795,7 @@ namespace CrazyStorm
                                     var lexer = new Lexer();
                                     lexer.Load(input);
                                     var syntaxTree = new Parser(lexer).Expression();
-                                    var result = syntaxTree.Test(environment);
+                                    var result = syntaxTree.Eval(environment);
                                     if (!(result is float))
                                         throw new ExpressionException();
 
@@ -814,7 +814,7 @@ namespace CrazyStorm
                         var lexer = new Lexer();
                         lexer.Load(input);
                         var syntaxTree = new Parser(lexer).Expression();
-                        var result = syntaxTree.Test(environment);
+                        var result = syntaxTree.Eval(environment);
                         if (!(result is float))
                             throw new ExpressionException();
                     }
@@ -882,7 +882,7 @@ namespace CrazyStorm
                 var lexer = new Lexer();
                 lexer.Load(input);
                 var syntaxTree = new Parser(lexer).Expression();
-                var result = syntaxTree.Test(environment);
+                var result = syntaxTree.Eval(environment);
                 if (!(result is bool))
                     throw new ExpressionException();
                 eventGroup.Condition = input;
@@ -905,7 +905,7 @@ namespace CrazyStorm
                 var lexer = new Lexer();
                 lexer.Load(input);
                 var syntaxTree = new Parser(lexer).Expression();
-                var result = syntaxTree.Test(environment);
+                var result = syntaxTree.Eval(environment);
                 if (!(result is bool))
                     throw new ExpressionException();
             }

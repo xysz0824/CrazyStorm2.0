@@ -53,29 +53,18 @@ namespace CrazyStorm
             this.component = component;
             this.updateFunc = updateFunc;
             InitializeComponent();
-            InitializerEnvironment();
+            InitializeEnvironment();
             LoadContent();
         }
         #endregion
 
         #region Private Methods
-        void InitializerEnvironment()
+        void InitializeEnvironment()
         {
             environment = new Expression.Environment();
             //Add globals.
             foreach (VariableResource item in file.Globals)
                 environment.PutGlobal(item.Label, item.Value);
-            //Add system functions.
-            Expression.Function angle = new Expression.Function(2);
-            environment.PutFunction("angle", angle);
-            Expression.Function rand = new Expression.Function(2);
-            environment.PutFunction("rand", rand);
-            Expression.Function sin = new Expression.Function(1);
-            environment.PutFunction("sin", sin);
-            Expression.Function cos = new Expression.Function(1);
-            environment.PutFunction("cos", cos);
-            Expression.Function tan = new Expression.Function(1);
-            environment.PutFunction("tan", tan);
         }
         void LoadContent()
         {
@@ -299,9 +288,13 @@ namespace CrazyStorm
         #region Window EventHandlers
         private void Grid_BeginningEdit(object sender, DataGridBeginningEditEventArgs e)
         {
-            editText = (e.EditingEventArgs.OriginalSource as TextBlock).Text;
-            if (OnBeginEditing != null)
-                OnBeginEditing();
+            var textBlock = e.EditingEventArgs.OriginalSource as TextBlock;
+            if (textBlock != null)
+            {
+                editText = textBlock.Text;
+                if (OnBeginEditing != null)
+                    OnBeginEditing();
+            }
         }
         private void ComponentGrid_CellEditEnding(object sender, DataGridCellEditEndingEventArgs e)
         {
