@@ -7,12 +7,12 @@
             <StackPanel>
                 <DockPanel Margin="0,1">
                     <Label Content="名称" />
-                    <TextBox Text="{Binding Path=Name}" VerticalContentAlignment="Center" />
+                    <TextBox Text="{Binding Path=Name}" VerticalContentAlignment="Center" MaxLines="1" />
                 </DockPanel>
                 <DockPanel Name="ConditionPanel" Margin="0,1">
                     <Label Content="条件" />
                     <TextBox Name="Condition" Text="{Binding Path=Condition, Mode=OneWay}" VerticalContentAlignment="Center" 
-                             PreviewLostKeyboardFocus="Condition_PreviewLostKeyboardFocus" Background="White" />
+                             PreviewLostKeyboardFocus="Condition_PreviewLostKeyboardFocus" Background="White" MaxLines="1" />
                 </DockPanel>
             </StackPanel>
         </GroupBox>
@@ -61,7 +61,7 @@
                     <RadioButton Name="LeftLessThan" Content="&lt;" />
                 </StackPanel>
                 <TextBox Name="LeftValue" Width="50" VerticalContentAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Center" Height="25" 
-                         PreviewLostKeyboardFocus="LeftValue_PreviewLostKeyboardFocus" />
+                         PreviewLostKeyboardFocus="LeftValue_PreviewLostKeyboardFocus" MaxLines="1" />
                 <StackPanel Margin="5,0" VerticalAlignment="Center">
                     <RadioButton Name="And" Content="且" />
                     <RadioButton Name="Or" Content="或" />
@@ -79,7 +79,7 @@
                     <RadioButton Name="RightLessThan" Content="&lt;" />
                 </StackPanel>
                 <TextBox Name="RightValue" Width="50" VerticalContentAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Center" Height="25" 
-                         PreviewLostKeyboardFocus="RightValue_PreviewLostKeyboardFocus"/>
+                         PreviewLostKeyboardFocus="RightValue_PreviewLostKeyboardFocus" MaxLines="1"/>
             </StackPanel>
         </GroupBox>
         <GroupBox Name="PropertyEventPanel" Header="属性事件">
@@ -95,7 +95,7 @@
                     <RadioButton Name="ChangeTo" Content="变化到" VerticalAlignment="Center" Margin="5,0,5,0"></RadioButton>
                     <RadioButton Name="Increase" Content="增加" VerticalAlignment="Center" Margin="5,0"></RadioButton>
                     <RadioButton Name="Decrease" Content="减少" VerticalAlignment="Center" Margin="5,0,5,0"></RadioButton>
-                    <TextBox Name="ResultValue" VerticalContentAlignment="Center" Height="25" PreviewLostKeyboardFocus="ResultValue_PreviewLostKeyboardFocus"/>
+                    <TextBox Name="ResultValue" VerticalContentAlignment="Center" Height="25" PreviewLostKeyboardFocus="ResultValue_PreviewLostKeyboardFocus" MaxLines="1"/>
                 </DockPanel>
                 <StackPanel Orientation="Horizontal" Margin="0,1" HorizontalAlignment="Center">
                     <StackPanel Margin="6,0">
@@ -118,10 +118,10 @@
                 <StackPanel Orientation="Horizontal" Margin="0,1" HorizontalAlignment="Right">
                     <Label Content="变化时间" Margin="4,0,0,0"/>
                     <TextBox x:Name="ChangeTime" Width="50" VerticalContentAlignment="Center" VerticalAlignment="Center" HorizontalAlignment="Center" Height="26" 
-                             PreviewLostKeyboardFocus="ChangeTime_PreviewLostKeyboardFocus"/>
+                             PreviewLostKeyboardFocus="ChangeTime_PreviewLostKeyboardFocus" MaxLines="1" MaxLength="9"/>
                     <Label  Content="执行次数" />
                     <TextBox Name="ExecuteTime" Width="50" VerticalContentAlignment="Center" VerticalAlignment="Center" HorizontalAlignment="Center" Height="25" 
-                             PreviewLostKeyboardFocus="ExecuteTime_PreviewLostKeyboardFocus"/>
+                             PreviewLostKeyboardFocus="ExecuteTime_PreviewLostKeyboardFocus" MaxLength="9" MaxLines="1"/>
                 </StackPanel>
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,1">
                     <Button x:Name="AddEvent" Width ="40" Content="添加" Margin="2,0" Click="AddEvent_Click" />
@@ -147,7 +147,7 @@
                 <DockPanel Name="LoopPanel" Margin="0,1" Visibility="Collapsed">
                     <Label Content="循环次数" />
                     <TextBox Name="LoopTime" Width="50" VerticalContentAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Center" Height="25" 
-                             PreviewLostKeyboardFocus="LoopTime_PreviewLostKeyboardFocus"/>
+                             PreviewLostKeyboardFocus="LoopTime_PreviewLostKeyboardFocus" MaxLines="1" MaxLength="9"/>
                     <Label Content="中止条件" />
                     <TextBox Name="StopCondition" VerticalContentAlignment="Center" PreviewLostKeyboardFocus="StopCondition_PreviewLostKeyboardFocus" />
                 </DockPanel>

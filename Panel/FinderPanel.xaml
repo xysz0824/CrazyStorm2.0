@@ -26,7 +26,7 @@
                 </UniformGrid>
                 <DockPanel Margin="0,1">
                     <Label DockPanel.Dock="Left" Content="名称" />
-                    <TextBox Name="InputName" VerticalContentAlignment="Center" TextChanged="InputName_TextChanged"/>
+                    <TextBox Name="InputName" VerticalContentAlignment="Center" TextChanged="InputName_TextChanged" MaxLines="1"/>
                 </DockPanel>
             </StackPanel>
         </GroupBox>

@@ -4,9 +4,9 @@
         Title="屏幕设置" Height="200" Width="300" WindowStyle="ToolWindow" WindowStartupLocation="CenterScreen" ResizeMode="NoResize" Background="#FFF0F0F0">
     <Canvas Name="Setting">
         <Label Content="背景宽度" Canvas.Left="10" Canvas.Top="10"/>
-        <TextBox Name="ScreenWidth" Text="{Binding Path=ScreenWidth, Mode=OneTime}" Height="23" Canvas.Left="73" TextWrapping="Wrap" Canvas.Top="13" Width="42" VerticalContentAlignment="Center"/>
+        <TextBox Name="ScreenWidth" Text="{Binding Path=ScreenWidth, Mode=OneTime}" Height="23" Canvas.Left="73" Canvas.Top="13" Width="42" VerticalContentAlignment="Center" MaxLines="1" MaxLength="10"/>
         <Label Content="背景高度" Canvas.Left="120" Canvas.Top="10"/>
-        <TextBox Name="ScreenHeight" Text="{Binding Path=ScreenHeight, Mode=OneTime}" Height="23" Canvas.Left="183" TextWrapping="Wrap" Canvas.Top="13" Width="42" VerticalContentAlignment="Center"/>
+        <TextBox Name="ScreenHeight" Text="{Binding Path=ScreenHeight, Mode=OneTime}" Height="23" Canvas.Left="183" Canvas.Top="13" Width="42" VerticalContentAlignment="Center" MaxLength="10" MaxLines="1"/>
         <Label Content="背景图案" Canvas.Left="10" Canvas.Top="40"/>
         <TextBox Name="ImagePath" Text="{Binding Path=ImagePath, Mode=OneTime}" Height="23" Canvas.Left="73" Canvas.Top="43" Width="152" VerticalContentAlignment="Center"/>
         <Label Content="网格对齐" Canvas.Left="10" Canvas.Top="70"/>
