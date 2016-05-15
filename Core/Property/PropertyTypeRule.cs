@@ -7,15 +7,19 @@ namespace CrazyStorm.Core
 {
     public class PropertyTypeRule
     {
+        public static bool CanConvertToSingle(Type type)
+        {
+            if (type.Equals(typeof(int)) || type.Equals(typeof(float)) || type.Equals(typeof(bool)) || type.IsEnum)
+                return true;
+            
+            return false;
+        }
         public static bool IsMatchWith(Type typeA, Type typeB)
         {
             if (typeA.Equals(typeB))
                 return true;
 
-            Type intType = typeof(int);
-            Type floatType = typeof(float);
-            if ((typeA.Equals(intType) && typeB.Equals(floatType)) ||
-                (typeA.Equals(floatType) && typeB.Equals(intType)))
+            if (CanConvertToSingle(typeA) && CanConvertToSingle(typeB))
                 return true;
 
             return false;
@@ -67,11 +71,6 @@ namespace CrazyStorm.Core
                 output = null;
 
             return result;
-        }
-        public static bool IsMatchWith(object target, string text)
-        {
-            object value;
-            return TryMatchWith(target, text, out value);
         }
     }
 }

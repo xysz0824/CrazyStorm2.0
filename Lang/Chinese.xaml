@@ -37,6 +37,7 @@
     <sys:String x:Key="ComponentStr">组件</sys:String>
     <sys:String x:Key="BindComponentStr">组件绑定</sys:String>
     <sys:String x:Key="UnbindComponentStr">组件解绑</sys:String>
+    <sys:String x:Key="TestStr">测试</sys:String>
     <sys:String x:Key="PlayStr">播放</sys:String>
     <sys:String x:Key="GeneratePlayFileStr">生成播放文件</sys:String>
     <sys:String x:Key="PlayCurrentStr">播放当前粒子</sys:String>

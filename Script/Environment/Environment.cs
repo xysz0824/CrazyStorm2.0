@@ -65,7 +65,7 @@ namespace CrazyStorm.Expression
         }
         bool TryPutVariable(IDictionary<string, float> map, string name, object value)
         {
-            if (value is int || value is float || value is bool || value is Enum)
+            if (Core.PropertyTypeRule.CanConvertToSingle(value.GetType()))
             {
                 map[name] = Convert.ToSingle(value);
                 return true;
