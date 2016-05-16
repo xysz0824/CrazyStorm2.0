@@ -62,9 +62,12 @@ namespace CrazyStorm
         void InitializeEnvironment()
         {
             environment = new Expression.Environment();
-            //Add globals.
+            //Put globals.
             foreach (VariableResource item in file.Globals)
                 environment.PutGlobal(item.Label, item.Value);
+            //Put locals
+            foreach (VariableResource item in component.Variables)
+                environment.PutLocal(item.Label, item.Value);
         }
         void LoadContent()
         {
@@ -148,9 +151,6 @@ namespace CrazyStorm
             //Load variables.
             VariableGrid.ItemsSource = component.Variables;
             DeleteVariable.IsEnabled = component.Variables.Count > 0 ? true : false;
-            //Put locals into environment.
-            foreach (var item in component.Variables)
-                environment.TryPutLocal(item.Label, item.Value);
             //Load component events.
             ComponentEventList.ItemsSource = component.ComponentEventGroups;
             //Load specific events.
@@ -192,8 +192,8 @@ namespace CrazyStorm
                     };
                     propertyItems.Add(property);
                 }
-                //Put the property into environment.
-                environment.TryPutLocal(item.Name, item.GetGetMethod().Invoke(container, null));
+                //Put this property into environment.
+                environment.PutProperty(item.Name, item.GetGetMethod().Invoke(container, null));
             }
             element.DataContext = propertyItems;
         }
@@ -343,7 +343,7 @@ namespace CrazyStorm
                     component.Variables.Add(newVar);
                     DeleteVariable.IsEnabled = true;
                     //Put this into environment.
-                    environment.TryPutLocal(newVar.Label, newVar.Value);
+                    environment.PutLocal(newVar.Label, newVar.Value);
                     return;
                 }
             }
@@ -484,11 +484,13 @@ namespace CrazyStorm
                     if (particleItems != null)
                     {
                         foreach (var item in particleItems)
-                            environment.RemoveLocal(item.Name);
+                            environment.RemoveProperty(item.Name);
+
                     }
                 }
                 //Remove unnecessary properties
-                environment.RemoveLocal("Name");
+                environment.RemoveProperty("PPosition");
+                environment.RemoveProperty("Name");
                 OpenEventSetting(ComponentEventList.SelectedItem as EventGroup, environment, 
                     component is Emitter, component is Emitter);
             }
@@ -502,16 +504,16 @@ namespace CrazyStorm
                 var componentItems = ComponentGrid.DataContext as IList<PropertyGridItem>;
                 var emitterItems = SpecificGrid.DataContext as IList<PropertyGridItem>;
                 foreach (var item in componentItems)
-                    environment.RemoveLocal(item.Name);
+                    environment.RemoveProperty(item.Name);
 
                 foreach (var item in emitterItems)
-                    environment.RemoveLocal(item.Name);
+                    environment.RemoveProperty(item.Name);
                 
                 if (component is EventField || component is Rebounder)
                 {
                     //For compatibility between particle and curveparticle, 
                     //Put uncommon particle properties
-                    environment.TryPutLocal("Length", 0);
+                    environment.PutLocal((string)FindResource("LengthStr"), 0);
                 }
                 OpenEventSetting(SpecificEventList.SelectedItem as EventGroup, environment, 
                     false, true);

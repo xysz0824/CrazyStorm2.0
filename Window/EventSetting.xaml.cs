@@ -62,21 +62,32 @@ namespace CrazyStorm
         }
         void LoadContent()
         {
-            //Load locals and globals.
-            foreach (var local in environment.Locals)
+            //Load properties.
+            foreach (var property in environment.Properties)
             {
                 var item = new VariableComboBoxItem();
-                item.Name = local.Key;
-                string[] split = local.Key.Split('.');
+                item.Name = property.Key;
+                string[] split = property.Key.Split('.');
                 var displayName = (string)TryFindResource(split[0] + "Str");
                 if (displayName != null && split.Length > 1)
                     displayName += "." + split[1];
 
-                item.DisplayName = displayName != null ? displayName : local.Key;
+                item.DisplayName = displayName != null ? displayName : property.Key;
                 LeftConditionComboBox.Items.Add(item);
                 RightConditionComboBox.Items.Add(item);
                 PropertyComboBox.Items.Add(item);
             }
+            //Load locals.
+            foreach (var local in environment.Locals)
+            {
+                var item = new VariableComboBoxItem();
+                item.Name = local.Key;
+                item.DisplayName = item.Name;
+                LeftConditionComboBox.Items.Add(item);
+                RightConditionComboBox.Items.Add(item);
+                PropertyComboBox.Items.Add(item);
+            }
+            //Load globals.
             foreach (var global in environment.Globals)
             {
                 var item = new VariableComboBoxItem();
@@ -636,7 +647,7 @@ namespace CrazyStorm
             {
                 var item = LeftConditionComboBox.SelectedItem as VariableComboBoxItem;
                 string[] selection = item.Name.Split('.');
-                object value = environment.GetLocal(item.Name);
+                object value = environment.GetProperty(item.Name);
                 if (value != null)
                 {
                     for (int i = 0; i < properties.Length; ++i)
@@ -672,6 +683,10 @@ namespace CrazyStorm
                 }
                 if (value == null)
                 {
+                    value = environment.GetLocal(selection[0]);
+                }
+                if (value == null)
+                {
                     value = environment.GetGlobal(selection[0]);
                 }
                 if (value != null)
@@ -697,7 +712,7 @@ namespace CrazyStorm
             {
                 var item = RightConditionComboBox.SelectedItem as VariableComboBoxItem;
                 string[] selection = item.Name.Split('.');
-                object value = environment.GetLocal(item.Name);
+                object value = environment.GetProperty(item.Name);
                 if (value != null)
                 {
                     for (int i = 0; i < properties.Length; ++i)
@@ -733,6 +748,10 @@ namespace CrazyStorm
                 }
                 if (value == null)
                 {
+                    value = environment.GetLocal(selection[0]);
+                }
+                if (value == null)
+                {
                     value = environment.GetGlobal(selection[0]);
                 }
                 if (value != null)
@@ -760,7 +779,7 @@ namespace CrazyStorm
                 {
                     var item = PropertyComboBox.SelectedItem as VariableComboBoxItem;
                     string[] selection = item.Name.Split('.');
-                    object value = environment.GetLocal(item.Name);
+                    object value = environment.GetProperty(item.Name);
                     if (value != null)
                     {
                         for (int i = 0; i < properties.Length; ++i)
@@ -803,6 +822,10 @@ namespace CrazyStorm
                                 }
                             }
                         }
+                    }
+                    if (value == null)
+                    {
+                        value = environment.GetLocal(selection[0]);
                     }
                     if (value == null)
                     {

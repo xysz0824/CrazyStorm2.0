@@ -20,14 +20,19 @@ namespace CrazyStorm.Expression
         public override object Eval(Environment e)
         {
             var name = (string)Token.GetValue();
-            //Find this in local variable.
-            var result = e.GetLocal(name);
+            //Find in property variables.
+            var result = e.GetProperty(name);
             if (result == null)
             {
-                //Find this in global variable.
-                result = e.GetGlobal(name);
+                //Find in local variables.
+                result = e.GetLocal(name);
                 if (result == null)
-                    throw new ExpressionException("Undefination error.");
+                {
+                    //Find in global variables.
+                    result = e.GetGlobal(name);
+                    if (result == null)
+                        throw new ExpressionException("Undefination error.");
+                }
             }
             return result;
         }

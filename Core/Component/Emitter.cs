@@ -72,7 +72,7 @@ namespace CrazyStorm.Core
             Properties["EmitPosition"] = new PropertyValue
             {
                 Expression = true,
-                Value = "[Position.x,Position.y]"
+                Value = "Position"
             };
             emitterData.emitCount = 1;
             emitterData.emitCycle = 10;

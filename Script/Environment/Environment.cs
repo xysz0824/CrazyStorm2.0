@@ -14,12 +14,14 @@ namespace CrazyStorm.Expression
         #region Private Members
         IDictionary<string, float> globals;
         IDictionary<string, float> locals;
+        IDictionary<string, object> properties;
         IDictionary<string, Function> functions;
         #endregion
 
         #region Public Members
         public IDictionary<string, float> Globals { get { return globals; } }
         public IDictionary<string, float> Locals { get { return locals; } }
+        public IDictionary<string, object> Properties { get { return properties; } }
         #endregion
 
         #region Constructor
@@ -27,6 +29,7 @@ namespace CrazyStorm.Expression
         {
             globals = new Dictionary<string, float>();
             locals = new Dictionary<string, float>();
+            properties = new Dictionary<string, object>();
             functions = new Dictionary<string, Function>();
             InitializeSystemFunctions();
         }
@@ -35,21 +38,21 @@ namespace CrazyStorm.Expression
         {
             globals = new Dictionary<string, float>();
             locals = new Dictionary<string, float>();
+            properties = new Dictionary<string, object>();
             functions = new Dictionary<string, Function>();
             if (environment != null)
             {
                 foreach (var item in environment.globals)
-                {
                     globals.Add(item.Key, item.Value);
-                }
+                
                 foreach (var item in environment.locals)
-                {
                     locals.Add(item.Key, item.Value);
-                }
+                
+                foreach (var item in environment.properties)
+                    properties.Add(item.Key, item.Value);
+                
                 foreach (var item in environment.functions)
-                {
                     functions.Add(item.Key, item.Value);
-                }
             }
         }
         #endregion
@@ -62,31 +65,6 @@ namespace CrazyStorm.Expression
             PutFunction("sin", new Expression.Function(1));
             PutFunction("cos", new Expression.Function(1));
             PutFunction("tan", new Expression.Function(1));
-        }
-        bool TryPutVariable(IDictionary<string, float> map, string name, object value)
-        {
-            if (Core.PropertyTypeRule.CanConvertToSingle(value.GetType()))
-            {
-                map[name] = Convert.ToSingle(value);
-                return true;
-            }
-            else if (value is Core.Vector2)
-            {
-                var vector2 = (Core.Vector2)value;
-                map[name + ".x"] = vector2.x;
-                map[name + ".y"] = vector2.y;
-                return true;
-            }
-            else if (value is Core.RGB)
-            {
-                var rgb = (Core.RGB)value;
-                map[name + ".r"] = rgb.r;
-                map[name + ".g"] = rgb.g;
-                map[name + ".b"] = rgb.b;
-                return true;
-            }
-            else
-                return false;
         }
         void PutFunction(string name, Function function)
         {
@@ -103,37 +81,66 @@ namespace CrazyStorm.Expression
         {
             if (globals.ContainsKey(name))
                 return globals[name];
-            else
-                return null;
+                
+            return null;
         }
         public void RemoveGlobal(string name) 
         {
             globals.Remove(name); 
         }
-        public bool TryPutLocal(string name, object value) 
-        { 
-            return TryPutVariable(locals, name, value); 
+        public void PutLocal(string name, float value) 
+        {
+            locals[name] = value;
         }
         public float? GetLocal(string name)
         {
             if (locals.ContainsKey(name))
                 return locals[name];
-            else
-                return null;
+                
+            return null;
         }
         public void RemoveLocal(string name) 
         {
-            if (!locals.Remove(name))
+            locals.Remove(name);
+        }
+        public void PutProperty(string name, object value)
+        {
+            properties[name] = value;
+            if (value is Core.Vector2)
             {
-                List<string> removeKeys = new List<string>();
-                foreach (var pair in locals)
-                {
-                    if (pair.Key.StartsWith(name + "."))
-                        removeKeys.Add(pair.Key);
-                }
-                for (int i = 0; i < removeKeys.Count; ++i)
-                    locals.Remove(removeKeys[i]);
+                var vector2 = (Core.Vector2)value;
+                properties[name + ".x"] = vector2.x;
+                properties[name + ".y"] = vector2.y;
             }
+            else if (value is Core.RGB)
+            {
+                var rgb = (Core.RGB)value;
+                properties[name + ".r"] = rgb.r;
+                properties[name + ".g"] = rgb.g;
+                properties[name + ".b"] = rgb.b;
+            }
+        }
+        public object GetProperty(string name)
+        {
+            return properties.ContainsKey(name) ? properties[name] : null;
+        }
+        public void RemoveProperty(string name)
+        {
+            if (!properties.ContainsKey(name))
+                return;
+
+            if (properties[name] is Core.Vector2)
+            {
+                properties.Remove(name + ".x");
+                properties.Remove(name + ".y");
+            }
+            else if (properties[name] is Core.RGB)
+            {
+                properties.Remove(name + ".r");
+                properties.Remove(name + ".g");
+                properties.Remove(name + ".b");
+            }
+            properties.Remove(name);
         }
         public Function GetFunction(string name)
         {
