@@ -27,7 +27,7 @@ namespace CrazyStorm
             using (FileStream stream = new FileStream(genPath, FileMode.Create))
             {
                 var writer = new BinaryWriter(stream);
-                //Play file using UTF-8 encoding
+                //Play file use UTF-8 encoding
                 //Write file header
                 writer.Write(PlayDataHelper.GetStringBytes("BG"));
                 //Write file version
@@ -35,6 +35,8 @@ namespace CrazyStorm
                 //Write file data
                 writer.Write(file.GeneratePlayData().ToArray());
             }
+            MessageBox.Show((string)FindResource("PlayFileSavedStr"), (string)FindResource("TipTitleStr"),
+                MessageBoxButton.OK, MessageBoxImage.Information);
         }
         #endregion
 

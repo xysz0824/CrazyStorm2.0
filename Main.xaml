@@ -318,7 +318,7 @@
             <MenuItem Header="{StaticResource PlayStr}" >
                 <MenuItem Header="{StaticResource GeneratePlayFileStr}" Click="GeneratePlayFile_Click" />
                 <MenuItem Header="{StaticResource PlayCurrentStr}" InputGestureText="F5"/>
-                <MenuItem Header="{StaticResource PlayAllStr}" InputGestureText="F10"/>
+                <MenuItem Header="{StaticResource PlayAllStr}" InputGestureText="F6"/>
                 <Separator/>
                 <MenuItem Header="{StaticResource SetPlayStr}" />
             </MenuItem>

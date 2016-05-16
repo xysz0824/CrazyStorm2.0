@@ -132,6 +132,7 @@
     <sys:String x:Key="NameRepeatingStr">名称重复，请重新修改</sys:String>
     <sys:String x:Key="VariableInvalidStr">变量中含有重复名称或无效值，请检查</sys:String>
     <sys:String x:Key="NeedSaveFirstStr">你需要先保存工程文件，然后才能执行该操作</sys:String>
+    <sys:String x:Key="PlayFileSavedStr">播放文件已保存到工程文件目录下</sys:String>
     <sys:String x:Key="SaveTipStr">要保存当前文件吗？</sys:String>
     <sys:String x:Key="ImageTypeStr">PNG图像(*.png)|*.png</sys:String>
     <sys:String x:Key="SoundTypeStr">WAV音效(*.wav)|*.wav</sys:String>
