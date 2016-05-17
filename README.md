@@ -1,6 +1,6 @@
 ![Logo](/logo.png)
 # About
-CrazyStorm is a visual editor for 2d particle to make game effect easily.
+CrazyStorm is a visual editor for 2D particle to make game effect easily.
 The project is developing now so we don't accept unofficial modification and other usage temporarily. Please wait official version, thank you!
 
 ## Features Overview
