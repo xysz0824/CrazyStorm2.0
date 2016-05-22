@@ -65,32 +65,32 @@ namespace CrazyStorm
             //Put globals.
             foreach (VariableResource item in file.Globals)
                 environment.PutGlobal(item.Label, item.Value);
-            //Put locals
+            //Put locals.
             foreach (VariableResource item in component.Variables)
                 environment.PutLocal(item.Label, item.Value);
         }
         void LoadContent()
         {
             //Load component properties.
-            var componentList = component.InitializeProperties(typeof(Component));
+            var componentList = component.InitializeAndGetProperties(typeof(Component));
             LoadProperties(ComponentGrid, component, componentList);
             //Load specific properties.
             List<PropertyInfo> specificList;
             if (component is Emitter)
-                specificList = component.InitializeProperties(typeof(Emitter));
+                specificList = component.InitializeAndGetProperties(typeof(Emitter));
             else
-                specificList = component.InitializeProperties(component.GetType());
+                specificList = component.InitializeAndGetProperties(component.GetType());
 
             LoadProperties(SpecificGrid, component, specificList);
             //Load particle properties.
             if (component is Emitter)
             {
                 ParticleGroup.Visibility = Visibility.Visible;
-                var particleList = (component as Emitter).Particle.InitializeProperties(typeof(ParticleBase));
+                var particleList = (component as Emitter).Particle.InitializeAndGetProperties(typeof(ParticleBase));
                 if (component is MultiEmitter)
-                    particleList.AddRange((component as Emitter).Particle.InitializeProperties(typeof(Particle)));
+                    particleList.AddRange((component as Emitter).Particle.InitializeAndGetProperties(typeof(Particle)));
                 else
-                    particleList.AddRange((component as Emitter).Particle.InitializeProperties(typeof(CurveParticle)));
+                    particleList.AddRange((component as Emitter).Particle.InitializeAndGetProperties(typeof(CurveParticle)));
 
                 LoadProperties(ParticleGrid, (component as Emitter).Particle, particleList);
             }
@@ -101,8 +101,8 @@ namespace CrazyStorm
                 {
                     //Only emitter have particles, but special event of event field or rebounder need it.
                     var stub = new MultiEmitter();
-                    var particleList = stub.Particle.InitializeProperties(typeof(ParticleBase));
-                    particleList.AddRange(stub.Particle.InitializeProperties(typeof(Particle)));
+                    var particleList = stub.Particle.InitializeAndGetProperties(typeof(ParticleBase));
+                    particleList.AddRange(stub.Particle.InitializeAndGetProperties(typeof(Particle)));
                     LoadProperties(ParticleGrid, stub.Particle, particleList);
                 }
             }
@@ -237,14 +237,8 @@ namespace CrazyStorm
         }
         void OpenEventSetting(EventGroup eventGroup, Expression.Environment environment, bool emitter, bool aboutParticle)
         {
-            var properties = new IList<PropertyGridItem>[3]
-            { 
-                ComponentGrid.DataContext as IList<PropertyGridItem>, 
-                SpecificGrid.DataContext as IList<PropertyGridItem>, 
-                ParticleGrid.DataContext as IList<PropertyGridItem>
-            };
             file.UpdateResource();
-            Window window = new EventSetting(eventGroup, environment, file.Sounds, types, properties, emitter, aboutParticle);
+            Window window = new EventSetting(eventGroup, environment, file.Sounds, types, emitter, aboutParticle);
             window.ShowDialog();
             window.Close();
         }

@@ -13,6 +13,7 @@ namespace CrazyStorm.Core
     {
         bool expression;
         string value;
+        byte[] compiledExpression;
         public bool Expression
         {
             get { return expression; }
@@ -23,9 +24,16 @@ namespace CrazyStorm.Core
             get { return value; }
             set { this.value = value; }
         }
+        public byte[] CompiledExpression
+        {
+            get { return compiledExpression; }
+            set { compiledExpression = value; }
+        }
         public object Clone()
         {
-            return MemberwiseClone();
+            var clone = MemberwiseClone() as PropertyValue;
+            clone.compiledExpression = null;
+            return clone;
         }
     }
 }

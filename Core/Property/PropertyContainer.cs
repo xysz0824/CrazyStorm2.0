@@ -20,7 +20,7 @@ namespace CrazyStorm.Core
         {
             properties = new Dictionary<string, PropertyValue>();
         }
-        public List<PropertyInfo> InitializeProperties(Type type)
+        public List<PropertyInfo> InitializeAndGetProperties(Type type)
         {
             var propertiesInfo = new List<PropertyInfo>();
             foreach (PropertyInfo property in type.GetProperties())
@@ -38,6 +38,17 @@ namespace CrazyStorm.Core
                         properties[property.Name] = value;
                     }
                 }
+            }
+            return propertiesInfo;
+        }
+        public List<PropertyInfo> GetProperties()
+        {
+            var propertiesInfo = new List<PropertyInfo>();
+            foreach (PropertyInfo property in GetType().GetProperties())
+            {
+                object[] attributes = property.GetCustomAttributes(false);
+                if (attributes.Length > 0 && attributes[0] is PropertyAttribute)
+                    propertiesInfo.Add(property);
             }
             return propertiesInfo;
         }

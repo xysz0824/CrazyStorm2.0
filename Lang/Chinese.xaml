@@ -116,6 +116,17 @@
     <sys:String x:Key="ForceStr">力大小</sys:String>
     <sys:String x:Key="DirectionStr">方向角</sys:String>
     <sys:String x:Key="ForceTypeStr">力类型</sys:String>
+    <sys:String x:Key="LinearStr">线性</sys:String>
+    <sys:String x:Key="AcceleratedStr">加速</sys:String>
+    <sys:String x:Key="DeceleratedStr">减速</sys:String>
+    <sys:String x:Key="FixedStr">固定</sys:String>
+    <sys:String x:Key="ChangeToStr">变化到</sys:String>
+    <sys:String x:Key="IncreaseStr">增加</sys:String>
+    <sys:String x:Key="DecreaseStr">减少</sys:String>
+    <sys:String x:Key="EmitParticleStr">发射粒子</sys:String>
+    <sys:String x:Key="PlaySoundStr">播放音效</sys:String>
+    <sys:String x:Key="LoopStr">循环执行</sys:String>
+    <sys:String x:Key="ChangeTypeStr">改变类型</sys:String>
     <sys:String x:Key="TipTitleStr">提示</sys:String>
     <sys:String x:Key="ErrorTitleStr">错误</sys:String>
     <sys:String x:Key="FileTypeErrorStr">该文件格式不正确，无法打开</sys:String>

@@ -9,7 +9,7 @@ using System.Text;
 
 namespace CrazyStorm.Expression
 {
-    class Arguments : SyntaxTree
+    public class Arguments : SyntaxTree
     {
         public Arguments(List<SyntaxTree> arguments)
             : base()
@@ -30,6 +30,15 @@ namespace CrazyStorm.Expression
                 resultList.Add(item.Eval(e));
 
             return resultList;
+        }
+
+        public override void Compile(List<byte> codeStream)
+        {
+            foreach (var item in GetArguments())
+                item.Compile(codeStream);
+
+            byte[] code = VM.CreateCode(VMCode.ARGUMENTS, Count);
+            codeStream.AddRange(code);
         }
     }
 }

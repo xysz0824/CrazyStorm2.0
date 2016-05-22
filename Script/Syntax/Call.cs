@@ -9,7 +9,7 @@ using System.Text;
 
 namespace CrazyStorm.Expression
 {
-    class Call : SyntaxTree
+    public class Call : SyntaxTree
     {
         public Call(Token name, SyntaxTree arguments)
             : base()
@@ -38,6 +38,13 @@ namespace CrazyStorm.Expression
             //Calling function is a runtime operation so it can't be evaluated right here.
             //Return a false value.
             return 0.0f;
+        }
+
+        public override void Compile(List<byte> codeStream)
+        {
+            GetArguments().Compile(codeStream);
+            byte[] code = VM.CreateCode(VMCode.CALL, (string)Token.GetValue());
+            codeStream.AddRange(code);
         }
     }
 }

@@ -34,6 +34,25 @@ namespace CrazyStorm.Expression
 
         public bool IsLeaf() { return token != null; }
 
+        public bool ContainType<T>() { return SyntaxTree.ContainType<T>(this); }
+
+        public static bool ContainType<T>(SyntaxTree syntaxTree)
+        {
+            if (syntaxTree is T)
+                return true;
+            else
+            {
+                for (int i = 0; i < syntaxTree.children.Count; ++i)
+                {
+                    if (ContainType<T>(syntaxTree.children[i]))
+                        return true;
+                }
+            }
+            return false;
+        }
+
         public abstract object Eval(Environment e);
+
+        public abstract void Compile(List<byte> codeStream);
     }
 }

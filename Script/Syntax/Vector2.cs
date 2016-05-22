@@ -9,7 +9,7 @@ using System.Text;
 
 namespace CrazyStorm.Expression
 {
-    class Vector2 : SyntaxTree
+    public class Vector2 : SyntaxTree
     {
         public Vector2(SyntaxTree x, SyntaxTree y)
         {
@@ -29,6 +29,14 @@ namespace CrazyStorm.Expression
                 throw new ExpressionException("Type error.");
 
             return new Core.Vector2(Convert.ToSingle(x), Convert.ToSingle(y));
+        }
+
+        public override void Compile(List<byte> codeStream)
+        {
+            GetX().Compile(codeStream);
+            GetY().Compile(codeStream);
+            byte[] code = VM.CreateCode(VMCode.VECTOR2);
+            codeStream.AddRange(code);
         }
     }
 }

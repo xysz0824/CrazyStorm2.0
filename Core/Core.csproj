@@ -45,6 +45,7 @@
     <Compile Include="Component\ComponentFactory.cs" />
     <Compile Include="Component\Emitter.cs" />
     <Compile Include="Event\EventGroup.cs" />
+    <Compile Include="Event\EventHelper.cs" />
     <Compile Include="IO\IPlayData.cs" />
     <Compile Include="IO\IRebuildReference.cs" />
     <Compile Include="IO\IXmlData.cs" />

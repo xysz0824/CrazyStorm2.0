@@ -9,7 +9,7 @@ using System.Text;
 
 namespace CrazyStorm.Expression
 {
-    class Name : SyntaxTree
+    public class Name : SyntaxTree
     {
         public Name(Token token)
             : base()
@@ -35,6 +35,12 @@ namespace CrazyStorm.Expression
                 }
             }
             return result;
+        }
+
+        public override void Compile(List<byte> codeStream)
+        {
+            byte[] code = VM.CreateCode(VMCode.NAME, (string)Token.GetValue());
+            codeStream.AddRange(code);
         }
     }
 }

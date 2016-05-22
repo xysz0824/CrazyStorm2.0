@@ -9,7 +9,7 @@ using System.Text;
 
 namespace CrazyStorm.Expression
 {
-    class Bool : SyntaxTree
+    public class Bool : SyntaxTree
     {
         public Bool(Token token)
             : base()
@@ -20,6 +20,12 @@ namespace CrazyStorm.Expression
         public override object Eval(Environment e)
         {
             return bool.Parse((string)Token.GetValue());
+        }
+
+        public override void Compile(List<byte> codeStream)
+        {
+            byte[] code = VM.CreateCode(VMCode.BOOL, Eval(null));
+            codeStream.AddRange(code);
         }
     }
 }

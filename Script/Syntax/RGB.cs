@@ -9,7 +9,7 @@ using System.Text;
 
 namespace CrazyStorm.Expression
 {
-    class RGB : SyntaxTree
+    public class RGB : SyntaxTree
     {
         public RGB(SyntaxTree r, SyntaxTree g, SyntaxTree b)
         {
@@ -33,6 +33,15 @@ namespace CrazyStorm.Expression
                 throw new ExpressionException("Type error.");
 
             return new Core.RGB(Convert.ToSingle(r), Convert.ToSingle(g), Convert.ToSingle(b));
+        }
+
+        public override void Compile(List<byte> codeStream)
+        {
+            GetR().Compile(codeStream);
+            GetG().Compile(codeStream);
+            GetB().Compile(codeStream);
+            byte[] code = VM.CreateCode(VMCode.RGB);
+            codeStream.AddRange(code);
         }
     }
 }

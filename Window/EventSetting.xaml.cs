@@ -30,25 +30,25 @@ namespace CrazyStorm
         Expression.Environment environment;
         IList<FileResource> sounds;
         IList<ParticleType> types;
-        IList<PropertyGridItem>[] properties;
         bool isPlaySound;
         bool isEditing;
+        bool isExpressionResult;
         DockPanel editingPanel;
+        IOrderedEnumerable<VariableComboBoxItem> sortedVaraibles;
         #endregion
 
         #region Constructor
         public EventSetting(EventGroup eventGroup, Expression.Environment environment,
-            IList<FileResource> sounds, IList<ParticleType> types, IList<PropertyGridItem>[] properties, 
-            bool emitter, bool aboutParticle)
+            IList<FileResource> sounds, IList<ParticleType> types, bool emitter, bool aboutParticle)
         {
             this.eventGroup = eventGroup;
             this.environment = environment;
             this.sounds = sounds;
             this.types = types;
-            this.properties = properties;
             InitializeComponent();
             InitializeSetting(emitter, aboutParticle);
             LoadContent();
+            TranslateEvents();
         }
         #endregion
 
@@ -56,7 +56,7 @@ namespace CrazyStorm
         void InitializeSetting(bool emitter, bool aboutParticle)
         {
             GroupBox.DataContext = eventGroup;
-            EventList.ItemsSource = eventGroup.Events;
+            EventList.ItemsSource = eventGroup.TranslatedEvents;
             EmitParticle.Visibility = emitter ? Visibility.Visible : Visibility.Collapsed;
             ChangeType.Visibility = aboutParticle ? Visibility.Visible : Visibility.Collapsed;
         }
@@ -120,6 +120,47 @@ namespace CrazyStorm
                     typesNorepeat.Add(item);
             }
             TypeCombo.ItemsSource = typesNorepeat;
+            //Create sorted variable list for translating event
+            var varaibleList = new List<VariableComboBoxItem>();
+            foreach (VariableComboBoxItem item in PropertyComboBox.Items)
+                varaibleList.Add(item);
+            //Longer name first
+            sortedVaraibles = varaibleList.OrderByDescending(s => s.Name.Length);
+        }
+        string TranslateEvent(string originalEvent)
+        {
+            return originalEvent;
+            //TODO
+            //string translatedEvent = "";
+            ////Translate variable name
+            //if (string.IsNullOrWhiteSpace(translatedEvent))
+            //    translatedEvent = originalEvent;
+
+            //foreach (VariableComboBoxItem item in sortedVaraibles)
+            //{
+            //    if (originalEvent.Contains(item.Name))
+            //        translatedEvent = translatedEvent.Replace(item.Name, item.DisplayName);
+            //}
+            ////Translate keyword
+            //if (string.IsNullOrWhiteSpace(translatedEvent))
+            //    translatedEvent = originalEvent;
+
+            //string[] keywords = {"Linear", "Accelerated", "Decelerated", "Fixed", "ChangeTo", "Increase", "Decrease",
+            //                    "EmitParticle", "PlaySound", "Loop", "ChangeType"};
+            //foreach (string item in keywords)
+            //{
+            //    if (originalEvent.Contains(item))
+            //        translatedEvent = translatedEvent.Replace(item, (string)FindResource(item + "Str"));
+            //}
+            //return translatedEvent;
+        }
+        void TranslateEvents()
+        {
+            if (eventGroup.TranslatedEvents.Count != 0)
+                return;
+
+            foreach (string originalEvent in eventGroup.OriginalEvents)
+                eventGroup.TranslatedEvents.Add(TranslateEvent(originalEvent));
         }
         void ChangeTextBoxState(TextBox source, bool hasError)
         {
@@ -138,132 +179,127 @@ namespace CrazyStorm
                 source.Background = new SolidColorBrush(Colors.White);
             }
         }
-        bool BuildCondition(out string text)
+        bool SetConditionInfo(EventInfo eventInfo)
         {
-            text = string.Empty;
             //Check if there have errors
             if (LeftValue.ToolTip != null || RightValue.ToolTip != null)
                 return false;
 
-            //Build left condition
-            string leftCondition = string.Empty;
-            string leftCompare = string.Empty;
             if (LeftLessThan.IsChecked == true)
-                leftCompare = " < ";
+                eventInfo.leftOperator = "<";
             else if (LeftEqual.IsChecked == true)
-                leftCompare = " == ";
+                eventInfo.leftOperator = "=";
             else if (LeftMoreThan.IsChecked == true)
-                leftCompare = " > ";
+                eventInfo.leftOperator = ">";
 
             if (LeftConditionComboBox.SelectedItem != null && !String.IsNullOrEmpty(LeftValue.Text) &&
-                !String.IsNullOrEmpty(leftCompare))
+                !String.IsNullOrEmpty(eventInfo.leftOperator))
             {
                 var selectedItem = LeftConditionComboBox.SelectedItem as VariableComboBoxItem;
-                leftCondition = selectedItem.DisplayName + leftCompare + LeftValue.Text;
+                eventInfo.leftCondition = selectedItem.Name;
+                eventInfo.leftValue = LeftValue.Text;
             }
-            //Build right condition
-            string rightCondition = string.Empty;
-            string rightCompare = string.Empty;
             if (RightLessThan.IsChecked == true)
-                rightCompare = " < ";
+                eventInfo.rightOperator = "<";
             else if (RightEqual.IsChecked == true)
-                rightCompare = " == ";
+                eventInfo.rightOperator = "=";
             else if (RightMoreThan.IsChecked == true)
-                rightCompare = " > ";
+                eventInfo.rightOperator = ">";
 
             if (RightConditionComboBox.SelectedItem != null && !String.IsNullOrEmpty(RightValue.Text) &&
-                !String.IsNullOrEmpty(rightCompare))
+                !String.IsNullOrEmpty(eventInfo.rightOperator))
             {
                 var selectedItem = RightConditionComboBox.SelectedItem as VariableComboBoxItem;
-                rightCondition = selectedItem.DisplayName + rightCompare + RightValue.Text;
+                eventInfo.rightCondition = selectedItem.Name;
+                eventInfo.rightValue = RightValue.Text;
             }
             //Allow empty condition
-            if (String.IsNullOrEmpty(leftCondition) && String.IsNullOrEmpty(rightCondition))
+            if (String.IsNullOrEmpty(eventInfo.leftCondition) && String.IsNullOrEmpty(eventInfo.rightCondition))
                 return true;
 
-            //Build condition
-            text = !String.IsNullOrEmpty(leftCondition) ? leftCondition : rightCondition;
-            string concat = string.Empty;
-            if (And.IsChecked == true)
-                concat = " & ";
-            else if (Or.IsChecked == true)
-                concat = " | ";
-
-            if (!String.IsNullOrEmpty(concat) && !String.IsNullOrEmpty(leftCondition) && !String.IsNullOrEmpty(rightCondition))
+            if (String.IsNullOrEmpty(eventInfo.leftCondition) && !String.IsNullOrEmpty(eventInfo.rightCondition))
             {
-                text = leftCondition + concat + rightCondition;
+                eventInfo.leftCondition = eventInfo.rightCondition;
+                eventInfo.rightCondition = null;
+                eventInfo.leftOperator = eventInfo.rightOperator;
+                eventInfo.rightOperator = null;
+                eventInfo.leftValue = eventInfo.rightValue;
+                eventInfo.rightValue = null;
             }
+            if (!String.IsNullOrEmpty(eventInfo.leftCondition) && !String.IsNullOrEmpty(eventInfo.rightCondition))
+            {
+                if (And.IsChecked == true)
+                    eventInfo.midOperator = "&";
+                else if (Or.IsChecked == true)
+                    eventInfo.midOperator = "|";
+            }
+            eventInfo.hasCondition = true;
             return true;
         }
-        bool BuildEventText(out string text)
+        bool BuildEvent(out string text)
         {
             text = string.Empty;
+            var eventInfo = new EventInfo();
             //Check if there have errors
             if (ResultValue.ToolTip != null || ChangeTime.ToolTip != null || ExecuteTime.ToolTip != null)
                 return false;
 
-            //Build condition
-            string condition = string.Empty;
-            if (!BuildCondition(out condition))
+            if (!SetConditionInfo(eventInfo))
                 return false;
-            //Build property event
-            string propertyEvent = string.Empty;
-            string changeType = string.Empty;
-            if (ChangeTo.IsChecked == true)
-                changeType = " = ";
-            else if (Increase.IsChecked == true)
-                changeType = " += ";
-            else if (Decrease.IsChecked == true)
-                changeType = " -= ";
 
-            string changeMode = string.Empty;
+            if (ChangeTo.IsChecked == true)
+                eventInfo.changeType = "ChangeTo";
+            else if (Increase.IsChecked == true)
+                eventInfo.changeType = "Increase";
+            else if (Decrease.IsChecked == true)
+                eventInfo.changeType = "Decrease";
+
             if (Linear.IsChecked == true)
-                changeMode = "Linear";
+                eventInfo.changeMode = "Linear";
             else if (Accelerated.IsChecked == true)
-                changeMode = "Accelerated";
+                eventInfo.changeMode = "Accelerated";
             else if (Decelerated.IsChecked == true)
-                changeMode = "Decelerated";
+                eventInfo.changeMode = "Decelerated";
             else if (Fixed.IsChecked == true)
-                changeMode = "Fixed";
+                eventInfo.changeMode = "Fixed";
 
             if (PropertyComboBox.SelectedItem != null && !String.IsNullOrEmpty(ResultValue.Text) &&
-                !String.IsNullOrEmpty(changeType) && !String.IsNullOrEmpty(changeMode) && !String.IsNullOrEmpty(ChangeTime.Text))
+                !String.IsNullOrEmpty(eventInfo.changeType) && !String.IsNullOrEmpty(eventInfo.changeMode) && 
+                !String.IsNullOrEmpty(ChangeTime.Text))
             {
                 var selectedItem = PropertyComboBox.SelectedItem as VariableComboBoxItem;
-                propertyEvent = selectedItem.DisplayName + changeType + ResultValue.Text + ", " +
-                    changeMode + ", " + ChangeTime.Text;
+                eventInfo.property = selectedItem.Name;
+                eventInfo.isExpressionResult = isExpressionResult;
+                eventInfo.resultValue = ResultValue.Text;
+                eventInfo.changeTime = ChangeTime.Text;
                 if (!String.IsNullOrEmpty(ExecuteTime.Text))
-                    propertyEvent += ", " + ExecuteTime.Text;
+                    eventInfo.executeTime = ExecuteTime.Text;
             }
-            if (String.IsNullOrEmpty(propertyEvent))
+            else
                 return false;
 
-            if (String.IsNullOrEmpty(condition))
-                text = propertyEvent;
-            else
-                text = condition + " : " + propertyEvent;
-
+            text = EventHelper.BuildEvent(eventInfo);
             return true;
         }
-        bool BuildSpecialEventText(out string text)
+        bool BuildSpecialEvent(out string text)
         {
             text = string.Empty;
-            //Build condition
-            string condition = string.Empty;
-            if (!BuildCondition(out condition))
+            var eventInfo = new EventInfo();
+            if (!SetConditionInfo(eventInfo))
                 return false;
-            //Build special event
-            string specialEvent = string.Empty;
+
             if (EmitParticle.IsChecked == true)
             {
-                specialEvent = "EmitParticle()";
+                eventInfo.specialEvent = "EmitParticle";
+                eventInfo.arguments = string.Empty;
             }
             else if (PlaySound.IsChecked == true)
             {
                 if (SoundCombo.SelectedItem == null)
                     return false;
 
-                specialEvent = "PlaySound(" + SoundCombo.SelectedItem + ", " + VolumeSlider.Value + ")";
+                eventInfo.specialEvent = "PlaySound";
+                eventInfo.arguments = SoundCombo.SelectedItem + ", " + VolumeSlider.Value;
             }
             else if (Loop.IsChecked == true)
             {
@@ -274,29 +310,30 @@ namespace CrazyStorm
                 if (String.IsNullOrEmpty(LoopTime.Text) && String.IsNullOrEmpty(StopCondition.Text))
                     return false;
 
-                string arguments = !String.IsNullOrEmpty(LoopTime.Text) ? LoopTime.Text : StopCondition.Text;
+                string arguments = string.Empty;
                 if (!String.IsNullOrEmpty(LoopTime.Text) && !String.IsNullOrEmpty(StopCondition.Text))
-                {
                     arguments = LoopTime.Text + ", " + StopCondition.Text;
-                }
-                specialEvent = "Loop(" + arguments + ")";
+                else if (String.IsNullOrEmpty(LoopTime.Text) && !String.IsNullOrEmpty(StopCondition.Text))
+                    arguments = "0, " + StopCondition.Text;
+                else
+                    arguments = LoopTime.Text;
+
+                eventInfo.specialEvent = "Loop";
+                eventInfo.arguments = arguments;
             }
             else if (ChangeType.IsChecked == true)
             {
                 if (TypeCombo.SelectedItem == null || ColorCombo.SelectedItem == null)
                     return false;
 
-                specialEvent = "ChangeType(" + TypeCombo.SelectedItem + ", " + 
-                    ((ComboBoxItem)ColorCombo.SelectedItem).Content + ")";
+                eventInfo.specialEvent = "ChangeType";
+                eventInfo.arguments = TypeCombo.SelectedItem + ", " + ((ComboBoxItem)ColorCombo.SelectedItem).Content;
             }
-            if (String.IsNullOrEmpty(specialEvent))
+            else
                 return false;
 
-            if (String.IsNullOrEmpty(condition))
-                text = specialEvent;
-            else
-                text = condition + " : " + specialEvent;
-
+            eventInfo.isSpecialEvent = true;
+            text = EventHelper.BuildEvent(eventInfo);
             return true;
         }
         void ResetAll()
@@ -345,13 +382,13 @@ namespace CrazyStorm
             ResetAll();
             Dictionary<string, RadioButton> buttonMap = new Dictionary<string, RadioButton>();
             buttonMap[">"] = LeftMoreThan;
-            buttonMap["=="] = LeftEqual;
+            buttonMap["="] = LeftEqual;
             buttonMap["<"] = LeftLessThan;
             buttonMap["&"] = And;
             buttonMap["|"] = Or;
-            buttonMap["="] = ChangeTo;
-            buttonMap["+="] = Increase;
-            buttonMap["-="] = Decrease;
+            buttonMap["ChangeTo"] = ChangeTo;
+            buttonMap["Increase"] = Increase;
+            buttonMap["Decrease"] = Decrease;
             buttonMap["Linear"] = Linear;
             buttonMap["Accelerated"] = Accelerated;
             buttonMap["Decelerated"] = Decelerated;
@@ -360,97 +397,70 @@ namespace CrazyStorm
             buttonMap["PlaySound"] = PlaySound;
             buttonMap["Loop"] = Loop;
             buttonMap["ChangeType"] = ChangeType;
-            string[] parts = text.Split(':');
-            string condition = string.Empty;
-            string eventText = string.Empty;
+            EventInfo eventInfo = EventHelper.SplitEvent(text);
             //Backfill condition
-            if (parts.Length == 2)
+            if (eventInfo.hasCondition)
             {
-                condition = parts[0];
-                string[] split = condition.Split(' ');
-                if (split.Length == 8)
+                if (eventInfo.rightCondition != null)
                 {
-                    for (int i = 0;i < LeftConditionComboBox.Items.Count;++i)
+                    for (int i = 0; i < LeftConditionComboBox.Items.Count; ++i)
                     {
                         var item = LeftConditionComboBox.Items[i] as VariableComboBoxItem;
-                        if (item.DisplayName == split[0])
+                        if (item.Name == eventInfo.leftCondition)
                             LeftConditionComboBox.SelectedIndex = i;
                     }
-                    buttonMap[split[1]].IsChecked = true;
-                    LeftValue.Text = split[2];
-                    buttonMap[split[3]].IsChecked = true;
+                    buttonMap[eventInfo.leftOperator].IsChecked = true;
+                    LeftValue.Text = eventInfo.leftValue;
+                    buttonMap[eventInfo.midOperator].IsChecked = true;
                     for (int i = 0; i < RightConditionComboBox.Items.Count; ++i)
                     {
                         var item = RightConditionComboBox.Items[i] as VariableComboBoxItem;
-                        if (item.DisplayName == split[4])
+                        if (item.Name == eventInfo.rightCondition)
                             RightConditionComboBox.SelectedIndex = i;
                     }
                     buttonMap[">"] = RightMoreThan;
-                    buttonMap["=="] = RightEqual;
+                    buttonMap["="] = RightEqual;
                     buttonMap["<"] = RightLessThan;
-                    buttonMap[split[5]].IsChecked = true;
-                    RightValue.Text = split[6];
+                    buttonMap[eventInfo.rightOperator].IsChecked = true;
+                    RightValue.Text = eventInfo.rightValue;
                 }
                 else
                 {
                     for (int i = 0; i < LeftConditionComboBox.Items.Count; ++i)
                     {
                         var item = LeftConditionComboBox.Items[i] as VariableComboBoxItem;
-                        if (item.DisplayName == split[0])
+                        if (item.Name == eventInfo.leftCondition)
                             LeftConditionComboBox.SelectedIndex = i;
                     }
-                    buttonMap[split[1]].IsChecked = true;
-                    LeftValue.Text = split[2];
+                    buttonMap[eventInfo.leftOperator].IsChecked = true;
+                    LeftValue.Text = eventInfo.leftValue;
                 }
-                eventText = parts[1].Trim();
-            }
-            else
-            {
-                eventText = parts[0].Trim();
             }
             //Backfill event
-            if (eventText.Contains('='))
+            if (!eventInfo.isSpecialEvent)
             {
-                string[] split = eventText.Split(' ');
                 for (int i = 0; i < PropertyComboBox.Items.Count; ++i)
                 {
                     var item = PropertyComboBox.Items[i] as VariableComboBoxItem;
-                    if (item.DisplayName == split[0])
+                    if (item.Name == eventInfo.property)
                         PropertyComboBox.SelectedIndex = i;
                 }
-                buttonMap[split[1]].IsChecked = true;
-                split = Regex.Split(eventText, "\\" + split[1])[1].Split(',');
-                string resultValue = string.Empty;
-                for (int i = 0; i < split.Length; ++i)
-                {
-                    split[i] = split[i].Trim();
-                    if (buttonMap.ContainsKey(split[i]))
-                    {
-                        buttonMap[split[i]].IsChecked = true;
-                        ChangeTime.Text = split[i + 1].Trim();
-                        if (split.Length > i + 2)
-                            ExecuteTime.Text = split[i + 2].Trim();
-
-                        break;
-                    }
-                    else
-                    {
-                        resultValue += split[i] + ",";
-                    }
-                }
-                resultValue = resultValue.Remove(resultValue.Length - 1);
-                ResultValue.Text = resultValue.Trim();
+                buttonMap[eventInfo.changeType].IsChecked = true;
+                ResultValue.Text = eventInfo.resultValue;
+                buttonMap[eventInfo.changeMode].IsChecked = true;
+                ChangeTime.Text = eventInfo.changeTime;
+                if (eventInfo.executeTime != null)
+                    ExecuteTime.Text = eventInfo.executeTime;
                 //Prevent from setting special event
                 SpecialEventPanel.IsEnabled = false;
             }
             else
             {
-                string[] split = eventText.Split('(');
-                buttonMap[split[0]].IsChecked = true;
-                if (split[0] == "PlaySound")
+                buttonMap[eventInfo.specialEvent].IsChecked = true;
+                string[] split = eventInfo.arguments.Split(',');
+                if (eventInfo.specialEvent == "PlaySound")
                 {
-                    split = split[1].Split(')')[0].Split(',');
-                    for (int i = 0; i < SoundCombo.Items.Count;++i)
+                    for (int i = 0; i < SoundCombo.Items.Count; ++i)
                     {
                         if ((SoundCombo.Items[i] as FileResource).Label == split[0])
                         {
@@ -460,18 +470,16 @@ namespace CrazyStorm
                     }
                     VolumeSlider.Value = int.Parse(split[1]);
                 }
-                else if (split[0] == "Loop")
+                else if (eventInfo.specialEvent == "Loop")
                 {
-                    split = split[1].Split(')')[0].Split(',');
-                    LoopTime.Text = split[0];
+                    LoopTime.Text = split[0] == "0" ? string.Empty : split[0];
                     if (split.Length > 1)
                     {
                         StopCondition.Text = split[1].Trim();
                     }
                 }
-                else if (split[0] == "ChangeType")
+                else if (eventInfo.specialEvent == "ChangeType")
                 {
-                    split = split[1].Split(')')[0].Split(',');
                     for (int i = 0; i < TypeCombo.Items.Count; ++i)
                     {
                         if ((TypeCombo.Items[i] as ParticleType).Name == split[0])
@@ -557,9 +565,10 @@ namespace CrazyStorm
             string text;
             if (isEditing)
             {
-                if (BuildEventText(out text))
+                if (BuildEvent(out text))
                 {
-                    eventGroup.Events[EventList.SelectedIndex] = text;
+                    eventGroup.OriginalEvents[EventList.SelectedIndex] = text;
+                    eventGroup.TranslatedEvents[EventList.SelectedIndex] = TranslateEvent(text);
                     editingPanel.Background = null;
                     EventList.IsEnabled = true;
                     AddEvent.Content = (string)FindResource("AddStr");
@@ -569,17 +578,21 @@ namespace CrazyStorm
                     isEditing = false;
                 }
             }
-            else if (BuildEventText(out text))
-                eventGroup.Events.Add(text);
+            else if (BuildEvent(out text))
+            {
+                eventGroup.OriginalEvents.Add(text);
+                eventGroup.TranslatedEvents.Add(TranslateEvent(text));
+            }
         }
         private void AddSpecialEvent_Click(object sender, RoutedEventArgs e)
         {
             string text;
             if (isEditing)
             {
-                if (BuildSpecialEventText(out text))
+                if (BuildSpecialEvent(out text))
                 {
-                    eventGroup.Events[EventList.SelectedIndex] = text;
+                    eventGroup.OriginalEvents[EventList.SelectedIndex] = text;
+                    eventGroup.TranslatedEvents[EventList.SelectedIndex] = TranslateEvent(text);
                     editingPanel.Background = null;
                     EventList.IsEnabled = true;
                     AddEvent.Content = (string)FindResource("AddStr");
@@ -589,14 +602,17 @@ namespace CrazyStorm
                     isEditing = false;
                 }
             }
-            else if (BuildSpecialEventText(out text))
-                eventGroup.Events.Add(text);
+            else if (BuildSpecialEvent(out text))
+            {
+                eventGroup.OriginalEvents.Add(text);
+                eventGroup.TranslatedEvents.Add(TranslateEvent(text));
+            }
         }
         private void EditEvent_Click(object sender, RoutedEventArgs e)
         {
             editingPanel = (((e.OriginalSource as FrameworkElement).Parent as ContextMenu).PlacementTarget) as DockPanel;
             editingPanel.Background = SystemColors.HighlightBrush;
-            MapEventText((string)EventList.SelectedItem);
+            MapEventText(eventGroup.OriginalEvents[EventList.SelectedIndex]);
             EventList.IsEnabled = false;
             AddEvent.Content = (string)FindResource("ModifyStr");
             AddSpecialEvent.Content = AddEvent.Content;
@@ -607,12 +623,20 @@ namespace CrazyStorm
             var item = EventList.SelectedItem;
             if (item != null)
             {
-                eventGroup.Events.Remove((string)item);
-                EventList.ItemsSource = eventGroup.Events;
+                int index = eventGroup.OriginalEvents.IndexOf((string)item);
+                eventGroup.OriginalEvents.RemoveAt(index);
+                eventGroup.TranslatedEvents.RemoveAt(index);
+                EventList.ItemsSource = eventGroup.TranslatedEvents;
             }
         }
         private void LeftConditionComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
+            var selectedItem = LeftConditionComboBox.SelectedItem as VariableComboBoxItem;
+            if (selectedItem != null)
+                LeftConditionComboBox.ToolTip = selectedItem.Name;
+            else
+                LeftConditionComboBox.ToolTip = null;
+
             LeftMoreThan.IsChecked = false;
             LeftEqual.IsChecked = false;
             LeftLessThan.IsChecked = false;
@@ -621,6 +645,12 @@ namespace CrazyStorm
         }
         private void RightConditionComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
+            var selectedItem = RightConditionComboBox.SelectedItem as VariableComboBoxItem;
+            if (selectedItem != null)
+                RightConditionComboBox.ToolTip = selectedItem.Name;
+            else
+                RightConditionComboBox.ToolTip = null;
+
             RightMoreThan.IsChecked = false;
             RightEqual.IsChecked = false;
             RightLessThan.IsChecked = false;
@@ -629,6 +659,12 @@ namespace CrazyStorm
         }
         private void PropertyComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
+            var selectedItem = PropertyComboBox.SelectedItem as VariableComboBoxItem;
+            if (selectedItem != null)
+                PropertyComboBox.ToolTip = selectedItem.Name;
+            else
+                PropertyComboBox.ToolTip = null;
+
             ChangeTo.IsChecked = false;
             Increase.IsChecked = false;
             Decrease.IsChecked = false;
@@ -650,36 +686,13 @@ namespace CrazyStorm
                 object value = environment.GetProperty(item.Name);
                 if (value != null)
                 {
-                    for (int i = 0; i < properties.Length; ++i)
+                    if (!PropertyTypeRule.TryMatchWith(value, input, out value))
                     {
-                        if (properties[i] == null)
-                            break;
-
-                        foreach (var property in properties[i])
-                        {
-                            if (selection[0] == property.Name && selection.Length <= 1)
-                            {
-                                var attribute = property.Info.GetCustomAttributes(false)[0] as PropertyAttribute;
-                                if (!attribute.IsLegal(input, out value))
-                                {
-                                    ChangeTextBoxState(LeftValue, true);
-                                    return;
-                                }
-                                LeftValue.Text = value.ToString();
-                                return;
-                            }
-                            else if (selection[0] == property.Name)
-                            {
-                                //Fields of support struct must be float type.
-                                float testValue;
-                                if (!float.TryParse(input, out testValue))
-                                {
-                                    ChangeTextBoxState(LeftValue, true);
-                                    return;
-                                }
-                            }
-                        }
+                        ChangeTextBoxState(LeftValue, true);
+                        return;
                     }
+                    LeftValue.Text = value.ToString();
+                    return;
                 }
                 if (value == null)
                 {
@@ -715,36 +728,13 @@ namespace CrazyStorm
                 object value = environment.GetProperty(item.Name);
                 if (value != null)
                 {
-                    for (int i = 0; i < properties.Length; ++i)
+                    if (!PropertyTypeRule.TryMatchWith(value, input, out value))
                     {
-                        if (properties[i] == null)
-                            break;
-
-                        foreach (var property in properties[i])
-                        {
-                            if (selection[0] == property.Name && selection.Length <= 1)
-                            {
-                                var attribute = property.Info.GetCustomAttributes(false)[0] as PropertyAttribute;
-                                if (!attribute.IsLegal(input, out value))
-                                {
-                                    ChangeTextBoxState(RightValue, true);
-                                    return;
-                                }
-                                RightValue.Text = value.ToString();
-                                return;
-                            }
-                            else if (selection[0] == property.Name)
-                            {
-                                //Fields of support struct must be float type.
-                                float testValue;
-                                if (!float.TryParse(input, out testValue))
-                                {
-                                    ChangeTextBoxState(RightValue, true);
-                                    return;
-                                }
-                            }
-                        }
+                        ChangeTextBoxState(RightValue, true);
+                        return;
                     }
+                    RightValue.Text = value.ToString();
+                    return;
                 }
                 if (value == null)
                 {
@@ -782,46 +772,25 @@ namespace CrazyStorm
                     object value = environment.GetProperty(item.Name);
                     if (value != null)
                     {
-                        for (int i = 0; i < properties.Length; ++i)
+                        object output = null;
+                        if (PropertyTypeRule.TryMatchWith(value, input, out output))
                         {
-                            if (properties[i] == null)
-                                break;
-
-                            foreach (var property in properties[i])
-                            {
-                                if (selection[0] == property.Name && selection.Length <= 1)
-                                {
-                                    var attribute = property.Info.GetCustomAttributes(false)[0] as PropertyAttribute;
-                                    if (attribute.IsLegal(input, out value))
-                                    {
-                                        ResultValue.Text = value.ToString();
-                                        return;
-                                    }
-                                    var lexer = new Lexer();
-                                    lexer.Load(input);
-                                    var syntaxTree = new Parser(lexer).Expression();
-                                    if (syntaxTree is Number)
-                                        throw new ExpressionException();
-
-                                    var result = syntaxTree.Eval(environment);
-                                    if (!(PropertyTypeRule.IsMatchWith(property.Info.PropertyType, result.GetType())))
-                                        throw new ExpressionException();
-
-                                    return;
-                                }
-                                else if (selection[0] == property.Name)
-                                {
-                                    var lexer = new Lexer();
-                                    lexer.Load(input);
-                                    var syntaxTree = new Parser(lexer).Expression();
-                                    var result = syntaxTree.Eval(environment);
-                                    if (!(result is float))
-                                        throw new ExpressionException();
-
-                                    return;
-                                }
-                            }
+                            ResultValue.Text = output.ToString();
+                            isExpressionResult = false;
+                            return;
                         }
+                        var lexer = new Lexer();
+                        lexer.Load(input);
+                        var syntaxTree = new Parser(lexer).Expression();
+                        if (syntaxTree is Number)
+                            throw new ExpressionException();
+
+                        var result = syntaxTree.Eval(environment);
+                        if (!(PropertyTypeRule.IsMatchWith(value.GetType(), result.GetType())))
+                            throw new ExpressionException();
+
+                        isExpressionResult = true;
+                        return;
                     }
                     if (value == null)
                     {
@@ -840,6 +809,8 @@ namespace CrazyStorm
                         var result = syntaxTree.Eval(environment);
                         if (!(result is float))
                             throw new ExpressionException();
+
+                        isExpressionResult = true;
                     }
                 }
                 catch
