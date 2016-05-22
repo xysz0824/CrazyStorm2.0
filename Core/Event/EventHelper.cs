@@ -204,6 +204,7 @@ namespace CrazyStorm.Core
             {
                 bytes.AddRange(PlayDataHelper.GetBytes(eventInfo.specialEvent));
                 string[] split = eventInfo.arguments.Split(',');
+                bytes.AddRange(PlayDataHelper.GetBytes(split.Length));
                 if (eventInfo.specialEvent == "Loop" && split.Length == 2)
                 {
                     bytes.AddRange(PlayDataHelper.GetBytes(split[0]));

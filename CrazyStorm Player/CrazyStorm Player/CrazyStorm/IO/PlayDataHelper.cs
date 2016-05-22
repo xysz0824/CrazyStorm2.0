@@ -42,6 +42,19 @@ namespace CrazyStorm_Player.CrazyStorm
             }
             return Encoding.UTF8.GetString(bytes.ToArray());
         }
+        public static string ReadString(byte[] bytes, int startIndex)
+        {
+            List<byte> stringBytes = new List<byte>();
+            while (true)
+            {
+                byte stringByte = bytes[startIndex++];
+                if (stringByte != '\0')
+                    stringBytes.Add(stringByte);
+                else
+                    break;
+            }
+            return Encoding.UTF8.GetString(stringBytes.ToArray());
+        }
         public static byte[] GetBlock(BinaryReader reader)
         {
             int size = reader.ReadInt32();

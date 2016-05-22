@@ -462,6 +462,7 @@ namespace CrazyStorm
                     if (item.Name == eventInfo.property)
                         PropertyComboBox.SelectedIndex = i;
                 }
+                isExpressionResult = eventInfo.isExpressionResult;
                 buttonMap[eventInfo.changeType].IsChecked = true;
                 ResultValue.Text = eventInfo.resultValue;
                 buttonMap[eventInfo.changeMode].IsChecked = true;

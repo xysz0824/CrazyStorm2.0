@@ -41,60 +41,27 @@ namespace CrazyStorm.Expression
             bytes.Add((byte)code);
             if (operand != null)
             {
-                byte[] operandBytes = PlayDataHelper.GetBytes(operand);
-                bytes.AddRange(operandBytes);
+                switch (code)
+                {
+                    case VMCode.NUMBER:
+                        bytes.AddRange(PlayDataHelper.GetBytes((float)operand));
+                        break;
+                    case VMCode.BOOL:
+                        bytes.AddRange(PlayDataHelper.GetBytes((bool)operand));
+                        break;
+                    case VMCode.NAME:
+                        bytes.AddRange(PlayDataHelper.GetBytes((string)operand));
+                        break;
+                    case VMCode.ARGUMENTS:
+                        bytes.AddRange(PlayDataHelper.GetBytes((int)operand));
+                        break;
+                }
             }
             return bytes.ToArray();
         }
         public static byte[] CreateInstruction(VMCode code)
         {
             return CreateInstruction(code, null);
-        }
-        public static VMInstruction[] Decode(byte[] bytes)
-        {
-            List<VMInstruction> list = new List<VMInstruction>();
-            int position = 0;
-            while (position != bytes.Length)
-            {
-                VMCode code = (VMCode)bytes[position++];
-                switch (code)
-                {
-                    case VMCode.NUMBER:
-                        int intOperand = BitConverter.ToInt32(bytes, position);
-                        position += sizeof(int);
-                        list.Add(new VMInstruction { code = code, intOperand = intOperand });
-                        break;
-                    case VMCode.BOOL:
-                        bool boolOperand = BitConverter.ToBoolean(bytes, position);
-                        position += sizeof(bool);
-                        list.Add(new VMInstruction { code = code, boolOperand = boolOperand });
-                        break;
-                    case VMCode.NAME:
-                        string name = ReadString(bytes, position);
-                        position += name.Length + 1;
-                        list.Add(new VMInstruction { code = code, stringOperand = name });
-                        break;
-                    case VMCode.ARGUMENTS:
-                        intOperand = BitConverter.ToInt32(bytes, position);
-                        position += sizeof(int);
-                        list.Add(new VMInstruction { code = code, intOperand = intOperand });
-                        break;
-                }
-            }
-            return list.ToArray();
-        }
-        public static string ReadString(byte[] bytes, int startIndex)
-        {
-            List<byte> stringBytes = new List<byte>();
-            while (true)
-            {
-                byte stringByte = bytes[startIndex++];
-                if (stringByte != '\0')
-                    stringBytes.Add(stringByte);
-                else
-                    break;
-            }
-            return Encoding.UTF8.GetString(stringBytes.ToArray());
         }
     }
 }

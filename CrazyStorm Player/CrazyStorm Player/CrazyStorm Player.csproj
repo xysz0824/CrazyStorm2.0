@@ -95,6 +95,7 @@
     <Compile Include="CrazyStorm\Component\MultiEmitter.cs" />
     <Compile Include="CrazyStorm\Component\Rebounder.cs" />
     <Compile Include="CrazyStorm\Event\EventGroup.cs" />
+    <Compile Include="CrazyStorm\Event\EventHelper.cs" />
     <Compile Include="CrazyStorm\File.cs" />
     <Compile Include="CrazyStorm\IO\ReferenceHelper.cs" />
     <Compile Include="CrazyStorm\IO\IPlayData.cs" />
@@ -112,6 +113,7 @@
     <Compile Include="CrazyStorm\Resource\VariableResource.cs" />
     <Compile Include="CrazyStorm\Struct\RGB.cs" />
     <Compile Include="CrazyStorm\Struct\Vector2.cs" />
+    <Compile Include="CrazyStorm\VM.cs" />
     <Compile Include="DirectX\DeviceContext.cs" />
     <Compile Include="DirectX\DeviceSettings.cs" />
     <Compile Include="DirectX\DirectXFramework.cs" />
@@ -158,12 +160,6 @@
       <ProductName>.NET Framework 3.5 SP1</ProductName>
       <Install>true</Install>
     </BootstrapperPackage>
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\Script\Expression.csproj">
-      <Project>{cea93dc4-9ff2-4d90-b0bf-e1e0d8027223}</Project>
-      <Name>Expression</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

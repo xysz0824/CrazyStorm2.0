@@ -112,6 +112,7 @@ namespace CrazyStorm.Expression
                     scode = VM.CreateInstruction(VMCode.NUMBER, (float)result);
 
                 codeStream.AddRange(scode);
+                return;
             }
             if (leftCanEval)
             {
