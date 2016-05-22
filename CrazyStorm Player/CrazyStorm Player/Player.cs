@@ -28,7 +28,7 @@ namespace CrazyStorm_Player
                 {
                     string version = PlayDataHelper.ReadString(reader);
                     file.LoadPlayData(reader);
-                    FileHelper.RebuildObjectReference(file);
+                    ReferenceHelper.RebuildObjectReference(file);
                 }
             }
         }

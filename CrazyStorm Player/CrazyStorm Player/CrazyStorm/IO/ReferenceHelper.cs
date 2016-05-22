@@ -5,7 +5,7 @@ using System.Text;
 
 namespace CrazyStorm_Player.CrazyStorm
 {
-    class FileHelper
+    class ReferenceHelper
     {
         public static void RebuildObjectReference(CrazyStorm.File file)
         {

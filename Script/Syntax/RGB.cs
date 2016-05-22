@@ -40,7 +40,7 @@ namespace CrazyStorm.Expression
             GetR().Compile(codeStream);
             GetG().Compile(codeStream);
             GetB().Compile(codeStream);
-            byte[] code = VM.CreateCode(VMCode.RGB);
+            byte[] code = VM.CreateInstruction(VMCode.RGB);
             codeStream.AddRange(code);
         }
     }

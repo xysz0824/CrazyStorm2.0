@@ -107,9 +107,9 @@ namespace CrazyStorm.Expression
                 object result = Eval(null);
                 byte[] scode = null;
                 if (result is bool)
-                    scode = VM.CreateCode(VMCode.BOOL, (bool)result);
+                    scode = VM.CreateInstruction(VMCode.BOOL, (bool)result);
                 else
-                    scode = VM.CreateCode(VMCode.NUMBER, (float)result);
+                    scode = VM.CreateInstruction(VMCode.NUMBER, (float)result);
 
                 codeStream.AddRange(scode);
             }
@@ -118,9 +118,9 @@ namespace CrazyStorm.Expression
                 object result = left.Eval(null);
                 byte[] scode = null;
                 if (result is bool)
-                    scode = VM.CreateCode(VMCode.BOOL, (bool)result);
+                    scode = VM.CreateInstruction(VMCode.BOOL, (bool)result);
                 else
-                    scode = VM.CreateCode(VMCode.NUMBER, (float)result);
+                    scode = VM.CreateInstruction(VMCode.NUMBER, (float)result);
 
                 codeStream.AddRange(scode);
             }
@@ -132,9 +132,9 @@ namespace CrazyStorm.Expression
                 object result = right.Eval(null);
                 byte[] scode = null;
                 if (result is bool)
-                    scode = VM.CreateCode(VMCode.BOOL, (bool)result);
+                    scode = VM.CreateInstruction(VMCode.BOOL, (bool)result);
                 else
-                    scode = VM.CreateCode(VMCode.NUMBER, (float)result);
+                    scode = VM.CreateInstruction(VMCode.NUMBER, (float)result);
 
                 codeStream.AddRange(scode);
             }
@@ -146,34 +146,34 @@ namespace CrazyStorm.Expression
             switch (op)
             {
                 case "&":
-                    code = VM.CreateCode(VMCode.AND);
+                    code = VM.CreateInstruction(VMCode.AND);
                     break;
                 case "|":
-                    code = VM.CreateCode(VMCode.OR);
+                    code = VM.CreateInstruction(VMCode.OR);
                     break;
                 case "=":
-                    code = VM.CreateCode(VMCode.EQUAL);
+                    code = VM.CreateInstruction(VMCode.EQUAL);
                     break;
                 case "+":
-                    code = VM.CreateCode(VMCode.ADD);
+                    code = VM.CreateInstruction(VMCode.ADD);
                     break;
                 case "-":
-                    code = VM.CreateCode(VMCode.SUB);
+                    code = VM.CreateInstruction(VMCode.SUB);
                     break;
                 case "*":
-                    code = VM.CreateCode(VMCode.MUL);
+                    code = VM.CreateInstruction(VMCode.MUL);
                     break;
                 case "/":
-                    code = VM.CreateCode(VMCode.DIV);
+                    code = VM.CreateInstruction(VMCode.DIV);
                     break;
                 case "%":
-                    code = VM.CreateCode(VMCode.MOD);
+                    code = VM.CreateInstruction(VMCode.MOD);
                     break;
                 case ">":
-                    code = VM.CreateCode(VMCode.MORE);
+                    code = VM.CreateInstruction(VMCode.MORE);
                     break;
                 case "<":
-                    code = VM.CreateCode(VMCode.LESS);
+                    code = VM.CreateInstruction(VMCode.LESS);
                     break;
             }
             codeStream.AddRange(code);

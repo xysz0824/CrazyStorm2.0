@@ -31,8 +31,8 @@ namespace CrazyStorm_Player.CrazyStorm
                 }
                 //particle
                 Particle.LoadPlayData(emitterReader);
-                //eventFieldEventGroups
-                //TODO
+                //emitterEventGroups
+                PlayDataHelper.LoadObjectList(emitterEventGroups, emitterReader);
             }
         }
     }

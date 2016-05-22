@@ -12,7 +12,7 @@ using System.Xml.Serialization;
 
 namespace CrazyStorm.Core
 {
-    public class EventGroup : IXmlData
+    public class EventGroup : IXmlData, IPlayData
     {
         #region Private Members
         [XmlAttribute]
@@ -93,6 +93,25 @@ namespace CrazyStorm.Core
             XmlHelper.StoreList(originalEvents, doc, eventGroupNode, "Events");
             node.AppendChild(eventGroupNode);
             return eventGroupNode;
+        }
+        public List<byte> GeneratePlayData()
+        {
+            var eventGroupBytes = new List<byte>();
+            //compiledCondition
+            if (compiledCondition != null)
+            {
+                eventGroupBytes.AddRange(PlayDataHelper.GetBytes(compiledCondition.Length));
+                eventGroupBytes.AddRange(compiledCondition);
+            }
+            else
+                eventGroupBytes.AddRange(PlayDataHelper.GetBytes(0));
+            //compiledEvents
+            for (int i = 0; i < compiledEvents.Count; ++i)
+            {
+                eventGroupBytes.AddRange(PlayDataHelper.GetBytes(CompiledEvents[i].Length));
+                eventGroupBytes.AddRange(compiledEvents[i]);
+            }
+            return PlayDataHelper.CreateBlock(eventGroupBytes);
         }
         #endregion
     }

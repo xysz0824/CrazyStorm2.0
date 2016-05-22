@@ -35,7 +35,7 @@ namespace CrazyStorm.Expression
         {
             GetX().Compile(codeStream);
             GetY().Compile(codeStream);
-            byte[] code = VM.CreateCode(VMCode.VECTOR2);
+            byte[] code = VM.CreateInstruction(VMCode.VECTOR2);
             codeStream.AddRange(code);
         }
     }

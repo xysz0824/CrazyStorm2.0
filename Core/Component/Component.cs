@@ -384,7 +384,7 @@ namespace CrazyStorm.Core
             componentBytes.AddRange(PlayDataHelper.GetStringBytes(GetType().Name));
             PlayDataHelper.GenerateFields(typeof(Component), this, componentBytes);
             //properties
-            //TODO
+            base.GeneratePlayData(componentBytes);
             //componentData
             PlayDataHelper.GenerateStruct(componentData, componentBytes);
             //parent
@@ -400,7 +400,7 @@ namespace CrazyStorm.Core
             //variables
             PlayDataHelper.GenerateObjectList(variables, componentBytes);
             //componentEventGroups
-            //TODO
+            PlayDataHelper.GenerateObjectList(componentEventGroups, componentBytes);
             return PlayDataHelper.CreateBlock(componentBytes);
         }
         #endregion

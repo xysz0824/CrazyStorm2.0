@@ -14,7 +14,7 @@ namespace CrazyStorm_Player.CrazyStorm
         Substraction,
         Multiply
     }
-    abstract class ParticleBase : IPlayData, IRebuildReference<ParticleType>
+    abstract class ParticleBase : PropertyContainer, IPlayData, IRebuildReference<ParticleType>
     {
         public ParticleType Type { get; set; }
         public int TypeID { get; set; }
@@ -47,7 +47,7 @@ namespace CrazyStorm_Player.CrazyStorm
             using (BinaryReader particleBaseReader = PlayDataHelper.GetBlockReader(reader))
             {
                 //properties
-                //TODO
+                base.BuildFromPlayData(particleBaseReader);
                 TypeID = particleBaseReader.ReadInt32();
                 using (BinaryReader dataReader = PlayDataHelper.GetBlockReader(particleBaseReader))
                 {

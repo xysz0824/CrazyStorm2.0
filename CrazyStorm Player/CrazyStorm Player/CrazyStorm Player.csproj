@@ -96,16 +96,17 @@
     <Compile Include="CrazyStorm\Component\Rebounder.cs" />
     <Compile Include="CrazyStorm\Event\EventGroup.cs" />
     <Compile Include="CrazyStorm\File.cs" />
-    <Compile Include="CrazyStorm\FileHelper.cs" />
-    <Compile Include="CrazyStorm\IPlayData.cs" />
-    <Compile Include="CrazyStorm\IRebuildReference.cs" />
+    <Compile Include="CrazyStorm\IO\ReferenceHelper.cs" />
+    <Compile Include="CrazyStorm\IO\IPlayData.cs" />
+    <Compile Include="CrazyStorm\IO\IRebuildReference.cs" />
     <Compile Include="CrazyStorm\Layer.cs" />
     <Compile Include="CrazyStorm\Particle\CurveParticle.cs" />
     <Compile Include="CrazyStorm\Particle\Particle.cs" />
     <Compile Include="CrazyStorm\Particle\ParticleBase.cs" />
     <Compile Include="CrazyStorm\Particle\ParticleSystem.cs" />
     <Compile Include="CrazyStorm\Particle\ParticleType.cs" />
-    <Compile Include="CrazyStorm\PlayDataHelper.cs" />
+    <Compile Include="CrazyStorm\IO\PlayDataHelper.cs" />
+    <Compile Include="CrazyStorm\Property\PropertyContainer.cs" />
     <Compile Include="CrazyStorm\Resource\FileResource.cs" />
     <Compile Include="CrazyStorm\Resource\Resource.cs" />
     <Compile Include="CrazyStorm\Resource\VariableResource.cs" />
@@ -157,6 +158,12 @@
       <ProductName>.NET Framework 3.5 SP1</ProductName>
       <Install>true</Install>
     </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Script\Expression.csproj">
+      <Project>{cea93dc4-9ff2-4d90-b0bf-e1e0d8027223}</Project>
+      <Name>Expression</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

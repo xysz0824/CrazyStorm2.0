@@ -31,7 +31,7 @@ namespace CrazyStorm_Player.CrazyStorm
                     CollisionTime = dataReader.ReadInt32();
                 }
                 //rebounderEventGroups
-                //TODO
+                PlayDataHelper.LoadObjectList(RebounderEventGroups, rebounderReader);
             }
         }
     }

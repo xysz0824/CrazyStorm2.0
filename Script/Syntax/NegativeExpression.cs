@@ -35,15 +35,15 @@ namespace CrazyStorm.Expression
             SyntaxTree expression = GetExpression();
             if (expression.ContainType<Expression.Name>() || expression.ContainType<Expression.Call>())
             {
-                byte[] code1 = VM.CreateCode(VMCode.NUMBER, 0);
+                byte[] code1 = VM.CreateInstruction(VMCode.NUMBER, 0);
                 codeStream.AddRange(code1);
                 expression.Compile(codeStream);
-                byte[] code2 = VM.CreateCode(VMCode.SUB);
+                byte[] code2 = VM.CreateInstruction(VMCode.SUB);
                 codeStream.AddRange(code2);
             }
             else
             {
-                byte[] code = VM.CreateCode(VMCode.NUMBER, (float)Eval(null));
+                byte[] code = VM.CreateInstruction(VMCode.NUMBER, (float)Eval(null));
                 codeStream.AddRange(code);
             }
         }

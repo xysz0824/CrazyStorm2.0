@@ -39,7 +39,7 @@ namespace CrazyStorm_Player.CrazyStorm
                     TargetName = PlayDataHelper.ReadString(dataReader);
                 }
                 //eventFieldEventGroups
-                //TODO
+                PlayDataHelper.LoadObjectList(EventFieldEventGroups, eventFieldReader);
             }
         }
     }

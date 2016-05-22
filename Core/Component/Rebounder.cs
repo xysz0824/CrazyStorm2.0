@@ -105,7 +105,7 @@ namespace CrazyStorm.Core
             //rebounderData
             PlayDataHelper.GenerateStruct(rebounderData, rebounderBytes);
             //rebounderEventGroups
-            //TODO
+            PlayDataHelper.GenerateObjectList(rebounderEventGroups, rebounderBytes);
             bytes.AddRange(PlayDataHelper.CreateBlock(rebounderBytes));
             return bytes;
         }

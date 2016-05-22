@@ -5,8 +5,38 @@ using System.Text;
 
 namespace CrazyStorm.Core
 {
+    public enum PropertyType : byte
+    {
+        IllegalType,
+        Boolean,
+        Int32,
+        Single,
+        Enum,
+        Vector2,
+        RGB,
+        String
+    }
     public class PropertyTypeRule
     {
+        public static PropertyType GetValueType(object value)
+        {
+            if (value is bool)
+                return PropertyType.Boolean;
+            else if (value is int)
+                return PropertyType.Int32;
+            else if (value is float)
+                return PropertyType.Single;
+            else if (value is Enum)
+                return PropertyType.Enum;
+            else if (value is Core.Vector2)
+                return PropertyType.Vector2;
+            else if (value is Core.RGB)
+                return PropertyType.RGB;
+            else if (value is string)
+                return PropertyType.String;
+            else
+                return PropertyType.IllegalType;
+        }
         public static bool IsMatchWith(Type typeA, Type typeB)
         {
             if (typeA.Equals(typeB))
@@ -20,7 +50,31 @@ namespace CrazyStorm.Core
 
             return false;
         }
-        public static bool TryMatchWith(object target, string text, out object output)
+        public static object Parse(PropertyType type, string text)
+        {
+            switch (type)
+            {
+                case PropertyType.Boolean:
+                    return bool.Parse(text);
+                case PropertyType.Int32:
+                    return int.Parse(text);
+                case PropertyType.Single:
+                    return float.Parse(text);
+                case PropertyType.Enum:
+                    return int.Parse(text);
+                case PropertyType.Vector2:
+                    Vector2 value;
+                    Vector2.TryParse(text, out value);
+                    return value;
+                case PropertyType.RGB:
+                    Vector2.TryParse(text, out value);
+                    return value;
+                case PropertyType.String:
+                    return text;
+            }
+            return null;
+        }
+        public static bool TryParse(object target, string text, out object output)
         {
             bool result = false;
             if (target is bool)

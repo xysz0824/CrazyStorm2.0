@@ -7,7 +7,7 @@ using CrazyStorm.Core;
 
 namespace CrazyStorm_Player.CrazyStorm
 {
-    class Component : IPlayData, IRebuildReference<Component>
+    class Component : PropertyContainer, IPlayData, IRebuildReference<Component>
     {
         public int Id { get; set; }
         public string Name { get; set; }
@@ -41,7 +41,7 @@ namespace CrazyStorm_Player.CrazyStorm
                 Id = componentReader.ReadInt32();
                 Name = PlayDataHelper.ReadString(componentReader);
                 //properties
-                //TODO
+                base.BuildFromPlayData(componentReader);
                 using (BinaryReader dataReader = PlayDataHelper.GetBlockReader(componentReader))
                 {
                     CurrentFrame = dataReader.ReadInt32();
@@ -61,7 +61,7 @@ namespace CrazyStorm_Player.CrazyStorm
                 //variables
                 PlayDataHelper.LoadObjectList(Variables, componentReader);
                 //componentEventGroups
-                //TODO
+                PlayDataHelper.LoadObjectList(ComponentEventGroups, componentReader);
             }
         }
         public void RebuildReferenceFromCollection(IList<Component> collection)

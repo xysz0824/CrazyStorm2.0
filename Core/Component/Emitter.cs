@@ -125,7 +125,7 @@ namespace CrazyStorm.Core
             //particle
             emitterBytes.AddRange(particle.GeneratePlayData());
             //particleEventGroups
-            //TODO
+            PlayDataHelper.GenerateObjectList(particleEventGroups, emitterBytes);
             bytes.AddRange(PlayDataHelper.CreateBlock(emitterBytes));
             return bytes;
         }

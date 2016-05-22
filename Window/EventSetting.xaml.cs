@@ -197,6 +197,7 @@ namespace CrazyStorm
             {
                 var selectedItem = LeftConditionComboBox.SelectedItem as VariableComboBoxItem;
                 eventInfo.leftCondition = selectedItem.Name;
+                eventInfo.leftType = GetValueType(selectedItem.Name);
                 eventInfo.leftValue = LeftValue.Text;
             }
             if (RightLessThan.IsChecked == true)
@@ -211,6 +212,7 @@ namespace CrazyStorm
             {
                 var selectedItem = RightConditionComboBox.SelectedItem as VariableComboBoxItem;
                 eventInfo.rightCondition = selectedItem.Name;
+                eventInfo.rightType = GetValueType(selectedItem.Name);
                 eventInfo.rightValue = RightValue.Text;
             }
             //Allow empty condition
@@ -223,8 +225,11 @@ namespace CrazyStorm
                 eventInfo.rightCondition = null;
                 eventInfo.leftOperator = eventInfo.rightOperator;
                 eventInfo.rightOperator = null;
+                eventInfo.leftType = eventInfo.rightType;
+                eventInfo.rightType = PropertyType.IllegalType;
                 eventInfo.leftValue = eventInfo.rightValue;
                 eventInfo.rightValue = null;
+
             }
             if (!String.IsNullOrEmpty(eventInfo.leftCondition) && !String.IsNullOrEmpty(eventInfo.rightCondition))
             {
@@ -270,6 +275,7 @@ namespace CrazyStorm
                 var selectedItem = PropertyComboBox.SelectedItem as VariableComboBoxItem;
                 eventInfo.property = selectedItem.Name;
                 eventInfo.isExpressionResult = isExpressionResult;
+                eventInfo.resultType = GetValueType(selectedItem.Name);
                 eventInfo.resultValue = ResultValue.Text;
                 eventInfo.changeTime = ChangeTime.Text;
                 if (!String.IsNullOrEmpty(ExecuteTime.Text))
@@ -280,6 +286,17 @@ namespace CrazyStorm
 
             text = EventHelper.BuildEvent(eventInfo);
             return true;
+        }
+        PropertyType GetValueType(string name)
+        {
+            object value = environment.GetProperty(name);
+            if (value == null)
+                value = environment.GetLocal(name);
+
+            if (value == null)
+                value = environment.GetGlobal(name);
+
+            return PropertyTypeRule.GetValueType(value);
         }
         bool BuildSpecialEvent(out string text)
         {
@@ -682,11 +699,10 @@ namespace CrazyStorm
             if (LeftConditionComboBox.SelectedItem != null)
             {
                 var item = LeftConditionComboBox.SelectedItem as VariableComboBoxItem;
-                string[] selection = item.Name.Split('.');
                 object value = environment.GetProperty(item.Name);
                 if (value != null)
                 {
-                    if (!PropertyTypeRule.TryMatchWith(value, input, out value))
+                    if (!PropertyTypeRule.TryParse(value, input, out value))
                     {
                         ChangeTextBoxState(LeftValue, true);
                         return;
@@ -696,11 +712,11 @@ namespace CrazyStorm
                 }
                 if (value == null)
                 {
-                    value = environment.GetLocal(selection[0]);
+                    value = environment.GetLocal(item.Name);
                 }
                 if (value == null)
                 {
-                    value = environment.GetGlobal(selection[0]);
+                    value = environment.GetGlobal(item.Name);
                 }
                 if (value != null)
                 {
@@ -724,11 +740,10 @@ namespace CrazyStorm
             if (RightConditionComboBox.SelectedItem != null)
             {
                 var item = RightConditionComboBox.SelectedItem as VariableComboBoxItem;
-                string[] selection = item.Name.Split('.');
                 object value = environment.GetProperty(item.Name);
                 if (value != null)
                 {
-                    if (!PropertyTypeRule.TryMatchWith(value, input, out value))
+                    if (!PropertyTypeRule.TryParse(value, input, out value))
                     {
                         ChangeTextBoxState(RightValue, true);
                         return;
@@ -738,11 +753,11 @@ namespace CrazyStorm
                 }
                 if (value == null)
                 {
-                    value = environment.GetLocal(selection[0]);
+                    value = environment.GetLocal(item.Name);
                 }
                 if (value == null)
                 {
-                    value = environment.GetGlobal(selection[0]);
+                    value = environment.GetGlobal(item.Name);
                 }
                 if (value != null)
                 {
@@ -768,12 +783,11 @@ namespace CrazyStorm
                 try
                 {
                     var item = PropertyComboBox.SelectedItem as VariableComboBoxItem;
-                    string[] selection = item.Name.Split('.');
                     object value = environment.GetProperty(item.Name);
                     if (value != null)
                     {
                         object output = null;
-                        if (PropertyTypeRule.TryMatchWith(value, input, out output))
+                        if (PropertyTypeRule.TryParse(value, input, out output))
                         {
                             ResultValue.Text = output.ToString();
                             isExpressionResult = false;
@@ -794,11 +808,11 @@ namespace CrazyStorm
                     }
                     if (value == null)
                     {
-                        value = environment.GetLocal(selection[0]);
+                        value = environment.GetLocal(item.Name);
                     }
                     if (value == null)
                     {
-                        value = environment.GetGlobal(selection[0]);
+                        value = environment.GetGlobal(item.Name);
                     }
                     if (value != null)
                     {

@@ -120,7 +120,7 @@ namespace CrazyStorm.Core
             //eventFieldData
             PlayDataHelper.GenerateStruct(eventFieldData, eventFieldBytes);
             //eventFieldEventGroups
-            //TODO
+            PlayDataHelper.GenerateObjectList(eventFieldEventGroups, eventFieldBytes);
             bytes.AddRange(PlayDataHelper.CreateBlock(eventFieldBytes));
             return bytes;
         }

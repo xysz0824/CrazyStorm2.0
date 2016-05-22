@@ -43,7 +43,7 @@ namespace CrazyStorm.Expression
         public override void Compile(List<byte> codeStream)
         {
             GetArguments().Compile(codeStream);
-            byte[] code = VM.CreateCode(VMCode.CALL, (string)Token.GetValue());
+            byte[] code = VM.CreateInstruction(VMCode.CALL, (string)Token.GetValue());
             codeStream.AddRange(code);
         }
     }

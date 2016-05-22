@@ -237,7 +237,7 @@ namespace CrazyStorm.Core
         {
             var particleBaseBytes = new List<byte>();
             //properties
-            //TODO
+            base.GeneratePlayData(particleBaseBytes);
             //type
             if (type != null)
                 particleBaseBytes.AddRange(PlayDataHelper.GetBytes(type.Id));

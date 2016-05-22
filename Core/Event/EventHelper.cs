@@ -11,15 +11,18 @@ namespace CrazyStorm.Core
         public bool hasCondition;
         public string leftCondition;
         public string leftOperator;
+        public PropertyType leftType;
         public string leftValue;
         public string midOperator;
         public string rightCondition;
         public string rightOperator;
+        public PropertyType rightType;
         public string rightValue;
         public bool isSpecialEvent;
         public string property;
         public string changeType;
         public bool isExpressionResult;
+        public PropertyType resultType;
         public string resultValue;
         public string changeMode;
         public string changeTime;
@@ -50,10 +53,13 @@ namespace CrazyStorm.Core
                     eventInfo.resultValue, eventInfo.changeMode, eventInfo.changeTime);
                 if (eventInfo.executeTime != null)
                     eventString += ", " + eventInfo.executeTime;
+
+                eventString += (char)eventInfo.leftType;
+                eventString += (char)eventInfo.rightType;
+                eventString += (char)eventInfo.resultType;
             }
             else
                 eventString += string.Format("{0}({1})", eventInfo.specialEvent, eventInfo.arguments);
-
             return eventString;
         }
         public static EventInfo SplitEvent(string text)
@@ -96,10 +102,23 @@ namespace CrazyStorm.Core
                         split[i] == "Accelerated" || split[i] == "Decelerated")
                     {
                         info.changeMode = split[i];
-                        info.changeTime = split[i + 1].Trim();
                         if (split.Length > i + 2)
-                            info.executeTime = split[i + 2].Trim();
-
+                        {
+                            info.changeTime = split[i + 1].Trim();
+                            string temp = split[i + 2].Trim();
+                            info.leftType = (PropertyType)temp[temp.Length - 3];
+                            info.rightType = (PropertyType)temp[temp.Length - 2];
+                            info.resultType = (PropertyType)temp[temp.Length - 1];
+                            info.executeTime = temp.Remove(temp.Length - 3, 3);
+                        }
+                        else
+                        {
+                            string temp = split[i + 1].Trim();
+                            info.leftType = (PropertyType)temp[temp.Length - 3];
+                            info.rightType = (PropertyType)temp[temp.Length - 2];
+                            info.resultType = (PropertyType)temp[temp.Length - 1];
+                            info.changeTime = temp.Remove(temp.Length - 3, 3);
+                        }
                         break;
                     }
                     else
@@ -145,13 +164,15 @@ namespace CrazyStorm.Core
             {
                 bytes.AddRange(PlayDataHelper.GetBytes(eventInfo.leftCondition));
                 bytes.Add(keywordMap[eventInfo.leftOperator]);
-                bytes.AddRange(PlayDataHelper.GetBytes(eventInfo.leftValue));
+                bytes.Add((byte)eventInfo.leftType);
+                bytes.AddRange(PlayDataHelper.GetBytes(PropertyTypeRule.Parse(eventInfo.leftType, eventInfo.leftValue)));
                 if (eventInfo.midOperator != null)
                 {
                     bytes.Add(keywordMap[eventInfo.midOperator]);
                     bytes.AddRange(PlayDataHelper.GetBytes(eventInfo.rightCondition));
                     bytes.Add(keywordMap[eventInfo.rightOperator]);
-                    bytes.AddRange(PlayDataHelper.GetBytes(eventInfo.rightValue));
+                    bytes.Add((byte)eventInfo.rightType);
+                    bytes.AddRange(PlayDataHelper.GetBytes(PropertyTypeRule.Parse(eventInfo.rightType, eventInfo.rightValue)));
                 }
                 else
                     bytes.Add(0);
@@ -162,6 +183,7 @@ namespace CrazyStorm.Core
                 bytes.AddRange(PlayDataHelper.GetBytes(eventInfo.property));
                 bytes.Add(keywordMap[eventInfo.changeType]);
                 bytes.AddRange(PlayDataHelper.GetBytes(eventInfo.isExpressionResult));
+                bytes.Add((byte)eventInfo.resultType);
                 if (eventInfo.isExpressionResult)
                 {
                     byte[] compiledExpression = compileFunc(eventInfo.resultValue);
@@ -169,7 +191,7 @@ namespace CrazyStorm.Core
                     bytes.AddRange(compiledExpression);
                 }
                 else
-                    bytes.AddRange(PlayDataHelper.GetBytes(eventInfo.resultValue));
+                    bytes.AddRange(PlayDataHelper.GetBytes(PropertyTypeRule.Parse(eventInfo.resultType, eventInfo.resultValue)));
 
                 bytes.Add(keywordMap[eventInfo.changeMode]);
                 bytes.AddRange(PlayDataHelper.GetBytes(int.Parse(eventInfo.changeTime)));

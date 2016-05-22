@@ -103,5 +103,20 @@ namespace CrazyStorm.Core
             }
             return propertiesNode;
         }
+        public void GeneratePlayData(List<byte> data)
+        {
+            List<byte> newData = new List<byte>();
+            foreach (var pair in properties)
+            {
+                if (pair.Value.Expression)
+                {
+                    List<byte> pairData = new List<byte>();
+                    pairData.AddRange(PlayDataHelper.GetBytes(pair.Key));
+                    pairData.AddRange(pair.Value.CompiledExpression);
+                    newData.AddRange(PlayDataHelper.CreateBlock(pairData));
+                }
+            }
+            data.AddRange(PlayDataHelper.CreateBlock(newData));
+        }
     }
 }
