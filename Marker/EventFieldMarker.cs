@@ -18,7 +18,7 @@ namespace CrazyStorm
         public void Draw(Canvas canvas, Component component, int x, int y)
         {
             var EventField = component as EventField;
-            if (EventField.Shape == FieldShape.Rectangle)
+            if (EventField.FieldShape == FieldShape.Rectangle)
             {
                 var rect = new Rectangle();
                 rect.Width = EventField.HalfWidth * 2;
@@ -29,7 +29,7 @@ namespace CrazyStorm
                 rect.SetValue(Canvas.TopProperty, (double)y - EventField.HalfHeight);
                 canvas.Children.Add(rect);
             }
-            else if (EventField.Shape == FieldShape.Ellipse)
+            else if (EventField.FieldShape == FieldShape.Ellipse)
             {
                 var ellipse = new Ellipse();
                 ellipse.Width = EventField.HalfWidth * 2;

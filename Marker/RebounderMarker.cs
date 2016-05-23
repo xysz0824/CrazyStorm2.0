@@ -18,7 +18,7 @@ namespace CrazyStorm
         public void Draw(Canvas canvas, Component component, int x, int y)
         {
             var Rebounder = component as Rebounder;
-            if (Rebounder.Shape == RebounderShape.Line)
+            if (Rebounder.RebounderShape == RebounderShape.Line)
             {
                 var line = new Line();
                 line.Stroke = new SolidColorBrush(Colors.Red);
@@ -30,12 +30,13 @@ namespace CrazyStorm
                 line.Y2 = y + Rebounder.Size * Math.Sin((Rebounder.Rotation + 180) / 180 * Math.PI);
                 canvas.Children.Add(line);
             }
-            else if (Rebounder.Shape == RebounderShape.Circle)
+            else if (Rebounder.RebounderShape == RebounderShape.Circle)
             {
                 var ellipse = new Ellipse();
                 ellipse.Width = Rebounder.Size * 2;
                 ellipse.Height = Rebounder.Size * 2;
-                ellipse.Fill = new SolidColorBrush(Colors.Red);
+                ellipse.Stroke = new SolidColorBrush(Colors.Red);
+                ellipse.StrokeThickness = 6;
                 ellipse.Opacity = 0.5f;
                 ellipse.SetValue(Canvas.LeftProperty, (double)x - Rebounder.Size);
                 ellipse.SetValue(Canvas.TopProperty, (double)y - Rebounder.Size);

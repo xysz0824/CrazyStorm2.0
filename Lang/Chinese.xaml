@@ -107,7 +107,8 @@
     <sys:String x:Key="LengthStr">长度</sys:String>
     <sys:String x:Key="HalfWidthStr">半长</sys:String>
     <sys:String x:Key="HalfHeightStr">半宽</sys:String>
-    <sys:String x:Key="ShapeStr">形状</sys:String>
+    <sys:String x:Key="FieldShapeStr">场形状</sys:String>
+    <sys:String x:Key="RebounderShapeStr">反弹板形状</sys:String>
     <sys:String x:Key="ReachStr">范围</sys:String>
     <sys:String x:Key="TargetNameStr">目标组件名称</sys:String>
     <sys:String x:Key="SizeStr">尺寸</sys:String>

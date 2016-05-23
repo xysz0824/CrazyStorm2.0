@@ -6,6 +6,24 @@ using System.Text.RegularExpressions;
 
 namespace CrazyStorm.Core
 {
+    public enum EventOperator : byte
+    {
+        More,
+        Less,
+        Equal,
+        And,
+        Or
+    }
+    public enum EventKeyword : byte
+    {
+        ChangeTo,
+        Increase,
+        Decrease,
+        Linear,
+        Accelerated,
+        Decelerated,
+        Fixed
+    }
     public class EventInfo
     {
         public bool hasCondition;
@@ -53,13 +71,13 @@ namespace CrazyStorm.Core
                     eventInfo.resultValue, eventInfo.changeMode, eventInfo.changeTime);
                 if (eventInfo.executeTime != null)
                     eventString += ", " + eventInfo.executeTime;
-
-                eventString += (char)eventInfo.leftType;
-                eventString += (char)eventInfo.rightType;
-                eventString += (char)eventInfo.resultType;
             }
             else
                 eventString += string.Format("{0}({1})", eventInfo.specialEvent, eventInfo.arguments);
+
+            eventString += (char)eventInfo.leftType;
+            eventString += (char)eventInfo.rightType;
+            eventString += (char)eventInfo.resultType;
             return eventString;
         }
         public static EventInfo SplitEvent(string text)
@@ -137,7 +155,11 @@ namespace CrazyStorm.Core
                 info.isSpecialEvent = true;
                 string[] split = eventText.Split('(');
                 info.specialEvent = split[0];
-                info.arguments = split[1].Split(')')[0];
+                split = split[1].Split(')');
+                info.arguments = split[0];
+                info.leftType = (PropertyType)split[1][0];
+                info.rightType = (PropertyType)split[1][1];
+                info.resultType = (PropertyType)split[1][2];
             }
             return info;
         }
@@ -145,34 +167,37 @@ namespace CrazyStorm.Core
         public static byte[] GenerateEventData(string text, CompileDelegate compileFunc)
         {
             EventInfo eventInfo = SplitEvent(text);
-            Dictionary<string, byte> keywordMap = new Dictionary<string, byte>();
-            keywordMap[">"] = 1;
-            keywordMap["="] = 2;
-            keywordMap["<"] = 3;
-            keywordMap["&"] = 1;
-            keywordMap["|"] = 2;
-            keywordMap["ChangeTo"] = 1;
-            keywordMap["Increase"] = 2;
-            keywordMap["Decrease"] = 3;
-            keywordMap["Linear"] = 1;
-            keywordMap["Accelerated"] = 2;
-            keywordMap["Decelerated"] = 3;
-            keywordMap["Fixed"] = 4;
+            Dictionary<string, EventOperator> operatorMap = new Dictionary<string,EventOperator>();
+            Dictionary<string, EventKeyword> keywordMap = new Dictionary<string, EventKeyword>();
+            operatorMap[">"] = EventOperator.More;
+            operatorMap["="] = EventOperator.Equal;
+            operatorMap["<"] = EventOperator.Less;
+            operatorMap["&"] = EventOperator.And;
+            operatorMap["|"] = EventOperator.Or;
+            keywordMap["ChangeTo"] = EventKeyword.ChangeTo;
+            keywordMap["Increase"] = EventKeyword.Increase;
+            keywordMap["Decrease"] = EventKeyword.Decrease;
+            keywordMap["Linear"] = EventKeyword.Linear;
+            keywordMap["Accelerated"] = EventKeyword.Accelerated;
+            keywordMap["Decelerated"] = EventKeyword.Decelerated;
+            keywordMap["Fixed"] = EventKeyword.Fixed;
             List<byte> bytes = new List<byte>();
             bytes.AddRange(PlayDataHelper.GetBytes(eventInfo.hasCondition));
             if (eventInfo.hasCondition)
             {
                 bytes.AddRange(PlayDataHelper.GetBytes(eventInfo.leftCondition));
-                bytes.Add(keywordMap[eventInfo.leftOperator]);
+                bytes.Add((byte)operatorMap[eventInfo.leftOperator]);
                 bytes.Add((byte)eventInfo.leftType);
-                bytes.AddRange(PlayDataHelper.GetBytes(PropertyTypeRule.Parse(eventInfo.leftType, eventInfo.leftValue)));
+                bytes.AddRange(PlayDataHelper.GetBytes(PropertyTypeRule.Parse(eventInfo.leftType, eventInfo.leftCondition,
+                    eventInfo.leftValue)));
                 if (eventInfo.midOperator != null)
                 {
-                    bytes.Add(keywordMap[eventInfo.midOperator]);
+                    bytes.Add((byte)operatorMap[eventInfo.midOperator]);
                     bytes.AddRange(PlayDataHelper.GetBytes(eventInfo.rightCondition));
-                    bytes.Add(keywordMap[eventInfo.rightOperator]);
+                    bytes.Add((byte)operatorMap[eventInfo.rightOperator]);
                     bytes.Add((byte)eventInfo.rightType);
-                    bytes.AddRange(PlayDataHelper.GetBytes(PropertyTypeRule.Parse(eventInfo.rightType, eventInfo.rightValue)));
+                    bytes.AddRange(PlayDataHelper.GetBytes(PropertyTypeRule.Parse(eventInfo.rightType, eventInfo.rightCondition, 
+                        eventInfo.rightValue)));
                 }
                 else
                     bytes.Add(0);
@@ -181,7 +206,7 @@ namespace CrazyStorm.Core
             if (!eventInfo.isSpecialEvent)
             {
                 bytes.AddRange(PlayDataHelper.GetBytes(eventInfo.property));
-                bytes.Add(keywordMap[eventInfo.changeType]);
+                bytes.Add((byte)keywordMap[eventInfo.changeType]);
                 bytes.AddRange(PlayDataHelper.GetBytes(eventInfo.isExpressionResult));
                 bytes.Add((byte)eventInfo.resultType);
                 if (eventInfo.isExpressionResult)
@@ -191,9 +216,10 @@ namespace CrazyStorm.Core
                     bytes.AddRange(compiledExpression);
                 }
                 else
-                    bytes.AddRange(PlayDataHelper.GetBytes(PropertyTypeRule.Parse(eventInfo.resultType, eventInfo.resultValue)));
+                    bytes.AddRange(PlayDataHelper.GetBytes(PropertyTypeRule.Parse(eventInfo.resultType, eventInfo.property, 
+                        eventInfo.resultValue)));
 
-                bytes.Add(keywordMap[eventInfo.changeMode]);
+                bytes.Add((byte)keywordMap[eventInfo.changeMode]);
                 bytes.AddRange(PlayDataHelper.GetBytes(int.Parse(eventInfo.changeTime)));
                 if (eventInfo.executeTime != null)
                     bytes.AddRange(PlayDataHelper.GetBytes(int.Parse(eventInfo.executeTime)));

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 
 namespace CrazyStorm.Core
@@ -50,7 +51,7 @@ namespace CrazyStorm.Core
 
             return false;
         }
-        public static object Parse(PropertyType type, string text)
+        public static object Parse(PropertyType type, string name, string text)
         {
             switch (type)
             {
@@ -61,7 +62,8 @@ namespace CrazyStorm.Core
                 case PropertyType.Single:
                     return float.Parse(text);
                 case PropertyType.Enum:
-                    return int.Parse(text);
+                    var namespaceName = MethodBase.GetCurrentMethod().DeclaringType.Namespace;
+                    return (int)Enum.Parse(Type.GetType(namespaceName + "." + name), text);
                 case PropertyType.Vector2:
                     Vector2 value;
                     Vector2.TryParse(text, out value);

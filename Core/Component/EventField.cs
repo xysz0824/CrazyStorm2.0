@@ -27,7 +27,7 @@ namespace CrazyStorm.Core
     {
         public float halfWidth;
         public float halfHeight;
-        public FieldShape shape;
+        public FieldShape fieldShape;
         public Reach reach;
         public string targetName;
     }
@@ -52,10 +52,10 @@ namespace CrazyStorm.Core
             set { eventFieldData.halfHeight = value; }
         }
         [EnumProperty(typeof(FieldShape))]
-        public FieldShape Shape
+        public FieldShape FieldShape
         {
-            get { return eventFieldData.shape; }
-            set { eventFieldData.shape = value; }
+            get { return eventFieldData.fieldShape; }
+            set { eventFieldData.fieldShape = value; }
         }
         [EnumProperty(typeof(Reach))]
         public Reach Reach

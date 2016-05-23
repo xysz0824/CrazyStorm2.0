@@ -7,6 +7,24 @@ using CrazyStorm.Core;
 
 namespace CrazyStorm_Player.CrazyStorm
 {
+    public enum EventOperator : byte
+    {
+        More,
+        Less,
+        Equal,
+        And,
+        Or
+    }
+    public enum EventKeyword : byte
+    {
+        ChangeTo,
+        Increase,
+        Decrease,
+        Linear,
+        Accelerated,
+        Decelerated,
+        Fixed
+    }
     enum PropertyType : byte
     {
         IllegalType,
@@ -32,22 +50,22 @@ namespace CrazyStorm_Player.CrazyStorm
     {
         public bool hasCondition;
         public string leftCondition;
-        public byte leftOperator;
+        public EventOperator leftOperator;
         public PropertyType leftType;
         public TypeSet leftValue;
-        public byte midOperator;
+        public EventOperator midOperator;
         public string rightCondition;
-        public byte rightOperator;
+        public EventOperator rightOperator;
         public PropertyType rightType;
         public TypeSet rightValue;
         public bool isSpecialEvent;
         public string property;
-        public byte changeType;
+        public EventKeyword changeType;
         public bool isExpressionResult;
         public PropertyType resultType;
         public TypeSet resultValue;
         public VMInstruction[] resultExpression;
-        public byte changeMode;
+        public EventKeyword changeMode;
         public int changeTime;
         public int executeTime;
         public string specialEvent;
@@ -65,14 +83,14 @@ namespace CrazyStorm_Player.CrazyStorm
                 if (eventInfo.hasCondition)
                 {
                     eventInfo.leftCondition = PlayDataHelper.ReadString(reader);
-                    eventInfo.leftOperator = reader.ReadByte();
+                    eventInfo.leftOperator = (EventOperator)reader.ReadByte();
                     eventInfo.leftType = (PropertyType)reader.ReadByte();
                     eventInfo.leftValue = ReadValue(reader, eventInfo.leftType);
-                    eventInfo.midOperator = reader.ReadByte();
+                    eventInfo.midOperator = (EventOperator)reader.ReadByte();
                     if (eventInfo.midOperator != 0)
                     {
                         eventInfo.rightCondition = PlayDataHelper.ReadString(reader);
-                        eventInfo.rightOperator = reader.ReadByte();
+                        eventInfo.rightOperator = (EventOperator)reader.ReadByte();
                         eventInfo.rightType = (PropertyType)reader.ReadByte();
                         eventInfo.rightValue = ReadValue(reader, eventInfo.rightType);
                     }
@@ -81,7 +99,7 @@ namespace CrazyStorm_Player.CrazyStorm
                 if (!eventInfo.isSpecialEvent)
                 {
                     eventInfo.property = PlayDataHelper.ReadString(reader);
-                    eventInfo.changeType = reader.ReadByte();
+                    eventInfo.changeType = (EventKeyword)reader.ReadByte();
                     eventInfo.isExpressionResult = reader.ReadBoolean();
                     eventInfo.resultType = (PropertyType)reader.ReadByte();
                     if (eventInfo.isExpressionResult)
@@ -92,7 +110,7 @@ namespace CrazyStorm_Player.CrazyStorm
                     else
                         eventInfo.resultValue = ReadValue(reader, eventInfo.resultType);
 
-                    eventInfo.changeMode = reader.ReadByte();
+                    eventInfo.changeMode = (EventKeyword)reader.ReadByte();
                     eventInfo.changeTime = reader.ReadInt32();
                     eventInfo.executeTime = reader.ReadInt32();
                 }

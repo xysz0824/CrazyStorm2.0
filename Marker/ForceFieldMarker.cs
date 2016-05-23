@@ -18,7 +18,7 @@ namespace CrazyStorm
         public void Draw(Canvas canvas, Component component, int x, int y)
         {
             var force = component as ForceField;
-            if (force.Shape == FieldShape.Rectangle)
+            if (force.FieldShape == FieldShape.Rectangle)
             {
                 var rect = new Rectangle();
                 rect.Width = force.HalfWidth * 2;
@@ -29,7 +29,7 @@ namespace CrazyStorm
                 rect.SetValue(Canvas.TopProperty, (double)y - force.HalfHeight);
                 canvas.Children.Add(rect);
             }
-            else if (force.Shape == FieldShape.Ellipse)
+            else if (force.FieldShape == FieldShape.Ellipse)
             {
                 var ellipse = new Ellipse();
                 ellipse.Width = force.HalfWidth * 2;

@@ -8,7 +8,7 @@ namespace CrazyStorm.Expression
 {
     public enum VMCode : byte
     {
-        NUMBER = 1,
+        NUMBER,
         BOOL,
         NAME,
         VECTOR2,

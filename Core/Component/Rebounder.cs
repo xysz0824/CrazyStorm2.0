@@ -20,7 +20,7 @@ namespace CrazyStorm.Core
     public struct RebounderData
     {
         public int size;
-        public RebounderShape shape;
+        public RebounderShape rebounderShape;
         public float rotation;
         public int collisionTime;
     }
@@ -39,10 +39,10 @@ namespace CrazyStorm.Core
             set { rebounderData.size = value; }
         }
         [EnumProperty(typeof(RebounderShape))]
-        public RebounderShape Shape
+        public RebounderShape RebounderShape
         {
-            get { return rebounderData.shape; }
-            set { rebounderData.shape = value; }
+            get { return rebounderData.rebounderShape; }
+            set { rebounderData.rebounderShape = value; }
         }
         [FloatProperty(float.MinValue, float.MaxValue)]
         public float Rotation
