@@ -26,5 +26,14 @@ namespace CrazyStorm_Player.CrazyStorm
                 }
             }
         }
+        public override void Copy(ParticleBase particleBase)
+        {
+            base.Copy(particleBase);
+            var particle = particleBase as Particle;
+            particle.StickToSpeedAngle = StickToSpeedAngle;
+            particle.HeightScale = HeightScale;
+            particle.RetainScale = RetainScale;
+            particle.AfterimageEffect = AfterimageEffect;
+        }
     }
 }

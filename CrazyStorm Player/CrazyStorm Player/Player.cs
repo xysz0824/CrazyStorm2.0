@@ -17,6 +17,7 @@ namespace CrazyStorm_Player
     {
         protected override void OnInitialize()
         {
+            ParticleManager.Initialize(WindowWidth, WindowHeight, 10000, 1000);
             WindowTitle = VersionInfo.AppTitle;
             CrazyStorm.File file = new CrazyStorm.File();
             using (FileStream stream = new FileStream("a.bg", FileMode.Open))

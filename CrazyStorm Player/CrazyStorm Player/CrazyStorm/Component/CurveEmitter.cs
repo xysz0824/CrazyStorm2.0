@@ -9,7 +9,7 @@ namespace CrazyStorm_Player.CrazyStorm
     {
         public CurveEmitter()
         {
-            Particle = new CurveParticle();
+            Template = new CurveParticle();
         }
     }
 }

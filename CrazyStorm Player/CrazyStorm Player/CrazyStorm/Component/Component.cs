@@ -7,8 +7,11 @@ using CrazyStorm.Core;
 
 namespace CrazyStorm_Player.CrazyStorm
 {
-    class Component : PropertyContainer, IPlayData, IRebuildReference<Component>
+    class Component : PropertyContainer, IPlayData, IRebuildReference<Component>, IPlayable
     {
+        private Vector2 speedVector;
+        private Vector2 acspeedVector;
+        protected Component initialState;
         public int Id { get; set; }
         public string Name { get; set; }
         public int CurrentFrame { get; set; }
@@ -24,7 +27,7 @@ namespace CrazyStorm_Player.CrazyStorm
         public int ParentID { get; private set; }
         public Component BindingTarget { get; private set; }
         public int BindingTargetID { get; private set; }
-        public IList<VariableResource> Variables { get; private set; }
+        public IList<VariableResource> Variables { get; set; }
         public IList<EventGroup> ComponentEventGroups { get; private set; }
         public Component()
         {
@@ -41,7 +44,7 @@ namespace CrazyStorm_Player.CrazyStorm
                 Id = componentReader.ReadInt32();
                 Name = PlayDataHelper.ReadString(componentReader);
                 //properties
-                base.BuildFromPlayData(componentReader);
+                base.LoadPropertyExpressions(componentReader);
                 using (BinaryReader dataReader = PlayDataHelper.GetBlockReader(componentReader))
                 {
                     CurrentFrame = dataReader.ReadInt32();
@@ -88,6 +91,61 @@ namespace CrazyStorm_Player.CrazyStorm
                     }
                 }
             }
+        }
+        public virtual bool Update(int currentFrame)
+        {
+            if (currentFrame < BeginFrame || currentFrame >= BeginFrame + TotalFrame)
+                return false;
+
+            CurrentFrame = currentFrame - BeginFrame;
+            base.ExecuteExpressions();
+            speedVector += acspeedVector;
+            Position += speedVector;
+            double vf = 0;
+            if (speedVector.y != 0)
+            {
+                vf = Math.PI / 2 - Math.Atan(speedVector.x / speedVector.y);
+                if (speedVector.y < 0) 
+                    vf += Math.PI;
+            }
+            else
+            {
+                vf = speedVector.x >= 0 ? 0 : Math.PI;
+            }
+            SpeedAngle = (float)MathHelper.RadToDeg(vf);
+            for (int i = 0; i < ComponentEventGroups.Count; ++i)
+                ComponentEventGroups[i].Execute();
+
+            return true;
+        }
+        public virtual void Reset()
+        {
+            if (initialState == null)
+            {
+                initialState = this.MemberwiseClone() as Component;
+                initialState.Variables = new List<VariableResource>();
+                foreach (VariableResource item in Variables)
+                {
+                    var variable = new VariableResource { Value = item.Value };
+                    initialState.Variables.Add(variable);
+                }
+            }
+            else
+            {
+                CurrentFrame = initialState.CurrentFrame;
+                BeginFrame = initialState.BeginFrame;
+                TotalFrame = initialState.TotalFrame;
+                Position = initialState.Position;
+                Speed = initialState.Speed;
+                SpeedAngle = initialState.SpeedAngle;
+                Acspeed = initialState.Acspeed;
+                AcspeedAngle = initialState.AcspeedAngle;
+                Visibility = initialState.Visibility;
+                for (int i = 0;i < Variables.Count;++i)
+                    Variables[i].Value = initialState.Variables[i].Value;
+            }
+            MathHelper.SetVector2(ref speedVector, Speed, SpeedAngle);
+            MathHelper.SetVector2(ref acspeedVector, Acspeed, AcspeedAngle);
         }
     }
 }

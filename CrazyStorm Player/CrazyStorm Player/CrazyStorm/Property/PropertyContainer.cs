@@ -9,12 +9,12 @@ namespace CrazyStorm_Player.CrazyStorm
     public class PropertyContainer
     {
         IDictionary<string, VMInstruction[]> propertyExpressions;
-        IDictionary<string, VMInstruction[]> PropertyExpressions { get { return propertyExpressions; } }
+        public IDictionary<string, VMInstruction[]> PropertyExpressions { get { return propertyExpressions; } }
         public PropertyContainer()
         {
             propertyExpressions = new Dictionary<string, VMInstruction[]>();
         }
-        public void BuildFromPlayData(BinaryReader reader)
+        public void LoadPropertyExpressions(BinaryReader reader)
         {
             using (BinaryReader listReader = PlayDataHelper.GetBlockReader(reader))
             {
@@ -28,6 +28,17 @@ namespace CrazyStorm_Player.CrazyStorm
                     }
                 }
             }
+        }
+        public void ExecuteExpressions()
+        {
+            //TODO
+        }
+        public void ExecuteExpression(string propertyName)
+        {
+            if (!PropertyExpressions.ContainsKey(propertyName))
+                return;
+
+            //TODO
         }
     }
 }

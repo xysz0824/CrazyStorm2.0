@@ -71,5 +71,17 @@ namespace CrazyStorm_Player.CrazyStorm
             }
             return list.ToArray();
         }
+        public static void Execute(VMInstruction[] instructions)
+        {
+            if (instructions == null)
+                return;
+
+            //TODO
+        }
+        public static bool GetBool()
+        {
+            //TODO
+            throw new NotImplementedException();
+        }
     }
 }

@@ -5,11 +5,9 @@ using System.Text;
 
 namespace CrazyStorm_Player.CrazyStorm
 {
-    class MultiEmitter : Emitter
+    interface IPlayable
     {
-        public MultiEmitter()
-        {
-            Template = new Particle();
-        }
+        bool Update(int currentFrame);
+        void Reset();
     }
 }

@@ -16,6 +16,11 @@ namespace CrazyStorm_Player.CrazyStorm
     }
     abstract class ParticleBase : PropertyContainer, IPlayData, IRebuildReference<ParticleType>
     {
+        private Vector2 pspeedVector;
+        private Vector2 pacspeedVector;
+        public Emitter Emitter { get; set; }
+        public ParticleQuadTree QuadTree { get; set; }
+        public bool Dead { get; private set; }
         public ParticleType Type { get; set; }
         public int TypeID { get; set; }
         public int MaxLife { get; set; }
@@ -25,6 +30,16 @@ namespace CrazyStorm_Player.CrazyStorm
         public RGB RGB { get; set; }
         public float Mass { get; set; }
         public float Opacity { get; set; }
+        public Vector2 PSpeedVector
+        {
+            get { return pspeedVector; }
+            set { pspeedVector = value; }
+        }
+        public Vector2 PAcspeedVector
+        {
+            get { return pacspeedVector; }
+            set { pacspeedVector = value; }
+        }
         public float PSpeed { get; set; }
         public float PSpeedAngle { get; set; }
         public float PAcspeed { get; set; }
@@ -38,6 +53,7 @@ namespace CrazyStorm_Player.CrazyStorm
         public bool IgnoreForce { get; set; }
         public bool FogEffect { get; set; }
         public bool FadeEffect { get; set; }
+        public IList<EventGroup> ParticleEventGroups { get; set; }
         public ParticleBase()
         {
             TypeID = -1;
@@ -47,7 +63,7 @@ namespace CrazyStorm_Player.CrazyStorm
             using (BinaryReader particleBaseReader = PlayDataHelper.GetBlockReader(reader))
             {
                 //properties
-                base.BuildFromPlayData(particleBaseReader);
+                base.LoadPropertyExpressions(particleBaseReader);
                 TypeID = particleBaseReader.ReadInt32();
                 using (BinaryReader dataReader = PlayDataHelper.GetBlockReader(particleBaseReader))
                 {
@@ -87,6 +103,64 @@ namespace CrazyStorm_Player.CrazyStorm
                     }
                 }
             }
+        }
+        public virtual void Update()
+        {
+            if (CurrentFrame >= MaxLife)
+            {
+                Dead = true;
+                return;
+            }
+            if (CurrentFrame == 0)
+            {
+                MathHelper.SetVector2(ref pspeedVector, PSpeed, PSpeedAngle);
+                MathHelper.SetVector2(ref pacspeedVector, PAcspeed, PAcspeedAngle);
+            }
+            QuadTree.Update(this);
+            PSpeedVector += PAcspeedVector;
+            PPosition += PSpeedVector;
+            double vf = 0;
+            if (PSpeedVector.y != 0)
+            {
+                vf = Math.PI / 2 - Math.Atan(PSpeedVector.x / PSpeedVector.y);
+                if (PSpeedVector.y < 0)
+                    vf += Math.PI;
+            }
+            else
+            {
+                vf = PSpeedVector.x >= 0 ? 0 : Math.PI;
+            }
+            PSpeedAngle = (float)MathHelper.RadToDeg(vf);
+            for (int i = 0; i < ParticleEventGroups.Count; ++i)
+                ParticleEventGroups[i].Execute();
+
+            ++CurrentFrame;
+        }
+        public virtual void Copy(ParticleBase particleBase)
+        {
+            particleBase.Dead = Dead;
+            particleBase.Type = Type;
+            particleBase.TypeID = TypeID;
+            particleBase.MaxLife = MaxLife;
+            particleBase.CurrentFrame = CurrentFrame;
+            particleBase.PPosition = PPosition;
+            particleBase.WidthScale = WidthScale;
+            particleBase.RGB = RGB;
+            particleBase.Mass = Mass;
+            particleBase.Opacity = Opacity;
+            particleBase.PSpeed = PSpeed;
+            particleBase.PSpeedAngle = PSpeedAngle;
+            particleBase.PAcspeed = PAcspeed;
+            particleBase.PAcspeedAngle = PAcspeedAngle;
+            particleBase.PRotation = PRotation;
+            particleBase.BlendType = BlendType;
+            particleBase.KillOutside = KillOutside;
+            particleBase.Collision = Collision;
+            particleBase.IgnoreMask = IgnoreMask;
+            particleBase.IgnoreRebound = IgnoreRebound;
+            particleBase.IgnoreForce = IgnoreForce;
+            particleBase.FogEffect = FogEffect;
+            particleBase.FadeEffect = FadeEffect;
         }
     }
 }

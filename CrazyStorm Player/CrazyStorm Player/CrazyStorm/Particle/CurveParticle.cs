@@ -20,5 +20,15 @@ namespace CrazyStorm_Player.CrazyStorm
                 }
             }
         }
+        public override void Update()
+        {
+            base.Update();
+        }
+        public override void Copy(ParticleBase particleBase)
+        {
+            base.Copy(particleBase);
+            var curveParticle = particleBase as CurveParticle;
+            curveParticle.Length = Length;
+        }
     }
 }

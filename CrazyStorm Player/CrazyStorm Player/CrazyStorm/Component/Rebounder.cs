@@ -14,7 +14,7 @@ namespace CrazyStorm_Player.CrazyStorm
     class Rebounder : Component
     {
         public int Size { get; set; }
-        public RebounderShape Shape { get; set; }
+        public RebounderShape RebounderShape { get; set; }
         public float Rotation { get; set; }
         public int CollisionTime { get; set; }
         public IList<EventGroup> RebounderEventGroups { get; private set; }
@@ -26,13 +26,49 @@ namespace CrazyStorm_Player.CrazyStorm
                 using (BinaryReader dataReader = PlayDataHelper.GetBlockReader(rebounderReader))
                 {
                     Size = dataReader.ReadInt32();
-                    Shape = PlayDataHelper.ReadEnum<RebounderShape>(dataReader);
+                    RebounderShape = PlayDataHelper.ReadEnum<RebounderShape>(dataReader);
                     Rotation = dataReader.ReadSingle();
                     CollisionTime = dataReader.ReadInt32();
                 }
                 //rebounderEventGroups
                 PlayDataHelper.LoadObjectList(RebounderEventGroups, rebounderReader);
             }
+        }
+        public override bool Update(int currentFrame)
+        {
+            if (!base.Update(currentFrame))
+                return false;
+
+            //TODO
+            List<ParticleBase> results = ParticleManager.ParticleQuadTree.SearchByRect(
+                (int)(Position.x - Size), (int)(Position.x + Size),
+                (int)(Position.y - Size), (int)(Position.y + Size));
+            foreach (ParticleBase particleBase in results)
+            {
+                if (particleBase.IgnoreRebound)
+                    continue;
+
+                switch (RebounderShape)
+                {
+                    case RebounderShape.Line:
+                        break;
+                    case RebounderShape.Circle:
+                        break;
+                }
+            }
+            //for (int i = 0; i < RebounderEventGroups.Count; ++i)
+            //    RebounderEventGroups[i].Execute();
+
+            return true;
+        }
+        public override void Reset()
+        {
+            base.Reset();
+            var initialState = base.initialState as Rebounder;
+            Size = initialState.Size;
+            RebounderShape = initialState.RebounderShape;
+            Rotation = initialState.Rotation;
+            CollisionTime = initialState.CollisionTime;
         }
     }
 }

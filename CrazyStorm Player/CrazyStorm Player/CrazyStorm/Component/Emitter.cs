@@ -14,8 +14,13 @@ namespace CrazyStorm_Player.CrazyStorm
         public int EmitCycle { get; set; }
         public float EmitAngle { get; set; }
         public float EmitRange { get; set; }
-        public ParticleBase Particle { get; protected set; }
-        public IList<EventGroup> emitterEventGroups { get; private set; }
+        public ParticleBase Template { get; protected set; }
+        public IList<ParticleBase> Particles { get; private set; }
+        public IList<EventGroup> EmitterEventGroups { get; private set; }
+        public Emitter()
+        {
+            Particles = new List<ParticleBase>();
+        }
         public override void LoadPlayData(BinaryReader reader)
         {
             base.LoadPlayData(reader);
@@ -30,10 +35,47 @@ namespace CrazyStorm_Player.CrazyStorm
                     EmitRange = dataReader.ReadSingle();
                 }
                 //particle
-                Particle.LoadPlayData(emitterReader);
+                Template.LoadPlayData(emitterReader);
                 //emitterEventGroups
-                PlayDataHelper.LoadObjectList(emitterEventGroups, emitterReader);
+                PlayDataHelper.LoadObjectList(EmitterEventGroups, emitterReader);
+                Template.ParticleEventGroups = EmitterEventGroups;
             }
+        }
+        public override bool Update(int currentFrame)
+        {
+            if (!base.Update(currentFrame))
+                return false;
+
+            if (currentFrame % EmitCycle == 0)
+            {
+                base.ExecuteExpression("EmitCycle");
+                base.ExecuteExpression("EmitRange");
+                base.ExecuteExpression("EmitCount");
+                base.ExecuteExpression("EmitAngle");
+                base.ExecuteExpression("EmitPosition");
+                Template.PPosition = EmitPosition;
+                float increment = EmitRange / EmitCount;
+                float angle = EmitAngle;
+                for (int i = 0;i < EmitCount;++i)
+                {
+                    angle += increment;
+                    Template.PSpeedAngle = angle;
+                    ParticleBase newParticle = ParticleManager.GetParticle(Template);
+                    newParticle.Emitter = this;
+                    Particles.Add(newParticle);
+                }
+            }
+            return true;
+        }
+        public override void Reset()
+        {
+            base.Reset();
+            var initialState = base.initialState as Emitter;
+            EmitPosition = initialState.EmitPosition;
+            EmitCount = initialState.EmitCount;
+            EmitCycle = initialState.EmitCycle;
+            EmitAngle = initialState.EmitAngle;
+            EmitRange = initialState.EmitRange;
         }
     }
 }

@@ -165,5 +165,9 @@ namespace CrazyStorm_Player.CrazyStorm
             }
             return set;
         }
+        public static void Execute(EventInfo eventInfo)
+        {
+            //TODO
+        }
     }
 }

@@ -6,7 +6,7 @@ using System.IO;
 
 namespace CrazyStorm_Player.CrazyStorm
 {
-    class Layer : IPlayData
+    class Layer : IPlayData, IPlayable
     {
         public string Name { get; set; }
         public bool Visible { get; set; }
@@ -59,6 +59,26 @@ namespace CrazyStorm_Player.CrazyStorm
                         }
                     }
                 }
+            }
+        }
+        public bool Update(int currentFrame)
+        {
+            if (Visible)
+            {
+                if (currentFrame < BeginFrame || currentFrame >= BeginFrame + TotalFrame)
+                    return false;
+
+                for (int i = 0; i < Components.Count; ++i)
+                    Components[i].Update(currentFrame - BeginFrame);
+            }
+            return Visible;
+        }
+        public void Reset()
+        {
+            if (Visible)
+            {
+                for (int i = 0; i < Components.Count; ++i)
+                    Components[i].Reset();
             }
         }
     }

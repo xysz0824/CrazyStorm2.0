@@ -32,5 +32,14 @@ namespace CrazyStorm_Player.CrazyStorm
                 }
             }
         }
+        public void Execute()
+        {
+            VM.Execute(Condition);
+            if (VM.GetBool())
+            {
+                for (int i = 0; i < Events.Count; ++i)
+                    EventHelper.Execute(Events[i]);
+            }
+        }
     }
 }

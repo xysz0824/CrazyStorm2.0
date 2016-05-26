@@ -6,9 +6,10 @@ using System.IO;
 
 namespace CrazyStorm_Player.CrazyStorm
 {
-    class ParticleSystem : IPlayData
+    class ParticleSystem : IPlayData, IPlayable
     {
         public string Name { get; set; }
+        public int CurrentFrame { get; set; }
         public IList<ParticleType> CustomTypes { get; private set; }
         public IList<Layer> Layers { get; private set; }
         public ParticleSystem()
@@ -26,6 +27,20 @@ namespace CrazyStorm_Player.CrazyStorm
                 //layers
                 PlayDataHelper.LoadObjectList(Layers, particleSystemReader);
             }
+        }
+        public bool Update(int currentFrame)
+        {
+            for (int i = 0; i < Layers.Count; ++i)
+                Layers[i].Update(CurrentFrame);
+
+            ++CurrentFrame;
+            return true;
+        }
+        public void Reset()
+        {
+            CurrentFrame = 0;
+            for (int i = 0; i < Layers.Count; ++i)
+                Layers[i].Reset();
         }
     }
 }
