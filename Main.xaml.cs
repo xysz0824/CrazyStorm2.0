@@ -39,7 +39,6 @@ namespace CrazyStorm
         #region Constructor
         public Main()
         {
-            config = new Config("Config.ini");
             defaultParticleTypes = new List<ParticleType>();
             commandStacks = new Dictionary<ParticleSystem, CommandStack>();
             clipBoard = new List<Core.Component>();
@@ -50,31 +49,15 @@ namespace CrazyStorm
         #region Private Methods
         void InitializeConfig()
         {
+            config = new Config("Config.ini");
             ParticleTabControl.DataContext = config;
         }
         void LoadDefaultParticleTypes()
         {
-            defaultParticleTypes.Clear();
             StreamResourceInfo info = Application.GetResourceStream(new Uri("set.txt", UriKind.Relative));
             using (System.IO.StreamReader reader = new System.IO.StreamReader(info.Stream))
             {
-                int i = 0;
-                while (!reader.EndOfStream)
-                {
-                    string[] splits = reader.ReadLine().Split('_');
-                    var particleType = new ParticleType(i + 1000);
-                    particleType.Name = splits[0];
-                    particleType.StartPoint = new Vector2(float.Parse(splits[1]), float.Parse(splits[2]));
-                    particleType.Width = int.Parse(splits[3]);
-                    particleType.Height = int.Parse(splits[4]);
-                    particleType.CenterPoint = new Vector2(float.Parse(splits[5]), float.Parse(splits[6]));
-                    particleType.Radius = int.Parse(splits[7]);
-                    if (!string.IsNullOrWhiteSpace(splits[8]))
-                        particleType.Color = (ParticleColor)(int.Parse(splits[8]) + 1);
-
-                    defaultParticleTypes.Add(particleType);
-                    i++;
-                }
+                ParticleType.LoadDefaultTypes(reader, defaultParticleTypes);
             }
         }
         void InitializeSystem()

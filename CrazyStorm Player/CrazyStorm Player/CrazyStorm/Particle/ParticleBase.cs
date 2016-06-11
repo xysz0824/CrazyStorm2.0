@@ -20,7 +20,7 @@ namespace CrazyStorm_Player.CrazyStorm
         private Vector2 pacspeedVector;
         public Emitter Emitter { get; set; }
         public ParticleQuadTree QuadTree { get; set; }
-        public bool Dead { get; private set; }
+        public bool Alive { get; set; }
         public ParticleType Type { get; set; }
         public int TypeID { get; set; }
         public int MaxLife { get; set; }
@@ -108,7 +108,7 @@ namespace CrazyStorm_Player.CrazyStorm
         {
             if (CurrentFrame >= MaxLife)
             {
-                Dead = true;
+                Alive = false;
                 return;
             }
             if (CurrentFrame == 0)
@@ -138,7 +138,7 @@ namespace CrazyStorm_Player.CrazyStorm
         }
         public virtual void Copy(ParticleBase particleBase)
         {
-            particleBase.Dead = Dead;
+            particleBase.Alive = Alive;
             particleBase.Type = Type;
             particleBase.TypeID = TypeID;
             particleBase.MaxLife = MaxLife;

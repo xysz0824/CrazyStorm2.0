@@ -97,7 +97,6 @@
     <Compile Include="CrazyStorm\Event\EventGroup.cs" />
     <Compile Include="CrazyStorm\Event\EventHelper.cs" />
     <Compile Include="CrazyStorm\File.cs" />
-    <Compile Include="CrazyStorm\IO\ReferenceHelper.cs" />
     <Compile Include="CrazyStorm\IO\IPlayData.cs" />
     <Compile Include="CrazyStorm\IO\IRebuildReference.cs" />
     <Compile Include="CrazyStorm\Layer.cs" />

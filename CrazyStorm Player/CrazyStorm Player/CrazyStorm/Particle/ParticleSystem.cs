@@ -28,7 +28,7 @@ namespace CrazyStorm_Player.CrazyStorm
                 PlayDataHelper.LoadObjectList(Layers, particleSystemReader);
             }
         }
-        public bool Update(int currentFrame)
+        public bool Update(int currentFrame = 0)
         {
             for (int i = 0; i < Layers.Count; ++i)
                 Layers[i].Update(CurrentFrame);

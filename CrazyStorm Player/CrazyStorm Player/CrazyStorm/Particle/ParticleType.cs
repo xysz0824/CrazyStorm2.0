@@ -52,5 +52,23 @@ namespace CrazyStorm_Player.CrazyStorm
                 }
             }
         }
+        public static void LoadDefaultTypes(StreamReader reader, IList<ParticleType> typeset)
+        {
+            typeset.Clear();
+            int i = 0;
+            while (!reader.EndOfStream)
+            {
+                string[] splits = reader.ReadLine().Split('_');
+                var particleType = new ParticleType();
+                particleType.Id = i + 1000;
+                particleType.StartPoint = new Vector2(float.Parse(splits[1]), float.Parse(splits[2]));
+                particleType.Width = int.Parse(splits[3]);
+                particleType.Height = int.Parse(splits[4]);
+                particleType.CenterPoint = new Vector2(float.Parse(splits[5]), float.Parse(splits[6]));
+                particleType.Radius = int.Parse(splits[7]);
+                typeset.Add(particleType);
+                i++;
+            }
+        }
     }
 }

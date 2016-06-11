@@ -24,6 +24,7 @@ namespace CrazyStorm_Player.DirectX
         Form form;
         FormConfig windowConfig;
         DeviceContext context;
+        Sprite sprite;
         long ticks;
         float deltaTime;
         float timeAccumulator;
@@ -32,6 +33,8 @@ namespace CrazyStorm_Player.DirectX
         #endregion
 
         #region Public Members
+        public Device Device { get { return context.Device; } }
+        public Sprite Sprite { get { return sprite; } }
         public string WindowTitle
         {
             get { return windowConfig.WindowTitle; }
@@ -78,7 +81,8 @@ namespace CrazyStorm_Player.DirectX
                 ClientSize = new Size(windowConfig.WindowWidth, windowConfig.WindowHeight),
                 FormBorderStyle = FormBorderStyle.FixedSingle,
                 StartPosition = FormStartPosition.CenterScreen,
-                Icon = Properties.Resources.logo
+                Icon = Properties.Resources.logo,
+                MaximizeBox = false
             };
         }
         void InitializeDevice()
@@ -92,6 +96,7 @@ namespace CrazyStorm_Player.DirectX
                 Windowed = Windowed
             };
             context = new DeviceContext(form.Handle, settings);
+            sprite = new Sprite(context.Device);
         }
         void HandleResize(object sender, EventArgs e)
         {
@@ -222,8 +227,14 @@ namespace CrazyStorm_Player.DirectX
 
         #region Abstract Methods
         protected abstract void OnInitialize();
-        protected abstract void OnLoad();
-        protected abstract void OnUnLoad();
+        protected virtual void OnLoad()
+        {
+            sprite.OnResetDevice();
+        }
+        protected virtual void OnUnLoad()
+        {
+            sprite.OnLostDevice();
+        }
         protected abstract void OnUpdate();
         protected abstract void OnDraw();
         #endregion
