@@ -13,68 +13,79 @@ namespace CrazyStorm_Player.CrazyStorm
         public delegate void CurveParticleDrawHandler(CurveParticle curveParticle);
         public static event CurveParticleDrawHandler OnCurveParticleDraw;
 
-        public static ParticleQuadTree ParticleQuadTree { get; private set; }
-        public static List<Particle> ParticlePool { get; private set; }
-        public static int ParticleIndex { get; private set; }
-        public static List<CurveParticle> CurveParticlePool { get; private set; }
-        public static int CurveParticleIndex { get; private set; }
+        static ParticleQuadTree particleQuadTree;
+        static List<Particle> particlePool;
+        static int particleIndex;
+        static List<CurveParticle> curveParticlePool;
+        static int curveParticleIndex;
         public static void Initialize(int windowWidth, int windowHeight, int particleMaximum, int curveParticleMaximum)
         {
-            ParticleQuadTree = new ParticleQuadTree(-windowWidth, windowWidth, -windowHeight, windowHeight);
-            ParticlePool = new List<Particle>(particleMaximum);
+            particleQuadTree = new ParticleQuadTree(-windowWidth, windowWidth, -windowHeight, windowHeight);
+            particlePool = new List<Particle>(particleMaximum);
             for (int i = 0; i < particleMaximum; ++i)
-                ParticlePool.Add(new Particle());
+                particlePool.Add(new Particle());
 
-            CurveParticlePool = new List<CurveParticle>(curveParticleMaximum);
+            curveParticlePool = new List<CurveParticle>(curveParticleMaximum);
             for (int i = 0; i < curveParticleMaximum; ++i)
-                CurveParticlePool.Add(new CurveParticle());
+                curveParticlePool.Add(new CurveParticle());
         }
         public static ParticleBase GetParticle(ParticleBase template)
         {
             if (template is Particle)
             {
-                ParticleIndex = ParticleIndex % ParticlePool.Count;
-                ParticlePool[ParticleIndex].Alive = true;
-                ParticlePool[ParticleIndex].Copy(template);
-                ParticleQuadTree.Insert(ParticlePool[ParticleIndex]);
-                return ParticlePool[ParticleIndex++];
+                particleIndex = particleIndex % particlePool.Count;
+                template.CopyTo(particlePool[particleIndex]);
+                particlePool[particleIndex].Alive = true;
+                particleQuadTree.Insert(particlePool[particleIndex]);
+                return particlePool[particleIndex++];
             }
             else
             {
-                CurveParticleIndex = CurveParticleIndex % CurveParticlePool.Count;
-                CurveParticlePool[CurveParticleIndex].Alive = true;
-                CurveParticlePool[CurveParticleIndex].Copy(template);
-                ParticleQuadTree.Insert(CurveParticlePool[CurveParticleIndex]);
-                return CurveParticlePool[CurveParticleIndex++];
+                curveParticleIndex = curveParticleIndex % curveParticlePool.Count;
+                template.CopyTo(curveParticlePool[curveParticleIndex]);
+                curveParticlePool[curveParticleIndex].Alive = true;
+                particleQuadTree.Insert(curveParticlePool[curveParticleIndex]);
+                return curveParticlePool[curveParticleIndex++];
             }
+        }
+        public static void Insert(ParticleBase particleBase)
+        {
+            particleQuadTree.Insert(particleBase);
         }
         public static List<ParticleBase> SearchByRect(int left, int right, int top, int bottom)
         {
-            return ParticleQuadTree.SearchByRect(left, right, top, bottom);
+            return particleQuadTree.SearchByRect(left, right, top, bottom);
         }
         public static void Update()
         {
-            for (int i = 0; i < ParticlePool.Count; ++i)
-                if (ParticlePool[i].Alive)
-                    ParticlePool[i].Update();
-
-            for (int i = 0; i < CurveParticlePool.Count; ++i)
-                if (CurveParticlePool[i].Alive)
-                    CurveParticlePool[i].Update();
+            for (int i = 0; i < particlePool.Count; ++i)
+            {
+                if (particlePool[i].Alive && !particleQuadTree.OutofRange(particlePool[i]))
+                    particlePool[i].Update();
+                else if (particlePool[i].Alive)
+                    particlePool[i].Alive = false;
+            }
+            for (int i = 0; i < curveParticlePool.Count; ++i)
+            {
+                if (curveParticlePool[i].Alive && !particleQuadTree.OutofRange(curveParticlePool[i]))
+                    curveParticlePool[i].Update();
+                else if (curveParticlePool[i].Alive)
+                    curveParticlePool[i].Alive = false;
+            }
         }
         public static void Draw()
         {
             if (OnParticleDraw != null)
             {
-                for (int i = 0; i < ParticlePool.Count; ++i)
-                    if (ParticlePool[i].Alive)
-                        OnParticleDraw(ParticlePool[i]);
+                for (int i = 0; i < particlePool.Count; ++i)
+                    if (particlePool[i].Alive)
+                        OnParticleDraw(particlePool[i]);
             }
             if (OnCurveParticleDraw != null)
             {
-                for (int i = 0; i < CurveParticlePool.Count; ++i)
-                    if (CurveParticlePool[i].Alive)
-                        OnCurveParticleDraw(CurveParticlePool[i]);
+                for (int i = 0; i < curveParticlePool.Count; ++i)
+                    if (curveParticlePool[i].Alive)
+                        OnCurveParticleDraw(curveParticlePool[i]);
             }
         }
     }

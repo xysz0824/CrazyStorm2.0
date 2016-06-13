@@ -32,13 +32,13 @@ namespace CrazyStorm_Player.CrazyStorm
                 }
             }
         }
-        public void Execute()
+        public void Execute(PropertyContainer propertyContainer)
         {
             VM.Execute(Condition);
-            if (VM.GetBool())
+            if (VM.PopBool())
             {
                 for (int i = 0; i < Events.Count; ++i)
-                    EventHelper.Execute(Events[i]);
+                    EventHelper.Execute(propertyContainer, Events[i]);
             }
         }
     }

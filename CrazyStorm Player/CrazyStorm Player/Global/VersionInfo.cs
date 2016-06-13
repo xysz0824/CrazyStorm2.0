@@ -12,7 +12,6 @@ namespace CrazyStorm_Player
     {
         public const string AppName = "Crazy Storm Player";
         public const string Version = "0.9";
-        public const string Extension = ".bgp";
         public static string AppTitle { get { return AppName + " " + Version; } }
     }
 }

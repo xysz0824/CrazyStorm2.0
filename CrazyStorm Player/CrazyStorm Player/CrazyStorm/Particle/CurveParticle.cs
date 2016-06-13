@@ -20,13 +20,39 @@ namespace CrazyStorm_Player.CrazyStorm
                 }
             }
         }
+        public override bool PushProperty(string propertyName)
+        {
+            if (base.PushProperty(propertyName))
+                return true;
+
+            switch (propertyName)
+            {
+                case "Length":
+                    VM.PushInt(Length);
+                    return true;
+            }
+            return false;
+        }
+        public override bool SetProperty(string propertyName)
+        {
+            if (base.SetProperty(propertyName))
+                return true;
+
+            switch (propertyName)
+            {
+                case "Length":
+                    Length = VM.PopInt();
+                    return true;
+            }
+            return false;
+        }
         public override void Update()
         {
             base.Update();
         }
-        public override void Copy(ParticleBase particleBase)
+        public override void CopyTo(ParticleBase particleBase)
         {
-            base.Copy(particleBase);
+            base.CopyTo(particleBase);
             var curveParticle = particleBase as CurveParticle;
             curveParticle.Length = Length;
         }

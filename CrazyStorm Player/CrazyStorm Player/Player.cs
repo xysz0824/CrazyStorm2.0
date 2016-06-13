@@ -9,6 +9,7 @@ using CrazyStorm_Player.DirectX;
 using SlimDX;
 using SlimDX.Direct3D9;
 using System.IO;
+using System.Drawing;
 using CrazyStorm_Player.CrazyStorm;
 
 namespace CrazyStorm_Player
@@ -24,17 +25,26 @@ namespace CrazyStorm_Player
             ParticleManager.Initialize(WindowWidth, WindowHeight, 10000, 1000);
             ParticleManager.OnParticleDraw += (particle) =>
             {
+                if (particle.Type == null)
+                    return;
+
                 Vector2 center = new Vector2(particle.Type.CenterPoint.x, particle.Type.CenterPoint.y);
                 Vector2 scale = new Vector2(particle.WidthScale, particle.HeightScale);
-                Vector2 position = new Vector2(particle.PPosition.x, particle.PPosition.y);
-                Sprite.Transform = Matrix.Transformation2D(center, 0, scale, center,
+                Vector2 position = new Vector2(particle.PPosition.x + WindowWidth / 2 - center.X, 
+                    particle.PPosition.y + WindowHeight / 2 - center.Y);
+                Sprite.Transform = Matrix.Transformation2D(Vector2.Zero, 0, scale, center,
                     (float)MathHelper.DegToRad(particle.PRotation), position);
-                Color4 color = new Color4(particle.Opacity, particle.RGB.r, particle.RGB.g, particle.RGB.b);
-                if (particle.TypeID >= 1000)
-                    Sprite.Draw(defaultTextures[0], color);
+                Color4 color = new Color4(particle.Opacity / 100, particle.RGB.r / 255, particle.RGB.g / 255, particle.RGB.b / 255);
+                Rectangle rect = new Rectangle((int)particle.Type.StartPoint.x, (int)particle.Type.StartPoint.y, 
+                    particle.Type.Width, particle.Type.Height);
+                if (particle.Type.Id >= 1000)
+                    Sprite.Draw(defaultTextures[0], rect, color);
             };
             ParticleManager.OnCurveParticleDraw += (curveParticle) =>
             {
+                if (curveParticle.Type == null)
+                    return;
+
                 //TODO
             };
         }
@@ -56,9 +66,14 @@ namespace CrazyStorm_Player
                 if (header == "BG")
                 {
                     string version = PlayDataHelper.ReadString(reader);
-                    file = new CrazyStorm.File();
-                    file.LoadPlayData(reader);
-                    RebuildObjectReference(file);
+                    if (VersionInfo.Version == version)
+                    {
+                        file = new CrazyStorm.File();
+                        file.LoadPlayData(reader);
+                        RebuildObjectReference(file);
+                    }
+                    else
+                        throw new NotSupportedException();
                 }
             }
         }
@@ -68,7 +83,9 @@ namespace CrazyStorm_Player
         }
         protected override void OnUpdate()
         {
-
+            file.ParticleSystems[0].Update();
+            ParticleManager.Update();
+            EventManager.Update();
         }
         protected override void OnDraw()
         {

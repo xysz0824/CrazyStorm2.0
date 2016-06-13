@@ -196,7 +196,7 @@ namespace CrazyStorm
                 !String.IsNullOrEmpty(eventInfo.leftOperator))
             {
                 var selectedItem = LeftConditionComboBox.SelectedItem as VariableComboBoxItem;
-                eventInfo.leftCondition = selectedItem.Name;
+                eventInfo.leftProperty = selectedItem.Name;
                 eventInfo.leftType = GetValueType(selectedItem.Name);
                 eventInfo.leftValue = LeftValue.Text;
             }
@@ -211,18 +211,18 @@ namespace CrazyStorm
                 !String.IsNullOrEmpty(eventInfo.rightOperator))
             {
                 var selectedItem = RightConditionComboBox.SelectedItem as VariableComboBoxItem;
-                eventInfo.rightCondition = selectedItem.Name;
+                eventInfo.rightProperty = selectedItem.Name;
                 eventInfo.rightType = GetValueType(selectedItem.Name);
                 eventInfo.rightValue = RightValue.Text;
             }
             //Allow empty condition
-            if (String.IsNullOrEmpty(eventInfo.leftCondition) && String.IsNullOrEmpty(eventInfo.rightCondition))
+            if (String.IsNullOrEmpty(eventInfo.leftProperty) && String.IsNullOrEmpty(eventInfo.rightProperty))
                 return true;
 
-            if (String.IsNullOrEmpty(eventInfo.leftCondition) && !String.IsNullOrEmpty(eventInfo.rightCondition))
+            if (String.IsNullOrEmpty(eventInfo.leftProperty) && !String.IsNullOrEmpty(eventInfo.rightProperty))
             {
-                eventInfo.leftCondition = eventInfo.rightCondition;
-                eventInfo.rightCondition = null;
+                eventInfo.leftProperty = eventInfo.rightProperty;
+                eventInfo.rightProperty = null;
                 eventInfo.leftOperator = eventInfo.rightOperator;
                 eventInfo.rightOperator = null;
                 eventInfo.leftType = eventInfo.rightType;
@@ -231,7 +231,7 @@ namespace CrazyStorm
                 eventInfo.rightValue = null;
 
             }
-            if (!String.IsNullOrEmpty(eventInfo.leftCondition) && !String.IsNullOrEmpty(eventInfo.rightCondition))
+            if (!String.IsNullOrEmpty(eventInfo.leftProperty) && !String.IsNullOrEmpty(eventInfo.rightProperty))
             {
                 if (And.IsChecked == true)
                     eventInfo.midOperator = "&";
@@ -273,7 +273,7 @@ namespace CrazyStorm
                 !String.IsNullOrEmpty(ChangeTime.Text))
             {
                 var selectedItem = PropertyComboBox.SelectedItem as VariableComboBoxItem;
-                eventInfo.property = selectedItem.Name;
+                eventInfo.resultProperty = selectedItem.Name;
                 eventInfo.isExpressionResult = isExpressionResult;
                 eventInfo.resultType = GetValueType(selectedItem.Name);
                 eventInfo.resultValue = ResultValue.Text;
@@ -418,12 +418,12 @@ namespace CrazyStorm
             //Backfill condition
             if (eventInfo.hasCondition)
             {
-                if (eventInfo.rightCondition != null)
+                if (eventInfo.rightProperty != null)
                 {
                     for (int i = 0; i < LeftConditionComboBox.Items.Count; ++i)
                     {
                         var item = LeftConditionComboBox.Items[i] as VariableComboBoxItem;
-                        if (item.Name == eventInfo.leftCondition)
+                        if (item.Name == eventInfo.leftProperty)
                             LeftConditionComboBox.SelectedIndex = i;
                     }
                     buttonMap[eventInfo.leftOperator].IsChecked = true;
@@ -432,7 +432,7 @@ namespace CrazyStorm
                     for (int i = 0; i < RightConditionComboBox.Items.Count; ++i)
                     {
                         var item = RightConditionComboBox.Items[i] as VariableComboBoxItem;
-                        if (item.Name == eventInfo.rightCondition)
+                        if (item.Name == eventInfo.rightProperty)
                             RightConditionComboBox.SelectedIndex = i;
                     }
                     buttonMap[">"] = RightMoreThan;
@@ -446,7 +446,7 @@ namespace CrazyStorm
                     for (int i = 0; i < LeftConditionComboBox.Items.Count; ++i)
                     {
                         var item = LeftConditionComboBox.Items[i] as VariableComboBoxItem;
-                        if (item.Name == eventInfo.leftCondition)
+                        if (item.Name == eventInfo.leftProperty)
                             LeftConditionComboBox.SelectedIndex = i;
                     }
                     buttonMap[eventInfo.leftOperator].IsChecked = true;
@@ -459,7 +459,7 @@ namespace CrazyStorm
                 for (int i = 0; i < PropertyComboBox.Items.Count; ++i)
                 {
                     var item = PropertyComboBox.Items[i] as VariableComboBoxItem;
-                    if (item.Name == eventInfo.property)
+                    if (item.Name == eventInfo.resultProperty)
                         PropertyComboBox.SelectedIndex = i;
                 }
                 isExpressionResult = eventInfo.isExpressionResult;

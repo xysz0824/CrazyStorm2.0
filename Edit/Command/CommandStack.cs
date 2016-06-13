@@ -41,7 +41,7 @@ namespace CrazyStorm
                 && command              is MoveComponentCommand)
             {
                 var last = list[list.Count - 1] as MoveComponentCommand;
-                var now = command as MoveComponentCommand;
+                var now = command               as MoveComponentCommand;
                 if (last.IsSameTarget(now))
                 {
                     last.Move += now.Move;

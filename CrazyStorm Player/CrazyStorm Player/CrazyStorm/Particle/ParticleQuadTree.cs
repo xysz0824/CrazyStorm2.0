@@ -8,7 +8,7 @@ namespace CrazyStorm_Player.CrazyStorm
     class ParticleQuadTree
     {
         private const int MaxDepth = 4;
-        public List<ParticleBase> Particles { get; private set; }
+        public LinkedList<ParticleBase> Particles { get; private set; }
         public ParticleQuadTree[] children { get; private set; }
         public int Left { get; set; }
         public int Right { get; set; }
@@ -31,9 +31,9 @@ namespace CrazyStorm_Player.CrazyStorm
             if (depth >= MaxDepth)
             {
                 if (Particles == null)
-                    Particles = new List<ParticleBase>();
+                    Particles = new LinkedList<ParticleBase>();
 
-                Particles.Add(particleBase);
+                Particles.AddLast(particleBase);
                 particleBase.QuadTree = this;
                 return;
             }
@@ -90,13 +90,17 @@ namespace CrazyStorm_Player.CrazyStorm
             
             return results;
         }
+        public bool OutofRange(ParticleBase particleBase)
+        {
+            return particleBase.PPosition.x < Left || particleBase.PPosition.x > Right ||
+                particleBase.PPosition.y < Top || particleBase.PPosition.y > Bottom;
+        }
         public void Update(ParticleBase particleBase)
         {
-            if (particleBase.PPosition.x < Left || particleBase.PPosition.x > Right || 
-                particleBase.PPosition.y < Top || particleBase.PPosition.y > Bottom)
+            if (OutofRange(particleBase))
             {
                 Particles.Remove(particleBase);
-                ParticleManager.ParticleQuadTree.Insert(particleBase);
+                ParticleManager.Insert(particleBase);
             }
         }
     }

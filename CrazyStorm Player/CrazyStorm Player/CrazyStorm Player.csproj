@@ -96,6 +96,7 @@
     <Compile Include="CrazyStorm\Component\Rebounder.cs" />
     <Compile Include="CrazyStorm\Event\EventGroup.cs" />
     <Compile Include="CrazyStorm\Event\EventHelper.cs" />
+    <Compile Include="CrazyStorm\Event\EventManager.cs" />
     <Compile Include="CrazyStorm\File.cs" />
     <Compile Include="CrazyStorm\IO\IPlayData.cs" />
     <Compile Include="CrazyStorm\IO\IRebuildReference.cs" />
@@ -115,7 +116,7 @@
     <Compile Include="CrazyStorm\Resource\VariableResource.cs" />
     <Compile Include="CrazyStorm\Struct\RGB.cs" />
     <Compile Include="CrazyStorm\Struct\Vector2.cs" />
-    <Compile Include="CrazyStorm\VM.cs" />
+    <Compile Include="CrazyStorm\Expression\VM.cs" />
     <Compile Include="DirectX\DeviceContext.cs" />
     <Compile Include="DirectX\DeviceSettings.cs" />
     <Compile Include="DirectX\DirectXFramework.cs" />

@@ -26,9 +26,62 @@ namespace CrazyStorm_Player.CrazyStorm
                 }
             }
         }
-        public override void Copy(ParticleBase particleBase)
+        public override bool PushProperty(string propertyName)
         {
-            base.Copy(particleBase);
+            if (base.PushProperty(propertyName))
+                return true;
+
+            switch (propertyName)
+            {
+                case "StickToSpeedAngle":
+                    VM.PushBool(StickToSpeedAngle);
+                    return true;
+                case "HeightScale":
+                    VM.PushFloat(HeightScale);
+                    return true;
+                case "RetainScale":
+                    VM.PushBool(RetainScale);
+                    return true;
+                case "AfterimageEffect":
+                    VM.PushBool(AfterimageEffect);
+                    return true;
+            }
+            return false;
+        }
+        public override bool SetProperty(string propertyName)
+        {
+            if (base.SetProperty(propertyName))
+                return true;
+
+            switch (propertyName)
+            {
+                case "StickToSpeedAngle":
+                    StickToSpeedAngle = VM.PopBool();
+                    return true;
+                case "HeightScale":
+                    HeightScale = VM.PopFloat();
+                    return true;
+                case "RetainScale":
+                    RetainScale = VM.PopBool();
+                    return true;
+                case "AfterimageEffect":
+                    AfterimageEffect = VM.PopBool();
+                    return true;
+            }
+            return false;
+        }
+        public override void Update()
+        {
+            base.Update();
+            if (StickToSpeedAngle)
+                PRotation = PSpeedAngle + 90;
+
+            if (RetainScale && WidthScale != HeightScale)
+                HeightScale = WidthScale;
+        }
+        public override void CopyTo(ParticleBase particleBase)
+        {
+            base.CopyTo(particleBase);
             var particle = particleBase as Particle;
             particle.StickToSpeedAngle = StickToSpeedAngle;
             particle.HeightScale = HeightScale;

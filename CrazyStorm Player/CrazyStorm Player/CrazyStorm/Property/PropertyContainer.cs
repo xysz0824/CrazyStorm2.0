@@ -6,7 +6,7 @@ using System.IO;
 
 namespace CrazyStorm_Player.CrazyStorm
 {
-    public class PropertyContainer
+    public abstract class PropertyContainer
     {
         IDictionary<string, VMInstruction[]> propertyExpressions;
         public IDictionary<string, VMInstruction[]> PropertyExpressions { get { return propertyExpressions; } }
@@ -40,5 +40,7 @@ namespace CrazyStorm_Player.CrazyStorm
 
             //TODO
         }
+        public abstract bool PushProperty(string propertyName);
+        public abstract bool SetProperty(string propertyName);
     }
 }

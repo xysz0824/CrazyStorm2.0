@@ -34,13 +34,23 @@ namespace CrazyStorm_Player.CrazyStorm
                 PlayDataHelper.LoadObjectList(RebounderEventGroups, rebounderReader);
             }
         }
+        public override bool PushProperty(string propertyName)
+        {
+            base.PushProperty(propertyName);
+            throw new NotImplementedException();
+        }
+        public override bool SetProperty(string propertyName)
+        {
+            base.SetProperty(propertyName);
+            throw new NotImplementedException();
+        }
         public override bool Update(int currentFrame)
         {
             if (!base.Update(currentFrame))
                 return false;
 
             //TODO
-            List<ParticleBase> results = ParticleManager.ParticleQuadTree.SearchByRect(
+            List<ParticleBase> results = ParticleManager.SearchByRect(
                 (int)(Position.x - Size), (int)(Position.x + Size),
                 (int)(Position.y - Size), (int)(Position.y + Size));
             foreach (ParticleBase particleBase in results)

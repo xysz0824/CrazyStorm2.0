@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using CrazyStorm.Core;
 
 namespace CrazyStorm_Player.CrazyStorm
 {
@@ -35,6 +36,13 @@ namespace CrazyStorm_Player.CrazyStorm
     }
     class VM
     {
+        static Stack<bool> boolStack = new Stack<bool>();
+        static Stack<int> intStack = new Stack<int>();
+        static Stack<float> floatStack = new Stack<float>();
+        static Stack<int> enumStack = new Stack<int>();
+        static Stack<Vector2> vector2Stack = new Stack<Vector2>();
+        static Stack<RGB> rgbStack = new Stack<RGB>();
+        static Stack<string> stringStack = new Stack<string>();
         public static VMInstruction[] Decode(byte[] bytes)
         {
             List<VMInstruction> list = new List<VMInstruction>();
@@ -74,14 +82,65 @@ namespace CrazyStorm_Player.CrazyStorm
         public static void Execute(VMInstruction[] instructions)
         {
             if (instructions == null)
-                return;
+                PushBool(true);
 
             //TODO
         }
-        public static bool GetBool()
+        public static void PushBool(bool value)
         {
-            //TODO
-            throw new NotImplementedException();
+            boolStack.Push(value);
+        }
+        public static bool PopBool()
+        {
+            return boolStack.Pop();
+        }
+        public static void PushInt(int value)
+        {
+            intStack.Push(value);
+        }
+        public static int PopInt()
+        {
+            return intStack.Pop();
+        }
+        public static void PushFloat(float value)
+        {
+            floatStack.Push(value);
+        }
+        public static float PopFloat()
+        {
+            return floatStack.Pop();
+        }
+        public static void PushEnum(int value)
+        {
+            enumStack.Push(value);
+        }
+        public static int PopEnum()
+        {
+            return enumStack.Pop();
+        }
+        public static void PushVector2(Vector2 value)
+        {
+            vector2Stack.Push(value);
+        }
+        public static Vector2 PopVector2()
+        {
+            return vector2Stack.Pop();
+        }
+        public static void PushRGB(RGB value)
+        {
+            rgbStack.Push(value);
+        }
+        public static RGB PopRGB()
+        {
+            return rgbStack.Pop();
+        }
+        public static void PushString(string value)
+        {
+            stringStack.Push(value);
+        }
+        public static string PopString()
+        {
+            return stringStack.Pop();
         }
     }
 }

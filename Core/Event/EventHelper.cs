@@ -27,17 +27,17 @@ namespace CrazyStorm.Core
     public class EventInfo
     {
         public bool hasCondition;
-        public string leftCondition;
+        public string leftProperty;
         public string leftOperator;
         public PropertyType leftType;
         public string leftValue;
         public string midOperator;
-        public string rightCondition;
+        public string rightProperty;
         public string rightOperator;
         public PropertyType rightType;
         public string rightValue;
         public bool isSpecialEvent;
-        public string property;
+        public string resultProperty;
         public string changeType;
         public bool isExpressionResult;
         public PropertyType resultType;
@@ -55,9 +55,9 @@ namespace CrazyStorm.Core
             string eventString = string.Empty;
             if (eventInfo.hasCondition)
             {
-                eventString += string.Format("{0} {1} {2} ", eventInfo.leftCondition, eventInfo.leftOperator, eventInfo.leftValue);
+                eventString += string.Format("{0} {1} {2} ", eventInfo.leftProperty, eventInfo.leftOperator, eventInfo.leftValue);
                 if (eventInfo.midOperator != null)
-                    eventString += string.Format("{0} {1} {2} {3} ", eventInfo.midOperator, eventInfo.rightCondition,
+                    eventString += string.Format("{0} {1} {2} {3} ", eventInfo.midOperator, eventInfo.rightProperty,
                         eventInfo.rightOperator, eventInfo.rightValue);
 
                 eventString += ": ";
@@ -67,7 +67,7 @@ namespace CrazyStorm.Core
                 if (eventInfo.isExpressionResult)
                     eventInfo.resultValue = "(" + eventInfo.resultValue + ")";
 
-                eventString += string.Format("{0} {1} {2}, {3}, {4}", eventInfo.property, eventInfo.changeType,
+                eventString += string.Format("{0} {1} {2}, {3}, {4}", eventInfo.resultProperty, eventInfo.changeType,
                     eventInfo.resultValue, eventInfo.changeMode, eventInfo.changeTime);
                 if (eventInfo.executeTime != null)
                     eventString += ", " + eventInfo.executeTime;
@@ -90,13 +90,13 @@ namespace CrazyStorm.Core
                 info.hasCondition = true;
                 string condition = parts[0];
                 string[] split = condition.Split(' ');
-                info.leftCondition = split[0];
+                info.leftProperty = split[0];
                 info.leftOperator = split[1];
                 info.leftValue = split[2];
                 if (split.Length == 8)
                 {
                     info.midOperator = split[3];
-                    info.rightCondition = split[4];
+                    info.rightProperty = split[4];
                     info.rightOperator = split[5];
                     info.rightValue = split[6];
                 }
@@ -109,7 +109,7 @@ namespace CrazyStorm.Core
             if (eventText.Contains("ChangeTo") || eventText.Contains("Increase") || eventText.Contains("Decrease"))
             {
                 string[] split = eventText.Split(' ');
-                info.property = split[0];
+                info.resultProperty = split[0];
                 info.changeType = split[1];
                 info.resultValue = string.Empty;
                 split = Regex.Split(eventText, split[1])[1].Split(',');
@@ -185,18 +185,18 @@ namespace CrazyStorm.Core
             bytes.AddRange(PlayDataHelper.GetBytes(eventInfo.hasCondition));
             if (eventInfo.hasCondition)
             {
-                bytes.AddRange(PlayDataHelper.GetBytes(eventInfo.leftCondition));
+                bytes.AddRange(PlayDataHelper.GetBytes(eventInfo.leftProperty));
                 bytes.Add((byte)operatorMap[eventInfo.leftOperator]);
                 bytes.Add((byte)eventInfo.leftType);
-                bytes.AddRange(PlayDataHelper.GetBytes(PropertyTypeRule.Parse(eventInfo.leftType, eventInfo.leftCondition,
+                bytes.AddRange(PlayDataHelper.GetBytes(PropertyTypeRule.Parse(eventInfo.leftType, eventInfo.leftProperty,
                     eventInfo.leftValue)));
                 if (eventInfo.midOperator != null)
                 {
                     bytes.Add((byte)operatorMap[eventInfo.midOperator]);
-                    bytes.AddRange(PlayDataHelper.GetBytes(eventInfo.rightCondition));
+                    bytes.AddRange(PlayDataHelper.GetBytes(eventInfo.rightProperty));
                     bytes.Add((byte)operatorMap[eventInfo.rightOperator]);
                     bytes.Add((byte)eventInfo.rightType);
-                    bytes.AddRange(PlayDataHelper.GetBytes(PropertyTypeRule.Parse(eventInfo.rightType, eventInfo.rightCondition, 
+                    bytes.AddRange(PlayDataHelper.GetBytes(PropertyTypeRule.Parse(eventInfo.rightType, eventInfo.rightProperty, 
                         eventInfo.rightValue)));
                 }
                 else
@@ -205,7 +205,7 @@ namespace CrazyStorm.Core
             bytes.AddRange(PlayDataHelper.GetBytes(eventInfo.isSpecialEvent));
             if (!eventInfo.isSpecialEvent)
             {
-                bytes.AddRange(PlayDataHelper.GetBytes(eventInfo.property));
+                bytes.AddRange(PlayDataHelper.GetBytes(eventInfo.resultProperty));
                 bytes.Add((byte)keywordMap[eventInfo.changeType]);
                 bytes.AddRange(PlayDataHelper.GetBytes(eventInfo.isExpressionResult));
                 bytes.Add((byte)eventInfo.resultType);
@@ -216,7 +216,7 @@ namespace CrazyStorm.Core
                     bytes.AddRange(compiledExpression);
                 }
                 else
-                    bytes.AddRange(PlayDataHelper.GetBytes(PropertyTypeRule.Parse(eventInfo.resultType, eventInfo.property, 
+                    bytes.AddRange(PlayDataHelper.GetBytes(PropertyTypeRule.Parse(eventInfo.resultType, eventInfo.resultProperty, 
                         eventInfo.resultValue)));
 
                 bytes.Add((byte)keywordMap[eventInfo.changeMode]);

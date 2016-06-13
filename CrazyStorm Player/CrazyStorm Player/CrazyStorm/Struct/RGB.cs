@@ -13,11 +13,11 @@ namespace CrazyStorm.Core
     {
         public float r, g, b;
         public static readonly RGB Zero = new RGB();
-        public RGB(float x, float y, float z)
+        public RGB(float r, float g, float b)
         {
-            this.r = x;
-            this.g = y;
-            this.b = z;
+            this.r = r;
+            this.g = g;
+            this.b = b;
         }
         public override string ToString()
         {

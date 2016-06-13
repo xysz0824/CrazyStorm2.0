@@ -29,11 +29,11 @@ namespace CrazyStorm
             {
                 var writer = new BinaryWriter(stream);
                 //Play file use UTF-8 encoding
-                //Write file header
+                //Write play file header
                 writer.Write(PlayDataHelper.GetStringBytes("BG"));
-                //Write file version
-                writer.Write(PlayDataHelper.GetStringBytes(VersionInfo.Version));
-                //Write file data
+                //Write play file version
+                writer.Write(PlayDataHelper.GetStringBytes(VersionInfo.PlayVersion));
+                //Write play file data
                 Compile();
                 writer.Write(file.GeneratePlayData().ToArray());
             }

@@ -8,27 +8,34 @@ namespace CrazyStorm_Player.CrazyStorm
 {
     class File : IPlayData
     {
+        public IList<ParticleSystem> ParticleSystems { get; private set; }
         public IList<FileResource> Images { get; private set; }
         public IList<FileResource> Sounds { get; private set; }
-        public IList<VariableResource> Globals { get; private set; }
-        public IList<ParticleSystem> ParticleSystems { get; private set; }
         public File()
         {
+            ParticleSystems = new List<ParticleSystem>();
             Images = new List<FileResource>();
             Sounds = new List<FileResource>();
-            Globals = new List<VariableResource>();
-            ParticleSystems = new List<ParticleSystem>();
         }
         public void LoadPlayData(BinaryReader reader)
         {
+            //ParticleSystems
+            PlayDataHelper.LoadObjectList(ParticleSystems, reader);
             //Images
             PlayDataHelper.LoadObjectList(Images, reader);
             //Sounds
             PlayDataHelper.LoadObjectList(Sounds, reader);
             //Globals
-            PlayDataHelper.LoadObjectList(Globals, reader);
-            //ParticleSystems
-            PlayDataHelper.LoadObjectList(ParticleSystems, reader);
+            var globals = new List<VariableResource>();
+            PlayDataHelper.LoadObjectList(globals, reader);
+            foreach (var particleSystem in ParticleSystems)
+            {
+                foreach (var layer in particleSystem.Layers)
+                {
+                    foreach (var component in layer.Components)
+                        component.Globals = globals;
+                }
+            }
         }
     }
 }

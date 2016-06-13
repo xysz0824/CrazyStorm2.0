@@ -28,6 +28,7 @@ namespace CrazyStorm_Player.CrazyStorm
         public Component BindingTarget { get; private set; }
         public int BindingTargetID { get; private set; }
         public IList<VariableResource> Variables { get; set; }
+        public IList<VariableResource> Globals { get; set; }
         public IList<EventGroup> ComponentEventGroups { get; private set; }
         public Component()
         {
@@ -92,6 +93,116 @@ namespace CrazyStorm_Player.CrazyStorm
                 }
             }
         }
+        public override bool PushProperty(string propertyName)
+        {
+            switch (propertyName)
+            {
+                case "CurrentFrame":
+                    VM.PushInt(CurrentFrame);
+                    return true;
+                case "BeginFrame":
+                    VM.PushInt(BeginFrame);
+                    return true;
+                case "TotalFrame":
+                    VM.PushInt(TotalFrame);
+                    return true;
+                case "Position":
+                    VM.PushVector2(Position);
+                    return true;
+                case "Position.x":
+                    VM.PushFloat(Position.x);
+                    return true;
+                case "Position.y":
+                    VM.PushFloat(Position.y);
+                    return true;
+                case "Speed":
+                    VM.PushFloat(Speed);
+                    return true;
+                case "SpeedAngle":
+                    VM.PushFloat(SpeedAngle);
+                    return true;
+                case "Acspeed":
+                    VM.PushFloat(Acspeed);
+                    return true;
+                case "AcspeedAngle":
+                    VM.PushFloat(AcspeedAngle);
+                    return true;
+                case "Visibility":
+                    VM.PushBool(Visibility);
+                    return true;
+                default:
+                    for (int i = 0; i < Variables.Count; ++i)
+                        if (Variables[i].Label == propertyName)
+                        {
+                            VM.PushFloat(Variables[i].Value);
+                            return true;
+                        }
+
+                    for (int i = 0; i < Globals.Count; ++i)
+                        if (Globals[i].Label == propertyName)
+                        {
+                            VM.PushFloat(Globals[i].Value);
+                            return true;
+                        }
+
+                    return false;
+            }
+        }
+        public override bool SetProperty(string propertyName)
+        {
+            switch (propertyName)
+            {
+                case "CurrentFrame":
+                    CurrentFrame = VM.PopInt();
+                    return true;
+                case "BeginFrame":
+                    BeginFrame = VM.PopInt();
+                    return true;
+                case "TotalFrame":
+                    TotalFrame = VM.PopInt();
+                    return true;
+                case "Position":
+                    Position = VM.PopVector2();
+                    return true;
+                case "Position.x":
+                    Position = new Vector2(VM.PopFloat(), Position.y);
+                    return true;
+                case "Position.y":
+                    Position = new Vector2(Position.x, VM.PopFloat());
+                    return true;
+                case "Speed":
+                    Speed = VM.PopFloat();
+                    return true;
+                case "SpeedAngle":
+                    SpeedAngle = VM.PopFloat();
+                    return true;
+                case "Acspeed":
+                    Acspeed = VM.PopFloat();
+                    return true;
+                case "AcspeedAngle":
+                    AcspeedAngle = VM.PopFloat();
+                    return true;
+                case "Visibility":
+                    Visibility = VM.PopBool();
+                    return true;
+                default:
+                    for (int i = 0; i < Variables.Count; ++i)
+                        if (Variables[i].Label == propertyName)
+                        {
+                            Variables[i].Value = VM.PopFloat();
+                            return true;
+                        }
+
+                    for (int i = 0; i < Globals.Count; ++i)
+                        if (Globals[i].Label == propertyName)
+                        {
+                            Globals[i].Value = VM.PopFloat();
+                            return true;
+                        }
+
+                    return false;
+            }
+        }
         public virtual bool Update(int currentFrame)
         {
             if (currentFrame < BeginFrame || currentFrame >= BeginFrame + TotalFrame)
@@ -114,7 +225,7 @@ namespace CrazyStorm_Player.CrazyStorm
             }
             SpeedAngle = (float)MathHelper.RadToDeg(vf);
             for (int i = 0; i < ComponentEventGroups.Count; ++i)
-                ComponentEventGroups[i].Execute();
+                ComponentEventGroups[i].Execute(this);
 
             return true;
         }

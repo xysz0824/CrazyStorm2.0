@@ -49,17 +49,17 @@ namespace CrazyStorm_Player.CrazyStorm
     class EventInfo
     {
         public bool hasCondition;
-        public string leftCondition;
+        public string leftProperty;
         public EventOperator leftOperator;
         public PropertyType leftType;
         public TypeSet leftValue;
         public EventOperator midOperator;
-        public string rightCondition;
+        public string rightProperty;
         public EventOperator rightOperator;
         public PropertyType rightType;
         public TypeSet rightValue;
         public bool isSpecialEvent;
-        public string property;
+        public string resultProperty;
         public EventKeyword changeType;
         public bool isExpressionResult;
         public PropertyType resultType;
@@ -82,14 +82,14 @@ namespace CrazyStorm_Player.CrazyStorm
                 eventInfo.hasCondition = reader.ReadBoolean();
                 if (eventInfo.hasCondition)
                 {
-                    eventInfo.leftCondition = PlayDataHelper.ReadString(reader);
+                    eventInfo.leftProperty = PlayDataHelper.ReadString(reader);
                     eventInfo.leftOperator = (EventOperator)reader.ReadByte();
                     eventInfo.leftType = (PropertyType)reader.ReadByte();
                     eventInfo.leftValue = ReadValue(reader, eventInfo.leftType);
                     eventInfo.midOperator = (EventOperator)reader.ReadByte();
                     if (eventInfo.midOperator != 0)
                     {
-                        eventInfo.rightCondition = PlayDataHelper.ReadString(reader);
+                        eventInfo.rightProperty = PlayDataHelper.ReadString(reader);
                         eventInfo.rightOperator = (EventOperator)reader.ReadByte();
                         eventInfo.rightType = (PropertyType)reader.ReadByte();
                         eventInfo.rightValue = ReadValue(reader, eventInfo.rightType);
@@ -98,7 +98,7 @@ namespace CrazyStorm_Player.CrazyStorm
                 eventInfo.isSpecialEvent = reader.ReadBoolean();
                 if (!eventInfo.isSpecialEvent)
                 {
-                    eventInfo.property = PlayDataHelper.ReadString(reader);
+                    eventInfo.resultProperty = PlayDataHelper.ReadString(reader);
                     eventInfo.changeType = (EventKeyword)reader.ReadByte();
                     eventInfo.isExpressionResult = reader.ReadBoolean();
                     eventInfo.resultType = (PropertyType)reader.ReadByte();
@@ -165,9 +165,63 @@ namespace CrazyStorm_Player.CrazyStorm
             }
             return set;
         }
-        public static void Execute(EventInfo eventInfo)
+        public static void Execute(PropertyContainer propertyContainer, EventInfo eventInfo)
         {
-            //TODO
+            if (eventInfo.hasCondition)
+            {
+                bool result = TestCondition(propertyContainer, eventInfo.leftProperty, eventInfo.leftOperator, 
+                    eventInfo.leftType, eventInfo.leftValue);
+                if (eventInfo.rightProperty != null)
+                {
+                    if (eventInfo.midOperator == EventOperator.And)
+                        result &= TestCondition(propertyContainer, eventInfo.rightProperty, eventInfo.rightOperator, 
+                            eventInfo.rightType, eventInfo.rightValue);
+                    else if (eventInfo.midOperator == EventOperator.Or)
+                        result |= TestCondition(propertyContainer, eventInfo.rightProperty, eventInfo.rightOperator, 
+                            eventInfo.rightType, eventInfo.rightValue);
+                }
+                if (!result)
+                    return;
+            }
+            if (!eventInfo.isSpecialEvent)
+                EventManager.AddEvent(propertyContainer, eventInfo);
+            else
+                EventManager.ExecuteSpecialEvent(propertyContainer, eventInfo.specialEvent, eventInfo.arguments, 
+                    eventInfo.argumentExpression);
+        }
+        static bool TestCondition(PropertyContainer propertyContainer, string property, EventOperator operators, 
+            PropertyType type, TypeSet value)
+        {
+            propertyContainer.PushProperty(property);
+            switch (type)
+            {
+                case PropertyType.Boolean:
+                    return VM.PopBool() == value.boolValue;
+                case PropertyType.Int32:
+                    if (operators == EventOperator.Less)
+                        return VM.PopInt() < value.intValue;
+                    else if (operators == EventOperator.Equal)
+                        return VM.PopInt() == value.intValue;
+                    else
+                        return VM.PopInt() > value.intValue;
+                case PropertyType.Single:
+                    if (operators == EventOperator.Less)
+                        return VM.PopFloat() < value.floatValue;
+                    else if (operators == EventOperator.Equal)
+                        return VM.PopFloat() == value.floatValue;
+                    else
+                        return VM.PopFloat() > value.floatValue;
+                case PropertyType.Enum:
+                    return VM.PopEnum() == value.enumValue;
+                case PropertyType.Vector2:
+                    return VM.PopVector2() == value.vector2Value;
+                case PropertyType.RGB:
+                    return VM.PopRGB() == value.rgbValue;
+                case PropertyType.String:
+                    return VM.PopString() == value.stringValue;
+                default:
+                    return false;
+            }
         }
     }
 }

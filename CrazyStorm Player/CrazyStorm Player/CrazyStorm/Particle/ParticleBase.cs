@@ -57,6 +57,7 @@ namespace CrazyStorm_Player.CrazyStorm
         public ParticleBase()
         {
             TypeID = -1;
+            ParticleEventGroups = new List<EventGroup>();
         }
         public virtual void LoadPlayData(BinaryReader reader)
         {
@@ -104,6 +105,204 @@ namespace CrazyStorm_Player.CrazyStorm
                 }
             }
         }
+        public override bool PushProperty(string propertyName)
+        {
+            switch (propertyName)
+            {
+                case "MaxLife":
+                    VM.PushInt(MaxLife);
+                    return true;
+                case "CurrentFrame":
+                    VM.PushInt(CurrentFrame);
+                    return true;
+                case "PPosition":
+                    VM.PushVector2(PPosition);
+                    return true;
+                case "PPosition.x":
+                    VM.PushFloat(PPosition.x);
+                    return true;
+                case "PPosition.y":
+                    VM.PushFloat(PPosition.y);
+                    return true;
+                case "WidthScale":
+                    VM.PushFloat(WidthScale);
+                    return true;
+                case "RGB":
+                    VM.PushRGB(RGB);
+                    return true;
+                case "RGB.r":
+                    VM.PushFloat(RGB.r);
+                    return true;
+                case "RGB.g":
+                    VM.PushFloat(RGB.g);
+                    return true;
+                case "RGB.b":
+                    VM.PushFloat(RGB.b);
+                    return true;
+                case "Mass":
+                    VM.PushFloat(Mass);
+                    return true;
+                case "Opacity":
+                    VM.PushFloat(Opacity);
+                    return true;
+                case "PSpeed":
+                    VM.PushFloat(PSpeed);
+                    return true;
+                case "PSpeedAngle":
+                    VM.PushFloat(PSpeedAngle);
+                    return true;
+                case "PAcspeed":
+                    VM.PushFloat(PAcspeed);
+                    return true;
+                case "PAcspeedAngle":
+                    VM.PushFloat(PAcspeedAngle);
+                    return true;
+                case "PRotation":
+                    VM.PushFloat(PRotation);
+                    return true;
+                case "BlendType":
+                    VM.PushEnum((int)BlendType);
+                    return true;
+                case "KillOutside":
+                    VM.PushBool(KillOutside);
+                    return true;
+                case "Collision":
+                    VM.PushBool(Collision);
+                    return true;
+                case "IgnoreMask":
+                    VM.PushBool(IgnoreMask);
+                    return true;
+                case "IgnoreRebound":
+                    VM.PushBool(IgnoreRebound);
+                    return true;
+                case "IgnoreForce":
+                    VM.PushBool(IgnoreForce);
+                    return true;
+                case "FogEffect":
+                    VM.PushBool(FogEffect);
+                    return true;
+                case "FadeEffect":
+                    VM.PushBool(FadeEffect);
+                    return true;
+                default:
+                    for (int i = 0; i < Emitter.Variables.Count; ++i)
+                        if (Emitter.Variables[i].Label == propertyName)
+                        {
+                            VM.PushFloat(Emitter.Variables[i].Value);
+                            return true;
+                        }
+
+                    for (int i = 0; i < Emitter.Globals.Count; ++i)
+                        if (Emitter.Globals[i].Label == propertyName)
+                        {
+                            VM.PushFloat(Emitter.Globals[i].Value);
+                            return true;
+                        }
+
+                    return false;
+            }
+        }
+        public override bool SetProperty(string propertyName)
+        {
+            switch (propertyName)
+            {
+                case "MaxLife":
+                    MaxLife = VM.PopInt();
+                    return true;
+                case "CurrentFrame":
+                    CurrentFrame = VM.PopInt();
+                    return true;
+                case "PPosition":
+                    PPosition = VM.PopVector2();
+                    return true;
+                case "PPosition.x":
+                    PPosition = new Vector2(VM.PopFloat(), PPosition.y);
+                    return true;
+                case "PPosition.y":
+                    PPosition = new Vector2(PPosition.y, VM.PopFloat());
+                    return true;
+                case "WidthScale":
+                    WidthScale = VM.PopFloat();
+                    return true;
+                case "RGB":
+                    RGB = VM.PopRGB();
+                    return true;
+                case "RGB.r":
+                    RGB = new RGB(VM.PopFloat(), RGB.g, RGB.b);
+                    return true;
+                case "RGB.g":
+                    RGB = new RGB(RGB.r, VM.PopFloat(), RGB.b);
+                    return true;
+                case "RGB.b":
+                    RGB = new RGB(RGB.r, RGB.g, VM.PopFloat());
+                    return true;
+                case "Mass":
+                    Mass = VM.PopFloat();
+                    return true;
+                case "Opacity":
+                    Opacity = VM.PopFloat();
+                    return true;
+                case "PSpeed":
+                    PSpeed = VM.PopFloat();
+                    MathHelper.SetVector2(ref pspeedVector, PSpeed, PSpeedAngle);
+                    return true;
+                case "PSpeedAngle":
+                    PSpeedAngle = VM.PopFloat();
+                    MathHelper.SetVector2(ref pspeedVector, PSpeed, PSpeedAngle);
+                    return true;
+                case "PAcspeed":
+                    PAcspeed = VM.PopFloat();
+                    MathHelper.SetVector2(ref pacspeedVector, PAcspeed, PAcspeedAngle);
+                    return true;
+                case "PAcspeedAngle":
+                    PAcspeedAngle = VM.PopFloat();
+                    MathHelper.SetVector2(ref pacspeedVector, PAcspeed, PAcspeedAngle);
+                    return true;
+                case "PRotation":
+                    PRotation = VM.PopFloat();
+                    return true;
+                case "BlendType":
+                    BlendType = (BlendType)VM.PopEnum();
+                    return true;
+                case "KillOutside":
+                    KillOutside = VM.PopBool();
+                    return true;
+                case "Collision":
+                    Collision = VM.PopBool();
+                    return true;
+                case "IgnoreMask":
+                    IgnoreMask = VM.PopBool();
+                    return true;
+                case "IgnoreRebound":
+                    IgnoreRebound = VM.PopBool();
+                    return true;
+                case "IgnoreForce":
+                    IgnoreForce = VM.PopBool();
+                    return true;
+                case "FogEffect":
+                    FogEffect = VM.PopBool();
+                    return true;
+                case "FadeEffect":
+                    FadeEffect = VM.PopBool();
+                    return true;
+                default:
+                    for (int i = 0; i < Emitter.Variables.Count; ++i)
+                        if (Emitter.Variables[i].Label == propertyName)
+                        {
+                            Emitter.Variables[i].Value = VM.PopFloat();
+                            return true;
+                        }
+
+                    for (int i = 0; i < Emitter.Globals.Count; ++i)
+                        if (Emitter.Globals[i].Label == propertyName)
+                        {
+                            Emitter.Globals[i].Value = VM.PopFloat();
+                            return true;
+                        }
+
+                    return false;
+            }
+        }
         public virtual void Update()
         {
             if (CurrentFrame >= MaxLife)
@@ -127,16 +326,17 @@ namespace CrazyStorm_Player.CrazyStorm
                     vf += Math.PI;
             }
             else
-            {
                 vf = PSpeedVector.x >= 0 ? 0 : Math.PI;
-            }
-            PSpeedAngle = (float)MathHelper.RadToDeg(vf);
+            
+            if (KillOutside && PSpeedVector.x != 0 && PSpeedVector.y != 0)
+                PSpeedAngle = (float)MathHelper.RadToDeg(vf);
+            
             for (int i = 0; i < ParticleEventGroups.Count; ++i)
-                ParticleEventGroups[i].Execute();
+                ParticleEventGroups[i].Execute(this);
 
             ++CurrentFrame;
         }
-        public virtual void Copy(ParticleBase particleBase)
+        public virtual void CopyTo(ParticleBase particleBase)
         {
             particleBase.Alive = Alive;
             particleBase.Type = Type;
