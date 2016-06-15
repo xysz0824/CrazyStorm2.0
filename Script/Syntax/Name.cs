@@ -20,15 +20,15 @@ namespace CrazyStorm.Expression
         public override object Eval(Environment e)
         {
             var name = (string)Token.GetValue();
-            //Find in property variables.
             var result = e.GetProperty(name);
+            if (result is int)
+                return (float)(int)result;
+
             if (result == null)
             {
-                //Find in local variables.
                 result = e.GetLocal(name);
                 if (result == null)
                 {
-                    //Find in global variables.
                     result = e.GetGlobal(name);
                     if (result == null)
                         throw new ExpressionException("Undefination error.");

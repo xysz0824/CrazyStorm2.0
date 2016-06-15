@@ -8,6 +8,7 @@ namespace CrazyStorm_Player.CrazyStorm
 {
     class ParticleSystem : IPlayData, IPlayable
     {
+        int totalFrame;
         public string Name { get; set; }
         public int CurrentFrame { get; set; }
         public IList<ParticleType> CustomTypes { get; private set; }
@@ -26,6 +27,9 @@ namespace CrazyStorm_Player.CrazyStorm
                 PlayDataHelper.LoadObjectList(CustomTypes, particleSystemReader);
                 //layers
                 PlayDataHelper.LoadObjectList(Layers, particleSystemReader);
+                //Set the biggest number as totalFrame 
+                for (int i = 0; i < Layers.Count; ++i)
+                    totalFrame = Layers[i].TotalFrame > totalFrame ? Layers[i].TotalFrame : totalFrame;
             }
         }
         public bool Update(int currentFrame = 0)
@@ -33,7 +37,9 @@ namespace CrazyStorm_Player.CrazyStorm
             for (int i = 0; i < Layers.Count; ++i)
                 Layers[i].Update(CurrentFrame);
 
-            ++CurrentFrame;
+            if (++CurrentFrame == totalFrame)
+                Reset();
+
             return true;
         }
         public void Reset()

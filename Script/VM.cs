@@ -26,13 +26,6 @@ namespace CrazyStorm.Expression
         MORE,
         LESS
     }
-    public struct VMInstruction
-    {
-        public VMCode code;
-        public int intOperand;
-        public bool boolOperand;
-        public string stringOperand;
-    }
     public class VM
     {
         public static byte[] CreateInstruction(VMCode code, object operand)
@@ -50,6 +43,9 @@ namespace CrazyStorm.Expression
                         bytes.AddRange(PlayDataHelper.GetBytes((bool)operand));
                         break;
                     case VMCode.NAME:
+                        bytes.AddRange(PlayDataHelper.GetBytes((string)operand));
+                        break;
+                    case VMCode.CALL:
                         bytes.AddRange(PlayDataHelper.GetBytes((string)operand));
                         break;
                     case VMCode.ARGUMENTS:

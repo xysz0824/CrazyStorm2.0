@@ -32,7 +32,7 @@ namespace CrazyStorm.Expression
                 throw new ExpressionException("Argument error.");
 
             foreach (var item in argumentList)
-                if (!(item is int) && !(item is float))
+                if (!(item is int) && !(item is float) && !(item is Core.Vector2))
                     throw new ExpressionException("Type error.");
 
             //Calling function is a runtime operation so it can't be evaluated right here.

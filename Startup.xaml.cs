@@ -56,9 +56,9 @@ namespace CrazyStorm
         {
             //A frame approximately equals to 16ms(60 frames equal to one second)
             frame++;
-            //if (Opacity < 1.0f) 
-            //    Opacity += 0.1f;
-            //else
+            if (Opacity < 1.0f)
+                Opacity += 0.1f;
+            else
             {
                 string[] args = Environment.GetCommandLineArgs();
                 Environment.CurrentDirectory = System.IO.Path.GetDirectoryName(args[0]);

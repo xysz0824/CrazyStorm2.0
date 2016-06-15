@@ -42,14 +42,14 @@ namespace CrazyStorm_Player.CrazyStorm
             if (x > 0 && y > 0)
             {
                 if (children[0] == null)
-                    children[0] = new ParticleQuadTree(OriginX, Right, Top, OriginY);
+                    children[0] = new ParticleQuadTree(OriginX, Right, OriginY, Bottom);
 
                 children[0].Insert(particleBase, depth + 1);
             }
             else if (x > 0 && y <= 0)
             {
                 if (children[1] == null)
-                    children[1] = new ParticleQuadTree(OriginX, Right, OriginY, Bottom);
+                    children[1] = new ParticleQuadTree(OriginX, Right, Top, OriginY);
 
                 children[1].Insert(particleBase, depth + 1);
             }

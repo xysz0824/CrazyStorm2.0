@@ -22,9 +22,7 @@ namespace CrazyStorm.Expression
         public override object Eval(Environment e)
         {
             var num = GetExpression().Eval(e);
-            if (num is int)
-                return -(int)num;
-            else if (num is float)
+            if (num is float)
                 return -(float)num;
             else
                 throw new ExpressionException("Type error.");

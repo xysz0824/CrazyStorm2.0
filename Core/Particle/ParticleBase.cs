@@ -98,7 +98,7 @@ namespace CrazyStorm.Core
             get { return particleBaseData.pspeed; }
             set { particleBaseData.pspeed = value; }
         }
-        [FloatProperty(float.MinValue, float.MaxValue)]
+        [RuntimeProperty]
         public float PSpeedAngle
         {
             get { return particleBaseData.pspeedAngle; }

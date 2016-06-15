@@ -172,15 +172,19 @@ namespace CrazyStorm_Player.CrazyStorm
                     return true;
                 case "Speed":
                     Speed = VM.PopFloat();
+                    MathHelper.SetVector2(ref speedVector, Speed, SpeedAngle);
                     return true;
                 case "SpeedAngle":
                     SpeedAngle = VM.PopFloat();
+                    MathHelper.SetVector2(ref speedVector, Speed, SpeedAngle);
                     return true;
                 case "Acspeed":
                     Acspeed = VM.PopFloat();
+                    MathHelper.SetVector2(ref acspeedVector, Acspeed, AcspeedAngle);
                     return true;
                 case "AcspeedAngle":
                     AcspeedAngle = VM.PopFloat();
+                    MathHelper.SetVector2(ref acspeedVector, Acspeed, AcspeedAngle);
                     return true;
                 case "Visibility":
                     Visibility = VM.PopBool();
@@ -209,7 +213,6 @@ namespace CrazyStorm_Player.CrazyStorm
                 return false;
 
             CurrentFrame = currentFrame - BeginFrame;
-            base.ExecuteExpressions();
             speedVector += acspeedVector;
             Position += speedVector;
             double vf = 0;
@@ -240,9 +243,11 @@ namespace CrazyStorm_Player.CrazyStorm
                     var variable = new VariableResource { Value = item.Value };
                     initialState.Variables.Add(variable);
                 }
+                initialState.ExecuteExpressions();
             }
             else
             {
+                initialState.ExecuteExpressions();
                 CurrentFrame = initialState.CurrentFrame;
                 BeginFrame = initialState.BeginFrame;
                 TotalFrame = initialState.TotalFrame;

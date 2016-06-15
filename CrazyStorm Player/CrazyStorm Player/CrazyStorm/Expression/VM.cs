@@ -36,13 +36,16 @@ namespace CrazyStorm_Player.CrazyStorm
     }
     class VM
     {
-        static Stack<bool> boolStack = new Stack<bool>();
-        static Stack<int> intStack = new Stack<int>();
+        static Random random = new Random();
         static Stack<float> floatStack = new Stack<float>();
         static Stack<int> enumStack = new Stack<int>();
         static Stack<Vector2> vector2Stack = new Stack<Vector2>();
         static Stack<RGB> rgbStack = new Stack<RGB>();
         static Stack<string> stringStack = new Stack<string>();
+        public static void SetRandomSeed(int seed)
+        {
+            random = new Random(seed);
+        }
         public static VMInstruction[] Decode(byte[] bytes)
         {
             List<VMInstruction> list = new List<VMInstruction>();
@@ -67,6 +70,11 @@ namespace CrazyStorm_Player.CrazyStorm
                         position += name.Length + 1;
                         list.Add(new VMInstruction { code = code, stringOperand = name });
                         break;
+                    case VMCode.CALL:
+                        string func = PlayDataHelper.ReadString(bytes, position);
+                        position += func.Length + 1;
+                        list.Add(new VMInstruction { code = code, stringOperand = func });
+                        break;
                     case VMCode.ARGUMENTS:
                         int intOperand = BitConverter.ToInt32(bytes, position);
                         position += sizeof(int);
@@ -79,28 +87,160 @@ namespace CrazyStorm_Player.CrazyStorm
             }
             return list.ToArray();
         }
-        public static void Execute(VMInstruction[] instructions)
+        public static void Execute(PropertyContainer propertyContainer, VMInstruction[] instructions)
         {
-            if (instructions == null)
-                PushBool(true);
-
-            //TODO
+            for (int i = 0;i < instructions.Length;++i)
+            {
+                switch (instructions[i].code)
+                {
+                    case VMCode.NUMBER:
+                        VM.PushFloat(instructions[i].floatOperand);
+                        break;
+                    case VMCode.BOOL:
+                        VM.PushBool(instructions[i].boolOperand);
+                        break;
+                    case VMCode.NAME:
+                        propertyContainer.PushProperty(instructions[i].stringOperand);
+                        break;
+                    case VMCode.VECTOR2:
+                        float y = VM.PopFloat();
+                        float x = VM.PopFloat();
+                        VM.PushVector2(new Vector2(x, y));
+                        break;
+                    case VMCode.RGB:
+                        float b = VM.PopFloat();
+                        float g = VM.PopFloat();
+                        float r = VM.PopFloat();
+                        VM.PushRGB(new RGB(r, g, b));
+                        break;
+                    case VMCode.ARGUMENTS:
+                        VM.PushFloat(instructions[i].intOperand);
+                        break;
+                    case VMCode.CALL:
+                        float count = VM.PopFloat();
+                        switch (instructions[i].stringOperand)
+                        {
+                            case "dist":
+                                Vector2 v = VM.PopVector2() - VM.PopVector2();
+                                VM.PushFloat((float)Math.Sqrt(v.x * v.x + v.y * v.y));
+                                break;
+                            case "angle":
+                                v = VM.PopVector2() - VM.PopVector2();
+                                double vf = 0;
+                                if (v.y != 0)
+                                {
+                                    vf = Math.PI / 2 - Math.Atan(v.x / v.y);
+                                    if (v.y < 0) 
+                                        vf += Math.PI;
+                                }
+                                else
+                                {
+                                    vf = v.x >= 0 ? 0 : Math.PI;
+                                }
+                                VM.PushFloat((float)MathHelper.RadToDeg(vf));
+                                break;
+                            case "rand":
+                                float ratio = (float)random.NextDouble();
+                                VM.PushFloat((1 - ratio) * VM.PopFloat() + ratio * VM.PopFloat());
+                                break;
+                            case "sin":
+                                VM.PushFloat((float)Math.Sin(MathHelper.DegToRad(VM.PopFloat())));
+                                break;
+                            case "cos":
+                                VM.PushFloat((float)Math.Cos(MathHelper.DegToRad(VM.PopFloat())));
+                                break;
+                            case "tan":
+                                VM.PushFloat((float)Math.Tan(MathHelper.DegToRad(VM.PopFloat())));
+                                break;
+                            case "pi":
+                                VM.PushFloat((float)Math.PI);
+                                break;
+                            case "e":
+                                VM.PushFloat((float)Math.E);
+                                break;
+                            case "asin":
+                                VM.PushFloat((float)MathHelper.RadToDeg(Math.Asin(VM.PopFloat())));
+                                break;
+                            case "acos":
+                                VM.PushFloat((float)MathHelper.RadToDeg(Math.Acos(VM.PopFloat())));
+                                break;
+                            case "atan":
+                                VM.PushFloat((float)MathHelper.RadToDeg(Math.Atan(VM.PopFloat())));
+                                break;
+                            case "exp":
+                                VM.PushFloat((float)Math.Exp(VM.PopFloat()));
+                                break;
+                            case "log":
+                                VM.PushFloat((float)Math.Log(VM.PopFloat(), VM.PopFloat()));
+                                break;
+                            case "pow":
+                                float power = VM.PopFloat();
+                                float value = VM.PopFloat();
+                                VM.PushFloat((float)Math.Pow(value, power));
+                                break;
+                            case "sqrt":
+                                VM.PushFloat((float)Math.Sqrt(VM.PopFloat()));
+                                break;
+                        }
+                        break;
+                    case VMCode.AND:
+                        VM.PushBool(VM.PopBool() & VM.PopBool());
+                        break;
+                    case VMCode.OR:
+                        VM.PushBool(VM.PopBool() | VM.PopBool());
+                        break;
+                    case VMCode.EQUAL:
+                        VM.PushBool(VM.PopFloat() == VM.PopFloat());
+                        break;
+                    case VMCode.ADD:
+                        VM.PushFloat(VM.PopFloat() + VM.PopFloat());
+                        break;
+                    case VMCode.SUB:
+                        float subtrahend = VM.PopFloat();
+                        float minuend = VM.PopFloat();
+                        VM.PushFloat(minuend - subtrahend);
+                        break;
+                    case VMCode.MUL:
+                        VM.PushFloat(VM.PopFloat() * VM.PopFloat());
+                        break;
+                    case VMCode.DIV:
+                        float divisor = VM.PopFloat();
+                        float dividend = VM.PopFloat();
+                        VM.PushFloat(dividend / divisor);
+                        break;
+                    case VMCode.MOD:
+                        divisor = VM.PopFloat();
+                        float number = VM.PopFloat();
+                        VM.PushFloat(number % divisor);
+                        break;
+                    case VMCode.MORE:
+                        float right = VM.PopFloat();
+                        float left = VM.PopFloat();
+                        VM.PushBool(left > right);
+                        break;
+                    case VMCode.LESS:
+                        right = VM.PopFloat();
+                        left = VM.PopFloat();
+                        VM.PushBool(left < right);
+                        break;
+                }
+            }
         }
         public static void PushBool(bool value)
         {
-            boolStack.Push(value);
+            floatStack.Push(value ? 1 : 0);
         }
         public static bool PopBool()
         {
-            return boolStack.Pop();
+            return floatStack.Pop() == 1;
         }
         public static void PushInt(int value)
         {
-            intStack.Push(value);
+            floatStack.Push(value);
         }
         public static int PopInt()
         {
-            return intStack.Pop();
+            return (int)floatStack.Pop();
         }
         public static void PushFloat(float value)
         {

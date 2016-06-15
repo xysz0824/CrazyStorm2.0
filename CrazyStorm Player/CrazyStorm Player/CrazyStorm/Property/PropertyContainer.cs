@@ -31,14 +31,19 @@ namespace CrazyStorm_Player.CrazyStorm
         }
         public void ExecuteExpressions()
         {
-            //TODO
+            foreach (var expression in PropertyExpressions)
+            {
+                VM.Execute(this, expression.Value);
+                SetProperty(expression.Key);
+            }
         }
         public void ExecuteExpression(string propertyName)
         {
             if (!PropertyExpressions.ContainsKey(propertyName))
                 return;
 
-            //TODO
+            VM.Execute(this, PropertyExpressions[propertyName]);
+            SetProperty(propertyName);
         }
         public abstract bool PushProperty(string propertyName);
         public abstract bool SetProperty(string propertyName);

@@ -58,7 +58,7 @@ namespace CrazyStorm_Player
                 defaultParticleTypes = new List<ParticleType>();
                 ParticleType.LoadDefaultTypes(reader, defaultParticleTypes);
             }
-            using (FileStream stream = new FileStream("a.bg", FileMode.Open))
+            using (FileStream stream = new FileStream("debug.bg", FileMode.Open))
             {
                 var reader = new BinaryReader(stream);
                 //Play file use UTF-8 encoding
@@ -76,6 +76,7 @@ namespace CrazyStorm_Player
                         throw new NotSupportedException();
                 }
             }
+            file.ParticleSystems[0].Reset();
         }
         protected override void OnUnLoad()
         {

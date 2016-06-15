@@ -5,6 +5,7 @@ using System.Text;
 using System.Windows;
 using System.IO;
 using System.Reflection;
+using System.Diagnostics;
 using CrazyStorm.Core;
 
 namespace CrazyStorm
@@ -24,7 +25,7 @@ namespace CrazyStorm
         }
         void GeneratePlayFile(string genPath)
         {
-            genPath = Path.GetDirectoryName(genPath) + "\\" + fileName + ".bg";
+            genPath = Path.GetDirectoryName(genPath) + "\\" + "debug" + ".bg";
             using (FileStream stream = new FileStream(genPath, FileMode.Create))
             {
                 var writer = new BinaryWriter(stream);
@@ -114,12 +115,45 @@ namespace CrazyStorm
                         }));
             }
         }
+        void Play()
+        {
+            if (string.IsNullOrWhiteSpace(Core.File.CurrentDirectory))
+            {
+                MessageBox.Show((string)FindResource("NeedSaveFirstStr"), (string)FindResource("TipTitleStr"),
+                    MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+            string genPath = Path.GetDirectoryName(filePath) + "\\" + "debug" + ".bg";
+            using (FileStream stream = new FileStream(genPath, FileMode.Create))
+            {
+                var writer = new BinaryWriter(stream);
+                //Play file use UTF-8 encoding
+                //Write play file header
+                writer.Write(PlayDataHelper.GetStringBytes("BG"));
+                //Write play file version
+                writer.Write(PlayDataHelper.GetStringBytes(VersionInfo.PlayVersion));
+                //Write play file data
+                Compile();
+                writer.Write(file.GeneratePlayData().ToArray());
+            }
+            ProcessStartInfo ps = new ProcessStartInfo(Path.GetDirectoryName(filePath) + "\\" + @"CrazyStorm Player.exe");
+            ps.WorkingDirectory = Path.GetDirectoryName(filePath);
+            ps.WindowStyle = ProcessWindowStyle.Normal;
+            Process p = new Process();
+            p.StartInfo = ps;
+            p.Start();
+            p.WaitForInputIdle();
+        }
         #endregion
 
         #region Window EventHandlers
         private void GeneratePlayFile_Click(object sender, RoutedEventArgs e)
         {
             GeneratePlayFile();
+        }
+        private void PlayItem_Click(object sender, RoutedEventArgs e)
+        {
+            Play();
         }
         #endregion
     }

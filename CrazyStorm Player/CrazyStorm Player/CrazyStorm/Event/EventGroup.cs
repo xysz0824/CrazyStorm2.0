@@ -34,8 +34,10 @@ namespace CrazyStorm_Player.CrazyStorm
         }
         public void Execute(PropertyContainer propertyContainer)
         {
-            VM.Execute(Condition);
-            if (VM.PopBool())
+            if (Condition != null)
+                VM.Execute(propertyContainer, Condition);
+
+            if (Condition == null || VM.PopBool())
             {
                 for (int i = 0; i < Events.Count; ++i)
                     EventHelper.Execute(propertyContainer, Events[i]);

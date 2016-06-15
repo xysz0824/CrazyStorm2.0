@@ -380,7 +380,7 @@
             </Button>
             <Separator/>
             <Button Name="PlayButton" IsDefault="False" IsCancel="False" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" 
-                    ToolTip="{StaticResource PlayStr}">
+                    ToolTip="{StaticResource PlayStr}" Click="PlayItem_Click">
                 <Image Source="Images/arrow-right-3.ico" Stretch="None" />
             </Button>
             <Button Name="SettingButton" IsDefault="False" IsCancel="False" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" 

@@ -33,7 +33,7 @@ namespace CrazyStorm_Player.CrazyStorm
                     VM.PushBool(TargetValue.boolValue);
                     break;
                 case PropertyType.Int32:
-                    VM.PushInt((int)((1 - ratio) * InitialValue.intValue + ratio * TargetValue.intValue));
+                    VM.PushFloat((int)((1 - ratio) * InitialValue.intValue + ratio * TargetValue.intValue));
                     break;
                 case PropertyType.Single:
                     VM.PushFloat((1 - ratio) * InitialValue.floatValue + ratio * TargetValue.floatValue);
@@ -81,60 +81,64 @@ namespace CrazyStorm_Player.CrazyStorm
             var targetValue = eventInfo.resultValue;
             if (eventInfo.isExpressionResult)
             {
-                VM.Execute(eventInfo.resultExpression);
+                VM.Execute(propertyContainer, eventInfo.resultExpression);
                 switch (eventInfo.resultType)
                 {
                     case PropertyType.Boolean:
-                        initialValue.boolValue = VM.PopBool();
                         targetValue.boolValue = VM.PopBool();
+                        initialValue.boolValue = VM.PopBool();
                         break;
                     case PropertyType.Int32:
-                        initialValue.intValue = VM.PopInt();
+                        int resultInt = (int)VM.PopFloat();
+                        initialValue.intValue = (int)VM.PopFloat();
                         if (eventInfo.changeType == EventKeyword.ChangeTo)
-                            targetValue.intValue = VM.PopInt();
+                            targetValue.intValue = resultInt;
                         else if (eventInfo.changeType == EventKeyword.Increase)
-                            targetValue.intValue = initialValue.intValue + VM.PopInt();
+                            targetValue.intValue = initialValue.intValue + resultInt;
                         else
-                            targetValue.intValue = initialValue.intValue - VM.PopInt();
+                            targetValue.intValue = initialValue.intValue - resultInt;
 
                         break;
                     case PropertyType.Single:
+                        float resultFloat = VM.PopFloat();
                         initialValue.floatValue = VM.PopFloat();
                         if (eventInfo.changeType == EventKeyword.ChangeTo)
-                            targetValue.floatValue = VM.PopFloat();
+                            targetValue.floatValue = resultFloat;
                         else if (eventInfo.changeType == EventKeyword.Increase)
-                            targetValue.floatValue = initialValue.floatValue + VM.PopFloat();
+                            targetValue.floatValue = initialValue.floatValue + resultFloat;
                         else
-                            targetValue.floatValue = initialValue.floatValue - VM.PopFloat();
+                            targetValue.floatValue = initialValue.floatValue - resultFloat;
 
                         break;
                     case PropertyType.Enum:
-                        initialValue.enumValue = VM.PopEnum();
                         targetValue.enumValue = VM.PopEnum();
+                        initialValue.enumValue = VM.PopEnum();
                         break;
                     case PropertyType.Vector2:
+                        Vector2 resultVector2 = VM.PopVector2();
                         initialValue.vector2Value = VM.PopVector2();
                         if (eventInfo.changeType == EventKeyword.ChangeTo)
-                            targetValue.vector2Value = VM.PopVector2();
+                            targetValue.vector2Value = resultVector2;
                         else if (eventInfo.changeType == EventKeyword.Increase)
-                            targetValue.vector2Value = initialValue.vector2Value + VM.PopVector2();
+                            targetValue.vector2Value = initialValue.vector2Value + resultVector2;
                         else
-                            targetValue.vector2Value = initialValue.vector2Value - VM.PopVector2();
+                            targetValue.vector2Value = initialValue.vector2Value - resultVector2;
 
                         break;
                     case PropertyType.RGB:
+                        RGB resultRGB = VM.PopRGB();
                         initialValue.rgbValue = VM.PopRGB();
                         if (eventInfo.changeType == EventKeyword.ChangeTo)
-                            targetValue.rgbValue = VM.PopRGB();
+                            targetValue.rgbValue = resultRGB;
                         else if (eventInfo.changeType == EventKeyword.Increase)
-                            targetValue.rgbValue = initialValue.rgbValue + VM.PopRGB();
+                            targetValue.rgbValue = initialValue.rgbValue + resultRGB;
                         else
-                            targetValue.rgbValue = initialValue.rgbValue - VM.PopRGB();
+                            targetValue.rgbValue = initialValue.rgbValue - resultRGB;
 
                         break;
                     case PropertyType.String:
-                        initialValue.stringValue = VM.PopString();
                         targetValue.stringValue = VM.PopString();
+                        initialValue.stringValue = VM.PopString();
                         break;
                 }
             }

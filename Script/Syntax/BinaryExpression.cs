@@ -28,7 +28,7 @@ namespace CrazyStorm.Expression
             var left = GetLeftChild().Eval(e);
             var right = GetRightChild().Eval(e);
             var op = (string)Token.GetValue();
-            if ((!(left is int) && !(left is float)) || (!(right is int) && !(right is float)))
+            if (!(left is float) && !(right is float))
             {
                 if (left is bool && right is bool)
                 {
@@ -47,51 +47,27 @@ namespace CrazyStorm.Expression
             switch (op)
             {
                 case "+":
-                    if (left is int && right is int)
-                        return (int)left + (int)right;
-                    else
-                        return (float)left + (float)right;
+                    return (float)left + (float)right;
                 case "-":
-                    if (left is int && right is int)
-                        return (int)left - (int)right;
-                    else
-                        return (float)left - (float)right;
+                    return (float)left - (float)right;
                 case "*":
-                    if (left is int && right is int)
-                        return (int)left * (int)right;
-                    else
-                        return (float)left * (float)right;
+                    return (float)left * (float)right;
                 case "/":
                     if (Convert.ToSingle(right) == 0)
                         throw new ExpressionException("Divided by zero.");
 
-                    if (left is int && right is int)
-                        return (int)left / (int)right;
-                    else
-                        return (float)left / (float)right;
+                    return (float)left / (float)right;
                 case "%":
                     if (Convert.ToSingle(right) == 0)
                         throw new ExpressionException("Divided by zero.");
 
-                    if (left is int && right is int)
-                        return (int)left % (int)right;
-                    else
-                        return (float)left % (float)right;
+                    return (float)left % (float)right;
                 case ">":
-                    if (left is int && right is int)
-                        return (int)left > (int)right;
-                    else
-                        return (float)left > (float)right;
+                    return (float)left > (float)right;
                 case "<":
-                    if (left is int && right is int)
-                        return (int)left < (int)right;
-                    else
-                        return (float)left < (float)right;
+                    return (float)left < (float)right;
                 case "=":
-                    if (left is int && right is int)
-                        return (int)left == (int)right;
-                    else
-                        return (float)left == (float)right;
+                    return (float)left == (float)right;
             }
             return new ExpressionException("Type error.");
         }
