@@ -15,11 +15,12 @@ namespace CrazyStorm_Player.CrazyStorm
         public float EmitAngle { get; set; }
         public float EmitRange { get; set; }
         public ParticleBase Template { get; protected set; }
-        public IList<ParticleBase> Particles { get; private set; }
+        public LinkedList<ParticleBase> Particles { get; private set; }
         public IList<EventGroup> EmitterEventGroups { get; private set; }
         public Emitter()
         {
-            Particles = new List<ParticleBase>();
+            Particles = new LinkedList<ParticleBase>();
+            EmitterEventGroups = new List<EventGroup>();
         }
         public override void LoadPlayData(BinaryReader reader)
         {
@@ -108,9 +109,9 @@ namespace CrazyStorm_Player.CrazyStorm
             if (!base.Update(currentFrame))
                 return false;
 
-            if (currentFrame % EmitCycle == 0)
-                Emit();
-            
+            if (currentFrame > 0 && currentFrame % EmitCycle == 0)
+                EmitParticle();
+
             return true;
         }
         public override void Reset()
@@ -123,7 +124,34 @@ namespace CrazyStorm_Player.CrazyStorm
             EmitAngle = initialState.EmitAngle;
             EmitRange = initialState.EmitRange;
         }
-        public void Emit()
+        public void EmitParticle()
+        {
+            if (BindingTarget == null || BindingTarget.Particles.Count == 0)
+                Emit();
+            else
+            {
+                Vector2 savePosition = Position;
+                float saveSpeed = Speed;
+                float saveSpeedAngle = SpeedAngle;
+                float saveAcspeed = Acspeed;
+                float saveAcspeedAngle = AcspeedAngle;
+                foreach (var particle in BindingTarget.Particles)
+                {
+                    Position = particle.PPosition;
+                    Speed = particle.PSpeed;
+                    SpeedAngle = particle.PSpeedAngle;
+                    Acspeed = particle.PAcspeed;
+                    AcspeedAngle = particle.PAcspeedAngle;
+                    Emit();
+                }
+                Position = savePosition;
+                Speed = saveSpeed;
+                SpeedAngle = saveSpeedAngle;
+                Acspeed = saveAcspeed;
+                AcspeedAngle = saveAcspeedAngle;
+            }
+        }
+        void Emit()
         {
             base.ExecuteExpression("EmitCycle");
             base.ExecuteExpression("EmitRange");
@@ -139,7 +167,8 @@ namespace CrazyStorm_Player.CrazyStorm
                 Template.PSpeedAngle = angle;
                 ParticleBase newParticle = ParticleManager.GetParticle(Template);
                 newParticle.Emitter = this;
-                Particles.Add(newParticle);
+                newParticle.ParticleEventGroups = EmitterEventGroups;
+                Particles.AddLast(newParticle);
             }
         }
     }

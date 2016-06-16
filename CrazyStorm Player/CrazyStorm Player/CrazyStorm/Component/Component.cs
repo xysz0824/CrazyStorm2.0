@@ -9,8 +9,9 @@ namespace CrazyStorm_Player.CrazyStorm
 {
     class Component : PropertyContainer, IPlayData, IRebuildReference<Component>, IPlayable
     {
-        private Vector2 speedVector;
-        private Vector2 acspeedVector;
+        Vector2 parentAbsolutePosition;
+        Vector2 speedVector;
+        Vector2 acspeedVector;
         protected Component initialState;
         public int Id { get; set; }
         public string Name { get; set; }
@@ -25,7 +26,7 @@ namespace CrazyStorm_Player.CrazyStorm
         public bool Visibility { get; set; }
         public Component Parent { get; private set; }
         public int ParentID { get; private set; }
-        public Component BindingTarget { get; private set; }
+        public Emitter BindingTarget { get; private set; }
         public int BindingTargetID { get; private set; }
         public IList<VariableResource> Variables { get; set; }
         public IList<VariableResource> Globals { get; set; }
@@ -87,11 +88,27 @@ namespace CrazyStorm_Player.CrazyStorm
                 {
                     if (BindingTargetID == target.Id)
                     {
-                        BindingTarget = target;
+                        BindingTarget = target as Emitter;
                         break;
                     }
                 }
             }
+        }
+        public Vector2 GetAbsolutePosition()
+        {
+            if (Parent != null)
+            {
+                parentAbsolutePosition = Parent.GetAbsolutePosition();
+                return Position + parentAbsolutePosition;
+            }
+            return Position;
+        }
+        public Vector2 GetRelativePosition()
+        {
+            if (Parent != null)
+                return Position - parentAbsolutePosition;
+
+            return Position;
         }
         public override bool PushProperty(string propertyName)
         {
@@ -209,31 +226,59 @@ namespace CrazyStorm_Player.CrazyStorm
         }
         public virtual bool Update(int currentFrame)
         {
-            if (currentFrame < BeginFrame || currentFrame >= BeginFrame + TotalFrame)
+            if (currentFrame < BeginFrame || currentFrame >= BeginFrame + TotalFrame || !Visibility)
                 return false;
 
             CurrentFrame = currentFrame - BeginFrame;
-            speedVector += acspeedVector;
-            Position += speedVector;
-            double vf = 0;
-            if (speedVector.y != 0)
+            Position = GetRelativePosition();
+            if (BindingTarget == null || BindingTarget.Particles.Count == 0)
             {
-                vf = Math.PI / 2 - Math.Atan(speedVector.x / speedVector.y);
-                if (speedVector.y < 0) 
-                    vf += Math.PI;
+                speedVector += acspeedVector;
+                Position += speedVector;
+                double vf = 0;
+                if (speedVector.y != 0)
+                {
+                    vf = Math.PI / 2 - Math.Atan(speedVector.x / speedVector.y);
+                    if (speedVector.y < 0)
+                        vf += Math.PI;
+                }
+                else
+                {
+                    vf = speedVector.x >= 0 ? 0 : Math.PI;
+                }
+                SpeedAngle = (float)MathHelper.RadToDeg(vf);
+                for (int i = 0; i < ComponentEventGroups.Count; ++i)
+                    ComponentEventGroups[i].Execute(this);
             }
             else
             {
-                vf = speedVector.x >= 0 ? 0 : Math.PI;
+                Vector2 savePosition = Position;
+                float saveSpeed = Speed;
+                float saveSpeedAngle = SpeedAngle;
+                float saveAcspeed = Acspeed;
+                float saveAcspeedAngle = AcspeedAngle;
+                foreach (var particle in BindingTarget.Particles)
+                {
+                    Position = particle.PPosition;
+                    Speed = particle.PSpeed;
+                    SpeedAngle = particle.PSpeedAngle;
+                    Acspeed = particle.PAcspeed;
+                    AcspeedAngle = particle.PAcspeedAngle;
+                    for (int i = 0; i < ComponentEventGroups.Count; ++i)
+                        ComponentEventGroups[i].Execute(this);
+                }
+                Position = savePosition;
+                Speed = saveSpeed;
+                SpeedAngle = saveSpeedAngle;
+                Acspeed = saveAcspeed;
+                AcspeedAngle = saveAcspeedAngle;
             }
-            SpeedAngle = (float)MathHelper.RadToDeg(vf);
-            for (int i = 0; i < ComponentEventGroups.Count; ++i)
-                ComponentEventGroups[i].Execute(this);
-
+            Position = GetAbsolutePosition();
             return true;
         }
         public virtual void Reset()
         {
+            parentAbsolutePosition = Vector2.Zero;
             if (initialState == null)
             {
                 initialState = this.MemberwiseClone() as Component;

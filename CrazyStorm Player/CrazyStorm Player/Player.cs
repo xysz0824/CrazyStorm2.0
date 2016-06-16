@@ -22,7 +22,7 @@ namespace CrazyStorm_Player
         protected override void OnInitialize()
         {
             WindowTitle = VersionInfo.AppTitle;
-            ParticleManager.Initialize(WindowWidth, WindowHeight, 10000, 1000);
+            ParticleManager.Initialize(WindowWidth, WindowHeight, 50, 10000, 1000);
             ParticleManager.OnParticleDraw += (particle) =>
             {
                 if (particle.Type == null)

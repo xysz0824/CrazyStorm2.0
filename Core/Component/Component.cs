@@ -42,7 +42,7 @@ namespace CrazyStorm.Core
         bool selected;
         Component parent;
         int parentID = -1;
-        Component bindingTarget;
+        Emitter bindingTarget;
         int bindingTargetID = -1;
         IList<VariableResource> variables;
         IList<EventGroup> componentEventGroups;
@@ -141,7 +141,7 @@ namespace CrazyStorm.Core
             get { return parent; }
             set { parent = value; }
         }
-        public Component BindingTarget
+        public Emitter BindingTarget
         {
             get { return bindingTarget; }
             set { bindingTarget = value; }
@@ -167,23 +167,18 @@ namespace CrazyStorm.Core
         public void TransPositiontoRelative()
         {
             if (parent != null)
-            {
                 componentData.position -= parent.GetAbsolutePosition();
-            }
         }
         public void TransPositiontoAbsolute()
         {
             if (parent != null)
-            {
                 componentData.position += parent.GetAbsolutePosition();
-            }
         }
         public Vector2 GetAbsolutePosition()
         {
             if (parent != null)
-            {
                 return componentData.position + parent.GetAbsolutePosition();
-            }
+
             return componentData.position;
         }
         public IList<Component> GetPosterity()
@@ -355,7 +350,7 @@ namespace CrazyStorm.Core
                 {
                     if (bindingTargetID == target.Id)
                     {
-                        bindingTarget = target;
+                        bindingTarget = target as Emitter;
                         break;
                     }
                 }

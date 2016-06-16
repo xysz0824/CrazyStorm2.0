@@ -16,7 +16,7 @@ namespace CrazyStorm
         {
             base.Redo(stack);
             var selectedComponents = Parameter[0] as IList<Component>;
-            var boundEmitters = new List<Component>();
+            var boundEmitters = new List<Emitter>();
             foreach (var component in selectedComponents)
             {
                 boundEmitters.Add(component.BindingTarget);
@@ -28,7 +28,7 @@ namespace CrazyStorm
         {
             base.Undo(stack);
             var selectedComponents = Parameter[0] as IList<Component>;
-            var boundEmitters = History[0] as IList<Component>;
+            var boundEmitters = History[0] as IList<Emitter>;
             foreach (var component in selectedComponents)
             {
                 component.BindingTarget = boundEmitters.First();

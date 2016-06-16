@@ -49,6 +49,7 @@ namespace CrazyStorm_Player.CrazyStorm
         public override void Update()
         {
             base.Update();
+            //TODO
         }
         public override void CopyTo(ParticleBase particleBase)
         {

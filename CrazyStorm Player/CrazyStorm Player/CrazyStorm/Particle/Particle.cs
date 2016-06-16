@@ -78,6 +78,8 @@ namespace CrazyStorm_Player.CrazyStorm
 
             if (RetainScale && WidthScale != HeightScale)
                 HeightScale = WidthScale;
+
+            //TODO
         }
         public override void CopyTo(ParticleBase particleBase)
         {

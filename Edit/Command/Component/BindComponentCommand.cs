@@ -17,8 +17,8 @@ namespace CrazyStorm
         {
             base.Redo(stack);
             var bindingLines = Parameter[0] as IList<Line>;
-            var boundEmitters = new List<Component>();
-            var selectedEmitter = Parameter[1] as Component;
+            var boundEmitters = new List<Emitter>();
+            var selectedEmitter = Parameter[1] as Emitter;
             foreach (var line in bindingLines)
             {
                 var component = line.DataContext as Component;
@@ -32,7 +32,7 @@ namespace CrazyStorm
         {
             base.Undo(stack);
             var bindingLines = Parameter[0] as IList<Line>;
-            var boundComponents = History[0] as IList<Component>;
+            var boundComponents = History[0] as IList<Emitter>;
             foreach (var line in bindingLines)
             {
                 var component = line.DataContext as Component;

@@ -14,13 +14,16 @@ namespace CrazyStorm_Player.CrazyStorm
         public static event CurveParticleDrawHandler OnCurveParticleDraw;
 
         static ParticleQuadTree particleQuadTree;
+        static int reserved;
         static List<Particle> particlePool;
         static int particleIndex;
         static List<CurveParticle> curveParticlePool;
         static int curveParticleIndex;
-        public static void Initialize(int windowWidth, int windowHeight, int particleMaximum, int curveParticleMaximum)
+        public static void Initialize(int windowWidth, int windowHeight, int reservedDist, 
+            int particleMaximum, int curveParticleMaximum)
         {
             particleQuadTree = new ParticleQuadTree(-windowWidth, windowWidth, -windowHeight, windowHeight);
+            reserved = reservedDist;
             particlePool = new List<Particle>(particleMaximum);
             for (int i = 0; i < particleMaximum; ++i)
                 particlePool.Add(new Particle());
@@ -55,6 +58,11 @@ namespace CrazyStorm_Player.CrazyStorm
         public static List<ParticleBase> SearchByRect(int left, int right, int top, int bottom)
         {
             return particleQuadTree.SearchByRect(left, right, top, bottom);
+        }
+        public static bool OutOfWindow(float x, float y)
+        {
+            return x < particleQuadTree.Left / 2 - reserved || x > particleQuadTree.Right / 2 + reserved ||
+            y < particleQuadTree.Top / 2 - reserved || y > particleQuadTree.Bottom / 2 + reserved;
         }
         public static void Update()
         {

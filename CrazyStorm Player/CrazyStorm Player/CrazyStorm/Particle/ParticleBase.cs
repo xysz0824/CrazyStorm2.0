@@ -305,9 +305,10 @@ namespace CrazyStorm_Player.CrazyStorm
         }
         public virtual void Update()
         {
-            if (CurrentFrame >= MaxLife)
+            if (CurrentFrame >= MaxLife || (KillOutside && ParticleManager.OutOfWindow(PPosition.x, PPosition.y)))
             {
                 Alive = false;
+                Emitter.Particles.Remove(this);
                 return;
             }
             if (CurrentFrame == 0)
@@ -315,6 +316,7 @@ namespace CrazyStorm_Player.CrazyStorm
                 MathHelper.SetVector2(ref pspeedVector, PSpeed, PSpeedAngle);
                 MathHelper.SetVector2(ref pacspeedVector, PAcspeed, PAcspeedAngle);
             }
+            //TODO
             QuadTree.Update(this);
             PSpeedVector += PAcspeedVector;
             PPosition += PSpeedVector;
@@ -328,7 +330,7 @@ namespace CrazyStorm_Player.CrazyStorm
             else
                 vf = PSpeedVector.x >= 0 ? 0 : Math.PI;
             
-            if (KillOutside && PSpeedVector.x != 0 && PSpeedVector.y != 0)
+            if (PSpeedVector.x != 0 && PSpeedVector.y != 0)
                 PSpeedAngle = (float)MathHelper.RadToDeg(vf);
             
             for (int i = 0; i < ParticleEventGroups.Count; ++i)

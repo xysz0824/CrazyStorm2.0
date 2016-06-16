@@ -16,10 +16,10 @@ namespace CrazyStorm_Player.CrazyStorm
         public TypeSet InitialValue { get; set; }
         public TypeSet TargetValue { get; set; }
         public int ChangeTime { get; set; }
-        public bool Finished { get { return currentTime == ChangeTime; } }
+        public bool Finished { get { return currentTime + 1 == ChangeTime; } }
         public void Update()
         {
-            float ratio = currentTime / ChangeTime;
+            float ratio = (currentTime + 1) / ChangeTime;
             if (ChangeMode == EventKeyword.Accelerated)
                 ratio *= ratio;
             else if (ChangeMode == EventKeyword.Decelerated)
@@ -199,7 +199,7 @@ namespace CrazyStorm_Player.CrazyStorm
             switch (eventName)
             {
                 case "EmitParticle":
-                    (propertyContainer as Emitter).Emit();
+                    (propertyContainer as Emitter).EmitParticle();
                     break;
                 case "PlaySound":
                     break;
@@ -216,13 +216,12 @@ namespace CrazyStorm_Player.CrazyStorm
 
             for (int i = 0; i < executorList.Count;++i)
             {
+                executorList[i].Update();
                 if (executorList[i].Finished)
                 {
                     executorList.RemoveAt(i);
                     i--;
                 }
-                else
-                    executorList[i].Update();
             }
         }
     }
