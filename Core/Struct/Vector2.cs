@@ -96,6 +96,19 @@ namespace CrazyStorm.Core
         {
             return Multiply(lhs, rhs);
         }
+        public static float Dot(Vector2 lhs, Vector2 rhs)
+        {
+            return lhs.x * rhs.x + lhs.y * rhs.y;
+        }
+        //
+        public static Vector2 Divide(Vector2 lhs, float rhs)
+        {
+            return new Vector2(lhs.x / rhs, lhs.y / rhs);
+        }
+        public static Vector2 operator /(Vector2 lhs, float rhs)
+        {
+            return Divide(lhs, rhs);
+        }
         public static bool TryParse(string value, out Vector2 result)
         {
             result = Vector2.Zero;

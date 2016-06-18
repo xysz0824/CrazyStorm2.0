@@ -145,7 +145,7 @@ namespace CrazyStorm
             //if (string.IsNullOrWhiteSpace(translatedEvent))
             //    translatedEvent = originalEvent;
 
-            //string[] keywords = {"Linear", "Accelerated", "Decelerated", "Fixed", "ChangeTo", "Increase", "Decrease",
+            //string[] keywords = {"Linear", "Accelerated", "Decelerated", "Instant", "ChangeTo", "Increase", "Decrease",
             //                    "EmitParticle", "PlaySound", "Loop", "ChangeType"};
             //foreach (string item in keywords)
             //{
@@ -246,7 +246,7 @@ namespace CrazyStorm
             text = string.Empty;
             var eventInfo = new EventInfo();
             //Check if there have errors
-            if (ResultValue.ToolTip != null || ChangeTime.ToolTip != null || ExecuteTime.ToolTip != null)
+            if (ResultValue.ToolTip != null || ChangeTime.ToolTip != null)
                 return false;
 
             if (!SetConditionInfo(eventInfo))
@@ -265,8 +265,8 @@ namespace CrazyStorm
                 eventInfo.changeMode = "Accelerated";
             else if (Decelerated.IsChecked == true)
                 eventInfo.changeMode = "Decelerated";
-            else if (Fixed.IsChecked == true)
-                eventInfo.changeMode = "Fixed";
+            else if (Instant.IsChecked == true)
+                eventInfo.changeMode = "Instant";
 
             if (PropertyComboBox.SelectedItem != null && !String.IsNullOrEmpty(ResultValue.Text) &&
                 !String.IsNullOrEmpty(eventInfo.changeType) && !String.IsNullOrEmpty(eventInfo.changeMode) && 
@@ -278,8 +278,6 @@ namespace CrazyStorm
                 eventInfo.resultType = GetValueType(selectedItem.Name);
                 eventInfo.resultValue = ResultValue.Text;
                 eventInfo.changeTime = ChangeTime.Text;
-                if (!String.IsNullOrEmpty(ExecuteTime.Text))
-                    eventInfo.executeTime = ExecuteTime.Text;
             }
             else
                 return false;
@@ -321,20 +319,11 @@ namespace CrazyStorm
             else if (Loop.IsChecked == true)
             {
                 //Check if there have errors
-                if (LoopTime.ToolTip != null || StopCondition.ToolTip != null)
-                    return false;
-
-                if (String.IsNullOrEmpty(LoopTime.Text) && String.IsNullOrEmpty(StopCondition.Text))
+                if (StopCondition.ToolTip != null || String.IsNullOrEmpty(StopCondition.Text))
                     return false;
 
                 string arguments = string.Empty;
-                if (!String.IsNullOrEmpty(LoopTime.Text) && !String.IsNullOrEmpty(StopCondition.Text))
-                    arguments = LoopTime.Text + ", " + StopCondition.Text;
-                else if (String.IsNullOrEmpty(LoopTime.Text) && !String.IsNullOrEmpty(StopCondition.Text))
-                    arguments = "0, " + StopCondition.Text;
-                else
-                    arguments = LoopTime.Text;
-
+                arguments = StopCondition.Text;
                 eventInfo.specialEvent = "Loop";
                 eventInfo.arguments = arguments;
             }
@@ -344,7 +333,7 @@ namespace CrazyStorm
                     return false;
 
                 eventInfo.specialEvent = "ChangeType";
-                eventInfo.arguments = TypeCombo.SelectedItem + ", " + ((ComboBoxItem)ColorCombo.SelectedItem).Content;
+                eventInfo.arguments = (TypeCombo.SelectedItem as ParticleType).Id + "," + ColorCombo.SelectedIndex;
             }
             else
                 return false;
@@ -375,9 +364,8 @@ namespace CrazyStorm
             Linear.IsChecked = false;
             Accelerated.IsChecked = false;
             Decelerated.IsChecked = false;
-            Fixed.IsChecked = false;
+            Instant.IsChecked = false;
             ChangeTime.Text = string.Empty;
-            ExecuteTime.Text = string.Empty;
             EmitParticle.IsChecked = false;
             PlaySoundPanel.Visibility = Visibility.Collapsed;
             PlaySound.IsChecked = false;
@@ -387,7 +375,6 @@ namespace CrazyStorm
             VolumeSlider.Value = 50;
             LoopPanel.Visibility = Visibility.Collapsed;
             Loop.IsChecked = false;
-            LoopTime.Text = string.Empty;
             StopCondition.Text = string.Empty;
             ChangeTypePanel.Visibility = Visibility.Collapsed;
             ChangeType.IsChecked = false;
@@ -409,7 +396,7 @@ namespace CrazyStorm
             buttonMap["Linear"] = Linear;
             buttonMap["Accelerated"] = Accelerated;
             buttonMap["Decelerated"] = Decelerated;
-            buttonMap["Fixed"] = Fixed;
+            buttonMap["Instant"] = Instant;
             buttonMap["EmitParticle"] = EmitParticle;
             buttonMap["PlaySound"] = PlaySound;
             buttonMap["Loop"] = Loop;
@@ -467,8 +454,6 @@ namespace CrazyStorm
                 ResultValue.Text = eventInfo.resultValue;
                 buttonMap[eventInfo.changeMode].IsChecked = true;
                 ChangeTime.Text = eventInfo.changeTime;
-                if (eventInfo.executeTime != null)
-                    ExecuteTime.Text = eventInfo.executeTime;
                 //Prevent from setting special event
                 SpecialEventPanel.IsEnabled = false;
             }
@@ -490,33 +475,20 @@ namespace CrazyStorm
                 }
                 else if (eventInfo.specialEvent == "Loop")
                 {
-                    LoopTime.Text = split[0] == "0" ? string.Empty : split[0];
-                    if (split.Length > 1)
-                    {
-                        StopCondition.Text = split[1].Trim();
-                    }
+                    StopCondition.Text = split[0].Trim();
                 }
                 else if (eventInfo.specialEvent == "ChangeType")
                 {
                     for (int i = 0; i < TypeCombo.Items.Count; ++i)
                     {
-                        if ((TypeCombo.Items[i] as ParticleType).Name == split[0])
+                        if ((TypeCombo.Items[i] as ParticleType).Id == int.Parse(split[0]))
                         {
                             TypeCombo.SelectedIndex = i;
                             break;
                         }
                     }
                     if (TypeCombo.SelectedItem != null)
-                    {
-                        for (int i = 0; i < ColorCombo.Items.Count; ++i)
-                        {
-                            if ((string)(ColorCombo.Items[i] as ComboBoxItem).Content == split[1].Trim())
-                            {
-                                ColorCombo.SelectedIndex = i;
-                                break;
-                            }
-                        }
-                    }
+                        ColorCombo.SelectedIndex = int.Parse(split[1].Trim());
                 }
                 //Prevent from setting property event
                 PropertyEventPanel.IsEnabled = false;
@@ -534,21 +506,21 @@ namespace CrazyStorm
         {
             Accelerated.IsChecked = false;
             Decelerated.IsChecked = false;
-            Fixed.IsChecked = false;
+            Instant.IsChecked = false;
         }
         private void Accelerated_Checked(object sender, RoutedEventArgs e)
         {
             Linear.IsChecked = false;
             Decelerated.IsChecked = false;
-            Fixed.IsChecked = false;
+            Instant.IsChecked = false;
         }
         private void Decelerated_Checked(object sender, RoutedEventArgs e)
         {
             Accelerated.IsChecked = false;
             Linear.IsChecked = false;
-            Fixed.IsChecked = false;
+            Instant.IsChecked = false;
         }
-        private void Fixed_Checked(object sender, RoutedEventArgs e)
+        private void Instant_Checked(object sender, RoutedEventArgs e)
         {
             Accelerated.IsChecked = false;
             Decelerated.IsChecked = false;
@@ -598,8 +570,12 @@ namespace CrazyStorm
             }
             else if (BuildEvent(out text))
             {
-                eventGroup.OriginalEvents.Add(text);
-                eventGroup.TranslatedEvents.Add(TranslateEvent(text));
+                int insertIndex = 0;
+                if (EventList.SelectedIndex != -1)
+                    insertIndex = EventList.SelectedIndex;
+
+                eventGroup.OriginalEvents.Insert(insertIndex, text);
+                eventGroup.TranslatedEvents.Insert(insertIndex, TranslateEvent(text));
             }
         }
         private void AddSpecialEvent_Click(object sender, RoutedEventArgs e)
@@ -622,8 +598,12 @@ namespace CrazyStorm
             }
             else if (BuildSpecialEvent(out text))
             {
-                eventGroup.OriginalEvents.Add(text);
-                eventGroup.TranslatedEvents.Add(TranslateEvent(text));
+                int insertIndex = 0;
+                if (EventList.SelectedIndex != -1)
+                    insertIndex = EventList.SelectedIndex;
+
+                eventGroup.OriginalEvents.Insert(insertIndex, text);
+                eventGroup.TranslatedEvents.Insert(insertIndex, TranslateEvent(text));
             }
         }
         private void EditEvent_Click(object sender, RoutedEventArgs e)
@@ -847,34 +827,6 @@ namespace CrazyStorm
                 ChangeTextBoxState(ChangeTime, true);
             else if (value <= 0)
                 ChangeTime.Text = "1";
-        }
-        private void ExecuteTime_PreviewLostKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
-        {
-            ChangeTextBoxState(ExecuteTime, false);
-            ExecuteTime.Text = ExecuteTime.Text.Trim();
-            string input = ExecuteTime.Text;
-            if (String.IsNullOrEmpty(input))
-                return;
-
-            int value;
-            if (!int.TryParse(input, out value))
-                ChangeTextBoxState(ExecuteTime, true);
-            else if (value < 0)
-                ExecuteTime.Text = "0";
-        }
-        private void LoopTime_PreviewLostKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
-        {
-            ChangeTextBoxState(LoopTime, false);
-            LoopTime.Text = LoopTime.Text.Trim();
-            string input = LoopTime.Text;
-            if (String.IsNullOrEmpty(input))
-                return;
-
-            int value;
-            if (!int.TryParse(input, out value))
-                ChangeTextBoxState(LoopTime, true);
-            else if (value <= 0)
-                LoopTime.Text = "1";
         }
         private void Condition_PreviewLostKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
         {

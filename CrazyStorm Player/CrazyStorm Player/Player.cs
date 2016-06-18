@@ -37,7 +37,7 @@ namespace CrazyStorm_Player
                 Color4 color = new Color4(particle.Opacity / 100, particle.RGB.r / 255, particle.RGB.g / 255, particle.RGB.b / 255);
                 Rectangle rect = new Rectangle((int)particle.Type.StartPoint.x, (int)particle.Type.StartPoint.y, 
                     particle.Type.Width, particle.Type.Height);
-                if (particle.Type.Id >= 1000)
+                if (particle.Type.Id >= ParticleType.DefaultTypeIndex)
                     Sprite.Draw(defaultTextures[0], rect, color);
             };
             ParticleManager.OnCurveParticleDraw += (curveParticle) =>
@@ -57,6 +57,7 @@ namespace CrazyStorm_Player
             {
                 defaultParticleTypes = new List<ParticleType>();
                 ParticleType.LoadDefaultTypes(reader, defaultParticleTypes);
+                EventManager.DefaultTypes = defaultParticleTypes;
             }
             using (FileStream stream = new FileStream("debug.bg", FileMode.Open))
             {

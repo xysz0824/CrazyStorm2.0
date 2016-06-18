@@ -343,7 +343,7 @@
   <ItemGroup>
     <Resource Include="Images\accelerated.png" />
     <Resource Include="Images\decelerated.png" />
-    <Resource Include="Images\fixed.png" />
+    <Resource Include="Images\instant.png" />
     <Resource Include="Images\linear.png" />
   </ItemGroup>
   <ItemGroup>

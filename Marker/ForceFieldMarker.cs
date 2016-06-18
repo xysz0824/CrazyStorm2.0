@@ -29,15 +29,15 @@ namespace CrazyStorm
                 rect.SetValue(Canvas.TopProperty, (double)y - force.HalfHeight);
                 canvas.Children.Add(rect);
             }
-            else if (force.FieldShape == FieldShape.Ellipse)
+            else if (force.FieldShape == FieldShape.Circle)
             {
                 var ellipse = new Ellipse();
                 ellipse.Width = force.HalfWidth * 2;
-                ellipse.Height = force.HalfHeight * 2;
+                ellipse.Height = force.HalfWidth * 2;
                 ellipse.Fill = new SolidColorBrush(Colors.Red);
                 ellipse.Opacity = 0.5f;
                 ellipse.SetValue(Canvas.LeftProperty, (double)x - force.HalfWidth);
-                ellipse.SetValue(Canvas.TopProperty, (double)y - force.HalfHeight);
+                ellipse.SetValue(Canvas.TopProperty, (double)y - force.HalfWidth);
                 canvas.Children.Add(ellipse);
             }
             switch (force.ForceType)

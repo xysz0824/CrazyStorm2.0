@@ -22,7 +22,7 @@ namespace CrazyStorm.Core
         Linear,
         Accelerated,
         Decelerated,
-        Fixed
+        Instant
     }
     public class EventInfo
     {
@@ -44,7 +44,6 @@ namespace CrazyStorm.Core
         public string resultValue;
         public string changeMode;
         public string changeTime;
-        public string executeTime;
         public string specialEvent;
         public string arguments;
     }
@@ -69,8 +68,6 @@ namespace CrazyStorm.Core
 
                 eventString += string.Format("{0} {1} {2}, {3}, {4}", eventInfo.resultProperty, eventInfo.changeType,
                     eventInfo.resultValue, eventInfo.changeMode, eventInfo.changeTime);
-                if (eventInfo.executeTime != null)
-                    eventString += ", " + eventInfo.executeTime;
             }
             else
                 eventString += string.Format("{0}({1})", eventInfo.specialEvent, eventInfo.arguments);
@@ -116,27 +113,15 @@ namespace CrazyStorm.Core
                 for (int i = 0; i < split.Length; ++i)
                 {
                     split[i] = split[i].Trim();
-                    if (split[i] == "Linear" || split[i] == "Fixed" ||
+                    if (split[i] == "Linear" || split[i] == "Instant" ||
                         split[i] == "Accelerated" || split[i] == "Decelerated")
                     {
                         info.changeMode = split[i];
-                        if (split.Length > i + 2)
-                        {
-                            info.changeTime = split[i + 1].Trim();
-                            string temp = split[i + 2].Trim();
-                            info.leftType = (PropertyType)temp[temp.Length - 3];
-                            info.rightType = (PropertyType)temp[temp.Length - 2];
-                            info.resultType = (PropertyType)temp[temp.Length - 1];
-                            info.executeTime = temp.Remove(temp.Length - 3, 3);
-                        }
-                        else
-                        {
-                            string temp = split[i + 1].Trim();
-                            info.leftType = (PropertyType)temp[temp.Length - 3];
-                            info.rightType = (PropertyType)temp[temp.Length - 2];
-                            info.resultType = (PropertyType)temp[temp.Length - 1];
-                            info.changeTime = temp.Remove(temp.Length - 3, 3);
-                        }
+                        string temp = split[i + 1].Trim();
+                        info.leftType = (PropertyType)temp[temp.Length - 3];
+                        info.rightType = (PropertyType)temp[temp.Length - 2];
+                        info.resultType = (PropertyType)temp[temp.Length - 1];
+                        info.changeTime = temp.Remove(temp.Length - 3, 3);
                         break;
                     }
                     else
@@ -180,7 +165,7 @@ namespace CrazyStorm.Core
             keywordMap["Linear"] = EventKeyword.Linear;
             keywordMap["Accelerated"] = EventKeyword.Accelerated;
             keywordMap["Decelerated"] = EventKeyword.Decelerated;
-            keywordMap["Fixed"] = EventKeyword.Fixed;
+            keywordMap["Instant"] = EventKeyword.Instant;
             List<byte> bytes = new List<byte>();
             bytes.AddRange(PlayDataHelper.GetBytes(eventInfo.hasCondition));
             if (eventInfo.hasCondition)
@@ -221,20 +206,15 @@ namespace CrazyStorm.Core
 
                 bytes.Add((byte)keywordMap[eventInfo.changeMode]);
                 bytes.AddRange(PlayDataHelper.GetBytes(int.Parse(eventInfo.changeTime)));
-                if (eventInfo.executeTime != null)
-                    bytes.AddRange(PlayDataHelper.GetBytes(int.Parse(eventInfo.executeTime)));
-                else
-                    bytes.AddRange(PlayDataHelper.GetBytes(0));
             }
             else
             {
                 bytes.AddRange(PlayDataHelper.GetBytes(eventInfo.specialEvent));
                 string[] split = eventInfo.arguments.Split(',');
                 bytes.AddRange(PlayDataHelper.GetBytes(split.Length));
-                if (eventInfo.specialEvent == "Loop" && split.Length == 2)
+                if (eventInfo.specialEvent == "Loop")
                 {
-                    bytes.AddRange(PlayDataHelper.GetBytes(split[0]));
-                    byte[] compiledExpression = compileFunc(split[1]);
+                    byte[] compiledExpression = compileFunc(split[0]);
                     bytes.AddRange(PlayDataHelper.GetBytes(compiledExpression.Length));
                     bytes.AddRange(compiledExpression);
                 }

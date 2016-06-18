@@ -391,13 +391,13 @@ namespace CrazyStorm
         }
         private void TypeCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (TypeCombo.SelectedItem != null && !initializeType)
+            if (TypeCombo.SelectedItem != null)
             {
                 var selectedType = TypeCombo.SelectedItem as ParticleType;
                 //Refresh color combobox.
                 InitializeColorCombo();
                 //Show default type preview
-                if (selectedType.Id >= 1000)
+                if (selectedType.Id >= ParticleType.DefaultTypeIndex)
                 {
                     TypeComboTip.Visibility = Visibility.Visible;
                     TypeImageRect.Width = selectedType.Width;
@@ -412,11 +412,10 @@ namespace CrazyStorm
                 else
                     TypeComboTip.Visibility = Visibility.Hidden;
             }
-            initializeType = false;
         }
         private void ColorCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (ColorCombo.SelectedItem != null)
+            if (ColorCombo.SelectedItem != null && !initializeType)
             {
                 var selectedType = TypeCombo.SelectedItem as ParticleType;
                 var selectedColor = ColorCombo.SelectedItem as ComboBoxItem;
@@ -429,6 +428,7 @@ namespace CrazyStorm
                     }
                 }
             }
+            initializeType = false;
         }
         private void AddComponentEvent_Click(object sender, RoutedEventArgs e)
         {

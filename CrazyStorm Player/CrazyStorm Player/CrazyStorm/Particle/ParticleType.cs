@@ -9,6 +9,8 @@ namespace CrazyStorm_Player.CrazyStorm
 {
     class ParticleType : IPlayData, IRebuildReference<FileResource>
     {
+        public const int DefaultTypeIndex = 1000;
+
         public FileResource Image { get; set; }
         public int ImageID { get; private set; }
         public int Id { get; set; }
@@ -60,7 +62,7 @@ namespace CrazyStorm_Player.CrazyStorm
             {
                 string[] splits = reader.ReadLine().Split('_');
                 var particleType = new ParticleType();
-                particleType.Id = i + 1000;
+                particleType.Id = i + DefaultTypeIndex;
                 particleType.StartPoint = new Vector2(float.Parse(splits[1]), float.Parse(splits[2]));
                 particleType.Width = int.Parse(splits[3]);
                 particleType.Height = int.Parse(splits[4]);

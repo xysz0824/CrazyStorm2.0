@@ -16,8 +16,8 @@ namespace CrazyStorm_Player.CrazyStorm
     }
     abstract class ParticleBase : PropertyContainer, IPlayData, IRebuildReference<ParticleType>
     {
-        private Vector2 pspeedVector;
-        private Vector2 pacspeedVector;
+        Vector2 pspeedVector;
+        Vector2 pacspeedVector;
         public Emitter Emitter { get; set; }
         public ParticleQuadTree QuadTree { get; set; }
         public bool Alive { get; set; }
@@ -316,22 +316,12 @@ namespace CrazyStorm_Player.CrazyStorm
                 MathHelper.SetVector2(ref pspeedVector, PSpeed, PSpeedAngle);
                 MathHelper.SetVector2(ref pacspeedVector, PAcspeed, PAcspeedAngle);
             }
-            //TODO
             QuadTree.Update(this);
             PSpeedVector += PAcspeedVector;
+            if (PSpeedVector != Vector2.Zero)
+                PSpeedAngle = MathHelper.GetDegree(PSpeedVector);
+
             PPosition += PSpeedVector;
-            double vf = 0;
-            if (PSpeedVector.y != 0)
-            {
-                vf = Math.PI / 2 - Math.Atan(PSpeedVector.x / PSpeedVector.y);
-                if (PSpeedVector.y < 0)
-                    vf += Math.PI;
-            }
-            else
-                vf = PSpeedVector.x >= 0 ? 0 : Math.PI;
-            
-            if (PSpeedVector.x != 0 && PSpeedVector.y != 0)
-                PSpeedAngle = (float)MathHelper.RadToDeg(vf);
             
             for (int i = 0; i < ParticleEventGroups.Count; ++i)
                 ParticleEventGroups[i].Execute(this);
@@ -340,6 +330,7 @@ namespace CrazyStorm_Player.CrazyStorm
         }
         public virtual void CopyTo(ParticleBase particleBase)
         {
+            particleBase.Emitter = Emitter;
             particleBase.Alive = Alive;
             particleBase.Type = Type;
             particleBase.TypeID = TypeID;

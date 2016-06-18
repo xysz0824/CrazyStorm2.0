@@ -111,17 +111,14 @@
                         <RadioButton Name="Decelerated" HorizontalAlignment="Center" Content="减速" Checked="Decelerated_Checked"></RadioButton>
                     </StackPanel>
                     <StackPanel Margin="6,0">
-                        <Image Source="/CrazyStorm;component/Images/fixed.png" Width="96" Height="48"></Image>
-                        <RadioButton Name="Fixed" HorizontalAlignment="Center" Content="固定" Checked="Fixed_Checked"></RadioButton>
+                        <Image Source="/CrazyStorm;component/Images/instant.png" Width="96" Height="48"></Image>
+                        <RadioButton Name="Instant" HorizontalAlignment="Center" Content="瞬时" Checked="Instant_Checked"></RadioButton>
                     </StackPanel>
                 </StackPanel>
                 <StackPanel Orientation="Horizontal" Margin="0,1" HorizontalAlignment="Right">
                     <Label Content="变化时间" Margin="4,0,0,0"/>
                     <TextBox x:Name="ChangeTime" Width="50" VerticalContentAlignment="Center" VerticalAlignment="Center" HorizontalAlignment="Center" Height="26" 
                              PreviewLostKeyboardFocus="ChangeTime_PreviewLostKeyboardFocus" MaxLines="1" MaxLength="9"/>
-                    <Label  Content="执行次数" />
-                    <TextBox Name="ExecuteTime" Width="50" VerticalContentAlignment="Center" VerticalAlignment="Center" HorizontalAlignment="Center" Height="25" 
-                             PreviewLostKeyboardFocus="ExecuteTime_PreviewLostKeyboardFocus" MaxLength="9" MaxLines="1"/>
                 </StackPanel>
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,1">
                     <Button x:Name="AddEvent" Width ="40" Content="添加" Margin="2,0" Click="AddEvent_Click" />
@@ -145,9 +142,6 @@
                     <Slider Name="VolumeSlider" VerticalAlignment="Center" AutoToolTipPlacement="BottomRight" Maximum="100" Value="50" IsSnapToTickEnabled="True" SmallChange="1"></Slider>
                 </DockPanel>
                 <DockPanel Name="LoopPanel" Margin="0,1" Visibility="Collapsed">
-                    <Label Content="循环次数" />
-                    <TextBox Name="LoopTime" Width="50" VerticalContentAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Center" Height="25" 
-                             PreviewLostKeyboardFocus="LoopTime_PreviewLostKeyboardFocus" MaxLines="1" MaxLength="9"/>
                     <Label Content="中止条件" />
                     <TextBox Name="StopCondition" VerticalContentAlignment="Center" PreviewLostKeyboardFocus="StopCondition_PreviewLostKeyboardFocus" />
                 </DockPanel>

@@ -27,6 +27,7 @@ namespace CrazyStorm.Core
     }
     public class ParticleType : INotifyPropertyChanged, IXmlData, IRebuildReference<FileResource>, IPlayData
     {
+        public const int DefaultTypeIndex = 1000;
         public event PropertyChangedEventHandler PropertyChanged;
 
         #region Private Members
@@ -322,7 +323,7 @@ namespace CrazyStorm.Core
             while (!reader.EndOfStream)
             {
                 string[] splits = reader.ReadLine().Split('_');
-                var particleType = new ParticleType(i + 1000);
+                var particleType = new ParticleType(i + DefaultTypeIndex);
                 particleType.Name = splits[0];
                 particleType.StartPoint = new Vector2(float.Parse(splits[1]), float.Parse(splits[2]));
                 particleType.Width = int.Parse(splits[3]);

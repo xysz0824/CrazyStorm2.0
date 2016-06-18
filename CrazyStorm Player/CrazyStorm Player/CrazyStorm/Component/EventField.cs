@@ -3,13 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.IO;
+using CrazyStorm.Core;
 
 namespace CrazyStorm_Player.CrazyStorm
 {
     public enum FieldShape
     {
         Rectangle,
-        Ellipse
+        Circle
     }
     public enum Reach
     {
@@ -25,6 +26,10 @@ namespace CrazyStorm_Player.CrazyStorm
         public Reach Reach { get; set; }
         public string TargetName { get; set; }
         public IList<EventGroup> EventFieldEventGroups { get; private set; }
+        public EventField()
+        {
+            EventFieldEventGroups = new List<EventGroup>();
+        }
         public override void LoadPlayData(BinaryReader reader)
         {
             base.LoadPlayData(reader);
@@ -44,45 +49,66 @@ namespace CrazyStorm_Player.CrazyStorm
         }
         public override bool PushProperty(string propertyName)
         {
-            base.PushProperty(propertyName);
-            throw new NotImplementedException();
+            if (base.PushProperty(propertyName))
+                return true;
+
+            switch (propertyName)
+            {
+                case "HalfWidth":
+                    VM.PushFloat(HalfWidth);
+                    return true;
+                case "HalfHeight":
+                    VM.PushFloat(HalfHeight);
+                    return true;
+                case "FieldShape":
+                    VM.PushEnum((int)FieldShape);
+                    return true;
+                case "Reach":
+                    VM.PushEnum((int)Reach);
+                    return true;
+                case "TargetName":
+                    VM.PushString(TargetName);
+                    return true;
+            }
+            return false;
         }
         public override bool SetProperty(string propertyName)
         {
-            base.SetProperty(propertyName);
-            throw new NotImplementedException();
+            if (base.SetProperty(propertyName))
+                return true;
+
+            switch (propertyName)
+            {
+                case "HalfWidth":
+                    HalfWidth = VM.PopFloat();
+                    return true;
+                case "HalfHeight":
+                    HalfHeight = VM.PopFloat();
+                    return true;
+                case "FieldShape":
+                    FieldShape = (FieldShape)VM.PopEnum();
+                    return true;
+                case "Reach":
+                    Reach = (Reach)VM.PopEnum();
+                    return true;
+                case "TargetName":
+                    TargetName = VM.PopString();
+                    return true;
+            }
+            return false;
         }
         public override bool Update(int currentFrame)
         {
             if (!base.Update(currentFrame))
                 return false;
 
-            //TODO
-            List<ParticleBase> results = ParticleManager.SearchByRect(
-                (int)(Position.x - HalfWidth), (int)(Position.x + HalfWidth),
-                (int)(Position.y - HalfHeight), (int)(Position.y + HalfHeight));
-            foreach (Particle particle in results)
+            if (BindingTarget == null || BindingTarget.Particles.Count == 0)
+                Update(Position);
+            else
             {
-                if (particle.IgnoreMask)
-                    continue;
-
-                if (FieldShape == FieldShape.Ellipse)
-                {
-
-                }
-                switch (Reach)
-                {
-                    case Reach.All:
-                        break;
-                    case Reach.Layer:
-                        break;
-                    case Reach.Name:
-                        break;
-                }
+                foreach (var particle in BindingTarget.Particles)
+                    Update(particle.PPosition);
             }
-            //for (int i = 0; i < EventFieldEventGroups.Count; ++i)
-            //    EventFieldEventGroups[i].Execute();
-
             return true;
         }
         public override void Reset()
@@ -94,6 +120,40 @@ namespace CrazyStorm_Player.CrazyStorm
             FieldShape = initialState.FieldShape;
             Reach = initialState.Reach;
             TargetName = initialState.TargetName;
+        }
+        void Update(Vector2 position)
+        {
+            base.ExecuteExpression("HalfWidth");
+            base.ExecuteExpression("HalfHeight");
+            List<ParticleBase> results = ParticleManager.SearchByRect(position.x - HalfWidth, position.x + HalfWidth,
+                position.y - HalfHeight, position.y + HalfHeight);
+            foreach (Particle particle in results)
+            {
+                if (particle.IgnoreMask)
+                    continue;
+
+                switch (Reach)
+                {
+                    case Reach.Layer:
+                        if (particle.Emitter.LayerName != TargetName && particle.Emitter.LayerName != LayerName)
+                            continue;
+
+                        break;
+                    case Reach.Name:
+                        if (particle.Emitter.Name != TargetName)
+                            continue;
+
+                        break;
+                }
+                if (FieldShape == FieldShape.Circle)
+                {
+                    Vector2 v = position - particle.PPosition;
+                    if (Math.Sqrt(v.x * v.x + v.y * v.y) > HalfWidth)
+                        continue;
+                }
+                for (int i = 0; i < EventFieldEventGroups.Count; ++i)
+                    EventFieldEventGroups[i].Execute(particle);
+            }
         }
     }
 }

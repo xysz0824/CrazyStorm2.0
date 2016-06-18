@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.IO;
+using CrazyStorm.Core;
 
 namespace CrazyStorm_Player.CrazyStorm
 {
@@ -42,41 +43,83 @@ namespace CrazyStorm_Player.CrazyStorm
         }
         public override bool PushProperty(string propertyName)
         {
-            base.PushProperty(propertyName);
-            throw new NotImplementedException();
+            if (base.PushProperty(propertyName))
+                return true;
+
+            switch (propertyName)
+            {
+                case "HalfWidth":
+                    VM.PushFloat(HalfWidth);
+                    return true;
+                case "HalfHeight":
+                    VM.PushFloat(HalfHeight);
+                    return true;
+                case "FieldShape":
+                    VM.PushEnum((int)FieldShape);
+                    return true;
+                case "Reach":
+                    VM.PushEnum((int)Reach);
+                    return true;
+                case "TargetName":
+                    VM.PushString(TargetName);
+                    return true;
+                case "Force":
+                    VM.PushFloat(Force);
+                    return true;
+                case "Direction":
+                    VM.PushFloat(Direction);
+                    return true;
+                case "ForceType":
+                    VM.PushEnum((int)ForceType);
+                    return true;
+            }
+            return false;
         }
         public override bool SetProperty(string propertyName)
         {
-            base.SetProperty(propertyName);
-            throw new NotImplementedException();
+            if (base.SetProperty(propertyName))
+                return true;
+
+            switch (propertyName)
+            {
+                case "HalfWidth":
+                    HalfWidth = VM.PopFloat();
+                    return true;
+                case "HalfHeight":
+                    HalfHeight = VM.PopFloat();
+                    return true;
+                case "FieldShape":
+                    FieldShape = (FieldShape)VM.PopEnum();
+                    return true;
+                case "Reach":
+                    Reach = (Reach)VM.PopEnum();
+                    return true;
+                case "TargetName":
+                    TargetName = VM.PopString();
+                    return true;
+                case "Force":
+                    Force = VM.PopFloat();
+                    return true;
+                case "Direction":
+                    Direction = VM.PopFloat();
+                    return true;
+                case "ForceType":
+                    ForceType = (ForceType)VM.PopEnum();
+                    return true;
+            }
+            return false;
         }
         public override bool Update(int currentFrame)
         {
             if (!base.Update(currentFrame))
                 return false;
 
-            //TODO
-            List<ParticleBase> results = ParticleManager.SearchByRect(
-                (int)(Position.x - HalfWidth), (int)(Position.x + HalfWidth), 
-                (int)(Position.y - HalfHeight), (int)(Position.y + HalfHeight));
-            foreach (Particle particle in results)
+            if (BindingTarget == null || BindingTarget.Particles.Count == 0)
+                Update(Position);
+            else
             {
-                if (particle.IgnoreForce)
-                    continue;
-
-                if (FieldShape == FieldShape.Ellipse)
-                {
-
-                }
-                switch (Reach)
-                {
-                    case Reach.All:
-                        break;
-                    case Reach.Layer:
-                        break;
-                    case Reach.Name:
-                        break;
-                }
+                foreach (var particle in BindingTarget.Particles)
+                    Update(particle.PPosition);
             }
             return true;
         }
@@ -92,6 +135,58 @@ namespace CrazyStorm_Player.CrazyStorm
             Force = initialState.Force;
             Direction = initialState.Direction;
             ForceType = initialState.ForceType;
+        }
+        void Update(Vector2 position)
+        {
+            base.ExecuteExpression("HalfWidth");
+            base.ExecuteExpression("HalfHeight");
+            base.ExecuteExpression("Force");
+            base.ExecuteExpression("Direction");
+            List<ParticleBase> results = ParticleManager.SearchByRect(position.x - HalfWidth, position.x + HalfWidth,
+                position.y - HalfHeight, position.y + HalfHeight);
+            foreach (Particle particle in results)
+            {
+                if (particle.IgnoreForce)
+                    continue;
+
+                switch (Reach)
+                {
+                    case Reach.Layer:
+                        if (particle.Emitter.LayerName != TargetName && particle.Emitter.LayerName != LayerName)
+                            continue;
+
+                        break;
+                    case Reach.Name:
+                        if (particle.Emitter.Name != TargetName)
+                            continue;
+
+                        break;
+                }
+                if (FieldShape == FieldShape.Circle)
+                {
+                    Vector2 v = position - particle.PPosition;
+                    if (Math.Sqrt(v.x * v.x + v.y * v.y) > HalfWidth)
+                        continue;
+                }
+                switch (ForceType)
+                {
+                    case ForceType.Direction:
+                        Vector2 v = new Vector2();
+                        MathHelper.SetVector2(ref v, Force / particle.Mass, Direction);
+                        particle.PSpeedVector += v;
+                        break;
+                    case ForceType.Inner:
+                        v = position - particle.PPosition;
+                        float d = (float)Math.Sqrt(v.x * v.x + v.y * v.y);
+                        particle.PSpeedVector += v / d * (Force / particle.Mass);
+                        break;
+                    case ForceType.Outer:
+                        v = particle.PPosition - position;
+                        d = (float)Math.Sqrt(v.x * v.x + v.y * v.y);
+                        particle.PSpeedVector += v / d * (Force / particle.Mass);
+                        break;
+                }
+            }
         }
     }
 }

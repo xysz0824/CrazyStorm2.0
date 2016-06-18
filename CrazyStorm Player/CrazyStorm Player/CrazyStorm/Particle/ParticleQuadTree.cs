@@ -7,7 +7,7 @@ namespace CrazyStorm_Player.CrazyStorm
 {
     class ParticleQuadTree
     {
-        private const int MaxDepth = 4;
+        const int MaxDepth = 4;
         public LinkedList<ParticleBase> Particles { get; private set; }
         public ParticleQuadTree[] children { get; private set; }
         public int Left { get; set; }
@@ -68,7 +68,7 @@ namespace CrazyStorm_Player.CrazyStorm
                 children[3].Insert(particleBase, depth + 1);
             }
         }
-        public List<ParticleBase> SearchByRect(int left, int right, int top, int bottom)
+        public List<ParticleBase> SearchByRect(float left, float right, float top, float bottom)
         {
             List<ParticleBase> results = new List<ParticleBase>();
             if (Particles != null)
@@ -76,16 +76,16 @@ namespace CrazyStorm_Player.CrazyStorm
                 results.AddRange(Particles);
                 return results;
             }
-            if (children[0] != null && right > children[0].OriginX && bottom > children[0].OriginY)
+            if (children[0] != null && right > OriginX && bottom > OriginY)
                 results.AddRange(children[0].SearchByRect(left, right, top, bottom));
             
-            if (children[1] != null && right > children[1].OriginX && top <= children[1].OriginY)
+            if (children[1] != null && right > OriginX && top <= OriginY)
                 results.AddRange(children[1].SearchByRect(left, right, top, bottom));
             
-            if (children[2] != null && left <= children[2].OriginX && top <= children[2].OriginY)
+            if (children[2] != null && left <= OriginX && top <= OriginY)
                 results.AddRange(children[2].SearchByRect(left, right, top, bottom));
             
-            if (children[3] != null && left <= children[3].OriginX && bottom > children[3].OriginY)
+            if (children[3] != null && left <= OriginX && bottom > OriginY)
                 results.AddRange(children[3].SearchByRect(left, right, top, bottom));
             
             return results;

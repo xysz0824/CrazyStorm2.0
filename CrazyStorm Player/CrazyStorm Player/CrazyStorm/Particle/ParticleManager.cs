@@ -55,7 +55,7 @@ namespace CrazyStorm_Player.CrazyStorm
         {
             particleQuadTree.Insert(particleBase);
         }
-        public static List<ParticleBase> SearchByRect(int left, int right, int top, int bottom)
+        public static List<ParticleBase> SearchByRect(float left, float right, float top, float bottom)
         {
             return particleQuadTree.SearchByRect(left, right, top, bottom);
         }

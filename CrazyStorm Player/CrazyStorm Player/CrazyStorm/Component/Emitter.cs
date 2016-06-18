@@ -37,6 +37,7 @@ namespace CrazyStorm_Player.CrazyStorm
                 }
                 //particle
                 Template.LoadPlayData(emitterReader);
+                Template.Emitter = this;
                 //emitterEventGroups
                 PlayDataHelper.LoadObjectList(EmitterEventGroups, emitterReader);
                 Template.ParticleEventGroups = EmitterEventGroups;
@@ -109,7 +110,7 @@ namespace CrazyStorm_Player.CrazyStorm
             if (!base.Update(currentFrame))
                 return false;
 
-            if (currentFrame > 0 && currentFrame % EmitCycle == 0)
+            if (currentFrame % EmitCycle == 0)
                 EmitParticle();
 
             return true;
@@ -166,7 +167,6 @@ namespace CrazyStorm_Player.CrazyStorm
                 angle += increment;
                 Template.PSpeedAngle = angle;
                 ParticleBase newParticle = ParticleManager.GetParticle(Template);
-                newParticle.Emitter = this;
                 newParticle.ParticleEventGroups = EmitterEventGroups;
                 Particles.AddLast(newParticle);
             }

@@ -22,7 +22,6 @@ namespace CrazyStorm.Core
         public int size;
         public RebounderShape rebounderShape;
         public float rotation;
-        public int collisionTime;
     }
     public class Rebounder : Component
     {
@@ -49,12 +48,6 @@ namespace CrazyStorm.Core
         {
             get { return rebounderData.rotation; }
             set { rebounderData.rotation = value; }
-        }
-        [IntProperty(0, int.MaxValue)]
-        public int CollisionTime
-        {
-            get { return rebounderData.collisionTime; }
-            set { rebounderData.collisionTime = value; }
         }
         public IList<EventGroup> RebounderEventGroups { get { return rebounderEventGroups; } }
         #endregion

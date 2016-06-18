@@ -55,6 +55,7 @@ namespace CrazyStorm_Player.CrazyStorm
                             //Back to start position of components block.
                             componentsReader.BaseStream.Position = startPosition;
                             component.LoadPlayData(componentsReader);
+                            component.LayerName = Name;
                             Components.Add(component);
                         }
                     }

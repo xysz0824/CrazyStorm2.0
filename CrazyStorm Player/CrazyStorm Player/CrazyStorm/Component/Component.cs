@@ -14,11 +14,22 @@ namespace CrazyStorm_Player.CrazyStorm
         Vector2 acspeedVector;
         protected Component initialState;
         public int Id { get; set; }
+        public string LayerName { get; set; }
         public string Name { get; set; }
         public int CurrentFrame { get; set; }
         public int BeginFrame { get; set; }
         public int TotalFrame { get; set; }
         public Vector2 Position { get; set; }
+        public Vector2 SpeedVector
+        {
+            get { return speedVector; }
+            set { speedVector = value; }
+        }
+        public Vector2 AcspeedVector
+        {
+            get { return acspeedVector; }
+            set { acspeedVector = value; }
+        }
         public float Speed { get; set; }
         public float SpeedAngle { get; set; }
         public float Acspeed { get; set; }
@@ -96,7 +107,7 @@ namespace CrazyStorm_Player.CrazyStorm
         }
         public Vector2 GetAbsolutePosition()
         {
-            if (Parent != null)
+            if (Parent != null && parentAbsolutePosition == Vector2.Zero)
             {
                 parentAbsolutePosition = Parent.GetAbsolutePosition();
                 return Position + parentAbsolutePosition;
@@ -106,8 +117,11 @@ namespace CrazyStorm_Player.CrazyStorm
         public Vector2 GetRelativePosition()
         {
             if (Parent != null)
-                return Position - parentAbsolutePosition;
-
+            {
+                Vector2 relative = Position - parentAbsolutePosition;
+                parentAbsolutePosition = Vector2.Zero;
+                return relative;
+            }
             return Position;
         }
         public override bool PushProperty(string propertyName)
@@ -234,19 +248,8 @@ namespace CrazyStorm_Player.CrazyStorm
             if (BindingTarget == null || BindingTarget.Particles.Count == 0)
             {
                 speedVector += acspeedVector;
+                SpeedAngle = MathHelper.GetDegree(speedVector);
                 Position += speedVector;
-                double vf = 0;
-                if (speedVector.y != 0)
-                {
-                    vf = Math.PI / 2 - Math.Atan(speedVector.x / speedVector.y);
-                    if (speedVector.y < 0)
-                        vf += Math.PI;
-                }
-                else
-                {
-                    vf = speedVector.x >= 0 ? 0 : Math.PI;
-                }
-                SpeedAngle = (float)MathHelper.RadToDeg(vf);
                 for (int i = 0; i < ComponentEventGroups.Count; ++i)
                     ComponentEventGroups[i].Execute(this);
             }

@@ -91,7 +91,7 @@ namespace CrazyStorm
         }
         public static void DrawFan(Canvas canvas, int x ,int y, float radius, float startAngle, float endAngle, Color color, float opacity)
         {
-            if (endAngle - startAngle < 360)
+            if (Math.Abs(endAngle - startAngle) < 360)
             {
                 var startRad = startAngle / 180 * Math.PI;
                 var endRad = endAngle / 180 * Math.PI;

@@ -40,7 +40,10 @@ namespace CrazyStorm_Player.CrazyStorm
             if (Condition == null || VM.PopBool())
             {
                 for (int i = 0; i < Events.Count; ++i)
-                    EventHelper.Execute(propertyContainer, Events[i]);
+                {
+                    if (EventHelper.Execute(propertyContainer, Events[i]))
+                        i = -1;
+                }
             }
         }
     }

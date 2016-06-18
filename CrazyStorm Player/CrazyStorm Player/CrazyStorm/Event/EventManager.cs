@@ -24,7 +24,7 @@ namespace CrazyStorm_Player.CrazyStorm
                 ratio *= ratio;
             else if (ChangeMode == EventKeyword.Decelerated)
                 ratio *= (2 - ratio);
-            else if (ChangeMode == EventKeyword.Fixed)
+            else if (ChangeMode == EventKeyword.Instant)
                 ratio = 1;
 
             switch (PropertyType)
@@ -65,6 +65,7 @@ namespace CrazyStorm_Player.CrazyStorm
     class EventManager
     {
         static List<EventExecutor> executorList;
+        public static List<ParticleType> DefaultTypes { get; set; }
         public static void AddEvent(PropertyContainer propertyContainer, EventInfo eventInfo)
         {
             if (executorList == null)
@@ -191,9 +192,12 @@ namespace CrazyStorm_Player.CrazyStorm
             }
             executor.InitialValue = initialValue;
             executor.TargetValue = targetValue;
-            executorList.Add(executor);
+            if (executor.ChangeMode == EventKeyword.Instant)
+                executor.Update();
+            else
+                executorList.Add(executor);
         }
-        public static void ExecuteSpecialEvent(PropertyContainer propertyContainer, string eventName, string[] arguments, 
+        public static bool ExecuteSpecialEvent(PropertyContainer propertyContainer, string eventName, string[] arguments, 
             VMInstruction[] argumentExpression)
         {
             switch (eventName)
@@ -204,10 +208,27 @@ namespace CrazyStorm_Player.CrazyStorm
                 case "PlaySound":
                     break;
                 case "Loop":
+                    VM.Execute(propertyContainer, argumentExpression);
+                    if (!VM.PopBool())
+                        return true;
+
                     break;
                 case "ChangeType":
+                    int typeId = int.Parse(arguments[0]);
+                    if (typeId >= ParticleType.DefaultTypeIndex)
+                    {
+                        if (propertyContainer is Emitter)
+                            (propertyContainer as Emitter).Template.Type = DefaultTypes[typeId - ParticleType.DefaultTypeIndex];
+                        else if (propertyContainer is ParticleBase)
+                            (propertyContainer as ParticleBase).Type = DefaultTypes[typeId - ParticleType.DefaultTypeIndex];
+                    }
+                    else
+                    {
+                        //TODO
+                    }
                     break;
             }
+            return false;
         }
         public static void Update()
         {

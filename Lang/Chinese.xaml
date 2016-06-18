@@ -110,7 +110,7 @@
     <sys:String x:Key="FieldShapeStr">场形状</sys:String>
     <sys:String x:Key="RebounderShapeStr">反弹板形状</sys:String>
     <sys:String x:Key="ReachStr">范围</sys:String>
-    <sys:String x:Key="TargetNameStr">目标组件名称</sys:String>
+    <sys:String x:Key="TargetNameStr">目标名称</sys:String>
     <sys:String x:Key="SizeStr">尺寸</sys:String>
     <sys:String x:Key="RotationStr">旋转角</sys:String>
     <sys:String x:Key="CollisionTimeStr">反弹次数</sys:String>
@@ -120,7 +120,7 @@
     <sys:String x:Key="LinearStr">线性</sys:String>
     <sys:String x:Key="AcceleratedStr">加速</sys:String>
     <sys:String x:Key="DeceleratedStr">减速</sys:String>
-    <sys:String x:Key="FixedStr">固定</sys:String>
+    <sys:String x:Key="FixedStr">瞬时</sys:String>
     <sys:String x:Key="ChangeToStr">变化到</sys:String>
     <sys:String x:Key="IncreaseStr">增加</sys:String>
     <sys:String x:Key="DecreaseStr">减少</sys:String>

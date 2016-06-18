@@ -23,7 +23,7 @@ namespace CrazyStorm_Player.CrazyStorm
         Linear,
         Accelerated,
         Decelerated,
-        Fixed
+        Instant
     }
     enum PropertyType : byte
     {
@@ -67,7 +67,6 @@ namespace CrazyStorm_Player.CrazyStorm
         public VMInstruction[] resultExpression;
         public EventKeyword changeMode;
         public int changeTime;
-        public int executeTime;
         public string specialEvent;
         public string[] arguments;
         public VMInstruction[] argumentExpression;
@@ -112,15 +111,13 @@ namespace CrazyStorm_Player.CrazyStorm
 
                     eventInfo.changeMode = (EventKeyword)reader.ReadByte();
                     eventInfo.changeTime = reader.ReadInt32();
-                    eventInfo.executeTime = reader.ReadInt32();
                 }
                 else
                 {
                     eventInfo.specialEvent = PlayDataHelper.ReadString(reader);
                     int argumentCount = reader.ReadInt32();
-                    if (eventInfo.specialEvent == "Loop" && argumentCount == 2)
+                    if (eventInfo.specialEvent == "Loop")
                     {
-                        eventInfo.arguments = new string[] { PlayDataHelper.ReadString(reader) };
                         int length = reader.ReadInt32();
                         eventInfo.argumentExpression = VM.Decode(reader.ReadBytes(length));
                     }
@@ -165,7 +162,7 @@ namespace CrazyStorm_Player.CrazyStorm
             }
             return set;
         }
-        public static void Execute(PropertyContainer propertyContainer, EventInfo eventInfo)
+        public static bool Execute(PropertyContainer propertyContainer, EventInfo eventInfo)
         {
             if (eventInfo.hasCondition)
             {
@@ -181,13 +178,18 @@ namespace CrazyStorm_Player.CrazyStorm
                             eventInfo.rightType, eventInfo.rightValue);
                 }
                 if (!result)
-                    return;
+                    return false;
             }
             if (!eventInfo.isSpecialEvent)
+            {
                 EventManager.AddEvent(propertyContainer, eventInfo);
+                return false;
+            }
             else
-                EventManager.ExecuteSpecialEvent(propertyContainer, eventInfo.specialEvent, eventInfo.arguments, 
+            {
+                return EventManager.ExecuteSpecialEvent(propertyContainer, eventInfo.specialEvent, eventInfo.arguments,
                     eventInfo.argumentExpression);
+            }
         }
         static bool TestCondition(PropertyContainer propertyContainer, string property, EventOperator operators, 
             PropertyType type, TypeSet value)

@@ -126,18 +126,7 @@ namespace CrazyStorm_Player.CrazyStorm
                                 break;
                             case "angle":
                                 v = VM.PopVector2() - VM.PopVector2();
-                                double vf = 0;
-                                if (v.y != 0)
-                                {
-                                    vf = Math.PI / 2 - Math.Atan(v.x / v.y);
-                                    if (v.y < 0) 
-                                        vf += Math.PI;
-                                }
-                                else
-                                {
-                                    vf = v.x >= 0 ? 0 : Math.PI;
-                                }
-                                VM.PushFloat((float)MathHelper.RadToDeg(vf));
+                                VM.PushFloat(MathHelper.GetDegree(v));
                                 break;
                             case "rand":
                                 float ratio = (float)random.NextDouble();

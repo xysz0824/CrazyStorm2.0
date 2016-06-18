@@ -15,7 +15,7 @@ namespace CrazyStorm.Core
     public enum FieldShape
     {
         Rectangle,
-        Ellipse
+        Circle
     }
     public enum Reach
     {
