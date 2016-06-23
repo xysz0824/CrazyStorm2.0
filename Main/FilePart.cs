@@ -41,6 +41,7 @@ namespace CrazyStorm
 
             file = new File();
             fileName = "Untitled";
+            filePath = string.Empty;
             InitializeSystem();
             saved = true;
         }

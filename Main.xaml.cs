@@ -65,6 +65,7 @@ namespace CrazyStorm
             InitializeFile();
             InitializeParticle();
             InitializeEdit();
+            InitializeScreen();
         }
         void InitializeFile()
         {
@@ -115,6 +116,11 @@ namespace CrazyStorm
             ComponentTree.ItemsSource = selectedParticle.ComponentTree;
             BindComponentItem.IsEnabled = false;
             UnbindComponentItem.IsEnabled = false;
+        }
+        void InitializeScreen()
+        {
+            aimRect = null;
+            aimComponent = null;
         }
         void UpdateSelectedStatus()
         {
