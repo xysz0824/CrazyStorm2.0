@@ -1,13 +1,12 @@
-﻿using Microsoft.Win32;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
+using Microsoft.Win32;
 using System.Management;
 
-namespace CrazyStorm
+namespace CrazyStorm.Common
 {
-    class EnviromentInfoHelper
+    public class EnvironmentInfoHelper
     {
         public static string ProcessorName
         {
@@ -32,8 +31,26 @@ namespace CrazyStorm
         {
             get
             {
-                string bit = Environment.Is64BitOperatingSystem ? "64" : "32";
-                return Environment.OSVersion + "(" + bit + "-bit)";
+                return Environment.OSVersion + "(" + OSBit + "-bit)";
+            }
+        }
+        public static string OSBit
+        {
+            get
+            {
+                ConnectionOptions oConn = new ConnectionOptions();
+                System.Management.ManagementScope oMs = new System.Management.ManagementScope("\\\\localhost", oConn);
+                System.Management.ObjectQuery oQuery = new System.Management.ObjectQuery("select AddressWidth from Win32_Processor");
+                ManagementObjectSearcher oSearcher = new ManagementObjectSearcher(oMs, oQuery);
+                ManagementObjectCollection oReturnCollection = oSearcher.Get();
+                string addressWidth = null;
+
+                foreach (ManagementObject oReturn in oReturnCollection)
+                {
+                    addressWidth = oReturn["AddressWidth"].ToString();
+                }
+
+                return addressWidth;
             }
         }
         public static string GraphicsCardName
@@ -54,6 +71,6 @@ namespace CrazyStorm
                 }
                 return string.Empty;
             }
-        } 
+        }
     }
 }

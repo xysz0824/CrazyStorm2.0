@@ -41,7 +41,7 @@
                                 <TextBox Name="Frames" Text="{Binding Path=Frames}" Width="50" Margin="0,1" VerticalContentAlignment="Center" TextChanged="Frames_TextChanged" MaxLength="9" MaxLines="1" />
                                 <Label Content="延迟" Margin="0,1" />
                                 <TextBox Text="{Binding Path=Delay}" Width="50" Margin="0,1" VerticalContentAlignment="Center" MaxLength="9" MaxLines="1"/>
-                                <Label Content="包围盒半径" Margin="0,1" />
+                                <Label Content="判定半径" Margin="0,1" />
                                 <TextBox Name="Radius"  Text="{Binding Path=Radius}" Width="50" Margin="0,1" VerticalContentAlignment="Center" MaxLength="9" MaxLines="1"/>
                                 <TextBlock Name="Diameter" Text="{Binding Path=Diameter}" Height="0" Width="0"/>
                                 <TextBlock Name="CircleBoxX" Text="{Binding Path=CircleBoxX}" Height="0" Width="0"/>

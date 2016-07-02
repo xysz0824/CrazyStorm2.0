@@ -94,9 +94,6 @@
     <Compile Include="Edit\Command\Layer\CopyLayerCommand.cs" />
     <Compile Include="Edit\Command\Component\PasteComponentCommand.cs" />
     <Compile Include="Edit\Command\Component\UnbindComponentCommand.cs" />
-    <Compile Include="Helper\HardwareInfoHelper.cs" />
-    <Compile Include="Helper\IniHelper.cs" />
-    <Compile Include="Helper\LogHelper.cs" />
     <Compile Include="Main\FilePart.cs" />
     <Compile Include="Main\PlayPart.cs" />
     <Compile Include="Marker\ComponentMarker.cs" />
@@ -112,6 +109,9 @@
     <Compile Include="Panel\PropertyGridItem.cs" />
     <Compile Include="Edit\Command\Property\SetPropertyCommand.cs" />
     <Compile Include="Helper\VisualHelper.cs" />
+    <Compile Include="Window\PlaySetting.xaml.cs">
+      <DependentUpon>PlaySetting.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Window\VariableComboBoxItem.cs" />
     <Page Include="Panel\FinderPanel.xaml">
       <SubType>Designer</SubType>
@@ -138,6 +138,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Panel\PropertyPanel.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Window\PlaySetting.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -251,9 +255,6 @@
     <Resource Include="Images\document-export.ico" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Images\configure-5.ico" />
-  </ItemGroup>
-  <ItemGroup>
     <Resource Include="Images\document-new-3.ico" />
   </ItemGroup>
   <ItemGroup>
@@ -335,6 +336,10 @@
     <Resource Include="Images\button-Rebounder.png" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="Common\Common.csproj">
+      <Project>{c7f105ce-aee2-4c95-96aa-21fc823620b5}</Project>
+      <Name>Common</Name>
+    </ProjectReference>
     <ProjectReference Include="Script\Expression.csproj">
       <Project>{cea93dc4-9ff2-4d90-b0bf-e1e0d8027223}</Project>
       <Name>Expression</Name>

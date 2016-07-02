@@ -59,18 +59,17 @@ namespace CrazyStorm
                 open.InitialDirectory = AppDomain.CurrentDomain.BaseDirectory;
                 open.Filter = (string)FindResource("BackGroundImageTypeStr");
                 if (open.ShowDialog() == System.Windows.Forms.DialogResult.OK)
-                    ImagePath.Text = open.FileName;
+                    BackgroundPath.Text = open.FileName;
             }
         }
         private void Button_Click(object sender, RoutedEventArgs e)
         {
             int width, height;
-            if (Int32.TryParse(ScreenWidth.Text, out width) 
-                && Int32.TryParse(ScreenHeight.Text, out height))
+            if (Int32.TryParse(ScreenWidth.Text, out width) && Int32.TryParse(ScreenHeight.Text, out height))
             {
                 config.ScreenWidth = width;
                 config.ScreenHeight = height;
-                config.ImagePath = ImagePath.Text;
+                config.BackgroundPath = BackgroundPath.Text;
                 if (GridOpen.IsChecked.HasValue && GridOpen.IsChecked.Value == true)
                     config.GridAlignment = true;
                 else

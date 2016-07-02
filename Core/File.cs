@@ -39,6 +39,7 @@ namespace CrazyStorm.Core
         #region Constructor
         public File()
         {
+            CurrentDirectory = string.Empty;
             particleSystems = new List<ParticleSystem>();
             particleSystems.Add(new ParticleSystem("Untitled"));
             images = new ObservableCollection<FileResource>();

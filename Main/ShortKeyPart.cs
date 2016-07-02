@@ -113,6 +113,9 @@ namespace CrazyStorm
                 case "SaveTo":
                     SaveTo();
                     break;
+                case "PlayCurrent":
+                    PlayCurrent();
+                    break;
             }
         }
         #endregion

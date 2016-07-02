@@ -1,26 +1,32 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.IO;
-using CrazyStorm.Core;
 
-namespace CrazyStorm
+namespace CrazyStorm.Common
 {
-    class LogHelper
+    public class LogHelper
     {
-        static readonly string logFilePath = "Log.txt";
-        public static void Clear()
+        static string logFilePath;
+        public static void Clear(string filePath, string title)
         {
+            logFilePath = filePath;
             using (StreamWriter writer = new StreamWriter(logFilePath, false, Encoding.UTF8))
             {
-                writer.WriteLine(VersionInfo.AppTitle + " Log");
+                writer.WriteLine(title + " Log");
                 writer.WriteLine("--------------------------------------------------------------");
-                writer.WriteLine("CPU : " + EnviromentInfoHelper.ProcessorName);
-                writer.WriteLine("Graphics Card : " + EnviromentInfoHelper.GraphicsCardName);
-                writer.WriteLine("System Version : " + EnviromentInfoHelper.OSVersion);
+                writer.WriteLine("CPU : " + EnvironmentInfoHelper.ProcessorName);
+                writer.WriteLine("Graphics Card : " + EnvironmentInfoHelper.GraphicsCardName);
+                writer.WriteLine("System Version : " + EnvironmentInfoHelper.OSVersion);
                 writer.WriteLine(".NET Version : " + Environment.Version);
                 writer.WriteLine("--------------------------------------------------------------");
+            }
+        }
+        public static void Info(string infoMessage)
+        {
+            using (StreamWriter writer = new StreamWriter(logFilePath, true, Encoding.UTF8))
+            {
+                writer.WriteLine(string.Format("{0} - [INFO]{1}", DateTime.Now, infoMessage));
             }
         }
         public static void Error(string errorMessage)

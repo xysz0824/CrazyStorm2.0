@@ -19,20 +19,27 @@ namespace CrazyStorm_Player
         List<Texture> defaultTextures;
         List<ParticleType> defaultParticleTypes;
         CrazyStorm.File file;
+        Vector2 customCenter;
         protected override void OnInitialize()
         {
             WindowTitle = VersionInfo.AppTitle;
-            ParticleManager.Initialize(WindowWidth, WindowHeight, 50, 10000, 1000);
+            int particleMaximum = Int32.Parse(Environment.GetCommandLineArgs()[2]);
+            int curveParticleMaximum = Int32.Parse(Environment.GetCommandLineArgs()[3]);
+            ParticleManager.Initialize(WindowWidth, WindowHeight, 50, particleMaximum, curveParticleMaximum);
+            if (!bool.Parse(Environment.GetCommandLineArgs()[4]))
+                customCenter = new Vector2(Int32.Parse(Environment.GetCommandLineArgs()[5]), 
+                    Int32.Parse(Environment.GetCommandLineArgs()[6]));
             ParticleManager.OnParticleDraw += (particle) =>
             {
                 if (particle.Type == null)
                     return;
 
-                Vector2 center = new Vector2(particle.Type.CenterPoint.x, particle.Type.CenterPoint.y);
+                Vector2 center = new Vector2(WindowWidth / 2, WindowHeight / 2) + customCenter;
+                Vector2 imageCenter = new Vector2(particle.Type.CenterPoint.x, particle.Type.CenterPoint.y);
                 Vector2 scale = new Vector2(particle.WidthScale, particle.HeightScale);
-                Vector2 position = new Vector2(particle.PPosition.x + WindowWidth / 2 - center.X, 
-                    particle.PPosition.y + WindowHeight / 2 - center.Y);
-                Sprite.Transform = Matrix.Transformation2D(Vector2.Zero, 0, scale, center,
+                Vector2 position = new Vector2(particle.PPosition.x + center.X - imageCenter.X, 
+                    particle.PPosition.y + center.Y - imageCenter.Y);
+                Sprite.Transform = Matrix.Transformation2D(Vector2.Zero, 0, scale, imageCenter,
                     (float)MathHelper.DegToRad(particle.PRotation), position);
                 Color4 color = new Color4(particle.Opacity / 100, particle.RGB.r / 255, particle.RGB.g / 255, particle.RGB.b / 255);
                 Rectangle rect = new Rectangle((int)particle.Type.StartPoint.x, (int)particle.Type.StartPoint.y, 
@@ -59,7 +66,7 @@ namespace CrazyStorm_Player
                 ParticleType.LoadDefaultTypes(reader, defaultParticleTypes);
                 EventManager.DefaultTypes = defaultParticleTypes;
             }
-            using (FileStream stream = new FileStream("debug.bg", FileMode.Open))
+            using (FileStream stream = new FileStream(Environment.GetCommandLineArgs()[1], FileMode.Open))
             {
                 var reader = new BinaryReader(stream);
                 //Play file use UTF-8 encoding

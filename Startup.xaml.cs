@@ -16,6 +16,8 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Windows.Threading;
+using CrazyStorm.Core;
+using CrazyStorm.Common;
 
 namespace CrazyStorm
 {
@@ -62,7 +64,7 @@ namespace CrazyStorm
             {
                 string[] args = Environment.GetCommandLineArgs();
                 Environment.CurrentDirectory = System.IO.Path.GetDirectoryName(args[0]);
-                LogHelper.Clear();
+                LogHelper.Clear("Log.txt", VersionInfo.AppTitle);
                 mainWindow = new Main();
                 mainWindow.Initailize();
                 if (args.Length >= 2)

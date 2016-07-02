@@ -9,6 +9,7 @@ using System.Linq;
 using System.Text;
 using System.ComponentModel;
 using CrazyStorm.Core;
+using CrazyStorm.Common;
 
 namespace CrazyStorm
 {
@@ -20,9 +21,17 @@ namespace CrazyStorm
         IniHelper iniHelper;
         int screenWidth;
         int screenHeight;
-        string imagePath = string.Empty;
-        bool gridAlignment = true;
-        bool centerDisplay = true;
+        string backgroundPath;
+        bool gridAlignment;
+        bool centerDisplay;
+        string playerPath;
+        int particleMaximum;
+        int curveParticleMaximum;
+        bool screenCenter;
+        int centerX;
+        int centerY;
+        string selfImagePath;
+        string selfSetting;
         #endregion
 
         #region Public Members
@@ -54,14 +63,14 @@ namespace CrazyStorm
             }
         }
         public int ScreenHeightOver2 { get { return screenHeight / 2; } }
-        public string ImagePath
+        public string BackgroundPath
         {
-            get { return imagePath; }
+            get { return backgroundPath; }
             set 
             { 
-                imagePath = value != null ? value : imagePath;
+                backgroundPath = value != null ? value : backgroundPath;
                 if (PropertyChanged != null)
-                    PropertyChanged(this, new PropertyChangedEventArgs("ImagePath"));
+                    PropertyChanged(this, new PropertyChangedEventArgs("BackgroundPath"));
             }
         }
         public Vector2 GridSize { get { return new Vector2(32, 32); } }
@@ -87,6 +96,94 @@ namespace CrazyStorm
                     PropertyChanged(this, new PropertyChangedEventArgs("CenterDisplay"));
             }
         }
+        public string PlayerPath
+        {
+            get { return playerPath; }
+            set
+            {
+                playerPath = value != null ? value : playerPath;
+                if (PropertyChanged != null)
+                    PropertyChanged(this, new PropertyChangedEventArgs("PlayerPath"));
+            }
+        }
+        public int ParticleMaximum
+        {
+            get { return particleMaximum; }
+            set
+            {
+                particleMaximum = value > 0 ? value : particleMaximum;
+                if (PropertyChanged != null)
+                {
+                    PropertyChanged(this, new PropertyChangedEventArgs("ParticleMaximum"));
+                }
+            }
+        }
+        public int CurveParticleMaximum
+        {
+            get { return curveParticleMaximum; }
+            set
+            {
+                curveParticleMaximum = value > 0 ? value : curveParticleMaximum;
+                if (PropertyChanged != null)
+                {
+                    PropertyChanged(this, new PropertyChangedEventArgs("CurveParticleMaximum"));
+                }
+            }
+        }
+        public bool ScreenCenter
+        {
+            get { return screenCenter; }
+            set
+            {
+                screenCenter = value;
+                if (PropertyChanged != null)
+                    PropertyChanged(this, new PropertyChangedEventArgs("ScreenCenter"));
+            }
+        }
+        public int CenterX
+        {
+            get { return centerX; }
+            set
+            {
+                centerX = value;
+                if (PropertyChanged != null)
+                {
+                    PropertyChanged(this, new PropertyChangedEventArgs("CenterX"));
+                }
+            }
+        }
+        public int CenterY
+        {
+            get { return centerY; }
+            set
+            {
+                centerY = value;
+                if (PropertyChanged != null)
+                {
+                    PropertyChanged(this, new PropertyChangedEventArgs("CenterY"));
+                }
+            }
+        }
+        public string SelfImagePath
+        {
+            get { return selfImagePath; }
+            set
+            {
+                selfImagePath = value != null ? value : selfImagePath;
+                if (PropertyChanged != null)
+                    PropertyChanged(this, new PropertyChangedEventArgs("SelfImagePath"));
+            }
+        }
+        public string SelfSetting
+        {
+            get { return selfSetting; }
+            set
+            {
+                selfSetting = value != null ? value : selfSetting;
+                if (PropertyChanged != null)
+                    PropertyChanged(this, new PropertyChangedEventArgs("SelfSetting"));
+            }
+        }
         #endregion
 
         #region Constructor
@@ -105,17 +202,33 @@ namespace CrazyStorm
         {
             screenWidth = iniHelper.ReadValue("Screen", "ScreenWidth", 640);
             screenHeight = iniHelper.ReadValue("Screen", "ScreenHeight", 480);
-            imagePath = iniHelper.ReadValue("Screen", "ImagePath", string.Empty);
+            backgroundPath = iniHelper.ReadValue("Screen", "BackgroundPath", string.Empty);
             gridAlignment = iniHelper.ReadValue("Screen", "GridAlignment", true);
             centerDisplay = iniHelper.ReadValue("Screen", "CenterDisplay", true);
+            playerPath = iniHelper.ReadValue("Play", "PlayerPath", string.Empty);
+            particleMaximum = iniHelper.ReadValue("Play", "ParticleMaximum", 10000);
+            curveParticleMaximum = iniHelper.ReadValue("Play", "CurveParticleMaximum", 200);
+            screenCenter = iniHelper.ReadValue("Play", "ScreenCenter", true);
+            centerX = iniHelper.ReadValue("Play", "CenterX", 0);
+            centerY = iniHelper.ReadValue("Play", "CenterY", 0);
+            selfImagePath = iniHelper.ReadValue("Play", "SelfImagePath", string.Empty);
+            selfSetting = iniHelper.ReadValue("Play", "SelfSetting", string.Empty);
         }
         public void Save()
         {
             iniHelper.WriteValue("Screen", "ScreenWidth", screenWidth);
             iniHelper.WriteValue("Screen", "ScreenHeight", screenHeight);
-            iniHelper.WriteValue("Screen", "ImagePath", imagePath);
+            iniHelper.WriteValue("Screen", "BackgroundPath", backgroundPath);
             iniHelper.WriteValue("Screen", "GridAlignment", gridAlignment);
             iniHelper.WriteValue("Screen", "CenterDisplay", centerDisplay);
+            iniHelper.WriteValue("Play", "PlayerPath", playerPath);
+            iniHelper.WriteValue("Play", "ParticleMaximum", particleMaximum);
+            iniHelper.WriteValue("Play", "CurveParticleMaximum", curveParticleMaximum);
+            iniHelper.WriteValue("Play", "ScreenCenter", screenCenter);
+            iniHelper.WriteValue("Play", "CenterX", centerX);
+            iniHelper.WriteValue("Play", "CenterY", centerY);
+            iniHelper.WriteValue("Play", "SelfImagePath", selfImagePath);
+            iniHelper.WriteValue("Play", "SelfSetting", selfSetting);
         }
         #endregion
     }

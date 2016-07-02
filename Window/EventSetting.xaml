@@ -1,6 +1,7 @@
 ﻿<Window x:Class="CrazyStorm.EventSetting"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local ="clr-namespace:CrazyStorm"
         Title="事件设置" Height="650" Width="450" WindowStyle="ToolWindow" WindowStartupLocation="CenterScreen" ResizeMode="NoResize" Background="#FFF0F0F0">
     <StackPanel>
         <GroupBox Name="GroupBox" Header="事件组">

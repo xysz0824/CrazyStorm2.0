@@ -148,7 +148,8 @@
     <sys:String x:Key="SaveTipStr">要保存当前文件吗？</sys:String>
     <sys:String x:Key="ImageTypeStr">PNG图像(*.png)|*.png</sys:String>
     <sys:String x:Key="SoundTypeStr">WAV音效(*.wav)|*.wav</sys:String>
-    <sys:String x:Key="BackGroundImageTypeStr">JPEG图像(*.jpg)|*.jpg|PNG图像(*.png)|*.png|BMP图像(*.bmp)|*.bmp</sys:String>
+    <sys:String x:Key="BackGroundImageTypeStr">JPEG图像(*.jpg)|*.jpg|PNG图像(*.png)|*.png</sys:String>
+    <sys:String x:Key="PlayerTypeStr">播放器程序(*.exe)|*.exe</sys:String>
     <sys:String x:Key="ProjectFileExtensionStr">弹幕工程文件(*.bgp)|*.bgp</sys:String>
     <sys:String x:Key="DoubleClickTipStr">继续双击进入属性面板</sys:String>
     <sys:String x:Key="ComponentUnitStr">个组件</sys:String>

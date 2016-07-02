@@ -182,6 +182,7 @@
         <RoutedUICommand x:Key="Open" Text="Open"/>
         <RoutedUICommand x:Key="Save" Text="Save"/>
         <RoutedUICommand x:Key="SaveTo" Text="SaveTo"/>
+        <RoutedUICommand x:Key="PlayCurrent" Text="PlayCurrent"/>
     </Window.Resources>
     <Window.InputBindings>
         <KeyBinding  Key="Delete" Command="{StaticResource DelComponent}" />
@@ -202,6 +203,7 @@
         <KeyBinding   Modifiers="Control"  Key="O" Command="{StaticResource Open}" />
         <KeyBinding   Modifiers="Control"  Key="S" Command="{StaticResource Save}" />
         <KeyBinding   Modifiers="Control+Shift"  Key="S" Command="{StaticResource SaveTo}" />
+        <KeyBinding   Key="F5" Command="{StaticResource PlayCurrent}" />
     </Window.InputBindings>
     <Window.CommandBindings>
         <CommandBinding Command="{StaticResource DelComponent}"
@@ -258,17 +260,20 @@
         <CommandBinding Command="{StaticResource SaveTo}"
                                             CanExecute="CommandBinding_CanExecute"
                                             Executed="CommandBinding_Executed" />
+        <CommandBinding Command="{StaticResource PlayCurrent}"
+                                            CanExecute="CommandBinding_CanExecute"
+                                            Executed="CommandBinding_Executed" />
     </Window.CommandBindings>
     <DockPanel Height="Auto" Name="dockPanel1" Width="Auto">
         <!-- Top Menu -->
-        <Menu Height="23" Name="menu1" Width="Auto" DockPanel.Dock="Top" Padding="2,0,0,0" IsEnabled="True">
+        <Menu Height="23" Name="menu1" Width="Auto" DockPanel.Dock="Top" Padding="2,0,0,0" IsEnabled="True" Margin="0">
             <Menu.Background>
                 <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
                     <GradientStop Color="White" Offset="0" />
                     <GradientStop Color="Gainsboro" Offset="1" />
                 </LinearGradientBrush>
             </Menu.Background>
-            <MenuItem Header="{StaticResource FileStr}">
+            <MenuItem  Header="{StaticResource FileStr}" Padding="10,0">
                 <MenuItem Name="NewItem" Header="{StaticResource NewStr}" InputGestureText="Ctrl+N" Click="NewItem_Click" />
                 <MenuItem Name="OpenItem" Header="{StaticResource OpenStr}" InputGestureText="Ctrl+O" Click="OpenItem_Click" />
                 <MenuItem Name="SaveItem" Header="{StaticResource SaveStr}" InputGestureText="Ctrl+S" Click="SaveItem_Click" />
@@ -278,7 +283,7 @@
                 <Separator/>
                 <MenuItem Header="{StaticResource ExitStr}" InputGestureText="Alt+F4"/>
             </MenuItem>
-            <MenuItem Header="{StaticResource EditStr}">
+            <MenuItem Header="{StaticResource EditStr}" Padding="10,0">
                 <MenuItem Name="UndoItem" Header="{StaticResource UndoStr}" InputGestureText="Ctrl+Z" Click="UndoItem_Click"/>
                 <MenuItem Name="RedoItem" Header="{StaticResource RedoStr}" InputGestureText="Ctrl+Y" Click="RedoItem_Click"/>
                 <Separator/>
@@ -290,12 +295,12 @@
                 <MenuItem Name="FindItem" Header="{StaticResource FindStr}" InputGestureText="Ctrl+F" Click="FindItem_Click"  />
                 <MenuItem Header="{StaticResource SelectAllStr}" InputGestureText="Ctrl+A" Click="SelectAllItem_Click"/>
             </MenuItem>
-            <MenuItem Header="{StaticResource ResourceStr}">
+            <MenuItem Header="{StaticResource ResourceStr}" Padding="10,0">
                 <MenuItem Header="{StaticResource AddImageStr}" Click="AddImageItem_Click"/>
                 <MenuItem Header="{StaticResource AddSoundStr}" Click="AddSound_Click"/>
                 <MenuItem Header="{StaticResource AddGlobalStr}" Click="AddGlobalItem_Click"/>
             </MenuItem>
-            <MenuItem Name="ParticleMenu" Header="{StaticResource ParticleStr}" Click="ParticleMenu_Click" >
+            <MenuItem Name="ParticleMenu" Header="{StaticResource ParticleStr}" Padding="10,0" Click="ParticleMenu_Click" >
                 <MenuItem Name="AddParticleItem" Header="{StaticResource AddParticleStr}" />
                 <MenuItem Name="DeleteParticleItem" Header="{StaticResource DeleteParticleStr}" />
                 <Separator/>
@@ -303,7 +308,7 @@
                 <Separator/>
                 <MenuItem Name="SetParticleItem" Header="{StaticResource SetParticleStr}" />
             </MenuItem>
-            <MenuItem Name="LayerMenu"  Header="{StaticResource LayerStr}" Click="LayerMenu_Click">
+            <MenuItem Name="LayerMenu"  Header="{StaticResource LayerStr}" Padding="10,0" Click="LayerMenu_Click">
                 <MenuItem Name ="AddLayerItem" Header="{StaticResource AddLayerStr}" />
                 <MenuItem Name="DeleteLayerItem" Header="{StaticResource DeleteLayerStr}" />
                 <Separator/>
@@ -311,18 +316,17 @@
                 <Separator/>
                 <MenuItem Name="SetLayerItem" Header="{StaticResource SetLayerStr}" />
             </MenuItem>
-            <MenuItem Header="{StaticResource ComponentStr}" >
+            <MenuItem Header="{StaticResource ComponentStr}" Padding="10,0">
                 <MenuItem Name="BindComponentItem" Header="{StaticResource BindComponentStr}" InputGestureText="Ctrl+B" Click="BindComponentItem_Click"/>
                 <MenuItem Name="UnbindComponentItem" Header="{StaticResource UnbindComponentStr}" InputGestureText="Ctrl+U" Click="UnbindComponentItem_Click"/>
             </MenuItem>
-            <MenuItem Header="{StaticResource PlayStr}" >
+            <MenuItem Header="{StaticResource PlayStr}" Padding="10,0">
                 <MenuItem Header="{StaticResource GeneratePlayFileStr}" Click="GeneratePlayFile_Click" />
-                <MenuItem Header="{StaticResource PlayCurrentStr}" InputGestureText="F5"/>
-                <MenuItem Header="{StaticResource PlayAllStr}" InputGestureText="F6"/>
+                <MenuItem Header="{StaticResource PlayCurrentStr}" InputGestureText="F5" Click="PlayItem_Click"/>
                 <Separator/>
-                <MenuItem Header="{StaticResource SetPlayStr}" />
+                <MenuItem Header="{StaticResource SetPlayStr}" Click="PlaySettingItem_Click"/>
             </MenuItem>
-            <MenuItem Header="{StaticResource HelpStr}" >
+            <MenuItem Header="{StaticResource HelpStr}" Padding="10,0">
                 <MenuItem Header="{StaticResource TutorialStr}" InputGestureText="F1"/>
                 <MenuItem Header="{StaticResource AboutStr}" />
             </MenuItem>
@@ -382,10 +386,6 @@
             <Button Name="PlayButton" IsDefault="False" IsCancel="False" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" 
                     ToolTip="{StaticResource PlayStr}" Click="PlayItem_Click">
                 <Image Source="Images/arrow-right-3.ico" Stretch="None" />
-            </Button>
-            <Button Name="SettingButton" IsDefault="False" IsCancel="False" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" 
-                    ToolTip="{StaticResource SetPlayStr}">
-                <Image Source="Images/configure-5.ico" Stretch="None" />
             </Button>
         </ToolBar>
         <!-- Main Grid -->
