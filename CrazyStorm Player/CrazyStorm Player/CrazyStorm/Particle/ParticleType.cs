@@ -27,6 +27,7 @@ namespace CrazyStorm_Player.CrazyStorm
         public int Radius { get; set; }
         public ParticleType()
         {
+            Frames = 1;
             ImageID = -1;
         }
         public void LoadPlayData(BinaryReader reader)

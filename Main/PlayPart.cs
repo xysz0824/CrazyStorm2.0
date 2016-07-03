@@ -142,8 +142,17 @@ namespace CrazyStorm
                     MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
+            int particleSystemIndex = 0;
+            for (int i = 0; i < file.ParticleSystems.Count; ++i)
+            {
+                if (selectedParticle == file.ParticleSystems[i])
+                {
+                    particleSystemIndex = i;
+                    break;
+                }
+            }
             ProcessStartInfo ps = new ProcessStartInfo(config.PlayerPath);
-            ps.Arguments = "\"" + genPath + "\" ";
+            ps.Arguments = "\"" + genPath + "\" " + particleSystemIndex + " ";
             ps.Arguments += config.ParticleMaximum + " " + config.CurveParticleMaximum + " ";
             ps.Arguments += config.ScreenCenter + " " + config.CenterX + " " + config.CenterY + " ";
             ps.Arguments += "\"" + config.SelfImagePath + "\" \"" + config.SelfSetting + "\"";

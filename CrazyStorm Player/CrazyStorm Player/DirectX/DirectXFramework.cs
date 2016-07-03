@@ -103,14 +103,14 @@ namespace CrazyStorm_Player.DirectX
             if (form.WindowState == FormWindowState.Minimized)
                 return;
 
-            OnUnLoad();
+            OnLost();
             if (context != null)
             {
                 context.PresentParameters.BackBufferWidth = 0;
                 context.PresentParameters.BackBufferHeight = 0;
                 context.Device.Reset(context.PresentParameters);
             }
-            OnLoad();
+            OnReset();
         }
         void HandleResize()
         {
@@ -131,7 +131,7 @@ namespace CrazyStorm_Player.DirectX
                 {
                     if (args.Alt && args.KeyCode == Keys.Enter)
                     {
-                        OnUnLoad();
+                        OnLost();
                         Windowed = !Windowed;
                         if (context != null)
                         {
@@ -143,7 +143,7 @@ namespace CrazyStorm_Player.DirectX
 
                             context.Device.Reset(context.PresentParameters);
                         }
-                        OnLoad();
+                        OnReset();
                     }
                 };
         }
@@ -177,7 +177,7 @@ namespace CrazyStorm_Player.DirectX
                 {
                     context.Device.Reset(context.PresentParameters);
                     deviceLost = false;
-                    OnLoad();
+                    OnReset();
                 }
                 else
                 {
@@ -197,7 +197,7 @@ namespace CrazyStorm_Player.DirectX
             {
                 if (ex.ResultCode == ResultCode.DeviceLost)
                 {
-                    OnUnLoad();
+                    OnLost();
                     deviceLost = true;
                     return;
                 }
@@ -227,16 +227,17 @@ namespace CrazyStorm_Player.DirectX
 
         #region Abstract Methods
         protected abstract void OnInitialize();
-        protected virtual void OnLoad()
+        protected abstract void OnLoad();
+        protected abstract void OnUpdate();
+        protected abstract void OnDraw();
+        protected virtual void OnReset()
         {
             sprite.OnResetDevice();
         }
-        protected virtual void OnUnLoad()
+        protected virtual void OnLost()
         {
             sprite.OnLostDevice();
         }
-        protected abstract void OnUpdate();
-        protected abstract void OnDraw();
         #endregion
 
         #region Public Methods
@@ -254,7 +255,7 @@ namespace CrazyStorm_Player.DirectX
                     if (!formResizing)
                         Draw();
                 });
-            OnUnLoad();
+            OnLost();
         }
         public void Dispose()
         {

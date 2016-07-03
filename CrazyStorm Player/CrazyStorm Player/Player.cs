@@ -18,34 +18,39 @@ namespace CrazyStorm_Player
     {
         List<Texture> defaultTextures;
         List<ParticleType> defaultParticleTypes;
+        Dictionary<int, Texture> customTextures;
         CrazyStorm.File file;
+        int selectedParticleSystemIndex;
         Vector2 customCenter;
         protected override void OnInitialize()
         {
             WindowTitle = VersionInfo.AppTitle;
-            int particleMaximum = Int32.Parse(Environment.GetCommandLineArgs()[2]);
-            int curveParticleMaximum = Int32.Parse(Environment.GetCommandLineArgs()[3]);
+            selectedParticleSystemIndex = Int32.Parse(Environment.GetCommandLineArgs()[2]);
+            int particleMaximum = Int32.Parse(Environment.GetCommandLineArgs()[3]);
+            int curveParticleMaximum = Int32.Parse(Environment.GetCommandLineArgs()[4]);
             ParticleManager.Initialize(WindowWidth, WindowHeight, 50, particleMaximum, curveParticleMaximum);
-            if (!bool.Parse(Environment.GetCommandLineArgs()[4]))
-                customCenter = new Vector2(Int32.Parse(Environment.GetCommandLineArgs()[5]), 
-                    Int32.Parse(Environment.GetCommandLineArgs()[6]));
+            if (!bool.Parse(Environment.GetCommandLineArgs()[5]))
+                customCenter = new Vector2(Int32.Parse(Environment.GetCommandLineArgs()[6]), 
+                    Int32.Parse(Environment.GetCommandLineArgs()[7]));
+            
             ParticleManager.OnParticleDraw += (particle) =>
             {
                 if (particle.Type == null)
                     return;
 
+                ParticleType type = particle.Type;
                 Vector2 center = new Vector2(WindowWidth / 2, WindowHeight / 2) + customCenter;
-                Vector2 imageCenter = new Vector2(particle.Type.CenterPoint.x, particle.Type.CenterPoint.y);
+                Vector2 imageCenter = new Vector2(type.CenterPoint.x, type.CenterPoint.y);
                 Vector2 scale = new Vector2(particle.WidthScale, particle.HeightScale);
-                Vector2 position = new Vector2(particle.PPosition.x + center.X - imageCenter.X, 
-                    particle.PPosition.y + center.Y - imageCenter.Y);
-                Sprite.Transform = Matrix.Transformation2D(Vector2.Zero, 0, scale, imageCenter,
-                    (float)MathHelper.DegToRad(particle.PRotation), position);
+                Vector2 position = new Vector2(particle.PPosition.x + center.X - imageCenter.X, particle.PPosition.y + center.Y - imageCenter.Y);
+                Sprite.Transform = Matrix.Transformation2D(Vector2.Zero, 0, scale, imageCenter, (float)MathHelper.DegToRad(particle.PRotation), position);
                 Color4 color = new Color4(particle.Opacity / 100, particle.RGB.r / 255, particle.RGB.g / 255, particle.RGB.b / 255);
-                Rectangle rect = new Rectangle((int)particle.Type.StartPoint.x, (int)particle.Type.StartPoint.y, 
-                    particle.Type.Width, particle.Type.Height);
-                if (particle.Type.Id >= ParticleType.DefaultTypeIndex)
+                int offset = particle.PCurrentFrame / (type.Delay + 1) % type.Frames;
+                Rectangle rect = new Rectangle((int)type.StartPoint.x + offset * type.Width, (int)type.StartPoint.y, type.Width, type.Height);
+                if (type.Id >= ParticleType.DefaultTypeIndex)
                     Sprite.Draw(defaultTextures[0], rect, color);
+                else
+                    Sprite.Draw(customTextures[type.Image.Id], rect, color);
             };
             ParticleManager.OnCurveParticleDraw += (curveParticle) =>
             {
@@ -57,7 +62,7 @@ namespace CrazyStorm_Player
         }
         protected override void OnLoad()
         {
-            base.OnLoad();
+            //Load default textures and types
             defaultTextures = new List<Texture>();
             defaultTextures.Add(Texture.FromFile(Device, "Resources/Default/barrages.png", Usage.None, Pool.Managed));
             using (StreamReader reader = new StreamReader("Resources/Default/set.txt"))
@@ -66,6 +71,7 @@ namespace CrazyStorm_Player
                 ParticleType.LoadDefaultTypes(reader, defaultParticleTypes);
                 EventManager.DefaultTypes = defaultParticleTypes;
             }
+            //Load play file
             using (FileStream stream = new FileStream(Environment.GetCommandLineArgs()[1], FileMode.Open))
             {
                 var reader = new BinaryReader(stream);
@@ -84,15 +90,18 @@ namespace CrazyStorm_Player
                         throw new NotSupportedException();
                 }
             }
-            file.ParticleSystems[0].Reset();
-        }
-        protected override void OnUnLoad()
-        {
-            base.OnUnLoad();
+            //Load custom textures and types
+            Environment.CurrentDirectory = Path.GetDirectoryName(Environment.GetCommandLineArgs()[1]);
+            customTextures = new Dictionary<int, Texture>();
+            foreach (var image in file.Images)
+                customTextures[image.Id] = Texture.FromFile(Device, image.Path, Usage.None, Pool.Managed);
+
+            EventManager.CustomTypes = file.ParticleSystems[selectedParticleSystemIndex].CustomTypes;
+            file.ParticleSystems[selectedParticleSystemIndex].Reset();
         }
         protected override void OnUpdate()
         {
-            file.ParticleSystems[0].Update();
+            file.ParticleSystems[selectedParticleSystemIndex].Update();
             ParticleManager.Update();
             EventManager.Update();
         }

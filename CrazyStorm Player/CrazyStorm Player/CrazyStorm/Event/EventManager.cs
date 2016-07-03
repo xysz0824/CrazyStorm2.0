@@ -13,7 +13,8 @@ namespace CrazyStorm_Player.CrazyStorm
     class EventManager
     {
         static List<EventExecutor> executorList;
-        public static List<ParticleType> DefaultTypes { get; set; }
+        public static IList<ParticleType> DefaultTypes { get; set; }
+        public static IList<ParticleType> CustomTypes { get; set; }
         public static void AddEvent(PropertyContainer propertyContainer, EventInfo eventInfo)
         {
             if (executorList == null)
@@ -173,7 +174,10 @@ namespace CrazyStorm_Player.CrazyStorm
                     }
                     else
                     {
-                        //TODO
+                        if (propertyContainer is Emitter)
+                            (propertyContainer as Emitter).Template.Type = CustomTypes[typeId];
+                        else if (propertyContainer is ParticleBase)
+                            (propertyContainer as ParticleBase).Type = CustomTypes[typeId];
                     }
                     break;
             }
