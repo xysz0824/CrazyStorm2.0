@@ -140,7 +140,7 @@ namespace CrazyStorm
                 //Select specific color.
                 InitializeColorCombo();
                 for (int i = 0; i < ColorCombo.Items.Count; ++i)
-                    if (type.Color.ToString() == (string)((ColorCombo.Items[i] as ComboBoxItem).Content))
+                    if ((string)FindResource(type.Color.ToString() + "Str") == (string)((ColorCombo.Items[i] as ComboBoxItem).Content))
                     {
                         ColorCombo.SelectedIndex = i;
                         break;
@@ -419,7 +419,8 @@ namespace CrazyStorm
                 var selectedColor = ColorCombo.SelectedItem as ComboBoxItem;
                 foreach (var item in types)
                 {
-                    if (item.Name == selectedType.Name && item.Color.ToString() == (string)selectedColor.Content)
+                    if (item.Name == selectedType.Name && 
+                        (string)FindResource(item.Color.ToString() + "Str") == (string)selectedColor.Content)
                     {
                         (component as Emitter).Particle.Type = item;
                         break;

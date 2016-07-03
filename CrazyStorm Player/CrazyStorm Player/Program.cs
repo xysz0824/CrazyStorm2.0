@@ -17,6 +17,9 @@ namespace CrazyStorm_Player
     {
         static void Main(string[] args)
         {
+            if (args.Length == 0)
+                return;
+
             LogHelper.Clear("Player Log.txt", VersionInfo.AppTitle);
             AppDomain.CurrentDomain.UnhandledException +=
                 new UnhandledExceptionEventHandler(CurrentDomain_UnhandledException);
