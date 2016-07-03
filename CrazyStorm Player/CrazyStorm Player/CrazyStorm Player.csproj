@@ -95,6 +95,7 @@
     <Compile Include="CrazyStorm\Component\ForceField.cs" />
     <Compile Include="CrazyStorm\Component\MultiEmitter.cs" />
     <Compile Include="CrazyStorm\Component\Rebounder.cs" />
+    <Compile Include="CrazyStorm\Event\EventExecutor.cs" />
     <Compile Include="CrazyStorm\Event\EventGroup.cs" />
     <Compile Include="CrazyStorm\Event\EventHelper.cs" />
     <Compile Include="CrazyStorm\Event\EventManager.cs" />

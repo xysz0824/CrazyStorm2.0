@@ -128,6 +128,9 @@ namespace CrazyStorm_Player.CrazyStorm
         {
             switch (propertyName)
             {
+                case "Name":
+                    VM.PushString(Name);
+                    return true;
                 case "CurrentFrame":
                     VM.PushInt(CurrentFrame);
                     return true;
@@ -183,6 +186,9 @@ namespace CrazyStorm_Player.CrazyStorm
         {
             switch (propertyName)
             {
+                case "Name":
+                    Name = VM.PopString();
+                    return true;
                 case "CurrentFrame":
                     CurrentFrame = VM.PopInt();
                     return true;

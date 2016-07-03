@@ -81,6 +81,7 @@
     <sys:String x:Key="EmitCycleStr">发射周期</sys:String>
     <sys:String x:Key="EmitAngleStr">发射角</sys:String>
     <sys:String x:Key="EmitRangeStr">发射范围</sys:String>
+    <sys:String x:Key="PCurrentFrameStr">粒子当前帧</sys:String>
     <sys:String x:Key="PPositionStr">粒子坐标</sys:String>
     <sys:String x:Key="MaxLifeStr">生命</sys:String>
     <sys:String x:Key="WidthScaleStr">宽比</sys:String>

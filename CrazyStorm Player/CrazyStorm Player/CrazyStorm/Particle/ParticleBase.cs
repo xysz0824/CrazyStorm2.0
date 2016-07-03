@@ -24,7 +24,7 @@ namespace CrazyStorm_Player.CrazyStorm
         public ParticleType Type { get; set; }
         public int TypeID { get; set; }
         public int MaxLife { get; set; }
-        public int CurrentFrame { get; set; }
+        public int PCurrentFrame { get; set; }
         public Vector2 PPosition { get; set; }
         public float WidthScale { get; set; }
         public RGB RGB { get; set; }
@@ -69,7 +69,7 @@ namespace CrazyStorm_Player.CrazyStorm
                 using (BinaryReader dataReader = PlayDataHelper.GetBlockReader(particleBaseReader))
                 {
                     MaxLife = dataReader.ReadInt32();
-                    CurrentFrame = dataReader.ReadInt32();
+                    PCurrentFrame = dataReader.ReadInt32();
                     PPosition = PlayDataHelper.ReadVector2(dataReader);
                     WidthScale = dataReader.ReadSingle();
                     RGB = PlayDataHelper.ReadRGB(dataReader);
@@ -112,8 +112,8 @@ namespace CrazyStorm_Player.CrazyStorm
                 case "MaxLife":
                     VM.PushInt(MaxLife);
                     return true;
-                case "CurrentFrame":
-                    VM.PushInt(CurrentFrame);
+                case "PCurrentFrame":
+                    VM.PushInt(PCurrentFrame);
                     return true;
                 case "PPosition":
                     VM.PushVector2(PPosition);
@@ -209,8 +209,8 @@ namespace CrazyStorm_Player.CrazyStorm
                 case "MaxLife":
                     MaxLife = VM.PopInt();
                     return true;
-                case "CurrentFrame":
-                    CurrentFrame = VM.PopInt();
+                case "PCurrentFrame":
+                    PCurrentFrame = VM.PopInt();
                     return true;
                 case "PPosition":
                     PPosition = VM.PopVector2();
@@ -305,13 +305,13 @@ namespace CrazyStorm_Player.CrazyStorm
         }
         public virtual void Update()
         {
-            if (CurrentFrame >= MaxLife || (KillOutside && ParticleManager.OutOfWindow(PPosition.x, PPosition.y)))
+            if (PCurrentFrame >= MaxLife || (KillOutside && ParticleManager.OutOfWindow(PPosition.x, PPosition.y)))
             {
                 Alive = false;
                 Emitter.Particles.Remove(this);
                 return;
             }
-            if (CurrentFrame == 0)
+            if (PCurrentFrame == 0)
             {
                 MathHelper.SetVector2(ref pspeedVector, PSpeed, PSpeedAngle);
                 MathHelper.SetVector2(ref pacspeedVector, PAcspeed, PAcspeedAngle);
@@ -326,7 +326,7 @@ namespace CrazyStorm_Player.CrazyStorm
             for (int i = 0; i < ParticleEventGroups.Count; ++i)
                 ParticleEventGroups[i].Execute(this);
 
-            ++CurrentFrame;
+            ++PCurrentFrame;
         }
         public virtual void CopyTo(ParticleBase particleBase)
         {
@@ -335,7 +335,7 @@ namespace CrazyStorm_Player.CrazyStorm
             particleBase.Type = Type;
             particleBase.TypeID = TypeID;
             particleBase.MaxLife = MaxLife;
-            particleBase.CurrentFrame = CurrentFrame;
+            particleBase.PCurrentFrame = PCurrentFrame;
             particleBase.PPosition = PPosition;
             particleBase.WidthScale = WidthScale;
             particleBase.RGB = RGB;

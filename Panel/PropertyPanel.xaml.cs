@@ -33,6 +33,9 @@ namespace CrazyStorm
         CommandStack commandStack;
         IList<ParticleType> types;
         Component component;
+        List<PropertyInfo> componentPropertyList;
+        List<PropertyInfo> specificPropertyList;
+        List<PropertyInfo> particlePropertyList;
         Action updateFunc;
         string editText;
         bool initializeType;
@@ -72,27 +75,26 @@ namespace CrazyStorm
         void LoadContent()
         {
             //Load component properties.
-            var componentList = component.InitializeAndGetProperties(typeof(Component));
-            LoadProperties(ComponentGrid, component, componentList);
+            componentPropertyList = component.InitializeAndGetProperties(typeof(Component));
+            LoadProperties(ComponentGrid, component, componentPropertyList);
             //Load specific properties.
-            List<PropertyInfo> specificList;
             if (component is Emitter)
-                specificList = component.InitializeAndGetProperties(typeof(Emitter));
+                specificPropertyList = component.InitializeAndGetProperties(typeof(Emitter));
             else
-                specificList = component.InitializeAndGetProperties(component.GetType());
+                specificPropertyList = component.InitializeAndGetProperties(component.GetType());
 
-            LoadProperties(SpecificGrid, component, specificList);
+            LoadProperties(SpecificGrid, component, specificPropertyList);
             //Load particle properties.
             if (component is Emitter)
             {
                 ParticleGroup.Visibility = Visibility.Visible;
-                var particleList = (component as Emitter).Particle.InitializeAndGetProperties(typeof(ParticleBase));
+                particlePropertyList = (component as Emitter).Particle.InitializeAndGetProperties(typeof(ParticleBase));
                 if (component is MultiEmitter)
-                    particleList.AddRange((component as Emitter).Particle.InitializeAndGetProperties(typeof(Particle)));
+                    particlePropertyList.AddRange((component as Emitter).Particle.InitializeAndGetProperties(typeof(Particle)));
                 else
-                    particleList.AddRange((component as Emitter).Particle.InitializeAndGetProperties(typeof(CurveParticle)));
+                    particlePropertyList.AddRange((component as Emitter).Particle.InitializeAndGetProperties(typeof(CurveParticle)));
 
-                LoadProperties(ParticleGrid, (component as Emitter).Particle, particleList);
+                LoadProperties(ParticleGrid, (component as Emitter).Particle, particlePropertyList);
             }
             else
             {
@@ -101,9 +103,8 @@ namespace CrazyStorm
                 {
                     //Only emitter have particles, but special event of event field or rebounder need it.
                     var stub = new MultiEmitter();
-                    var particleList = stub.Particle.InitializeAndGetProperties(typeof(ParticleBase));
-                    particleList.AddRange(stub.Particle.InitializeAndGetProperties(typeof(Particle)));
-                    LoadProperties(ParticleGrid, stub.Particle, particleList);
+                    particlePropertyList = stub.Particle.InitializeAndGetProperties(typeof(ParticleBase));
+                    LoadProperties(ParticleGrid, stub.Particle, particlePropertyList);
                 }
             }
             //Load particle types.
@@ -470,21 +471,13 @@ namespace CrazyStorm
         {
             if (e.OriginalSource is TextBlock && ComponentEventList.SelectedItem != null)
             {
-                Expression.Environment environment = new Expression.Environment(this.environment);
-                //Remove particle properties
-                if (!(component is Emitter))
+                var environment = new Expression.Environment(this.environment);
+                //Remove particle properties if the component isn't an emitter
+                if (!(component is Emitter) && particlePropertyList != null)
                 {
-                    var particleItems = ParticleGrid.DataContext as IList<PropertyGridItem>;
-                    if (particleItems != null)
-                    {
-                        foreach (var item in particleItems)
-                            environment.RemoveProperty(item.Name);
-
-                    }
+                    foreach (var item in particlePropertyList)
+                        environment.RemoveProperty(item.Name);
                 }
-                //Remove unnecessary properties
-                environment.RemoveProperty("PPosition");
-                environment.RemoveProperty("Name");
                 OpenEventSetting(ComponentEventList.SelectedItem as EventGroup, environment, 
                     component is Emitter, component is Emitter);
             }
@@ -493,24 +486,15 @@ namespace CrazyStorm
         {
             if (e.OriginalSource is TextBlock && SpecificEventList.SelectedItem != null)
             {
-                Expression.Environment environment = new Expression.Environment(this.environment);
-                //Remove component and emitter properties
-                var componentItems = ComponentGrid.DataContext as IList<PropertyGridItem>;
-                var emitterItems = SpecificGrid.DataContext as IList<PropertyGridItem>;
-                foreach (var item in componentItems)
+                var environment = new Expression.Environment(this.environment);
+                //Remove component and specific properties
+                foreach (var item in componentPropertyList)
                     environment.RemoveProperty(item.Name);
 
-                foreach (var item in emitterItems)
+                foreach (var item in specificPropertyList)
                     environment.RemoveProperty(item.Name);
-                
-                if (component is EventField || component is Rebounder)
-                {
-                    //For compatibility between particle and curveparticle, 
-                    //Put uncommon particle properties
-                    environment.PutLocal((string)FindResource("LengthStr"), 0);
-                }
-                OpenEventSetting(SpecificEventList.SelectedItem as EventGroup, environment, 
-                    false, true);
+               
+                OpenEventSetting(SpecificEventList.SelectedItem as EventGroup, environment, false, true);
             }
         }
         #endregion

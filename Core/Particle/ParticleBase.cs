@@ -16,7 +16,7 @@ namespace CrazyStorm.Core
     public struct ParticleBaseData
     {
         public int maxLife;
-        public int currentFrame;
+        public int pcurrentFrame;
         public Vector2 pposition;
         public float widthScale;
         public RGB rgb;
@@ -52,10 +52,10 @@ namespace CrazyStorm.Core
             set { particleBaseData.maxLife = value; }
         }
         [RuntimeProperty]
-        public int CurrentFrame
+        public int PCurrentFrame
         {
-            get { return particleBaseData.currentFrame; }
-            set { particleBaseData.currentFrame = value; }
+            get { return particleBaseData.pcurrentFrame; }
+            set { particleBaseData.pcurrentFrame = value; }
         }
         [RuntimeProperty]
         public Vector2 PPosition
