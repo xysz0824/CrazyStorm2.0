@@ -22,9 +22,6 @@ using System.Collections.ObjectModel;
 
 namespace CrazyStorm
 {
-    /// <summary>
-    /// PropertyPanel.xaml 的交互逻辑
-    /// </summary>
     public partial class PropertyPanel : UserControl
     {
         #region Private Members

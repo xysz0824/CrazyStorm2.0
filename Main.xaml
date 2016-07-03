@@ -300,13 +300,13 @@
                 <MenuItem Header="{StaticResource AddSoundStr}" Click="AddSound_Click"/>
                 <MenuItem Header="{StaticResource AddGlobalStr}" Click="AddGlobalItem_Click"/>
             </MenuItem>
-            <MenuItem Name="ParticleMenu" Header="{StaticResource ParticleStr}" Padding="10,0" Click="ParticleMenu_Click" >
-                <MenuItem Name="AddParticleItem" Header="{StaticResource AddParticleStr}" />
-                <MenuItem Name="DeleteParticleItem" Header="{StaticResource DeleteParticleStr}" />
+            <MenuItem Name="ParticleSystemMenu" Header="{StaticResource ParticleSystemStr}" Padding="10,0" Click="ParticleSystemMenu_Click" >
+                <MenuItem Name="AddParticleSystemItem" Header="{StaticResource AddParticleSystemStr}" />
+                <MenuItem Name="DeleteParticleSystemItem" Header="{StaticResource DeleteParticleSystemStr}" />
                 <Separator/>
-                <MenuItem Name="CopyParticleItem" Header="{StaticResource CopyParticleStr}" />
+                <MenuItem Name="CopyParticleSystemItem" Header="{StaticResource CopyParticleSystemStr}" />
                 <Separator/>
-                <MenuItem Name="SetParticleItem" Header="{StaticResource SetParticleStr}" />
+                <MenuItem Name="SetParticleSystemItem" Header="{StaticResource SetParticleSystemStr}" />
             </MenuItem>
             <MenuItem Name="LayerMenu"  Header="{StaticResource LayerStr}" Padding="10,0" Click="LayerMenu_Click">
                 <MenuItem Name ="AddLayerItem" Header="{StaticResource AddLayerStr}" />

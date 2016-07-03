@@ -22,9 +22,9 @@ namespace CrazyStorm
     public partial class Main
     {
         #region Private Methods
-        void CreateNewParticle()
+        void CreateNewParticleSystem()
         {
-            var particleSystem = new ParticleSystem("Particle" + file.ParticleIndex);
+            var particleSystem = new ParticleSystem("ParticleSystem" + file.ParticleIndex);
             file.ParticleSystems.Add(particleSystem);
             selectedParticle = particleSystem;
             InitializeCommandStack(particleSystem);
@@ -51,7 +51,7 @@ namespace CrazyStorm
                 i--;
             }
         }
-        void DeleteSeletedParticle()
+        void DeleteSeletedParticleSystem()
         {
             if (file.ParticleSystems.Count > 1)
             {
@@ -64,7 +64,7 @@ namespace CrazyStorm
                         break;
                     }
                 }
-                if (MessageBox.Show((string)FindResource("ConfirmDeleteParticleStr"), (string)FindResource("TipTitleStr"),
+                if (MessageBox.Show((string)FindResource("ConfirmDeleteParticleSystemStr"), (string)FindResource("TipTitleStr"),
                     MessageBoxButton.YesNo, MessageBoxImage.Warning) == MessageBoxResult.Yes)
                 {
                     commandStacks.Remove(selectedParticle);
@@ -73,10 +73,10 @@ namespace CrazyStorm
                 }
             }
             else
-                MessageBox.Show((string)FindResource("CanNotDeleteAllParticleStr"), (string)FindResource("TipTitleStr"),
+                MessageBox.Show((string)FindResource("CanNotDeleteAllParticleSystemStr"), (string)FindResource("TipTitleStr"),
                     MessageBoxButton.OK, MessageBoxImage.Warning);
         }
-        void CopySeletedParticle()
+        void CopySeletedParticleSystem()
         {
             var particle = selectedParticle.Clone() as ParticleSystem;
             var components = new List<Component>();
@@ -92,32 +92,32 @@ namespace CrazyStorm
             InitializeCommandStack(particle);
             AddNewParticleTab(particle);
         }
-        void OpenSelectedParticleSetting()
+        void OpenSelectedParticleSystemSetting()
         {
-            ParticleSetting window = new ParticleSetting(file, selectedParticle, ParticleTabControl.SelectedItem as TabItem);
+            ParticleSystemSetting window = new ParticleSystemSetting(file, selectedParticle, ParticleTabControl.SelectedItem as TabItem);
             window.ShowDialog();
             window.Close();
         }
         #endregion
 
         #region Window EventHandlers
-        private void ParticleMenu_Click(object sender, RoutedEventArgs e)
+        private void ParticleSystemMenu_Click(object sender, RoutedEventArgs e)
         {
-            //Navigate to the corresponding function of Particle menu.
+            //Navigate to the corresponding function of ParticleSystem menu.
             var item = e.Source as MenuItem;
             switch (item.Name)
             {
-                case "AddParticleItem":
-                    CreateNewParticle();
+                case "AddParticleSystemItem":
+                    CreateNewParticleSystem();
                     break;
-                case "DeleteParticleItem":
-                    DeleteSeletedParticle();
+                case "DeleteParticleSystemItem":
+                    DeleteSeletedParticleSystem();
                     break;
-                case "CopyParticleItem":
-                    CopySeletedParticle();
+                case "CopyParticleSystemItem":
+                    CopySeletedParticleSystem();
                     break;
-                case "SetParticleItem":
-                    OpenSelectedParticleSetting();
+                case "SetParticleSystemItem":
+                    OpenSelectedParticleSystemSetting();
                     break;
             }
             saved = false;

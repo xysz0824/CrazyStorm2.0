@@ -13,9 +13,6 @@ using System.Windows.Shapes;
 
 namespace CrazyStorm
 {
-    /// <summary>
-    /// Interaction logic for PlaySetting.xaml
-    /// </summary>
     public partial class PlaySetting : Window
     {
         #region Private Members

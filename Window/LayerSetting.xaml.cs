@@ -18,9 +18,6 @@ using CrazyStorm.Core;
 
 namespace CrazyStorm
 {
-    /// <summary>
-    /// LayerSetting.xaml 的交互逻辑
-    /// </summary>
     public partial class LayerSetting : Window
     {
         #region Private Members

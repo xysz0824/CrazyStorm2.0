@@ -21,9 +21,6 @@ using CrazyStorm.Common;
 
 namespace CrazyStorm
 {
-    /// <summary>
-    /// StartupWindow.xaml 的交互逻辑
-    /// </summary>
     public partial class StartupWindow : Window
     {
         #region Private Members

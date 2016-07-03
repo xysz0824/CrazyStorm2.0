@@ -13,9 +13,6 @@ using System.Windows.Shapes;
 
 namespace CrazyStorm
 {
-    /// <summary>
-    /// ScreenSetting.xaml 的交互逻辑
-    /// </summary>
     public partial class ScreenSetting : Window
     {
         #region Private Members

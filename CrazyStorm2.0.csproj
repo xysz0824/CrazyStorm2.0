@@ -121,7 +121,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Window\ParticleSetting.xaml">
+    <Page Include="Window\ParticleSystemSetting.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -157,12 +157,12 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Main\ParticlePart.cs" />
+    <Compile Include="Main\ParticleSystemPart.cs" />
     <Compile Include="Window\EventSetting.xaml.cs">
       <DependentUpon>EventSetting.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Window\ParticleSetting.xaml.cs">
-      <DependentUpon>ParticleSetting.xaml</DependentUpon>
+    <Compile Include="Window\ParticleSystemSetting.xaml.cs">
+      <DependentUpon>ParticleSystemSetting.xaml</DependentUpon>
     </Compile>
     <Compile Include="Edit\Command\Component\AddComponentCommand.cs" />
     <Compile Include="Edit\Command\Command.cs" />

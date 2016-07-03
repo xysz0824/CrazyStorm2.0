@@ -22,9 +22,6 @@ using System.Text.RegularExpressions;
 
 namespace CrazyStorm
 {
-    /// <summary>
-    /// Interaction logic for FinderPanel.xaml
-    /// </summary>
     public partial class FinderPanel : UserControl
     {
         #region Private Members

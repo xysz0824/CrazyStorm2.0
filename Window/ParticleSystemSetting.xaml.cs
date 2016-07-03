@@ -18,10 +18,7 @@ using CrazyStorm.Core;
 
 namespace CrazyStorm
 {
-    /// <summary>
-    /// BrrageSetting.xaml 的交互逻辑
-    /// </summary>
-    public partial class ParticleSetting : Window
+    public partial class ParticleSystemSetting : Window
     {
         #region Private Members
         File file;
@@ -31,10 +28,10 @@ namespace CrazyStorm
         #endregion
 
         #region Constructor
-        public ParticleSetting(File file, ParticleSystem particle, TabItem selectedTab)
+        public ParticleSystemSetting(File file, ParticleSystem particleSystem, TabItem selectedTab)
         {
             this.file = file;
-            this.selectedParticle = particle;
+            this.selectedParticle = particleSystem;
             this.selectedTab = selectedTab;
             InitializeComponent();
             InitializeDataBinding();
@@ -45,7 +42,7 @@ namespace CrazyStorm
         #region Private Methods
         void InitializeDataBinding()
         {
-            ParticleName.DataContext = selectedParticle;
+            ParticleSystemName.DataContext = selectedParticle;
             TypeList.ItemsSource = selectedParticle.CustomTypes;
             file.UpdateResource();
             //Load images.
@@ -102,15 +99,15 @@ namespace CrazyStorm
         #region Window EventHandlers
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            if (string.IsNullOrWhiteSpace(ParticleName.Text))
+            if (string.IsNullOrWhiteSpace(ParticleSystemName.Text))
             {
-                MessageBox.Show((string)FindResource("ParticleNameCanNotBeEmptyStr"), (string)FindResource("TipTitleStr"),
+                MessageBox.Show((string)FindResource("ParticleSystemNameCanNotBeEmptyStr"), (string)FindResource("TipTitleStr"),
                     MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
-            selectedParticle.Name = ParticleName.Text;
-            selectedTab.Header = ParticleName.Text;
-            MessageBox.Show((string)FindResource("ParticleNameSuccessfullyChangedStr"), (string)FindResource("TipTitleStr"),
+            selectedParticle.Name = ParticleSystemName.Text;
+            selectedTab.Header = ParticleSystemName.Text;
+            MessageBox.Show((string)FindResource("ParticleSystemNameSuccessfullyChangedStr"), (string)FindResource("TipTitleStr"),
                 MessageBoxButton.OK, MessageBoxImage.Information);
         }
         private void TypeList_SelectionChanged(object sender, SelectionChangedEventArgs e)

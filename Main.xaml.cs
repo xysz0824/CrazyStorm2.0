@@ -23,9 +23,6 @@ using System.Threading;
 
 namespace CrazyStorm
 {
-    /// <summary>
-    /// Main.xaml 的交互逻辑
-    /// </summary>
     public partial class Main : Window
     {
         #region Private Members

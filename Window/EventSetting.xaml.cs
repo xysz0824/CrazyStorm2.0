@@ -20,9 +20,6 @@ using CrazyStorm.Expression;
 
 namespace CrazyStorm
 {
-    /// <summary>
-    /// Interaction logic for EventSetting.xaml
-    /// </summary>
     public partial class EventSetting : Window
     {
         #region Private Members
@@ -581,12 +578,16 @@ namespace CrazyStorm
             }
             else if (BuildEvent(out text))
             {
-                int insertIndex = 0;
-                if (EventList.SelectedIndex != -1)
-                    insertIndex = EventList.SelectedIndex;
-
-                eventGroup.OriginalEvents.Insert(insertIndex, text);
-                eventGroup.TranslatedEvents.Insert(insertIndex, TranslateEvent(text));
+                if (EventList.SelectedIndex != -1 && EventList.Items.Count - 1 > EventList.SelectedIndex)
+                {
+                    eventGroup.OriginalEvents.Insert(EventList.SelectedIndex + 1, text);
+                    eventGroup.TranslatedEvents.Insert(EventList.SelectedIndex + 1, TranslateEvent(text));
+                }
+                else
+                {
+                    eventGroup.OriginalEvents.Add(text);
+                    eventGroup.TranslatedEvents.Add(TranslateEvent(text));
+                }
             }
         }
         private void AddSpecialEvent_Click(object sender, RoutedEventArgs e)
@@ -609,12 +610,16 @@ namespace CrazyStorm
             }
             else if (BuildSpecialEvent(out text))
             {
-                int insertIndex = 0;
-                if (EventList.SelectedIndex != -1)
-                    insertIndex = EventList.SelectedIndex;
-
-                eventGroup.OriginalEvents.Insert(insertIndex, text);
-                eventGroup.TranslatedEvents.Insert(insertIndex, TranslateEvent(text));
+                if (EventList.SelectedIndex != -1 && EventList.Items.Count - 1 > EventList.SelectedIndex)
+                {
+                    eventGroup.OriginalEvents.Insert(EventList.SelectedIndex + 1, text);
+                    eventGroup.TranslatedEvents.Insert(EventList.SelectedIndex + 1, TranslateEvent(text));
+                }
+                else
+                {
+                    eventGroup.OriginalEvents.Add(text);
+                    eventGroup.TranslatedEvents.Add(TranslateEvent(text));
+                }
             }
         }
         private void EditEvent_Click(object sender, RoutedEventArgs e)
@@ -632,11 +637,16 @@ namespace CrazyStorm
             var item = EventList.SelectedItem;
             if (item != null)
             {
-                int index = eventGroup.OriginalEvents.IndexOf((string)item);
+                int index = eventGroup.TranslatedEvents.IndexOf((string)item);
                 eventGroup.OriginalEvents.RemoveAt(index);
                 eventGroup.TranslatedEvents.RemoveAt(index);
-                EventList.ItemsSource = eventGroup.TranslatedEvents;
             }
+            else if (eventGroup.TranslatedEvents.Count > 0)
+            {
+                eventGroup.OriginalEvents.RemoveAt(0);
+                eventGroup.TranslatedEvents.RemoveAt(0);
+            }
+            EventList.ItemsSource = eventGroup.TranslatedEvents;
         }
         private void LeftConditionComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
