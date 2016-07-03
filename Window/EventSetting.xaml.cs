@@ -67,11 +67,7 @@ namespace CrazyStorm
             {
                 var item = new VariableComboBoxItem();
                 item.Name = property.Key;
-                string[] split = property.Key.Split('.');
-                var displayName = (string)TryFindResource(split[0] + "Str");
-                if (displayName != null && split.Length > 1)
-                    displayName += "." + split[1];
-
+                var displayName = TranslateProperty(property.Key);
                 item.DisplayName = displayName != null ? displayName : property.Key;
                 LeftConditionComboBox.Items.Add(item);
                 RightConditionComboBox.Items.Add(item);
@@ -127,32 +123,47 @@ namespace CrazyStorm
             //Longer name first
             sortedVaraibles = varaibleList.OrderByDescending(s => s.Name.Length);
         }
+        string TranslateProperty(string properyName)
+        {
+            string[] split = properyName.Split('.');
+            var displayName = (string)TryFindResource(split[0] + "Str");
+            if (displayName != null && split.Length > 1)
+                displayName += "." + split[1];
+
+            return displayName;
+        }
         string TranslateEvent(string originalEvent)
         {
-            return originalEvent;
-            //TODO
-            //string translatedEvent = "";
-            ////Translate variable name
-            //if (string.IsNullOrWhiteSpace(translatedEvent))
-            //    translatedEvent = originalEvent;
+            var info = EventHelper.SplitEvent(originalEvent);
+            if (info.leftProperty != null)
+                info.leftProperty = TranslateProperty(info.leftProperty);
 
-            //foreach (VariableComboBoxItem item in sortedVaraibles)
-            //{
-            //    if (originalEvent.Contains(item.Name))
-            //        translatedEvent = translatedEvent.Replace(item.Name, item.DisplayName);
-            //}
-            ////Translate keyword
-            //if (string.IsNullOrWhiteSpace(translatedEvent))
-            //    translatedEvent = originalEvent;
+            if (info.rightProperty != null)
+                info.rightProperty = TranslateProperty(info.rightProperty);
 
-            //string[] keywords = {"Linear", "Accelerated", "Decelerated", "Instant", "ChangeTo", "Increase", "Decrease",
-            //                    "EmitParticle", "PlaySound", "Loop", "ChangeType"};
-            //foreach (string item in keywords)
-            //{
-            //    if (originalEvent.Contains(item))
-            //        translatedEvent = translatedEvent.Replace(item, (string)FindResource(item + "Str"));
-            //}
-            //return translatedEvent;
+            if (!info.isSpecialEvent)
+            {
+                info.resultProperty = TranslateProperty(info.resultProperty);
+                string[] keywords = {"Linear", "Accelerated", "Decelerated", "Instant", "ChangeTo", "Increase", "Decrease"};
+                foreach (string item in keywords)
+                {
+                    if (info.changeType == item)
+                        info.changeType = (string)FindResource(item + "Str");
+
+                    if (info.changeMode == item)
+                        info.changeMode = (string)FindResource(item + "Str");
+                }
+            }
+            else
+            {
+                string[] keywords = {"EmitParticle", "PlaySound", "Loop", "ChangeType"};
+                foreach (string item in keywords)
+                {
+                    if (info.specialEvent == item)
+                        info.specialEvent = (string)FindResource(item + "Str");
+                }
+            }
+            return EventHelper.BuildEvent(info, false);
         }
         void TranslateEvents()
         {
@@ -282,7 +293,7 @@ namespace CrazyStorm
             else
                 return false;
 
-            text = EventHelper.BuildEvent(eventInfo);
+            text = EventHelper.BuildEvent(eventInfo, true);
             return true;
         }
         PropertyType GetValueType(string name)
@@ -339,7 +350,7 @@ namespace CrazyStorm
                 return false;
 
             eventInfo.isSpecialEvent = true;
-            text = EventHelper.BuildEvent(eventInfo);
+            text = EventHelper.BuildEvent(eventInfo, true);
             return true;
         }
         void ResetAll()
@@ -886,7 +897,7 @@ namespace CrazyStorm
                     if (item.Name == selectedItem.Name)
                     {
                         var color = new ComboBoxItem();
-                        color.Content = item.Color.ToString();
+                        color.Content = (string)FindResource(item.Color.ToString() + "Str");
                         ColorCombo.Items.Add(color);
                     }
                 }

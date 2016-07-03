@@ -132,6 +132,12 @@ namespace CrazyStorm
                 Compile();
                 writer.Write(file.GeneratePlayData().ToArray());
             }
+            if (!System.IO.File.Exists(config.PlayerPath))
+            {
+                MessageBox.Show((string)FindResource("PlayerNotFoundStr"), (string)FindResource("TipTitleStr"),
+                    MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
             ProcessStartInfo ps = new ProcessStartInfo(config.PlayerPath);
             ps.Arguments = "\"" + genPath + "\" ";
             ps.Arguments += config.ParticleMaximum + " " + config.CurveParticleMaximum + " ";

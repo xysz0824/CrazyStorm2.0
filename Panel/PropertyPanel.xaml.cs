@@ -231,7 +231,7 @@ namespace CrazyStorm
                 if (item.Name == selectedItem.Name)
                 {
                     var color = new ComboBoxItem();
-                    color.Content = item.Color.ToString();
+                    color.Content = (string)FindResource(item.Color.ToString() + "Str");
                     ColorCombo.Items.Add(color);
                 }
             }

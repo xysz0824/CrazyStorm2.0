@@ -49,7 +49,7 @@ namespace CrazyStorm.Core
     }
     public class EventHelper
     {
-        public static string BuildEvent(EventInfo eventInfo)
+        public static string BuildEvent(EventInfo eventInfo, bool addTypeFlag)
         {
             string eventString = string.Empty;
             if (eventInfo.hasCondition)
@@ -72,9 +72,12 @@ namespace CrazyStorm.Core
             else
                 eventString += string.Format("{0}({1})", eventInfo.specialEvent, eventInfo.arguments);
 
-            eventString += (char)eventInfo.leftType;
-            eventString += (char)eventInfo.rightType;
-            eventString += (char)eventInfo.resultType;
+            if (addTypeFlag)
+            {
+                eventString += (char)eventInfo.leftType;
+                eventString += (char)eventInfo.rightType;
+                eventString += (char)eventInfo.resultType;
+            }
             return eventString;
         }
         public static EventInfo SplitEvent(string text)

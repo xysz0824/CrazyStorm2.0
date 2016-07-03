@@ -131,6 +131,15 @@
     <sys:String x:Key="ChangeTypeStr">改变类型</sys:String>
     <sys:String x:Key="TipTitleStr">提示</sys:String>
     <sys:String x:Key="ErrorTitleStr">错误</sys:String>
+    <sys:String x:Key="NoneStr">无</sys:String>
+    <sys:String x:Key="RedStr">红</sys:String>
+    <sys:String x:Key="PurpleStr">紫</sys:String>
+    <sys:String x:Key="BlueStr">蓝</sys:String>
+    <sys:String x:Key="CyanStr">青</sys:String>
+    <sys:String x:Key="GreenStr">绿</sys:String>
+    <sys:String x:Key="YellowStr">黄</sys:String>
+    <sys:String x:Key="OrangeStr">橙</sys:String>
+    <sys:String x:Key="GrayStr">灰</sys:String>
     <sys:String x:Key="FileTypeErrorStr">该文件格式不正确，无法打开</sys:String>
     <sys:String x:Key="FileDataErrorStr">该文件数据已损坏，无法打开</sys:String>
     <sys:String x:Key="DifferentVersionStr">该文件版本与当前版本不一致，确认要打开吗？</sys:String>
@@ -147,6 +156,7 @@
     <sys:String x:Key="NeedSaveFirstStr">你需要先保存工程文件，然后才能执行该操作</sys:String>
     <sys:String x:Key="PlayFileSavedStr">播放文件已保存到工程文件目录下</sys:String>
     <sys:String x:Key="SaveTipStr">要保存当前文件吗？</sys:String>
+    <sys:String x:Key="PlayerNotFoundStr">找不到指定的播放器程序，请重新设置</sys:String>
     <sys:String x:Key="ImageTypeStr">PNG图像(*.png)|*.png</sys:String>
     <sys:String x:Key="SoundTypeStr">WAV音效(*.wav)|*.wav</sys:String>
     <sys:String x:Key="BackGroundImageTypeStr">JPEG图像(*.jpg)|*.jpg|PNG图像(*.png)|*.png</sys:String>
