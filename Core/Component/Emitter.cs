@@ -1,6 +1,6 @@
 ﻿/*
  * The MIT License (MIT)
- * Copyright (c) StarX 2015 
+ * Copyright (c) StarX 2016 
  */
 using System;
 using System.Collections.Generic;

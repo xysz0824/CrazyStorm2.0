@@ -10,7 +10,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("StarX")]
 [assembly: AssemblyProduct("CrazyStorm Expression")]
-[assembly: AssemblyCopyright("Copyright © StarX 2015")]
+[assembly: AssemblyCopyright("Copyright © StarX 2016")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
