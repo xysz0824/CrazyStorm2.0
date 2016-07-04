@@ -26,19 +26,19 @@
                             </WrapPanel>
                             <WrapPanel VerticalAlignment="Top">
                                 <Label Content="起点X" BorderThickness="0" Margin="0,1" />
-                                <TextBox Name="StartPointX" Text="{Binding Path=StartPointX}" Width="50" Margin="0,1" VerticalContentAlignment="Center" MaxLines="1" MaxLength="9"/>
+                                <TextBox Name="StartPointX" Text="{Binding Path=StartPointX}" Width="50" Margin="0,1" VerticalContentAlignment="Center" MaxLines="1" MaxLength="9" TextChanged="TextBox_TextChanged"/>
                                 <Label Content="起点Y" Margin="0,1" />
-                                <TextBox Name="StartPointY" Text="{Binding Path=StartPointY}" Width="50" Margin="0,1" VerticalContentAlignment="Center" MaxLength="9" MaxLines="1"/>
+                                <TextBox Name="StartPointY" Text="{Binding Path=StartPointY}" Width="50" Margin="0,1" VerticalContentAlignment="Center" MaxLength="9" MaxLines="1" TextChanged="TextBox_TextChanged"/>
                                 <Label Content="宽度" Margin="0,1" />
-                                <TextBox Name="RectWidth" Text="{Binding Path=Width}" Width="50" Margin="0,1" VerticalContentAlignment="Center" MaxLength="9" MaxLines="1"/>
+                                <TextBox Name="RectWidth" Text="{Binding Path=Width}" Width="50" Margin="0,1" VerticalContentAlignment="Center" MaxLength="9" MaxLines="1" TextChanged="TextBox_TextChanged"/>
                                 <Label Content="高度" Margin="0,1" />
-                                <TextBox Name="RectHeight" Text="{Binding Path=Height}" Width="50" Margin="0,1" VerticalContentAlignment="Center" MaxLength="9" MaxLines="1"/>
+                                <TextBox Name="RectHeight" Text="{Binding Path=Height}" Width="50" Margin="0,1" VerticalContentAlignment="Center" MaxLength="9" MaxLines="1" TextChanged="TextBox_TextChanged"/>
                                 <Label Content="中心X" Margin="0,1" />
                                 <TextBox Name="CenterPointX" Text="{Binding Path=CenterPointX}" Width="50" Margin="0,1" VerticalContentAlignment="Center" MaxLength="9" MaxLines="1"/>
                                 <Label Content="中心Y" Margin="0,1" />
                                 <TextBox Name="CenterPointY" Text="{Binding Path=CenterPointY}" Width="50" Margin="0,1" VerticalContentAlignment="Center" MaxLength="9" MaxLines="1"/>
                                 <Label Content="帧数" Margin="0,1" />
-                                <TextBox Name="Frames" Text="{Binding Path=Frames}" Width="50" Margin="0,1" VerticalContentAlignment="Center" TextChanged="Frames_TextChanged" MaxLength="9" MaxLines="1" />
+                                <TextBox Name="Frames" Text="{Binding Path=Frames}" Width="50" Margin="0,1" VerticalContentAlignment="Center" TextChanged="TextBox_TextChanged" MaxLength="9" MaxLines="1" />
                                 <Label Content="延迟" Margin="0,1" />
                                 <TextBox Text="{Binding Path=Delay}" Width="50" Margin="0,1" VerticalContentAlignment="Center" MaxLength="9" MaxLines="1"/>
                                 <Label Content="判定半径" Margin="0,1" />

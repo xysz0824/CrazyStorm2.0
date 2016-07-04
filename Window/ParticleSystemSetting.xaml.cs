@@ -35,7 +35,6 @@ namespace CrazyStorm
             this.selectedTab = selectedTab;
             InitializeComponent();
             InitializeDataBinding();
-            UpdatePreview();
         }
         #endregion
 
@@ -65,12 +64,13 @@ namespace CrazyStorm
         }
         void UpdatePreview()
         {
-            var type = Setting.DataContext as ParticleType;
-            if (type == null)
+            if (Setting.DataContext == null)
                 return;
 
-            int frame;
-            if (!int.TryParse(Frames.Text, out frame))
+            int frame = 0, width = 0, height = 0, startPointX = 0, startPointY = 0;
+            if (!int.TryParse(Frames.Text, out frame) || !int.TryParse(RectWidth.Text, out width) ||
+                !int.TryParse(RectHeight.Text, out height) || !int.TryParse(StartPointX.Text, out startPointX) ||
+                !int.TryParse(StartPointY.Text, out startPointY))
                 return;
 
             for (int i = 0; i < Preview.Children.Count;++i)
@@ -85,12 +85,12 @@ namespace CrazyStorm
             {
                 var rect = new Rectangle();
                 rect.Name = "FrameRect";
-                rect.Width = type.Width;
-                rect.Height = type.Height;
+                rect.Width = width;
+                rect.Height = height;
                 rect.Stroke = new SolidColorBrush(Colors.Red);
                 Preview.Children.Add(rect);
-                Canvas.SetLeft(rect, type.StartPointX + i * type.Width);
-                Canvas.SetTop(rect, type.StartPointY);
+                Canvas.SetLeft(rect, startPointX + i * width);
+                Canvas.SetTop(rect, startPointY);
                 rect.Opacity = 0.8f;
             }
         }
@@ -147,7 +147,7 @@ namespace CrazyStorm
         {
             selectedParticle.CustomTypes.Remove(selectedType);
         }
-        private void Frames_TextChanged(object sender, TextChangedEventArgs e)
+        private void TextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
             UpdatePreview();
         }

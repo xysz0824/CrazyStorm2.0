@@ -60,7 +60,7 @@ namespace CrazyStorm
             else
             {
                 string[] args = Environment.GetCommandLineArgs();
-                LogHelper.Clear(Environment.CurrentDirectory + "\\Log.txt", VersionInfo.AppTitle);
+                LogHelper.Clear("Log.txt", VersionInfo.AppTitle);
                 Environment.CurrentDirectory = System.IO.Path.GetDirectoryName(args[0]);
                 mainWindow = new Main();
                 mainWindow.Initailize();

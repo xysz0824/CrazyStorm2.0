@@ -8,9 +8,9 @@ namespace CrazyStorm.Common
     public class LogHelper
     {
         static string logFilePath;
-        public static void Clear(string filePath, string title)
+        public static void Clear(string fileName, string title)
         {
-            logFilePath = filePath;
+            logFilePath = System.AppDomain.CurrentDomain.SetupInformation.ApplicationBase + fileName;
             using (StreamWriter writer = new StreamWriter(logFilePath, false, Encoding.UTF8))
             {
                 writer.WriteLine(title + " Log");
