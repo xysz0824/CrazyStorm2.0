@@ -22,7 +22,7 @@
                                 <Label Content="名称" Margin="0,1,7,1"/>
                                 <TextBox Text="{Binding Path=Name}" Width="141" Margin="0,1" VerticalContentAlignment="Center" MaxLines="1" MaxLength="20"/>
                                 <Label Content="图案" Margin="0,1" />
-                                <ComboBox Name="ImageCombo" SelectedItem="{Binding Path=Image}" Width="134" Margin="0,1" VerticalContentAlignment="Center"/>
+                                <ComboBox Name="ImageCombo" SelectedItem="{Binding Path=Image}" Width="134" Margin="0,1" VerticalContentAlignment="Center" SelectionChanged="ImageCombo_SelectionChanged"/>
                             </WrapPanel>
                             <WrapPanel VerticalAlignment="Top">
                                 <Label Content="起点X" BorderThickness="0" Margin="0,1" />
@@ -91,7 +91,7 @@
                         </ListView>
                     <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
                         <Canvas Name="Preview" Height="{Binding ElementName=Image, Path=ActualHeight}" Width="{Binding ElementName=Image, Path=ActualWidth}">
-                            <Image Name="Image" DataContext="{Binding ElementName=ImageCombo,Path=SelectedItem}" Source="{Binding Path=AbsolutePath}" Canvas.Left="0" Canvas.Top="0"/>
+                            <Image Name="Image" Canvas.Left="0" Canvas.Top="0"/>
                             <Rectangle 
                             Fill="Blue" 
                             Width="{Binding ElementName=RectWidth, Path=Text}" Height="{Binding ElementName=RectHeight, Path=Text}" 

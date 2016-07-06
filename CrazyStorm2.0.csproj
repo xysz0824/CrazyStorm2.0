@@ -179,7 +179,6 @@
     <Compile Include="Converter\LayerStartConverter.cs" />
     <Compile Include="Converter\ResourceValidConverter.cs" />
     <Compile Include="Edit\Command\ParameterEmptyException.cs" />
-    <Compile Include="Helper\DoubleClickDetector.cs" />
     <Compile Include="Window\LayerSetting.xaml.cs">
       <DependentUpon>LayerSetting.xaml</DependentUpon>
     </Compile>

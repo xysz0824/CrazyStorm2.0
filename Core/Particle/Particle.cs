@@ -26,12 +26,6 @@ namespace CrazyStorm.Core
         #endregion
 
         #region Public Members
-        [BoolProperty]
-        public bool StickToSpeedAngle
-        {
-            get { return particleData.stickToSpeedAngle; }
-            set { particleData.stickToSpeedAngle = value; }
-        }
         [FloatProperty(0, float.MaxValue)]
         public float HeightScale
         {
@@ -43,6 +37,12 @@ namespace CrazyStorm.Core
         {
             get { return particleData.retainScale; }
             set { particleData.retainScale = value; }
+        }
+        [BoolProperty]
+        public bool StickToSpeedAngle
+        {
+            get { return particleData.stickToSpeedAngle; }
+            set { particleData.stickToSpeedAngle = value; }
         }
         [BoolProperty]
         public bool AfterimageEffect

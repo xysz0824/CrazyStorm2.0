@@ -26,7 +26,12 @@ namespace CrazyStorm_Player.CrazyStorm
         public Vector2 SpeedVector
         {
             get { return speedVector; }
-            set { speedVector = value; }
+            set 
+            { 
+                speedVector = value;
+                if (speedVector != Vector2.Zero)
+                    SpeedAngle = MathHelper.GetDegree(speedVector);
+            }
         }
         public Vector2 AcspeedVector
         {
@@ -257,7 +262,6 @@ namespace CrazyStorm_Player.CrazyStorm
             if (BindingTarget == null || BindingTarget.Particles.Count == 0)
             {
                 speedVector += acspeedVector;
-                SpeedAngle = MathHelper.GetDegree(speedVector);
                 Position += speedVector;
                 for (int i = 0; i < ComponentEventGroups.Count; ++i)
                     ComponentEventGroups[i].Execute(this);

@@ -75,7 +75,7 @@ namespace CrazyStorm
         void InitializeParticle()
         {
             DeleteAllParticle();
-            selectedParticle = file.ParticleSystems.First();
+            selectedSystem = file.ParticleSystems.First();
             foreach (var item in file.ParticleSystems)
             {
                 InitializeCommandStack(item);
@@ -107,10 +107,10 @@ namespace CrazyStorm
         }
         void InitializeLayerAndComponent()
         {
-            selectedLayer = selectedParticle.Layers.First();
-            LayerTree.ItemsSource = selectedParticle.Layers;            
-            LayerAxis.ItemsSource = selectedParticle.Layers;
-            ComponentTree.ItemsSource = selectedParticle.ComponentTree;
+            selectedLayer = selectedSystem.Layers.First();
+            LayerTree.ItemsSource = selectedSystem.Layers;            
+            LayerAxis.ItemsSource = selectedSystem.Layers;
+            ComponentTree.ItemsSource = selectedSystem.ComponentTree;
             BindComponentItem.IsEnabled = false;
             UnbindComponentItem.IsEnabled = false;
         }

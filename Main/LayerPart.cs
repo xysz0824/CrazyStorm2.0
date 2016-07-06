@@ -31,13 +31,13 @@ namespace CrazyStorm
         #region Private Methods
         void CreateNewLayer()
         {
-                new AddLayerCommand().Do(commandStacks[selectedParticle], selectedParticle);
+                new AddLayerCommand().Do(commandStacks[selectedSystem], selectedSystem);
         }
         void DeleteSelectedLayer()
         {
-            if (selectedParticle.Layers.Count > 1)
+            if (selectedSystem.Layers.Count > 1)
             {
-                new DelLayerCommand().Do(commandStacks[selectedParticle], selectedParticle, selectedLayer);
+                new DelLayerCommand().Do(commandStacks[selectedSystem], selectedSystem, selectedLayer);
                 UpdateSelectedStatus();
             }
             else
@@ -46,12 +46,12 @@ namespace CrazyStorm
         }
         void CopySelectedLayer()
         {
-            new CopyLayerCommand().Do(commandStacks[selectedParticle], selectedParticle, selectedLayer);
+            new CopyLayerCommand().Do(commandStacks[selectedSystem], selectedSystem, selectedLayer);
             UpdateScreen();
         }
         void OpenSelectedLayerSetting()
         {
-            Window window = new LayerSetting(commandStacks[selectedParticle], selectedLayer);
+            Window window = new LayerSetting(commandStacks[selectedSystem], selectedLayer);
             window.ShowDialog();
             window.Close();
         }
@@ -82,7 +82,7 @@ namespace CrazyStorm
             //Select layer.
             if (LayerTree.SelectedItem != null)
             {
-                selectedLayer = selectedParticle.Layers[LayerTree.Items.IndexOf(LayerTree.SelectedItem)];
+                selectedLayer = selectedSystem.Layers[LayerTree.Items.IndexOf(LayerTree.SelectedItem)];
                 //Press Ctrl key to select all components in this layer.
                 if (Keyboard.Modifiers == ModifierKeys.Control && selectedLayer.Visible)
                 {
@@ -98,7 +98,7 @@ namespace CrazyStorm
         {
             //Set the visibllity of layer.
             if (LayerTree.SelectedItem != null)
-                selectedLayer = selectedParticle.Layers[LayerTree.Items.IndexOf(LayerTree.SelectedItem)];
+                selectedLayer = selectedSystem.Layers[LayerTree.Items.IndexOf(LayerTree.SelectedItem)];
             else
                 return;
 
@@ -110,45 +110,45 @@ namespace CrazyStorm
         {
             //Move down selected layer.
             if (LayerTree.SelectedItem != null)
-                selectedLayer = selectedParticle.Layers[LayerTree.Items.IndexOf(LayerTree.SelectedItem)];
+                selectedLayer = selectedSystem.Layers[LayerTree.Items.IndexOf(LayerTree.SelectedItem)];
             else
                 return;
 
-            int index = selectedParticle.Layers.IndexOf(selectedLayer);
-            if (index != selectedParticle.Layers.Count - 1)
+            int index = selectedSystem.Layers.IndexOf(selectedLayer);
+            if (index != selectedSystem.Layers.Count - 1)
             {
-                var temp = selectedParticle.Layers[index];
-                selectedParticle.Layers[index] = selectedParticle.Layers[index + 1];
-                selectedParticle.Layers[index + 1] = temp;
+                var temp = selectedSystem.Layers[index];
+                selectedSystem.Layers[index] = selectedSystem.Layers[index + 1];
+                selectedSystem.Layers[index + 1] = temp;
             }
         }
         private void LayerUp_MouseUp(object sender, MouseButtonEventArgs e)
         {
             //Move up selected layer.
             if (LayerTree.SelectedItem != null)
-                selectedLayer = selectedParticle.Layers[LayerTree.Items.IndexOf(LayerTree.SelectedItem)];
+                selectedLayer = selectedSystem.Layers[LayerTree.Items.IndexOf(LayerTree.SelectedItem)];
             else
                 return;
 
-            int index = selectedParticle.Layers.IndexOf(selectedLayer);
+            int index = selectedSystem.Layers.IndexOf(selectedLayer);
             if (index != 0)
             {
-                var temp = selectedParticle.Layers[index];
-                selectedParticle.Layers[index] = selectedParticle.Layers[index - 1];
-                selectedParticle.Layers[index - 1] = temp;
+                var temp = selectedSystem.Layers[index];
+                selectedSystem.Layers[index] = selectedSystem.Layers[index - 1];
+                selectedSystem.Layers[index - 1] = temp;
             }
         }
         private void LayerColor_MouseUp(object sender, MouseButtonEventArgs e)
         {
             //Set the color of layer.
             if (LayerTree.SelectedItem != null)
-                selectedLayer = selectedParticle.Layers[LayerTree.Items.IndexOf(LayerTree.SelectedItem)];
+                selectedLayer = selectedSystem.Layers[LayerTree.Items.IndexOf(LayerTree.SelectedItem)];
             else
                 return;
 
             if (Enum.IsDefined(typeof(LayerColor), selectedLayer.Color + 1))
             {
-                new SetLayerCommand().Do(commandStacks[selectedParticle], selectedLayer,
+                new SetLayerCommand().Do(commandStacks[selectedSystem], selectedLayer,
                     (LayerColor)selectedLayer.Color + 1,
                     selectedLayer.BeginFrame,
                     selectedLayer.TotalFrame,
@@ -157,7 +157,7 @@ namespace CrazyStorm
             else
             {
                 selectedLayer.Color = LayerColor.Blue;
-                new SetLayerCommand().Do(commandStacks[selectedParticle], selectedLayer,
+                new SetLayerCommand().Do(commandStacks[selectedSystem], selectedLayer,
                     LayerColor.Blue,
                     selectedLayer.BeginFrame,
                     selectedLayer.TotalFrame,

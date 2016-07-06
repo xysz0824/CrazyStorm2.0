@@ -26,7 +26,7 @@ namespace CrazyStorm
         {
             var particleSystem = new ParticleSystem("ParticleSystem" + file.ParticleIndex);
             file.ParticleSystems.Add(particleSystem);
-            selectedParticle = particleSystem;
+            selectedSystem = particleSystem;
             InitializeCommandStack(particleSystem);
             AddNewParticleTab(particleSystem);
         }
@@ -58,7 +58,7 @@ namespace CrazyStorm
                 TabItem selected = null;
                 foreach (TabItem item in ParticleTabControl.Items)
                 {
-                    if (item.Tag == selectedParticle)
+                    if (item.Tag == selectedSystem)
                     {
                         selected = item;
                         break;
@@ -67,8 +67,8 @@ namespace CrazyStorm
                 if (MessageBox.Show((string)FindResource("ConfirmDeleteParticleSystemStr"), (string)FindResource("TipTitleStr"),
                     MessageBoxButton.YesNo, MessageBoxImage.Warning) == MessageBoxResult.Yes)
                 {
-                    commandStacks.Remove(selectedParticle);
-                    file.ParticleSystems.Remove(selectedParticle);
+                    commandStacks.Remove(selectedSystem);
+                    file.ParticleSystems.Remove(selectedSystem);
                     ParticleTabControl.Items.Remove(selected);
                 }
             }
@@ -78,7 +78,7 @@ namespace CrazyStorm
         }
         void CopySeletedParticleSystem()
         {
-            var particle = selectedParticle.Clone() as ParticleSystem;
+            var particle = selectedSystem.Clone() as ParticleSystem;
             var components = new List<Component>();
             foreach (var layer in particle.Layers)
                 components.AddRange(layer.Components);
@@ -88,15 +88,27 @@ namespace CrazyStorm
 
             RebuildComponentTree(particle);
             file.ParticleSystems.Add(particle);
-            selectedParticle = particle;
+            selectedSystem = particle;
             InitializeCommandStack(particle);
             AddNewParticleTab(particle);
         }
+        void ReloadTypes()
+        {
+            var particleTypes = new List<ParticleType>();
+            particleTypes.AddRange(defaultParticleTypes);
+            particleTypes.AddRange(selectedSystem.CustomTypes);
+            for (int i = 2; i < LeftTabControl.Items.Count; ++i)
+            {
+                var panel = ((LeftTabControl.Items[i] as TabItem).Content as ScrollViewer).Content as PropertyPanel;
+                panel.LoadTypes(particleTypes);
+            }
+        }
         void OpenSelectedParticleSystemSetting()
         {
-            ParticleSystemSetting window = new ParticleSystemSetting(file, selectedParticle, ParticleTabControl.SelectedItem as TabItem);
+            ParticleSystemSetting window = new ParticleSystemSetting(file, selectedSystem, ParticleTabControl.SelectedItem as TabItem);
             window.ShowDialog();
             window.Close();
+            ReloadTypes();
         }
         #endregion
 

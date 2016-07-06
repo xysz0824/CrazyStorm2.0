@@ -77,9 +77,8 @@ namespace CrazyStorm.Core
                 component.Parent.Children.Add(component);
 
             foreach (var item in component.GetPosterity())
-            {
                 layer.Components.Add(item);
-            }
+
             layer.Components.Add(component);
         }
         public void DeleteComponentFromLayer(Layer layer, Component component)
@@ -90,25 +89,35 @@ namespace CrazyStorm.Core
                 component.Parent.Children.Remove(component);
 
             foreach (var item in component.GetPosterity())
-            {
                 layer.Components.Remove(item);
+
+
+            foreach (var layerItem in layers)
+            {
+                foreach (var componentItem in layerItem.Components)
+                {
+                    if (componentItem.BindingTarget == component)
+                        componentItem.BindingTarget = null;
+                }
             }
             layer.Components.Remove(component);
         }
         public void AddLayer(Layer layer)
         {
             foreach (var component in layer.Components)
+            {
                 if (component.Parent == null)
                     componentTree.Add(component);
-
+            }
             layers.Add(layer);
         }
         public void DeleteLayer(Layer layer)
         {
             foreach (var component in layer.Components)
+            {
                 if (component.Parent == null)
                     componentTree.Remove(component);
-
+            }
             layers.Remove(layer);
         }
         public object Clone()

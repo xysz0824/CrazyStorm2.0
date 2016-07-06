@@ -278,14 +278,17 @@ namespace CrazyStorm
 
             if (PropertyComboBox.SelectedItem != null && !String.IsNullOrEmpty(ResultValue.Text) &&
                 !String.IsNullOrEmpty(eventInfo.changeType) && !String.IsNullOrEmpty(eventInfo.changeMode) && 
-                !String.IsNullOrEmpty(ChangeTime.Text))
+                (!String.IsNullOrEmpty(ChangeTime.Text) || Instant.IsChecked == true))
             {
                 var selectedItem = PropertyComboBox.SelectedItem as VariableComboBoxItem;
                 eventInfo.resultProperty = selectedItem.Name;
                 eventInfo.isExpressionResult = isExpressionResult;
                 eventInfo.resultType = GetValueType(selectedItem.Name);
                 eventInfo.resultValue = ResultValue.Text;
-                eventInfo.changeTime = ChangeTime.Text;
+                if (Instant.IsChecked == true)
+                    eventInfo.changeTime = "1";
+                else
+                    eventInfo.changeTime = ChangeTime.Text;
             }
             else
                 return false;
@@ -462,8 +465,6 @@ namespace CrazyStorm
                 ResultValue.Text = eventInfo.resultValue;
                 buttonMap[eventInfo.changeMode].IsChecked = true;
                 ChangeTime.Text = eventInfo.changeTime;
-                //Prevent from setting special event
-                SpecialEventPanel.IsEnabled = false;
             }
             else
             {
@@ -498,9 +499,32 @@ namespace CrazyStorm
                     if (TypeCombo.SelectedItem != null)
                         ColorCombo.SelectedIndex = int.Parse(split[1].Trim());
                 }
-                //Prevent from setting property event
-                PropertyEventPanel.IsEnabled = false;
             }
+        }
+        void EditEvent(DockPanel editingPanel)
+        {
+            this.editingPanel = editingPanel;
+            editingPanel.Background = SystemColors.HighlightBrush;
+            EventList.IsEnabled = false;
+            AddEvent.Content = (string)FindResource("ModifyStr");
+            AddSpecialEvent.Content = AddEvent.Content;
+            isEditing = true;
+        }
+        void DeleteEvent()
+        {
+            var item = EventList.SelectedItem;
+            if (item != null)
+            {
+                int index = eventGroup.TranslatedEvents.IndexOf((string)item);
+                eventGroup.OriginalEvents.RemoveAt(index);
+                eventGroup.TranslatedEvents.RemoveAt(index);
+            }
+            else if (eventGroup.TranslatedEvents.Count > 0)
+            {
+                eventGroup.OriginalEvents.RemoveAt(0);
+                eventGroup.TranslatedEvents.RemoveAt(0);
+            }
+            EventList.ItemsSource = eventGroup.TranslatedEvents;
         }
         #endregion
 
@@ -515,24 +539,29 @@ namespace CrazyStorm
             Accelerated.IsChecked = false;
             Decelerated.IsChecked = false;
             Instant.IsChecked = false;
+            ChangeTimePanel.Visibility = Visibility.Visible;
         }
         private void Accelerated_Checked(object sender, RoutedEventArgs e)
         {
             Linear.IsChecked = false;
             Decelerated.IsChecked = false;
             Instant.IsChecked = false;
+            ChangeTimePanel.Visibility = Visibility.Visible;
         }
         private void Decelerated_Checked(object sender, RoutedEventArgs e)
         {
             Accelerated.IsChecked = false;
             Linear.IsChecked = false;
             Instant.IsChecked = false;
+            ChangeTimePanel.Visibility = Visibility.Visible;
         }
         private void Instant_Checked(object sender, RoutedEventArgs e)
         {
             Accelerated.IsChecked = false;
             Decelerated.IsChecked = false;
             Linear.IsChecked = false;
+            ChangeTimePanel.Visibility = Visibility.Collapsed;
+            ChangeTime.Text = string.Empty;
         }
         private void EmitParticleButton_Checked(object sender, RoutedEventArgs e)
         {
@@ -624,71 +653,23 @@ namespace CrazyStorm
         }
         private void EditEvent_Click(object sender, RoutedEventArgs e)
         {
-            editingPanel = (((e.OriginalSource as FrameworkElement).Parent as ContextMenu).PlacementTarget) as DockPanel;
-            editingPanel.Background = SystemColors.HighlightBrush;
-            MapEventText(eventGroup.OriginalEvents[EventList.SelectedIndex]);
-            EventList.IsEnabled = false;
-            AddEvent.Content = (string)FindResource("ModifyStr");
-            AddSpecialEvent.Content = AddEvent.Content;
-            isEditing = true;
+            EditEvent((((e.OriginalSource as FrameworkElement).Parent as ContextMenu).PlacementTarget) as DockPanel);
         }
         private void DeleteEvent_Click(object sender, RoutedEventArgs e)
         {
-            var item = EventList.SelectedItem;
-            if (item != null)
-            {
-                int index = eventGroup.TranslatedEvents.IndexOf((string)item);
-                eventGroup.OriginalEvents.RemoveAt(index);
-                eventGroup.TranslatedEvents.RemoveAt(index);
-            }
-            else if (eventGroup.TranslatedEvents.Count > 0)
-            {
-                eventGroup.OriginalEvents.RemoveAt(0);
-                eventGroup.TranslatedEvents.RemoveAt(0);
-            }
-            EventList.ItemsSource = eventGroup.TranslatedEvents;
+            DeleteEvent();
         }
         private void LeftConditionComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            var selectedItem = LeftConditionComboBox.SelectedItem as VariableComboBoxItem;
-            if (selectedItem != null)
-                LeftConditionComboBox.ToolTip = selectedItem.Name;
-            else
-                LeftConditionComboBox.ToolTip = null;
-
-            LeftMoreThan.IsChecked = false;
-            LeftEqual.IsChecked = false;
-            LeftLessThan.IsChecked = false;
-            LeftValue.Text = string.Empty;
-            ChangeTextBoxState(LeftValue, false);
+            LeftValue_PreviewLostKeyboardFocus(sender, null);
         }
         private void RightConditionComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            var selectedItem = RightConditionComboBox.SelectedItem as VariableComboBoxItem;
-            if (selectedItem != null)
-                RightConditionComboBox.ToolTip = selectedItem.Name;
-            else
-                RightConditionComboBox.ToolTip = null;
-
-            RightMoreThan.IsChecked = false;
-            RightEqual.IsChecked = false;
-            RightLessThan.IsChecked = false;
-            RightValue.Text = string.Empty;
-            ChangeTextBoxState(RightValue, false);
+            RightValue_PreviewLostKeyboardFocus(sender, null);
         }
         private void PropertyComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            var selectedItem = PropertyComboBox.SelectedItem as VariableComboBoxItem;
-            if (selectedItem != null)
-                PropertyComboBox.ToolTip = selectedItem.Name;
-            else
-                PropertyComboBox.ToolTip = null;
-
-            ChangeTo.IsChecked = false;
-            Increase.IsChecked = false;
-            Decrease.IsChecked = false;
-            ResultValue.Text = string.Empty;
-            ChangeTextBoxState(ResultValue, false);
+            ResultValue_PreviewLostKeyboardFocus(sender, null);
         }
         private void LeftValue_PreviewLostKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
         {
@@ -939,6 +920,25 @@ namespace CrazyStorm
             SoundTestButton.Content = (string)FindResource("TestStr");
             MediaPlayer.Stop();
         }
+        private void EventItem_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            //If mouse double clicked
+            if (e.ClickCount == 2)
+                EditEvent((e.OriginalSource as FrameworkElement).Parent as DockPanel);
+        }
+        private void EventList_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Delete)
+                DeleteEvent();
+        }
         #endregion
+
+        private void EventList_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (EventList.SelectedIndex == -1)
+                return;
+
+            MapEventText(eventGroup.OriginalEvents[EventList.SelectedIndex]);
+        }
     }
 }

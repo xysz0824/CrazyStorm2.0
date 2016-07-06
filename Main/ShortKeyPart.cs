@@ -52,7 +52,7 @@ namespace CrazyStorm
         {
             var gridSize = config.GridSize;
             var command = (RoutedUICommand)e.Command;
-            var stack = commandStacks[selectedParticle];
+            var stack = commandStacks[selectedSystem];
             switch (command.Text)
             {
                 case "DelComponent":

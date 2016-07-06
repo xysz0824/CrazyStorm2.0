@@ -17,8 +17,8 @@ namespace CrazyStorm
         #region Private Methods
         void UpdateCommandStackStatus()
         {
-            var redoPeek = commandStacks[selectedParticle].RedoPeek();
-            var undoPeek = commandStacks[selectedParticle].UndoPeek();
+            var redoPeek = commandStacks[selectedSystem].RedoPeek();
+            var undoPeek = commandStacks[selectedSystem].UndoPeek();
             UndoButton.IsEnabled = redoPeek != null ? true : false;
             RedoButton.IsEnabled = undoPeek != null ? true : false;
             UndoItem.IsEnabled = UndoButton.IsEnabled;
@@ -37,7 +37,7 @@ namespace CrazyStorm
         void SelectAll()
         {
             var set = new List<Component>();
-            foreach (var layer in selectedParticle.Layers)
+            foreach (var layer in selectedSystem.Layers)
                 if (layer.Visible)
                     set.AddRange(layer.Components);
 
@@ -45,14 +45,14 @@ namespace CrazyStorm
         }
         void Undo()
         {
-            var stack = commandStacks[selectedParticle];
+            var stack = commandStacks[selectedSystem];
             var command = stack.RedoPop();
             command.Undo(stack);
             UpdateSelectedStatus();
         }
         void Redo()
         {
-            var stack = commandStacks[selectedParticle];
+            var stack = commandStacks[selectedSystem];
             var command = stack.UndoPop();
             command.Redo(stack);
             UpdateSelectedStatus();
@@ -72,12 +72,12 @@ namespace CrazyStorm
         void Paste()
         {
             CancelAllSelection();
-            new PasteComponentCommand().Do(commandStacks[selectedParticle], selectedParticle, selectedLayer, clipBoard);
+            new PasteComponentCommand().Do(commandStacks[selectedSystem], selectedSystem, selectedLayer, clipBoard);
             UpdateSelectedStatus();
         }
         void Del()
         {
-            new DelComponentCommand().Do(commandStacks[selectedParticle], selectedParticle, selectedComponents);
+            new DelComponentCommand().Do(commandStacks[selectedSystem], selectedSystem, selectedComponents);
             UpdateSelectedStatus();
         }
         void Find()
@@ -98,7 +98,7 @@ namespace CrazyStorm
             //Create finder panel.
             item = new TabItem();
             item.Style = (Style)FindResource("CanCloseStyle");
-            var panel = new FinderPanel(selectedParticle);
+            var panel = new FinderPanel(selectedSystem);
             panel.OnSelectComponent += (Component component) =>
             {
                 var set = new List<CrazyStorm.Core.Component>();

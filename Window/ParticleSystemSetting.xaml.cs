@@ -151,6 +151,29 @@ namespace CrazyStorm
         {
             UpdatePreview();
         }
+        private void ImageCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (ImageCombo.SelectedItem == null)
+            {
+                Image.Source = null;
+                Image.Width = Image.Height = 0;
+            }
+            else
+            {
+                var bitmap = new BitmapImage(new Uri((ImageCombo.SelectedItem as FileResource).AbsolutePath));
+                Image.Source = bitmap;
+                Image.Width = bitmap.PixelWidth;
+                Image.Height = bitmap.PixelHeight;
+                //Check if width or height is 2 to the power of n
+                if (((int)Image.Width & ((int)Image.Width - 1)) != 0 ||
+                    ((int)Image.Height & ((int)Image.Height - 1)) != 0)
+                {
+                    MessageBox.Show((string)FindResource("ImageSizeWaringStr"), (string)FindResource("TipTitleStr"),
+                        MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
+            }
+        }
         #endregion
     }
 }

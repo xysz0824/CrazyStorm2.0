@@ -164,7 +164,7 @@ namespace CrazyStorm_Player.CrazyStorm
             base.ExecuteExpression("EmitPosition");
             Template.PPosition = EmitPosition;
             float increment = EmitRange / EmitCount;
-            float angle = EmitAngle;
+            float angle = EmitAngle - (EmitRange + increment) / 2;
             for (int i = 0; i < EmitCount; ++i)
             {
                 angle += increment;

@@ -135,6 +135,11 @@ namespace CrazyStorm_Player.CrazyStorm
                                 float ratio = (float)random.NextDouble();
                                 VM.PushFloat((1 - ratio) * VM.PopFloat() + ratio * VM.PopFloat());
                                 break;
+                            case "randi":
+                                int i2 = VM.PopInt();
+                                int i1 = VM.PopInt();
+                                VM.PushInt(random.Next(i1, i2));
+                                break;
                             case "sin":
                                 VM.PushFloat((float)Math.Sin(MathHelper.DegToRad(VM.PopFloat())));
                                 break;

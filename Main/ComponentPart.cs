@@ -32,7 +32,7 @@ namespace CrazyStorm
         {
             //Get all visible components in this particle system.
             var set = new List<Component>();
-            foreach (var layer in selectedParticle.Layers)
+            foreach (var layer in selectedSystem.Layers)
                 if (layer.Visible)
                     set.AddRange(layer.Components);
             //Clean removed component.
@@ -87,9 +87,9 @@ namespace CrazyStorm
             scroll.VerticalScrollBarVisibility = ScrollBarVisibility.Auto;
             var particleTypes = new List<ParticleType>();
             particleTypes.AddRange(defaultParticleTypes);
-            particleTypes.AddRange(selectedParticle.CustomTypes);
-            var panel = new PropertyPanel(commandStacks[selectedParticle],
-                file, particleTypes, component, UpdateProperty);
+            particleTypes.AddRange(selectedSystem.CustomTypes);
+            var panel = new PropertyPanel(commandStacks[selectedSystem], file, 
+                particleTypes, component, UpdateProperty);
             scroll.Content = panel;
             panel.OnBeginEditing += () =>
             {
@@ -128,7 +128,7 @@ namespace CrazyStorm
         {
             //Get all visible components in this particle system.
             var set = new List<Component>();
-            foreach (var layer in selectedParticle.Layers)
+            foreach (var layer in selectedSystem.Layers)
                 if (layer.Visible)
                     set.AddRange(layer.Components);
             for (int i = 2; i < LeftTabControl.Items.Count; ++i)
@@ -142,7 +142,7 @@ namespace CrazyStorm
                 }
                 //Update finder panel
                 if (item.Content is FinderPanel)
-                    (item.Content as FinderPanel).Update(selectedParticle);
+                    (item.Content as FinderPanel).Update(selectedSystem);
             }
         }
         void BindComponent()
@@ -174,7 +174,7 @@ namespace CrazyStorm
                 {
                     if (component.BindingTarget != null)
                     {
-                        new UnbindComponentCommand().Do(commandStacks[selectedParticle], selectedComponents);
+                        new UnbindComponentCommand().Do(commandStacks[selectedSystem], selectedComponents);
                         UpdateScreen();
                         break;
                     }
@@ -247,7 +247,7 @@ namespace CrazyStorm
             {
                 //A way to change the node from parenthood to brotherhood. 
                 var tree = new Component();
-                foreach (Component item in selectedParticle.ComponentTree)
+                foreach (Component item in selectedSystem.ComponentTree)
                     tree.Children.Add(item);
 
                 var parent = tree.FindParent(targetComponent);
@@ -255,7 +255,7 @@ namespace CrazyStorm
                 {
                     if (parent == tree)
                     {
-                        selectedParticle.ComponentTree.Add(sourceComponent);
+                        selectedSystem.ComponentTree.Add(sourceComponent);
                         sourceComponent.TransPositiontoAbsolute();
                         sourceComponent.Parent = null;
                     }
@@ -273,14 +273,14 @@ namespace CrazyStorm
             {
                 //Add source component to target component as child
                 var tree = new Component();
-                foreach (Component item in selectedParticle.ComponentTree)
+                foreach (Component item in selectedSystem.ComponentTree)
                     tree.Children.Add(item);
 
                 var parent = tree.FindParent(sourceComponent);
                 if (parent != null)
                 {
                     if (parent == tree)
-                        selectedParticle.ComponentTree.Remove(sourceComponent);
+                        selectedSystem.ComponentTree.Remove(sourceComponent);
                     else
                         parent.Children.Remove(sourceComponent);
 

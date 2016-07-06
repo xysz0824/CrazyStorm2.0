@@ -155,8 +155,7 @@ namespace CrazyStorm.Core
             }
             return info;
         }
-        public delegate byte[] CompileDelegate(string text);
-        public static byte[] GenerateEventData(string text, CompileDelegate compileFunc)
+        public static byte[] GenerateEventData(string text, Func<string, byte[]> compileFunc)
         {
             EventInfo eventInfo = SplitEvent(text);
             Dictionary<string, EventOperator> operatorMap = new Dictionary<string,EventOperator>();

@@ -76,6 +76,7 @@ namespace CrazyStorm.Core
             };
             emitterData.emitCount = 1;
             emitterData.emitCycle = 10;
+            emitterData.emitRange = 360;
             particleEventGroups = new ObservableCollection<EventGroup>();
         }
         #endregion

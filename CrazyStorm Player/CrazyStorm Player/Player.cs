@@ -42,14 +42,14 @@ namespace CrazyStorm_Player
                 Vector2 center = new Vector2(WindowWidth / 2, WindowHeight / 2) + customCenter;
                 Vector2 imageCenter = new Vector2(type.CenterPoint.x, type.CenterPoint.y);
                 Vector2 scale = new Vector2(particle.WidthScale, particle.HeightScale);
-                Vector2 position = new Vector2(particle.PPosition.x + center.X - imageCenter.X, particle.PPosition.y + center.Y - imageCenter.Y);
-                Sprite.Transform = Matrix.Transformation2D(Vector2.Zero, 0, scale, imageCenter, (float)MathHelper.DegToRad(particle.PRotation), position);
+                Vector2 position = new Vector2(particle.PPosition.x, particle.PPosition.y) + center - imageCenter;
+                Sprite.Transform = Matrix.Transformation2D(imageCenter, 0, scale, imageCenter, (float)MathHelper.DegToRad(particle.PRotation), position);
                 Color4 color = new Color4(particle.Opacity / 100, particle.RGB.r / 255, particle.RGB.g / 255, particle.RGB.b / 255);
                 int offset = particle.PCurrentFrame / (type.Delay + 1) % type.Frames;
                 Rectangle rect = new Rectangle((int)type.StartPoint.x + offset * type.Width, (int)type.StartPoint.y, type.Width, type.Height);
                 if (type.Id >= ParticleType.DefaultTypeIndex)
                     Sprite.Draw(defaultTextures[0], rect, color);
-                else
+                else if (type.Image != null)
                     Sprite.Draw(customTextures[type.Image.Id], rect, color);
             };
             ParticleManager.OnCurveParticleDraw += (curveParticle) =>
@@ -64,6 +64,7 @@ namespace CrazyStorm_Player
         {
             //Load default textures and types
             defaultTextures = new List<Texture>();
+            Environment.CurrentDirectory = System.AppDomain.CurrentDomain.SetupInformation.ApplicationBase;
             defaultTextures.Add(Texture.FromFile(Device, "Resources/Default/barrages.png", Usage.None, Pool.Managed));
             using (StreamReader reader = new StreamReader("Resources/Default/set.txt"))
             {

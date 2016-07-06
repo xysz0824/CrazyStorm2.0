@@ -36,7 +36,12 @@ namespace CrazyStorm_Player.CrazyStorm
         public Vector2 PSpeedVector
         {
             get { return pspeedVector; }
-            set { pspeedVector = value; }
+            set 
+            { 
+                pspeedVector = value;
+                if (pspeedVector != Vector2.Zero)
+                    PSpeedAngle = MathHelper.GetDegree(pspeedVector);
+            }
         }
         public Vector2 PAcspeedVector
         {
@@ -321,11 +326,7 @@ namespace CrazyStorm_Player.CrazyStorm
             }
             QuadTree.Update(this);
             PSpeedVector += PAcspeedVector;
-            if (PSpeedVector != Vector2.Zero)
-                PSpeedAngle = MathHelper.GetDegree(PSpeedVector);
-
             PPosition += PSpeedVector;
-            
             for (int i = 0; i < ParticleEventGroups.Count; ++i)
                 ParticleEventGroups[i].Execute(this);
 

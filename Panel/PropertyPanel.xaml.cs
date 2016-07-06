@@ -28,7 +28,7 @@ namespace CrazyStorm
         Expression.Environment environment;
         File file;
         CommandStack commandStack;
-        IList<ParticleType> types;
+        List<ParticleType> types;
         Component component;
         List<PropertyInfo> componentPropertyList;
         List<PropertyInfo> specificPropertyList;
@@ -44,8 +44,8 @@ namespace CrazyStorm
         #endregion
 
         #region Constructor
-        public PropertyPanel(CommandStack commandStack,
-            File file, IList<ParticleType> types, Component component, Action updateFunc)
+        public PropertyPanel(CommandStack commandStack, File file,
+            List<ParticleType> types, Component component, Action updateFunc)
         {
             this.commandStack = commandStack;
             this.file = file;
@@ -106,46 +106,7 @@ namespace CrazyStorm
             }
             //Load particle types.
             //First needs to merge repeated type name.
-            var typesNorepeat = new List<ParticleType>();
-            foreach (var item in types)
-            {
-                bool exist = false;
-                for (int i = 0; i < typesNorepeat.Count; ++i)
-                    if (item.Name == typesNorepeat[i].Name)
-                    {
-                        exist = true;
-                        break;
-                    }
-
-                if (!exist)
-                    typesNorepeat.Add(item);
-            }
-            TypeCombo.ItemsSource = typesNorepeat;
-            ParticleType type = null;
-            if (component is Emitter)
-                type = (component as Emitter).Particle.Type;
-
-            if (type != null)
-            {
-                //Select specific type.
-                foreach (var item in typesNorepeat)
-                    if (item.Name == type.Name)
-                    {
-                        TypeCombo.SelectedItem = item;
-                        break;
-                    }
-                //Prevent doing ColorCombo_SelectionChanged(),
-                //or it will initialize again after selecting some type.
-                initializeType = true;
-                //Select specific color.
-                InitializeColorCombo();
-                for (int i = 0; i < ColorCombo.Items.Count; ++i)
-                    if ((string)FindResource(type.Color.ToString() + "Str") == (string)((ColorCombo.Items[i] as ComboBoxItem).Content))
-                    {
-                        ColorCombo.SelectedIndex = i;
-                        break;
-                    }
-            }
+            LoadTypes(types);
             //Load variables.
             VariableGrid.ItemsSource = component.Variables;
             DeleteVariable.IsEnabled = component.Variables.Count > 0 ? true : false;
@@ -275,6 +236,54 @@ namespace CrazyStorm
                     break;
             }
         }
+        public void LoadTypes(List<ParticleType> types)
+        {
+            this.types = types;
+            var typesNorepeat = new List<ParticleType>();
+            foreach (var item in types)
+            {
+                bool exist = false;
+                for (int i = 0; i < typesNorepeat.Count; ++i)
+                    if (item.Name == typesNorepeat[i].Name)
+                    {
+                        exist = true;
+                        break;
+                    }
+
+                if (!exist)
+                    typesNorepeat.Add(item);
+            }
+            TypeCombo.ItemsSource = typesNorepeat;
+            ParticleType type = null;
+            if (component is Emitter)
+            {
+                type = (component as Emitter).Particle.Type;
+                if (!types.Contains(type))
+                {
+                    ColorCombo.Items.Clear();
+                    (component as Emitter).Particle.Type = null;
+                    type = null;
+                }
+            }
+            if (type != null)
+            {
+                //Select specific type.
+                foreach (var item in typesNorepeat)
+                    if (item.Name == type.Name)
+                    {
+                        TypeCombo.SelectedItem = item;
+                        break;
+                    }
+                //Select specific color.
+                InitializeColorCombo();
+                for (int i = 0; i < ColorCombo.Items.Count; ++i)
+                    if ((string)FindResource(type.Color.ToString() + "Str") == (string)((ColorCombo.Items[i] as ComboBoxItem).Content))
+                    {
+                        ColorCombo.SelectedIndex = i;
+                        break;
+                    }
+            }
+        }
         #endregion
 
         #region Window EventHandlers
@@ -370,6 +379,9 @@ namespace CrazyStorm
                             (e.EditingElement as TextBox).Text = editItem.Label;
                             return;
                         }
+                    //Modify local varaible name
+                    environment.RemoveLocal(editItem.Label);
+                    environment.PutLocal(newValue, editItem.Value);
                 }
                 else if (e.Column.SortMemberPath == "Value")
                 {

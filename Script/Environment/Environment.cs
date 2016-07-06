@@ -63,6 +63,7 @@ namespace CrazyStorm.Expression
             PutFunction("dist", new Expression.Function(2));
             PutFunction("angle", new Expression.Function(2));
             PutFunction("rand", new Expression.Function(2));
+            PutFunction("randi", new Expression.Function(2));
             PutFunction("sin", new Expression.Function(1));
             PutFunction("cos", new Expression.Function(1));
             PutFunction("tan", new Expression.Function(1));

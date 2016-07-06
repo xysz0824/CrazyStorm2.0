@@ -72,12 +72,6 @@ namespace CrazyStorm.Core
             get { return type; }
             set { type = value; }
         }
-        [FloatProperty(0, float.MaxValue)]
-        public float WidthScale
-        {
-            get { return particleBaseData.widthScale; }
-            set { particleBaseData.widthScale = value; }
-        }
         [RGBProperty]
         public RGB RGB
         {
@@ -161,6 +155,12 @@ namespace CrazyStorm.Core
         {
             get { return particleBaseData.ignoreForce; }
             set { particleBaseData.ignoreForce = value; }
+        }
+        [FloatProperty(0, float.MaxValue)]
+        public float WidthScale
+        {
+            get { return particleBaseData.widthScale; }
+            set { particleBaseData.widthScale = value; }
         }
         #endregion
 

@@ -29,10 +29,10 @@
                         <TextBox Width="40"></TextBox>
                     </StackPanel>
                     <ListView Name="EventList" ItemsSource="{Binding }" Height="180" SelectionMode="Single" 
-                              PreviewMouseRightButtonDown="EventList_PreviewMouseRightButtonDown">
+                              PreviewMouseRightButtonDown="EventList_PreviewMouseRightButtonDown" KeyDown="EventList_KeyDown" SelectionChanged="EventList_SelectionChanged" >
                         <ListView.ItemTemplate>
                             <DataTemplate>
-                                <DockPanel>
+                                <DockPanel Name="EventItem" PreviewMouseLeftButtonDown="EventItem_PreviewMouseLeftButtonDown">
                                     <DockPanel.ContextMenu >
                                         <ContextMenu>
                                             <MenuItem Name="EditEvent" Header="编辑" Click="EditEvent_Click" />
@@ -116,7 +116,7 @@
                         <RadioButton Name="Instant" HorizontalAlignment="Center" Content="瞬时" Checked="Instant_Checked"></RadioButton>
                     </StackPanel>
                 </StackPanel>
-                <StackPanel Orientation="Horizontal" Margin="0,1" HorizontalAlignment="Right">
+                <StackPanel Name="ChangeTimePanel" Orientation="Horizontal" Margin="0,1" HorizontalAlignment="Right">
                     <Label Content="变化时间" Margin="4,0,0,0"/>
                     <TextBox x:Name="ChangeTime" Width="50" VerticalContentAlignment="Center" VerticalAlignment="Center" HorizontalAlignment="Center" Height="26" 
                              PreviewLostKeyboardFocus="ChangeTime_PreviewLostKeyboardFocus" MaxLines="1" MaxLength="9"/>

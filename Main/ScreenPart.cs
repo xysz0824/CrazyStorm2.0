@@ -24,15 +24,14 @@ namespace CrazyStorm
     {
         #region Private Members
         Point screenMousePos;
-        ParticleSystem selectedParticle;
+        ParticleSystem selectedSystem;
         DependencyObject aimRect;
         Component aimComponent;
         DependencyObject selectionRect;
-        int selectionRectX, selectionRectY;
+        double selectionRectX, selectionRectY;
         bool selectingComponent;
         List<Line> bindingLines;
         List<Component> selectedComponents;
-        DoubleClickDetector dclickDetector;
         #endregion
 
         #region Private Methods
@@ -43,7 +42,7 @@ namespace CrazyStorm
             foreach (TabItem item in ParticleTabControl.Items)
             {
                 var content = item.Content as Canvas;
-                if (item.Tag == selectedParticle)
+                if (item.Tag == selectedSystem)
                 {
                     canvas = VisualHelper.VisualDownwardSearch(content, "ComponentLayer") as Canvas;
                     break;
@@ -65,7 +64,7 @@ namespace CrazyStorm
                 }
                 //Update components on current screen.
                 var itemTemplate = FindResource("ComponentItem") as DataTemplate;
-                foreach (var layer in selectedParticle.Layers)
+                foreach (var layer in selectedSystem.Layers)
                 {
                     if (layer.Visible)
                     {
@@ -158,12 +157,12 @@ namespace CrazyStorm
                 }
             }
         }
-        void SelectComponents(int x, int y, int width, int height)
+        void SelectComponents(int x, int y, int width, int height, int clickCount)
         {
             var set = new List<Component>();
             //Select those involved in selection rect. 
             int index = 0;
-            foreach (var layer in selectedParticle.Layers)
+            foreach (var layer in selectedSystem.Layers)
             {
                 if (layer.Visible)
                 {
@@ -193,11 +192,15 @@ namespace CrazyStorm
                     }
                 }
             }
-            SelectComponents(set, width == 0 && height == 0);
+            SelectComponents(set, width == 0 && height == 0, clickCount);
         }
         void SelectComponents(List<Component> set, bool canDoubleClick)
         {
-            foreach (var layer in selectedParticle.Layers)
+            SelectComponents(set, canDoubleClick, 0);
+        }
+        void SelectComponents(List<Component> set, bool canDoubleClick, int clickCount)
+        {
+            foreach (var layer in selectedSystem.Layers)
                 if (layer.Visible)
                     foreach (var component in layer.Components)
                     {
@@ -221,20 +224,16 @@ namespace CrazyStorm
                     }
 
             UpdateSelectedStatus();
-            //Check double click.
+            //If mouse double click
             if (!(canDoubleClick && set != null && set.Count > 0 && Keyboard.Modifiers != ModifierKeys.Control))
                 return;
 
-            if (dclickDetector == null)
-                dclickDetector = new DoubleClickDetector();
-
-            dclickDetector.Start();
-            if (set.Count > 0 && dclickDetector.IsDetected())
+            if (set.Count > 0 && clickCount == 2)
                 CreatePropertyPanel(set.First());
         }
         void CancelAllSelection()
         {
-            foreach (var layer in selectedParticle.Layers)
+            foreach (var layer in selectedSystem.Layers)
                 foreach (var component in layer.Components)
                     component.Selected = false;
 
@@ -277,7 +276,7 @@ namespace CrazyStorm
                 var width = x - selectionRectX;
                 if (width >= 0)
                 {
-                    selectionRect.SetValue(Canvas.LeftProperty, (double)selectionRectX);
+                    selectionRect.SetValue(Canvas.LeftProperty, selectionRectX);
                     selectionRect.SetValue(WidthProperty, (double)width);
                 }
                 else
@@ -288,7 +287,7 @@ namespace CrazyStorm
                 var height = y - selectionRectY;
                 if (height >= 0)
                 {
-                    selectionRect.SetValue(Canvas.TopProperty, (double)selectionRectY);
+                    selectionRect.SetValue(Canvas.TopProperty, selectionRectY);
                     selectionRect.SetValue(HeightProperty, (double)height);
                 }
                 else
@@ -320,13 +319,13 @@ namespace CrazyStorm
         {
             //Show selection rect.
             Point point = e.GetPosition(sender as IInputElement);
-            int x = (int)point.X;
-            int y = (int)point.Y;
+            double x = point.X;
+            double y = point.Y;
             selectingComponent = true;
             var content = (DependencyObject)ParticleTabControl.SelectedContent;
             selectionRect = VisualHelper.VisualDownwardSearch(content, "SelectingBox");
-            selectionRect.SetValue(Canvas.LeftProperty, (double)x);
-            selectionRect.SetValue(Canvas.TopProperty, (double)y);
+            selectionRect.SetValue(Canvas.LeftProperty, x);
+            selectionRect.SetValue(Canvas.TopProperty, y);
             selectionRectX = x;
             selectionRectY = y;
             //Add component to the place mouse down with left-button.
@@ -335,12 +334,12 @@ namespace CrazyStorm
                 aimRect.SetValue(OpacityProperty, 0.0d);
                 var boxX = (double)aimRect.GetValue(Canvas.LeftProperty);
                 var boxY = (double)aimRect.GetValue(Canvas.TopProperty);
-                aimComponent.Id = selectedParticle.GetComponentIndex();
-                var index = selectedParticle.GetAndIncreaseComponentIndex(aimComponent.GetType().ToString());
+                aimComponent.Id = selectedSystem.GetComponentIndex();
+                var index = selectedSystem.GetAndIncreaseComponentIndex(aimComponent.GetType().ToString());
                 aimComponent.Name = aimComponent.GetType().Name + index;
                 aimComponent.X = (int)(boxX + (double)aimRect.GetValue(Canvas.WidthProperty) / 2 - config.ScreenWidthOver2);
                 aimComponent.Y = (int)(boxY + (double)aimRect.GetValue(Canvas.HeightProperty) / 2 - config.ScreenHeightOver2);
-                new AddComponentCommand().Do(commandStacks[selectedParticle], selectedParticle, selectedLayer, aimComponent);
+                new AddComponentCommand().Do(commandStacks[selectedSystem], selectedSystem, selectedLayer, aimComponent);
                 UpdateSelectedStatus();
                 aimComponent = null;
                 aimRect = null;
@@ -348,11 +347,15 @@ namespace CrazyStorm
             //Binding to selected emitter
             if (bindingLines != null)
             {
-                SelectComponents((int)screenMousePos.X, (int)screenMousePos.Y, 1, 1);
+                SelectComponents((int)screenMousePos.X, (int)screenMousePos.Y, 1, 1, e.ClickCount);
                 if (selectedComponents.Count == 1 && selectedComponents[0] is Emitter)
-                    new BindComponentCommand().Do(commandStacks[selectedParticle], bindingLines, selectedComponents.First());
+                    new BindComponentCommand().Do(commandStacks[selectedSystem], bindingLines, selectedComponents.First());
 
                 bindingLines = null;
+            }
+            if (e.ClickCount == 2)
+            {
+                ParticleTabControl_MouseLeftButtonUp(sender, e);
             }
         }
         private void ParticleTabControl_MouseLeave(object sender, MouseEventArgs e)
@@ -371,7 +374,7 @@ namespace CrazyStorm
                 var y = (double)selectionRect.GetValue(TopProperty);
                 var width = (double)selectionRect.GetValue(WidthProperty);
                 var height = (double)selectionRect.GetValue(HeightProperty);
-                SelectComponents((int)x, (int)y, (int)width, (int)height);
+                SelectComponents((int)x, (int)y, (int)width, (int)height, e.ClickCount);
                 selectionRect.SetValue(WidthProperty, 0.0d);
                 selectionRect.SetValue(HeightProperty, 0.0d);
                 selectionRect = null;
@@ -389,7 +392,7 @@ namespace CrazyStorm
                 {
                     if (item == tabItem.Tag)
                     {
-                        selectedParticle = item;
+                        selectedSystem = item;
                         break;
                     }
                 }

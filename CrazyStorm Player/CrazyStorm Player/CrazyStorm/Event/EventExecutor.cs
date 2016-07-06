@@ -19,7 +19,7 @@ namespace CrazyStorm_Player.CrazyStorm
         public TypeSet InitialValue { get; set; }
         public TypeSet TargetValue { get; set; }
         public int ChangeTime { get; set; }
-        public bool Finished { get { return currentTime + 1 == ChangeTime; } }
+        public bool Finished { get { return currentTime + 1 >= ChangeTime; } }
         public void Update()
         {
             float ratio = (currentTime + 1) / ChangeTime;
@@ -27,8 +27,6 @@ namespace CrazyStorm_Player.CrazyStorm
                 ratio *= ratio;
             else if (ChangeMode == EventKeyword.Decelerated)
                 ratio *= (2 - ratio);
-            else if (ChangeMode == EventKeyword.Instant)
-                ratio = 1;
 
             switch (PropertyType)
             {

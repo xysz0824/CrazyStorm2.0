@@ -117,14 +117,20 @@ namespace CrazyStorm
         }
         void PlayCurrent()
         {
-            if (string.IsNullOrWhiteSpace(Core.File.CurrentDirectory))
+            if (!System.IO.File.Exists(config.PlayerPath))
             {
-                MessageBox.Show((string)FindResource("NeedSaveFirstStr"), (string)FindResource("TipTitleStr"),
-                    MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show((string)FindResource("PlayerNotFoundStr"), (string)FindResource("TipTitleStr"),
+                    MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
-            string genPath = Path.GetDirectoryName(filePath) + "\\" + fileName + ".bg";
-            using (FileStream stream = new FileStream(genPath, FileMode.Create))
+            string genPath = Path.GetDirectoryName(config.PlayerPath) + "\\Temp\\Temp.bg";
+            if (!System.IO.Directory.Exists(Path.GetDirectoryName(genPath)))
+                System.IO.Directory.CreateDirectory(Path.GetDirectoryName(genPath));
+
+            if (System.IO.File.Exists(genPath))
+                System.IO.File.Delete(genPath);
+
+            using (FileStream stream = new FileStream(genPath, FileMode.CreateNew))
             {
                 var writer = new BinaryWriter(stream);
                 //Play file use UTF-8 encoding
@@ -136,16 +142,10 @@ namespace CrazyStorm
                 Compile();
                 writer.Write(file.GeneratePlayData().ToArray());
             }
-            if (!System.IO.File.Exists(config.PlayerPath))
-            {
-                MessageBox.Show((string)FindResource("PlayerNotFoundStr"), (string)FindResource("TipTitleStr"),
-                    MessageBoxButton.OK, MessageBoxImage.Error);
-                return;
-            }
             int particleSystemIndex = 0;
             for (int i = 0; i < file.ParticleSystems.Count; ++i)
             {
-                if (selectedParticle == file.ParticleSystems[i])
+                if (selectedSystem == file.ParticleSystems[i])
                 {
                     particleSystemIndex = i;
                     break;

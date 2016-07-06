@@ -121,7 +121,7 @@
     <sys:String x:Key="LinearStr">线性</sys:String>
     <sys:String x:Key="AcceleratedStr">加速</sys:String>
     <sys:String x:Key="DeceleratedStr">减速</sys:String>
-    <sys:String x:Key="FixedStr">瞬时</sys:String>
+    <sys:String x:Key="InstantStr">瞬时</sys:String>
     <sys:String x:Key="ChangeToStr">变化到</sys:String>
     <sys:String x:Key="IncreaseStr">增加</sys:String>
     <sys:String x:Key="DecreaseStr">减少</sys:String>
@@ -157,6 +157,7 @@
     <sys:String x:Key="PlayFileSavedStr">播放文件已保存到工程文件目录下</sys:String>
     <sys:String x:Key="SaveTipStr">要保存当前文件吗？</sys:String>
     <sys:String x:Key="PlayerNotFoundStr">找不到指定的播放器程序，请重新设置</sys:String>
+    <sys:String x:Key="ImageSizeWaringStr">该图案的尺寸大小非2次幂，请考虑更改图案尺寸，否则将会变形</sys:String>
     <sys:String x:Key="ImageTypeStr">PNG图像(*.png)|*.png</sys:String>
     <sys:String x:Key="SoundTypeStr">WAV音效(*.wav)|*.wav</sys:String>
     <sys:String x:Key="BackGroundImageTypeStr">JPEG图像(*.jpg)|*.jpg|PNG图像(*.png)|*.png</sys:String>
