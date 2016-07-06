@@ -123,7 +123,11 @@ namespace CrazyStorm
                     MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
-            string genPath = Path.GetDirectoryName(config.PlayerPath) + "\\Temp\\Temp.bg";
+            string genPath = Path.GetDirectoryName(config.PlayerPath);
+            if (string.IsNullOrEmpty(genPath))
+                genPath = Environment.CurrentDirectory;
+
+            genPath += "\\Temp\\Temp.bg";
             if (!System.IO.Directory.Exists(Path.GetDirectoryName(genPath)))
                 System.IO.Directory.CreateDirectory(Path.GetDirectoryName(genPath));
 
