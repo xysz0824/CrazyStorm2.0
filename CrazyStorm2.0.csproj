@@ -230,36 +230,6 @@
     <Resource Include="Images\startup1.png" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Images\document-open-2.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Images\edit-cut-3.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Images\edit-copy-3.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Images\edit-paste-3.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Images\edit-undo-3.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Images\edit-redo-3.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Images\arrow-right-3.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Images\document-export.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Images\document-new-3.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Images\edit-find-5.ico" />
-  </ItemGroup>
-  <ItemGroup>
     <Resource Include="Images\ruler.png" />
   </ItemGroup>
   <ItemGroup>
@@ -294,7 +264,7 @@
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.0,Profile=Client">
       <Visible>False</Visible>
-      <ProductName>Microsoft .NET Framework 4 Client Profile %28x86 和 x64%29</ProductName>
+      <ProductName>Microsoft .NET Framework 4 Client Profile %28x86 and x64%29</ProductName>
       <Install>true</Install>
     </BootstrapperPackage>
     <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
@@ -318,9 +288,6 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Images\group.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="icon.ico" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Images\button-CurveEmitter-on.png" />
@@ -355,6 +322,21 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Images\barrages.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\arrow-right-3.png" />
+    <Resource Include="Images\document-export.png" />
+    <Resource Include="Images\document-new-3.png" />
+    <Resource Include="Images\document-open-2.png" />
+    <Resource Include="Images\edit-copy-3.png" />
+    <Resource Include="Images\edit-cut-3.png" />
+    <Resource Include="Images\edit-find-5.png" />
+    <Resource Include="Images\edit-paste-3.png" />
+    <Resource Include="Images\edit-redo-3.png" />
+    <Resource Include="Images\edit-undo-3.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="icon.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
