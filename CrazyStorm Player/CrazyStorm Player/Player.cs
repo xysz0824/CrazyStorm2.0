@@ -108,7 +108,7 @@ namespace CrazyStorm_Player
         }
         protected override void OnDraw()
         {
-            ClearScreen(ClearFlags.Target | ClearFlags.ZBuffer, new Color4(0.3f, 0.3f, 0.3f), 1, 0);
+            ClearScreen(ClearFlags.Target | ClearFlags.ZBuffer, Color.Black, 1, 0);
             Sprite.Begin(SpriteFlags.AlphaBlend);
             ParticleManager.Draw();
             Sprite.End();

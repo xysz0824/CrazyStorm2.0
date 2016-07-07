@@ -35,6 +35,7 @@ namespace CrazyStorm
         List<PropertyInfo> particlePropertyList;
         Action updateFunc;
         string editText;
+        Popup popup;
         bool initializeType;
         #endregion
 
@@ -201,6 +202,47 @@ namespace CrazyStorm
             window.ShowDialog();
             window.Close();
         }
+        void ShowIntellisense(PropertyContainer container, DataGridBeginningEditEventArgs e)
+        {
+            var property = e.Row.Item as PropertyGridItem;
+            var presenter = VisualHelper.GetVisualChild<DataGridCellsPresenter>(e.Row);
+            var cell = (DataGridCell)presenter.ItemContainerGenerator.ContainerFromIndex(1);
+            popup = new Popup();
+            popup.PlacementTarget = cell;
+            popup.Placement = PlacementMode.Bottom;
+            popup.PopupAnimation = PopupAnimation.Fade;
+            var listView = new ListView();
+            if (property.Info.PropertyType == typeof(bool))
+            {
+                listView.Items.Add(true.ToString());
+                listView.Items.Add(false.ToString());
+            }
+            else if (property.Info.PropertyType.IsSubclassOf(typeof(Enum)))
+            {
+                Array array = Enum.GetValues(property.Info.PropertyType);
+                foreach (var item in array)
+                    listView.Items.Add(item.ToString());
+            }
+            if (!listView.Items.IsEmpty)
+            {
+                listView.PreviewMouseLeftButtonDown += (sender, args) =>
+                {
+                    args.Handled = true;
+                    if (!(args.OriginalSource is TextBlock))
+                        return;
+
+                    var textBox = cell.Content as TextBox;
+                    textBox.Text = (args.OriginalSource as TextBlock).Text;
+                };
+                popup.Child = listView;
+                popup.IsOpen = true;
+            }
+        }
+        void HideIntellisense()
+        {
+            popup.Child = null;
+            popup.IsOpen = false;
+        }
         #endregion
 
         #region Public Methods
@@ -297,31 +339,38 @@ namespace CrazyStorm
                     OnBeginEditing();
             }
         }
-        private void ComponentGrid_CellEditEnding(object sender, DataGridCellEditEndingEventArgs e)
+        private void Grid_CellEditEnding(object sender, DataGridCellEditEndingEventArgs e)
         {
-            if ((e.EditingElement as TextBox).Text != editText)
-                SetProperty(component, e);
-
             if (OnEndEditing != null)
                 OnEndEditing();
         }
-        private void SpecificGrid_CellEditEnding(object sender, DataGridCellEditEndingEventArgs e)
+        private void ComponentGrid_BeginningEdit(object sender, DataGridBeginningEditEventArgs e)
         {
+            Grid_BeginningEdit(sender, e);
+            ShowIntellisense(component, e);
+        }
+        private void ComponentGrid_CellEditEnding(object sender, DataGridCellEditEndingEventArgs e)
+        {
+            Grid_CellEditEnding(sender, e);
             if ((e.EditingElement as TextBox).Text != editText)
                 SetProperty(component, e);
 
-            if (OnEndEditing != null)
-                OnEndEditing();
+            HideIntellisense();
+        }
+        private void ParticleGrid_BeginningEdit(object sender, DataGridBeginningEditEventArgs e)
+        {
+            Grid_BeginningEdit(sender, e);
+            ShowIntellisense((component as Emitter).Particle, e);
         }
         private void ParticleGrid_CellEditEnding(object sender, DataGridCellEditEndingEventArgs e)
         {
+            Grid_CellEditEnding(sender, e);
             if ((e.EditingElement as TextBox).Text != editText)
             {
                 if (component is Emitter)
                     SetProperty((component as Emitter).Particle, e);
             }
-            if (OnEndEditing != null)
-                OnEndEditing();
+            HideIntellisense();
         }
         private void AddVariable_Click(object sender, RoutedEventArgs e)
         {

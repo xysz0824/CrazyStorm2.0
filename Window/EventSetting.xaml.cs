@@ -15,6 +15,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using System.Windows.Controls.Primitives;
 using CrazyStorm.Core;
 using CrazyStorm.Expression;
 
@@ -31,6 +32,7 @@ namespace CrazyStorm
         bool isEditing;
         bool isExpressionResult;
         DockPanel editingPanel;
+        Popup popup;
         IOrderedEnumerable<VariableComboBoxItem> sortedVaraibles;
         #endregion
 
@@ -515,9 +517,8 @@ namespace CrazyStorm
             var item = EventList.SelectedItem;
             if (item != null)
             {
-                int index = eventGroup.TranslatedEvents.IndexOf((string)item);
-                eventGroup.OriginalEvents.RemoveAt(index);
-                eventGroup.TranslatedEvents.RemoveAt(index);
+                eventGroup.OriginalEvents.RemoveAt(EventList.SelectedIndex);
+                eventGroup.TranslatedEvents.RemoveAt(EventList.SelectedIndex);
             }
             else if (eventGroup.TranslatedEvents.Count > 0)
             {
@@ -526,14 +527,50 @@ namespace CrazyStorm
             }
             EventList.ItemsSource = eventGroup.TranslatedEvents;
         }
+        void ShowIntellisense(object propertyName, UIElement element)
+        {
+            popup = new Popup();
+            popup.PlacementTarget = element;
+            popup.Placement = PlacementMode.Bottom;
+            popup.PopupAnimation = PopupAnimation.Fade;
+            var listView = new ListView();
+            if (propertyName is bool)
+            {
+                listView.Items.Add(true.ToString());
+                listView.Items.Add(false.ToString());
+            }
+            else if (propertyName is Enum)
+            {
+                Array array = Enum.GetValues(propertyName.GetType());
+                foreach (var item in array)
+                    listView.Items.Add(item.ToString());
+            }
+            if (!listView.Items.IsEmpty)
+            {
+                listView.PreviewMouseLeftButtonDown += (sender, args) =>
+                {
+                    args.Handled = true;
+                    if (!(args.OriginalSource is TextBlock))
+                        return;
+
+                    var textBox = element as TextBox;
+                    textBox.Text = (args.OriginalSource as TextBlock).Text;
+                };
+                popup.Child = listView;
+                popup.IsOpen = true;
+            }
+        }
+        void HideIntellisense()
+        {
+            if (popup != null)
+            {
+                popup.Child = null;
+                popup.IsOpen = false;
+            }
+        }
         #endregion
 
         #region Window EventHandlers
-        private void EventList_PreviewMouseRightButtonDown(object sender, MouseButtonEventArgs e)
-        {
-            var item = VisualHelper.VisualUpwardSearch<ListViewItem>(e.OriginalSource as DependencyObject);
-            EventList.SelectedItem = item;
-        }
         private void Linear_Checked(object sender, RoutedEventArgs e)
         {
             Accelerated.IsChecked = false;
@@ -671,8 +708,18 @@ namespace CrazyStorm
         {
             ResultValue_PreviewLostKeyboardFocus(sender, null);
         }
+        private void LeftValue_PreviewGotKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
+        {
+            if (LeftConditionComboBox.SelectedItem != null)
+            {
+                var item = LeftConditionComboBox.SelectedItem as VariableComboBoxItem;
+                object value = environment.GetProperty(item.Name);
+                ShowIntellisense(value, LeftValue);
+            }
+        }
         private void LeftValue_PreviewLostKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
         {
+            HideIntellisense();
             ChangeTextBoxState(LeftValue, false);
             LeftValue.Text = LeftValue.Text.Trim();
             string input = LeftValue.Text;
@@ -712,8 +759,18 @@ namespace CrazyStorm
                 }
             }
         }
+        private void RightValue_PreviewGotKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
+        {
+            if (RightConditionComboBox.SelectedItem != null)
+            {
+                var item = RightConditionComboBox.SelectedItem as VariableComboBoxItem;
+                object value = environment.GetProperty(item.Name);
+                ShowIntellisense(value, RightValue);
+            }
+        }
         private void RightValue_PreviewLostKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
         {
+            HideIntellisense();
             ChangeTextBoxState(RightValue, false);
             RightValue.Text = RightValue.Text.Trim();
             string input = RightValue.Text;
@@ -753,8 +810,18 @@ namespace CrazyStorm
                 }
             }
         }
+        private void ResultValue_PreviewGotKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
+        {
+            if (PropertyComboBox.SelectedItem != null)
+            {
+                var item = PropertyComboBox.SelectedItem as VariableComboBoxItem;
+                object value = environment.GetProperty(item.Name);
+                ShowIntellisense(value, ResultValue);
+            }
+        }
         private void ResultValue_PreviewLostKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
         {
+            HideIntellisense();
             ChangeTextBoxState(ResultValue, false);
             ResultValue.Text = ResultValue.Text.Trim();
             string input = ResultValue.Text;
@@ -931,8 +998,6 @@ namespace CrazyStorm
             if (e.Key == Key.Delete)
                 DeleteEvent();
         }
-        #endregion
-
         private void EventList_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (EventList.SelectedIndex == -1)
@@ -940,5 +1005,6 @@ namespace CrazyStorm
 
             MapEventText(eventGroup.OriginalEvents[EventList.SelectedIndex]);
         }
+        #endregion
     }
 }

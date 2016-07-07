@@ -270,7 +270,7 @@
             <Menu.Background>
                 <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
                     <GradientStop Color="White" Offset="0" />
-                    <GradientStop Color="Gainsboro" Offset="1" />
+                    <GradientStop Color="#FFF0F0F0" Offset="1" />
                 </LinearGradientBrush>
             </Menu.Background>
             <MenuItem  Header="{StaticResource FileStr}" Padding="10,0">
@@ -332,7 +332,7 @@
             </MenuItem>
         </Menu>
         <!-- Status Bar -->
-        <StatusBar Height="23" Width="Auto" DockPanel.Dock="Bottom" Background="#FFE4E4E4" Padding="1,0,6,0">
+        <StatusBar Height="23" Width="Auto" DockPanel.Dock="Bottom" Background="#FFF0F0F0" Padding="1,0,6,0">
             <StatusBarItem Name="StatusText" Content="{Binding Path=Status}" />
             <StatusBarItem Name="MousePosTip" HorizontalAlignment="Right" />
         </StatusBar>
@@ -341,7 +341,7 @@
             <ToolBar.Background>
                 <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
                     <GradientStop Color="White" Offset="0" />
-                    <GradientStop Color="Gainsboro" Offset="1" />
+                    <GradientStop Color="#FFF0F0F0" Offset="1" />
                 </LinearGradientBrush>
             </ToolBar.Background>
             <Button Name="NewButton" IsDefault="False" IsCancel="False" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" 
@@ -648,7 +648,7 @@
                         <DockPanel.Background>
                             <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
                                 <GradientStop Color="White" Offset="0" />
-                                <GradientStop Color="Gainsboro" Offset="1" />
+                                <GradientStop Color="#FFF0F0F0" Offset="1" />
                             </LinearGradientBrush>
                         </DockPanel.Background>
                         <Label  Content="{StaticResource LayerStr}" Height="28" Width="228" Name="label1" Padding="5,6,5,5" BorderBrush="{x:Null}" />

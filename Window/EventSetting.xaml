@@ -29,7 +29,7 @@
                         <TextBox Width="40"></TextBox>
                     </StackPanel>
                     <ListView Name="EventList" ItemsSource="{Binding }" Height="180" SelectionMode="Single" 
-                              PreviewMouseRightButtonDown="EventList_PreviewMouseRightButtonDown" KeyDown="EventList_KeyDown" SelectionChanged="EventList_SelectionChanged" >
+                             KeyDown="EventList_KeyDown" SelectionChanged="EventList_SelectionChanged" >
                         <ListView.ItemTemplate>
                             <DataTemplate>
                                 <DockPanel Name="EventItem" PreviewMouseLeftButtonDown="EventItem_PreviewMouseLeftButtonDown">
@@ -62,7 +62,7 @@
                     <RadioButton Name="LeftLessThan" Content="&lt;" />
                 </StackPanel>
                 <TextBox Name="LeftValue" Width="50" VerticalContentAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Center" Height="25" 
-                         PreviewLostKeyboardFocus="LeftValue_PreviewLostKeyboardFocus" MaxLines="1" />
+                         PreviewLostKeyboardFocus="LeftValue_PreviewLostKeyboardFocus" MaxLines="1" PreviewGotKeyboardFocus="LeftValue_PreviewGotKeyboardFocus" />
                 <StackPanel Margin="5,0" VerticalAlignment="Center">
                     <RadioButton Name="And" Content="且" />
                     <RadioButton Name="Or" Content="或" />
@@ -80,7 +80,7 @@
                     <RadioButton Name="RightLessThan" Content="&lt;" />
                 </StackPanel>
                 <TextBox Name="RightValue" Width="50" VerticalContentAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Center" Height="25" 
-                         PreviewLostKeyboardFocus="RightValue_PreviewLostKeyboardFocus" MaxLines="1"/>
+                         PreviewLostKeyboardFocus="RightValue_PreviewLostKeyboardFocus" MaxLines="1" PreviewGotKeyboardFocus="RightValue_PreviewGotKeyboardFocus"/>
             </StackPanel>
         </GroupBox>
         <GroupBox Name="PropertyEventPanel" Header="属性事件">
@@ -96,7 +96,7 @@
                     <RadioButton Name="ChangeTo" Content="变化到" VerticalAlignment="Center" Margin="5,0,5,0"></RadioButton>
                     <RadioButton Name="Increase" Content="增加" VerticalAlignment="Center" Margin="5,0"></RadioButton>
                     <RadioButton Name="Decrease" Content="减少" VerticalAlignment="Center" Margin="5,0,5,0"></RadioButton>
-                    <TextBox Name="ResultValue" VerticalContentAlignment="Center" Height="25" PreviewLostKeyboardFocus="ResultValue_PreviewLostKeyboardFocus" MaxLines="1"/>
+                    <TextBox Name="ResultValue" VerticalContentAlignment="Center" Height="25" PreviewLostKeyboardFocus="ResultValue_PreviewLostKeyboardFocus" MaxLines="1" PreviewGotKeyboardFocus="ResultValue_PreviewGotKeyboardFocus"/>
                 </DockPanel>
                 <StackPanel Orientation="Horizontal" Margin="0,1" HorizontalAlignment="Center">
                     <StackPanel Margin="6,0">
