@@ -140,6 +140,12 @@
     <sys:String x:Key="YellowStr">黄</sys:String>
     <sys:String x:Key="OrangeStr">橙</sys:String>
     <sys:String x:Key="GrayStr">灰</sys:String>
+    <sys:String x:Key="TypeErrorStr">值类型错误</sys:String>
+    <sys:String x:Key="IllegalInputStr">非法输入</sys:String>
+    <sys:String x:Key="SyntaxErrorStr">语法错误</sys:String>
+    <sys:String x:Key="DividedByZeroStr">除零错误</sys:String>
+    <sys:String x:Key="UndefinationErrorStr">未定义变量错误</sys:String>
+    <sys:String x:Key="ArgumentErrorStr">参数数量错误</sys:String>
     <sys:String x:Key="FileTypeErrorStr">该文件格式不正确，无法打开</sys:String>
     <sys:String x:Key="FileDataErrorStr">该文件数据已损坏，无法打开</sys:String>
     <sys:String x:Key="DifferentVersionStr">该文件版本与当前版本不一致，确认要打开吗？</sys:String>

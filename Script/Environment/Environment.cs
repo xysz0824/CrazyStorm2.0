@@ -60,22 +60,22 @@ namespace CrazyStorm.Expression
         #region Private Methods
         void InitializeSystemFunctions()
         {
-            PutFunction("dist", new Expression.Function(2));
-            PutFunction("angle", new Expression.Function(2));
-            PutFunction("rand", new Expression.Function(2));
-            PutFunction("randi", new Expression.Function(2));
-            PutFunction("sin", new Expression.Function(1));
-            PutFunction("cos", new Expression.Function(1));
-            PutFunction("tan", new Expression.Function(1));
-            PutFunction("pi", new Expression.Function(0));
-            PutFunction("e", new Expression.Function(0));
-            PutFunction("asin", new Expression.Function(1));
-            PutFunction("acos", new Expression.Function(1));
-            PutFunction("atan", new Expression.Function(1));
-            PutFunction("exp", new Expression.Function(1));
-            PutFunction("log", new Expression.Function(2));
-            PutFunction("pow", new Expression.Function(2));
-            PutFunction("sqrt", new Expression.Function(1));
+            PutFunction("dist", new Expression.Function(typeof(Core.Vector2), typeof(Core.Vector2)));
+            PutFunction("angle", new Expression.Function(typeof(Core.Vector2), typeof(Core.Vector2)));
+            PutFunction("rand", new Expression.Function(typeof(float), typeof(float)));
+            PutFunction("randi", new Expression.Function(typeof(float), typeof(float)));
+            PutFunction("sin", new Expression.Function(typeof(float)));
+            PutFunction("cos", new Expression.Function(typeof(float)));
+            PutFunction("tan", new Expression.Function(typeof(float)));
+            PutFunction("pi", new Expression.Function());
+            PutFunction("e", new Expression.Function());
+            PutFunction("asin", new Expression.Function(typeof(float)));
+            PutFunction("acos", new Expression.Function(typeof(float)));
+            PutFunction("atan", new Expression.Function(typeof(float)));
+            PutFunction("exp", new Expression.Function(typeof(float)));
+            PutFunction("log", new Expression.Function(typeof(float), typeof(float)));
+            PutFunction("pow", new Expression.Function(typeof(float), typeof(float)));
+            PutFunction("sqrt", new Expression.Function(typeof(float)));
         }
         void PutFunction(string name, Function function)
         {

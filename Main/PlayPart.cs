@@ -158,6 +158,7 @@ namespace CrazyStorm
             ProcessStartInfo ps = new ProcessStartInfo(config.PlayerPath);
             ps.Arguments = "\"" + genPath + "\" " + particleSystemIndex + " ";
             ps.Arguments += config.ParticleMaximum + " " + config.CurveParticleMaximum + " ";
+            ps.Arguments += config.Windowed + " ";
             ps.Arguments += config.ScreenCenter + " " + config.CenterX + " " + config.CenterY + " ";
             ps.Arguments += "\"" + config.SelfImagePath + "\" \"" + config.SelfSetting + "\"";
             ps.WindowStyle = ProcessWindowStyle.Normal;

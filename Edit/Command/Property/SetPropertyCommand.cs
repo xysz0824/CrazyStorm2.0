@@ -63,17 +63,17 @@ namespace CrazyStorm
                     return true;
                 }
                 if (attribute is StringPropertyAttribute)
-                    throw new ExpressionException("Illegal string.");
+                    throw new ExpressionException("IllegalInput");
 
                 var lexer = new Lexer();
                 lexer.Load(newValue);
                 var syntaxTree = new Parser(lexer).Expression();
                 if (syntaxTree is Number)
-                    throw new ExpressionException("Illegal input.");
+                    throw new ExpressionException("IllegalInput");
 
                 var result = syntaxTree.Eval(environment);
                 if (!PropertyTypeRule.IsMatchWith(propertyInfo.PropertyType, result.GetType()))
-                    throw new ExpressionException("Type error.");
+                    throw new ExpressionException("TypeError");
 
                 container.Properties[propertyInfo.Name].Expression = true;
                 container.Properties[propertyInfo.Name].Value = newValue;
@@ -86,7 +86,7 @@ namespace CrazyStorm
             {
                 var tip = new ToolTip();
                 var tipText = new TextBlock();
-                tipText.Text = e.Message;
+                tipText.Text = (string)cell.FindResource(e.Message + "Str");
                 tip.Content = tipText;
                 cell.ToolTip = tip;
                 cell.BorderBrush = new SolidColorBrush(Colors.Red);

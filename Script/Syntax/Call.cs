@@ -25,15 +25,15 @@ namespace CrazyStorm.Expression
             var functionName = (string)Token.GetValue();
             var function = e.GetFunction(functionName);
             if (function == null)
-                throw new ExpressionException("Undefination error.");
+                throw new ExpressionException("UndefinationError");
 
             var argumentList = GetArguments().Eval(e) as List<object>;
             if (argumentList.Count != function.ArgumentCount)
-                throw new ExpressionException("Argument error.");
+                throw new ExpressionException("ArgumentError");
 
-            foreach (var item in argumentList)
-                if (!(item is int) && !(item is float) && !(item is Core.Vector2))
-                    throw new ExpressionException("Type error.");
+            for(int i = 0;i < argumentList.Count;++i)
+                if (argumentList[i].GetType() != function.ArgumentTypes[i])
+                    throw new ExpressionException("TypeError");
 
             //Calling function is a runtime operation so it can't be evaluated right here.
             //Return a false value.

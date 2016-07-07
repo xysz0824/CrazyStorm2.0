@@ -172,13 +172,13 @@ namespace CrazyStorm
             foreach (string originalEvent in eventGroup.OriginalEvents)
                 eventGroup.TranslatedEvents.Add(TranslateEvent(originalEvent));
         }
-        void ChangeTextBoxState(TextBox source, bool hasError)
+        void ChangeTextBoxState(TextBox source, ExpressionException error)
         {
-            if (hasError)
+            if (error != null)
             {
                 var tip = new ToolTip();
                 var tipText = new TextBlock();
-                tipText.Text = (string)FindResource("ValueInvalidStr");
+                tipText.Text = (string)FindResource(error.Message + "Str");
                 tip.Content = tipText;
                 source.ToolTip = tip;
                 source.Background = new SolidColorBrush(Color.FromRgb(255, 190, 190));
@@ -720,7 +720,7 @@ namespace CrazyStorm
         private void LeftValue_PreviewLostKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
         {
             HideIntellisense();
-            ChangeTextBoxState(LeftValue, false);
+            ChangeTextBoxState(LeftValue, null);
             LeftValue.Text = LeftValue.Text.Trim();
             string input = LeftValue.Text;
             if (String.IsNullOrEmpty(input))
@@ -734,7 +734,7 @@ namespace CrazyStorm
                 {
                     if (!PropertyTypeRule.TryParse(value, input, out value))
                     {
-                        ChangeTextBoxState(LeftValue, true);
+                        ChangeTextBoxState(LeftValue, new ExpressionException("TypeError"));
                         return;
                     }
                     LeftValue.Text = value.ToString();
@@ -753,7 +753,7 @@ namespace CrazyStorm
                     float testValue;
                     if (!float.TryParse(input, out testValue))
                     {
-                        ChangeTextBoxState(LeftValue, true);
+                        ChangeTextBoxState(LeftValue, new ExpressionException("TypeError"));
                         return;
                     }
                 }
@@ -771,7 +771,7 @@ namespace CrazyStorm
         private void RightValue_PreviewLostKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
         {
             HideIntellisense();
-            ChangeTextBoxState(RightValue, false);
+            ChangeTextBoxState(RightValue, null);
             RightValue.Text = RightValue.Text.Trim();
             string input = RightValue.Text;
             if (String.IsNullOrEmpty(input))
@@ -785,7 +785,7 @@ namespace CrazyStorm
                 {
                     if (!PropertyTypeRule.TryParse(value, input, out value))
                     {
-                        ChangeTextBoxState(RightValue, true);
+                        ChangeTextBoxState(RightValue, new ExpressionException("TypeError"));
                         return;
                     }
                     RightValue.Text = value.ToString();
@@ -804,7 +804,7 @@ namespace CrazyStorm
                     float testValue;
                     if (!float.TryParse(input, out testValue))
                     {
-                        ChangeTextBoxState(RightValue, true);
+                        ChangeTextBoxState(RightValue, new ExpressionException("TypeError"));
                         return;
                     }
                 }
@@ -822,7 +822,7 @@ namespace CrazyStorm
         private void ResultValue_PreviewLostKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
         {
             HideIntellisense();
-            ChangeTextBoxState(ResultValue, false);
+            ChangeTextBoxState(ResultValue, null);
             ResultValue.Text = ResultValue.Text.Trim();
             string input = ResultValue.Text;
             if (String.IsNullOrEmpty(input))
@@ -847,11 +847,11 @@ namespace CrazyStorm
                         lexer.Load(input);
                         var syntaxTree = new Parser(lexer).Expression();
                         if (syntaxTree is Number)
-                            throw new ExpressionException();
+                            throw new ExpressionException("TypeError");
 
                         var result = syntaxTree.Eval(environment);
                         if (!(PropertyTypeRule.IsMatchWith(value.GetType(), result.GetType())))
-                            throw new ExpressionException();
+                            throw new ExpressionException("TypeError");
 
                         isExpressionResult = true;
                         return;
@@ -872,20 +872,20 @@ namespace CrazyStorm
                         var syntaxTree = new Parser(lexer).Expression();
                         var result = syntaxTree.Eval(environment);
                         if (!(result is float))
-                            throw new ExpressionException();
+                            throw new ExpressionException("TypeError");
 
                         isExpressionResult = true;
                     }
                 }
-                catch
+                catch (ExpressionException error)
                 {
-                    ChangeTextBoxState(ResultValue, true);
+                    ChangeTextBoxState(ResultValue, error);
                 }
             }
         }
         private void ChangeTime_PreviewLostKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
         {
-            ChangeTextBoxState(ChangeTime, false);
+            ChangeTextBoxState(ChangeTime, null);
             ChangeTime.Text = ChangeTime.Text.Trim();
             string input = ChangeTime.Text;
             if (String.IsNullOrEmpty(input))
@@ -893,13 +893,13 @@ namespace CrazyStorm
 
             int value;
             if (!int.TryParse(input, out value))
-                ChangeTextBoxState(ChangeTime, true);
+                ChangeTextBoxState(ChangeTime, new ExpressionException("TypeError"));
             else if (value <= 0)
                 ChangeTime.Text = "1";
         }
         private void Condition_PreviewLostKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
         {
-            ChangeTextBoxState(Condition, false);
+            ChangeTextBoxState(Condition, null);
             Condition.Text = Condition.Text.Trim();
             string input = Condition.Text;
             if (String.IsNullOrEmpty(input))
@@ -914,17 +914,17 @@ namespace CrazyStorm
                 var syntaxTree = new Parser(lexer).Expression();
                 var result = syntaxTree.Eval(environment);
                 if (!(result is bool))
-                    throw new ExpressionException();
+                    throw new ExpressionException("TypeError");
                 eventGroup.Condition = input;
             }
-            catch
+            catch (ExpressionException error)
             {
-                ChangeTextBoxState(Condition, true);
+                ChangeTextBoxState(Condition, error);
             }
         }
         private void StopCondition_PreviewLostKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
         {
-            ChangeTextBoxState(StopCondition, false);
+            ChangeTextBoxState(StopCondition, null);
             StopCondition.Text = StopCondition.Text.Trim();
             string input = StopCondition.Text;
             if (String.IsNullOrEmpty(input))
@@ -937,11 +937,11 @@ namespace CrazyStorm
                 var syntaxTree = new Parser(lexer).Expression();
                 var result = syntaxTree.Eval(environment);
                 if (!(result is bool))
-                    throw new ExpressionException();
+                    throw new ExpressionException("TypeError");
             }
-            catch
+            catch (ExpressionException error)
             {
-                ChangeTextBoxState(StopCondition, true);
+                ChangeTextBoxState(StopCondition, error);
             }
         }
         private void TypeCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)

@@ -64,7 +64,7 @@ namespace CrazyStorm.Expression
         {
             Token token = lexer.Read();
             if (!(token is IdentifierToken && name == (string)token.GetValue()))
-                throw new ExpressionException("Syntax error.");
+                throw new ExpressionException("SyntaxError");
 
             return token;
         }
@@ -124,7 +124,7 @@ namespace CrazyStorm.Expression
             else if (dimension == 3)
                 return new RGB(coordinateList[0], coordinateList[1], coordinateList[2]);
             else
-                throw new ExpressionException("Syntax error.");
+                throw new ExpressionException("SyntaxError");
         }
 
         public SyntaxTree Factor()
@@ -166,7 +166,7 @@ namespace CrazyStorm.Expression
                         return new Name(token);
                 }
                 else
-                    throw new ExpressionException("Syntax error.");
+                    throw new ExpressionException("SyntaxError");
             }
         }
 

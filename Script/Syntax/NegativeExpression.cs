@@ -25,7 +25,7 @@ namespace CrazyStorm.Expression
             if (num is float)
                 return -(float)num;
             else
-                throw new ExpressionException("Type error.");
+                throw new ExpressionException("TypeError");
         }
 
         public override void Compile(List<byte> codeStream)

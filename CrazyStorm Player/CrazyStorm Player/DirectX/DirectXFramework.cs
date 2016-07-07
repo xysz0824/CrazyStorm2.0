@@ -20,7 +20,6 @@ namespace CrazyStorm_Player.DirectX
         #region Private Members
         bool disposed;
         bool deviceLost;
-        bool formResizing;
         Form form;
         FormConfig windowConfig;
         DeviceContext context;
@@ -98,55 +97,6 @@ namespace CrazyStorm_Player.DirectX
             context = new DeviceContext(form.Handle, settings);
             sprite = new Sprite(context.Device);
         }
-        void HandleResize(object sender, EventArgs e)
-        {
-            if (form.WindowState == FormWindowState.Minimized)
-                return;
-
-            OnLost();
-            if (context != null)
-            {
-                context.PresentParameters.BackBufferWidth = 0;
-                context.PresentParameters.BackBufferHeight = 0;
-                context.Device.Reset(context.PresentParameters);
-            }
-            OnReset();
-        }
-        void HandleResize()
-        {
-            var currentWindowState = form.WindowState;
-            form.ResizeBegin += (o, args) => { formResizing = true; };
-            form.Resize += (o, args) =>
-                {
-                    if (form.WindowState != currentWindowState)
-                        HandleResize(o, args);
-
-                    currentWindowState = form.WindowState;
-                };
-            form.ResizeEnd += (o, args) => { formResizing = false; HandleResize(o, args); };
-        }
-        void HandleAltEnter()
-        {
-            form.KeyUp += (o, args) =>
-                {
-                    if (args.Alt && args.KeyCode == Keys.Enter)
-                    {
-                        OnLost();
-                        Windowed = !Windowed;
-                        if (context != null)
-                        {
-                            context.PresentParameters.BackBufferWidth = windowConfig.WindowWidth;
-                            context.PresentParameters.BackBufferHeight = windowConfig.WindowHeight;
-                            context.PresentParameters.Windowed = !Windowed;
-                            if (Windowed)
-                                form.MaximizeBox = true;
-
-                            context.Device.Reset(context.PresentParameters);
-                        }
-                        OnReset();
-                    }
-                };
-        }
         void MeasureDeltaTime()
         {
             long lastTicks = ticks;
@@ -223,13 +173,6 @@ namespace CrazyStorm_Player.DirectX
             }
             disposed = true;
         }
-        #endregion
-
-        #region Abstract Methods
-        protected abstract void OnInitialize();
-        protected abstract void OnLoad();
-        protected abstract void OnUpdate();
-        protected abstract void OnDraw();
         protected virtual void OnReset()
         {
             sprite.OnResetDevice();
@@ -238,6 +181,10 @@ namespace CrazyStorm_Player.DirectX
         {
             sprite.OnLostDevice();
         }
+        protected abstract void OnInitialize();
+        protected abstract void OnLoad();
+        protected abstract void OnUpdate();
+        protected abstract void OnDraw();
         #endregion
 
         #region Public Methods
@@ -246,14 +193,11 @@ namespace CrazyStorm_Player.DirectX
             OnInitialize();
             CreateWindow();
             InitializeDevice();
-            HandleResize();
-            HandleAltEnter();
             OnLoad();
             MessagePump.Run(form, () =>
                 {
                     Update();
-                    if (!formResizing)
-                        Draw();
+                    Draw();
                 });
             OnLost();
         }

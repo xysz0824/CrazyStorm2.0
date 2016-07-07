@@ -29,9 +29,10 @@ namespace CrazyStorm_Player
             int particleMaximum = Int32.Parse(Environment.GetCommandLineArgs()[3]);
             int curveParticleMaximum = Int32.Parse(Environment.GetCommandLineArgs()[4]);
             ParticleManager.Initialize(WindowWidth, WindowHeight, 50, particleMaximum, curveParticleMaximum);
-            if (!bool.Parse(Environment.GetCommandLineArgs()[5]))
-                customCenter = new Vector2(Int32.Parse(Environment.GetCommandLineArgs()[6]), 
-                    Int32.Parse(Environment.GetCommandLineArgs()[7]));
+            Windowed = bool.Parse(Environment.GetCommandLineArgs()[5]);
+            if (!bool.Parse(Environment.GetCommandLineArgs()[6]))
+                customCenter = new Vector2(Int32.Parse(Environment.GetCommandLineArgs()[7]), 
+                    Int32.Parse(Environment.GetCommandLineArgs()[8]));
             
             ParticleManager.OnParticleDraw += (particle) =>
             {

@@ -31,7 +31,7 @@ namespace CrazyStorm.Expression
                 {
                     result = e.GetGlobal(name);
                     if (result == null)
-                        throw new ExpressionException("Undefination error.");
+                        throw new ExpressionException("UndefinationError");
                 }
             }
             return result;

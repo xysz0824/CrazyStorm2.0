@@ -42,7 +42,7 @@ namespace CrazyStorm.Expression
                             return (bool)left == (bool)right;
                     }
                 }
-                return new ExpressionException("Type error.");
+                return new ExpressionException("TypeError");
             }
             switch (op)
             {
@@ -54,12 +54,12 @@ namespace CrazyStorm.Expression
                     return (float)left * (float)right;
                 case "/":
                     if (Convert.ToSingle(right) == 0)
-                        throw new ExpressionException("Divided by zero.");
+                        throw new ExpressionException("DividedByZero");
 
                     return (float)left / (float)right;
                 case "%":
                     if (Convert.ToSingle(right) == 0)
-                        throw new ExpressionException("Divided by zero.");
+                        throw new ExpressionException("DividedByZero");
 
                     return (float)left % (float)right;
                 case ">":
@@ -69,7 +69,7 @@ namespace CrazyStorm.Expression
                 case "=":
                     return (float)left == (float)right;
             }
-            return new ExpressionException("Type error.");
+            return new ExpressionException("TypeError");
         }
 
         public override void Compile(List<byte> codeStream)

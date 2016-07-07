@@ -12,11 +12,14 @@ namespace CrazyStorm.Expression
     public class Function
     {
         int argumentCount;
-        public Function(int argumentCount)
+        Type[] argumentTypes;
+        public Function(params Type[] argumentTypes)
         {
-            this.argumentCount = argumentCount;
+            this.argumentCount = argumentTypes.Length;
+            this.argumentTypes = argumentTypes;
         }
 
         public int ArgumentCount { get { return argumentCount; } }
+        public Type[] ArgumentTypes { get { return argumentTypes; } }
     }
 }

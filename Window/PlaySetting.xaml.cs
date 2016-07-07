@@ -39,6 +39,11 @@ namespace CrazyStorm
             Setting.DataContext = config;
             selfSettingBoxes = new TextBox[] { SelfStartX, SelfStartY, SelfWidth, SelfHeight, SelfCenterX, SelfCenterY,
                 SelfFrames, SelfDelay, SelfRadius};
+            if (config.Windowed)
+                Windowed.IsChecked = true;
+            else
+                FullScreen.IsChecked = true;
+
             if (config.ScreenCenter)
                 ScreenCenter.IsChecked = true;
             else
@@ -92,6 +97,7 @@ namespace CrazyStorm
                 config.PlayerPath = PlayerPath.Text;
                 config.ParticleMaximum = particleMaximum;
                 config.CurveParticleMaximum = curveParticleMaximum;
+                config.Windowed = Windowed.IsChecked == true;
                 config.ScreenCenter = ScreenCenter.IsChecked == true;
                 config.CenterX = centerX;
                 config.CenterY = centerY;

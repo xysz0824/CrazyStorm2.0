@@ -26,7 +26,7 @@ namespace CrazyStorm.Expression
             var x = GetX().Eval(e);
             var y = GetY().Eval(e);
             if ((!(x is int) && !(x is float)) || (!(y is int) && !(y is float)))
-                throw new ExpressionException("Type error.");
+                throw new ExpressionException("TypeError");
 
             return new Core.Vector2(Convert.ToSingle(x), Convert.ToSingle(y));
         }

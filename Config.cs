@@ -27,6 +27,7 @@ namespace CrazyStorm
         string playerPath;
         int particleMaximum;
         int curveParticleMaximum;
+        bool windowed;
         bool screenCenter;
         int centerX;
         int centerY;
@@ -130,6 +131,16 @@ namespace CrazyStorm
                 }
             }
         }
+        public bool Windowed
+        {
+            get { return windowed; }
+            set
+            {
+                windowed = value;
+                if (PropertyChanged != null)
+                    PropertyChanged(this, new PropertyChangedEventArgs("Windowed"));
+            }
+        }
         public bool ScreenCenter
         {
             get { return screenCenter; }
@@ -208,6 +219,7 @@ namespace CrazyStorm
             playerPath = iniHelper.ReadValue("Play", "PlayerPath", string.Empty);
             particleMaximum = iniHelper.ReadValue("Play", "ParticleMaximum", 10000);
             curveParticleMaximum = iniHelper.ReadValue("Play", "CurveParticleMaximum", 200);
+            windowed = iniHelper.ReadValue("Play", "Windowed", true);
             screenCenter = iniHelper.ReadValue("Play", "ScreenCenter", true);
             centerX = iniHelper.ReadValue("Play", "CenterX", 0);
             centerY = iniHelper.ReadValue("Play", "CenterY", 0);
@@ -224,6 +236,7 @@ namespace CrazyStorm
             iniHelper.WriteValue("Play", "PlayerPath", playerPath);
             iniHelper.WriteValue("Play", "ParticleMaximum", particleMaximum);
             iniHelper.WriteValue("Play", "CurveParticleMaximum", curveParticleMaximum);
+            iniHelper.WriteValue("Play", "Windowed", windowed);
             iniHelper.WriteValue("Play", "ScreenCenter", screenCenter);
             iniHelper.WriteValue("Play", "CenterX", centerX);
             iniHelper.WriteValue("Play", "CenterY", centerY);

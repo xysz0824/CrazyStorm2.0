@@ -138,6 +138,12 @@ namespace CrazyStorm_Player.CrazyStorm
                             case "randi":
                                 int i2 = VM.PopInt();
                                 int i1 = VM.PopInt();
+                                if (i1 > i2)
+                                {
+                                    int temp = i1;
+                                    i1 = i2;
+                                    i2 = temp;
+                                }
                                 VM.PushInt(random.Next(i1, i2));
                                 break;
                             case "sin":

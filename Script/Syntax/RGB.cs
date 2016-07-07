@@ -30,7 +30,7 @@ namespace CrazyStorm.Expression
             var g = GetG().Eval(e);
             var b = GetB().Eval(e);
             if ((!(r is int) && !(r is float)) || (!(g is int) && !(g is float)) || (!(b is int) && !(b is float)))
-                throw new ExpressionException("Type error.");
+                throw new ExpressionException("TypeError");
 
             return new Core.RGB(Convert.ToSingle(r), Convert.ToSingle(g), Convert.ToSingle(b));
         }
