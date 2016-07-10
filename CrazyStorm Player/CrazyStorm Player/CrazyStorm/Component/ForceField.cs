@@ -118,12 +118,10 @@ namespace CrazyStorm_Player.CrazyStorm
                 return false;
 
             if (BindingTarget == null || BindingTarget.Particles.Count == 0)
-                Update(Position);
+                Update();
             else
-            {
-                foreach (var particle in BindingTarget.Particles)
-                    Update(particle.PPosition);
-            }
+                BindingUpdate(Update);
+
             return true;
         }
         public override void Reset()
@@ -139,14 +137,14 @@ namespace CrazyStorm_Player.CrazyStorm
             Direction = initialState.Direction;
             ForceType = initialState.ForceType;
         }
-        void Update(Vector2 position)
+        void Update()
         {
             base.ExecuteExpression("HalfWidth");
             base.ExecuteExpression("HalfHeight");
             base.ExecuteExpression("Force");
             base.ExecuteExpression("Direction");
-            List<ParticleBase> results = ParticleManager.SearchByRect(position.x - HalfWidth, position.x + HalfWidth,
-                position.y - HalfHeight, position.y + HalfHeight);
+            List<ParticleBase> results = ParticleManager.SearchByRect(Position.x - HalfWidth, Position.x + HalfWidth,
+                Position.y - HalfHeight, Position.y + HalfHeight);
             foreach (Particle particle in results)
             {
                 if (particle.IgnoreForce)
@@ -167,7 +165,7 @@ namespace CrazyStorm_Player.CrazyStorm
                 }
                 if (FieldShape == FieldShape.Circle)
                 {
-                    Vector2 v = position - particle.PPosition;
+                    Vector2 v = Position - particle.PPosition;
                     if (Math.Sqrt(v.x * v.x + v.y * v.y) > HalfWidth)
                         continue;
                 }
@@ -179,12 +177,12 @@ namespace CrazyStorm_Player.CrazyStorm
                         particle.PSpeedVector += v;
                         break;
                     case ForceType.Inner:
-                        v = position - particle.PPosition;
+                        v = Position - particle.PPosition;
                         float d = (float)Math.Sqrt(v.x * v.x + v.y * v.y);
                         particle.PSpeedVector += v / d * (Force / particle.Mass);
                         break;
                     case ForceType.Outer:
-                        v = particle.PPosition - position;
+                        v = particle.PPosition - Position;
                         d = (float)Math.Sqrt(v.x * v.x + v.y * v.y);
                         particle.PSpeedVector += v / d * (Force / particle.Mass);
                         break;

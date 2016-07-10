@@ -346,46 +346,46 @@
             </ToolBar.Background>
             <Button Name="NewButton" IsDefault="False" IsCancel="False" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" 
                     ToolTip="{StaticResource NewStr}" Click="NewItem_Click">
-                <Image Source="Images/document-new-3.ico" Stretch="None" />
+                <Image Source="Images/document-new-3.png" Width="24" Height="24" />
             </Button>
             <Button Name="OpenButton" IsDefault="False" IsCancel="False" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" 
                     ToolTip="{StaticResource OpenStr}"  Click="OpenItem_Click">
-                <Image Source="Images/document-open-2.ico" Stretch="None" />
+                <Image Source="Images/document-open-2.png" Width="24" Height="24" />
             </Button>
             <Button Name="SaveButton" IsDefault="False" IsCancel="False" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" 
                     ToolTip="{StaticResource SaveStr}"  Click="SaveItem_Click">
-                <Image Source="Images/document-export.ico" Stretch="None" />
+                <Image Source="Images/document-export.png" Width="24" Height="24" />
             </Button>
             <Separator/>
             <Button Name="CutButton" IsDefault="False" IsCancel="False" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" 
                     ToolTip="{StaticResource CutStr}" Click="CutItem_Click">
-                <Image Source="Images/edit-cut-3.ico" Stretch="None" />
+                <Image Source="Images/edit-cut-3.png" Width="24" Height="24" />
             </Button>
             <Button Name="CopyButton" IsDefault="False" IsCancel="False" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" 
                     ToolTip="{StaticResource CopyStr}" Click="CopyItem_Click">
-                <Image Source="Images/edit-copy-3.ico" Stretch="None" />
+                <Image Source="Images/edit-copy-3.png" Width="24" Height="24" />
             </Button>
             <Button Name="PasteButton" IsDefault="False" IsCancel="False" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" 
                     ToolTip="{StaticResource PasteStr}" Click="PasteItem_Click">
-                <Image Source="Images/edit-paste-3.ico" Stretch="None" />
+                <Image Source="Images/edit-paste-3.png" Width="24" Height="24" />
             </Button>
             <Button Name="FindButton" IsDefault="False" IsCancel="False" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" 
                     ToolTip="{StaticResource FindStr}" Click="FindItem_Click" >
-                <Image Source="Images/edit-find-5.ico" Stretch="None" />
+                <Image Source="Images/edit-find-5.png" Width="24" Height="24" />
             </Button>
             <Separator/>
             <Button Name="UndoButton" IsDefault="False" IsCancel="False" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" 
                     ToolTip="{StaticResource UndoStr}" Click="UndoItem_Click">
-                <Image Source="Images/edit-undo-3.ico" Stretch="None" />
+                <Image Source="Images/edit-undo-3.png" Width="24" Height="24" />
             </Button>
             <Button Name="RedoButton" IsDefault="False" IsCancel="False" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" 
                     ToolTip="{StaticResource RedoStr}" Click="RedoItem_Click">
-                <Image Source="Images/edit-redo-3.ico" Stretch="None" />
+                <Image Source="Images/edit-redo-3.png" Width="24" Height="24" />
             </Button>
             <Separator/>
             <Button Name="PlayButton" IsDefault="False" IsCancel="False" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" 
                     ToolTip="{StaticResource PlayStr}" Click="PlayItem_Click">
-                <Image Source="Images/arrow-right-3.ico" Stretch="None" />
+                <Image Source="Images/arrow-right-3.png" Width="24" Height="24" />
             </Button>
         </ToolBar>
         <!-- Main Grid -->

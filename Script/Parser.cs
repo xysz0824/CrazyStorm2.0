@@ -176,6 +176,8 @@ namespace CrazyStorm.Expression
             SyntaxTree arguments = null;
             if (!IsIdentifierToken(")"))
                 arguments = Arguments();
+            else
+                arguments = new Arguments(new List<SyntaxTree>());
 
             IdentifierToken(")");
             return arguments;

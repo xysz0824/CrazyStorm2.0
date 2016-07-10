@@ -252,6 +252,30 @@ namespace CrazyStorm_Player.CrazyStorm
                     return false;
             }
         }
+        public delegate void Action();
+        public void BindingUpdate(Action updateFunc)
+        {
+            Vector2 savePosition = Position;
+            float saveSpeed = Speed;
+            float saveSpeedAngle = SpeedAngle;
+            float saveAcspeed = Acspeed;
+            float saveAcspeedAngle = AcspeedAngle;
+            foreach (var particle in BindingTarget.Particles)
+            {
+                Position = particle.PPosition;
+                Speed = particle.PSpeed;
+                SpeedAngle = particle.PSpeedAngle;
+                Acspeed = particle.PAcspeed;
+                AcspeedAngle = particle.PAcspeedAngle;
+                if (updateFunc != null)
+                    updateFunc();
+            }
+            Position = savePosition;
+            Speed = saveSpeed;
+            SpeedAngle = saveSpeedAngle;
+            Acspeed = saveAcspeed;
+            AcspeedAngle = saveAcspeedAngle;
+        }
         public virtual bool Update(int currentFrame)
         {
             if (currentFrame < BeginFrame || currentFrame >= BeginFrame + TotalFrame || !Visibility)
@@ -267,30 +291,15 @@ namespace CrazyStorm_Player.CrazyStorm
                     ComponentEventGroups[i].Execute(this);
             }
             else
-            {
-                Vector2 savePosition = Position;
-                float saveSpeed = Speed;
-                float saveSpeedAngle = SpeedAngle;
-                float saveAcspeed = Acspeed;
-                float saveAcspeedAngle = AcspeedAngle;
-                foreach (var particle in BindingTarget.Particles)
-                {
-                    Position = particle.PPosition;
-                    Speed = particle.PSpeed;
-                    SpeedAngle = particle.PSpeedAngle;
-                    Acspeed = particle.PAcspeed;
-                    AcspeedAngle = particle.PAcspeedAngle;
-                    for (int i = 0; i < ComponentEventGroups.Count; ++i)
-                        ComponentEventGroups[i].Execute(this);
-                }
-                Position = savePosition;
-                Speed = saveSpeed;
-                SpeedAngle = saveSpeedAngle;
-                Acspeed = saveAcspeed;
-                AcspeedAngle = saveAcspeedAngle;
-            }
+                BindingUpdate(ExecuteEventGroups);
+
             Position = GetAbsolutePosition();
             return true;
+        }
+        void ExecuteEventGroups()
+        {
+            for (int i = 0; i < ComponentEventGroups.Count; ++i)
+                ComponentEventGroups[i].Execute(this);
         }
         public virtual void Reset()
         {

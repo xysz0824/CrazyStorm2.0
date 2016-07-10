@@ -86,12 +86,10 @@ namespace CrazyStorm_Player.CrazyStorm
                 return false;
 
             if (BindingTarget == null || BindingTarget.Particles.Count == 0)
-                Update(Position);
+                Update();
             else
-            {
-                foreach (var particle in BindingTarget.Particles)
-                    Update(particle.PPosition);
-            }
+                BindingUpdate(Update);
+
             return true;
         }
         public override void Reset()
@@ -102,12 +100,12 @@ namespace CrazyStorm_Player.CrazyStorm
             RebounderShape = initialState.RebounderShape;
             Rotation = initialState.Rotation;
         }
-        void Update(Vector2 position)
+        void Update()
         {
             base.ExecuteExpression("Size");
             base.ExecuteExpression("Rotation");
-            List<ParticleBase> results = ParticleManager.SearchByRect(position.x - Size, position.x + Size,
-                position.y - Size, position.y + Size);
+            List<ParticleBase> results = ParticleManager.SearchByRect(Position.x - Size, Position.x + Size,
+                Position.y - Size, Position.y + Size);
             foreach (ParticleBase particle in results)
             {
                 if (particle.IgnoreRebound || particle.Type == null || particle.PSpeedVector == Vector2.Zero)

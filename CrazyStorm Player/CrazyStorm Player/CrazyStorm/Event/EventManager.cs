@@ -163,7 +163,7 @@ namespace CrazyStorm_Player.CrazyStorm
 
                     break;
                 case "ChangeType":
-                    int typeId = int.Parse(arguments[0]);
+                    int typeId = int.Parse(arguments[0]) + int.Parse(arguments[1]);
                     if (typeId >= ParticleType.DefaultTypeIndex)
                     {
                         if (propertyContainer is Emitter)

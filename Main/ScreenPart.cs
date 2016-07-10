@@ -374,7 +374,11 @@ namespace CrazyStorm
                 var y = (double)selectionRect.GetValue(TopProperty);
                 var width = (double)selectionRect.GetValue(WidthProperty);
                 var height = (double)selectionRect.GetValue(HeightProperty);
-                SelectComponents((int)x, (int)y, (int)width, (int)height, e.ClickCount);
+                if (e != null)
+                    SelectComponents((int)x, (int)y, (int)width, (int)height, e.ClickCount);
+                else
+                    SelectComponents((int)x, (int)y, (int)width, (int)height, 0);
+
                 selectionRect.SetValue(WidthProperty, 0.0d);
                 selectionRect.SetValue(HeightProperty, 0.0d);
                 selectionRect = null;

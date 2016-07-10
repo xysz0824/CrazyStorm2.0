@@ -106,12 +106,10 @@ namespace CrazyStorm_Player.CrazyStorm
                 return false;
 
             if (BindingTarget == null || BindingTarget.Particles.Count == 0)
-                Update(Position);
+                Update();
             else
-            {
-                foreach (var particle in BindingTarget.Particles)
-                    Update(particle.PPosition);
-            }
+                BindingUpdate(Update);
+
             return true;
         }
         public override void Reset()
@@ -124,12 +122,12 @@ namespace CrazyStorm_Player.CrazyStorm
             Reach = initialState.Reach;
             TargetName = initialState.TargetName;
         }
-        void Update(Vector2 position)
+        void Update()
         {
             base.ExecuteExpression("HalfWidth");
             base.ExecuteExpression("HalfHeight");
-            List<ParticleBase> results = ParticleManager.SearchByRect(position.x - HalfWidth, position.x + HalfWidth,
-                position.y - HalfHeight, position.y + HalfHeight);
+            List<ParticleBase> results = ParticleManager.SearchByRect(Position.x - HalfWidth, Position.x + HalfWidth,
+                Position.y - HalfHeight, Position.y + HalfHeight);
             foreach (Particle particle in results)
             {
                 if (particle.IgnoreMask)
@@ -150,7 +148,7 @@ namespace CrazyStorm_Player.CrazyStorm
                 }
                 if (FieldShape == FieldShape.Circle)
                 {
-                    Vector2 v = position - particle.PPosition;
+                    Vector2 v = Position - particle.PPosition;
                     if (Math.Sqrt(v.x * v.x + v.y * v.y) > HalfWidth)
                         continue;
                 }

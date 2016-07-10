@@ -128,7 +128,7 @@ namespace CrazyStorm
             var displayName = (string)TryFindResource(split[0] + "Str");
             if (displayName != null && split.Length > 1)
                 displayName += "." + split[1];
-            else
+            else if (displayName == null)
                 displayName = split[0];
 
             return displayName;

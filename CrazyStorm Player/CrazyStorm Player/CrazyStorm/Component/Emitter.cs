@@ -133,27 +133,7 @@ namespace CrazyStorm_Player.CrazyStorm
             if (BindingTarget == null || BindingTarget.Particles.Count == 0)
                 Emit();
             else
-            {
-                Vector2 savePosition = Position;
-                float saveSpeed = Speed;
-                float saveSpeedAngle = SpeedAngle;
-                float saveAcspeed = Acspeed;
-                float saveAcspeedAngle = AcspeedAngle;
-                foreach (var particle in BindingTarget.Particles)
-                {
-                    Position = particle.PPosition;
-                    Speed = particle.PSpeed;
-                    SpeedAngle = particle.PSpeedAngle;
-                    Acspeed = particle.PAcspeed;
-                    AcspeedAngle = particle.PAcspeedAngle;
-                    Emit();
-                }
-                Position = savePosition;
-                Speed = saveSpeed;
-                SpeedAngle = saveSpeedAngle;
-                Acspeed = saveAcspeed;
-                AcspeedAngle = saveAcspeedAngle;
-            }
+                BindingUpdate(Emit);
         }
         void Emit()
         {
@@ -162,6 +142,7 @@ namespace CrazyStorm_Player.CrazyStorm
             base.ExecuteExpression("EmitCount");
             base.ExecuteExpression("EmitAngle");
             base.ExecuteExpression("EmitPosition");
+            Template.ExecuteExpressions();
             Template.PPosition = EmitPosition;
             float increment = EmitRange / EmitCount;
             float angle = EmitAngle - (EmitRange + increment) / 2;

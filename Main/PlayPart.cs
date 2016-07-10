@@ -55,10 +55,13 @@ namespace CrazyStorm
                 }
             }
         }
-        void CompilePropertyExpressions(Component component)
+        void CompilePropertyExpressions(PropertyContainer container)
         {
-            Type componentType = component.GetType();
-            foreach (var property in component.Properties)
+            if (container is Emitter)
+                CompilePropertyExpressions((container as Emitter).Particle);
+
+            Type containerType = container.GetType();
+            foreach (var property in container.Properties)
             {
                 if (property.Value.Expression)
                 {
@@ -74,7 +77,7 @@ namespace CrazyStorm
                     else
                     {
                         object value = syntaxTree.Eval(null);
-                        componentType.GetProperty(property.Key).GetSetMethod().Invoke(component, new object[] { value });
+                        containerType.GetProperty(property.Key).GetSetMethod().Invoke(container, new object[] { value });
                     }
                 }
             }
