@@ -227,7 +227,7 @@ namespace CrazyStorm_Player.CrazyStorm
                     PPosition = new Vector2(VM.PopFloat(), PPosition.y);
                     return true;
                 case "PPosition.y":
-                    PPosition = new Vector2(PPosition.y, VM.PopFloat());
+                    PPosition = new Vector2(PPosition.x, VM.PopFloat());
                     return true;
                 case "WidthScale":
                     WidthScale = VM.PopFloat();
