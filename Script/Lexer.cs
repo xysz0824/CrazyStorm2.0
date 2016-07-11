@@ -13,7 +13,7 @@ namespace CrazyStorm.Expression
 {
     public class Lexer
     {
-        static Regex NumberTokenRegex = new Regex(@"[-]?([0-9]+\.[0-9]+|[0-9]+)");
+        static Regex NumberTokenRegex = new Regex(@"[0-9]+\.[0-9]+|[0-9]+");
         static Regex IdentifierTokenRegex = new Regex(@"[A-Z_a-z][A-Z_a-z0-9\.]*");
         static Regex OperatorTokenRegex = new Regex(@"[+\-*/%>=<&|(,)\[\]]");
         List<Token> tokens;
