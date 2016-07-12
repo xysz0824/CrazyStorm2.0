@@ -26,9 +26,9 @@ namespace CrazyStorm_Player.CrazyStorm
         public float Force { get; set; }
         public float Direction { get; set; }
         public ForceType ForceType { get; set; }
-        public override void LoadPlayData(BinaryReader reader)
+        public override void LoadPlayData(BinaryReader reader, float version)
         {
-            base.LoadPlayData(reader);
+            base.LoadPlayData(reader, version);
             using (BinaryReader forceFieldReader = PlayDataHelper.GetBlockReader(reader))
             {
                 using (BinaryReader dataReader = PlayDataHelper.GetBlockReader(forceFieldReader))

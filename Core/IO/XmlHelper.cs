@@ -17,7 +17,7 @@ namespace CrazyStorm.Core
         public static void BuildFromFields(Type type, object source, XmlElement node)
         {
             if (node == null)
-                throw new System.IO.FileLoadException("FileDataError");
+                return;
 
             BindingFlags flags = BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly;
             FieldInfo[] fieldInfos = type.GetFields(flags);
@@ -29,7 +29,7 @@ namespace CrazyStorm.Core
                     if (attributes[i] is XmlAttributeAttribute)
                     {
                         if (!node.HasAttribute(info.Name))
-                            throw new System.IO.FileLoadException("FileDataError");
+                            return;
 
                         var text = node.GetAttribute(info.Name);
                         object value;
@@ -74,13 +74,13 @@ namespace CrazyStorm.Core
         {
             XmlElement structNode = (XmlElement)node.SelectSingleNode(name);
             if (structNode == null)
-                throw new System.IO.FileLoadException("FileDataError");
+                return;
 
             FieldInfo[] fieldInfos = source.GetType().GetFields();
             foreach (var info in fieldInfos)
             {
                 if (!structNode.HasAttribute(info.Name))
-                    throw new System.IO.FileLoadException("FileDataError");
+                    return;
 
                 var text = structNode.GetAttribute(info.Name);
                 object value;
@@ -106,7 +106,7 @@ namespace CrazyStorm.Core
         {
             var listNode = node.SelectSingleNode(name);
             if (listNode == null)
-                throw new System.IO.FileLoadException("FileDataError");
+                return;
 
             foreach (XmlElement childNode in listNode.ChildNodes)
             {
@@ -136,7 +136,7 @@ namespace CrazyStorm.Core
             source.Clear();
             var objectListNode = (XmlElement)node.SelectSingleNode(name);
             if (objectListNode == null)
-                throw new System.IO.FileLoadException("FileDataError");
+                return;
 
             foreach (XmlElement childNode in objectListNode.ChildNodes)
             {
@@ -160,12 +160,12 @@ namespace CrazyStorm.Core
             source.Clear();
             var dictionaryNode = (XmlElement)node.SelectSingleNode(name);
             if (dictionaryNode == null)
-                throw new System.IO.FileLoadException("FileDataError");
+                return;
 
             foreach (XmlElement childNode in dictionaryNode.ChildNodes)
             {
                 if (!childNode.HasAttribute("Key"))
-                    throw new System.IO.FileLoadException("FileDataError");
+                    return;
 
                 string key = childNode.GetAttribute("Key");
                 if (!childNode.HasAttribute("Value"))

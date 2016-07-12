@@ -17,6 +17,7 @@ namespace CrazyStorm_Player.CrazyStorm
         public int EmitCycle { get; set; }
         public float EmitAngle { get; set; }
         public float EmitRange { get; set; }
+        public float EmitRadius { get; set; }
         public ParticleBase Template { get; protected set; }
         public LinkedList<ParticleBase> Particles { get; private set; }
         public IList<EventGroup> EmitterEventGroups { get; private set; }
@@ -25,9 +26,9 @@ namespace CrazyStorm_Player.CrazyStorm
             Particles = new LinkedList<ParticleBase>();
             EmitterEventGroups = new List<EventGroup>();
         }
-        public override void LoadPlayData(BinaryReader reader)
+        public override void LoadPlayData(BinaryReader reader, float version)
         {
-            base.LoadPlayData(reader);
+            base.LoadPlayData(reader, version);
             using (BinaryReader emitterReader = PlayDataHelper.GetBlockReader(reader))
             {
                 using (BinaryReader dataReader = PlayDataHelper.GetBlockReader(emitterReader))
@@ -37,12 +38,16 @@ namespace CrazyStorm_Player.CrazyStorm
                     EmitCycle = dataReader.ReadInt32();
                     EmitAngle = dataReader.ReadSingle();
                     EmitRange = dataReader.ReadSingle();
+                    if (version >= 0.91)
+                    {
+                        EmitRadius = dataReader.ReadSingle();
+                    }
                 }
                 //particle
-                Template.LoadPlayData(emitterReader);
+                Template.LoadPlayData(emitterReader, version);
                 Template.Emitter = this;
                 //emitterEventGroups
-                PlayDataHelper.LoadObjectList(EmitterEventGroups, emitterReader);
+                PlayDataHelper.LoadObjectList(EmitterEventGroups, emitterReader, version);
                 Template.ParticleEventGroups = EmitterEventGroups;
             }
         }
@@ -73,6 +78,9 @@ namespace CrazyStorm_Player.CrazyStorm
                     return true;
                 case "EmitRange":
                     VM.PushFloat(EmitRange);
+                    return true;
+                case "EmitRadius":
+                    VM.PushFloat(EmitRadius);
                     return true;
             }
             return Template.PushProperty(propertyName);
@@ -105,6 +113,9 @@ namespace CrazyStorm_Player.CrazyStorm
                 case "EmitRange":
                     EmitRange = VM.PopFloat();
                     return true;
+                case "EmitRadius":
+                    EmitRadius = VM.PopFloat();
+                    return true;
             }
             return Template.SetProperty(propertyName);
         }
@@ -127,6 +138,7 @@ namespace CrazyStorm_Player.CrazyStorm
             EmitCycle = initialState.EmitCycle;
             EmitAngle = initialState.EmitAngle;
             EmitRange = initialState.EmitRange;
+            EmitRadius = initialState.EmitRadius;
         }
         public void EmitParticle()
         {
@@ -142,13 +154,16 @@ namespace CrazyStorm_Player.CrazyStorm
             base.ExecuteExpression("EmitCount");
             base.ExecuteExpression("EmitAngle");
             base.ExecuteExpression("EmitPosition");
+            base.ExecuteExpression("EmitRadius");
             Template.ExecuteExpressions();
-            Template.PPosition = EmitPosition;
             float increment = EmitRange / EmitCount;
             float angle = EmitAngle - (EmitRange + increment) / 2;
             for (int i = 0; i < EmitCount; ++i)
             {
                 angle += increment;
+                Template.PPosition = new Vector2(
+                    EmitPosition.x + EmitRadius * (float)Math.Cos(MathHelper.DegToRad(angle)),
+                    EmitPosition.y + EmitRadius * (float)Math.Sin(MathHelper.DegToRad(angle)));
                 Template.PSpeedAngle = angle;
                 ParticleBase newParticle = ParticleManager.GetParticle(Template);
                 newParticle.ParticleEventGroups = EmitterEventGroups;

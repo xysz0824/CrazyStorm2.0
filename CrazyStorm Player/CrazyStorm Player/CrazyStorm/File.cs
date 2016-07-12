@@ -20,17 +20,17 @@ namespace CrazyStorm_Player.CrazyStorm
             Images = new List<FileResource>();
             Sounds = new List<FileResource>();
         }
-        public void LoadPlayData(BinaryReader reader)
+        public void LoadPlayData(BinaryReader reader, float version)
         {
             //ParticleSystems
-            PlayDataHelper.LoadObjectList(ParticleSystems, reader);
+            PlayDataHelper.LoadObjectList(ParticleSystems, reader, version);
             //Images
-            PlayDataHelper.LoadObjectList(Images, reader);
+            PlayDataHelper.LoadObjectList(Images, reader, version);
             //Sounds
-            PlayDataHelper.LoadObjectList(Sounds, reader);
+            PlayDataHelper.LoadObjectList(Sounds, reader, version);
             //Globals
             var globals = new List<VariableResource>();
-            PlayDataHelper.LoadObjectList(globals, reader);
+            PlayDataHelper.LoadObjectList(globals, reader, version);
             foreach (var particleSystem in ParticleSystems)
             {
                 foreach (var layer in particleSystem.Layers)

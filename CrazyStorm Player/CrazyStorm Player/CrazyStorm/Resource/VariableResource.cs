@@ -12,9 +12,9 @@ namespace CrazyStorm_Player.CrazyStorm
     class VariableResource : Resource
     {
         public float Value { get; set; }
-        public override void LoadPlayData(BinaryReader reader)
+        public override void LoadPlayData(BinaryReader reader, float version)
         {
-            base.LoadPlayData(reader);
+            base.LoadPlayData(reader, version);
             using (BinaryReader variableResourceReader = PlayDataHelper.GetBlockReader(reader))
             {
                 Value = variableResourceReader.ReadSingle();

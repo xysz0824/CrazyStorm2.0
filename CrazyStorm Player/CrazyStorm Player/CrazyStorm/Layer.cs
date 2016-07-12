@@ -20,7 +20,7 @@ namespace CrazyStorm_Player.CrazyStorm
         {
             Components = new List<Component>();
         }
-        public void LoadPlayData(BinaryReader reader)
+        public void LoadPlayData(BinaryReader reader, float version)
         {
             using (BinaryReader layerReader = PlayDataHelper.GetBlockReader(reader))
             {
@@ -57,7 +57,7 @@ namespace CrazyStorm_Player.CrazyStorm
                             }
                             //Back to start position of components block.
                             componentsReader.BaseStream.Position = startPosition;
-                            component.LoadPlayData(componentsReader);
+                            component.LoadPlayData(componentsReader, version);
                             component.LayerName = Name;
                             Components.Add(component);
                         }

@@ -13,9 +13,9 @@ namespace CrazyStorm_Player.CrazyStorm
     {
         public int Id { get; set; }
         public string Path { get; set; }
-        public override void LoadPlayData(BinaryReader reader)
+        public override void LoadPlayData(BinaryReader reader, float version)
         {
-            base.LoadPlayData(reader);
+            base.LoadPlayData(reader, version);
             using (BinaryReader fileResourceReader = PlayDataHelper.GetBlockReader(reader))
             {
                 Id = fileResourceReader.ReadInt32();

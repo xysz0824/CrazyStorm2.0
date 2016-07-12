@@ -57,7 +57,7 @@ namespace CrazyStorm_Player.CrazyStorm
             Variables = new List<VariableResource>();
             ComponentEventGroups = new List<EventGroup>();
         }
-        public virtual void LoadPlayData(BinaryReader reader)
+        public virtual void LoadPlayData(BinaryReader reader, float version)
         {
             using (BinaryReader componentReader = PlayDataHelper.GetBlockReader(reader))
             {
@@ -83,9 +83,9 @@ namespace CrazyStorm_Player.CrazyStorm
                 //bindingTarget
                 BindingTargetID = componentReader.ReadInt32();
                 //variables
-                PlayDataHelper.LoadObjectList(Variables, componentReader);
+                PlayDataHelper.LoadObjectList(Variables, componentReader, version);
                 //componentEventGroups
-                PlayDataHelper.LoadObjectList(ComponentEventGroups, componentReader);
+                PlayDataHelper.LoadObjectList(ComponentEventGroups, componentReader, version);
             }
         }
         public void RebuildReferenceFromCollection(IList<Component> collection)

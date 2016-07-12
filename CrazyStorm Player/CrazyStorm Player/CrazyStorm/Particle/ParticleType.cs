@@ -29,7 +29,7 @@ namespace CrazyStorm_Player.CrazyStorm
             Frames = 1;
             ImageID = -1;
         }
-        public void LoadPlayData(BinaryReader reader)
+        public void LoadPlayData(BinaryReader reader, float version)
         {
             using (BinaryReader particleTypeReader = PlayDataHelper.GetBlockReader(reader))
             {

@@ -77,7 +77,7 @@ namespace CrazyStorm
                         throw new System.IO.FileLoadException("FileDataError");
 
                     string version = root.GetAttribute("version");
-                    if (VersionInfo.Version != version &&
+                    if (VersionInfo.PlayVersion != version &&
                         MessageBox.Show((string)FindResource("DifferentVersionStr"), (string)FindResource("TipTitleStr"),
                         MessageBoxButton.OKCancel, MessageBoxImage.Warning) != MessageBoxResult.OK)
                         return false;
@@ -164,7 +164,7 @@ namespace CrazyStorm
             doc.AppendChild(declaration);
             var root = doc.CreateElement(VersionInfo.AppName.Replace(" ", ""));
             var version = doc.CreateAttribute("version");
-            version.Value = VersionInfo.Version;
+            version.Value = VersionInfo.PlayVersion;
             root.Attributes.Append(version);
             file.StoreAsXml(doc, root);
             doc.AppendChild(root);

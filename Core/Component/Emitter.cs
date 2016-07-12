@@ -19,6 +19,7 @@ namespace CrazyStorm.Core
         public int emitCycle;
         public float emitAngle;
         public float emitRange;
+        public float emitRadius;
     }
     public abstract class Emitter : Component
     {
@@ -61,6 +62,12 @@ namespace CrazyStorm.Core
         {
             get { return emitterData.emitRange; }
             set { emitterData.emitRange = value; }
+        }
+        [FloatProperty(float.MinValue, float.MaxValue)]
+        public float EmitRadius
+        {
+            get { return emitterData.emitRadius; }
+            set { emitterData.emitRadius = value; }
         }
         public ParticleBase Particle { get { return particle; } }
         public IList<EventGroup> ParticleEventGroups { get { return particleEventGroups; } }

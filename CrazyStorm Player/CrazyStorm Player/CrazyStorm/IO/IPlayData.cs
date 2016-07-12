@@ -11,6 +11,6 @@ namespace CrazyStorm_Player.CrazyStorm
 {
     interface IPlayData
     {
-        void LoadPlayData(BinaryReader reader);
+        void LoadPlayData(BinaryReader reader, float version);
     }
 }

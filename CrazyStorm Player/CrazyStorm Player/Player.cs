@@ -81,11 +81,11 @@ namespace CrazyStorm_Player
                 string header = PlayDataHelper.ReadString(reader);
                 if (header == "BG")
                 {
-                    string version = PlayDataHelper.ReadString(reader);
-                    if (VersionInfo.Version == version)
+                    float version = float.Parse(PlayDataHelper.ReadString(reader));
+                    if (version >= VersionInfo.BaseVersion)
                     {
                         file = new CrazyStorm.File();
-                        file.LoadPlayData(reader);
+                        file.LoadPlayData(reader, version);
                         RebuildObjectReference(file);
                     }
                     else

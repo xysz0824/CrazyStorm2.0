@@ -21,15 +21,15 @@ namespace CrazyStorm_Player.CrazyStorm
             CustomTypes = new List<ParticleType>();
             Layers = new List<Layer>();
         }
-        public void LoadPlayData(BinaryReader reader)
+        public void LoadPlayData(BinaryReader reader, float version)
         {
             using (BinaryReader particleSystemReader = PlayDataHelper.GetBlockReader(reader))
             {
                 Name = PlayDataHelper.ReadString(particleSystemReader);
                 //customTypes
-                PlayDataHelper.LoadObjectList(CustomTypes, particleSystemReader);
+                PlayDataHelper.LoadObjectList(CustomTypes, particleSystemReader, version);
                 //layers
-                PlayDataHelper.LoadObjectList(Layers, particleSystemReader);
+                PlayDataHelper.LoadObjectList(Layers, particleSystemReader, version);
                 //Set the biggest number as totalFrame 
                 for (int i = 0; i < Layers.Count; ++i)
                     totalFrame = Layers[i].TotalFrame > totalFrame ? Layers[i].TotalFrame : totalFrame;

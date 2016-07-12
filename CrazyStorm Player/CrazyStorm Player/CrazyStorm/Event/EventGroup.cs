@@ -18,7 +18,7 @@ namespace CrazyStorm_Player.CrazyStorm
         {
             Events = new List<EventInfo>();
         }
-        public void LoadPlayData(BinaryReader reader)
+        public void LoadPlayData(BinaryReader reader, float version)
         {
             using (BinaryReader eventGroupReader = PlayDataHelper.GetBlockReader(reader))
             {

@@ -72,7 +72,7 @@ namespace CrazyStorm_Player.CrazyStorm
         {
             return reader.BaseStream.Position == reader.BaseStream.Length;
         }
-        public static void LoadObjectList<T>(IList<T> source, BinaryReader reader)
+        public static void LoadObjectList<T>(IList<T> source, BinaryReader reader, float version)
             where T : IPlayData , new()
         {
             using (BinaryReader objectListReader = GetBlockReader(reader))
@@ -80,7 +80,7 @@ namespace CrazyStorm_Player.CrazyStorm
                 while (!EndOfReader(objectListReader))
                 {
                     T obj = new T();
-                    (obj as IPlayData).LoadPlayData(objectListReader);
+                    (obj as IPlayData).LoadPlayData(objectListReader, version);
                     source.Add(obj);
                 }
             }

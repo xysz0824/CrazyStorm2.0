@@ -67,7 +67,7 @@ namespace CrazyStorm_Player.CrazyStorm
             TypeID = -1;
             ParticleEventGroups = new List<EventGroup>();
         }
-        public virtual void LoadPlayData(BinaryReader reader)
+        public virtual void LoadPlayData(BinaryReader reader, float version)
         {
             using (BinaryReader particleBaseReader = PlayDataHelper.GetBlockReader(reader))
             {

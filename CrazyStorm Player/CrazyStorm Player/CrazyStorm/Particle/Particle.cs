@@ -15,9 +15,9 @@ namespace CrazyStorm_Player.CrazyStorm
         public float HeightScale { get; set; }
         public bool RetainScale { get; set; }
         public bool AfterimageEffect { get; set; }
-        public override void LoadPlayData(BinaryReader reader)
+        public override void LoadPlayData(BinaryReader reader, float version)
         {
-            base.LoadPlayData(reader);
+            base.LoadPlayData(reader, version);
             using (BinaryReader particleReader = PlayDataHelper.GetBlockReader(reader))
             {
                 using (BinaryReader dataReader = PlayDataHelper.GetBlockReader(particleReader))

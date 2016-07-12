@@ -26,9 +26,9 @@ namespace CrazyStorm_Player.CrazyStorm
         {
             RebounderEventGroups = new List<EventGroup>();
         }
-        public override void LoadPlayData(BinaryReader reader)
+        public override void LoadPlayData(BinaryReader reader, float version)
         {
-            base.LoadPlayData(reader);
+            base.LoadPlayData(reader, version);
             using (BinaryReader rebounderReader = PlayDataHelper.GetBlockReader(reader))
             {
                 using (BinaryReader dataReader = PlayDataHelper.GetBlockReader(rebounderReader))
@@ -39,7 +39,7 @@ namespace CrazyStorm_Player.CrazyStorm
                     lastRotation = Rotation;
                 }
                 //rebounderEventGroups
-                PlayDataHelper.LoadObjectList(RebounderEventGroups, rebounderReader);
+                PlayDataHelper.LoadObjectList(RebounderEventGroups, rebounderReader, version);
             }
         }
         public override bool PushProperty(string propertyName)

@@ -12,9 +12,9 @@ namespace CrazyStorm_Player.CrazyStorm
     class CurveParticle : ParticleBase
     {
         public int Length { get; set; }
-        public override void LoadPlayData(BinaryReader reader)
+        public override void LoadPlayData(BinaryReader reader, float version)
         {
-            base.LoadPlayData(reader);
+            base.LoadPlayData(reader, version);
             using (BinaryReader curveParticleReader = PlayDataHelper.GetBlockReader(reader))
             {
                 using (BinaryReader dataReader = PlayDataHelper.GetBlockReader(curveParticleReader))

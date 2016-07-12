@@ -33,9 +33,9 @@ namespace CrazyStorm_Player.CrazyStorm
         {
             EventFieldEventGroups = new List<EventGroup>();
         }
-        public override void LoadPlayData(BinaryReader reader)
+        public override void LoadPlayData(BinaryReader reader, float version)
         {
-            base.LoadPlayData(reader);
+            base.LoadPlayData(reader, version);
             using (BinaryReader eventFieldReader = PlayDataHelper.GetBlockReader(reader))
             {
                 using (BinaryReader dataReader = PlayDataHelper.GetBlockReader(eventFieldReader))
@@ -47,7 +47,7 @@ namespace CrazyStorm_Player.CrazyStorm
                     TargetName = PlayDataHelper.ReadString(dataReader);
                 }
                 //eventFieldEventGroups
-                PlayDataHelper.LoadObjectList(EventFieldEventGroups, eventFieldReader);
+                PlayDataHelper.LoadObjectList(EventFieldEventGroups, eventFieldReader, version);
             }
         }
         public override bool PushProperty(string propertyName)

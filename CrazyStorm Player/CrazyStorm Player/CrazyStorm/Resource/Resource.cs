@@ -13,7 +13,7 @@ namespace CrazyStorm_Player.CrazyStorm
     {
         public string Label { get; set; }
 
-        public virtual void LoadPlayData(BinaryReader reader)
+        public virtual void LoadPlayData(BinaryReader reader, float version)
         {
             using (BinaryReader resourceReader = PlayDataHelper.GetBlockReader(reader))
             {

@@ -13,7 +13,7 @@ namespace CrazyStorm.Core
     {
         public const string AppName = "Crazy Storm";
         public const string Version = "2.0";
-        public const string PlayVersion = "0.9";
+        public const string PlayVersion = "0.91";
         public static string AppTitle { get { return AppName + " " + Version; } }
     }
 }
