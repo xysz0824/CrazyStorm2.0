@@ -255,6 +255,7 @@ namespace CrazyStorm_Player.CrazyStorm
         public delegate void Action();
         public void BindingUpdate(Action updateFunc)
         {
+            int saveCurrentFrame = CurrentFrame;
             Vector2 savePosition = Position;
             float saveSpeed = Speed;
             float saveSpeedAngle = SpeedAngle;
@@ -262,6 +263,7 @@ namespace CrazyStorm_Player.CrazyStorm
             float saveAcspeedAngle = AcspeedAngle;
             foreach (var particle in BindingTarget.Particles)
             {
+                CurrentFrame = particle.PCurrentFrame;
                 Position = particle.PPosition;
                 Speed = particle.PSpeed;
                 SpeedAngle = particle.PSpeedAngle;
@@ -270,6 +272,7 @@ namespace CrazyStorm_Player.CrazyStorm
                 if (updateFunc != null)
                     updateFunc();
             }
+            CurrentFrame = saveCurrentFrame;
             Position = savePosition;
             Speed = saveSpeed;
             SpeedAngle = saveSpeedAngle;
