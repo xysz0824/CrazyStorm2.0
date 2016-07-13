@@ -16,6 +16,8 @@ namespace CrazyStorm_Player
 {
     class Player : DirectXFramework
     {
+        bool hasBackground;
+        Texture backgroundTexture;
         List<Texture> defaultTextures;
         List<ParticleType> defaultParticleTypes;
         Dictionary<int, Texture> customTextures;
@@ -25,14 +27,15 @@ namespace CrazyStorm_Player
         protected override void OnInitialize()
         {
             WindowTitle = VersionInfo.AppTitle;
-            selectedParticleSystemIndex = Int32.Parse(Environment.GetCommandLineArgs()[2]);
-            int particleMaximum = Int32.Parse(Environment.GetCommandLineArgs()[3]);
-            int curveParticleMaximum = Int32.Parse(Environment.GetCommandLineArgs()[4]);
+            hasBackground = System.IO.File.Exists(Environment.GetCommandLineArgs()[2]);
+            selectedParticleSystemIndex = Int32.Parse(Environment.GetCommandLineArgs()[3]);
+            int particleMaximum = Int32.Parse(Environment.GetCommandLineArgs()[4]);
+            int curveParticleMaximum = Int32.Parse(Environment.GetCommandLineArgs()[5]);
             ParticleManager.Initialize(WindowWidth, WindowHeight, 50, particleMaximum, curveParticleMaximum);
-            Windowed = bool.Parse(Environment.GetCommandLineArgs()[5]);
-            if (!bool.Parse(Environment.GetCommandLineArgs()[6]))
-                customCenter = new Vector2(Int32.Parse(Environment.GetCommandLineArgs()[7]), 
-                    Int32.Parse(Environment.GetCommandLineArgs()[8]));
+            Windowed = bool.Parse(Environment.GetCommandLineArgs()[6]);
+            if (!bool.Parse(Environment.GetCommandLineArgs()[7]))
+                customCenter = new Vector2(Int32.Parse(Environment.GetCommandLineArgs()[8]), 
+                    Int32.Parse(Environment.GetCommandLineArgs()[9]));
             
             ParticleManager.OnParticleDraw += (particle) =>
             {
@@ -63,6 +66,9 @@ namespace CrazyStorm_Player
         }
         protected override void OnLoad()
         {
+            //Load background
+            if (hasBackground)
+                backgroundTexture = Texture.FromFile(Device, Environment.GetCommandLineArgs()[2], Usage.None, Pool.Managed);
             //Load default textures and types
             defaultTextures = new List<Texture>();
             Environment.CurrentDirectory = System.AppDomain.CurrentDomain.SetupInformation.ApplicationBase;
@@ -111,6 +117,9 @@ namespace CrazyStorm_Player
         {
             ClearScreen(ClearFlags.Target | ClearFlags.ZBuffer, Color.Black, 1, 0);
             Sprite.Begin(SpriteFlags.AlphaBlend);
+            if (backgroundTexture != null)
+                Sprite.Draw(backgroundTexture, Color.White);
+
             ParticleManager.Draw();
             Sprite.End();
         }

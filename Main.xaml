@@ -425,7 +425,7 @@
                                     </Canvas.Background>
                                     <Canvas Width="{Binding Path=ScreenWidth}" Height="{Binding Path=ScreenHeight}">
                                         <Canvas.Background>
-                                            <ImageBrush Stretch="Uniform" ImageSource="{Binding Path=ImagePath}" />
+                                            <ImageBrush Stretch="Uniform" ImageSource="{Binding Path=BackgroundPath}" />
                                         </Canvas.Background>
                                         <Canvas Name="Grid" Canvas.Top="0" Canvas.Left="0" Width="{Binding Path=ScreenWidth}" Height="{Binding Path=ScreenHeight}">
                                             <Canvas.Background>
