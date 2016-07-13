@@ -18,6 +18,8 @@ namespace CrazyStorm_Player
     {
         bool hasBackground;
         Texture backgroundTexture;
+        Vector2 backgroundScale;
+        Vector2 backgroundPos;
         List<Texture> defaultTextures;
         List<ParticleType> defaultParticleTypes;
         Dictionary<int, Texture> customTextures;
@@ -29,13 +31,15 @@ namespace CrazyStorm_Player
             WindowTitle = VersionInfo.AppTitle;
             hasBackground = System.IO.File.Exists(Environment.GetCommandLineArgs()[2]);
             selectedParticleSystemIndex = Int32.Parse(Environment.GetCommandLineArgs()[3]);
-            int particleMaximum = Int32.Parse(Environment.GetCommandLineArgs()[4]);
-            int curveParticleMaximum = Int32.Parse(Environment.GetCommandLineArgs()[5]);
+            WindowWidth = Int32.Parse(Environment.GetCommandLineArgs()[4]);
+            WindowHeight = Int32.Parse(Environment.GetCommandLineArgs()[5]);
+            int particleMaximum = Int32.Parse(Environment.GetCommandLineArgs()[6]);
+            int curveParticleMaximum = Int32.Parse(Environment.GetCommandLineArgs()[7]);
             ParticleManager.Initialize(WindowWidth, WindowHeight, 50, particleMaximum, curveParticleMaximum);
-            Windowed = bool.Parse(Environment.GetCommandLineArgs()[6]);
-            if (!bool.Parse(Environment.GetCommandLineArgs()[7]))
-                customCenter = new Vector2(Int32.Parse(Environment.GetCommandLineArgs()[8]), 
-                    Int32.Parse(Environment.GetCommandLineArgs()[9]));
+            Windowed = bool.Parse(Environment.GetCommandLineArgs()[8]);
+            if (!bool.Parse(Environment.GetCommandLineArgs()[9]))
+                customCenter = new Vector2(Int32.Parse(Environment.GetCommandLineArgs()[10]), 
+                    Int32.Parse(Environment.GetCommandLineArgs()[11]));
             
             ParticleManager.OnParticleDraw += (particle) =>
             {
@@ -68,7 +72,24 @@ namespace CrazyStorm_Player
         {
             //Load background
             if (hasBackground)
-                backgroundTexture = Texture.FromFile(Device, Environment.GetCommandLineArgs()[2], Usage.None, Pool.Managed);
+            {
+                var info = new ImageInformation();
+                backgroundTexture = Texture.FromFile(Device, Environment.GetCommandLineArgs()[2], 
+                    D3DX.DefaultNonPowerOf2, D3DX.DefaultNonPowerOf2, 1, Usage.None, Format.Unknown, 
+                    Pool.Managed, Filter.None, Filter.None, 0, out info);
+                float scale1 = WindowWidth / (float)info.Width;
+                float scale2 = WindowHeight / (float)info.Height;
+                if (scale1 < scale2)
+                {
+                    backgroundScale = new Vector2(scale1, scale1);
+                    backgroundPos.Y = (WindowHeight - scale1 * info.Height) / 2;
+                }
+                else
+                {
+                    backgroundScale = new Vector2(scale2, scale2);
+                    backgroundPos.X = (WindowWidth - scale2 * info.Width) / 2;
+                }
+            }
             //Load default textures and types
             defaultTextures = new List<Texture>();
             Environment.CurrentDirectory = System.AppDomain.CurrentDomain.SetupInformation.ApplicationBase;
@@ -118,8 +139,10 @@ namespace CrazyStorm_Player
             ClearScreen(ClearFlags.Target | ClearFlags.ZBuffer, Color.Black, 1, 0);
             Sprite.Begin(SpriteFlags.AlphaBlend);
             if (backgroundTexture != null)
+            {
+                Sprite.Transform = Matrix.Transformation2D(Vector2.Zero, 0, backgroundScale, Vector2.Zero, 0, backgroundPos);
                 Sprite.Draw(backgroundTexture, Color.White);
-
+            }
             ParticleManager.Draw();
             Sprite.End();
         }
