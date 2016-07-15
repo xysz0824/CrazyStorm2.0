@@ -18,6 +18,7 @@ namespace CrazyStorm_Player.CrazyStorm
         public float EmitAngle { get; set; }
         public float EmitRange { get; set; }
         public float EmitRadius { get; set; }
+        public ParticleBase InitialTemplate { get; protected set; }
         public ParticleBase Template { get; protected set; }
         public LinkedList<ParticleBase> Particles { get; private set; }
         public IList<EventGroup> EmitterEventGroups { get; private set; }
@@ -44,11 +45,11 @@ namespace CrazyStorm_Player.CrazyStorm
                     }
                 }
                 //particle
-                Template.LoadPlayData(emitterReader, version);
-                Template.Emitter = this;
+                InitialTemplate.LoadPlayData(emitterReader, version);
+                InitialTemplate.Emitter = this;
                 //emitterEventGroups
                 PlayDataHelper.LoadObjectList(EmitterEventGroups, emitterReader, version);
-                Template.ParticleEventGroups = EmitterEventGroups;
+                InitialTemplate.ParticleEventGroups = EmitterEventGroups;
             }
         }
         public override bool PushProperty(string propertyName)
@@ -139,6 +140,7 @@ namespace CrazyStorm_Player.CrazyStorm
             EmitAngle = initialState.EmitAngle;
             EmitRange = initialState.EmitRange;
             EmitRadius = initialState.EmitRadius;
+            Template = InitialTemplate.Copy();
         }
         public void EmitParticle()
         {

@@ -54,11 +54,5 @@ namespace CrazyStorm_Player.CrazyStorm
             base.Update();
             //TODO
         }
-        public override void CopyTo(ParticleBase particleBase)
-        {
-            base.CopyTo(particleBase);
-            var curveParticle = particleBase as CurveParticle;
-            curveParticle.Length = Length;
-        }
     }
 }
