@@ -262,7 +262,7 @@ namespace CrazyStorm
                 UpdateProperty(particle, particleProperties);
             }
         }
-        public void UpdateGlobals(UpdateType type, VariableResource variable, string newName)
+        public void UpdateGlobals(UpdateType type, VariableResource variable, string newName, float newValue)
         {
             switch (type)
             {
@@ -274,7 +274,7 @@ namespace CrazyStorm
                     break;
                 case UpdateType.Modify:
                     environment.RemoveGlobal(variable.Label);
-                    environment.PutGlobal(newName, variable.Value);
+                    environment.PutGlobal(newName, newValue);
                     break;
             }
         }
@@ -428,7 +428,7 @@ namespace CrazyStorm
                             (e.EditingElement as TextBox).Text = editItem.Label;
                             return;
                         }
-                    //Modify local varaible name
+                    //Modify local variable name
                     environment.RemoveLocal(editItem.Label);
                     environment.PutLocal(newValue, editItem.Value);
                 }
@@ -445,6 +445,9 @@ namespace CrazyStorm
                         (e.EditingElement as TextBox).Text = editItem.Value.ToString();
                         return;
                     }
+                    //Modify local variable value
+                    environment.RemoveLocal(editItem.Label);
+                    environment.PutLocal(editItem.Label, value);
                 }
             }
         }
