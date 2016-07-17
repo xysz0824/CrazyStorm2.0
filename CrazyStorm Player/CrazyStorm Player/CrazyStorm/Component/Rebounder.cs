@@ -85,7 +85,7 @@ namespace CrazyStorm_Player.CrazyStorm
             if (!base.Update(currentFrame))
                 return false;
 
-            if (BindingTarget == null || BindingTarget.Particles.Count == 0)
+            if (BindingTarget == null)
                 Update();
             else
                 BindingUpdate(Update);

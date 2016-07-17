@@ -263,7 +263,10 @@ namespace CrazyStorm_Player.CrazyStorm
             float saveAcspeedAngle = AcspeedAngle;
             foreach (var particle in BindingTarget.Particles)
             {
-                CurrentFrame = particle.PCurrentFrame;
+                CurrentFrame = particle.PCurrentFrame - BeginFrame;
+                if (CurrentFrame < 0 || CurrentFrame >= TotalFrame || !Visibility)
+                    continue;
+
                 Position = particle.PPosition;
                 Speed = particle.PSpeed;
                 SpeedAngle = particle.PSpeedAngle;
@@ -281,12 +284,14 @@ namespace CrazyStorm_Player.CrazyStorm
         }
         public virtual bool Update(int currentFrame)
         {
-            if (currentFrame < BeginFrame || currentFrame >= BeginFrame + TotalFrame || !Visibility)
-                return false;
-
-            CurrentFrame = currentFrame - BeginFrame;
+            if (BindingTarget == null)
+            {
+                CurrentFrame = currentFrame - BeginFrame;
+                if (CurrentFrame < 0 || CurrentFrame >= TotalFrame || !Visibility)
+                    return false;
+            }
             Position = GetRelativePosition();
-            if (BindingTarget == null || BindingTarget.Particles.Count == 0)
+            if (BindingTarget == null)
             {
                 speedVector += acspeedVector;
                 Position += speedVector;
