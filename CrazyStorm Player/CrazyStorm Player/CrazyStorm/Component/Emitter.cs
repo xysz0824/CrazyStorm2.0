@@ -39,10 +39,7 @@ namespace CrazyStorm_Player.CrazyStorm
                     EmitCycle = dataReader.ReadInt32();
                     EmitAngle = dataReader.ReadSingle();
                     EmitRange = dataReader.ReadSingle();
-                    if (version >= 0.91)
-                    {
-                        EmitRadius = dataReader.ReadSingle();
-                    }
+                    EmitRadius = dataReader.ReadSingle();
                 }
                 //particle
                 InitialTemplate.LoadPlayData(emitterReader, version);
@@ -153,7 +150,7 @@ namespace CrazyStorm_Player.CrazyStorm
         }
         void EmitCyclically()
         {
-            if (CurrentFrame % EmitCycle == 0)
+            if ((CurrentFrame + BeginFrame) % EmitCycle == 0)
                 Emit();
         }
         void Emit()

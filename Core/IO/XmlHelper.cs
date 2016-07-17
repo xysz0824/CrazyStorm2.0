@@ -29,7 +29,7 @@ namespace CrazyStorm.Core
                     if (attributes[i] is XmlAttributeAttribute)
                     {
                         if (!node.HasAttribute(info.Name))
-                            return;
+                            continue;
 
                         var text = node.GetAttribute(info.Name);
                         object value;
@@ -80,7 +80,7 @@ namespace CrazyStorm.Core
             foreach (var info in fieldInfos)
             {
                 if (!structNode.HasAttribute(info.Name))
-                    return;
+                    continue;
 
                 var text = structNode.GetAttribute(info.Name);
                 object value;
@@ -165,7 +165,7 @@ namespace CrazyStorm.Core
             foreach (XmlElement childNode in dictionaryNode.ChildNodes)
             {
                 if (!childNode.HasAttribute("Key"))
-                    return;
+                    continue;
 
                 string key = childNode.GetAttribute("Key");
                 if (!childNode.HasAttribute("Value"))

@@ -19,6 +19,7 @@ namespace CrazyStorm_Player.CrazyStorm
         public int Id { get; set; }
         public string LayerName { get; set; }
         public string Name { get; set; }
+        public int LayerFrame { get; set; }
         public int CurrentFrame { get; set; }
         public int BeginFrame { get; set; }
         public int TotalFrame { get; set; }
@@ -68,6 +69,7 @@ namespace CrazyStorm_Player.CrazyStorm
                 base.LoadPropertyExpressions(componentReader);
                 using (BinaryReader dataReader = PlayDataHelper.GetBlockReader(componentReader))
                 {
+                    LayerFrame = dataReader.ReadInt32();
                     CurrentFrame = dataReader.ReadInt32();
                     BeginFrame = dataReader.ReadInt32();
                     TotalFrame = dataReader.ReadInt32();
@@ -139,6 +141,9 @@ namespace CrazyStorm_Player.CrazyStorm
                 case "Name":
                     VM.PushString(Name);
                     return true;
+                case "LayerFrame":
+                    VM.PushInt(LayerFrame);
+                    return true;
                 case "CurrentFrame":
                     VM.PushInt(CurrentFrame);
                     return true;
@@ -196,6 +201,9 @@ namespace CrazyStorm_Player.CrazyStorm
             {
                 case "Name":
                     Name = VM.PopString();
+                    return true;
+                case "LayerFrame":
+                    LayerFrame = VM.PopInt();
                     return true;
                 case "CurrentFrame":
                     CurrentFrame = VM.PopInt();
@@ -284,6 +292,7 @@ namespace CrazyStorm_Player.CrazyStorm
         }
         public virtual bool Update(int currentFrame)
         {
+            LayerFrame = currentFrame;
             if (BindingTarget == null)
             {
                 CurrentFrame = currentFrame - BeginFrame;
@@ -326,7 +335,6 @@ namespace CrazyStorm_Player.CrazyStorm
             else
             {
                 initialState.ExecuteExpressions();
-                CurrentFrame = initialState.CurrentFrame;
                 BeginFrame = initialState.BeginFrame;
                 TotalFrame = initialState.TotalFrame;
                 Position = initialState.Position;

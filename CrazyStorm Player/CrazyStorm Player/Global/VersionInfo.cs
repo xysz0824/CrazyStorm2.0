@@ -11,8 +11,8 @@ namespace CrazyStorm_Player
     public static class VersionInfo
     {
         public const string AppName = "Crazy Storm Player";
-        public const float BaseVersion = 0.9f;
-        public const float Version = 0.91f;
+        public const float BaseVersion = 0.92f;
+        public const float Version = 0.92f;
         public static string AppTitle { get { return AppName + " " + Version; } }
     }
 }

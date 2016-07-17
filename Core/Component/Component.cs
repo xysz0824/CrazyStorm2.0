@@ -17,6 +17,7 @@ namespace CrazyStorm.Core
 {
     public struct ComponentData
     {
+        public int layerFrame;
         public int currentFrame;
         public int beginFrame;
         public int totalFrame;
@@ -66,6 +67,12 @@ namespace CrazyStorm.Core
                 if (PropertyChanged != null)
                     PropertyChanged(this, new PropertyChangedEventArgs("Name"));
             }
+        }
+        [RuntimeProperty]
+        public int LayerFrame
+        {
+            get { return componentData.layerFrame; }
+            set { componentData.layerFrame = value; }
         }
         [RuntimeProperty]
         public int CurrentFrame

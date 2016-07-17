@@ -69,6 +69,7 @@
     <sys:String x:Key="NameStr">名称</sys:String>
     <sys:String x:Key="BeginFrameStr">起始帧</sys:String>
     <sys:String x:Key="TotalFrameStr">持续帧</sys:String>
+    <sys:String x:Key="LayerFrameStr">图层帧</sys:String>
     <sys:String x:Key="CurrentFrameStr">当前帧</sys:String>
     <sys:String x:Key="PositionStr">坐标</sys:String>
     <sys:String x:Key="SpeedStr">速度</sys:String>
