@@ -29,12 +29,12 @@ namespace CrazyStorm
     public partial class Main
     {
         #region Private Methods
-        void UpdateGlobals(UpdateType type, VariableResource variable, string newName = null)
+        void UpdateGlobals(UpdateType type, VariableResource variable, string newName = null, float newValue = 0)
         {
             for (int i = 2; i < LeftTabControl.Items.Count; ++i)
             {
                 var panel = ((LeftTabControl.Items[i] as TabItem).Content as ScrollViewer).Content as PropertyPanel;
-                panel.UpdateGlobals(type, variable, newName);
+                panel.UpdateGlobals(type, variable, newName, newValue);
             }
         }
         #endregion
@@ -145,7 +145,7 @@ namespace CrazyStorm
                             (e.EditingElement as TextBox).Text = editItem.Label;
                             return;
                         }
-                    UpdateGlobals(UpdateType.Modify, editItem, newValue);
+                    UpdateGlobals(UpdateType.Modify, editItem, newValue, editItem.Value);
                 }
                 else if (e.Column.SortMemberPath == "Value")
                 {
@@ -160,6 +160,7 @@ namespace CrazyStorm
                         (e.EditingElement as TextBox).Text = editItem.Value.ToString();
                         return;
                     }
+                    UpdateGlobals(UpdateType.Modify, editItem, editItem.Label, value);
                 }
             }
         }

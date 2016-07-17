@@ -84,14 +84,5 @@ namespace CrazyStorm_Player.CrazyStorm
 
             //TODO
         }
-        public override void CopyTo(ParticleBase particleBase)
-        {
-            base.CopyTo(particleBase);
-            var particle = particleBase as Particle;
-            particle.StickToSpeedAngle = StickToSpeedAngle;
-            particle.HeightScale = HeightScale;
-            particle.RetainScale = RetainScale;
-            particle.AfterimageEffect = AfterimageEffect;
-        }
     }
 }

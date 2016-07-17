@@ -332,32 +332,9 @@ namespace CrazyStorm_Player.CrazyStorm
 
             ++PCurrentFrame;
         }
-        public virtual void CopyTo(ParticleBase particleBase)
+        public ParticleBase Copy()
         {
-            particleBase.Emitter = Emitter;
-            particleBase.Alive = Alive;
-            particleBase.Type = Type;
-            particleBase.TypeID = TypeID;
-            particleBase.MaxLife = MaxLife;
-            particleBase.PCurrentFrame = PCurrentFrame;
-            particleBase.PPosition = PPosition;
-            particleBase.WidthScale = WidthScale;
-            particleBase.RGB = RGB;
-            particleBase.Mass = Mass;
-            particleBase.Opacity = Opacity;
-            particleBase.PSpeed = PSpeed;
-            particleBase.PSpeedAngle = PSpeedAngle;
-            particleBase.PAcspeed = PAcspeed;
-            particleBase.PAcspeedAngle = PAcspeedAngle;
-            particleBase.PRotation = PRotation;
-            particleBase.BlendType = BlendType;
-            particleBase.KillOutside = KillOutside;
-            particleBase.Collision = Collision;
-            particleBase.IgnoreMask = IgnoreMask;
-            particleBase.IgnoreRebound = IgnoreRebound;
-            particleBase.IgnoreForce = IgnoreForce;
-            particleBase.FogEffect = FogEffect;
-            particleBase.FadeEffect = FadeEffect;
+            return MemberwiseClone() as ParticleBase;
         }
     }
 }

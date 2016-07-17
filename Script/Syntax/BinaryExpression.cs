@@ -53,12 +53,12 @@ namespace CrazyStorm.Expression
                 case "*":
                     return (float)left * (float)right;
                 case "/":
-                    if (Convert.ToSingle(right) == 0)
+                    if (GetRightChild() is Number && Convert.ToSingle(right) == 0)
                         throw new ExpressionException("DividedByZero");
 
                     return (float)left / (float)right;
                 case "%":
-                    if (Convert.ToSingle(right) == 0)
+                    if (GetRightChild() is Number && Convert.ToSingle(right) == 0)
                         throw new ExpressionException("DividedByZero");
 
                     return (float)left % (float)right;

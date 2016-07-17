@@ -40,7 +40,7 @@ namespace CrazyStorm_Player.CrazyStorm
             if (template is Particle)
             {
                 particleIndex = particleIndex % particlePool.Count;
-                template.CopyTo(particlePool[particleIndex]);
+                particlePool[particleIndex] = template.Copy() as Particle;
                 particlePool[particleIndex].Alive = true;
                 particleQuadTree.Insert(particlePool[particleIndex]);
                 return particlePool[particleIndex++];
@@ -48,7 +48,7 @@ namespace CrazyStorm_Player.CrazyStorm
             else
             {
                 curveParticleIndex = curveParticleIndex % curveParticlePool.Count;
-                template.CopyTo(curveParticlePool[curveParticleIndex]);
+                curveParticlePool[curveParticleIndex] = template.Copy() as CurveParticle;
                 curveParticlePool[curveParticleIndex].Alive = true;
                 particleQuadTree.Insert(curveParticlePool[curveParticleIndex]);
                 return curveParticlePool[curveParticleIndex++];

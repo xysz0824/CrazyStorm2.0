@@ -167,7 +167,7 @@ namespace CrazyStorm_Player
                     component.RebuildReferenceFromCollection(components);
                     //Rebuild particles reference
                     if (component is Emitter)
-                        (component as Emitter).Template.RebuildReferenceFromCollection(particleTypes);
+                        (component as Emitter).InitialTemplate.RebuildReferenceFromCollection(particleTypes);
                 }
             }
         }

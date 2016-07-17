@@ -12,7 +12,7 @@ namespace CrazyStorm_Player.CrazyStorm
     {
         public MultiEmitter()
         {
-            Template = new Particle();
+            InitialTemplate = new Particle();
         }
     }
 }
