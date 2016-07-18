@@ -260,8 +260,8 @@ namespace CrazyStorm_Player.CrazyStorm
                     return false;
             }
         }
-        public delegate void Action();
-        public void BindingUpdate(Action updateFunc)
+        protected delegate void Action();
+        protected void BindingUpdate(Action updateFunc)
         {
             int saveCurrentFrame = CurrentFrame;
             Vector2 savePosition = Position;
@@ -290,17 +290,25 @@ namespace CrazyStorm_Player.CrazyStorm
             Acspeed = saveAcspeed;
             AcspeedAngle = saveAcspeedAngle;
         }
+        protected bool CheckCircularBinding()
+        {
+            if (this is Emitter)
+                return BindingTarget != null && BindingTarget.BindingTarget == this && 
+                    BindingTarget.Particles.Count == 0 && (this as Emitter).Particles.Count == 0;
+            else
+                return false;
+        }
         public virtual bool Update(int currentFrame)
         {
             LayerFrame = currentFrame;
-            if (BindingTarget == null)
+            if (BindingTarget == null || CheckCircularBinding())
             {
                 CurrentFrame = currentFrame - BeginFrame;
                 if (CurrentFrame < 0 || CurrentFrame >= TotalFrame || !Visibility)
                     return false;
             }
             Position = GetRelativePosition();
-            if (BindingTarget == null)
+            if (BindingTarget == null || CheckCircularBinding())
             {
                 speedVector += acspeedVector;
                 Position += speedVector;

@@ -18,6 +18,8 @@ namespace CrazyStorm
             var selectedParticle = Parameter[0] as ParticleSystem;
             var selectedLayer = Parameter[1] as Layer;
             var aimComponent = Parameter[2] as Component;
+            aimComponent.BeginFrame = selectedLayer.BeginFrame;
+            aimComponent.TotalFrame = selectedLayer.TotalFrame;
             selectedParticle.AddComponentToLayer(selectedLayer, aimComponent);
         }
         public override void Undo(CommandStack stack)

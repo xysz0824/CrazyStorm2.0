@@ -122,7 +122,7 @@ namespace CrazyStorm_Player.CrazyStorm
             if (!base.Update(currentFrame))
                 return false;
 
-            if (BindingTarget == null)
+            if (BindingTarget == null || CheckCircularBinding())
                 EmitCyclically();
             else
                 BindingUpdate(EmitCyclically);
@@ -143,7 +143,7 @@ namespace CrazyStorm_Player.CrazyStorm
         }
         public void EmitParticle()
         {
-            if (BindingTarget == null)
+            if (BindingTarget == null || CheckCircularBinding())
                 Emit();
             else
                 BindingUpdate(Emit);
