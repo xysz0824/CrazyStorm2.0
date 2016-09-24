@@ -150,7 +150,7 @@ namespace CrazyStorm_Player.CrazyStorm
         }
         void EmitCyclically()
         {
-            if ((CurrentFrame + BeginFrame) % EmitCycle == 0)
+            if (CurrentFrame % EmitCycle == 0)
                 Emit();
         }
         void Emit()
