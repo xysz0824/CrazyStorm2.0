@@ -117,6 +117,7 @@ namespace CrazyStorm_Player.CrazyStorm
         {
             switch (propertyName)
             {
+#if GENERATE_SNIPPET
                 case "MaxLife":
                     VM.PushInt(MaxLife);
                     return true;
@@ -192,11 +193,12 @@ namespace CrazyStorm_Player.CrazyStorm
                 case "FadeEffect":
                     VM.PushBool(FadeEffect);
                     return true;
+#endif
                 default:
-                    for (int i = 0; i < Emitter.Variables.Count; ++i)
-                        if (Emitter.Variables[i].Label == propertyName)
+                    for (int i = 0; i < Emitter.Locals.Count; ++i)
+                        if (Emitter.Locals[i].Label == propertyName)
                         {
-                            VM.PushFloat(Emitter.Variables[i].Value);
+                            VM.PushFloat(Emitter.Locals[i].Value);
                             return true;
                         }
 
@@ -214,6 +216,7 @@ namespace CrazyStorm_Player.CrazyStorm
         {
             switch (propertyName)
             {
+#if GENERATE_SNIPPET
                 case "MaxLife":
                     MaxLife = VM.PopInt();
                     return true;
@@ -293,11 +296,12 @@ namespace CrazyStorm_Player.CrazyStorm
                 case "FadeEffect":
                     FadeEffect = VM.PopBool();
                     return true;
+#endif
                 default:
-                    for (int i = 0; i < Emitter.Variables.Count; ++i)
-                        if (Emitter.Variables[i].Label == propertyName)
+                    for (int i = 0; i < Emitter.Locals.Count; ++i)
+                        if (Emitter.Locals[i].Label == propertyName)
                         {
-                            Emitter.Variables[i].Value = VM.PopFloat();
+                            Emitter.Locals[i].Value = VM.PopFloat();
                             return true;
                         }
 

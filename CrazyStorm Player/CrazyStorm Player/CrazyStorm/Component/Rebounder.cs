@@ -49,6 +49,7 @@ namespace CrazyStorm_Player.CrazyStorm
 
             switch (propertyName)
             {
+#if GENERATE_SNIPPET
                 case "Size":
                     VM.PushInt(Size);
                     return true;
@@ -58,6 +59,7 @@ namespace CrazyStorm_Player.CrazyStorm
                 case "Rotation":
                     VM.PushFloat(Rotation);
                     return true;
+#endif
             }
             return false;
         }
@@ -68,6 +70,7 @@ namespace CrazyStorm_Player.CrazyStorm
 
             switch (propertyName)
             {
+#if GENERATE_SNIPPET
                 case "Size":
                     Size = VM.PopInt();
                     return true;
@@ -77,6 +80,7 @@ namespace CrazyStorm_Player.CrazyStorm
                 case "Rotation":
                     Rotation = VM.PopFloat();
                     return true;
+#endif
             }
             return false;
         }

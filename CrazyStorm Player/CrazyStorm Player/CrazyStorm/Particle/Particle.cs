@@ -36,6 +36,7 @@ namespace CrazyStorm_Player.CrazyStorm
 
             switch (propertyName)
             {
+#if GENERATE_SNIPPET
                 case "StickToSpeedAngle":
                     VM.PushBool(StickToSpeedAngle);
                     return true;
@@ -48,6 +49,7 @@ namespace CrazyStorm_Player.CrazyStorm
                 case "AfterimageEffect":
                     VM.PushBool(AfterimageEffect);
                     return true;
+#endif
             }
             return false;
         }
@@ -58,6 +60,7 @@ namespace CrazyStorm_Player.CrazyStorm
 
             switch (propertyName)
             {
+#if GENERATE_SNIPPET
                 case "StickToSpeedAngle":
                     StickToSpeedAngle = VM.PopBool();
                     return true;
@@ -70,6 +73,7 @@ namespace CrazyStorm_Player.CrazyStorm
                 case "AfterimageEffect":
                     AfterimageEffect = VM.PopBool();
                     return true;
+#endif
             }
             return false;
         }

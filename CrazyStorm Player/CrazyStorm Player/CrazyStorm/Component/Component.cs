@@ -48,14 +48,14 @@ namespace CrazyStorm_Player.CrazyStorm
         public int ParentID { get; private set; }
         public Emitter BindingTarget { get; private set; }
         public int BindingTargetID { get; private set; }
-        public IList<VariableResource> Variables { get; set; }
+        public IList<VariableResource> Locals { get; set; }
         public IList<VariableResource> Globals { get; set; }
         public IList<EventGroup> ComponentEventGroups { get; private set; }
         public Component()
         {
             ParentID = -1;
             BindingTargetID = -1;
-            Variables = new List<VariableResource>();
+            Locals = new List<VariableResource>();
             ComponentEventGroups = new List<EventGroup>();
         }
         public virtual void LoadPlayData(BinaryReader reader, float version)
@@ -85,7 +85,7 @@ namespace CrazyStorm_Player.CrazyStorm
                 //bindingTarget
                 BindingTargetID = componentReader.ReadInt32();
                 //variables
-                PlayDataHelper.LoadObjectList(Variables, componentReader, version);
+                PlayDataHelper.LoadObjectList(Locals, componentReader, version);
                 //componentEventGroups
                 PlayDataHelper.LoadObjectList(ComponentEventGroups, componentReader, version);
             }
@@ -138,6 +138,7 @@ namespace CrazyStorm_Player.CrazyStorm
         {
             switch (propertyName)
             {
+#if GENERATE_SNIPPET
                 case "Name":
                     VM.PushString(Name);
                     return true;
@@ -177,11 +178,12 @@ namespace CrazyStorm_Player.CrazyStorm
                 case "Visibility":
                     VM.PushBool(Visibility);
                     return true;
+#endif
                 default:
-                    for (int i = 0; i < Variables.Count; ++i)
-                        if (Variables[i].Label == propertyName)
+                    for (int i = 0; i < Locals.Count; ++i)
+                        if (Locals[i].Label == propertyName)
                         {
-                            VM.PushFloat(Variables[i].Value);
+                            VM.PushFloat(Locals[i].Value);
                             return true;
                         }
 
@@ -199,6 +201,7 @@ namespace CrazyStorm_Player.CrazyStorm
         {
             switch (propertyName)
             {
+#if GENERATE_SNIPPET
                 case "Name":
                     Name = VM.PopString();
                     return true;
@@ -242,11 +245,12 @@ namespace CrazyStorm_Player.CrazyStorm
                 case "Visibility":
                     Visibility = VM.PopBool();
                     return true;
+#endif
                 default:
-                    for (int i = 0; i < Variables.Count; ++i)
-                        if (Variables[i].Label == propertyName)
+                    for (int i = 0; i < Locals.Count; ++i)
+                        if (Locals[i].Label == propertyName)
                         {
-                            Variables[i].Value = VM.PopFloat();
+                            Locals[i].Value = VM.PopFloat();
                             return true;
                         }
 
@@ -332,11 +336,11 @@ namespace CrazyStorm_Player.CrazyStorm
             if (initialState == null)
             {
                 initialState = this.MemberwiseClone() as Component;
-                initialState.Variables = new List<VariableResource>();
-                foreach (VariableResource item in Variables)
+                initialState.Locals = new List<VariableResource>();
+                foreach (VariableResource item in Locals)
                 {
                     var variable = new VariableResource { Value = item.Value };
-                    initialState.Variables.Add(variable);
+                    initialState.Locals.Add(variable);
                 }
                 initialState.ExecuteExpressions();
             }
@@ -351,8 +355,8 @@ namespace CrazyStorm_Player.CrazyStorm
                 Acspeed = initialState.Acspeed;
                 AcspeedAngle = initialState.AcspeedAngle;
                 Visibility = initialState.Visibility;
-                for (int i = 0;i < Variables.Count;++i)
-                    Variables[i].Value = initialState.Variables[i].Value;
+                for (int i = 0;i < Locals.Count;++i)
+                    Locals[i].Value = initialState.Locals[i].Value;
             }
             MathHelper.SetVector2(ref speedVector, Speed, SpeedAngle);
             MathHelper.SetVector2(ref acspeedVector, Acspeed, AcspeedAngle);

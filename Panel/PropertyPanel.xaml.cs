@@ -67,7 +67,7 @@ namespace CrazyStorm
             foreach (VariableResource item in file.Globals)
                 environment.PutGlobal(item.Label, item.Value);
             //Put locals.
-            foreach (VariableResource item in component.Variables)
+            foreach (VariableResource item in component.Locals)
                 environment.PutLocal(item.Label, item.Value);
         }
         void LoadContent()
@@ -109,8 +109,8 @@ namespace CrazyStorm
             //First needs to merge repeated type name.
             LoadTypes(types);
             //Load variables.
-            VariableGrid.ItemsSource = component.Variables;
-            DeleteVariable.IsEnabled = component.Variables.Count > 0 ? true : false;
+            VariableGrid.ItemsSource = component.Locals;
+            DeleteVariable.IsEnabled = component.Locals.Count > 0 ? true : false;
             //Load component events.
             ComponentEventList.ItemsSource = component.ComponentEventGroups;
             //Load specific events.
@@ -380,8 +380,8 @@ namespace CrazyStorm
                 //To avoid repeating name, use number.
                 var name = label + i;
                 bool ok = true;
-                for (int k = 0;k < component.Variables.Count;++k)
-                    if (component.Variables[k].Label == name)
+                for (int k = 0;k < component.Locals.Count;++k)
+                    if (component.Locals[k].Label == name)
                     {
                         ok = false;
                         break;
@@ -390,7 +390,7 @@ namespace CrazyStorm
                 if (ok)
                 {
                     var newVar = new VariableResource(name);
-                    component.Variables.Add(newVar);
+                    component.Locals.Add(newVar);
                     DeleteVariable.IsEnabled = true;
                     //Put this into environment.
                     environment.PutLocal(newVar.Label, newVar.Value);
@@ -403,8 +403,8 @@ namespace CrazyStorm
             if (VariableGrid.SelectedItem != null)
             {
                 var item = VariableGrid.SelectedItem as VariableResource;
-                component.Variables.Remove(item);
-                DeleteVariable.IsEnabled = component.Variables.Count > 0 ? true : false;
+                component.Locals.Remove(item);
+                DeleteVariable.IsEnabled = component.Locals.Count > 0 ? true : false;
                 //Remove this from environment.
                 environment.RemoveLocal(item.Label);
             }
@@ -419,7 +419,7 @@ namespace CrazyStorm
                 {
                     //Check the commit to avoid repeating name.
                     newValue = newValue.Trim();
-                    foreach (var item in component.Variables)
+                    foreach (var item in component.Locals)
                         if (item != editItem && item.Label == newValue)
                         {
                             MessageBox.Show((string)FindResource("NameRepeatingStr"), (string)FindResource("TipTitleStr"),

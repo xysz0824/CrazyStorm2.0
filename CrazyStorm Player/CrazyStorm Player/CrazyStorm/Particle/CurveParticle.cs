@@ -30,9 +30,11 @@ namespace CrazyStorm_Player.CrazyStorm
 
             switch (propertyName)
             {
+#if GENERATE_SNIPPET
                 case "Length":
                     VM.PushInt(Length);
                     return true;
+#endif
             }
             return false;
         }
@@ -43,9 +45,11 @@ namespace CrazyStorm_Player.CrazyStorm
 
             switch (propertyName)
             {
+#if GENERATE_SNIPPET
                 case "Length":
                     Length = VM.PopInt();
                     return true;
+#endif
             }
             return false;
         }

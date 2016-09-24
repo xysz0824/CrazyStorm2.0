@@ -45,7 +45,7 @@ namespace CrazyStorm.Core
         int parentID = -1;
         Emitter bindingTarget;
         int bindingTargetID = -1;
-        IList<VariableResource> variables;
+        IList<VariableResource> locals;
         IList<EventGroup> componentEventGroups;
         IList<Component> children;
         IList<int> childrenIDs;
@@ -153,7 +153,7 @@ namespace CrazyStorm.Core
             get { return bindingTarget; }
             set { bindingTarget = value; }
         }
-        public IList<VariableResource> Variables { get { return variables; } }
+        public IList<VariableResource> Locals { get { return locals; } }
         public IList<EventGroup> ComponentEventGroups { get { return componentEventGroups; } }
         public IList<Component> Children { get { return children; } }
         #endregion
@@ -164,7 +164,7 @@ namespace CrazyStorm.Core
             name = string.Empty;
             componentData.totalFrame = 200;
             componentData.visibility = true;
-            variables = new ObservableCollection<VariableResource>();
+            locals = new ObservableCollection<VariableResource>();
             componentEventGroups = new ObservableCollection<EventGroup>();
             children = new ObservableCollection<Component>();
         }
@@ -225,9 +225,9 @@ namespace CrazyStorm.Core
             if (bindingTarget != null)
                 clone.bindingTargetID = bindingTarget.id;
 
-            clone.variables = new ObservableCollection<VariableResource>();
-            foreach (var variable in variables)
-                clone.variables.Add(variable.Clone() as VariableResource);
+            clone.locals = new ObservableCollection<VariableResource>();
+            foreach (var variable in locals)
+                clone.locals.Add(variable.Clone() as VariableResource);
 
             clone.componentEventGroups = new ObservableCollection<EventGroup>();
             foreach (var componentEventGroup in componentEventGroups)
@@ -275,7 +275,7 @@ namespace CrazyStorm.Core
                     throw new System.IO.FileLoadException("FileDataError");
             }
             //variables
-            XmlHelper.BuildFromObjectList(variables, new VariableResource(""), componentNode, "Variables");
+            XmlHelper.BuildFromObjectList(locals, new VariableResource(""), componentNode, "Variables");
             //componentEventGroups
             XmlHelper.BuildFromObjectList(componentEventGroups, new EventGroup(), componentNode, "ComponentEventGroups");
             //children
@@ -318,7 +318,7 @@ namespace CrazyStorm.Core
                 componentNode.Attributes.Append(bindingTargetAttribute);
             }
             //variables
-            XmlHelper.StoreObjectList(variables, doc, componentNode, "Variables");
+            XmlHelper.StoreObjectList(locals, doc, componentNode, "Variables");
             //componentEventGroups
             XmlHelper.StoreObjectList(componentEventGroups, doc, componentNode, "ComponentEventGroups");
             //children
@@ -400,7 +400,7 @@ namespace CrazyStorm.Core
             else
                 componentBytes.AddRange(PlayDataHelper.GetBytes(-1));
             //variables
-            PlayDataHelper.GenerateObjectList(variables, componentBytes);
+            PlayDataHelper.GenerateObjectList(locals, componentBytes);
             //componentEventGroups
             PlayDataHelper.GenerateObjectList(componentEventGroups, componentBytes);
             return PlayDataHelper.CreateBlock(componentBytes);

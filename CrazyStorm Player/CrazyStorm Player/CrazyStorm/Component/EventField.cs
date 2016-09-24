@@ -57,6 +57,7 @@ namespace CrazyStorm_Player.CrazyStorm
 
             switch (propertyName)
             {
+#if GENERATE_SNIPPET
                 case "HalfWidth":
                     VM.PushFloat(HalfWidth);
                     return true;
@@ -72,6 +73,7 @@ namespace CrazyStorm_Player.CrazyStorm
                 case "TargetName":
                     VM.PushString(TargetName);
                     return true;
+#endif
             }
             return false;
         }
@@ -82,6 +84,7 @@ namespace CrazyStorm_Player.CrazyStorm
 
             switch (propertyName)
             {
+#if GENERATE_SNIPPET
                 case "HalfWidth":
                     HalfWidth = VM.PopFloat();
                     return true;
@@ -97,6 +100,7 @@ namespace CrazyStorm_Player.CrazyStorm
                 case "TargetName":
                     TargetName = VM.PopString();
                     return true;
+#endif
             }
             return false;
         }

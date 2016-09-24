@@ -56,6 +56,7 @@ namespace CrazyStorm_Player.CrazyStorm
 
             switch (propertyName)
             {
+#if GENERATE_SNIPPET
                 case "EmitPosition": 
                     VM.PushVector2(EmitPosition);
                     return true;
@@ -80,6 +81,7 @@ namespace CrazyStorm_Player.CrazyStorm
                 case "EmitRadius":
                     VM.PushFloat(EmitRadius);
                     return true;
+#endif
             }
             return Template.PushProperty(propertyName);
         }
@@ -90,6 +92,7 @@ namespace CrazyStorm_Player.CrazyStorm
 
             switch (propertyName)
             {
+#if GENERATE_SNIPPET
                 case "EmitPosition":
                     EmitPosition = VM.PopVector2();
                     return true;
@@ -114,6 +117,7 @@ namespace CrazyStorm_Player.CrazyStorm
                 case "EmitRadius":
                     EmitRadius = VM.PopFloat();
                     return true;
+#endif
             }
             return Template.SetProperty(propertyName);
         }

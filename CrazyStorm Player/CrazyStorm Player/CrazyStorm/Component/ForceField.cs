@@ -51,6 +51,7 @@ namespace CrazyStorm_Player.CrazyStorm
 
             switch (propertyName)
             {
+#if GENERATE_SNIPPET
                 case "HalfWidth":
                     VM.PushFloat(HalfWidth);
                     return true;
@@ -75,6 +76,7 @@ namespace CrazyStorm_Player.CrazyStorm
                 case "ForceType":
                     VM.PushEnum((int)ForceType);
                     return true;
+#endif
             }
             return false;
         }
@@ -85,6 +87,7 @@ namespace CrazyStorm_Player.CrazyStorm
 
             switch (propertyName)
             {
+#if GENERATE_SNIPPET
                 case "HalfWidth":
                     HalfWidth = VM.PopFloat();
                     return true;
@@ -109,6 +112,7 @@ namespace CrazyStorm_Player.CrazyStorm
                 case "ForceType":
                     ForceType = (ForceType)VM.PopEnum();
                     return true;
+#endif
             }
             return false;
         }
