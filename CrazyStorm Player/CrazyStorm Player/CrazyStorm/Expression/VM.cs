@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using CrazyStorm.Core;
+using System.Runtime.InteropServices;
 
 namespace CrazyStorm_Player.CrazyStorm
 {
@@ -29,12 +30,18 @@ namespace CrazyStorm_Player.CrazyStorm
         MORE,
         LESS
     }
+    [StructLayout(LayoutKind.Explicit)]
     public struct VMInstruction
     {
+        [FieldOffset(0)]
         public VMCode code;
+        [FieldOffset(1)]
         public int intOperand;
+        [FieldOffset(1)]
         public float floatOperand;
+        [FieldOffset(1)]
         public bool boolOperand;
+        [FieldOffset(8)]
         public string stringOperand;
     }
     class VM
