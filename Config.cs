@@ -202,7 +202,9 @@ namespace CrazyStorm
         {
             iniHelper = new IniHelper(filePath);
             if (!iniHelper.ExistINIFile())
-                throw new FileNotFoundException("Check Config.ini existence.");
+            {
+                System.IO.File.CreateText(filePath);
+            }
 
             Load();
         }
