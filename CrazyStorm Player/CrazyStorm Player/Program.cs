@@ -17,12 +17,11 @@ namespace CrazyStorm_Player
     {
         static void Main(string[] args)
         {
-            AppDomain.CurrentDomain.UnhandledException +=
-                new UnhandledExceptionEventHandler(CurrentDomain_UnhandledException);
+            AppDomain.CurrentDomain.UnhandledException += new UnhandledExceptionEventHandler(CurrentDomain_UnhandledException);
+            LogHelper.Clear("Player Log.txt", VersionInfo.AppTitle);
             if (args.Length == 0)
                 return;
 
-            LogHelper.Clear("Player Log.txt", VersionInfo.AppTitle);
             OutputArgs(args);
             using (Player player = new Player())
             {
