@@ -153,7 +153,10 @@ namespace CrazyStorm
         {
             //Highlight selected layer.
             TreeViewItem item = (TreeViewItem)LayerTree.ItemContainerGenerator.ContainerFromItem(selectedLayer);
-            item.IsSelected = true;
+            if (item != null)
+            {
+                item.IsSelected = true;
+            }
         }
         #endregion
     }
