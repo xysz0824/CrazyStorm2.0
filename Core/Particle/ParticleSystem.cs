@@ -4,7 +4,6 @@
  */
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Collections.ObjectModel;
 using System.Xml;
@@ -45,9 +44,9 @@ namespace CrazyStorm.Core
         public ParticleSystem(string name)
         {
             this.name = name;
-            customTypes = new ObservableCollection<ParticleType>();
-            layers = new ObservableCollection<Layer>();
-            componentTree = new ObservableCollection<Component>();
+            customTypes = new GenericContainer<ParticleType>();
+            layers = new GenericContainer<Layer>();
+            componentTree = new GenericContainer<Component>();
             componentIndex = new Dictionary<string, int>();
             layers.Add(new Layer("Main"));
         }
@@ -123,12 +122,12 @@ namespace CrazyStorm.Core
         public object Clone()
         {
             var clone = MemberwiseClone() as ParticleSystem;
-            clone.customTypes = new ObservableCollection<ParticleType>();
+            clone.customTypes = new GenericContainer<ParticleType>();
             foreach (var type in customTypes)
                 clone.customTypes.Add(type.Clone() as ParticleType);
 
-            clone.layers = new ObservableCollection<Layer>();
-            clone.componentTree = new ObservableCollection<Component>();
+            clone.layers = new GenericContainer<Layer>();
+            clone.componentTree = new GenericContainer<Component>();
             foreach (var layer in layers)
                 clone.layers.Add(layer.Clone() as Layer);
 

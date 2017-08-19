@@ -5,7 +5,6 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
 using System.Text;
 using System.Xml;
 using System.Xml.Serialization;
@@ -78,7 +77,7 @@ namespace CrazyStorm.Core
             eventFieldData.targetName = string.Empty;
             eventFieldData.halfWidth = 50;
             eventFieldData.halfHeight = 50;
-            eventFieldEventGroups = new ObservableCollection<EventGroup>();
+            eventFieldEventGroups = new GenericContainer<EventGroup>();
         }
         #endregion
 
@@ -86,7 +85,7 @@ namespace CrazyStorm.Core
         public override object Clone()
         {
             var clone = base.Clone() as EventField;
-            clone.eventFieldEventGroups = new ObservableCollection<EventGroup>();
+            clone.eventFieldEventGroups = new GenericContainer<EventGroup>();
             foreach (var item in eventFieldEventGroups)
                 clone.eventFieldEventGroups.Add(item.Clone() as EventGroup);
 

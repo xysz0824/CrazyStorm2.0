@@ -4,7 +4,6 @@
  */
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -155,7 +154,8 @@ namespace CrazyStorm.Core
             }
             return info;
         }
-        public static byte[] GenerateEventData(string text, Func<string, byte[]> compileFunc)
+        public delegate byte[] CompileFunc(string str);
+        public static byte[] GenerateEventData(string text, CompileFunc compileFunc)
         {
             EventInfo eventInfo = SplitEvent(text);
             Dictionary<string, EventOperator> operatorMap = new Dictionary<string,EventOperator>();

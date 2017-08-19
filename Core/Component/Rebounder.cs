@@ -5,7 +5,6 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
 using System.Text;
 using System.Xml;
 using System.Xml.Serialization;
@@ -56,7 +55,7 @@ namespace CrazyStorm.Core
         public Rebounder()
         {
             rebounderData.size = 50;
-            rebounderEventGroups = new ObservableCollection<EventGroup>();
+            rebounderEventGroups = new GenericContainer<EventGroup>();
         }
         #endregion
 
@@ -64,7 +63,7 @@ namespace CrazyStorm.Core
         public override object Clone()
         {
             var clone = base.Clone() as Rebounder;
-            clone.rebounderEventGroups = new ObservableCollection<EventGroup>();
+            clone.rebounderEventGroups = new GenericContainer<EventGroup>();
             foreach (var item in rebounderEventGroups)
                 clone.rebounderEventGroups.Add(item.Clone() as EventGroup);
 

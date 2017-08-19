@@ -4,7 +4,6 @@
  */
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Collections.ObjectModel;
 using System.Xml;
@@ -42,9 +41,9 @@ namespace CrazyStorm.Core
             CurrentDirectory = string.Empty;
             particleSystems = new List<ParticleSystem>();
             particleSystems.Add(new ParticleSystem("Untitled"));
-            images = new ObservableCollection<FileResource>();
-            sounds = new ObservableCollection<FileResource>();
-            globals = new ObservableCollection<VariableResource>();
+            images = new GenericContainer<FileResource>();
+            sounds = new GenericContainer<FileResource>();
+            globals = new GenericContainer<VariableResource>();
         }
         #endregion
 

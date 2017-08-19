@@ -4,7 +4,6 @@
  */
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.ComponentModel;
 using System.Xml;
@@ -74,7 +73,7 @@ namespace CrazyStorm.Core
             get { return name; }
             set
             {
-                if (!string.IsNullOrWhiteSpace(value)) name = value;
+                if (!StringUtil.IsNullOrWhiteSpace(value)) name = value;
                 if (PropertyChanged != null)
                     PropertyChanged(this, new PropertyChangedEventArgs("Name"));
             }
@@ -330,7 +329,7 @@ namespace CrazyStorm.Core
                 particleType.Height = int.Parse(splits[4]);
                 particleType.CenterPoint = new Vector2(float.Parse(splits[5]), float.Parse(splits[6]));
                 particleType.Radius = int.Parse(splits[7]);
-                if (!string.IsNullOrWhiteSpace(splits[8]))
+                if (!StringUtil.IsNullOrWhiteSpace(splits[8]))
                     particleType.Color = (ParticleColor)(int.Parse(splits[8]) + 1);
 
                 typeset.Add(particleType);

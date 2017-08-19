@@ -4,7 +4,6 @@
  */
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.IO;
 using System.ComponentModel;
@@ -48,10 +47,10 @@ namespace CrazyStorm.Core
         #region Public Methods
         public override void CheckValid()
         {
-            if (!string.IsNullOrWhiteSpace(File.CurrentDirectory))
+            if (!StringUtil.IsNullOrWhiteSpace(File.CurrentDirectory))
                 relativePath = relativePath.Replace(File.CurrentDirectory, "");
             
-            if (relativePath.Contains(':'))
+            if (relativePath.Contains(":"))
                 absolutePath = relativePath;
             else
                 absolutePath = File.CurrentDirectory + relativePath;

@@ -5,7 +5,6 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
 using System.Text;
 using System.Xml;
 using System.Xml.Serialization;
@@ -84,7 +83,7 @@ namespace CrazyStorm.Core
             emitterData.emitCount = 1;
             emitterData.emitCycle = 10;
             emitterData.emitRange = 360;
-            particleEventGroups = new ObservableCollection<EventGroup>();
+            particleEventGroups = new GenericContainer<EventGroup>();
         }
         #endregion
 
@@ -93,7 +92,7 @@ namespace CrazyStorm.Core
         {
             var clone = base.Clone() as Emitter;
             clone.particle = particle.Clone() as ParticleBase;
-            clone.particleEventGroups = new ObservableCollection<EventGroup>();
+            clone.particleEventGroups = new GenericContainer<EventGroup>();
             foreach (var item in particleEventGroups)
                 clone.particleEventGroups.Add(item.Clone() as EventGroup);
 

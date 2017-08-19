@@ -4,7 +4,6 @@
  */
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Collections.ObjectModel;
 using System.Xml;
@@ -51,8 +50,8 @@ namespace CrazyStorm.Core
         {
             name = "NewEventGroup";
             condition = string.Empty;
-            originalEvents = new ObservableCollection<string>();
-            translatedEvents = new ObservableCollection<string>();
+            originalEvents = new GenericContainer<string>();
+            translatedEvents = new GenericContainer<string>();
             compiledEvents = new List<byte[]>();
         }
         #endregion
@@ -61,11 +60,11 @@ namespace CrazyStorm.Core
         public object Clone()
         {
             var clone = MemberwiseClone() as EventGroup;
-            clone.originalEvents = new ObservableCollection<string>();
+            clone.originalEvents = new GenericContainer<string>();
             foreach (var item in originalEvents)
                 clone.originalEvents.Add(item);
 
-            clone.translatedEvents = new ObservableCollection<string>();
+            clone.translatedEvents = new GenericContainer<string>();
             foreach (var item in translatedEvents)
                 clone.translatedEvents.Add(item);
 

@@ -4,7 +4,6 @@
  */
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Reflection;
 using System.Collections.ObjectModel;
@@ -164,9 +163,9 @@ namespace CrazyStorm.Core
             name = string.Empty;
             componentData.totalFrame = 200;
             componentData.visibility = true;
-            locals = new ObservableCollection<VariableResource>();
-            componentEventGroups = new ObservableCollection<EventGroup>();
-            children = new ObservableCollection<Component>();
+            locals = new GenericContainer<VariableResource>();
+            componentEventGroups = new GenericContainer<EventGroup>();
+            children = new GenericContainer<Component>();
         }
         #endregion
 
@@ -225,15 +224,15 @@ namespace CrazyStorm.Core
             if (bindingTarget != null)
                 clone.bindingTargetID = bindingTarget.id;
 
-            clone.locals = new ObservableCollection<VariableResource>();
+            clone.locals = new GenericContainer<VariableResource>();
             foreach (var variable in locals)
                 clone.locals.Add(variable.Clone() as VariableResource);
 
-            clone.componentEventGroups = new ObservableCollection<EventGroup>();
+            clone.componentEventGroups = new GenericContainer<EventGroup>();
             foreach (var componentEventGroup in componentEventGroups)
                 clone.componentEventGroups.Add(componentEventGroup.Clone() as EventGroup);
 
-            clone.children = new ObservableCollection<Component>();
+            clone.children = new GenericContainer<Component>();
             if (children.Count > 0)
             {
                 clone.childrenIDs = new List<int>();

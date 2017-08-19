@@ -4,7 +4,6 @@
  */
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -105,7 +104,7 @@ namespace CrazyStorm.Core
             this.name = name;
             visible = true;
             totalFrame = 200;
-            components = new ObservableCollection<Component>();
+            components = new GenericContainer<Component>();
         }
         #endregion
 
@@ -113,7 +112,7 @@ namespace CrazyStorm.Core
         public object Clone()
         {
             var clone = MemberwiseClone() as Layer;
-            clone.components = new ObservableCollection<Component>();
+            clone.components = new GenericContainer<Component>();
             foreach (var component in components)
                 clone.components.Add(component.Clone() as Component);
             
