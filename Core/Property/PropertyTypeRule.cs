@@ -9,17 +9,6 @@ using System.Text;
 
 namespace CrazyStorm.Core
 {
-    public enum PropertyType : byte
-    {
-        IllegalType,
-        Boolean,
-        Int32,
-        Single,
-        Enum,
-        Vector2,
-        RGB,
-        String
-    }
     public class PropertyTypeRule
     {
         public static PropertyType GetValueType(object value)

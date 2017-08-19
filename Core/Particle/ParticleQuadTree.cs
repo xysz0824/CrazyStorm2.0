@@ -6,9 +6,9 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace CrazyStorm_Player.CrazyStorm
+namespace CrazyStorm.Core
 {
-    class ParticleQuadTree
+    public class ParticleQuadTree
     {
         const int MaxDepth = 4;
         public LinkedList<ParticleBase> Particles { get; private set; }
@@ -81,16 +81,16 @@ namespace CrazyStorm_Player.CrazyStorm
             }
             if (children[0] != null && right > OriginX && bottom > OriginY)
                 results.AddRange(children[0].SearchByRect(left, right, top, bottom));
-            
+
             if (children[1] != null && right > OriginX && top <= OriginY)
                 results.AddRange(children[1].SearchByRect(left, right, top, bottom));
-            
+
             if (children[2] != null && left <= OriginX && top <= OriginY)
                 results.AddRange(children[2].SearchByRect(left, right, top, bottom));
-            
+
             if (children[3] != null && left <= OriginX && bottom > OriginY)
                 results.AddRange(children[3].SearchByRect(left, right, top, bottom));
-            
+
             return results;
         }
         public bool OutofRange(ParticleBase particleBase)

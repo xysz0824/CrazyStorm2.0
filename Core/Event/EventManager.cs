@@ -5,16 +5,15 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-using CrazyStorm.Core;
 
-namespace CrazyStorm_Player.CrazyStorm
+namespace CrazyStorm.Core
 {
-    class EventManager
+    public class EventManager
     {
         static List<EventExecutor> executorList;
         public static IList<ParticleType> DefaultTypes { get; set; }
         public static IList<ParticleType> CustomTypes { get; set; }
-        public static void AddEvent(PropertyContainer propertyContainer, EventInfo eventInfo)
+        public static void AddEvent(PropertyContainer propertyContainer, VMEventInfo eventInfo)
         {
             if (executorList == null)
                 executorList = new List<EventExecutor>();
@@ -145,7 +144,7 @@ namespace CrazyStorm_Player.CrazyStorm
             else
                 executorList.Add(executor);
         }
-        public static bool ExecuteSpecialEvent(PropertyContainer propertyContainer, string eventName, string[] arguments, 
+        public static bool ExecuteSpecialEvent(PropertyContainer propertyContainer, string eventName, string[] arguments,
             VMInstruction[] argumentExpression)
         {
             switch (eventName)
@@ -187,7 +186,7 @@ namespace CrazyStorm_Player.CrazyStorm
             if (executorList == null)
                 return;
 
-            for (int i = 0; i < executorList.Count;++i)
+            for (int i = 0; i < executorList.Count; ++i)
             {
                 executorList[i].Update();
                 if (executorList[i].Finished)

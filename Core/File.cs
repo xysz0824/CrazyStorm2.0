@@ -12,7 +12,7 @@ using System.IO;
 
 namespace CrazyStorm.Core
 {
-    public class File : IXmlData, IPlayData
+    public class File : IXmlData, IGeneratePlayData, ILoadPlayData
     {
         #region Private Members
         IList<ParticleSystem> particleSystems;
@@ -101,6 +101,26 @@ namespace CrazyStorm.Core
             //globals
             PlayDataHelper.GenerateObjectList(globals, fileBytes);
             return fileBytes;
+        }
+        public void LoadPlayData(BinaryReader reader, float version)
+        {
+            //ParticleSystems
+            PlayDataHelper.LoadObjectList(ParticleSystems, reader, version);
+            //Images
+            PlayDataHelper.LoadObjectList(Images, reader, version);
+            //Sounds
+            PlayDataHelper.LoadObjectList(Sounds, reader, version);
+            //Globals
+            var globals = new List<VariableResource>();
+            PlayDataHelper.LoadObjectList(globals, reader, version);
+            foreach (var particleSystem in ParticleSystems)
+            {
+                foreach (var layer in particleSystem.Layers)
+                {
+                    foreach (var component in layer.Components)
+                        component.Globals = globals;
+                }
+            }
         }
         #endregion
     }

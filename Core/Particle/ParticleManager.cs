@@ -5,11 +5,10 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-using SlimDX.Direct3D9;
 
-namespace CrazyStorm_Player.CrazyStorm
+namespace CrazyStorm.Core
 {
-    class ParticleManager
+    public class ParticleManager
     {
         public delegate void ParticleDrawHanlder(Particle particle);
         public static event ParticleDrawHanlder OnParticleDraw;
@@ -22,7 +21,7 @@ namespace CrazyStorm_Player.CrazyStorm
         static int particleIndex;
         static List<CurveParticle> curveParticlePool;
         static int curveParticleIndex;
-        public static void Initialize(int windowWidth, int windowHeight, int reservedDist, 
+        public static void Initialize(int windowWidth, int windowHeight, int reservedDist,
             int particleMaximum, int curveParticleMaximum)
         {
             particleQuadTree = new ParticleQuadTree(-windowWidth, windowWidth, -windowHeight, windowHeight);

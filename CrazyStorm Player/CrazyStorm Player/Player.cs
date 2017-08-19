@@ -10,7 +10,9 @@ using SlimDX;
 using SlimDX.Direct3D9;
 using System.IO;
 using System.Drawing;
-using CrazyStorm_Player.CrazyStorm;
+using CrazyStorm.Core;
+using File = CrazyStorm.Core.File;
+using Vector2 = SlimDX.Vector2;
 
 namespace CrazyStorm_Player
 {
@@ -23,7 +25,7 @@ namespace CrazyStorm_Player
         List<Texture> defaultTextures;
         List<ParticleType> defaultParticleTypes;
         Dictionary<int, Texture> customTextures;
-        CrazyStorm.File file;
+        File file;
         int selectedParticleSystemIndex;
         Vector2 customCenter;
         protected override void OnInitialize()
@@ -55,7 +57,7 @@ namespace CrazyStorm_Player
                 Color4 color = new Color4(particle.Opacity / 100, particle.RGB.r / 255, particle.RGB.g / 255, particle.RGB.b / 255);
                 int offset = particle.PCurrentFrame / (type.Delay + 1) % type.Frames;
                 Rectangle rect = new Rectangle((int)type.StartPoint.x + offset * type.Width, (int)type.StartPoint.y, type.Width, type.Height);
-                if (type.Id >= ParticleType.DefaultTypeIndex)
+                if (type.ID >= ParticleType.DefaultTypeIndex)
                     Sprite.Draw(defaultTextures[0], rect, color);
                 else if (type.Image != null)
                     Sprite.Draw(customTextures[type.Image.Id], rect, color);
@@ -111,7 +113,7 @@ namespace CrazyStorm_Player
                     float version = float.Parse(PlayDataHelper.ReadString(reader));
                     if (version >= VersionInfo.BaseVersion)
                     {
-                        file = new CrazyStorm.File();
+                        file = new File();
                         file.LoadPlayData(reader, version);
                         RebuildObjectReference(file);
                     }
@@ -123,7 +125,7 @@ namespace CrazyStorm_Player
             Environment.CurrentDirectory = Path.GetDirectoryName(Environment.GetCommandLineArgs()[1]);
             customTextures = new Dictionary<int, Texture>();
             foreach (var image in file.Images)
-                customTextures[image.Id] = Texture.FromFile(Device, image.Path, Usage.None, Pool.Managed);
+                customTextures[image.Id] = Texture.FromFile(Device, image.RelatviePath, Usage.None, Pool.Managed);
 
             EventManager.CustomTypes = file.ParticleSystems[selectedParticleSystemIndex].CustomTypes;
             file.ParticleSystems[selectedParticleSystemIndex].Reset();
@@ -146,7 +148,7 @@ namespace CrazyStorm_Player
             ParticleManager.Draw();
             Sprite.End();
         }
-        void RebuildObjectReference(CrazyStorm.File file)
+        void RebuildObjectReference(File file)
         {
             foreach (var particleSystem in file.ParticleSystems)
             {

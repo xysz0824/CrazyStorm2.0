@@ -10,7 +10,7 @@ using System.Text;
 namespace CrazyStorm.Core
 {
     [Serializable]
-    class PlayDataException : Exception
+    public class PlayDataException : Exception
     {
         public PlayDataException() { }
         public PlayDataException(string message)

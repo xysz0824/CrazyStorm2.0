@@ -1,16 +1,16 @@
 ﻿/*
  * The MIT License (MIT)
- * Copyright (c) StarX 2016 
+ * Copyright (c) StarX 2016
  */
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Text;
 
 namespace CrazyStorm.Core
 {
-    public interface IPlayData
+    public interface IPlayable
     {
-        List<byte> GeneratePlayData();
+        bool Update(int currentFrame);
+        void Reset();
     }
 }

@@ -4,6 +4,7 @@
  */
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 using System.Xml;
 
@@ -39,15 +40,20 @@ namespace CrazyStorm.Core
         public bool fogEffect;
         public bool fadeEffect;
     }
-    public abstract class ParticleBase : PropertyContainer, IXmlData, IRebuildReference<ParticleType>, IPlayData
+    public abstract class ParticleBase : PropertyContainer, IXmlData, IRebuildReference<ParticleType>, IGeneratePlayData, ILoadPlayData
     {
         #region Private Members
+        Vector2 pspeedVector;
+        Vector2 pacspeedVector;
         ParticleType type;
         int typeID = -1;
         ParticleBaseData particleBaseData;
         #endregion
 
         #region Public Members
+        public Emitter Emitter { get; set; }
+        public ParticleQuadTree QuadTree { get; set; }
+        public bool Alive { get; set; }
         [IntProperty(0, int.MaxValue)]
         public int MaxLife
         {
@@ -88,6 +94,21 @@ namespace CrazyStorm.Core
         {
             get { return particleBaseData.opacity; }
             set { particleBaseData.opacity = value; }
+        }
+        public Vector2 PSpeedVector
+        {
+            get { return pspeedVector; }
+            set
+            {
+                pspeedVector = value;
+                if (pspeedVector != Vector2.Zero)
+                    PSpeedAngle = MathHelper.GetDegree(pspeedVector);
+            }
+        }
+        public Vector2 PAcspeedVector
+        {
+            get { return pacspeedVector; }
+            set { pacspeedVector = value; }
         }
         [FloatProperty(float.MinValue, float.MaxValue)]
         public float PSpeed
@@ -161,6 +182,17 @@ namespace CrazyStorm.Core
             get { return particleBaseData.widthScale; }
             set { particleBaseData.widthScale = value; }
         }
+        public bool FogEffect
+        {
+            get { return particleBaseData.fogEffect; }
+            set { particleBaseData.fogEffect = value; }
+        }
+        public bool FadeEffect
+        {
+            get { return particleBaseData.fadeEffect; }
+            set { particleBaseData.fadeEffect = value; }
+        }
+        public IList<EventGroup> ParticleEventGroups { get; set; }
         #endregion
 
         #region Constructor
@@ -176,6 +208,7 @@ namespace CrazyStorm.Core
             particleBaseData.collision = true;
             particleBaseData.fogEffect = true;
             particleBaseData.fadeEffect = true;
+            ParticleEventGroups = new List<EventGroup>();
         }
         #endregion
 
@@ -212,7 +245,7 @@ namespace CrazyStorm.Core
             if (type != null)
             {
                 var typeAttribute = doc.CreateAttribute("type");
-                typeAttribute.Value = type.Id.ToString();
+                typeAttribute.Value = type.ID.ToString();
                 particleBaseNode.Attributes.Append(typeAttribute);
             }
             //particleBaseData
@@ -227,7 +260,7 @@ namespace CrazyStorm.Core
             {
                 foreach (var target in collection)
                 {
-                    if (typeID == target.Id)
+                    if (typeID == target.ID)
                     {
                         type = target;
                         break;
@@ -243,13 +276,268 @@ namespace CrazyStorm.Core
             base.GeneratePlayData(particleBaseBytes);
             //type
             if (type != null)
-                particleBaseBytes.AddRange(PlayDataHelper.GetBytes(type.Id));
+                particleBaseBytes.AddRange(PlayDataHelper.GetBytes(type.ID));
             else
                 particleBaseBytes.AddRange(PlayDataHelper.GetBytes(-1));
 
             //particleBaseData
             PlayDataHelper.GenerateStruct(particleBaseData, particleBaseBytes);
             return PlayDataHelper.CreateBlock(particleBaseBytes);
+        }
+        public virtual void LoadPlayData(BinaryReader reader, float version)
+        {
+            using (BinaryReader particleBaseReader = PlayDataHelper.GetBlockReader(reader))
+            {
+                //properties
+                base.LoadPropertyExpressions(particleBaseReader);
+                typeID = particleBaseReader.ReadInt32();
+                using (BinaryReader dataReader = PlayDataHelper.GetBlockReader(particleBaseReader))
+                {
+                    MaxLife = dataReader.ReadInt32();
+                    PCurrentFrame = dataReader.ReadInt32();
+                    PPosition = PlayDataHelper.ReadVector2(dataReader);
+                    WidthScale = dataReader.ReadSingle();
+                    RGB = PlayDataHelper.ReadRGB(dataReader);
+                    Mass = dataReader.ReadSingle();
+                    Opacity = dataReader.ReadSingle();
+                    PSpeed = dataReader.ReadSingle();
+                    PSpeedAngle = dataReader.ReadSingle();
+                    PAcspeed = dataReader.ReadSingle();
+                    PAcspeedAngle = dataReader.ReadSingle();
+                    PRotation = dataReader.ReadSingle();
+                    BlendType = PlayDataHelper.ReadEnum<BlendType>(dataReader);
+                    KillOutside = dataReader.ReadBoolean();
+                    Collision = dataReader.ReadBoolean();
+                    IgnoreMask = dataReader.ReadBoolean();
+                    IgnoreRebound = dataReader.ReadBoolean();
+                    IgnoreForce = dataReader.ReadBoolean();
+                    FogEffect = dataReader.ReadBoolean();
+                    FadeEffect = dataReader.ReadBoolean();
+                }
+            }
+        }
+        public override bool PushProperty(string propertyName)
+        {
+            switch (propertyName)
+            {
+                case "MaxLife":
+                    VM.PushInt(MaxLife);
+                    return true;
+                case "PCurrentFrame":
+                    VM.PushInt(PCurrentFrame);
+                    return true;
+                case "PPosition":
+                    VM.PushVector2(PPosition);
+                    return true;
+                case "PPosition.x":
+                    VM.PushFloat(PPosition.x);
+                    return true;
+                case "PPosition.y":
+                    VM.PushFloat(PPosition.y);
+                    return true;
+                case "WidthScale":
+                    VM.PushFloat(WidthScale);
+                    return true;
+                case "RGB":
+                    VM.PushRGB(RGB);
+                    return true;
+                case "RGB.r":
+                    VM.PushFloat(RGB.r);
+                    return true;
+                case "RGB.g":
+                    VM.PushFloat(RGB.g);
+                    return true;
+                case "RGB.b":
+                    VM.PushFloat(RGB.b);
+                    return true;
+                case "Mass":
+                    VM.PushFloat(Mass);
+                    return true;
+                case "Opacity":
+                    VM.PushFloat(Opacity);
+                    return true;
+                case "PSpeed":
+                    VM.PushFloat(PSpeed);
+                    return true;
+                case "PSpeedAngle":
+                    VM.PushFloat(PSpeedAngle);
+                    return true;
+                case "PAcspeed":
+                    VM.PushFloat(PAcspeed);
+                    return true;
+                case "PAcspeedAngle":
+                    VM.PushFloat(PAcspeedAngle);
+                    return true;
+                case "PRotation":
+                    VM.PushFloat(PRotation);
+                    return true;
+                case "BlendType":
+                    VM.PushEnum((int)BlendType);
+                    return true;
+                case "KillOutside":
+                    VM.PushBool(KillOutside);
+                    return true;
+                case "Collision":
+                    VM.PushBool(Collision);
+                    return true;
+                case "IgnoreMask":
+                    VM.PushBool(IgnoreMask);
+                    return true;
+                case "IgnoreRebound":
+                    VM.PushBool(IgnoreRebound);
+                    return true;
+                case "IgnoreForce":
+                    VM.PushBool(IgnoreForce);
+                    return true;
+                case "FogEffect":
+                    VM.PushBool(FogEffect);
+                    return true;
+                case "FadeEffect":
+                    VM.PushBool(FadeEffect);
+                    return true;
+                default:
+                    for (int i = 0; i < Emitter.Locals.Count; ++i)
+                        if (Emitter.Locals[i].Label == propertyName)
+                        {
+                            VM.PushFloat(Emitter.Locals[i].Value);
+                            return true;
+                        }
+
+                    for (int i = 0; i < Emitter.Globals.Count; ++i)
+                        if (Emitter.Globals[i].Label == propertyName)
+                        {
+                            VM.PushFloat(Emitter.Globals[i].Value);
+                            return true;
+                        }
+
+                    return false;
+            }
+        }
+        public override bool SetProperty(string propertyName)
+        {
+            switch (propertyName)
+            {
+                case "MaxLife":
+                    MaxLife = VM.PopInt();
+                    return true;
+                case "PCurrentFrame":
+                    PCurrentFrame = VM.PopInt();
+                    return true;
+                case "PPosition":
+                    PPosition = VM.PopVector2();
+                    return true;
+                case "PPosition.x":
+                    PPosition = new Vector2(VM.PopFloat(), PPosition.y);
+                    return true;
+                case "PPosition.y":
+                    PPosition = new Vector2(PPosition.x, VM.PopFloat());
+                    return true;
+                case "WidthScale":
+                    WidthScale = VM.PopFloat();
+                    return true;
+                case "RGB":
+                    RGB = VM.PopRGB();
+                    return true;
+                case "RGB.r":
+                    RGB = new RGB(VM.PopFloat(), RGB.g, RGB.b);
+                    return true;
+                case "RGB.g":
+                    RGB = new RGB(RGB.r, VM.PopFloat(), RGB.b);
+                    return true;
+                case "RGB.b":
+                    RGB = new RGB(RGB.r, RGB.g, VM.PopFloat());
+                    return true;
+                case "Mass":
+                    Mass = VM.PopFloat();
+                    return true;
+                case "Opacity":
+                    Opacity = VM.PopFloat();
+                    return true;
+                case "PSpeed":
+                    PSpeed = VM.PopFloat();
+                    MathHelper.SetVector2(ref pspeedVector, PSpeed, PSpeedAngle);
+                    return true;
+                case "PSpeedAngle":
+                    PSpeedAngle = VM.PopFloat();
+                    MathHelper.SetVector2(ref pspeedVector, PSpeed, PSpeedAngle);
+                    return true;
+                case "PAcspeed":
+                    PAcspeed = VM.PopFloat();
+                    MathHelper.SetVector2(ref pacspeedVector, PAcspeed, PAcspeedAngle);
+                    return true;
+                case "PAcspeedAngle":
+                    PAcspeedAngle = VM.PopFloat();
+                    MathHelper.SetVector2(ref pacspeedVector, PAcspeed, PAcspeedAngle);
+                    return true;
+                case "PRotation":
+                    PRotation = VM.PopFloat();
+                    return true;
+                case "BlendType":
+                    BlendType = (BlendType)VM.PopEnum();
+                    return true;
+                case "KillOutside":
+                    KillOutside = VM.PopBool();
+                    return true;
+                case "Collision":
+                    Collision = VM.PopBool();
+                    return true;
+                case "IgnoreMask":
+                    IgnoreMask = VM.PopBool();
+                    return true;
+                case "IgnoreRebound":
+                    IgnoreRebound = VM.PopBool();
+                    return true;
+                case "IgnoreForce":
+                    IgnoreForce = VM.PopBool();
+                    return true;
+                case "FogEffect":
+                    FogEffect = VM.PopBool();
+                    return true;
+                case "FadeEffect":
+                    FadeEffect = VM.PopBool();
+                    return true;
+                default:
+                    for (int i = 0; i < Emitter.Locals.Count; ++i)
+                        if (Emitter.Locals[i].Label == propertyName)
+                        {
+                            Emitter.Locals[i].Value = VM.PopFloat();
+                            return true;
+                        }
+
+                    for (int i = 0; i < Emitter.Globals.Count; ++i)
+                        if (Emitter.Globals[i].Label == propertyName)
+                        {
+                            Emitter.Globals[i].Value = VM.PopFloat();
+                            return true;
+                        }
+
+                    return false;
+            }
+        }
+        public virtual void Update()
+        {
+            if (PCurrentFrame >= MaxLife || (KillOutside && ParticleManager.OutOfWindow(PPosition.x, PPosition.y)))
+            {
+                Alive = false;
+                Emitter.Particles.Remove(this);
+                return;
+            }
+            if (PCurrentFrame == 0)
+            {
+                MathHelper.SetVector2(ref pspeedVector, PSpeed, PSpeedAngle);
+                MathHelper.SetVector2(ref pacspeedVector, PAcspeed, PAcspeedAngle);
+            }
+            QuadTree.Update(this);
+            PSpeedVector += PAcspeedVector;
+            PPosition += PSpeedVector;
+            for (int i = 0; i < ParticleEventGroups.Count; ++i)
+                ParticleEventGroups[i].Execute(this);
+
+            ++PCurrentFrame;
+        }
+        public ParticleBase Copy()
+        {
+            return MemberwiseClone() as ParticleBase;
         }
         #endregion
     }

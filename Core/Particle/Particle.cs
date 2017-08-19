@@ -8,6 +8,7 @@ using System.Text;
 using System.Reflection;
 using System.Xml;
 using System.Xml.Serialization;
+using System.IO;
 
 namespace CrazyStorm.Core
 {
@@ -86,6 +87,75 @@ namespace CrazyStorm.Core
             PlayDataHelper.GenerateStruct(particleData, particleBytes);
             bytes.AddRange(PlayDataHelper.CreateBlock(particleBytes));
             return bytes;
+        }
+        public override void LoadPlayData(BinaryReader reader, float version)
+        {
+            base.LoadPlayData(reader, version);
+            using (BinaryReader particleReader = PlayDataHelper.GetBlockReader(reader))
+            {
+                using (BinaryReader dataReader = PlayDataHelper.GetBlockReader(particleReader))
+                {
+                    StickToSpeedAngle = dataReader.ReadBoolean();
+                    HeightScale = dataReader.ReadSingle();
+                    RetainScale = dataReader.ReadBoolean();
+                    AfterimageEffect = dataReader.ReadBoolean();
+                }
+            }
+        }
+        public override bool PushProperty(string propertyName)
+        {
+            if (base.PushProperty(propertyName))
+                return true;
+
+            switch (propertyName)
+            {
+                case "StickToSpeedAngle":
+                    VM.PushBool(StickToSpeedAngle);
+                    return true;
+                case "HeightScale":
+                    VM.PushFloat(HeightScale);
+                    return true;
+                case "RetainScale":
+                    VM.PushBool(RetainScale);
+                    return true;
+                case "AfterimageEffect":
+                    VM.PushBool(AfterimageEffect);
+                    return true;
+            }
+            return false;
+        }
+        public override bool SetProperty(string propertyName)
+        {
+            if (base.SetProperty(propertyName))
+                return true;
+
+            switch (propertyName)
+            {
+                case "StickToSpeedAngle":
+                    StickToSpeedAngle = VM.PopBool();
+                    return true;
+                case "HeightScale":
+                    HeightScale = VM.PopFloat();
+                    return true;
+                case "RetainScale":
+                    RetainScale = VM.PopBool();
+                    return true;
+                case "AfterimageEffect":
+                    AfterimageEffect = VM.PopBool();
+                    return true;
+            }
+            return false;
+        }
+        public override void Update()
+        {
+            base.Update();
+            if (StickToSpeedAngle)
+                PRotation = PSpeedAngle + 90;
+
+            if (RetainScale && WidthScale != HeightScale)
+                HeightScale = WidthScale;
+
+            //TODO
         }
         #endregion
     }

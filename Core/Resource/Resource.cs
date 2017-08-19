@@ -12,7 +12,7 @@ using System.Xml.Serialization;
 
 namespace CrazyStorm.Core
 {
-    public abstract class Resource : INotifyPropertyChanged, IXmlData, IPlayData
+    public abstract class Resource : INotifyPropertyChanged, IXmlData, IGeneratePlayData, ILoadPlayData
     {
         public event PropertyChangedEventHandler PropertyChanged;
         [PlayData]
@@ -31,6 +31,7 @@ namespace CrazyStorm.Core
         }
         public bool IsValid { get { CheckValid(); return isValid; } }
 
+        public Resource() { }
         public Resource(string label)
         {
             this.label = label;
@@ -69,6 +70,13 @@ namespace CrazyStorm.Core
             var resourceBytes = new List<byte>();
             PlayDataHelper.GenerateFields(typeof(Resource), this, resourceBytes);
             return PlayDataHelper.CreateBlock(resourceBytes);
+        }
+        public virtual void LoadPlayData(BinaryReader reader, float version)
+        {
+            using (BinaryReader resourceReader = PlayDataHelper.GetBlockReader(reader))
+            {
+                label = PlayDataHelper.ReadString(resourceReader);
+            }
         }
     }
 }

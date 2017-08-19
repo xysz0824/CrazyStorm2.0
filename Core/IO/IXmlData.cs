@@ -9,7 +9,7 @@ using System.Xml;
 
 namespace CrazyStorm.Core
 {
-    interface IXmlData : ICloneable
+    public interface IXmlData : ICloneable
     {
         XmlElement  BuildFromXml(XmlElement node);
         XmlElement  StoreAsXml(XmlDocument doc, XmlElement node);

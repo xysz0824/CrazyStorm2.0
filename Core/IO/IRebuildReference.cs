@@ -8,7 +8,7 @@ using System.Text;
 
 namespace CrazyStorm.Core
 {
-    interface IRebuildReference<T>
+    public interface IRebuildReference<T>
     {
         void RebuildReferenceFromCollection(IList<T> collection);
     }

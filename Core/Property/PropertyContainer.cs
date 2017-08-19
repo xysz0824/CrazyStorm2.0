@@ -8,16 +8,20 @@ using System.Text;
 using System.Reflection;
 using System.Xml;
 using System.Xml.Serialization;
+using System.IO;
 
 namespace CrazyStorm.Core
 {
-    public class PropertyContainer : ICloneable
+    public abstract class PropertyContainer : ICloneable
     {
         IDictionary<string, PropertyValue> properties;
         public IDictionary<string, PropertyValue> Properties { get { return properties; } }
+        IDictionary<string, VMInstruction[]> propertyExpressions;
+        public IDictionary<string, VMInstruction[]> PropertyExpressions { get { return propertyExpressions; } }
         public PropertyContainer()
         {
             properties = new Dictionary<string, PropertyValue>();
+            propertyExpressions = new Dictionary<string, VMInstruction[]>();
         }
         public List<PropertyInfo> InitializeAndGetProperties(Type type)
         {
@@ -117,5 +121,38 @@ namespace CrazyStorm.Core
             }
             data.AddRange(PlayDataHelper.CreateBlock(newData));
         }
+        public void LoadPropertyExpressions(BinaryReader reader)
+        {
+            using (BinaryReader listReader = PlayDataHelper.GetBlockReader(reader))
+            {
+                while (!PlayDataHelper.EndOfReader(listReader))
+                {
+                    using (BinaryReader expressionReader = PlayDataHelper.GetBlockReader(listReader))
+                    {
+                        string propertyName = PlayDataHelper.ReadString(expressionReader);
+                        int bytesLength = (int)expressionReader.BaseStream.Length - propertyName.Length - 1;
+                        propertyExpressions[propertyName] = VM.Decode(expressionReader.ReadBytes(bytesLength));
+                    }
+                }
+            }
+        }
+        public void ExecuteExpressions()
+        {
+            foreach (var expression in PropertyExpressions)
+            {
+                VM.Execute(this, expression.Value);
+                SetProperty(expression.Key);
+            }
+        }
+        public void ExecuteExpression(string propertyName)
+        {
+            if (!PropertyExpressions.ContainsKey(propertyName))
+                return;
+
+            VM.Execute(this, PropertyExpressions[propertyName]);
+            SetProperty(propertyName);
+        }
+        public abstract bool PushProperty(string propertyName);
+        public abstract bool SetProperty(string propertyName);
     }
 }

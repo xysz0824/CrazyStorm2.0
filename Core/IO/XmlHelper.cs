@@ -11,7 +11,7 @@ using System.Reflection;
 
 namespace CrazyStorm.Core
 {
-    class XmlHelper
+    public class XmlHelper
     {
         public static void BuildFromFields(Type type, object source, XmlElement node)
         {

@@ -7,9 +7,9 @@ using System.Collections.Generic;
 using System.Text;
 using System.IO;
 
-namespace CrazyStorm_Player.CrazyStorm
+namespace CrazyStorm.Core
 {
-    interface IPlayData
+    public interface ILoadPlayData
     {
         void LoadPlayData(BinaryReader reader, float version);
     }

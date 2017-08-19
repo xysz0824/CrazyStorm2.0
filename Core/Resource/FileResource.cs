@@ -35,6 +35,7 @@ namespace CrazyStorm.Core
         #endregion
 
         #region Constructor
+        public FileResource() { }
         public FileResource(int id, string label, string absolutePath)
             : base(label)
         {
@@ -83,6 +84,15 @@ namespace CrazyStorm.Core
             PlayDataHelper.GenerateFields(typeof(FileResource), this, fileResourceBytes);
             bytes.AddRange(PlayDataHelper.CreateBlock(fileResourceBytes));
             return bytes;
+        }
+        public override void LoadPlayData(BinaryReader reader, float version)
+        {
+            base.LoadPlayData(reader, version);
+            using (BinaryReader fileResourceReader = PlayDataHelper.GetBlockReader(reader))
+            {
+                id = fileResourceReader.ReadInt32();
+                relativePath = PlayDataHelper.ReadString(fileResourceReader);
+            }
         }
         #endregion
     }

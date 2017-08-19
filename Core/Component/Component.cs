@@ -11,6 +11,7 @@ using System.ComponentModel;
 using System.Xml;
 using System.Xml.Serialization;
 using System.Runtime.InteropServices;
+using System.IO;
 
 namespace CrazyStorm.Core
 {
@@ -27,11 +28,15 @@ namespace CrazyStorm.Core
         public float acspeedAngle;
         public bool visibility;
     }
-    public class Component : PropertyContainer, INotifyPropertyChanged, IXmlData, IRebuildReference<Component>, IPlayData
+    public class Component : PropertyContainer, INotifyPropertyChanged, IXmlData, IRebuildReference<Component>, IGeneratePlayData
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
         #region Private Members
+        Vector2 parentAbsolutePosition;
+        Vector2 speedVector;
+        Vector2 acspeedVector;
+        protected Component initialState;
         ComponentData componentData;
         [PlayData]
         [XmlAttribute]
@@ -44,7 +49,6 @@ namespace CrazyStorm.Core
         int parentID = -1;
         Emitter bindingTarget;
         int bindingTargetID = -1;
-        IList<VariableResource> locals;
         IList<EventGroup> componentEventGroups;
         IList<Component> children;
         IList<int> childrenIDs;
@@ -67,6 +71,7 @@ namespace CrazyStorm.Core
                     PropertyChanged(this, new PropertyChangedEventArgs("Name"));
             }
         }
+        public string LayerName { get; set; }
         [RuntimeProperty]
         public int LayerFrame
         {
@@ -106,6 +111,21 @@ namespace CrazyStorm.Core
         {
             get { return componentData.position.y; }
             set { componentData.position.y = value; }
+        }
+        public Vector2 SpeedVector
+        {
+            get { return speedVector; }
+            set
+            {
+                speedVector = value;
+                if (speedVector != Vector2.Zero)
+                    SpeedAngle = MathHelper.GetDegree(speedVector);
+            }
+        }
+        public Vector2 AcspeedVector
+        {
+            get { return acspeedVector; }
+            set { acspeedVector = value; }
         }
         [FloatProperty(float.MinValue, float.MaxValue)]
         public float Speed
@@ -147,12 +167,15 @@ namespace CrazyStorm.Core
             get { return parent; }
             set { parent = value; }
         }
+        public int ParentID { get; private set; }
         public Emitter BindingTarget
         {
             get { return bindingTarget; }
             set { bindingTarget = value; }
         }
-        public IList<VariableResource> Locals { get { return locals; } }
+        public int BindingTargetID { get; private set; }
+        public IList<VariableResource> Locals { get; set; }
+        public IList<VariableResource> Globals { get; set; }
         public IList<EventGroup> ComponentEventGroups { get { return componentEventGroups; } }
         public IList<Component> Children { get { return children; } }
         #endregion
@@ -160,10 +183,12 @@ namespace CrazyStorm.Core
         #region Constructor
         public Component()
         {
+            ParentID = -1;
+            BindingTargetID = -1;
             name = string.Empty;
             componentData.totalFrame = 200;
             componentData.visibility = true;
-            locals = new GenericContainer<VariableResource>();
+            Locals = new GenericContainer<VariableResource>();
             componentEventGroups = new GenericContainer<EventGroup>();
             children = new GenericContainer<Component>();
         }
@@ -224,9 +249,9 @@ namespace CrazyStorm.Core
             if (bindingTarget != null)
                 clone.bindingTargetID = bindingTarget.id;
 
-            clone.locals = new GenericContainer<VariableResource>();
-            foreach (var variable in locals)
-                clone.locals.Add(variable.Clone() as VariableResource);
+            clone.Locals = new GenericContainer<VariableResource>();
+            foreach (var variable in Locals)
+                clone.Locals.Add(variable.Clone() as VariableResource);
 
             clone.componentEventGroups = new GenericContainer<EventGroup>();
             foreach (var componentEventGroup in componentEventGroups)
@@ -274,7 +299,7 @@ namespace CrazyStorm.Core
                     throw new System.IO.FileLoadException("FileDataError");
             }
             //variables
-            XmlHelper.BuildFromObjectList(locals, new VariableResource(""), componentNode, "Variables");
+            XmlHelper.BuildFromObjectList(Locals, new VariableResource(""), componentNode, "Variables");
             //componentEventGroups
             XmlHelper.BuildFromObjectList(componentEventGroups, new EventGroup(), componentNode, "ComponentEventGroups");
             //children
@@ -317,7 +342,7 @@ namespace CrazyStorm.Core
                 componentNode.Attributes.Append(bindingTargetAttribute);
             }
             //variables
-            XmlHelper.StoreObjectList(locals, doc, componentNode, "Variables");
+            XmlHelper.StoreObjectList(Locals, doc, componentNode, "Variables");
             //componentEventGroups
             XmlHelper.StoreObjectList(componentEventGroups, doc, componentNode, "ComponentEventGroups");
             //children
@@ -399,10 +424,284 @@ namespace CrazyStorm.Core
             else
                 componentBytes.AddRange(PlayDataHelper.GetBytes(-1));
             //variables
-            PlayDataHelper.GenerateObjectList(locals, componentBytes);
+            PlayDataHelper.GenerateObjectList(Locals, componentBytes);
             //componentEventGroups
             PlayDataHelper.GenerateObjectList(componentEventGroups, componentBytes);
             return PlayDataHelper.CreateBlock(componentBytes);
+        }
+                public virtual void LoadPlayData(BinaryReader reader, float version)
+        {
+            using (BinaryReader componentReader = PlayDataHelper.GetBlockReader(reader))
+            {
+                string specificType = PlayDataHelper.ReadString(componentReader);
+                Id = componentReader.ReadInt32();
+                Name = PlayDataHelper.ReadString(componentReader);
+                //properties
+                base.LoadPropertyExpressions(componentReader);
+                using (BinaryReader dataReader = PlayDataHelper.GetBlockReader(componentReader))
+                {
+                    LayerFrame = dataReader.ReadInt32();
+                    CurrentFrame = dataReader.ReadInt32();
+                    BeginFrame = dataReader.ReadInt32();
+                    TotalFrame = dataReader.ReadInt32();
+                    Position = PlayDataHelper.ReadVector2(dataReader);
+                    Speed = dataReader.ReadSingle();
+                    SpeedAngle = dataReader.ReadSingle();
+                    Acspeed = dataReader.ReadSingle();
+                    AcspeedAngle = dataReader.ReadSingle();
+                    Visibility = dataReader.ReadBoolean();
+                }
+                //parent
+                ParentID = componentReader.ReadInt32();
+                //bindingTarget
+                BindingTargetID = componentReader.ReadInt32();
+                //variables
+                PlayDataHelper.LoadObjectList(Locals, componentReader, version);
+                //componentEventGroups
+                PlayDataHelper.LoadObjectList(ComponentEventGroups, componentReader, version);
+            }
+        }
+        public Vector2 GetAbsolutePositionRuntime()
+        {
+            if (Parent != null && parentAbsolutePosition == Vector2.Zero)
+            {
+                parentAbsolutePosition = Parent.GetAbsolutePosition();
+                return Position + parentAbsolutePosition;
+            }
+            return Position;
+        }
+        public Vector2 GetRelativePosition()
+        {
+            if (Parent != null)
+            {
+                Vector2 relative = Position - parentAbsolutePosition;
+                parentAbsolutePosition = Vector2.Zero;
+                return relative;
+            }
+            return Position;
+        }
+        public override bool PushProperty(string propertyName)
+        {
+            switch (propertyName)
+            {
+                case "Name":
+                    VM.PushString(Name);
+                    return true;
+                case "LayerFrame":
+                    VM.PushInt(LayerFrame);
+                    return true;
+                case "CurrentFrame":
+                    VM.PushInt(CurrentFrame);
+                    return true;
+                case "BeginFrame":
+                    VM.PushInt(BeginFrame);
+                    return true;
+                case "TotalFrame":
+                    VM.PushInt(TotalFrame);
+                    return true;
+                case "Position":
+                    VM.PushVector2(Position);
+                    return true;
+                case "Position.x":
+                    VM.PushFloat(Position.x);
+                    return true;
+                case "Position.y":
+                    VM.PushFloat(Position.y);
+                    return true;
+                case "Speed":
+                    VM.PushFloat(Speed);
+                    return true;
+                case "SpeedAngle":
+                    VM.PushFloat(SpeedAngle);
+                    return true;
+                case "Acspeed":
+                    VM.PushFloat(Acspeed);
+                    return true;
+                case "AcspeedAngle":
+                    VM.PushFloat(AcspeedAngle);
+                    return true;
+                case "Visibility":
+                    VM.PushBool(Visibility);
+                    return true;
+                default:
+                    for (int i = 0; i < Locals.Count; ++i)
+                        if (Locals[i].Label == propertyName)
+                        {
+                            VM.PushFloat(Locals[i].Value);
+                            return true;
+                        }
+
+                    for (int i = 0; i < Globals.Count; ++i)
+                        if (Globals[i].Label == propertyName)
+                        {
+                            VM.PushFloat(Globals[i].Value);
+                            return true;
+                        }
+
+                    return false;
+            }
+        }
+        public override bool SetProperty(string propertyName)
+        {
+            switch (propertyName)
+            {
+                case "Name":
+                    Name = VM.PopString();
+                    return true;
+                case "LayerFrame":
+                    LayerFrame = VM.PopInt();
+                    return true;
+                case "CurrentFrame":
+                    CurrentFrame = VM.PopInt();
+                    return true;
+                case "BeginFrame":
+                    BeginFrame = VM.PopInt();
+                    return true;
+                case "TotalFrame":
+                    TotalFrame = VM.PopInt();
+                    return true;
+                case "Position":
+                    Position = VM.PopVector2();
+                    return true;
+                case "Position.x":
+                    Position = new Vector2(VM.PopFloat(), Position.y);
+                    return true;
+                case "Position.y":
+                    Position = new Vector2(Position.x, VM.PopFloat());
+                    return true;
+                case "Speed":
+                    Speed = VM.PopFloat();
+                    MathHelper.SetVector2(ref speedVector, Speed, SpeedAngle);
+                    return true;
+                case "SpeedAngle":
+                    SpeedAngle = VM.PopFloat();
+                    MathHelper.SetVector2(ref speedVector, Speed, SpeedAngle);
+                    return true;
+                case "Acspeed":
+                    Acspeed = VM.PopFloat();
+                    MathHelper.SetVector2(ref acspeedVector, Acspeed, AcspeedAngle);
+                    return true;
+                case "AcspeedAngle":
+                    AcspeedAngle = VM.PopFloat();
+                    MathHelper.SetVector2(ref acspeedVector, Acspeed, AcspeedAngle);
+                    return true;
+                case "Visibility":
+                    Visibility = VM.PopBool();
+                    return true;
+                default:
+                    for (int i = 0; i < Locals.Count; ++i)
+                        if (Locals[i].Label == propertyName)
+                        {
+                            Locals[i].Value = VM.PopFloat();
+                            return true;
+                        }
+
+                    for (int i = 0; i < Globals.Count; ++i)
+                        if (Globals[i].Label == propertyName)
+                        {
+                            Globals[i].Value = VM.PopFloat();
+                            return true;
+                        }
+
+                    return false;
+            }
+        }
+        protected delegate void Action();
+        protected void BindingUpdate(Action updateFunc)
+        {
+            int saveCurrentFrame = CurrentFrame;
+            Vector2 savePosition = Position;
+            float saveSpeed = Speed;
+            float saveSpeedAngle = SpeedAngle;
+            float saveAcspeed = Acspeed;
+            float saveAcspeedAngle = AcspeedAngle;
+            foreach (var particle in BindingTarget.Particles)
+            {
+                CurrentFrame = particle.PCurrentFrame - BeginFrame;
+                if (CurrentFrame < 0 || CurrentFrame >= TotalFrame || !Visibility)
+                    continue;
+
+                Position = particle.PPosition;
+                Speed = particle.PSpeed;
+                SpeedAngle = particle.PSpeedAngle;
+                Acspeed = particle.PAcspeed;
+                AcspeedAngle = particle.PAcspeedAngle;
+                if (updateFunc != null)
+                    updateFunc();
+            }
+            CurrentFrame = saveCurrentFrame;
+            Position = savePosition;
+            Speed = saveSpeed;
+            SpeedAngle = saveSpeedAngle;
+            Acspeed = saveAcspeed;
+            AcspeedAngle = saveAcspeedAngle;
+        }
+        protected bool CheckCircularBinding()
+        {
+            if (this is Emitter)
+                return BindingTarget != null && BindingTarget.BindingTarget == this && 
+                    BindingTarget.Particles.Count == 0 && (this as Emitter).Particles.Count == 0;
+            else
+                return false;
+        }
+        public virtual bool Update(int currentFrame)
+        {
+            LayerFrame = currentFrame;
+            if (BindingTarget == null || CheckCircularBinding())
+            {
+                CurrentFrame = currentFrame - BeginFrame;
+                if (CurrentFrame < 0 || CurrentFrame >= TotalFrame || !Visibility)
+                    return false;
+            }
+            Position = GetRelativePosition();
+            if (BindingTarget == null || CheckCircularBinding())
+            {
+                speedVector += acspeedVector;
+                Position += speedVector;
+                for (int i = 0; i < ComponentEventGroups.Count; ++i)
+                    ComponentEventGroups[i].Execute(this);
+            }
+            else
+                BindingUpdate(ExecuteEventGroups);
+
+            Position = GetAbsolutePositionRuntime();
+            return true;
+        }
+        void ExecuteEventGroups()
+        {
+            for (int i = 0; i < ComponentEventGroups.Count; ++i)
+                ComponentEventGroups[i].Execute(this);
+        }
+        public virtual void Reset()
+        {
+            parentAbsolutePosition = Vector2.Zero;
+            if (initialState == null)
+            {
+                initialState = this.MemberwiseClone() as Component;
+                initialState.Locals = new List<VariableResource>();
+                foreach (VariableResource item in Locals)
+                {
+                    var variable = new VariableResource { Value = item.Value };
+                    initialState.Locals.Add(variable);
+                }
+                initialState.ExecuteExpressions();
+            }
+            else
+            {
+                initialState.ExecuteExpressions();
+                BeginFrame = initialState.BeginFrame;
+                TotalFrame = initialState.TotalFrame;
+                Position = initialState.Position;
+                Speed = initialState.Speed;
+                SpeedAngle = initialState.SpeedAngle;
+                Acspeed = initialState.Acspeed;
+                AcspeedAngle = initialState.AcspeedAngle;
+                Visibility = initialState.Visibility;
+                for (int i = 0;i < Locals.Count;++i)
+                    Locals[i].Value = initialState.Locals[i].Value;
+            }
+            MathHelper.SetVector2(ref speedVector, Speed, SpeedAngle);
+            MathHelper.SetVector2(ref acspeedVector, Acspeed, AcspeedAngle);
         }
         #endregion
     }

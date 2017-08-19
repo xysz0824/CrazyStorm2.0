@@ -5,11 +5,10 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-using CrazyStorm.Core;
 
-namespace CrazyStorm_Player.CrazyStorm
+namespace CrazyStorm.Core
 {
-    class EventExecutor
+    public class EventExecutor
     {
         float currentTime;
         public PropertyContainer PropertyContainer { get; set; }

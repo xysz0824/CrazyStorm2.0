@@ -4,6 +4,7 @@
  */
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 using System.Xml;
 using System.Xml.Serialization;
@@ -62,6 +63,48 @@ namespace CrazyStorm.Core
             PlayDataHelper.GenerateStruct(curveParticleData, curveParticleBytes);
             bytes.AddRange(PlayDataHelper.CreateBlock(curveParticleBytes));
             return bytes;
+        }
+        public override void LoadPlayData(BinaryReader reader, float version)
+        {
+            base.LoadPlayData(reader, version);
+            using (BinaryReader curveParticleReader = PlayDataHelper.GetBlockReader(reader))
+            {
+                using (BinaryReader dataReader = PlayDataHelper.GetBlockReader(curveParticleReader))
+                {
+                    Length = dataReader.ReadInt32();
+                }
+            }
+        }
+        public override bool PushProperty(string propertyName)
+        {
+            if (base.PushProperty(propertyName))
+                return true;
+
+            switch (propertyName)
+            {
+                case "Length":
+                    VM.PushInt(Length);
+                    return true;
+            }
+            return false;
+        }
+        public override bool SetProperty(string propertyName)
+        {
+            if (base.SetProperty(propertyName))
+                return true;
+
+            switch (propertyName)
+            {
+                case "Length":
+                    Length = VM.PopInt();
+                    return true;
+            }
+            return false;
+        }
+        public override void Update()
+        {
+            base.Update();
+            //TODO
         }
         #endregion
     }

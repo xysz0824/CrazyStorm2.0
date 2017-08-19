@@ -8,7 +8,7 @@ using System.Text;
 using CrazyStorm.Core;
 using System.Runtime.InteropServices;
 
-namespace CrazyStorm_Player.CrazyStorm
+namespace CrazyStorm.Core
 {
     public enum VMCode : byte
     {
@@ -44,7 +44,7 @@ namespace CrazyStorm_Player.CrazyStorm
         [FieldOffset(8)]
         public string stringOperand;
     }
-    class VM
+    public class VM
     {
         static Random random = new Random();
         static Stack<float> floatStack = new Stack<float>();
@@ -99,7 +99,7 @@ namespace CrazyStorm_Player.CrazyStorm
         }
         public static void Execute(PropertyContainer propertyContainer, VMInstruction[] instructions)
         {
-            for (int i = 0;i < instructions.Length;++i)
+            for (int i = 0; i < instructions.Length; ++i)
             {
                 switch (instructions[i].code)
                 {

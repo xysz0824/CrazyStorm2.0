@@ -24,7 +24,7 @@ namespace CrazyStorm.Core
         Orange,
         Gray
     }
-    public class ParticleType : INotifyPropertyChanged, IXmlData, IRebuildReference<FileResource>, IPlayData
+    public class ParticleType : INotifyPropertyChanged, IXmlData, IRebuildReference<FileResource>, IGeneratePlayData, ILoadPlayData
     {
         public const int DefaultTypeIndex = 1000;
         public event PropertyChangedEventHandler PropertyChanged;
@@ -63,7 +63,7 @@ namespace CrazyStorm.Core
         #endregion
 
         #region Public Members
-        public int Id
+        public int ID
         {
             get { return id; }
             set { id = value; }
@@ -237,6 +237,11 @@ namespace CrazyStorm.Core
         #endregion
 
         #region Constructor
+        public ParticleType()
+        {
+            frames = 1;
+            imageID = -1;
+        }
         public ParticleType(int id)
         {
             this.id = id;
@@ -334,6 +339,21 @@ namespace CrazyStorm.Core
 
                 typeset.Add(particleType);
                 i++;
+            }
+        }
+        public void LoadPlayData(BinaryReader reader, float version)
+        {
+            using (BinaryReader particleTypeReader = PlayDataHelper.GetBlockReader(reader))
+            {
+                imageID = particleTypeReader.ReadInt32();
+                ID = particleTypeReader.ReadInt32();
+                StartPoint = PlayDataHelper.ReadVector2(particleTypeReader);
+                Width = particleTypeReader.ReadInt32();
+                Height = particleTypeReader.ReadInt32();
+                CenterPoint = PlayDataHelper.ReadVector2(particleTypeReader);
+                Frames = particleTypeReader.ReadInt32();
+                Delay = particleTypeReader.ReadInt32();
+                Radius = particleTypeReader.ReadInt32();
             }
         }
         #endregion

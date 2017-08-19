@@ -8,10 +8,11 @@ using System.Text;
 using System.Collections.ObjectModel;
 using System.Xml;
 using System.Xml.Serialization;
+using System.IO;
 
 namespace CrazyStorm.Core
 {
-    public class EventGroup : IXmlData, IPlayData
+    public class EventGroup : IXmlData, IGeneratePlayData, ILoadPlayData
     {
         #region Private Members
         [XmlAttribute]
@@ -25,6 +26,8 @@ namespace CrazyStorm.Core
         #endregion
 
         #region Public Members
+        public VMInstruction[] VMCondition { get; set; }
+        public IList<VMEventInfo> VMEvents { get; set; }
         public string Name 
         { 
             get { return name; }
@@ -53,6 +56,7 @@ namespace CrazyStorm.Core
             originalEvents = new GenericContainer<string>();
             translatedEvents = new GenericContainer<string>();
             compiledEvents = new List<byte[]>();
+            VMEvents = new List<VMEventInfo>();
         }
         #endregion
 
@@ -111,6 +115,37 @@ namespace CrazyStorm.Core
                 eventGroupBytes.AddRange(compiledEvents[i]);
             }
             return PlayDataHelper.CreateBlock(eventGroupBytes);
+        }
+        public void LoadPlayData(BinaryReader reader, float version)
+        {
+            using (BinaryReader eventGroupReader = PlayDataHelper.GetBlockReader(reader))
+            {
+                //compiledCondition
+                int length = eventGroupReader.ReadInt32();
+                if (length > 0)
+                    VMCondition = VM.Decode(eventGroupReader.ReadBytes(length));
+
+                //compiledEvents
+                while (!PlayDataHelper.EndOfReader(eventGroupReader))
+                {
+                    length = eventGroupReader.ReadInt32();
+                    VMEvents.Add(EventHelper.BuildFromPlayData(eventGroupReader.ReadBytes(length)));
+                }
+            }
+        }
+        public void Execute(PropertyContainer propertyContainer)
+        {
+            if (VMCondition != null)
+                VM.Execute(propertyContainer, VMCondition);
+
+            if (VMCondition == null || VM.PopBool())
+            {
+                for (int i = 0; i < VMEvents.Count; ++i)
+                {
+                    if (EventHelper.Execute(propertyContainer, VMEvents[i]))
+                        i = -1;
+                }
+            }
         }
         #endregion
     }

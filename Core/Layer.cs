@@ -9,6 +9,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Xml;
 using System.Xml.Serialization;
+using System.IO;
 
 namespace CrazyStorm.Core
 {
@@ -22,7 +23,7 @@ namespace CrazyStorm.Core
         Orange,
         Gray
     }
-    public class Layer : INotifyPropertyChanged, IXmlData, IPlayData
+    public class Layer : INotifyPropertyChanged, IXmlData, IGeneratePlayData, ILoadPlayData
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -99,6 +100,10 @@ namespace CrazyStorm.Core
         #endregion
 
         #region Constructor
+        public Layer() 
+        {
+            components = new GenericContainer<Component>();
+        }
         public Layer(string name)
         {
             this.name = name;
@@ -161,6 +166,71 @@ namespace CrazyStorm.Core
             //components
             PlayDataHelper.GenerateObjectList(components, layerBytes);
             return PlayDataHelper.CreateBlock(layerBytes);
+        }
+        public void LoadPlayData(BinaryReader reader, float version)
+        {
+            using (BinaryReader layerReader = PlayDataHelper.GetBlockReader(reader))
+            {
+                Name = PlayDataHelper.ReadString(layerReader);
+                Visible = layerReader.ReadBoolean();
+                BeginFrame = layerReader.ReadInt32();
+                TotalFrame = layerReader.ReadInt32();
+                //components
+                using (BinaryReader componentsReader = PlayDataHelper.GetBlockReader(layerReader))
+                {
+                    while (!PlayDataHelper.EndOfReader(componentsReader))
+                    {
+                        long startPosition = componentsReader.BaseStream.Position;
+                        using (BinaryReader componentReader = PlayDataHelper.GetBlockReader(componentsReader))
+                        {
+                            Component component = null;
+                            switch (PlayDataHelper.ReadString(componentReader))
+                            {
+                                case "MultiEmitter":
+                                    component = new MultiEmitter();
+                                    break;
+                                case "CurveEmitter":
+                                    component = new CurveEmitter();
+                                    break;
+                                case "EventField":
+                                    component = new EventField();
+                                    break;
+                                case "Rebounder":
+                                    component = new Rebounder();
+                                    break;
+                                case "ForceField":
+                                    component = new ForceField();
+                                    break;
+                            }
+                            //Back to start position of components block.
+                            componentsReader.BaseStream.Position = startPosition;
+                            component.LoadPlayData(componentsReader, version);
+                            component.LayerName = Name;
+                            Components.Add(component);
+                        }
+                    }
+                }
+            }
+        }
+        public bool Update(int currentFrame)
+        {
+            if (Visible)
+            {
+                if (currentFrame < BeginFrame || currentFrame >= BeginFrame + TotalFrame)
+                    return false;
+
+                for (int i = 0; i < Components.Count; ++i)
+                    Components[i].Update(currentFrame - BeginFrame);
+            }
+            return Visible;
+        }
+        public void Reset()
+        {
+            if (Visible)
+            {
+                for (int i = 0; i < Components.Count; ++i)
+                    Components[i].Reset();
+            }
         }
         #endregion
     }

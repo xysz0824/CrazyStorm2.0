@@ -8,6 +8,7 @@ using System.Text;
 using System.ComponentModel;
 using System.Xml;
 using System.Xml.Serialization;
+using System.IO;
 
 namespace CrazyStorm.Core
 {
@@ -28,6 +29,7 @@ namespace CrazyStorm.Core
         #endregion
 
         #region Constructor
+        public VariableResource() { }
         public VariableResource(string label)
             : base(label)
         {
@@ -65,6 +67,14 @@ namespace CrazyStorm.Core
             PlayDataHelper.GenerateFields(typeof(VariableResource), this, variableResourceBytes);
             bytes.AddRange(PlayDataHelper.CreateBlock(variableResourceBytes));
             return bytes;
+        }
+        public override void LoadPlayData(BinaryReader reader, float version)
+        {
+            base.LoadPlayData(reader, version);
+            using (BinaryReader variableResourceReader = PlayDataHelper.GetBlockReader(reader))
+            {
+                value = variableResourceReader.ReadSingle();
+            }
         }
         #endregion
     }

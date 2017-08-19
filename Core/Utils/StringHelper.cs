@@ -4,7 +4,7 @@ using System.Text;
 
 namespace CrazyStorm.Core
 {
-    class StringUtil
+    public class StringUtil
     {
         public static bool IsNullOrWhiteSpace(string value)
         {

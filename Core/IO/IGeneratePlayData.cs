@@ -4,12 +4,13 @@
  */
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 
 namespace CrazyStorm.Core
 {
-    [AttributeUsage(AttributeTargets.Field, AllowMultiple = false, Inherited = false)]
-    public class PlayDataAttribute : Attribute
+    public interface IGeneratePlayData
     {
+        List<byte> GeneratePlayData();
     }
 }
