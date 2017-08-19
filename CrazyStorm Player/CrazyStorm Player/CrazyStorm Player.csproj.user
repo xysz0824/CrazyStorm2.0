@@ -2,7 +2,7 @@
 <Project ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
-    <StartArguments>"Temp\Temp.bg" “” 0 800 600 10000 200 True True 0 0 "" "0,0,0,0,0,0,0,0,0"</StartArguments>
+    <StartArguments>"Temp.bg" “” 0 800 600 10000 200 True True 0 0 "" "0,0,0,0,0,0,0,0,0"</StartArguments>
   </PropertyGroup>
   <PropertyGroup>
     <PublishUrlHistory>publish\</PublishUrlHistory>
