@@ -36,7 +36,6 @@ namespace CrazyStorm.Core
         Vector2 parentAbsolutePosition;
         Vector2 speedVector;
         Vector2 acspeedVector;
-        protected Component initialState;
         ComponentData componentData;
         [PlayData]
         [XmlAttribute]
@@ -52,6 +51,10 @@ namespace CrazyStorm.Core
         IList<EventGroup> componentEventGroups;
         IList<Component> children;
         IList<int> childrenIDs;
+        #endregion
+
+        #region Protected Members
+        protected Component initialState;
         #endregion
 
         #region Public Members
@@ -191,6 +194,55 @@ namespace CrazyStorm.Core
             Locals = new GenericContainer<VariableResource>();
             componentEventGroups = new GenericContainer<EventGroup>();
             children = new GenericContainer<Component>();
+        }
+        #endregion
+
+        #region Private Methods
+        void ExecuteEventGroups()
+        {
+            for (int i = 0; i < ComponentEventGroups.Count; ++i)
+                ComponentEventGroups[i].Execute(this);
+        }
+        #endregion
+
+        #region Protected Methods
+        protected delegate void Action();
+        protected void BindingUpdate(Action updateFunc)
+        {
+            int saveCurrentFrame = CurrentFrame;
+            Vector2 savePosition = Position;
+            float saveSpeed = Speed;
+            float saveSpeedAngle = SpeedAngle;
+            float saveAcspeed = Acspeed;
+            float saveAcspeedAngle = AcspeedAngle;
+            foreach (var particle in BindingTarget.Particles)
+            {
+                CurrentFrame = particle.PCurrentFrame - BeginFrame;
+                if (CurrentFrame < 0 || CurrentFrame >= TotalFrame || !Visibility)
+                    continue;
+
+                Position = particle.PPosition;
+                Speed = particle.PSpeed;
+                SpeedAngle = particle.PSpeedAngle;
+                Acspeed = particle.PAcspeed;
+                AcspeedAngle = particle.PAcspeedAngle;
+                if (updateFunc != null)
+                    updateFunc();
+            }
+            CurrentFrame = saveCurrentFrame;
+            Position = savePosition;
+            Speed = saveSpeed;
+            SpeedAngle = saveSpeedAngle;
+            Acspeed = saveAcspeed;
+            AcspeedAngle = saveAcspeedAngle;
+        }
+        protected bool CheckCircularBinding()
+        {
+            if (this is Emitter)
+                return BindingTarget != null && BindingTarget.BindingTarget == this &&
+                    BindingTarget.Particles.Count == 0 && (this as Emitter).Particles.Count == 0;
+            else
+                return false;
         }
         #endregion
 
@@ -429,7 +481,7 @@ namespace CrazyStorm.Core
             PlayDataHelper.GenerateObjectList(componentEventGroups, componentBytes);
             return PlayDataHelper.CreateBlock(componentBytes);
         }
-                public virtual void LoadPlayData(BinaryReader reader, float version)
+        public virtual void LoadPlayData(BinaryReader reader, float version)
         {
             using (BinaryReader componentReader = PlayDataHelper.GetBlockReader(reader))
             {
@@ -606,44 +658,6 @@ namespace CrazyStorm.Core
                     return false;
             }
         }
-        protected delegate void Action();
-        protected void BindingUpdate(Action updateFunc)
-        {
-            int saveCurrentFrame = CurrentFrame;
-            Vector2 savePosition = Position;
-            float saveSpeed = Speed;
-            float saveSpeedAngle = SpeedAngle;
-            float saveAcspeed = Acspeed;
-            float saveAcspeedAngle = AcspeedAngle;
-            foreach (var particle in BindingTarget.Particles)
-            {
-                CurrentFrame = particle.PCurrentFrame - BeginFrame;
-                if (CurrentFrame < 0 || CurrentFrame >= TotalFrame || !Visibility)
-                    continue;
-
-                Position = particle.PPosition;
-                Speed = particle.PSpeed;
-                SpeedAngle = particle.PSpeedAngle;
-                Acspeed = particle.PAcspeed;
-                AcspeedAngle = particle.PAcspeedAngle;
-                if (updateFunc != null)
-                    updateFunc();
-            }
-            CurrentFrame = saveCurrentFrame;
-            Position = savePosition;
-            Speed = saveSpeed;
-            SpeedAngle = saveSpeedAngle;
-            Acspeed = saveAcspeed;
-            AcspeedAngle = saveAcspeedAngle;
-        }
-        protected bool CheckCircularBinding()
-        {
-            if (this is Emitter)
-                return BindingTarget != null && BindingTarget.BindingTarget == this && 
-                    BindingTarget.Particles.Count == 0 && (this as Emitter).Particles.Count == 0;
-            else
-                return false;
-        }
         public virtual bool Update(int currentFrame)
         {
             LayerFrame = currentFrame;
@@ -666,11 +680,6 @@ namespace CrazyStorm.Core
 
             Position = GetAbsolutePositionRuntime();
             return true;
-        }
-        void ExecuteEventGroups()
-        {
-            for (int i = 0; i < ComponentEventGroups.Count; ++i)
-                ComponentEventGroups[i].Execute(this);
         }
         public virtual void Reset()
         {

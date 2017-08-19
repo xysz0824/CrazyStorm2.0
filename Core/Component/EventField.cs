@@ -82,6 +82,43 @@ namespace CrazyStorm.Core
         }
         #endregion
 
+        #region Private Methods
+        void Update()
+        {
+            base.ExecuteExpression("HalfWidth");
+            base.ExecuteExpression("HalfHeight");
+            List<ParticleBase> results = ParticleManager.SearchByRect(Position.x - HalfWidth, Position.x + HalfWidth,
+                Position.y - HalfHeight, Position.y + HalfHeight);
+            foreach (Particle particle in results)
+            {
+                if (particle.IgnoreMask)
+                    continue;
+
+                switch (Reach)
+                {
+                    case Reach.Layer:
+                        if (particle.Emitter.LayerName != TargetName && particle.Emitter.LayerName != LayerName)
+                            continue;
+
+                        break;
+                    case Reach.Name:
+                        if (particle.Emitter.Name != TargetName)
+                            continue;
+
+                        break;
+                }
+                if (FieldShape == FieldShape.Circle)
+                {
+                    Vector2 v = Position - particle.PPosition;
+                    if (Math.Sqrt(v.x * v.x + v.y * v.y) > HalfWidth)
+                        continue;
+                }
+                for (int i = 0; i < EventFieldEventGroups.Count; ++i)
+                    EventFieldEventGroups[i].Execute(particle);
+            }
+        }
+        #endregion
+
         #region Public Methods
         public override object Clone()
         {
@@ -212,40 +249,6 @@ namespace CrazyStorm.Core
             FieldShape = initialState.FieldShape;
             Reach = initialState.Reach;
             TargetName = initialState.TargetName;
-        }
-        void Update()
-        {
-            base.ExecuteExpression("HalfWidth");
-            base.ExecuteExpression("HalfHeight");
-            List<ParticleBase> results = ParticleManager.SearchByRect(Position.x - HalfWidth, Position.x + HalfWidth,
-                Position.y - HalfHeight, Position.y + HalfHeight);
-            foreach (Particle particle in results)
-            {
-                if (particle.IgnoreMask)
-                    continue;
-
-                switch (Reach)
-                {
-                    case Reach.Layer:
-                        if (particle.Emitter.LayerName != TargetName && particle.Emitter.LayerName != LayerName)
-                            continue;
-
-                        break;
-                    case Reach.Name:
-                        if (particle.Emitter.Name != TargetName)
-                            continue;
-
-                        break;
-                }
-                if (FieldShape == FieldShape.Circle)
-                {
-                    Vector2 v = Position - particle.PPosition;
-                    if (Math.Sqrt(v.x * v.x + v.y * v.y) > HalfWidth)
-                        continue;
-                }
-                for (int i = 0; i < EventFieldEventGroups.Count; ++i)
-                    EventFieldEventGroups[i].Execute(particle);
-            }
         }
         #endregion
     }

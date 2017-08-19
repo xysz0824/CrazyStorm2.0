@@ -30,12 +30,12 @@ namespace CrazyStorm.Core
         #endregion
 
         #region Public Members
-        public int CurrentFrame { get; set; }
         public string Name 
         { 
             get { return name; }
             set { name = value; }
         }
+        public int CurrentFrame { get; set; }
         public IList<ParticleType> CustomTypes { get { return customTypes; } }
         public IList<Layer> Layers { get { return layers; } }
         public IList<Component> ComponentTree { get { return componentTree; } }

@@ -26,8 +26,6 @@ namespace CrazyStorm.Core
         #endregion
 
         #region Public Members
-        public VMInstruction[] VMCondition { get; set; }
-        public IList<VMEventInfo> VMEvents { get; set; }
         public string Name 
         { 
             get { return name; }
@@ -43,6 +41,8 @@ namespace CrazyStorm.Core
             get { return compiledCondition; }
             set { compiledCondition = value; }
         }
+        public VMInstruction[] VMCondition { get; set; }
+        public IList<VMEventInfo> VMEvents { get; set; }
         public IList<string> OriginalEvents { get { return originalEvents; } }
         public IList<string> TranslatedEvents { get { return translatedEvents; } }
         public IList<byte[]> CompiledEvents { get { return compiledEvents; } }

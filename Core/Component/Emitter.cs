@@ -94,6 +94,37 @@ namespace CrazyStorm.Core
         }
         #endregion
 
+        #region Private Methods
+        void EmitCyclically()
+        {
+            if (CurrentFrame % EmitCycle == 0)
+                Emit();
+        }
+        void Emit()
+        {
+            base.ExecuteExpression("EmitCycle");
+            base.ExecuteExpression("EmitRange");
+            base.ExecuteExpression("EmitCount");
+            base.ExecuteExpression("EmitAngle");
+            base.ExecuteExpression("EmitPosition");
+            base.ExecuteExpression("EmitRadius");
+            Template.ExecuteExpressions();
+            float increment = EmitRange / EmitCount;
+            float angle = EmitAngle - (EmitRange + increment) / 2;
+            for (int i = 0; i < EmitCount; ++i)
+            {
+                angle += increment;
+                Template.PPosition = new Vector2(
+                    EmitPosition.x + EmitRadius * (float)Math.Cos(MathHelper.DegToRad(angle)),
+                    EmitPosition.y + EmitRadius * (float)Math.Sin(MathHelper.DegToRad(angle)));
+                Template.PSpeedAngle = angle;
+                ParticleBase newParticle = ParticleManager.GetParticle(Template);
+                newParticle.ParticleEventGroups = EmitterEventGroups;
+                Particles.AddLast(newParticle);
+            }
+        }
+        #endregion
+
         #region Public Methods
         public override object Clone()
         {
@@ -263,34 +294,6 @@ namespace CrazyStorm.Core
                 Emit();
             else
                 BindingUpdate(Emit);
-        }
-        void EmitCyclically()
-        {
-            if (CurrentFrame % EmitCycle == 0)
-                Emit();
-        }
-        void Emit()
-        {
-            base.ExecuteExpression("EmitCycle");
-            base.ExecuteExpression("EmitRange");
-            base.ExecuteExpression("EmitCount");
-            base.ExecuteExpression("EmitAngle");
-            base.ExecuteExpression("EmitPosition");
-            base.ExecuteExpression("EmitRadius");
-            Template.ExecuteExpressions();
-            float increment = EmitRange / EmitCount;
-            float angle = EmitAngle - (EmitRange + increment) / 2;
-            for (int i = 0; i < EmitCount; ++i)
-            {
-                angle += increment;
-                Template.PPosition = new Vector2(
-                    EmitPosition.x + EmitRadius * (float)Math.Cos(MathHelper.DegToRad(angle)),
-                    EmitPosition.y + EmitRadius * (float)Math.Sin(MathHelper.DegToRad(angle)));
-                Template.PSpeedAngle = angle;
-                ParticleBase newParticle = ParticleManager.GetParticle(Template);
-                newParticle.ParticleEventGroups = EmitterEventGroups;
-                Particles.AddLast(newParticle);
-            }
         }
         #endregion
     }
