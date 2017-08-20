@@ -24,7 +24,6 @@ namespace CrazyStorm_Player.DirectX
         #region Constructor
         public DeviceContext(IntPtr handle, DeviceSettings settings)
         {
-
             PresentParameters = new PresentParameters();
             PresentParameters.BackBufferFormat = Format.X8R8G8B8;
             PresentParameters.BackBufferCount = 1;
@@ -40,6 +39,11 @@ namespace CrazyStorm_Player.DirectX
             PresentParameters.DeviceWindowHandle = handle;
 
             direct3D = new Direct3D();
+            Capabilities cap = direct3D.GetDeviceCaps(0, DeviceType.Hardware);
+            if ((cap.DeviceCaps & DeviceCaps.HWTransformAndLight) == 0)
+            {
+                settings.CreateFlags = CreateFlags.SoftwareVertexProcessing;
+            }
             Device = new Device(direct3D, settings.Adapter, DeviceType.Hardware, handle, settings.CreateFlags, PresentParameters);
         }
         #endregion
