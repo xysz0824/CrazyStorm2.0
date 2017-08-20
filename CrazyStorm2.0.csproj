@@ -307,6 +307,10 @@
       <Project>{c7f105ce-aee2-4c95-96aa-21fc823620b5}</Project>
       <Name>Common</Name>
     </ProjectReference>
+    <ProjectReference Include="CrazyStorm Player\CrazyStorm Player\CrazyStorm Player.csproj">
+      <Project>{6969210a-fb47-48a8-b14c-52d4f0955e63}</Project>
+      <Name>CrazyStorm Player</Name>
+    </ProjectReference>
     <ProjectReference Include="Script\Expression.csproj">
       <Project>{cea93dc4-9ff2-4d90-b0bf-e1e0d8027223}</Project>
       <Name>Expression</Name>
