@@ -155,7 +155,7 @@ namespace CrazyStorm.Core
             if (RetainScale && WidthScale != HeightScale)
                 HeightScale = WidthScale;
 
-            //TODO
+            //TODO Particle Effect
         }
         #endregion
     }

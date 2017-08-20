@@ -67,7 +67,7 @@ namespace CrazyStorm_Player
                 if (curveParticle.Type == null)
                     return;
 
-                //TODO
+                //TODO Curve Particle
             };
         }
         protected override void OnLoad()

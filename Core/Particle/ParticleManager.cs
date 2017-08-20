@@ -85,6 +85,7 @@ namespace CrazyStorm.Core
         }
         public static void Draw()
         {
+            //TODO BlendType
             if (OnParticleDraw != null)
             {
                 for (int i = 0; i < particlePool.Count; ++i)
