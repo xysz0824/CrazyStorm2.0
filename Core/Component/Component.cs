@@ -45,9 +45,7 @@ namespace CrazyStorm.Core
         string name;
         bool selected;
         Component parent;
-        int parentID = -1;
         Emitter bindingTarget;
-        int bindingTargetID = -1;
         IList<EventGroup> componentEventGroups;
         IList<Component> children;
         IList<int> childrenIDs;
@@ -295,11 +293,11 @@ namespace CrazyStorm.Core
             var clone = base.Clone() as Component;
             clone.parent = null;
             if (parent != null)
-                clone.parentID = parent.id;
+                clone.ParentID = parent.id;
 
             clone.bindingTarget = null;
             if (bindingTarget != null)
-                clone.bindingTargetID = bindingTarget.id;
+                clone.BindingTargetID = bindingTarget.id;
 
             clone.Locals = new GenericContainer<VariableResource>();
             foreach (var variable in Locals)
@@ -336,7 +334,7 @@ namespace CrazyStorm.Core
                 string parentAttribute = componentNode.GetAttribute("parent");
                 int parsedID;
                 if (int.TryParse(parentAttribute, out parsedID))
-                    parentID = parsedID;
+                    ParentID = parsedID;
                 else
                     throw new System.IO.FileLoadException("FileDataError");
             }
@@ -346,7 +344,7 @@ namespace CrazyStorm.Core
                 string bindingTargetAttribute = componentNode.GetAttribute("bindingTarget");
                 int parsedID;
                 if (int.TryParse(bindingTargetAttribute, out parsedID))
-                    bindingTargetID = parsedID;
+                    BindingTargetID = parsedID;
                 else
                     throw new System.IO.FileLoadException("FileDataError");
             }
@@ -414,30 +412,30 @@ namespace CrazyStorm.Core
         public void RebuildReferenceFromCollection(IList<Component> collection)
         {
             //parent
-            if (parentID != -1)
+            if (ParentID != -1)
             {
                 foreach (var target in collection)
                 {
-                    if (parentID == target.Id)
+                    if (ParentID == target.Id)
                     {
                         parent = target;
                         break;
                     }
                 }
-                parentID = -1;
+                ParentID = -1;
             }
             //bindingTarget
-            if (bindingTargetID != -1)
+            if (BindingTargetID != -1)
             {
                 foreach (var target in collection)
                 {
-                    if (bindingTargetID == target.Id)
+                    if (BindingTargetID == target.Id)
                     {
                         bindingTarget = target as Emitter;
                         break;
                     }
                 }
-                bindingTargetID = -1;
+                BindingTargetID = -1;
             }
             //children
             if (childrenIDs != null)
@@ -523,7 +521,7 @@ namespace CrazyStorm.Core
             }
             return Position;
         }
-        public Vector2 GetRelativePosition()
+        public Vector2 GetRelativePositionRuntime()
         {
             if (Parent != null)
             {
@@ -670,7 +668,7 @@ namespace CrazyStorm.Core
                 if (CurrentFrame < 0 || CurrentFrame >= TotalFrame || !Visibility)
                     return false;
             }
-            Position = GetRelativePosition();
+            Position = GetRelativePositionRuntime();
             if (BindingTarget == null || CheckCircularBinding())
             {
                 speedVector += acspeedVector;

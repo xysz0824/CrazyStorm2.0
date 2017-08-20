@@ -182,10 +182,12 @@ namespace CrazyStorm
         #region Window EventHandlers
         private void GeneratePlayFile_Click(object sender, RoutedEventArgs e)
         {
+            file.UpdateResource();
             GeneratePlayFile();
         }
         private void PlayItem_Click(object sender, RoutedEventArgs e)
         {
+            file.UpdateResource();
             PlayCurrent();
         }
         private void PlaySettingItem_Click(object sender, RoutedEventArgs e)
