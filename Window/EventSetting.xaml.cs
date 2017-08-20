@@ -48,6 +48,7 @@ namespace CrazyStorm
             InitializeSetting(emitter, aboutParticle);
             LoadContent();
             TranslateEvents();
+            ResetAll();
         }
         #endregion
 
@@ -361,22 +362,22 @@ namespace CrazyStorm
         {
             LeftConditionComboBox.SelectedIndex = -1;
             LeftMoreThan.IsChecked = false;
-            LeftEqual.IsChecked = false;
+            LeftEqual.IsChecked = true;
             LeftLessThan.IsChecked = false;
             LeftValue.Text = string.Empty;
-            And.IsChecked = false;
+            And.IsChecked = true;
             Or.IsChecked = false;
             RightConditionComboBox.SelectedIndex = -1;
             RightMoreThan.IsChecked = false;
-            RightEqual.IsChecked = false;
+            RightEqual.IsChecked = true;
             RightLessThan.IsChecked = false;
             RightValue.Text = string.Empty;
             PropertyComboBox.SelectedIndex = -1;
-            ChangeTo.IsChecked = false;
+            ChangeTo.IsChecked = true;
             Increase.IsChecked = false;
             Decrease.IsChecked = false;
             ResultValue.Text = string.Empty;
-            Linear.IsChecked = false;
+            Linear.IsChecked = true;
             Accelerated.IsChecked = false;
             Decelerated.IsChecked = false;
             Instant.IsChecked = false;
