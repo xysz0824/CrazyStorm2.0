@@ -5,13 +5,13 @@ This project has two aspects "Editor" and "Player", while the "Editor" is releas
 You can now study finished parts or start use Editor for producing. Also you can fork and refrom it for you own reason anyway.
 
 ## Features Overview
-1. Expression support  
+- Expression support  
 You can utilize expression to design more complicate animation than Crazy Storm 1.0.
-2. Component tree  
+- Component tree  
 Set component relationship as father-child makes it easy to manager multi components movement.
-3. More Friendly UI  
+- More Friendly UI  
 Improve your work efficiency and Avoid cause of unnecessary error.
-4. Independent Player  
+- Independent Player  
 It's not only for demostrating your particle but giving someone who want to use these productions on his own game an example or just basing on it for development. 
 
 ## What's Our Goal
