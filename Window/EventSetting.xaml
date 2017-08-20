@@ -2,32 +2,24 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:local ="clr-namespace:CrazyStorm"
-        Title="事件设置" Height="650" Width="450" WindowStyle="ToolWindow" WindowStartupLocation="CenterScreen" ResizeMode="NoResize" Background="#FFF0F0F0">
+        Title="{StaticResource EventSettingStr}" Height="650" Width="450" WindowStyle="ToolWindow" WindowStartupLocation="CenterScreen" ResizeMode="NoResize" Background="#FFF0F0F0">
     <StackPanel>
-        <GroupBox Name="GroupBox" Header="事件组">
+        <GroupBox Name="GroupBox" Header="{StaticResource EventGroupStr}">
             <StackPanel>
                 <DockPanel Margin="0,1">
-                    <Label Content="名称" />
+                    <Label Content="{StaticResource NameStr}" />
                     <TextBox Text="{Binding Path=Name}" VerticalContentAlignment="Center" MaxLines="1" />
                 </DockPanel>
                 <DockPanel Name="ConditionPanel" Margin="0,1">
-                    <Label Content="条件" />
+                    <Label Content="{StaticResource ConditionStr}" />
                     <TextBox Name="Condition" Text="{Binding Path=Condition, Mode=OneWay}" VerticalContentAlignment="Center" 
                              PreviewLostKeyboardFocus="Condition_PreviewLostKeyboardFocus" Background="White" MaxLines="1" />
                 </DockPanel>
             </StackPanel>
         </GroupBox>
-        <GroupBox Header="事件列表">
+        <GroupBox Header="{StaticResource EventListStr}">
             <StackPanel>
                 <StackPanel>
-                    <StackPanel Name="CycleSetting" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,1" Visibility="Collapsed">
-                        <Label Content="起始帧" />
-                        <TextBox Width="40"></TextBox>
-                        <Label Content="持续帧" />
-                        <TextBox Width="40"></TextBox>
-                        <Label Content="周期" />
-                        <TextBox Width="40"></TextBox>
-                    </StackPanel>
                     <ListView Name="EventList" ItemsSource="{Binding }" Height="180" SelectionMode="Single" 
                              KeyDown="EventList_KeyDown" SelectionChanged="EventList_SelectionChanged" >
                         <ListView.ItemTemplate>
@@ -47,7 +39,7 @@
                 </StackPanel>
             </StackPanel>
         </GroupBox>
-        <GroupBox Name="ConditionSetting" Header="事件条件">
+        <GroupBox Name="ConditionSetting" Header="{StaticResource EventConditionStr}">
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                 <ComboBox Name="LeftConditionComboBox" Width="100" VerticalAlignment="Center" SelectionChanged="LeftConditionComboBox_SelectionChanged">
                     <ComboBox.ItemTemplate>
@@ -64,8 +56,8 @@
                 <TextBox Name="LeftValue" Width="50" VerticalContentAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Center" Height="25" 
                          PreviewLostKeyboardFocus="LeftValue_PreviewLostKeyboardFocus" MaxLines="1" PreviewGotKeyboardFocus="LeftValue_PreviewGotKeyboardFocus" />
                 <StackPanel Margin="5,0" VerticalAlignment="Center">
-                    <RadioButton Name="And" Content="且" />
-                    <RadioButton Name="Or" Content="或" />
+                    <RadioButton Name="And" Content="{StaticResource AndStr}" />
+                    <RadioButton Name="Or" Content="{StaticResource OrStr}" />
                 </StackPanel>
                 <ComboBox Name="RightConditionComboBox" Width="100" VerticalAlignment="Center" SelectionChanged="RightConditionComboBox_SelectionChanged">
                     <ComboBox.ItemTemplate>
@@ -83,7 +75,7 @@
                          PreviewLostKeyboardFocus="RightValue_PreviewLostKeyboardFocus" MaxLines="1" PreviewGotKeyboardFocus="RightValue_PreviewGotKeyboardFocus"/>
             </StackPanel>
         </GroupBox>
-        <GroupBox Name="PropertyEventPanel" Header="属性事件">
+        <GroupBox Name="PropertyEventPanel" Header="{StaticResource EventContentStr}">
             <StackPanel>
                 <DockPanel Margin="0,1">
                     <ComboBox Name="PropertyComboBox" Width="105" SelectionChanged="PropertyComboBox_SelectionChanged">
@@ -93,67 +85,67 @@
                             </DataTemplate>
                         </ComboBox.ItemTemplate>
                     </ComboBox>
-                    <RadioButton Name="ChangeTo" Content="变化到" VerticalAlignment="Center" Margin="5,0,5,0"></RadioButton>
-                    <RadioButton Name="Increase" Content="增加" VerticalAlignment="Center" Margin="5,0"></RadioButton>
-                    <RadioButton Name="Decrease" Content="减少" VerticalAlignment="Center" Margin="5,0,5,0"></RadioButton>
+                    <RadioButton Name="ChangeTo" Content="{StaticResource ChangeToStr}" VerticalAlignment="Center" Margin="5,0,5,0"></RadioButton>
+                    <RadioButton Name="Increase" Content="{StaticResource IncreaseStr}" VerticalAlignment="Center" Margin="5,0"></RadioButton>
+                    <RadioButton Name="Decrease" Content="{StaticResource DecreaseStr}" VerticalAlignment="Center" Margin="5,0,5,0"></RadioButton>
                     <TextBox Name="ResultValue" VerticalContentAlignment="Center" Height="25" PreviewLostKeyboardFocus="ResultValue_PreviewLostKeyboardFocus" MaxLines="1" PreviewGotKeyboardFocus="ResultValue_PreviewGotKeyboardFocus"/>
                 </DockPanel>
                 <StackPanel Orientation="Horizontal" Margin="0,1" HorizontalAlignment="Center">
                     <StackPanel Margin="6,0">
                         <Image Source="/CrazyStorm;component/Images/linear.png" Width="96" Height="48"/>
-                        <RadioButton Name="Linear"  HorizontalAlignment="Center" Content="线性" Checked="Linear_Checked"></RadioButton>
+                        <RadioButton Name="Linear"  HorizontalAlignment="Center" Content="{StaticResource LinearStr}" Checked="Linear_Checked"></RadioButton>
                     </StackPanel>
                     <StackPanel Margin="6,0">
                         <Image Source="/CrazyStorm;component/Images/accelerated.png" Width="96" Height="48"></Image>
-                        <RadioButton Name="Accelerated" HorizontalAlignment="Center" Content="加速" Checked="Accelerated_Checked"></RadioButton>
+                        <RadioButton Name="Accelerated" HorizontalAlignment="Center" Content="{StaticResource AcceleratedStr}" Checked="Accelerated_Checked"></RadioButton>
                     </StackPanel>
                     <StackPanel Margin="6,0">
                         <Image Source="/CrazyStorm;component/Images/decelerated.png" Width="96" Height="48"></Image>
-                        <RadioButton Name="Decelerated" HorizontalAlignment="Center" Content="减速" Checked="Decelerated_Checked"></RadioButton>
+                        <RadioButton Name="Decelerated" HorizontalAlignment="Center" Content="{StaticResource DeceleratedStr}" Checked="Decelerated_Checked"></RadioButton>
                     </StackPanel>
                     <StackPanel Margin="6,0">
                         <Image Source="/CrazyStorm;component/Images/instant.png" Width="96" Height="48"></Image>
-                        <RadioButton Name="Instant" HorizontalAlignment="Center" Content="瞬时" Checked="Instant_Checked"></RadioButton>
+                        <RadioButton Name="Instant" HorizontalAlignment="Center" Content="{StaticResource InstantStr}" Checked="Instant_Checked"></RadioButton>
                     </StackPanel>
                 </StackPanel>
                 <StackPanel Name="ChangeTimePanel" Orientation="Horizontal" Margin="0,1" HorizontalAlignment="Right">
-                    <Label Content="变化时间" Margin="4,0,0,0"/>
+                    <Label Content="{StaticResource ChangeTimeStr}" Margin="4,0,0,0"/>
                     <TextBox x:Name="ChangeTime" Width="50" VerticalContentAlignment="Center" VerticalAlignment="Center" HorizontalAlignment="Center" Height="26" 
                              PreviewLostKeyboardFocus="ChangeTime_PreviewLostKeyboardFocus" MaxLines="1" MaxLength="9"/>
                 </StackPanel>
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,1">
-                    <Button x:Name="AddEvent" Width ="40" Content="添加" Margin="2,0" Click="AddEvent_Click" />
+                    <Button x:Name="AddEvent" Width ="40" Content="{StaticResource AddStr}" Margin="2,0" Click="AddEvent_Click" />
                 </StackPanel>
             </StackPanel>
         </GroupBox>
-        <GroupBox Name="SpecialEventPanel" Header="特殊事件">
+        <GroupBox Name="SpecialEventPanel" Header="{StaticResource SpecialEventStr}">
             <StackPanel>
                 <StackPanel Orientation="Horizontal" Margin="0,1">
-                    <RadioButton Name="EmitParticle" Content="发射粒子" Margin="8,0,5,0" Checked="EmitParticleButton_Checked" />
-                    <RadioButton Name="PlaySound" Content="播放音效" Margin="5,0" Checked="PlaySoundButton_Checked" />
-                    <RadioButton Name="Loop" Content="循环执行" Margin="5,0,8,0" Checked="LoopButton_Checked" />
-                    <RadioButton Name="ChangeType" Content="改变类型" Margin="5,0,8,0" Checked="ChangeTypeButton_Checked" />
+                    <RadioButton Name="EmitParticle" Content="{StaticResource EmitParticleStr}" Margin="8,0,5,0" Checked="EmitParticleButton_Checked" />
+                    <RadioButton Name="PlaySound" Content="{StaticResource PlaySoundStr}" Margin="5,0" Checked="PlaySoundButton_Checked" />
+                    <RadioButton Name="Loop" Content="{StaticResource LoopStr}" Margin="5,0,8,0" Checked="LoopButton_Checked" />
+                    <RadioButton Name="ChangeType" Content="{StaticResource ChangeTypeStr}" Margin="5,0,8,0" Checked="ChangeTypeButton_Checked" />
                 </StackPanel>
                 <DockPanel Name="PlaySoundPanel" Margin="0,1" Visibility="Collapsed">
-                    <Label Content="音效资源" />
+                    <Label Content="{StaticResource SoundResourceStr}" />
                     <ComboBox Name="SoundCombo" VerticalContentAlignment="Center" Width="100" />
                     <MediaElement Name="MediaPlayer" MediaEnded="MediaPlayer_MediaEnded"></MediaElement>
-                    <Button Margin="1,0" Name="SoundTestButton" Content="测试" Click="SoundTestButton_Click"/>
-                    <Label Content="音量大小" />
+                    <Button Margin="1,0" Name="SoundTestButton" Content="{StaticResource TestStr}" Click="SoundTestButton_Click"/>
+                    <Label Content="{StaticResource SoundVolumeStr}" />
                     <Slider Name="VolumeSlider" VerticalAlignment="Center" AutoToolTipPlacement="BottomRight" Maximum="100" Value="50" IsSnapToTickEnabled="True" SmallChange="1"></Slider>
                 </DockPanel>
                 <DockPanel Name="LoopPanel" Margin="0,1" Visibility="Collapsed">
-                    <Label Content="中止条件" />
+                    <Label Content="{StaticResource StopConditionStr}" />
                     <TextBox Name="StopCondition" VerticalContentAlignment="Center" PreviewLostKeyboardFocus="StopCondition_PreviewLostKeyboardFocus" />
                 </DockPanel>
                 <StackPanel Name="ChangeTypePanel" Margin="0,1" Orientation="Horizontal" Visibility="Collapsed">
-                    <Label  Content="粒子类型" />
+                    <Label  Content="{StaticResource TypeStr}" />
                     <ComboBox Name="TypeCombo" Width="150" SelectionChanged="TypeCombo_SelectionChanged"/>
-                    <Label  Content="标识色" />
+                    <Label  Content="{StaticResource RGBStr}" />
                     <ComboBox Name="ColorCombo" Width="80"/>
                 </StackPanel>
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,1">
-                    <Button Name="AddSpecialEvent" Width ="40" Content="添加" Margin="2,0" Click="AddSpecialEvent_Click" />
+                    <Button Name="AddSpecialEvent" Width ="40" Content="{StaticResource AddStr}" Margin="2,0" Click="AddSpecialEvent_Click" />
                 </StackPanel>
             </StackPanel>
         </GroupBox>

@@ -10,7 +10,7 @@
         </Style>
     </UserControl.Resources>
     <StackPanel Background="#FFF0F0F0">
-        <GroupBox Header="基本" Background="#FFF9F9F9">
+        <GroupBox Header="{StaticResource BasicStr}" Background="#FFF9F9F9">
             <DataGrid Name="ComponentGrid" ItemsSource="{Binding}" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" 
                           GridLinesVisibility="Horizontal" ColumnWidth="Auto" SelectionMode="Single" AutoGenerateColumns="False"  CanUserAddRows="False" CanUserReorderColumns="False" CanUserSortColumns="False" 
                       ScrollViewer.CanContentScroll="False" CanUserResizeRows="False" CellEditEnding="ComponentGrid_CellEditEnding" CanUserDeleteRows="False" BeginningEdit="ComponentGrid_BeginningEdit">
@@ -18,18 +18,18 @@
                     <SolidColorBrush Color="{StaticResource {x:Static SystemColors.ControlColorKey}}"/>
                 </DataGrid.HorizontalGridLinesBrush>
                 <DataGrid.Columns>
-                    <DataGridTextColumn x:Name="ComponentKey" Header="属性名" IsReadOnly="True" Binding="{Binding DisplayName}" CanUserResize="False">
+                    <DataGridTextColumn x:Name="ComponentKey" Header="{StaticResource PropertyNameStr}" IsReadOnly="True" Binding="{Binding DisplayName}" CanUserResize="False">
                         <DataGridTextColumn.CellStyle>
                             <Style TargetType="DataGridCell">
                                 <Setter Property="ToolTip" Value="{Binding Name}" />
                             </Style>
                         </DataGridTextColumn.CellStyle>
                     </DataGridTextColumn>
-                    <DataGridTextColumn x:Name="ComponentValue" Header="属性值" Binding="{Binding Value}" />
+                    <DataGridTextColumn x:Name="ComponentValue" Header="{StaticResource PropertyValueStr}" Binding="{Binding Value}" />
                 </DataGrid.Columns>
             </DataGrid>
         </GroupBox>
-        <GroupBox Header="组件" Background="#FFF9F9F9">
+        <GroupBox Header="{StaticResource ComponentStr}" Background="#FFF9F9F9">
             <DataGrid Name="SpecificGrid" ItemsSource="{Binding}" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" 
                           GridLinesVisibility="Horizontal" ColumnWidth="Auto" SelectionMode="Single" AutoGenerateColumns="False"  CanUserAddRows="False" CanUserReorderColumns="False" CanUserSortColumns="False" 
                       ScrollViewer.CanContentScroll="False" CanUserResizeRows="False" CellEditEnding="ComponentGrid_CellEditEnding" CanUserDeleteRows="False" BeginningEdit="ComponentGrid_BeginningEdit">
@@ -37,23 +37,23 @@
                     <SolidColorBrush Color="{StaticResource {x:Static SystemColors.ControlColorKey}}"/>
                 </DataGrid.HorizontalGridLinesBrush>
                 <DataGrid.Columns>
-                    <DataGridTextColumn x:Name="SpecificKey" Header="属性名" IsReadOnly="True" Binding="{Binding DisplayName}" CanUserResize="False">
+                    <DataGridTextColumn x:Name="SpecificKey" Header="{StaticResource PropertyNameStr}" IsReadOnly="True" Binding="{Binding DisplayName}" CanUserResize="False">
                         <DataGridTextColumn.CellStyle>
                             <Style TargetType="DataGridCell">
                                 <Setter Property="ToolTip" Value="{Binding Name}" />
                             </Style>
                         </DataGridTextColumn.CellStyle>
                     </DataGridTextColumn>
-                    <DataGridTextColumn x:Name="SepcificValue" Header="属性值" Binding="{Binding Value}" />
+                    <DataGridTextColumn x:Name="SepcificValue" Header="{StaticResource PropertyValueStr}" Binding="{Binding Value}" />
                 </DataGrid.Columns>
             </DataGrid>
         </GroupBox>
-        <GroupBox Name="ParticleGroup"  Header="粒子" Background="#FFF9F9F9">
+        <GroupBox Name="ParticleGroup"  Header="{StaticResource ParticleStr}" Background="#FFF9F9F9">
             <StackPanel>
                 <DockPanel>
-                    <Label Content="类型" HorizontalContentAlignment="Center" Margin="0,0,1,1" DockPanel.Dock="Left"/>
+                    <Label Content="{StaticResource TypeStr}" HorizontalContentAlignment="Center" Margin="0,0,1,1" DockPanel.Dock="Left"/>
                     <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
-                        <Label Content="标识色" HorizontalContentAlignment="Center" Margin="0,0,1,1"/>
+                        <Label Content="{StaticResource RGBStr}" HorizontalContentAlignment="Center" Margin="0,0,1,1"/>
                         <ComboBox Name="ColorCombo" Width = "60" Margin="0,1" SelectionChanged="ColorCombo_SelectionChanged" />
                     </StackPanel>
                     <ComboBox Name="TypeCombo" ItemsSource="{Binding}" Margin="0,1" SelectionChanged="TypeCombo_SelectionChanged">
@@ -76,19 +76,19 @@
                         <SolidColorBrush Color="{StaticResource {x:Static SystemColors.ControlColorKey}}"/>
                     </DataGrid.HorizontalGridLinesBrush>
                     <DataGrid.Columns>
-                        <DataGridTextColumn x:Name="ParticleKey"  Header="属性名" IsReadOnly="True" Binding="{Binding DisplayName}" CanUserResize="False">
+                        <DataGridTextColumn x:Name="ParticleKey"  Header="{StaticResource PropertyNameStr}" IsReadOnly="True" Binding="{Binding DisplayName}" CanUserResize="False">
                             <DataGridTextColumn.CellStyle>
                                 <Style TargetType="DataGridCell">
                                     <Setter Property="ToolTip" Value="{Binding Name}" />
                                 </Style>
                             </DataGridTextColumn.CellStyle>
                         </DataGridTextColumn>
-                        <DataGridTextColumn x:Name="ParticleValue"  Header="属性值" Binding="{Binding Value}" />
+                        <DataGridTextColumn x:Name="ParticleValue"  Header="{StaticResource PropertyValueStr}" Binding="{Binding Value}" />
                     </DataGrid.Columns>
                 </DataGrid>
             </StackPanel>
         </GroupBox>
-        <GroupBox Header="变量" Background="#FFF9F9F9">
+        <GroupBox Header="{StaticResource VariableStr}" Background="#FFF9F9F9">
             <StackPanel>
                 <DataGrid Name="VariableGrid" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" 
                           GridLinesVisibility="Horizontal" ColumnWidth="Auto" SelectionMode="Single" CanUserReorderColumns="False" CanUserSortColumns="False" 
@@ -98,23 +98,23 @@
                         <SolidColorBrush Color="{StaticResource {x:Static SystemColors.ControlColorKey}}"/>
                     </DataGrid.HorizontalGridLinesBrush>
                     <DataGrid.Columns>
-                        <DataGridTextColumn x:Name="VariableKey"  Header="变量名" Binding="{Binding Label}"/>
-                        <DataGridTextColumn x:Name="VariableValue"  Header="变量值" Binding="{Binding Value}" />
+                        <DataGridTextColumn x:Name="VariableKey"  Header="{StaticResource VariableKeyStr}" Binding="{Binding Label}"/>
+                        <DataGridTextColumn x:Name="VariableValue"  Header="{StaticResource VariableValueStr}" Binding="{Binding Value}" />
                     </DataGrid.Columns>
                 </DataGrid>
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" >
-                    <Button Name="AddVariable" Width ="40" Content="添加" Margin="2,0" Click="AddVariable_Click" />
-                    <Button Name="DeleteVariable" Width ="40" Content="删除" Click="DeleteVariable_Click" />
+                    <Button Name="AddVariable" Width ="40" Content="{StaticResource AddStr}" Margin="2,0" Click="AddVariable_Click" />
+                    <Button Name="DeleteVariable" Width ="40" Content="{StaticResource DelStr}" Click="DeleteVariable_Click" />
                 </StackPanel>
             </StackPanel>
         </GroupBox>
-        <GroupBox Header="组件事件组" Height="130" Margin="0">
+        <GroupBox Header="{StaticResource ComponentEventGroupStr}" Height="130" Margin="0">
             <TreeView Name="ComponentEventList" ItemsSource="{Binding ElementName=Name}" Padding="-12,1,1,1" 
                       PreviewMouseRightButtonDown="ComponentEventList_PreviewMouseRightButtonDown" 
                       MouseDoubleClick="ComponentEventList_MouseDoubleClick">
                 <TreeView.ContextMenu>
                     <ContextMenu>
-                        <MenuItem Name="AddComponentEvent" Header="添加事件" Click="AddComponentEvent_Click"/>
+                        <MenuItem Name="AddComponentEvent" Header="{StaticResource AddStr}" Click="AddComponentEvent_Click"/>
                     </ContextMenu>
                 </TreeView.ContextMenu>
                 <TreeView.ItemTemplate>
@@ -122,7 +122,7 @@
                         <DockPanel>
                             <DockPanel.ContextMenu>
                                 <ContextMenu>
-                                    <MenuItem Name="DelComponentEvent" Header="删除" Click="DelComponentEvent_Click" />
+                                    <MenuItem Name="DelComponentEvent" Header="{StaticResource DelStr}" Click="DelComponentEvent_Click" />
                                 </ContextMenu>
                             </DockPanel.ContextMenu>
                             <TextBlock Text="{Binding Path=Name}" />
@@ -131,13 +131,13 @@
                 </TreeView.ItemTemplate>
             </TreeView>
         </GroupBox>
-        <GroupBox Name="SpecificGroup" Header="具体事件组" Height="130" Margin="0" >
+        <GroupBox Name="SpecificGroup" Header="{StaticResource SpecificEventGroupStr}" Height="130" Margin="0" >
             <TreeView Name="SpecificEventList" Padding="-12,1,1,1" 
                       PreviewMouseRightButtonDown="SpecificEventList_PreviewMouseRightButtonDown" 
                       MouseDoubleClick="SpecificEventList_MouseDoubleClick">
                 <TreeView.ContextMenu>
                     <ContextMenu>
-                        <MenuItem Name="AddSpecificEvent" Header="添加事件" Click="AddSpecificEvent_Click"/>
+                        <MenuItem Name="AddSpecificEvent" Header="{StaticResource AddStr}" Click="AddSpecificEvent_Click"/>
                     </ContextMenu>
                 </TreeView.ContextMenu>
                 <TreeView.ItemTemplate>
@@ -145,7 +145,7 @@
                         <DockPanel>
                             <DockPanel.ContextMenu>
                                 <ContextMenu>
-                                    <MenuItem Name="DelSpecificEvent" Header="删除" Click="DelSpecificEvent_Click" />
+                                    <MenuItem Name="DelSpecificEvent" Header="{StaticResource DelStr}" Click="DelSpecificEvent_Click" />
                                 </ContextMenu>
                             </DockPanel.ContextMenu>
                             <TextBlock Text="{Binding Path=Name}" />

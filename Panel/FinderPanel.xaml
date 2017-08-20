@@ -3,13 +3,13 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             mc:Ignorable="d" Name="查找">
+             mc:Ignorable="d" >
     <DockPanel>
-        <GroupBox DockPanel.Dock="Top" Header="条件">
+        <GroupBox DockPanel.Dock="Top" Header="{StaticResource ConditionStr}">
             <StackPanel>
                 <UniformGrid Columns="2" Rows="1" >
                     <DockPanel>
-                        <CheckBox Name="LayerCheckBox" DockPanel.Dock="Left" Content="图层" VerticalAlignment="Center" Margin="6,0,5,0" Click="LayerCheckBox_Click"/>
+                        <CheckBox Name="LayerCheckBox" DockPanel.Dock="Left" Content="{StaticResource LayerStr}" VerticalAlignment="Center" Margin="6,0,5,0" Click="LayerCheckBox_Click"/>
                         <ComboBox Name="LayerComboBox" SelectedIndex="0" VerticalAlignment="Center" Margin="0,1" SelectionChanged="LayerComboBox_SelectionChanged">
                             <ComboBox.ItemTemplate>
                                 <DataTemplate>
@@ -19,18 +19,18 @@
                         </ComboBox>
                     </DockPanel>
                     <DockPanel>
-                        <CheckBox Name="TypeCheckBox" DockPanel.Dock="Left" Content="类型" VerticalAlignment="Center" Margin="6,0,5,0" Click="TypeCheckBox_Click"/>
+                        <CheckBox Name="TypeCheckBox" DockPanel.Dock="Left" Content="{StaticResource TypeStr}" VerticalAlignment="Center" Margin="6,0,5,0" Click="TypeCheckBox_Click"/>
                         <ComboBox Name="TypeComboBox" SelectedIndex="0" VerticalAlignment="Center" Margin="0,1" SelectionChanged="TypeComboBox_SelectionChanged">
                         </ComboBox>
                     </DockPanel>
                 </UniformGrid>
                 <DockPanel Margin="0,1">
-                    <Label DockPanel.Dock="Left" Content="名称" />
+                    <Label DockPanel.Dock="Left" Content="{StaticResource NameStr}" />
                     <TextBox Name="InputName" VerticalContentAlignment="Center" TextChanged="InputName_TextChanged" MaxLines="1"/>
                 </DockPanel>
             </StackPanel>
         </GroupBox>
-        <GroupBox Header="结果">
+        <GroupBox Header="{StaticResource ResultStr}">
             <DockPanel>
                 <TextBlock Margin="5,1" DockPanel.Dock="Top" Name="ResultCount" HorizontalAlignment="Right" />
                 <TreeView Name="ComponentTree" Padding="-2,1,1,1" VerticalContentAlignment="Stretch" HorizontalContentAlignment="Stretch" 

@@ -2,69 +2,69 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
         xmlns:local ="clr-namespace:CrazyStorm"
-        Title="粒子系统设置" Height="440" Width="410" WindowStyle="ToolWindow" WindowStartupLocation="CenterScreen" ResizeMode="CanResize" Background="#FFF0F0F0">
+        Title="{StaticResource SetParticleSystemStr}" Height="440" Width="410" WindowStyle="ToolWindow" WindowStartupLocation="CenterScreen" ResizeMode="CanResize" Background="#FFF0F0F0">
     <Window.Resources>
     </Window.Resources>
     <DockPanel>
-        <GroupBox DockPanel.Dock="Top" Header="基本">
+        <GroupBox DockPanel.Dock="Top" Header="{StaticResource BasicStr}">
             <StackPanel Orientation="Horizontal" >
-                <Label Content="粒子系统名称"/>
+                <Label Content="{StaticResource ParticleSystemNameStr}"/>
                 <TextBox Name="ParticleSystemName" Text="{Binding Path=Name, Mode=OneTime}" Width="100" VerticalContentAlignment="Center" MaxLength="20" MaxLines="1"/>
-                <Button Content="修改" Width="42" Click="Button_Click" Margin="4,0"/>
+                <Button Content="{StaticResource ModifyStr}" Width="42" Click="Button_Click" Margin="4,0"/>
             </StackPanel>
         </GroupBox>
         <TabControl>
-            <TabItem Header="自定义类型">
+            <TabItem Header="{StaticResource CustomTypeStr}">
                 <DockPanel>
-                    <GroupBox DockPanel.Dock="Bottom" Name="Setting"  IsEnabled="False" Header="设置" Canvas.Left="10" Canvas.Top="193" Width="378" Height="135">
+                    <GroupBox DockPanel.Dock="Bottom" Name="Setting"  IsEnabled="False" Header="{StaticResource SettingStr}" Canvas.Left="10" Canvas.Top="193" Width="378" Height="135">
                         <StackPanel>
                             <WrapPanel Margin="0">
-                                <Label Content="名称" Margin="0,1,7,1"/>
+                                <Label Content="{StaticResource NameStr}" Margin="0,1,7,1"/>
                                 <TextBox Text="{Binding Path=Name}" Width="141" Margin="0,1" VerticalContentAlignment="Center" MaxLines="1" MaxLength="20"/>
-                                <Label Content="图案" Margin="0,1" />
+                                <Label Content="{StaticResource ImageStr}" Margin="0,1" />
                                 <ComboBox Name="ImageCombo" SelectedItem="{Binding Path=Image}" Width="134" Margin="0,1" VerticalContentAlignment="Center" SelectionChanged="ImageCombo_SelectionChanged"/>
                             </WrapPanel>
                             <WrapPanel VerticalAlignment="Top">
-                                <Label Content="起点X" BorderThickness="0" Margin="0,1" />
+                                <Label Content="{StaticResource StartPointXStr}" BorderThickness="0" Margin="0,1" />
                                 <TextBox Name="StartPointX" Text="{Binding Path=StartPointX}" Width="50" Margin="0,1" VerticalContentAlignment="Center" MaxLines="1" MaxLength="9" TextChanged="TextBox_TextChanged"/>
-                                <Label Content="起点Y" Margin="0,1" />
+                                <Label Content="{StaticResource StartPointYStr}" Margin="0,1" />
                                 <TextBox Name="StartPointY" Text="{Binding Path=StartPointY}" Width="50" Margin="0,1" VerticalContentAlignment="Center" MaxLength="9" MaxLines="1" TextChanged="TextBox_TextChanged"/>
-                                <Label Content="宽度" Margin="0,1" />
+                                <Label Content="{StaticResource WidthStr}" Margin="0,1" />
                                 <TextBox Name="RectWidth" Text="{Binding Path=Width}" Width="50" Margin="0,1" VerticalContentAlignment="Center" MaxLength="9" MaxLines="1" TextChanged="TextBox_TextChanged"/>
-                                <Label Content="高度" Margin="0,1" />
+                                <Label Content="{StaticResource HeightStr}" Margin="0,1" />
                                 <TextBox Name="RectHeight" Text="{Binding Path=Height}" Width="50" Margin="0,1" VerticalContentAlignment="Center" MaxLength="9" MaxLines="1" TextChanged="TextBox_TextChanged"/>
-                                <Label Content="中心X" Margin="0,1" />
+                                <Label Content="{StaticResource CenterPointXStr}" Margin="0,1" />
                                 <TextBox Name="CenterPointX" Text="{Binding Path=CenterPointX}" Width="50" Margin="0,1" VerticalContentAlignment="Center" MaxLength="9" MaxLines="1"/>
-                                <Label Content="中心Y" Margin="0,1" />
+                                <Label Content="{StaticResource CenterPointYStr}" Margin="0,1" />
                                 <TextBox Name="CenterPointY" Text="{Binding Path=CenterPointY}" Width="50" Margin="0,1" VerticalContentAlignment="Center" MaxLength="9" MaxLines="1"/>
-                                <Label Content="帧数" Margin="0,1" />
+                                <Label Content="{StaticResource FramesStr}" Margin="0,1" />
                                 <TextBox Name="Frames" Text="{Binding Path=Frames}" Width="50" Margin="0,1" VerticalContentAlignment="Center" TextChanged="TextBox_TextChanged" MaxLength="9" MaxLines="1" />
-                                <Label Content="延迟" Margin="0,1" />
+                                <Label Content="{StaticResource DelayStr}" Margin="0,1" />
                                 <TextBox Text="{Binding Path=Delay}" Width="50" Margin="0,1" VerticalContentAlignment="Center" MaxLength="9" MaxLines="1"/>
-                                <Label Content="判定半径" Margin="0,1" />
+                                <Label Content="{StaticResource HitRadiusStr}" Margin="0,1" />
                                 <TextBox Name="Radius"  Text="{Binding Path=Radius}" Width="50" Margin="0,1" VerticalContentAlignment="Center" MaxLength="9" MaxLines="1"/>
                                 <TextBlock Name="Diameter" Text="{Binding Path=Diameter}" Height="0" Width="0"/>
                                 <TextBlock Name="CircleBoxX" Text="{Binding Path=CircleBoxX}" Height="0" Width="0"/>
                                 <TextBlock Name="CircleBoxY" Text="{Binding Path=CircleBoxY}" Height="0" Width="0"/>
-                                <Label Content="标识色 " Margin="0,1" />
+                                <Label Content= "{StaticResource RGBStr}" Margin="0,1" />
                                 <StackPanel Name="ColorPanel"  Orientation="Horizontal" MouseLeftButtonUp="ColorPanel_MouseUp" >
-                                    <Label Width="20" Height="20"  Padding="0" Content="无"
+                                    <Label Width="20" Height="20"  Padding="0" Content="{StaticResource NoneStr}"
                                HorizontalContentAlignment="Center" VerticalContentAlignment="Center" BorderBrush="Black" Margin="0,1"/>
-                                    <Label Width="20" Height="20"  Padding="0" Content="红"
+                                    <Label Width="20" Height="20"  Padding="0" Content="{StaticResource RedStr}"
                                HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Foreground="Red" BorderBrush="Red"/>
-                                    <Label Width="20" Height="20"  Padding="0" Content="紫" 
+                                    <Label Width="20" Height="20"  Padding="0" Content="{StaticResource PurpleStr}" 
                                HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Foreground="Purple" BorderBrush="Purple"/>
-                                    <Label Width="20" Height="20"  Padding="0" Content="蓝" 
+                                    <Label Width="20" Height="20"  Padding="0" Content="{StaticResource BlueStr}" 
                                HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Foreground="Blue" BorderBrush="Blue"/>
-                                    <Label Width="20" Height="20"  Padding="0" Content="青" 
+                                    <Label Width="20" Height="20"  Padding="0" Content="{StaticResource CyanStr}" 
                                HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Foreground="Cyan" BorderBrush="Cyan"/>
-                                    <Label Width="20" Height="20"  Padding="0" Content="绿" 
+                                    <Label Width="20" Height="20"  Padding="0" Content="{StaticResource GreenStr}" 
                                HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Foreground="Green" BorderBrush="Green"/>
-                                    <Label Width="20" Height="20"  Padding="0" Content="黄" 
+                                    <Label Width="20" Height="20"  Padding="0" Content="{StaticResource YellowStr}" 
                                HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Foreground="Yellow" BorderBrush="Yellow"/>
-                                    <Label Width="20" Height="20"  Padding="0" Content="橙" 
+                                    <Label Width="20" Height="20"  Padding="0" Content="{StaticResource OrangeStr}" 
                                HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Foreground="Orange" BorderBrush="Orange"/>
-                                    <Label Width="20" Height="20"  Padding="0" Content="灰"
+                                    <Label Width="20" Height="20"  Padding="0" Content="{StaticResource GrayStr}"
                                HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Foreground="Gray" BorderBrush="Gray" Margin="0,1"/>
                                 </StackPanel>
                             </WrapPanel>
@@ -73,7 +73,7 @@
                         <ListView Name="TypeList" DockPanel.Dock="Left" Width="120" SelectionChanged="TypeList_SelectionChanged" SelectionMode="Single">
                             <ListView.ContextMenu>
                                 <ContextMenu>
-                                    <MenuItem Header="添加类型" Click="AddNewType_Click" />
+                                    <MenuItem Header="{StaticResource AddStr}" Click="AddNewType_Click" />
                                 </ContextMenu>
                             </ListView.ContextMenu>
                             <ListView.ItemTemplate>
@@ -81,7 +81,7 @@
                                     <DockPanel>
                                         <DockPanel.ContextMenu>
                                             <ContextMenu>
-                                                <MenuItem Name="DeleteType" Header="删除" Click="DeleteType_Click" />
+                                                <MenuItem Name="DeleteType" Header="{StaticResource DelStr}" Click="DeleteType_Click" />
                                             </ContextMenu>
                                         </DockPanel.ContextMenu>
                                         <TextBlock Text="{Binding Path=Name}"/>

@@ -1,25 +1,25 @@
 ﻿<Window x:Class="CrazyStorm.ScreenSetting"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="屏幕设置" Height="205" Width="300" WindowStyle="ToolWindow" WindowStartupLocation="CenterScreen" ResizeMode="NoResize" Background="#FFF0F0F0">
+        Title="{StaticResource ScreenSettingStr}" Height="205" Width="300" WindowStyle="ToolWindow" WindowStartupLocation="CenterScreen" ResizeMode="NoResize" Background="#FFF0F0F0">
     <Canvas Name="Setting">
-        <Label Content="背景宽度" Canvas.Left="10" Canvas.Top="10"/>
+        <Label Content="{StaticResource ScreenWidthStr}" Canvas.Left="10" Canvas.Top="10"/>
         <TextBox Name="ScreenWidth" Text="{Binding Path=ScreenWidth, Mode=OneTime}" Height="23" Canvas.Left="73" Canvas.Top="13" Width="42" VerticalContentAlignment="Center" MaxLines="1" MaxLength="9"/>
-        <Label Content="背景高度" Canvas.Left="120" Canvas.Top="10"/>
+        <Label Content="{StaticResource ScreenHeightStr}" Canvas.Left="120" Canvas.Top="10"/>
         <TextBox Name="ScreenHeight" Text="{Binding Path=ScreenHeight, Mode=OneTime}" Height="23" Canvas.Left="183" Canvas.Top="13" Width="42" VerticalContentAlignment="Center" MaxLength="9" MaxLines="1"/>
-        <Label Content="背景图案" Canvas.Left="10" Canvas.Top="40"/>
+        <Label Content="{StaticResource BackgroundPathStr}" Canvas.Left="10" Canvas.Top="40"/>
         <TextBox Name="BackgroundPath" Text="{Binding Path=BackgroundPath, Mode=OneTime}" Height="23" Canvas.Left="73" Canvas.Top="43" Width="152" VerticalContentAlignment="Center"/>
-        <Label Content="网格对齐" Canvas.Left="10" Canvas.Top="70"/>
-        <Label Content="显示中心" Canvas.Left="10" Canvas.Top="100"/>
-        <Button Name="Browse"  Content="浏览" Canvas.Left="230" Canvas.Top="43" Width="42" Click="Browse_Click"/>
+        <Label Content="{StaticResource GridSnapStr}" Canvas.Left="10" Canvas.Top="70"/>
+        <Label Content="{StaticResource CenterDisplayStr}" Canvas.Left="10" Canvas.Top="100"/>
+        <Button Name="Browse"  Content="{StaticResource BrowseStr}" Canvas.Left="230" Canvas.Top="43" Width="42" Click="Browse_Click"/>
         <Canvas Height="26" Canvas.Left="73" Canvas.Top="71" Width="199">
-            <RadioButton Name="GridOpen" Content="开启" Canvas.Top="5"/>
-            <RadioButton Name="GridClose" Content="关闭" Canvas.Left="110" Canvas.Top="5"/>
+            <RadioButton Name="GridOpen" Content="{StaticResource ActiveStr}" Canvas.Top="5"/>
+            <RadioButton Name="GridClose" Content="{StaticResource InactiveStr}" Canvas.Left="110" Canvas.Top="5"/>
         </Canvas>
         <Canvas Height="26" Canvas.Left="73" Canvas.Top="100" Width="199">
-            <RadioButton Name="CenterOpen" Content="开启" Canvas.Top="5"/>
-            <RadioButton Name="CenterClose" Content="关闭" Canvas.Left="110" Canvas.Top="5"/>
+            <RadioButton Name="CenterOpen" Content="{StaticResource ActiveStr}" Canvas.Top="5"/>
+            <RadioButton Name="CenterClose" Content="{StaticResource InactiveStr}" Canvas.Left="110" Canvas.Top="5"/>
         </Canvas>
-        <Button Content="确定" Canvas.Left="104" Canvas.Top="135" Width="75" Click="Button_Click"/>
+        <Button Content="{StaticResource ConfirmStr}" Canvas.Left="104" Canvas.Top="135" Width="75" Click="Button_Click"/>
     </Canvas>
 </Window>

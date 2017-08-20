@@ -99,6 +99,7 @@ namespace CrazyStorm
             item = new TabItem();
             item.Style = (Style)FindResource("CanCloseStyle");
             var panel = new FinderPanel(selectedSystem);
+            panel.Name = (string)FindResource("FindStr");
             panel.OnSelectComponent += (Component component) =>
             {
                 var set = new List<CrazyStorm.Core.Component>();

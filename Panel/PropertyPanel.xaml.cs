@@ -117,19 +117,19 @@ namespace CrazyStorm
             if (component is Emitter)
             {
                 SpecificGroup.Visibility = Visibility.Visible;
-                SpecificGroup.Header = (string)FindResource("ParticleEventListStr");
+                SpecificGroup.Header = (string)FindResource("ParticleEventGroupStr");
                 SpecificEventList.ItemsSource = (component as Emitter).ParticleEventGroups;
             }
             else if (component is EventField)
             {
                 SpecificGroup.Visibility = Visibility.Visible;
-                SpecificGroup.Header = (string)FindResource("EventFieldEventListStr");
+                SpecificGroup.Header = (string)FindResource("EventFieldEventGroupStr");
                 SpecificEventList.ItemsSource = (component as EventField).EventFieldEventGroups;
             }
             else if (component is Rebounder)
             {
                 SpecificGroup.Visibility = Visibility.Visible;
-                SpecificGroup.Header = (string)FindResource("RebounderEventListStr");
+                SpecificGroup.Header = (string)FindResource("RebounderEventGroupStr");
                 SpecificEventList.ItemsSource = (component as Rebounder).RebounderEventGroups;
             }
             else
@@ -459,7 +459,7 @@ namespace CrazyStorm
                 //Refresh color combobox.
                 InitializeColorCombo();
                 //Show default type preview
-                if (selectedType.Id >= ParticleType.DefaultTypeIndex)
+                if (selectedType.ID >= ParticleType.DefaultTypeIndex)
                 {
                     TypeComboTip.Visibility = Visibility.Visible;
                     TypeImageRect.Width = selectedType.Width;

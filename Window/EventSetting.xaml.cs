@@ -348,7 +348,7 @@ namespace CrazyStorm
                     return false;
 
                 eventInfo.specialEvent = "ChangeType";
-                eventInfo.arguments = (TypeCombo.SelectedItem as ParticleType).Id + "," + ColorCombo.SelectedIndex;
+                eventInfo.arguments = (TypeCombo.SelectedItem as ParticleType).ID + "," + ColorCombo.SelectedIndex;
             }
             else
                 return false;
@@ -494,7 +494,7 @@ namespace CrazyStorm
                 {
                     for (int i = 0; i < TypeCombo.Items.Count; ++i)
                     {
-                        if ((TypeCombo.Items[i] as ParticleType).Id == int.Parse(split[0]))
+                        if ((TypeCombo.Items[i] as ParticleType).ID == int.Parse(split[0]))
                         {
                             TypeCombo.SelectedIndex = i;
                             break;
