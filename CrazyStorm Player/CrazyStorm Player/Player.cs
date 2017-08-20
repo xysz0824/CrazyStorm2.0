@@ -13,6 +13,7 @@ using System.Drawing;
 using CrazyStorm.Core;
 using File = CrazyStorm.Core.File;
 using Vector2 = SlimDX.Vector2;
+using System.Reflection;
 
 namespace CrazyStorm_Player
 {
@@ -95,8 +96,10 @@ namespace CrazyStorm_Player
             //Load default textures and types
             defaultTextures = new List<Texture>();
             Environment.CurrentDirectory = System.AppDomain.CurrentDomain.SetupInformation.ApplicationBase;
-            defaultTextures.Add(Texture.FromFile(Device, "Resources/Default/barrages.png", Usage.None, Pool.Managed));
-            using (StreamReader reader = new StreamReader("Resources/Default/set.txt"))
+            Stream defaultTexturesStream = Assembly.GetExecutingAssembly().GetManifestResourceStream("CrazyStorm_Player.barrages.png");
+            defaultTextures.Add(Texture.FromStream(Device, defaultTexturesStream, Usage.None, Pool.Managed));
+            Stream defaultParticleTypesStream = Assembly.GetExecutingAssembly().GetManifestResourceStream("CrazyStorm_Player.set.txt");
+            using (StreamReader reader = new StreamReader(defaultParticleTypesStream))
             {
                 defaultParticleTypes = new List<ParticleType>();
                 ParticleType.LoadDefaultTypes(reader, defaultParticleTypes);
