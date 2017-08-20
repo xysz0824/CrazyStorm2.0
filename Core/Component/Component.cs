@@ -459,6 +459,7 @@ namespace CrazyStorm.Core
         public virtual List<byte> GeneratePlayData()
         {
             var componentBytes = new List<byte>();
+            //type
             componentBytes.AddRange(PlayDataHelper.GetStringBytes(GetType().Name));
             PlayDataHelper.GenerateFields(typeof(Component), this, componentBytes);
             //properties

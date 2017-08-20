@@ -10,6 +10,7 @@ using System.ComponentModel;
 using System.Xml;
 using System.Xml.Serialization;
 using System.IO;
+using System.Reflection;
 
 namespace CrazyStorm.Core
 {
@@ -183,25 +184,8 @@ namespace CrazyStorm.Core
                         long startPosition = componentsReader.BaseStream.Position;
                         using (BinaryReader componentReader = PlayDataHelper.GetBlockReader(componentsReader))
                         {
-                            Component component = null;
-                            switch (PlayDataHelper.ReadString(componentReader))
-                            {
-                                case "MultiEmitter":
-                                    component = new MultiEmitter();
-                                    break;
-                                case "CurveEmitter":
-                                    component = new CurveEmitter();
-                                    break;
-                                case "EventField":
-                                    component = new EventField();
-                                    break;
-                                case "Rebounder":
-                                    component = new Rebounder();
-                                    break;
-                                case "ForceField":
-                                    component = new ForceField();
-                                    break;
-                            }
+                            string specificType = PlayDataHelper.ReadString(componentReader);
+                            Component component = ComponentFactory.Create(specificType);
                             //Back to start position of components block.
                             componentsReader.BaseStream.Position = startPosition;
                             component.LoadPlayData(componentsReader, version);
