@@ -527,7 +527,7 @@
                                 </GroupBox>
                                 <GroupBox Header="{StaticResource ComponentTreeStr}" Name="Explorer" VerticalContentAlignment="Stretch" HorizontalContentAlignment="Stretch" >
                                     <TreeView Name="ComponentTree" Padding="-2,1,1,1" VerticalContentAlignment="Stretch" HorizontalContentAlignment="Stretch" 
-                                              AllowDrop="True" MouseMove="ComponentTree_MouseMove" 
+                                              AllowDrop="True" MouseMove="ComponentTree_MouseMove" MouseDoubleClick="ComponentTree_MouseDoubleClick"
                                               DragEnter="ComponentTree_CheckDrop" DragOver="ComponentTree_CheckDrop" DragLeave="ComponentTree_CheckDrop" Drop="ComponentTree_Drop" 
                                               IsTextSearchEnabled="True">
                                         <TreeView.ItemTemplate >

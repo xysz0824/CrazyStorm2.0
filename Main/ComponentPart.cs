@@ -292,6 +292,13 @@ namespace CrazyStorm
             }
             UpdateProperty();
         }
+        private void ComponentTree_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            if (e.OriginalSource is TextBlock && ComponentTree.SelectedItem != null)
+            {
+                CreatePropertyPanel(ComponentTree.SelectedItem as Component);
+            }
+        }
         private void TabClose_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             TabItem item = VisualHelper.VisualUpwardSearch<TabItem>(sender as DependencyObject) as TabItem;
