@@ -1,18 +1,23 @@
 ![Logo](/logo.png)
 # About
-CrazyStorm is a visual editor for 2D particle to make game effect easily.
-The project is developing now so we don't accept unofficial modification and other usage temporarily. Please wait official version, thank you!
+CrazyStorm is a visual editor for 2D particle to design particle animation easily.
+This project has two aspects "Editor" and "Player", while the "Editor" is releasable status and "Player" is close to release.
+You can now study finished parts or start use Editor for produsing. Also you can fork and refrom it for you own reason anyway.
 
 ## Features Overview
-Wait to work out.
+1. Expression support
+You can utilize expression to design more complicate animation than Crazy Storm 1.0.
+2. Component tree
+Set component relationship as father-child makes it easy to manager multi components movement.
+3. More Friendly UI
+Improve your work efficiency and Avoid cause of unnecessary error.
+4. Independent Player
+It's not only for demostrating your particle but giving someone who want to use these productions on his own game an example or just basing on it for development. 
 
 ## What's Our Goal
 1. Opensource
 2. New format and old version conversion
-3. Independent player
-4. Struggle for multiplatforms
-6. Script support
-6. so on
+3. Struggle for multiplatforms
 
 ## Runtime Environment
 - Windows XP/Vista/7 or above
