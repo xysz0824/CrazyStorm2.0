@@ -43,7 +43,7 @@ namespace CrazyStorm
             if (!SaveTip())
                 return;
 
-            file = new File();
+            file = new File(true);
             fileName = "Untitled";
             filePath = string.Empty;
             InitializeSystem();
@@ -83,7 +83,7 @@ namespace CrazyStorm
                         return false;
                     else
                     {
-                        file = new File();
+                        file = new File(false);
                         file.BuildFromXml(root);
                         RebuildObjectReference();
                         RebuildComponentTree();

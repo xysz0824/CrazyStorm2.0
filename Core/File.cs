@@ -36,11 +36,14 @@ namespace CrazyStorm.Core
         #endregion
 
         #region Constructor
-        public File()
+        public File(bool newFile)
         {
             CurrentDirectory = string.Empty;
             particleSystems = new List<ParticleSystem>();
-            particleSystems.Add(new ParticleSystem("Untitled"));
+            if (newFile)
+            {
+                particleSystems.Add(new ParticleSystem("Untitled"));
+            }
             images = new GenericContainer<FileResource>();
             sounds = new GenericContainer<FileResource>();
             globals = new GenericContainer<VariableResource>();

@@ -113,7 +113,7 @@ namespace CrazyStorm_Player
                     float version = float.Parse(PlayDataHelper.ReadString(reader));
                     if (version >= VersionInfo.BaseVersion)
                     {
-                        file = new File();
+                        file = new File(false);
                         file.LoadPlayData(reader, version);
                         RebuildObjectReference(file);
                     }
