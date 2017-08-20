@@ -575,23 +575,24 @@ namespace CrazyStorm.Core
                 case "Visibility":
                     VM.PushBool(Visibility);
                     return true;
-                default:
-                    for (int i = 0; i < Locals.Count; ++i)
-                        if (Locals[i].Label == propertyName)
-                        {
-                            VM.PushFloat(Locals[i].Value);
-                            return true;
-                        }
-
-                    for (int i = 0; i < Globals.Count; ++i)
-                        if (Globals[i].Label == propertyName)
-                        {
-                            VM.PushFloat(Globals[i].Value);
-                            return true;
-                        }
-
-                    return false;
             }
+            for (int i = 0; i < Locals.Count; ++i)
+            {
+                if (Locals[i].Label == propertyName)
+                {
+                    VM.PushFloat(Locals[i].Value);
+                    return true;
+                }
+            }
+            for (int i = 0; i < Globals.Count; ++i)
+            {
+                if (Globals[i].Label == propertyName)
+                {
+                    VM.PushFloat(Globals[i].Value);
+                    return true;
+                }
+            }
+            return false;
         }
         public override bool SetProperty(string propertyName)
         {
@@ -640,23 +641,24 @@ namespace CrazyStorm.Core
                 case "Visibility":
                     Visibility = VM.PopBool();
                     return true;
-                default:
-                    for (int i = 0; i < Locals.Count; ++i)
-                        if (Locals[i].Label == propertyName)
-                        {
-                            Locals[i].Value = VM.PopFloat();
-                            return true;
-                        }
-
-                    for (int i = 0; i < Globals.Count; ++i)
-                        if (Globals[i].Label == propertyName)
-                        {
-                            Globals[i].Value = VM.PopFloat();
-                            return true;
-                        }
-
-                    return false;
             }
+            for (int i = 0; i < Locals.Count; ++i)
+            {
+                if (Locals[i].Label == propertyName)
+                {
+                    Locals[i].Value = VM.PopFloat();
+                    return true;
+                }
+            }
+            for (int i = 0; i < Globals.Count; ++i)
+            {
+                if (Globals[i].Label == propertyName)
+                {
+                    Globals[i].Value = VM.PopFloat();
+                    return true;
+                }
+            }
+            return false;
         }
         public virtual bool Update(int currentFrame)
         {

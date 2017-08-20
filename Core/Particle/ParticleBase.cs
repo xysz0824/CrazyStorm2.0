@@ -182,11 +182,13 @@ namespace CrazyStorm.Core
             get { return particleBaseData.widthScale; }
             set { particleBaseData.widthScale = value; }
         }
+        [BoolProperty]
         public bool FogEffect
         {
             get { return particleBaseData.fogEffect; }
             set { particleBaseData.fogEffect = value; }
         }
+        [BoolProperty]
         public bool FadeEffect
         {
             get { return particleBaseData.fadeEffect; }
@@ -395,23 +397,24 @@ namespace CrazyStorm.Core
                 case "FadeEffect":
                     VM.PushBool(FadeEffect);
                     return true;
-                default:
-                    for (int i = 0; i < Emitter.Locals.Count; ++i)
-                        if (Emitter.Locals[i].Label == propertyName)
-                        {
-                            VM.PushFloat(Emitter.Locals[i].Value);
-                            return true;
-                        }
-
-                    for (int i = 0; i < Emitter.Globals.Count; ++i)
-                        if (Emitter.Globals[i].Label == propertyName)
-                        {
-                            VM.PushFloat(Emitter.Globals[i].Value);
-                            return true;
-                        }
-
-                    return false;
             }
+            for (int i = 0; i < Emitter.Locals.Count; ++i)
+            {
+                if (Emitter.Locals[i].Label == propertyName)
+                {
+                    VM.PushFloat(Emitter.Locals[i].Value);
+                    return true;
+                }
+            }
+            for (int i = 0; i < Emitter.Globals.Count; ++i)
+            {
+                if (Emitter.Globals[i].Label == propertyName)
+                {
+                    VM.PushFloat(Emitter.Globals[i].Value);
+                    return true;
+                }
+            }
+            return false;
         }
         public override bool SetProperty(string propertyName)
         {
@@ -496,23 +499,24 @@ namespace CrazyStorm.Core
                 case "FadeEffect":
                     FadeEffect = VM.PopBool();
                     return true;
-                default:
-                    for (int i = 0; i < Emitter.Locals.Count; ++i)
-                        if (Emitter.Locals[i].Label == propertyName)
-                        {
-                            Emitter.Locals[i].Value = VM.PopFloat();
-                            return true;
-                        }
-
-                    for (int i = 0; i < Emitter.Globals.Count; ++i)
-                        if (Emitter.Globals[i].Label == propertyName)
-                        {
-                            Emitter.Globals[i].Value = VM.PopFloat();
-                            return true;
-                        }
-
-                    return false;
             }
+            for (int i = 0; i < Emitter.Locals.Count; ++i)
+            {
+                if (Emitter.Locals[i].Label == propertyName)
+                {
+                    Emitter.Locals[i].Value = VM.PopFloat();
+                    return true;
+                }
+            }
+            for (int i = 0; i < Emitter.Globals.Count; ++i)
+            {
+                if (Emitter.Globals[i].Label == propertyName)
+                {
+                    Emitter.Globals[i].Value = VM.PopFloat();
+                    return true;
+                }
+            }
+            return false;
         }
         public virtual void Update()
         {
