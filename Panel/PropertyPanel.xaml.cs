@@ -327,10 +327,13 @@ namespace CrazyStorm
             }
             else
             {
-                (component as Emitter).Particle.Type = types[0];
-                type = (component as Emitter).Particle.Type;
-                TypeCombo.SelectedItem = typesNorepeat[0];
-                ColorCombo.SelectedIndex = 0;
+                if (component is Emitter)
+                {
+                    (component as Emitter).Particle.Type = types[0];
+                    type = (component as Emitter).Particle.Type;
+                    TypeCombo.SelectedItem = typesNorepeat[0];
+                    ColorCombo.SelectedIndex = 0;
+                }
             }
         }
         #endregion
