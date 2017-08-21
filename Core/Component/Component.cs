@@ -195,15 +195,12 @@ namespace CrazyStorm.Core
         }
         #endregion
 
-        #region Private Methods
-        void ExecuteEventGroups()
+        #region Protected Methods
+        protected void ExecuteEventGroups()
         {
             for (int i = 0; i < ComponentEventGroups.Count; ++i)
                 ComponentEventGroups[i].Execute(this);
         }
-        #endregion
-
-        #region Protected Methods
         protected delegate void Action();
         protected void BindingUpdate(Action updateFunc)
         {
@@ -224,6 +221,7 @@ namespace CrazyStorm.Core
                 SpeedAngle = particle.PSpeedAngle;
                 Acspeed = particle.PAcspeed;
                 AcspeedAngle = particle.PAcspeedAngle;
+                ExecuteEventGroups();
                 if (updateFunc != null)
                     updateFunc();
             }
@@ -673,12 +671,8 @@ namespace CrazyStorm.Core
             {
                 speedVector += acspeedVector;
                 Position += speedVector;
-                for (int i = 0; i < ComponentEventGroups.Count; ++i)
-                    ComponentEventGroups[i].Execute(this);
+                ExecuteEventGroups();
             }
-            else
-                BindingUpdate(ExecuteEventGroups);
-
             Position = GetAbsolutePositionRuntime();
             return true;
         }
