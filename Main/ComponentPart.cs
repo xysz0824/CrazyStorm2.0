@@ -243,6 +243,9 @@ namespace CrazyStorm
             if (sourceComponent == targetComponent)
                 return;
 
+            if (sourceComponent.Children.Contains(targetComponent))
+                return;
+
             if (targetComponent.Children.Contains(sourceComponent))
             {
                 //A way to change the node from parenthood to brotherhood. 
