@@ -691,7 +691,7 @@ namespace CrazyStorm.Core
                 initialState.Locals = new List<VariableResource>();
                 foreach (VariableResource item in Locals)
                 {
-                    var variable = new VariableResource { Value = item.Value };
+                    var variable = new VariableResource { Label = item.Label, Value = item.Value };
                     initialState.Locals.Add(variable);
                 }
                 initialState.ExecuteExpressions();

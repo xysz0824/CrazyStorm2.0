@@ -228,6 +228,10 @@ namespace CrazyStorm.Core
                     VM.PushFloat(EmitRadius);
                     return true;
             }
+            if (Template == null)
+            {
+                return false;
+            }
             return Template.PushProperty(propertyName);
         }
         public override bool SetProperty(string propertyName)
@@ -261,6 +265,10 @@ namespace CrazyStorm.Core
                 case "EmitRadius":
                     EmitRadius = VM.PopFloat();
                     return true;
+            }
+            if (Template == null)
+            {
+                return false;
             }
             return Template.SetProperty(propertyName);
         }
