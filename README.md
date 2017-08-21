@@ -10,14 +10,14 @@ You can utilize expression to design more complicate animation than Crazy Storm 
 - Component tree  
 Set component relationship as father-child makes it easy to manager multi components movement.
 - More Friendly UI  
-Improve your work efficiency and Avoid cause of unnecessary error.
+Improve your work efficiency and avoid cause of unnecessary error.
 - Independent Player  
 It's not only for demostrating your particle but giving someone who want to use these productions on his own game an example or just basing on it for development. 
 
 ## What's Our Goal
-1. Opensource
-2. New format and old version conversion
-3. Struggle for multiplatforms
+- Opensource
+- New format and old version conversion
+- Struggle for multiplatforms
 
 ## Runtime Environment
 - Windows XP/Vista/7 or above
