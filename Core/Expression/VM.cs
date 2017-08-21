@@ -211,7 +211,9 @@ namespace CrazyStorm.Core
                         VM.PushFloat(minuend - subtrahend);
                         break;
                     case VMCode.MUL:
-                        VM.PushFloat(VM.PopFloat() * VM.PopFloat());
+                        float one = VM.PopFloat();
+                        float another = VM.PopFloat();
+                        VM.PushFloat(one * another);
                         break;
                     case VMCode.DIV:
                         float divisor = VM.PopFloat();
@@ -254,6 +256,10 @@ namespace CrazyStorm.Core
         }
         public static void PushFloat(float value)
         {
+            if (float.IsNaN(value))
+            {
+                throw new NotFiniteNumberException();
+            }
             floatStack.Push(value);
         }
         public static float PopFloat()
