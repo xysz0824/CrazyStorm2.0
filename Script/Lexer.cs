@@ -1,6 +1,6 @@
 ﻿/*
  * The MIT License (MIT)
- * Copyright (c) StarX 2016 
+ * Copyright (c) StarX 2017 
  */
 using System;
 using System.IO;
