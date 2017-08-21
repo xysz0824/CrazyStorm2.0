@@ -66,58 +66,59 @@ namespace CrazyStorm.Core
         {
             base.ExecuteExpression("Size");
             base.ExecuteExpression("Rotation");
+            int count = 0;
             List<ParticleBase> results = ParticleManager.SearchByRect(Position.x - Size, Position.x + Size,
-                Position.y - Size, Position.y + Size);
-            foreach (ParticleBase particle in results)
+                Position.y - Size, Position.y + Size, out count);
+            for (int i = 0; i < count; ++i)
             {
-                if (particle.IgnoreRebound || particle.Type == null || particle.PSpeedVector == Vector2.Zero)
+                if (results[i].IgnoreRebound || results[i].Type == null || results[i].PSpeedVector == Vector2.Zero)
                     continue;
 
-                float radius = Math.Max(particle.Type.Width, particle.Type.Height) / 2;
+                float radius = Math.Max(results[i].Type.Width, results[i].Type.Height) / 2;
                 float rotation = Rotation;
                 switch (RebounderShape)
                 {
                     case RebounderShape.Line:
                         Vector2 p1 = Position + MathHelper.GetVector2(Size, Rotation);
                         Vector2 p2 = Position + MathHelper.GetVector2(Size, Rotation + 180);
-                        if (!MathHelper.LineIntersectWithCircle(p1, p2, particle.PPosition, radius))
+                        if (!MathHelper.LineIntersectWithCircle(p1, p2, results[i].PPosition, radius))
                             continue;
 
-                        if (SpeedVector != Vector2.Zero && Vector2.Dot(particle.PSpeedVector, SpeedVector) >= 0)
+                        if (SpeedVector != Vector2.Zero && Vector2.Dot(results[i].PSpeedVector, SpeedVector) >= 0)
                             continue;
 
                         float dr = Rotation - lastRotation;
                         if (dr > 0)
                         {
                             Vector2 rotationVector = MathHelper.GetVector2(1, Rotation + 90);
-                            if (Vector2.Dot(particle.PSpeedVector, rotationVector) >= 0)
+                            if (Vector2.Dot(results[i].PSpeedVector, rotationVector) >= 0)
                                 continue;
                         }
                         else if (dr < 0)
                         {
                             Vector2 rotationVector = MathHelper.GetVector2(1, Rotation - 90);
-                            if (Vector2.Dot(particle.PSpeedVector, rotationVector) >= 0)
+                            if (Vector2.Dot(results[i].PSpeedVector, rotationVector) >= 0)
                                 continue;
                         }
                         break;
                     case RebounderShape.Circle:
-                        if (!MathHelper.TwoCirclesIntersect(Position, Size, particle.PPosition, radius))
+                        if (!MathHelper.TwoCirclesIntersect(Position, Size, results[i].PPosition, radius))
                             continue;
 
-                        if (MathHelper.PointInsideCircle(Position, Size, particle.PPosition))
+                        if (MathHelper.PointInsideCircle(Position, Size, results[i].PPosition))
                         {
-                            if (Vector2.Dot(particle.PSpeedVector, Position - particle.PPosition) >= 0)
+                            if (Vector2.Dot(results[i].PSpeedVector, Position - results[i].PPosition) >= 0)
                                 continue;
                         }
-                        else if (Vector2.Dot(particle.PSpeedVector, particle.PPosition - Position) >= 0)
+                        else if (Vector2.Dot(results[i].PSpeedVector, results[i].PPosition - Position) >= 0)
                             continue;
 
-                        rotation = MathHelper.GetDegree(particle.PPosition - Position) + 90;
+                        rotation = MathHelper.GetDegree(results[i].PPosition - Position) + 90;
                         break;
                 }
-                particle.PSpeedVector = MathHelper.GetVector2(particle.PSpeed, 2 * rotation - particle.PSpeedAngle);
-                for (int i = 0; i < RebounderEventGroups.Count; ++i)
-                    RebounderEventGroups[i].Execute(particle);
+                results[i].PSpeedVector = MathHelper.GetVector2(results[i].PSpeed, 2 * rotation - results[i].PSpeedAngle);
+                for (int k = 0; k < RebounderEventGroups.Count; ++k)
+                    RebounderEventGroups[k].Execute(results[i]);
             }
             lastRotation = Rotation;
         }

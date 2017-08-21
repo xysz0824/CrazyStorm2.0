@@ -15,16 +15,25 @@ namespace CrazyStorm.Core
         public delegate void CurveParticleDrawHandler(CurveParticle curveParticle);
         public static event CurveParticleDrawHandler OnCurveParticleDraw;
 
-        static ParticleQuadTree particleQuadTree;
+        //static ParticleQuadTree particleQuadTree;
+        static int left;
+        static int right;
+        static int top;
+        static int bottom;
         static int reserved;
         static List<Particle> particlePool;
         static int particleIndex;
         static List<CurveParticle> curveParticlePool;
         static int curveParticleIndex;
+        static List<ParticleBase> searchList;
         public static void Initialize(int windowWidth, int windowHeight, int reservedDist,
             int particleMaximum, int curveParticleMaximum)
         {
-            particleQuadTree = new ParticleQuadTree(-windowWidth, windowWidth, -windowHeight, windowHeight);
+            //particleQuadTree = new ParticleQuadTree(-windowWidth, windowWidth, -windowHeight, windowHeight);
+            left = -windowWidth;
+            right = windowWidth;
+            top = -windowHeight;
+            bottom = windowHeight;
             reserved = reservedDist;
             particlePool = new List<Particle>(particleMaximum);
             for (int i = 0; i < particleMaximum; ++i)
@@ -33,6 +42,10 @@ namespace CrazyStorm.Core
             curveParticlePool = new List<CurveParticle>(curveParticleMaximum);
             for (int i = 0; i < curveParticleMaximum; ++i)
                 curveParticlePool.Add(new CurveParticle());
+
+            searchList = new List<ParticleBase>(particleMaximum);
+            for (int i = 0; i < particleMaximum; ++i)
+                searchList.Add(null);
         }
         public static ParticleBase GetParticle(ParticleBase template)
         {
@@ -41,7 +54,7 @@ namespace CrazyStorm.Core
                 particleIndex = particleIndex % particlePool.Count;
                 particlePool[particleIndex] = template.Copy() as Particle;
                 particlePool[particleIndex].Alive = true;
-                particleQuadTree.Insert(particlePool[particleIndex]);
+                //particleQuadTree.Insert(particlePool[particleIndex]);
                 return particlePool[particleIndex++];
             }
             else
@@ -49,35 +62,66 @@ namespace CrazyStorm.Core
                 curveParticleIndex = curveParticleIndex % curveParticlePool.Count;
                 curveParticlePool[curveParticleIndex] = template.Copy() as CurveParticle;
                 curveParticlePool[curveParticleIndex].Alive = true;
-                particleQuadTree.Insert(curveParticlePool[curveParticleIndex]);
+                //particleQuadTree.Insert(curveParticlePool[curveParticleIndex]);
                 return curveParticlePool[curveParticleIndex++];
             }
         }
-        public static void Insert(ParticleBase particleBase)
+        //public static void Insert(ParticleBase particleBase)
+        //{
+        //    particleQuadTree.Insert(particleBase);
+        //}
+        public static List<ParticleBase> SearchByRect(float left, float right, float top, float bottom, out int count)
         {
-            particleQuadTree.Insert(particleBase);
-        }
-        public static List<ParticleBase> SearchByRect(float left, float right, float top, float bottom)
-        {
-            return particleQuadTree.SearchByRect(left, right, top, bottom);
+            int index = 0;
+            for (int i = 0; i < particlePool.Count; ++i)
+            {
+                if (particlePool[i].Alive)
+                {
+                    float x = particlePool[i].PPosition.x;
+                    float y = particlePool[i].PPosition.y;
+                    if (x >= left && x <= right && y >= top && y <= bottom)
+                    {
+                        searchList[index++] = particlePool[i];
+                    }
+                }
+            }
+            for (int i = 0; i < curveParticlePool.Count; ++i)
+            {
+                if (curveParticlePool[i].Alive)
+                {
+                    float x = curveParticlePool[i].PPosition.x;
+                    float y = curveParticlePool[i].PPosition.y;
+                    if (x >= left && x <= right && y >= top && y <= bottom)
+                    {
+                        searchList[index++] = curveParticlePool[i];
+                    }
+                }
+            }
+            count = index;
+            return searchList;
         }
         public static bool OutOfWindow(float x, float y)
         {
-            return x < particleQuadTree.Left / 2 - reserved || x > particleQuadTree.Right / 2 + reserved ||
-            y < particleQuadTree.Top / 2 - reserved || y > particleQuadTree.Bottom / 2 + reserved;
+            return x < left / 2 - reserved || x > right / 2 + reserved ||
+            y < top / 2 - reserved || y > bottom / 2 + reserved;
+        }
+        private static bool OutOfRange(ParticleBase particleBase)
+        {
+            return particleBase.PPosition.x < left || particleBase.PPosition.x > right ||
+                particleBase.PPosition.y < top || particleBase.PPosition.y > bottom;
         }
         public static void Update()
         {
             for (int i = 0; i < particlePool.Count; ++i)
             {
-                if (particlePool[i].Alive && !particleQuadTree.OutofRange(particlePool[i]))
+                if (particlePool[i].Alive && !OutOfRange(particlePool[i]))
                     particlePool[i].Update();
                 else if (particlePool[i].Alive)
                     particlePool[i].Alive = false;
             }
             for (int i = 0; i < curveParticlePool.Count; ++i)
             {
-                if (curveParticlePool[i].Alive && !particleQuadTree.OutofRange(curveParticlePool[i]))
+                if (curveParticlePool[i].Alive && !OutOfRange(curveParticlePool[i]))
                     curveParticlePool[i].Update();
                 else if (curveParticlePool[i].Alive)
                     curveParticlePool[i].Alive = false;

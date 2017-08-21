@@ -52,7 +52,7 @@ namespace CrazyStorm.Core
 
         #region Public Members
         public Emitter Emitter { get; set; }
-        public ParticleQuadTree QuadTree { get; set; }
+        //public ParticleQuadTree QuadTree { get; set; }
         public bool Alive { get; set; }
         [IntProperty(0, int.MaxValue)]
         public int MaxLife
@@ -531,7 +531,7 @@ namespace CrazyStorm.Core
                 MathHelper.SetVector2(ref pspeedVector, PSpeed, PSpeedAngle);
                 MathHelper.SetVector2(ref pacspeedVector, PAcspeed, PAcspeedAngle);
             }
-            QuadTree.Update(this);
+            //QuadTree.Update(this);
             PSpeedVector += PAcspeedVector;
             PPosition += PSpeedVector;
             for (int i = 0; i < ParticleEventGroups.Count; ++i)

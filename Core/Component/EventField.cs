@@ -87,34 +87,35 @@ namespace CrazyStorm.Core
         {
             base.ExecuteExpression("HalfWidth");
             base.ExecuteExpression("HalfHeight");
+            int count = 0;
             List<ParticleBase> results = ParticleManager.SearchByRect(Position.x - HalfWidth, Position.x + HalfWidth,
-                Position.y - HalfHeight, Position.y + HalfHeight);
-            foreach (Particle particle in results)
+                Position.y - HalfHeight, Position.y + HalfHeight, out count);
+            for (int i = 0;i < count; ++i)
             {
-                if (particle.IgnoreMask)
+                if (results[i].IgnoreMask)
                     continue;
 
                 switch (Reach)
                 {
                     case Reach.Layer:
-                        if (particle.Emitter.LayerName != TargetName && particle.Emitter.LayerName != LayerName)
+                        if (results[i].Emitter.LayerName != TargetName && results[i].Emitter.LayerName != LayerName)
                             continue;
 
                         break;
                     case Reach.Name:
-                        if (particle.Emitter.Name != TargetName)
+                        if (results[i].Emitter.Name != TargetName)
                             continue;
 
                         break;
                 }
                 if (FieldShape == FieldShape.Circle)
                 {
-                    Vector2 v = Position - particle.PPosition;
+                    Vector2 v = Position - results[i].PPosition;
                     if (Math.Sqrt(v.x * v.x + v.y * v.y) > HalfWidth)
                         continue;
                 }
-                for (int i = 0; i < EventFieldEventGroups.Count; ++i)
-                    EventFieldEventGroups[i].Execute(particle);
+                for (int k = 0; k < EventFieldEventGroups.Count; ++k)
+                    EventFieldEventGroups[k].Execute(results[i]);
             }
         }
         #endregion
