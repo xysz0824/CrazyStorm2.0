@@ -37,8 +37,11 @@ namespace CrazyStorm.Expression
             operators["|"] = new Precedence(1, true);
 
             operators[">"] = new Precedence(2, true);
+            operators[">="] = new Precedence(2, true);
             operators["<"] = new Precedence(2, true);
+            operators["<="] = new Precedence(2, true);
             operators["="] = new Precedence(2, true);
+            operators["!="] = new Precedence(2, true);
 
             operators["+"] = new Precedence(3, true);
             operators["-"] = new Precedence(3, true);

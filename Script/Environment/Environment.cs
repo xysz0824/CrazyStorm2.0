@@ -60,6 +60,7 @@ namespace CrazyStorm.Expression
         #region Private Methods
         void InitializeSystemFunctions()
         {
+            PutFunction("abs", new Expression.Function(typeof(float)));
             PutFunction("dist", new Expression.Function(typeof(Core.Vector2), typeof(Core.Vector2)));
             PutFunction("angle", new Expression.Function(typeof(Core.Vector2), typeof(Core.Vector2)));
             PutFunction("rand", new Expression.Function(typeof(float), typeof(float)));

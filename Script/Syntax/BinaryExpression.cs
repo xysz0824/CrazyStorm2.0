@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using CrazyStorm.Core;
 
 namespace CrazyStorm.Expression
 {
@@ -40,6 +41,8 @@ namespace CrazyStorm.Expression
                             return (bool)left || (bool)right;
                         case "=":
                             return (bool)left == (bool)right;
+                        case "!=":
+                            return (bool)left != (bool)right;
                     }
                 }
                 return new ExpressionException("TypeError");
@@ -64,10 +67,16 @@ namespace CrazyStorm.Expression
                     return (float)left % (float)right;
                 case ">":
                     return (float)left > (float)right;
+                case ">=":
+                    return (float)left >= (float)right;
                 case "<":
                     return (float)left < (float)right;
+                case "<=":
+                    return (float)left <= (float)right;
                 case "=":
                     return (float)left == (float)right;
+                case "!=":
+                    return (float)left != (float)right;
             }
             return new ExpressionException("TypeError");
         }
@@ -151,6 +160,15 @@ namespace CrazyStorm.Expression
                     break;
                 case "<":
                     code = VM.CreateInstruction(VMCode.LESS);
+                    break;
+                case ">=":
+                    code = VM.CreateInstruction(VMCode.MOREOREQUAL);
+                    break;
+                case "<=":
+                    code = VM.CreateInstruction(VMCode.LESSOREQUAL);
+                    break;
+                case "!=":
+                    code = VM.CreateInstruction(VMCode.NOTEQUAL);
                     break;
             }
             codeStream.AddRange(code);

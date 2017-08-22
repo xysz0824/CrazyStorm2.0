@@ -28,7 +28,10 @@ namespace CrazyStorm.Core
         DIV,
         MOD,
         MORE,
-        LESS
+        LESS,
+        MOREOREQUAL,
+        LESSOREQUAL,
+        NOTEQUAL
     }
     [StructLayout(LayoutKind.Explicit)]
     public struct VMInstruction
@@ -52,6 +55,37 @@ namespace CrazyStorm.Core
         static Stack<Vector2> vector2Stack = new Stack<Vector2>();
         static Stack<RGB> rgbStack = new Stack<RGB>();
         static Stack<string> stringStack = new Stack<string>();
+        public static byte[] CreateInstruction(VMCode code, object operand)
+        {
+            List<byte> bytes = new List<byte>();
+            bytes.Add((byte)code);
+            if (operand != null)
+            {
+                switch (code)
+                {
+                    case VMCode.NUMBER:
+                        bytes.AddRange(PlayDataHelper.GetBytes((float)operand));
+                        break;
+                    case VMCode.BOOL:
+                        bytes.AddRange(PlayDataHelper.GetBytes((bool)operand));
+                        break;
+                    case VMCode.NAME:
+                        bytes.AddRange(PlayDataHelper.GetBytes((string)operand));
+                        break;
+                    case VMCode.CALL:
+                        bytes.AddRange(PlayDataHelper.GetBytes((string)operand));
+                        break;
+                    case VMCode.ARGUMENTS:
+                        bytes.AddRange(PlayDataHelper.GetBytes((int)operand));
+                        break;
+                }
+            }
+            return bytes.ToArray();
+        }
+        public static byte[] CreateInstruction(VMCode code)
+        {
+            return CreateInstruction(code, null);
+        }
         public static void SetRandomSeed(int seed)
         {
             random = new Random(seed);
@@ -130,6 +164,9 @@ namespace CrazyStorm.Core
                         float count = VM.PopFloat();
                         switch (instructions[i].stringOperand)
                         {
+                            case "abs":
+                                VM.PushFloat(Math.Abs(VM.PopFloat()));
+                                break;
                             case "dist":
                                 Vector2 v = VM.PopVector2() - VM.PopVector2();
                                 VM.PushFloat((float)Math.Sqrt(v.x * v.x + v.y * v.y));
@@ -234,6 +271,21 @@ namespace CrazyStorm.Core
                         right = VM.PopFloat();
                         left = VM.PopFloat();
                         VM.PushBool(left < right);
+                        break;
+                    case VMCode.MOREOREQUAL:
+                        right = VM.PopFloat();
+                        left = VM.PopFloat();
+                        VM.PushBool(left >= right);
+                        break;
+                    case VMCode.LESSOREQUAL:
+                        right = VM.PopFloat();
+                        left = VM.PopFloat();
+                        VM.PushBool(left <= right);
+                        break;
+                    case VMCode.NOTEQUAL:
+                        right = VM.PopFloat();
+                        left = VM.PopFloat();
+                        VM.PushBool(left != right);
                         break;
                 }
             }
