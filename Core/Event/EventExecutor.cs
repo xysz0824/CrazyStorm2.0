@@ -18,7 +18,7 @@ namespace CrazyStorm.Core
         public TypeSet InitialValue { get; set; }
         public TypeSet TargetValue { get; set; }
         public int ChangeTime { get; set; }
-        public bool Finished { get { return currentTime + 1 >= ChangeTime; } }
+        public bool Finished { get { return currentTime >= ChangeTime; } }
         public void Update()
         {
             float ratio = (currentTime + 1) / ChangeTime;
