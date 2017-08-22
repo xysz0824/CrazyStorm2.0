@@ -918,6 +918,7 @@ namespace CrazyStorm
                 var result = syntaxTree.Eval(environment);
                 if (!(result is bool))
                     throw new ExpressionException("TypeError");
+                
                 eventGroup.Condition = input;
             }
             catch (ExpressionException error)

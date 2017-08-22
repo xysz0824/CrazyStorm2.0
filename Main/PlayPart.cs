@@ -96,6 +96,7 @@ namespace CrazyStorm
         {
             foreach (EventGroup eventGroup in eventGroups)
             {
+                eventGroup.CompiledCondition = null;
                 if (!string.IsNullOrEmpty(eventGroup.Condition))
                 {
                     var lexer = new Expression.Lexer();
