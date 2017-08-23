@@ -118,7 +118,7 @@ namespace CrazyStorm.Core
                 }
                 results[i].PSpeedVector = MathHelper.GetVector2(results[i].PSpeed, 2 * rotation - results[i].PSpeedAngle);
                 for (int k = 0; k < RebounderEventGroups.Count; ++k)
-                    RebounderEventGroups[k].Execute(results[i]);
+                    RebounderEventGroups[k].Execute(results[i], null);
             }
             lastRotation = Rotation;
         }

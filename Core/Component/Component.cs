@@ -196,11 +196,6 @@ namespace CrazyStorm.Core
         #endregion
 
         #region Protected Methods
-        protected void ExecuteEventGroups()
-        {
-            for (int i = 0; i < ComponentEventGroups.Count; ++i)
-                ComponentEventGroups[i].Execute(this);
-        }
         protected delegate void Action();
         protected void BindingUpdate(Action updateFunc)
         {
@@ -210,20 +205,34 @@ namespace CrazyStorm.Core
             float saveSpeedAngle = SpeedAngle;
             float saveAcspeed = Acspeed;
             float saveAcspeedAngle = AcspeedAngle;
+            bool eventImpacted = false;
             foreach (var particle in BindingTarget.Particles)
             {
                 CurrentFrame = particle.PCurrentFrame - BeginFrame;
                 if (CurrentFrame < 0 || CurrentFrame >= TotalFrame || !Visibility)
                     continue;
 
+                if (eventImpacted && !EventManager.BindingRecover(this, particle))
+                {
+                    Reset();
+                }
                 Position = particle.PPosition;
                 Speed = particle.PSpeed;
                 SpeedAngle = particle.PSpeedAngle;
                 Acspeed = particle.PAcspeed;
                 AcspeedAngle = particle.PAcspeedAngle;
-                ExecuteEventGroups();
+                for (int i = 0; i < ComponentEventGroups.Count; ++i)
+                {
+                    ComponentEventGroups[i].Execute(this, particle);
+                }
                 if (updateFunc != null)
+                {
                     updateFunc();
+                }
+                if (EventManager.BindingUpdate(particle))
+                {
+                    eventImpacted = true;
+                }
             }
             CurrentFrame = saveCurrentFrame;
             Position = savePosition;
@@ -671,7 +680,8 @@ namespace CrazyStorm.Core
             {
                 speedVector += acspeedVector;
                 Position += speedVector;
-                ExecuteEventGroups();
+                for (int i = 0; i < ComponentEventGroups.Count; ++i)
+                    ComponentEventGroups[i].Execute(this, null);
             }
             Position = GetAbsolutePositionRuntime();
             return true;

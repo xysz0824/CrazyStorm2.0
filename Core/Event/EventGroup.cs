@@ -133,7 +133,7 @@ namespace CrazyStorm.Core
                 }
             }
         }
-        public void Execute(PropertyContainer propertyContainer)
+        public void Execute(PropertyContainer propertyContainer, PropertyContainer bindingContainer)
         {
             if (VMCondition != null)
                 VM.Execute(propertyContainer, VMCondition);
@@ -142,7 +142,7 @@ namespace CrazyStorm.Core
             {
                 for (int i = 0; i < VMEvents.Count; ++i)
                 {
-                    if (EventHelper.Execute(propertyContainer, VMEvents[i]))
+                    if (EventHelper.Execute(propertyContainer, bindingContainer, VMEvents[i]))
                         i = -1;
                 }
             }

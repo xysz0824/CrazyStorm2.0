@@ -115,7 +115,7 @@ namespace CrazyStorm.Core
                         continue;
                 }
                 for (int k = 0; k < EventFieldEventGroups.Count; ++k)
-                    EventFieldEventGroups[k].Execute(results[i]);
+                    EventFieldEventGroups[k].Execute(results[i], null);
             }
         }
         #endregion

@@ -41,6 +41,7 @@ namespace CrazyStorm.Core
     }
     public struct TypeSet
     {
+        public PropertyType type;
         public bool boolValue;
         public int intValue;
         public float floatValue;
@@ -368,7 +369,7 @@ namespace CrazyStorm.Core
             }
             return set;
         }
-        public static bool Execute(PropertyContainer propertyContainer, VMEventInfo eventInfo)
+        public static bool Execute(PropertyContainer propertyContainer, PropertyContainer bindingContainer, VMEventInfo eventInfo)
         {
             if (eventInfo.hasCondition)
             {
@@ -388,7 +389,7 @@ namespace CrazyStorm.Core
             }
             if (!eventInfo.isSpecialEvent)
             {
-                EventManager.AddEvent(propertyContainer, eventInfo);
+                EventManager.AddEvent(propertyContainer, bindingContainer, eventInfo);
                 return false;
             }
             else

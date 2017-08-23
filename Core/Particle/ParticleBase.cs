@@ -535,7 +535,7 @@ namespace CrazyStorm.Core
             PSpeedVector += PAcspeedVector;
             PPosition += PSpeedVector;
             for (int i = 0; i < ParticleEventGroups.Count; ++i)
-                ParticleEventGroups[i].Execute(this);
+                ParticleEventGroups[i].Execute(this, null);
 
             ++PCurrentFrame;
         }

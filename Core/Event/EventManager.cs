@@ -11,21 +11,23 @@ namespace CrazyStorm.Core
     public class EventManager
     {
         static List<EventExecutor> executorList;
+        static Dictionary<PropertyContainer, Dictionary<string, TypeSet>> cache = new Dictionary<PropertyContainer, Dictionary<string, TypeSet>>();
         public static IList<ParticleType> DefaultTypes { get; set; }
         public static IList<ParticleType> CustomTypes { get; set; }
-        public static void AddEvent(PropertyContainer propertyContainer, VMEventInfo eventInfo)
+        public static void AddEvent(PropertyContainer propertyContainer, PropertyContainer bindingContainer, VMEventInfo eventInfo)
         {
             if (executorList == null)
                 executorList = new List<EventExecutor>();
 
             var executor = new EventExecutor();
             executor.PropertyContainer = propertyContainer;
+            executor.BindingContainer = bindingContainer;
             executor.PropertyName = eventInfo.resultProperty;
-            executor.PropertyType = eventInfo.resultType;
             executor.ChangeMode = eventInfo.changeMode;
             executor.ChangeTime = eventInfo.changeTime;
             propertyContainer.PushProperty(executor.PropertyName);
             var initialValue = new TypeSet();
+            initialValue.type = eventInfo.resultType;
             var targetValue = eventInfo.resultValue;
             if (eventInfo.isExpressionResult)
             {
@@ -188,13 +190,77 @@ namespace CrazyStorm.Core
 
             for (int i = 0; i < executorList.Count; ++i)
             {
-                executorList[i].Update();
-                if (executorList[i].Finished)
+                if (executorList[i].BindingContainer == null)
                 {
-                    executorList.RemoveAt(i);
-                    i--;
+                    executorList[i].Update();
+                    if (executorList[i].Finished)
+                    {
+                        executorList.RemoveAt(i);
+                        --i;
+                    }
                 }
             }
+        }
+        public static bool BindingUpdate(PropertyContainer bindingContainer)
+        {
+            if (executorList == null)
+                return false;
+
+            bool updated = false;
+            for (int i = 0; i < executorList.Count; ++i)
+            {
+                if (executorList[i].BindingContainer == bindingContainer)
+                {
+                    if (!cache.ContainsKey(bindingContainer))
+                    {
+                        cache.Add(bindingContainer, new Dictionary<string, TypeSet>());
+                    }
+                    executorList[i].Update();
+                    cache[bindingContainer][executorList[i].PropertyName] = executorList[i].CurrentValue;
+                    if (executorList[i].Finished)
+                    {
+                        executorList.RemoveAt(i);
+                        --i;
+                    }
+                    updated = true;
+                }
+            }
+            return updated;
+        }
+        public static bool BindingRecover(PropertyContainer propertyContainer, PropertyContainer bindingContainer)
+        {
+            if (!cache.ContainsKey(bindingContainer))
+                return false;
+
+            foreach (var item in cache[bindingContainer])
+            {
+                switch (item.Value.type)
+                {
+                    case PropertyType.Boolean:
+                        VM.PushBool(item.Value.boolValue);
+                        break;
+                    case PropertyType.Int32:
+                        VM.PushFloat(item.Value.intValue);
+                        break;
+                    case PropertyType.Single:
+                        VM.PushFloat(item.Value.floatValue);
+                        break;
+                    case PropertyType.Enum:
+                        VM.PushEnum(item.Value.enumValue);
+                        break;
+                    case PropertyType.Vector2:
+                        VM.PushVector2(item.Value.vector2Value);
+                        break;
+                    case PropertyType.RGB:
+                        VM.PushRGB(item.Value.rgbValue);
+                        break;
+                    case PropertyType.String:
+                        VM.PushString(item.Value.stringValue);
+                        break;
+                }
+                propertyContainer.SetProperty(item.Key);
+            }
+            return true;
         }
     }
 }
