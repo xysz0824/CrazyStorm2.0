@@ -142,9 +142,10 @@ namespace CrazyStorm.Core
             executor.InitialValue = initialValue;
             executor.TargetValue = targetValue;
             if (executor.ChangeMode == EventKeyword.Instant)
+            {
                 executor.Update();
-            else
-                executorList.Add(executor);
+            }
+            executorList.Add(executor);
         }
         public static bool ExecuteSpecialEvent(PropertyContainer propertyContainer, string eventName, string[] arguments,
             VMInstruction[] argumentExpression)
@@ -192,12 +193,13 @@ namespace CrazyStorm.Core
             {
                 if (executorList[i].BindingContainer == null)
                 {
-                    executorList[i].Update();
                     if (executorList[i].Finished)
                     {
                         executorList.RemoveAt(i);
                         --i;
                     }
+                    else
+                        executorList[i].Update();
                 }
             }
         }
@@ -215,7 +217,10 @@ namespace CrazyStorm.Core
                     {
                         cache.Add(bindingContainer, new Dictionary<string, TypeSet>());
                     }
-                    executorList[i].Update();
+                    if (!executorList[i].Finished)
+                    {
+                        executorList[i].Update();
+                    }
                     cache[bindingContainer][executorList[i].PropertyName] = executorList[i].CurrentValue;
                     if (executorList[i].Finished)
                     {

@@ -212,7 +212,7 @@ namespace CrazyStorm.Core
                 if (CurrentFrame < 0 || CurrentFrame >= TotalFrame || !Visibility)
                     continue;
 
-                if (eventImpacted && !EventManager.BindingRecover(this, particle))
+                if (!EventManager.BindingRecover(this, particle) && eventImpacted)
                 {
                     Reset();
                 }
