@@ -51,19 +51,27 @@ namespace CrazyStorm.Core
         {
             if (template is Particle)
             {
-                particleIndex = particleIndex % particlePool.Count;
+                do
+                {
+                    particleIndex = (particleIndex + 1) % particlePool.Count;
+                }
+                while (particlePool[particleIndex].Alive);
                 particlePool[particleIndex] = template.Copy() as Particle;
                 particlePool[particleIndex].Alive = true;
                 //particleQuadTree.Insert(particlePool[particleIndex]);
-                return particlePool[particleIndex++];
+                return particlePool[particleIndex];
             }
             else
             {
-                curveParticleIndex = curveParticleIndex % curveParticlePool.Count;
+                do
+                {
+                    curveParticleIndex = curveParticleIndex % curveParticlePool.Count;
+                }
+                while (curveParticlePool[curveParticleIndex].Alive);
                 curveParticlePool[curveParticleIndex] = template.Copy() as CurveParticle;
                 curveParticlePool[curveParticleIndex].Alive = true;
                 //particleQuadTree.Insert(curveParticlePool[curveParticleIndex]);
-                return curveParticlePool[curveParticleIndex++];
+                return curveParticlePool[curveParticleIndex];
             }
         }
         //public static void Insert(ParticleBase particleBase)
