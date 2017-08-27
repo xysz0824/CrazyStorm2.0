@@ -54,7 +54,7 @@ namespace CrazyStorm
                 string[] split = config.SelfSetting.Split(',');
                 if (split.Length == selfSettingBoxes.Length)
                 {
-                    for (int i = 0;i < split.Length;++i)
+                    for (int i = 0; i < split.Length; ++i)
                     {
                         int test;
                         if (Int32.TryParse(split[i], out test) && test >= 0)

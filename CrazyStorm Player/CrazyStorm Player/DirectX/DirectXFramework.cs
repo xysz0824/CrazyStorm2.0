@@ -12,6 +12,8 @@ using System.Windows.Forms;
 using System.Drawing;
 using System.Threading;
 using System.Diagnostics;
+using SlimDX.DirectInput;
+using Device = SlimDX.Direct3D9.Device;
 
 namespace CrazyStorm_Player.DirectX
 {
@@ -24,6 +26,9 @@ namespace CrazyStorm_Player.DirectX
         FormConfig windowConfig;
         DeviceContext context;
         Sprite sprite;
+        DirectInput input;
+        Keyboard keyboard;
+        KeyboardState keyboardState;
         long ticks;
         float deltaTime;
         float timeAccumulator;
@@ -34,6 +39,7 @@ namespace CrazyStorm_Player.DirectX
         #region Public Members
         public Device Device { get { return context.Device; } }
         public Sprite Sprite { get { return sprite; } }
+        public KeyboardState KeyboardState { get { return keyboardState; } }
         public string WindowTitle
         {
             get { return windowConfig.WindowTitle; }
@@ -96,6 +102,10 @@ namespace CrazyStorm_Player.DirectX
             };
             context = new DeviceContext(form.Handle, settings);
             sprite = new Sprite(context.Device);
+            input = new DirectInput();
+            keyboard = new Keyboard(input);
+            keyboard.SetCooperativeLevel(form, CooperativeLevel.Nonexclusive | CooperativeLevel.Background);
+            keyboard.Acquire();
         }
         void MeasureDeltaTime()
         {
@@ -116,6 +126,7 @@ namespace CrazyStorm_Player.DirectX
         }
         void Update()
         {
+            keyboardState = keyboard.GetCurrentState();
             MeasureDeltaTime();
             OnUpdate();
         }
@@ -123,7 +134,7 @@ namespace CrazyStorm_Player.DirectX
         {
             if (deviceLost)
             {
-                if (context.Device.TestCooperativeLevel() == ResultCode.DeviceNotReset)
+                if (context.Device.TestCooperativeLevel() == SlimDX.Direct3D9.ResultCode.DeviceNotReset)
                 {
                     context.Device.Reset(context.PresentParameters);
                     deviceLost = false;
@@ -145,7 +156,7 @@ namespace CrazyStorm_Player.DirectX
             }
             catch (Direct3D9Exception ex)
             {
-                if (ex.ResultCode == ResultCode.DeviceLost)
+                if (ex.ResultCode == SlimDX.Direct3D9.ResultCode.DeviceLost)
                 {
                     OnLost();
                     deviceLost = true;

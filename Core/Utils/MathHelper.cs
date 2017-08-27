@@ -72,5 +72,14 @@ namespace CrazyStorm.Core
             double dist = (float)Math.Sqrt(v.x * v.x + v.y * v.y);
             return dist <= radius;
         }
+        public static float Clamp(float value, float max, float min)
+        {
+            float result = value;
+            if (value.CompareTo(max) > 0)
+                result = max;
+            if (value.CompareTo(min) < 0)
+                result = min;
+            return result;
+        }
     }
 }

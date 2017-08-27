@@ -17,6 +17,89 @@ using System.Reflection;
 
 namespace CrazyStorm_Player
 {
+    class Character
+    {
+        int currentFrame;
+        bool slow;
+        int movableWidth;
+        int movableHeight;
+        public Vector2 selfPosition;
+        public string imagePath = string.Empty;
+        public Vector2 selfStart = Vector2.Zero;
+        public Vector2 selfSize = Vector2.Zero;
+        public Vector2 selfCenter = Vector2.Zero;
+        public int selfFrames = 0;
+        public int selfDelay = 0;
+        public int selfRadius = 0;
+        public Character(int movableWidth, int movableHeight)
+        {
+            selfPosition.Y = movableHeight / 3;
+            this.movableWidth = movableWidth;
+            this.movableHeight = movableHeight;
+        }
+        public void Update(SlimDX.DirectInput.KeyboardState state)
+        {
+            Vector2 direction = Vector2.Zero;
+            if (state.IsPressed(SlimDX.DirectInput.Key.LeftArrow))
+            {
+                direction.X = -1;
+            }
+            else if (state.IsPressed(SlimDX.DirectInput.Key.RightArrow))
+            {
+                direction.X = 1;
+            }
+            if (state.IsPressed(SlimDX.DirectInput.Key.UpArrow))
+            {
+                direction.Y = -1;
+            }
+            else if (state.IsPressed(SlimDX.DirectInput.Key.DownArrow))
+            {
+                direction.Y = 1;
+            }
+            direction.Normalize();
+            if (state.IsPressed(SlimDX.DirectInput.Key.LeftShift) || state.IsPressed(SlimDX.DirectInput.Key.RightShift))
+            {
+                slow = true;
+                selfPosition += direction * 2.0f;
+            }
+            else
+            {
+                slow = false;
+                selfPosition += direction * 4.0f;
+            }
+            selfPosition.X = MathHelper.Clamp(selfPosition.X, movableWidth / 2, -movableWidth / 2);
+            selfPosition.Y = MathHelper.Clamp(selfPosition.Y, movableHeight / 2, -movableHeight / 2);            
+        }
+        public void Draw(Sprite sprite, Texture character, Texture point, Texture slowMode)
+        {
+            Vector2 offset = new Vector2(movableWidth / 2, movableHeight / 2);
+            Vector2 position = selfPosition + offset - selfCenter;
+            Color4 color = new Color4(1, 1, 1, 1);
+            Rectangle rect;
+            if (character != null)
+            {
+                sprite.Transform = Matrix.Transformation2D(selfCenter, 0, new Vector2(1, 1), selfCenter, 0, position);
+                int frame = currentFrame / (selfDelay + 1) % selfFrames;
+                rect = new Rectangle((int)selfStart.X + frame * (int)selfSize.X, (int)selfStart.Y, (int)selfSize.X, (int)selfSize.Y);
+                sprite.Draw(character, rect, color);
+            }
+            Vector2 center = new Vector2(7, 7);
+            position = selfPosition + offset - center;
+            sprite.Transform = Matrix.Transformation2D(center, 0, new Vector2(1, 1), center, 0, position);
+            rect = new Rectangle(0, 0, 16, 16);
+            sprite.Draw(point, rect, color);
+            if (slow)
+            {
+                center = new Vector2(31, 31);
+                position = selfPosition + offset - center;
+                float rotation = currentFrame / 30.0f;
+                sprite.Transform = Matrix.Transformation2D(center, 0, new Vector2(1, 1), center, rotation, position);
+                rect = new Rectangle(0, 0, 64, 64);
+                sprite.Draw(slowMode, rect, color);
+            }
+            ++currentFrame;
+        }
+    }
     class Player : DirectXFramework
     {
         bool hasBackground;
@@ -29,6 +112,10 @@ namespace CrazyStorm_Player
         File file;
         int selectedParticleSystemIndex;
         Vector2 customCenter;
+        Texture characterTexture;
+        Texture pointTexture;
+        Texture slowModeTexture;
+        Character mainCharacter;
         protected override void OnInitialize()
         {
             WindowTitle = VersionInfo.AppTitle;
@@ -40,10 +127,20 @@ namespace CrazyStorm_Player
             int curveParticleMaximum = Int32.Parse(Environment.GetCommandLineArgs()[7]);
             ParticleManager.Initialize(WindowWidth, WindowHeight, 50, particleMaximum, curveParticleMaximum);
             Windowed = bool.Parse(Environment.GetCommandLineArgs()[8]);
-            if (!bool.Parse(Environment.GetCommandLineArgs()[9]))
-                customCenter = new Vector2(Int32.Parse(Environment.GetCommandLineArgs()[10]), 
-                    Int32.Parse(Environment.GetCommandLineArgs()[11]));
-            
+            customCenter = new Vector2(Int32.Parse(Environment.GetCommandLineArgs()[9]), Int32.Parse(Environment.GetCommandLineArgs()[10]));
+
+            mainCharacter = new Character(WindowWidth, WindowHeight);
+            mainCharacter.imagePath = Environment.GetCommandLineArgs()[11];
+            string[] selfSetting = Environment.GetCommandLineArgs()[12].Split(',');
+            if (selfSetting.Length == 9)
+            {
+                mainCharacter.selfStart = new Vector2(Int32.Parse(selfSetting[0]), Int32.Parse(selfSetting[1]));
+                mainCharacter.selfSize = new Vector2(Int32.Parse(selfSetting[2]), Int32.Parse(selfSetting[3]));
+                mainCharacter.selfCenter = new Vector2(Int32.Parse(selfSetting[4]), Int32.Parse(selfSetting[5]));
+                mainCharacter.selfFrames = Int32.Parse(selfSetting[6]);
+                mainCharacter.selfDelay = Int32.Parse(selfSetting[7]);
+                mainCharacter.selfRadius = Int32.Parse(selfSetting[8]);
+            }
             ParticleManager.OnParticleDraw += (particle) =>
             {
                 if (particle.Type == null)
@@ -56,8 +153,8 @@ namespace CrazyStorm_Player
                 Vector2 position = new Vector2(particle.PPosition.x, particle.PPosition.y) + center - imageCenter;
                 Sprite.Transform = Matrix.Transformation2D(imageCenter, 0, scale, imageCenter, (float)MathHelper.DegToRad(particle.PRotation), position);
                 Color4 color = new Color4(particle.Opacity / 100, particle.RGB.r / 255, particle.RGB.g / 255, particle.RGB.b / 255);
-                int offset = particle.PCurrentFrame / (type.Delay + 1) % type.Frames;
-                Rectangle rect = new Rectangle((int)type.StartPoint.x + offset * type.Width, (int)type.StartPoint.y, type.Width, type.Height);
+                int frame = particle.PCurrentFrame / (type.Delay + 1) % type.Frames;
+                Rectangle rect = new Rectangle((int)type.StartPoint.x + frame * type.Width, (int)type.StartPoint.y, type.Width, type.Height);
                 if (type.ID >= ParticleType.DefaultTypeIndex)
                     Sprite.Draw(defaultTextures[0], rect, color);
                 else if (type.Image != null)
@@ -105,6 +202,15 @@ namespace CrazyStorm_Player
                 ParticleType.LoadDefaultTypes(reader, defaultParticleTypes);
                 EventManager.DefaultTypes = defaultParticleTypes;
             }
+            //Load main character texture
+            if (!StringUtil.IsNullOrWhiteSpace(mainCharacter.imagePath))
+            {
+                characterTexture = Texture.FromFile(Device, mainCharacter.imagePath, Usage.None, Pool.Managed);
+            }
+            Stream pointTextureStream = Assembly.GetExecutingAssembly().GetManifestResourceStream("CrazyStorm_Player.point.png");
+            pointTexture = Texture.FromStream(Device, pointTextureStream, Usage.None, Pool.Managed);
+            Stream slowModeTextureStream = Assembly.GetExecutingAssembly().GetManifestResourceStream("CrazyStorm_Player.ring.png");
+            slowModeTexture = Texture.FromStream(Device, slowModeTextureStream, Usage.None, Pool.Managed);
             //Load play file
             using (FileStream stream = new FileStream(Environment.GetCommandLineArgs()[1], FileMode.Open))
             {
@@ -130,11 +236,14 @@ namespace CrazyStorm_Player
             foreach (var image in file.Images)
                 customTextures[image.Id] = Texture.FromFile(Device, image.RelatviePath, Usage.None, Pool.Managed);
 
-            EventManager.CustomTypes = file.ParticleSystems[selectedParticleSystemIndex].CustomTypes;
             file.ParticleSystems[selectedParticleSystemIndex].Reset();
         }
         protected override void OnUpdate()
         {
+            mainCharacter.Update(KeyboardState);
+            file.SetGlobal("cx", mainCharacter.selfPosition.X);
+            file.SetGlobal("cy", mainCharacter.selfPosition.Y);
+            EventManager.CustomTypes = file.ParticleSystems[selectedParticleSystemIndex].CustomTypes;
             file.ParticleSystems[selectedParticleSystemIndex].Update();
             ParticleManager.Update();
             EventManager.Update();
@@ -148,6 +257,7 @@ namespace CrazyStorm_Player
                 Sprite.Transform = Matrix.Transformation2D(Vector2.Zero, 0, backgroundScale, Vector2.Zero, 0, backgroundPos);
                 Sprite.Draw(backgroundTexture, Color.White);
             }
+            mainCharacter.Draw(Sprite, characterTexture, pointTexture, slowModeTexture);
             ParticleManager.Draw();
             Sprite.End();
         }

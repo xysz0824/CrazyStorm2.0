@@ -40,13 +40,15 @@ namespace CrazyStorm.Core
         {
             CurrentDirectory = string.Empty;
             particleSystems = new List<ParticleSystem>();
-            if (newFile)
-            {
-                particleSystems.Add(new ParticleSystem("Untitled"));
-            }
             images = new GenericContainer<FileResource>();
             sounds = new GenericContainer<FileResource>();
             globals = new GenericContainer<VariableResource>();
+            if (newFile)
+            {
+                particleSystems.Add(new ParticleSystem("Untitled"));
+                globals.Add(new VariableResource("cx"));
+                globals.Add(new VariableResource("cy"));
+            }
         }
         #endregion
 
@@ -114,7 +116,7 @@ namespace CrazyStorm.Core
             //Sounds
             PlayDataHelper.LoadObjectList(Sounds, reader, version);
             //Globals
-            var globals = new List<VariableResource>();
+            globals = new List<VariableResource>();
             PlayDataHelper.LoadObjectList(globals, reader, version);
             foreach (var particleSystem in ParticleSystems)
             {
@@ -122,6 +124,16 @@ namespace CrazyStorm.Core
                 {
                     foreach (var component in layer.Components)
                         component.Globals = globals;
+                }
+            }
+        }
+        public void SetGlobal(string label, float value)
+        {
+            for (int i = 0; i < globals.Count; ++i)
+            {
+                if (globals[i].Label == label)
+                {
+                    globals[i].Value = value;
                 }
             }
         }

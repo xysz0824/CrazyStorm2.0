@@ -115,6 +115,8 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="logo.ico" />
+    <EmbeddedResource Include="point.png" />
+    <EmbeddedResource Include="ring.png" />
     <EmbeddedResource Include="set.txt" />
     <EmbeddedResource Include="barrages.png" />
   </ItemGroup>

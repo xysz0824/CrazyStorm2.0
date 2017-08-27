@@ -164,7 +164,7 @@ namespace CrazyStorm
             ps.Arguments += config.ScreenWidth + " " + config.ScreenHeight + " ";
             ps.Arguments += config.ParticleMaximum + " " + config.CurveParticleMaximum + " ";
             ps.Arguments += config.Windowed + " ";
-            ps.Arguments += config.ScreenCenter + " " + config.CenterX + " " + config.CenterY + " ";
+            ps.Arguments += config.CenterX + " " + config.CenterY + " ";
             ps.Arguments += "\"" + config.SelfImagePath + "\" \"" + config.SelfSetting + "\"";
             ps.WindowStyle = ProcessWindowStyle.Normal;
             Process p = new Process();
