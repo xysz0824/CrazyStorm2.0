@@ -29,7 +29,7 @@ namespace CrazyStorm.Expression
             var left = GetLeftChild().Eval(e);
             var right = GetRightChild().Eval(e);
             var op = (string)Token.GetValue();
-            if (!(left is float) && !(right is float))
+            if (!(left is float) || !(right is float))
             {
                 if (left is bool && right is bool)
                 {
