@@ -25,7 +25,7 @@ namespace CrazyStorm
 
                 foreach (var component in clone.Components)
                 {
-                    component.Id = selectedParticle.GetComponentIndex();
+                    component.ID = selectedParticle.GetComponentIndex();
                     selectedParticle.GetAndIncreaseComponentIndex(component.GetType().ToString());
                 }
                 selectedParticle.AddLayer(clone);

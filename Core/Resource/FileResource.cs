@@ -25,7 +25,7 @@ namespace CrazyStorm.Core
         #endregion
 
         #region Public Members
-        public int Id
+        public int ID
         {
             get { return id; }
             set { id = value; }

@@ -56,7 +56,7 @@ namespace CrazyStorm.Core
         #endregion
 
         #region Public Members
-        public int Id
+        public int ID
         {
             get { return id; }
             set { id = value; }
@@ -229,7 +229,7 @@ namespace CrazyStorm.Core
                 {
                     updateFunc();
                 }
-                if (EventManager.BindingUpdate(particle))
+                if (EventManager.BindingUpdate(this, particle))
                 {
                     eventImpacted = true;
                 }
@@ -319,7 +319,7 @@ namespace CrazyStorm.Core
             {
                 clone.childrenIDs = new List<int>();
                 foreach (var child in children)
-                    clone.childrenIDs.Add(child.Id);
+                    clone.childrenIDs.Add(child.ID);
             }
             return clone;
         }
@@ -388,14 +388,14 @@ namespace CrazyStorm.Core
             if (parent != null)
             {
                 var parentAttribute = doc.CreateAttribute("parent");
-                parentAttribute.Value = parent.Id.ToString();
+                parentAttribute.Value = parent.ID.ToString();
                 componentNode.Attributes.Append(parentAttribute);
             }
             //bindingTarget
             if (bindingTarget != null)
             {
                 var bindingTargetAttribute = doc.CreateAttribute("bindingTarget");
-                bindingTargetAttribute.Value = bindingTarget.Id.ToString();
+                bindingTargetAttribute.Value = bindingTarget.ID.ToString();
                 componentNode.Attributes.Append(bindingTargetAttribute);
             }
             //variables
@@ -408,7 +408,7 @@ namespace CrazyStorm.Core
             {
                 var childNode = doc.CreateElement("Component");
                 var idAttribute = doc.CreateAttribute("id");
-                idAttribute.Value = component.Id.ToString();
+                idAttribute.Value = component.ID.ToString();
                 childNode.Attributes.Append(idAttribute);
                 childrenNode.AppendChild(childNode);
             }
@@ -423,7 +423,7 @@ namespace CrazyStorm.Core
             {
                 foreach (var target in collection)
                 {
-                    if (ParentID == target.Id)
+                    if (ParentID == target.ID)
                     {
                         parent = target;
                         break;
@@ -436,7 +436,7 @@ namespace CrazyStorm.Core
             {
                 foreach (var target in collection)
                 {
-                    if (BindingTargetID == target.Id)
+                    if (BindingTargetID == target.ID)
                     {
                         bindingTarget = target as Emitter;
                         break;
@@ -451,7 +451,7 @@ namespace CrazyStorm.Core
                 {
                     foreach (var target in collection)
                     {
-                        if (childrenID == target.Id)
+                        if (childrenID == target.ID)
                         {
                             children.Add(target);
                             break;
@@ -473,12 +473,12 @@ namespace CrazyStorm.Core
             PlayDataHelper.GenerateStruct(componentData, componentBytes);
             //parent
             if (parent != null)
-                componentBytes.AddRange(PlayDataHelper.GetBytes(parent.Id));
+                componentBytes.AddRange(PlayDataHelper.GetBytes(parent.ID));
             else
                 componentBytes.AddRange(PlayDataHelper.GetBytes(-1));
             //bindingTarget
             if (bindingTarget != null)
-                componentBytes.AddRange(PlayDataHelper.GetBytes(bindingTarget.Id));
+                componentBytes.AddRange(PlayDataHelper.GetBytes(bindingTarget.ID));
             else
                 componentBytes.AddRange(PlayDataHelper.GetBytes(-1));
             //variables
@@ -492,7 +492,7 @@ namespace CrazyStorm.Core
             using (BinaryReader componentReader = PlayDataHelper.GetBlockReader(reader))
             {
                 string specificType = PlayDataHelper.ReadString(componentReader);
-                Id = componentReader.ReadInt32();
+                ID = componentReader.ReadInt32();
                 Name = PlayDataHelper.ReadString(componentReader);
                 //properties
                 base.LoadPropertyExpressions(componentReader);

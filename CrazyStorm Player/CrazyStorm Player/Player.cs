@@ -158,7 +158,7 @@ namespace CrazyStorm_Player
                 if (type.ID >= ParticleType.DefaultTypeIndex)
                     Sprite.Draw(defaultTextures[0], rect, color);
                 else if (type.Image != null)
-                    Sprite.Draw(customTextures[type.Image.Id], rect, color);
+                    Sprite.Draw(customTextures[type.Image.ID], rect, color);
             };
             ParticleManager.OnCurveParticleDraw += (curveParticle) =>
             {
@@ -234,7 +234,7 @@ namespace CrazyStorm_Player
             Environment.CurrentDirectory = Path.GetDirectoryName(Environment.GetCommandLineArgs()[1]);
             customTextures = new Dictionary<int, Texture>();
             foreach (var image in file.Images)
-                customTextures[image.Id] = Texture.FromFile(Device, image.RelatviePath, Usage.None, Pool.Managed);
+                customTextures[image.ID] = Texture.FromFile(Device, image.RelatviePath, Usage.None, Pool.Managed);
 
             file.ParticleSystems[selectedParticleSystemIndex].Reset();
         }

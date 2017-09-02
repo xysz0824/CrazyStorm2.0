@@ -37,11 +37,19 @@ namespace CrazyStorm.Core
             reserved = reservedDist;
             particlePool = new List<Particle>(particleMaximum);
             for (int i = 0; i < particleMaximum; ++i)
-                particlePool.Add(new Particle());
+            {
+                var particle = new Particle();
+                particle.ID = i;
+                particlePool.Add(particle);
+            }
 
             curveParticlePool = new List<CurveParticle>(curveParticleMaximum);
             for (int i = 0; i < curveParticleMaximum; ++i)
-                curveParticlePool.Add(new CurveParticle());
+            {
+                var curveParticle = new CurveParticle();
+                curveParticle.ID = particleMaximum + i;
+                curveParticlePool.Add(curveParticle);
+            }
 
             searchList = new List<ParticleBase>(particleMaximum);
             for (int i = 0; i < particleMaximum; ++i)

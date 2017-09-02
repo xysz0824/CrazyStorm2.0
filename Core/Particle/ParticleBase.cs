@@ -51,6 +51,7 @@ namespace CrazyStorm.Core
         #endregion
 
         #region Public Members
+        public int ID { get; set; }
         public Emitter Emitter { get; set; }
         //public ParticleQuadTree QuadTree { get; set; }
         public bool Alive { get; set; }

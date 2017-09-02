@@ -11,7 +11,7 @@ namespace CrazyStorm.Core
     public class EventManager
     {
         static List<EventExecutor> executorList;
-        static Dictionary<PropertyContainer, Dictionary<string, TypeSet>> cache = new Dictionary<PropertyContainer, Dictionary<string, TypeSet>>();
+        static Dictionary<string, Dictionary<string, TypeSet>> cache = new Dictionary<string, Dictionary<string, TypeSet>>();
         public static IList<ParticleType> DefaultTypes { get; set; }
         public static IList<ParticleType> CustomTypes { get; set; }
         public static void AddEvent(PropertyContainer propertyContainer, PropertyContainer bindingContainer, VMEventInfo eventInfo)
@@ -203,25 +203,26 @@ namespace CrazyStorm.Core
                 }
             }
         }
-        public static bool BindingUpdate(PropertyContainer bindingContainer)
+        public static bool BindingUpdate(PropertyContainer propertyContainer, PropertyContainer bindingContainer)
         {
             if (executorList == null)
                 return false;
 
             bool updated = false;
+            string id = GetUniqueKey(propertyContainer, bindingContainer);
             for (int i = 0; i < executorList.Count; ++i)
             {
-                if (executorList[i].BindingContainer == bindingContainer)
+                if (executorList[i].PropertyContainer == propertyContainer && executorList[i].BindingContainer == bindingContainer)
                 {
-                    if (!cache.ContainsKey(bindingContainer))
+                    if (!cache.ContainsKey(id))
                     {
-                        cache.Add(bindingContainer, new Dictionary<string, TypeSet>());
+                        cache.Add(id, new Dictionary<string, TypeSet>());
                     }
                     if (!executorList[i].Finished)
                     {
                         executorList[i].Update();
                     }
-                    cache[bindingContainer][executorList[i].PropertyName] = executorList[i].CurrentValue;
+                    cache[id][executorList[i].PropertyName] = executorList[i].CurrentValue;
                     if (executorList[i].Finished)
                     {
                         executorList.RemoveAt(i);
@@ -234,10 +235,11 @@ namespace CrazyStorm.Core
         }
         public static bool BindingRecover(PropertyContainer propertyContainer, PropertyContainer bindingContainer)
         {
-            if (!cache.ContainsKey(bindingContainer))
+            string id = GetUniqueKey(propertyContainer, bindingContainer);
+            if (!cache.ContainsKey(id))
                 return false;
 
-            foreach (var item in cache[bindingContainer])
+            foreach (var item in cache[id])
             {
                 switch (item.Value.type)
                 {
@@ -266,6 +268,10 @@ namespace CrazyStorm.Core
                 propertyContainer.SetProperty(item.Key);
             }
             return true;
+        }
+        private static string GetUniqueKey(PropertyContainer propertyContainer, PropertyContainer bindingContainer)
+        {
+            return (propertyContainer as Component).ID + "_" + (bindingContainer as ParticleBase).ID;
         }
     }
 }

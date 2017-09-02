@@ -286,7 +286,7 @@ namespace CrazyStorm.Core
             if (image != null)
             {
                 var fileResourceAttribute = doc.CreateAttribute("image");
-                fileResourceAttribute.Value = image.Id.ToString();
+                fileResourceAttribute.Value = image.ID.ToString();
                 particleTypeNode.Attributes.Append(fileResourceAttribute);
             }
             XmlHelper.StoreFields(this, doc, particleTypeNode);
@@ -300,7 +300,7 @@ namespace CrazyStorm.Core
             {
                 foreach (var target in collection)
                 {
-                    if (imageID == target.Id)
+                    if (imageID == target.ID)
                     {
                         image = target;
                         break;
@@ -313,7 +313,7 @@ namespace CrazyStorm.Core
         {
             var particleTypeBytes = new List<byte>();
             if (image != null)
-                particleTypeBytes.AddRange(PlayDataHelper.GetBytes(image.Id));
+                particleTypeBytes.AddRange(PlayDataHelper.GetBytes(image.ID));
             else
                 particleTypeBytes.AddRange(PlayDataHelper.GetBytes(-1));
 
