@@ -219,7 +219,7 @@ namespace CrazyStorm
             gridAlignment = iniHelper.ReadValue("Screen", "GridAlignment", true);
             centerDisplay = iniHelper.ReadValue("Screen", "CenterDisplay", true);
             playerPath = iniHelper.ReadValue("Play", "PlayerPath", "CrazyStorm Player.exe");
-            particleMaximum = iniHelper.ReadValue("Play", "ParticleMaximum", 10000);
+            particleMaximum = iniHelper.ReadValue("Play", "ParticleMaximum", 3000);
             curveParticleMaximum = iniHelper.ReadValue("Play", "CurveParticleMaximum", 200);
             windowed = iniHelper.ReadValue("Play", "Windowed", true);
             screenCenter = iniHelper.ReadValue("Play", "ScreenCenter", true);

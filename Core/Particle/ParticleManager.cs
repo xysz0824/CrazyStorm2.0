@@ -55,8 +55,9 @@ namespace CrazyStorm.Core
             for (int i = 0; i < particleMaximum; ++i)
                 searchList.Add(null);
         }
-        public static ParticleBase GetParticle(ParticleBase template)
+        public static ParticleBase GetParticle(int layerID, ParticleBase template)
         {
+            int order = layerID * 1000000000 + 9 - (int)template.BlendType;
             if (template is Particle)
             {
                 do
@@ -66,6 +67,7 @@ namespace CrazyStorm.Core
                 while (particlePool[particleIndex].Alive);
                 particlePool[particleIndex] = template.Copy() as Particle;
                 particlePool[particleIndex].Alive = true;
+                particlePool[particleIndex].RenderOrder = order + particleIndex * 10;
                 //particleQuadTree.Insert(particlePool[particleIndex]);
                 return particlePool[particleIndex];
             }
@@ -78,6 +80,7 @@ namespace CrazyStorm.Core
                 while (curveParticlePool[curveParticleIndex].Alive);
                 curveParticlePool[curveParticleIndex] = template.Copy() as CurveParticle;
                 curveParticlePool[curveParticleIndex].Alive = true;
+                curveParticlePool[curveParticleIndex].RenderOrder = order + particleIndex * 10;
                 //particleQuadTree.Insert(curveParticlePool[curveParticleIndex]);
                 return curveParticlePool[curveParticleIndex];
             }
@@ -128,8 +131,11 @@ namespace CrazyStorm.Core
         }
         public static void Update()
         {
+            particlePool.Sort();
+            curveParticlePool.Sort();
             for (int i = 0; i < particlePool.Count; ++i)
             {
+                int order = particlePool[i].RenderOrder;
                 if (particlePool[i].Alive && !OutOfRange(particlePool[i]))
                     particlePool[i].Update();
                 else if (particlePool[i].Alive)
@@ -145,7 +151,6 @@ namespace CrazyStorm.Core
         }
         public static void Draw()
         {
-            //TODO BlendType
             if (OnParticleDraw != null)
             {
                 for (int i = 0; i < particlePool.Count; ++i)

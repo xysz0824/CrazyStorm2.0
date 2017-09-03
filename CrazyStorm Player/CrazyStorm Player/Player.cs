@@ -116,6 +116,7 @@ namespace CrazyStorm_Player
         Texture pointTexture;
         Texture slowModeTexture;
         Character mainCharacter;
+        BlendType lastBlendType = BlendType.None;
         protected override void OnInitialize()
         {
             WindowTitle = VersionInfo.AppTitle;
@@ -146,6 +147,33 @@ namespace CrazyStorm_Player
                 if (particle.Type == null)
                     return;
 
+                BlendType blendType = (BlendType)(9 - particle.RenderOrder % 10);
+                if (lastBlendType != blendType)
+                {
+                    switch (blendType)
+                    {
+                        case BlendType.Additive:
+                            Sprite.End();
+                            Sprite.Begin(SpriteFlags.AlphaBlend);
+                            Device.SetRenderState(RenderState.SourceBlend, (int)Blend.SourceAlpha);
+                            Device.SetRenderState(RenderState.DestinationBlend, (int)Blend.One);
+                            break;
+                        case BlendType.Substraction:
+                            Sprite.End();
+                            Sprite.Begin(SpriteFlags.AlphaBlend);
+                            Device.SetRenderState(RenderState.SourceBlend, (int)Blend.SourceAlpha);
+                            Device.SetRenderState(RenderState.DestinationBlend, (int)Blend.One);
+                            Device.SetRenderState(RenderState.BlendOperation, (int)BlendOperation.Subtract);
+                            break;
+                        case BlendType.Multiply:
+                            Sprite.End();
+                            Sprite.Begin(SpriteFlags.AlphaBlend);
+                            Device.SetRenderState(RenderState.SourceBlend, (int)Blend.Zero);
+                            Device.SetRenderState(RenderState.DestinationBlend, (int)Blend.SourceColor);
+                            break;
+                    }
+                }
+                lastBlendType = blendType;
                 ParticleType type = particle.Type;
                 Vector2 center = new Vector2(WindowWidth / 2, WindowHeight / 2) + customCenter;
                 Vector2 imageCenter = new Vector2(type.CenterPoint.x, type.CenterPoint.y);
@@ -259,6 +287,7 @@ namespace CrazyStorm_Player
             }
             mainCharacter.Draw(Sprite, characterTexture, pointTexture, slowModeTexture);
             ParticleManager.Draw();
+            lastBlendType = BlendType.None;
             Sprite.End();
         }
         void RebuildObjectReference(File file)

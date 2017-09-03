@@ -73,6 +73,7 @@ namespace CrazyStorm.Core
             }
         }
         public string LayerName { get; set; }
+        public int LayerID { get; set; }
         [RuntimeProperty]
         public int LayerFrame
         {

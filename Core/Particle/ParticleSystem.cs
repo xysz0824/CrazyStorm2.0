@@ -193,9 +193,13 @@ namespace CrazyStorm.Core
                 PlayDataHelper.LoadObjectList(CustomTypes, particleSystemReader, version);
                 //layers
                 PlayDataHelper.LoadObjectList(Layers, particleSystemReader, version);
-                //Set the biggest number as totalFrame 
                 for (int i = 0; i < Layers.Count; ++i)
+                {
+                    //Set the biggest number as totalFrame 
                     totalFrame = Layers[i].TotalFrame > totalFrame ? Layers[i].TotalFrame : totalFrame;
+                    //Set id of layer to components of layer
+                    Layers[i].SetComponentsID(i);
+                }
             }
         }
         public bool Update(int currentFrame = 0)

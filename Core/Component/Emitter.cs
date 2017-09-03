@@ -118,7 +118,7 @@ namespace CrazyStorm.Core
                     EmitPosition.x + EmitRadius * (float)Math.Cos(MathHelper.DegToRad(angle)),
                     EmitPosition.y + EmitRadius * (float)Math.Sin(MathHelper.DegToRad(angle)));
                 Template.PSpeedAngle = angle;
-                ParticleBase newParticle = ParticleManager.GetParticle(Template);
+                ParticleBase newParticle = ParticleManager.GetParticle(LayerID, Template);
                 newParticle.ParticleEventGroups = EmitterEventGroups;
                 Particles.AddLast(newParticle);
             }

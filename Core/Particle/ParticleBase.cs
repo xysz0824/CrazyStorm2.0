@@ -15,7 +15,8 @@ namespace CrazyStorm.Core
         AlphaBlend,
         Additive,
         Substraction,
-        Multiply
+        Multiply,
+        None
     }
     public struct ParticleBaseData
     {
@@ -40,7 +41,8 @@ namespace CrazyStorm.Core
         public bool fogEffect;
         public bool fadeEffect;
     }
-    public abstract class ParticleBase : PropertyContainer, IXmlData, IRebuildReference<ParticleType>, IGeneratePlayData, ILoadPlayData
+    public abstract class ParticleBase : PropertyContainer, IXmlData, IRebuildReference<ParticleType>, IGeneratePlayData, ILoadPlayData, 
+        IComparable<ParticleBase>
     {
         #region Private Members
         Vector2 pspeedVector;
@@ -52,9 +54,10 @@ namespace CrazyStorm.Core
 
         #region Public Members
         public int ID { get; set; }
+        public int RenderOrder;
+        public bool Alive;
         public Emitter Emitter { get; set; }
         //public ParticleQuadTree QuadTree { get; set; }
-        public bool Alive { get; set; }
         [IntProperty(0, int.MaxValue)]
         public int MaxLife
         {
@@ -201,6 +204,7 @@ namespace CrazyStorm.Core
         #region Constructor
         public ParticleBase()
         {
+            RenderOrder = int.MaxValue;
             particleBaseData.maxLife = 200;
             particleBaseData.widthScale = 1;
             particleBaseData.rgb = new RGB(255, 255, 255);
@@ -543,6 +547,10 @@ namespace CrazyStorm.Core
         public ParticleBase Copy()
         {
             return MemberwiseClone() as ParticleBase;
+        }
+        public int CompareTo(ParticleBase other)
+        {
+            return RenderOrder - other.RenderOrder;
         }
         #endregion
     }

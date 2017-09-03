@@ -196,6 +196,13 @@ namespace CrazyStorm.Core
                 }
             }
         }
+        public void SetComponentsID(int id)
+        {
+            for (int i = 0; i < Components.Count; ++i)
+            {
+                components[i].LayerID = id;
+            }
+        }
         public bool Update(int currentFrame)
         {
             if (Visible)
