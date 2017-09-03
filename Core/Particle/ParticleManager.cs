@@ -119,6 +119,25 @@ namespace CrazyStorm.Core
             count = index;
             return searchList;
         }
+        public static void CheckCollision(float x, float y, float radius)
+        {
+            int index = 0;
+            for (int i = 0; i < particlePool.Count; ++i)
+            {
+                if (particlePool[i].Alive)
+                {
+                    float px = particlePool[i].PPosition.x;
+                    float py = particlePool[i].PPosition.y;
+                    if (particlePool[i].FogFrame >= ParticleBase.FOG_TIME &&
+                        Math.Pow(px - x, 2) + Math.Pow(py - y, 2) <= Math.Pow(particlePool[i].Type.Radius + radius, 2))
+                    {
+                        particlePool[i].PCurrentFrame = particlePool[i].MaxLife - (int)ParticleBase.FOG_TIME;
+                        searchList[index++] = particlePool[i];
+                    }
+                }
+            }
+            //TODO Curve Particle
+        }
         public static bool OutOfWindow(float x, float y)
         {
             return x < left / 2 - reserved || x > right / 2 + reserved ||

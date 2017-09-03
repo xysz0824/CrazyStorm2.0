@@ -44,6 +44,7 @@ namespace CrazyStorm.Core
     public abstract class ParticleBase : PropertyContainer, IXmlData, IRebuildReference<ParticleType>, IGeneratePlayData, ILoadPlayData, 
         IComparable<ParticleBase>
     {
+        public const float FOG_TIME = 10;
         #region Private Members
         Vector2 pspeedVector;
         Vector2 pacspeedVector;
@@ -544,11 +545,11 @@ namespace CrazyStorm.Core
                 ParticleEventGroups[i].Execute(this, null);
 
             ++PCurrentFrame;
-            if (PCurrentFrame < MaxLife - 10)
+            if (PCurrentFrame < MaxLife - FOG_TIME)
             {
                 ++FogFrame;
-                if (!FogEffect || FogFrame >= 10)
-                    FogFrame = 10;
+                if (!FogEffect || FogFrame >= FOG_TIME)
+                    FogFrame = (int)FOG_TIME;
             }
             else if (FadeEffect)
             {

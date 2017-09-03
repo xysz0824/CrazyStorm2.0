@@ -72,28 +72,28 @@ namespace CrazyStorm_Player
         }
         public void Draw(Sprite sprite, Texture character, Texture point, Texture slowMode)
         {
-            Vector2 offset = new Vector2(movableWidth / 2, movableHeight / 2);
-            Vector2 position = selfPosition + offset - selfCenter;
+            Vector2 center = new Vector2(movableWidth / 2, movableHeight / 2);
+            Vector2 position = selfPosition + center - this.selfCenter;
             Color4 color = new Color4(1, 1, 1, 1);
             Rectangle rect;
             if (character != null)
             {
-                sprite.Transform = Matrix.Transformation2D(selfCenter, 0, new Vector2(1, 1), selfCenter, 0, position);
+                sprite.Transform = Matrix.Transformation2D(this.selfCenter, 0, new Vector2(1, 1), this.selfCenter, 0, position);
                 int frame = currentFrame / (selfDelay + 1) % selfFrames;
                 rect = new Rectangle((int)selfStart.X + frame * (int)selfSize.X, (int)selfStart.Y, (int)selfSize.X, (int)selfSize.Y);
                 sprite.Draw(character, rect, color);
             }
-            Vector2 center = new Vector2(7, 7);
-            position = selfPosition + offset - center;
-            sprite.Transform = Matrix.Transformation2D(center, 0, new Vector2(1, 1), center, 0, position);
+            Vector2 selfCenter = new Vector2(7, 7);
+            position = selfPosition + center - selfCenter;
+            sprite.Transform = Matrix.Transformation2D(selfCenter, 0, new Vector2(1, 1), selfCenter, 0, position);
             rect = new Rectangle(0, 0, 16, 16);
             sprite.Draw(point, rect, color);
             if (slow)
             {
-                center = new Vector2(31, 31);
-                position = selfPosition + offset - center;
+                selfCenter = new Vector2(31, 31);
+                position = selfPosition + center - selfCenter;
                 float rotation = currentFrame / 30.0f;
-                sprite.Transform = Matrix.Transformation2D(center, 0, new Vector2(1, 1), center, rotation, position);
+                sprite.Transform = Matrix.Transformation2D(selfCenter, 0, new Vector2(1, 1), selfCenter, rotation, position);
                 rect = new Rectangle(0, 0, 64, 64);
                 sprite.Draw(slowMode, rect, color);
             }
@@ -177,11 +177,11 @@ namespace CrazyStorm_Player
                 ParticleType type = particle.Type;
                 Vector2 center = new Vector2(WindowWidth / 2, WindowHeight / 2) + customCenter;
                 Vector2 imageCenter = new Vector2(type.CenterPoint.x, type.CenterPoint.y);
-                float fogScale = (10 - particle.FogFrame) / 15.0f;
+                float fogScale = (ParticleBase.FOG_TIME - particle.FogFrame) / 15.0f;
                 Vector2 scale = new Vector2(particle.WidthScale + fogScale, particle.HeightScale + fogScale);
                 Vector2 position = new Vector2(particle.PPosition.x, particle.PPosition.y) + center - imageCenter;
                 Sprite.Transform = Matrix.Transformation2D(imageCenter, 0, scale, imageCenter, (float)MathHelper.DegToRad(particle.PRotation), position);
-                Color4 color = new Color4((particle.Opacity - (10 - particle.FogFrame) * 10) / 100, particle.RGB.r / 255, particle.RGB.g / 255, particle.RGB.b / 255);
+                Color4 color = new Color4(particle.Opacity / 100 - (ParticleBase.FOG_TIME - particle.FogFrame) / ParticleBase.FOG_TIME, particle.RGB.r / 255, particle.RGB.g / 255, particle.RGB.b / 255);
                 int frame = particle.PCurrentFrame / (type.Delay + 1) % type.Frames;
                 Rectangle rect = new Rectangle((int)type.StartPoint.x + frame * type.Width, (int)type.StartPoint.y, type.Width, type.Height);
                 if (type.ID >= ParticleType.DefaultTypeIndex)
@@ -274,6 +274,7 @@ namespace CrazyStorm_Player
             file.SetGlobal("cy", mainCharacter.selfPosition.Y);
             EventManager.CustomTypes = file.ParticleSystems[selectedParticleSystemIndex].CustomTypes;
             file.ParticleSystems[selectedParticleSystemIndex].Update();
+            ParticleManager.CheckCollision(mainCharacter.selfPosition.X, mainCharacter.selfPosition.Y, mainCharacter.selfRadius);
             ParticleManager.Update();
             EventManager.Update();
         }
