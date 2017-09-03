@@ -177,10 +177,11 @@ namespace CrazyStorm_Player
                 ParticleType type = particle.Type;
                 Vector2 center = new Vector2(WindowWidth / 2, WindowHeight / 2) + customCenter;
                 Vector2 imageCenter = new Vector2(type.CenterPoint.x, type.CenterPoint.y);
-                Vector2 scale = new Vector2(particle.WidthScale, particle.HeightScale);
+                float fogScale = (10 - particle.FogFrame) / 15.0f;
+                Vector2 scale = new Vector2(particle.WidthScale + fogScale, particle.HeightScale + fogScale);
                 Vector2 position = new Vector2(particle.PPosition.x, particle.PPosition.y) + center - imageCenter;
                 Sprite.Transform = Matrix.Transformation2D(imageCenter, 0, scale, imageCenter, (float)MathHelper.DegToRad(particle.PRotation), position);
-                Color4 color = new Color4(particle.Opacity / 100, particle.RGB.r / 255, particle.RGB.g / 255, particle.RGB.b / 255);
+                Color4 color = new Color4((particle.Opacity - (10 - particle.FogFrame) * 10) / 100, particle.RGB.r / 255, particle.RGB.g / 255, particle.RGB.b / 255);
                 int frame = particle.PCurrentFrame / (type.Delay + 1) % type.Frames;
                 Rectangle rect = new Rectangle((int)type.StartPoint.x + frame * type.Width, (int)type.StartPoint.y, type.Width, type.Height);
                 if (type.ID >= ParticleType.DefaultTypeIndex)

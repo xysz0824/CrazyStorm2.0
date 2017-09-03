@@ -56,6 +56,7 @@ namespace CrazyStorm.Core
         public int ID { get; set; }
         public int RenderOrder;
         public bool Alive;
+        public int FogFrame;
         public Emitter Emitter { get; set; }
         //public ParticleQuadTree QuadTree { get; set; }
         [IntProperty(0, int.MaxValue)]
@@ -543,6 +544,18 @@ namespace CrazyStorm.Core
                 ParticleEventGroups[i].Execute(this, null);
 
             ++PCurrentFrame;
+            if (PCurrentFrame < MaxLife - 10)
+            {
+                ++FogFrame;
+                if (!FogEffect || FogFrame >= 10)
+                    FogFrame = 10;
+            }
+            else if (FadeEffect)
+            {
+                --FogFrame;
+                if (FogFrame <= 0)
+                    FogFrame = 0;
+            }
         }
         public ParticleBase Copy()
         {
