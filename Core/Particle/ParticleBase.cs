@@ -545,7 +545,11 @@ namespace CrazyStorm.Core
                 ParticleEventGroups[i].Execute(this, null);
 
             ++PCurrentFrame;
-            if (PCurrentFrame < MaxLife - FOG_TIME)
+            if (MaxLife <= FOG_TIME)
+            {
+                FogFrame = (int)FOG_TIME;
+            }
+            else if (PCurrentFrame < MaxLife - FOG_TIME)
             {
                 ++FogFrame;
                 if (!FogEffect || FogFrame >= FOG_TIME)

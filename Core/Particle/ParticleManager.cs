@@ -131,7 +131,7 @@ namespace CrazyStorm.Core
                     if (particlePool[i].FogFrame >= ParticleBase.FOG_TIME &&
                         Math.Pow(px - x, 2) + Math.Pow(py - y, 2) <= Math.Pow(particlePool[i].Type.Radius + radius, 2))
                     {
-                        particlePool[i].PCurrentFrame = particlePool[i].MaxLife - (int)ParticleBase.FOG_TIME;
+                        particlePool[i].PCurrentFrame = Math.Max(particlePool[i].MaxLife - (int)ParticleBase.FOG_TIME, 0);
                         searchList[index++] = particlePool[i];
                     }
                 }
