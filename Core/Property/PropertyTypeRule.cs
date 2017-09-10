@@ -57,12 +57,13 @@ namespace CrazyStorm.Core
                     var namespaceName = MethodBase.GetCurrentMethod().DeclaringType.Namespace;
                     return (int)Enum.Parse(Type.GetType(namespaceName + "." + name), text);
                 case PropertyType.Vector2:
-                    Vector2 value;
-                    Vector2.TryParse(text, out value);
-                    return value;
+                    Vector2 vector2Value;
+                    Vector2.TryParse(text, out vector2Value);
+                    return vector2Value;
                 case PropertyType.RGB:
-                    Vector2.TryParse(text, out value);
-                    return value;
+                    RGB rgbValue;
+                    RGB.TryParse(text, out rgbValue);
+                    return rgbValue;
                 case PropertyType.String:
                     return text;
             }
