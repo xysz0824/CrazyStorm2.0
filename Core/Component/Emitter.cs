@@ -286,6 +286,7 @@ namespace CrazyStorm.Core
         }
         public override void Reset()
         {
+            Template = InitialTemplate.Copy();
             base.Reset();
             var initialState = base.initialState as Emitter;
             EmitPosition = initialState.EmitPosition;
@@ -294,7 +295,6 @@ namespace CrazyStorm.Core
             EmitAngle = initialState.EmitAngle;
             EmitRange = initialState.EmitRange;
             EmitRadius = initialState.EmitRadius;
-            Template = InitialTemplate.Copy();
         }
         public void EmitParticle()
         {

@@ -191,6 +191,11 @@ namespace CrazyStorm
             aimRect = VisualHelper.VisualDownwardSearch((DependencyObject)ParticleTabControl.SelectedContent, "AimBox");
             aimRect.SetValue(OpacityProperty, 1.0d);
             aimComponent = ComponentFactory.Create(button.Name);
+            var emitter = aimComponent as Emitter;
+            if (emitter != null)
+            {
+                emitter.Particle.Type = defaultParticleTypes[0];
+            }
         }
         private void ComponentButton_MouseEnter(object sender, MouseEventArgs e)
         {
