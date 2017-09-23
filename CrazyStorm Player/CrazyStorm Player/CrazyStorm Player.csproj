@@ -114,7 +114,6 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="logo.ico" />
     <EmbeddedResource Include="point.png" />
     <EmbeddedResource Include="ring.png" />
     <EmbeddedResource Include="set.txt" />
@@ -141,6 +140,9 @@
       <Project>{1fed6550-8156-45ba-abd3-7c400fd86a03}</Project>
       <Name>Core</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="logo.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
