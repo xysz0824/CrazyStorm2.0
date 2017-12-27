@@ -24,7 +24,7 @@ It's not only for demostrating your particle but giving someone who want to use 
 - .NET Framework 4.0 Client Profile
 
 ## Development Requirement
-- Visual Studio 2013 or above
+- Visual Studio 2013 or 2015
 
 ## License
 The MIT License (MIT)
