@@ -20,11 +20,11 @@ It's not only for demostrating your particle but giving someone who want to use 
 - Struggle for multiplatforms
 
 ## Runtime Environment
-- Windows XP/Vista/7 or above
-- .NET Framework 4.0 Client Profile
+- Windows 10 or above
+- .NET Framework 4.7.2
 
 ## Development Requirement
-- Visual Studio 2013 or 2015
+- Visual Studio 2019 or above
 
 ## License
 The MIT License (MIT)
