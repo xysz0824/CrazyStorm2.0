@@ -2,3 +2,4 @@
 [Dd]ebug/
 obj/
 *.suo
+.vs/
