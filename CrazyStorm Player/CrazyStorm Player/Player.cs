@@ -57,7 +57,7 @@ namespace CrazyStorm_Player
             {
                 direction.Y = 1;
             }
-            direction.Normalize();
+            if (direction.LengthSquared() != 0) direction.Normalize();
             if (state.IsKeyDown(Keys.LeftShift) || state.IsKeyDown(Keys.RightShift))
             {
                 slow = true;
@@ -68,14 +68,14 @@ namespace CrazyStorm_Player
                 slow = false;
                 selfPosition += direction * 4.0f;
             }
-            selfPosition.X = MathHelper.Clamp(selfPosition.X, movableWidth / 2, -movableWidth / 2);
-            selfPosition.Y = MathHelper.Clamp(selfPosition.Y, movableHeight / 2, -movableHeight / 2);            
+            selfPosition.X = MathHelper.Clamp(selfPosition.X, -movableWidth / 2, movableWidth / 2);
+            selfPosition.Y = MathHelper.Clamp(selfPosition.Y, -movableHeight / 2, movableHeight / 2);            
         }
         public void Draw(SpriteBatch spriteBatch, Texture2D character, Texture2D point, Texture2D slowMode)
         {
             Vector2 center = new Vector2(movableWidth / 2, movableHeight / 2);
-            Vector2 position = selfPosition + center - this.selfCenter;
-            Color color = new Color(1, 1, 1, 1);
+            Vector2 position = selfPosition + center;
+            Color color = new Color(1f, 1f, 1f, 1f);
             Rectangle rect;
             if (character != null)
             {
@@ -84,13 +84,11 @@ namespace CrazyStorm_Player
                 spriteBatch.Draw(character, position, rect, color, 0, this.selfCenter, new Vector2(1, 1), SpriteEffects.None, 0);
             }
             Vector2 selfCenter = new Vector2(7, 7);
-            position = selfPosition + center - selfCenter;
             rect = new Rectangle(0, 0, 16, 16);
             spriteBatch.Draw(point, position, rect, color, 0, selfCenter, new Vector2(1, 1), SpriteEffects.None, 0);
             if (slow)
             {
                 selfCenter = new Vector2(31, 31);
-                position = selfPosition + center - selfCenter;
                 float rotation = currentFrame / 30.0f;
                 rect = new Rectangle(0, 0, 64, 64);
                 spriteBatch.Draw(slowMode, position, rect, color, rotation, selfCenter, new Vector2(1, 1), SpriteEffects.None, 0);
@@ -175,17 +173,21 @@ namespace CrazyStorm_Player
                 {
                     switch (blendType)
                     {
+                        case BlendType.AlphaBlend:
+                            spriteBatch.End();
+                            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied, SamplerState.LinearWrap);
+                            break;
                         case BlendType.Additive:
                             spriteBatch.End();
-                            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Additive);
+                            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Additive, SamplerState.LinearWrap);
                             break;
                         case BlendType.Substraction:
                             spriteBatch.End();
-                            spriteBatch.Begin(SpriteSortMode.Deferred, substration);
+                            spriteBatch.Begin(SpriteSortMode.Deferred, substration, SamplerState.LinearWrap);
                             break;
                         case BlendType.Multiply:
                             spriteBatch.End();
-                            spriteBatch.Begin(SpriteSortMode.Deferred, multiply);
+                            spriteBatch.Begin(SpriteSortMode.Deferred, multiply, SamplerState.LinearWrap);
                             break;
                     }
                 }
@@ -195,8 +197,9 @@ namespace CrazyStorm_Player
                 Vector2 imageCenter = new Vector2(type.CenterPoint.x, type.CenterPoint.y);
                 float fogScale = (ParticleBase.FOG_TIME - particle.FogFrame) / 15.0f;
                 Vector2 scale = new Vector2(particle.WidthScale + fogScale, particle.HeightScale + fogScale);
-                Vector2 position = new Vector2(particle.PPosition.x, particle.PPosition.y) + center - imageCenter;
-                Color color = new Color(particle.Opacity / 100 - (ParticleBase.FOG_TIME - particle.FogFrame) / ParticleBase.FOG_TIME, particle.RGB.r / 255, particle.RGB.g / 255, particle.RGB.b / 255);
+                Vector2 position = new Vector2(particle.PPosition.x, particle.PPosition.y) + center;
+                float alpha = particle.Opacity / 100f - (ParticleBase.FOG_TIME - particle.FogFrame) / ParticleBase.FOG_TIME;
+                Color color = new Color(particle.RGB.r / 255f, particle.RGB.g / 255f, particle.RGB.b / 255f, alpha);
                 int frame = particle.PCurrentFrame / (type.Delay + 1) % type.Frames;
                 Rectangle rect = new Rectangle((int)type.StartPoint.x + frame * type.Width, (int)type.StartPoint.y, type.Width, type.Height);
                 if (type.ID >= ParticleType.DefaultTypeIndex)
@@ -300,7 +303,7 @@ namespace CrazyStorm_Player
         protected override void Draw(GameTime gameTime)
         {
             GraphicsDevice.Clear(Color.Black);
-            spriteBatch.Begin();
+            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied, SamplerState.LinearWrap);
             if (backgroundTexture != null)
             {
                 spriteBatch.Draw(backgroundTexture, Vector2.Zero, null, Color.White, 0, Vector2.Zero, backgroundScale, SpriteEffects.None, 0);
