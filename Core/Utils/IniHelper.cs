@@ -3,7 +3,7 @@ using System.IO;
 using System.Text;
 using System.Runtime.InteropServices;
 
-namespace CrazyStorm.Common
+namespace CrazyStorm.Core
 {
     public class IniHelper
     {
@@ -41,7 +41,7 @@ namespace CrazyStorm.Common
         }
         public bool ExistINIFile()
         {
-            return File.Exists(fileName);
+            return System.IO.File.Exists(fileName);
         }
         public void WriteValue(string Section, string Key, int Value)
         {

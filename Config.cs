@@ -9,7 +9,6 @@ using System.Linq;
 using System.Text;
 using System.ComponentModel;
 using CrazyStorm.Core;
-using CrazyStorm.Common;
 
 namespace CrazyStorm
 {

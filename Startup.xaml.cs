@@ -17,7 +17,6 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Windows.Threading;
 using CrazyStorm.Core;
-using CrazyStorm.Common;
 
 namespace CrazyStorm
 {

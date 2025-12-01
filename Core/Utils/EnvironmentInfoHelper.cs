@@ -4,7 +4,7 @@ using System.Text;
 using Microsoft.Win32;
 using System.Management;
 
-namespace CrazyStorm.Common
+namespace CrazyStorm.Core
 {
     public class EnvironmentInfoHelper
     {

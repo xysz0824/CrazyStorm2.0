@@ -135,10 +135,6 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Common\Common.csproj">
-      <Project>{c7f105ce-aee2-4c95-96aa-21fc823620b5}</Project>
-      <Name>Common</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\Core\Core.csproj">
       <Project>{1fed6550-8156-45ba-abd3-7c400fd86a03}</Project>
       <Name>Core</Name>

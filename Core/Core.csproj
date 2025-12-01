@@ -39,6 +39,7 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Management" />
     <Reference Include="System.XML" />
   </ItemGroup>
   <ItemGroup>
@@ -92,7 +93,10 @@
     <Compile Include="Resource\Resource.cs" />
     <Compile Include="Resource\VariableResource.cs" />
     <Compile Include="Property\PropertyTypeRule.cs" />
+    <Compile Include="Utils\EnvironmentInfoHelper.cs" />
     <Compile Include="Utils\GenericContainer.cs" />
+    <Compile Include="Utils\IniHelper.cs" />
+    <Compile Include="Utils\LogHelper.cs" />
     <Compile Include="Utils\MathHelper.cs" />
     <Compile Include="Utils\StringHelper.cs" />
   </ItemGroup>

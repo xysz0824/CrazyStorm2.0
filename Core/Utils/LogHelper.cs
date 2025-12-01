@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.IO;
 
-namespace CrazyStorm.Common
+namespace CrazyStorm.Core
 {
     public class LogHelper
     {

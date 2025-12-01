@@ -6,7 +6,6 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using CrazyStorm.Core;
-using CrazyStorm.Common;
 using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Forms;
