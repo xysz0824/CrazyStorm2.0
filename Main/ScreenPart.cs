@@ -424,6 +424,11 @@ namespace CrazyStorm
                 UpdateSelectedStatus();
             }
         }
+        private void StyleItem_Loaded(object sender, RoutedEventArgs e)
+        {
+            var clickedItem = sender as MenuItem;
+            clickedItem.IsChecked = clickedItem.Name == config.Theme;
+        }
         private void ScreenSettingItem_Click(object sender, RoutedEventArgs e)
         {
             //Open screen setting window.

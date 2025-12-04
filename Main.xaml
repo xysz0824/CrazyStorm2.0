@@ -282,8 +282,8 @@
                 <Separator/>
                 <MenuItem Header="{StaticResource SetScreenStr}" Click="ScreenSettingItem_Click" />
                 <MenuItem Header="{StaticResource StyleStr}">
-                    <MenuItem Name="StyleDefault" Header="{StaticResource StyleDefaultStr}" IsCheckable="True" IsChecked="True" Click="StyleItem_Click" />
-                    <MenuItem Name="StyleBlack" Header="{StaticResource StyleBlackStr}" IsCheckable="True" Click="StyleItem_Click" />
+                    <MenuItem Name="StyleDefault" Header="{StaticResource StyleDefaultStr}" IsCheckable="True" IsChecked="True" Click="StyleItem_Click" Loaded="StyleItem_Loaded"/>
+                    <MenuItem Name="StyleBlack" Header="{StaticResource StyleBlackStr}" IsCheckable="True" Click="StyleItem_Click" Loaded="StyleItem_Loaded"/>
                 </MenuItem>
                 <Separator/>
                 <MenuItem Header="{StaticResource ExitStr}" InputGestureText="Alt+F4"/>
