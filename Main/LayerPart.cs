@@ -213,7 +213,7 @@ namespace CrazyStorm
                         var imageBruch = TimeAxis.Background as ImageBrush;
                         imageBruch.Viewport = new Rect(-axisScroll.HorizontalOffset, -1 - axisScroll.VerticalOffset,
                             imageBruch.Viewport.Width, imageBruch.Viewport.Height);
-                        imageBruch = TimeScale.Background as ImageBrush;
+                        imageBruch = TimeScale.Background.Clone() as ImageBrush;
                         imageBruch.Viewport = new Rect(-axisScroll.HorizontalOffset, imageBruch.Viewport.Y,
                             imageBruch.Viewport.Width, imageBruch.Viewport.Height);
                         layerScroll.ScrollToVerticalOffset(axisScroll.VerticalOffset);

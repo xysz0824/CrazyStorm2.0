@@ -4,13 +4,14 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              mc:Ignorable="d" >
-    <DockPanel>
-        <GroupBox DockPanel.Dock="Top" Header="{StaticResource ConditionStr}">
+    <DockPanel Background="{DynamicResource ListBrush}">
+        <GroupBox Padding="0,24,0,0" Style="{StaticResource FlatGroupBox}" DockPanel.Dock="Top" Header="{StaticResource ConditionStr}">
             <StackPanel>
-                <UniformGrid Columns="2" Rows="1" >
-                    <DockPanel>
-                        <CheckBox Name="LayerCheckBox" DockPanel.Dock="Left" Content="{StaticResource LayerStr}" VerticalAlignment="Center" Margin="6,0,5,0" Click="LayerCheckBox_Click"/>
-                        <ComboBox Name="LayerComboBox" SelectedIndex="0" VerticalAlignment="Center" Margin="0,1" SelectionChanged="LayerComboBox_SelectionChanged">
+                <UniformGrid Columns="1" Rows="2" >
+                    <DockPanel Margin="0,2,0,2">
+                        <CheckBox Name="LayerCheckBox" DockPanel.Dock="Left" Content="{StaticResource LayerStr}" VerticalAlignment="Center" Margin="6,0,5,0" Click="LayerCheckBox_Click"
+                                  Foreground="{DynamicResource TextBrush}"/>
+                        <ComboBox  Style="{StaticResource FlatComboBox}" Name="LayerComboBox" SelectedIndex="0" VerticalAlignment="Center" Margin="0,1" SelectionChanged="LayerComboBox_SelectionChanged">
                             <ComboBox.ItemTemplate>
                                 <DataTemplate>
                                     <TextBlock Text="{Binding Name}" />
@@ -19,22 +20,24 @@
                         </ComboBox>
                     </DockPanel>
                     <DockPanel>
-                        <CheckBox Name="TypeCheckBox" DockPanel.Dock="Left" Content="{StaticResource TypeStr}" VerticalAlignment="Center" Margin="6,0,5,0" Click="TypeCheckBox_Click"/>
-                        <ComboBox Name="TypeComboBox" SelectedIndex="0" VerticalAlignment="Center" Margin="0,1" SelectionChanged="TypeComboBox_SelectionChanged">
+                        <CheckBox Name="TypeCheckBox" DockPanel.Dock="Left" Content="{StaticResource TypeStr}" VerticalAlignment="Center" Margin="6,0,5,0" Click="TypeCheckBox_Click"
+                                  Foreground="{DynamicResource TextBrush}"/>
+                        <ComboBox Style="{StaticResource FlatComboBox}" Name="TypeComboBox" SelectedIndex="0" VerticalAlignment="Center" Margin="0,1" SelectionChanged="TypeComboBox_SelectionChanged">
                         </ComboBox>
                     </DockPanel>
                 </UniformGrid>
-                <DockPanel Margin="0,1">
-                    <Label DockPanel.Dock="Left" Content="{StaticResource NameStr}" />
-                    <TextBox Name="InputName" VerticalContentAlignment="Center" TextChanged="InputName_TextChanged" MaxLines="1"/>
+                <DockPanel Margin="0,0,0,2">
+                    <Label DockPanel.Dock="Left" Content="{StaticResource NameStr}" Foreground="{DynamicResource TextBrush}"/>
+                    <TextBox Name="InputName" VerticalContentAlignment="Center" TextChanged="InputName_TextChanged" MaxLines="1" 
+                             BorderBrush="{DynamicResource GroupBorderBrush}" Background="{DynamicResource ListBrush}" Foreground="{DynamicResource TextBrush}"/>
                 </DockPanel>
             </StackPanel>
         </GroupBox>
-        <GroupBox Header="{StaticResource ResultStr}">
+        <GroupBox Padding="0,24,0,0" Style="{StaticResource FlatGroupBox}" Header="{StaticResource ResultStr}">
             <DockPanel>
-                <TextBlock Margin="5,1" DockPanel.Dock="Top" Name="ResultCount" HorizontalAlignment="Right" />
+                <TextBlock Margin="5,1" DockPanel.Dock="Top" Name="ResultCount" HorizontalAlignment="Right" Foreground="#FF8B8B8B"/>
                 <TreeView Name="ComponentTree" Padding="-2,1,1,1" VerticalContentAlignment="Stretch" HorizontalContentAlignment="Stretch" 
-                      IsTextSearchEnabled="True">
+                      IsTextSearchEnabled="True" Background="{DynamicResource ListBrush}" BorderThickness="0,0,0,0">
                     <TreeView.ItemTemplate >
                         <DataTemplate>
                             <TextBlock Text="{Binding Name}" PreviewMouseLeftButtonDown="TextBlock_PreviewMouseLeftButtonDown" >
@@ -53,6 +56,14 @@
                             </TextBlock>
                         </DataTemplate>
                     </TreeView.ItemTemplate>
+                    <TreeView.ItemContainerStyle>
+                        <Style TargetType="TreeViewItem">
+                            <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
+                        </Style>
+                    </TreeView.ItemContainerStyle>
+                    <TreeView.Resources>
+                        <Style TargetType="ScrollBar" BasedOn="{StaticResource FlatScrollBarStyle}" />
+                    </TreeView.Resources>
                 </TreeView>
             </DockPanel>
         </GroupBox>

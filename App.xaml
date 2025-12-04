@@ -5,6 +5,8 @@
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/Common.xaml"/>
+                <ResourceDictionary Source="Style\Default.xaml"/>
                 <ResourceDictionary Source="Lang\Chinese.xaml"/>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>

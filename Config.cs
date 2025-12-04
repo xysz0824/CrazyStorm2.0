@@ -32,6 +32,7 @@ namespace CrazyStorm
         int centerY;
         string selfImagePath;
         string selfSetting;
+        string theme;
         #endregion
 
         #region Public Members
@@ -194,6 +195,16 @@ namespace CrazyStorm
                     PropertyChanged(this, new PropertyChangedEventArgs("SelfSetting"));
             }
         }
+        public string Theme
+        {
+            get { return theme; }
+            set
+            {
+                theme = value != null ? value : theme;
+                if (PropertyChanged != null)
+                    PropertyChanged(this, new PropertyChangedEventArgs("Theme"));
+            }
+        }
         #endregion
 
         #region Constructor
@@ -226,6 +237,7 @@ namespace CrazyStorm
             centerY = iniHelper.ReadValue("Play", "CenterY", 0);
             selfImagePath = iniHelper.ReadValue("Play", "SelfImagePath", string.Empty);
             selfSetting = iniHelper.ReadValue("Play", "SelfSetting", string.Empty);
+            theme = iniHelper.ReadValue("General", "Theme", "StyleDefault");
         }
         public void Save()
         {
@@ -243,6 +255,7 @@ namespace CrazyStorm
             iniHelper.WriteValue("Play", "CenterY", centerY);
             iniHelper.WriteValue("Play", "SelfImagePath", selfImagePath);
             iniHelper.WriteValue("Play", "SelfSetting", selfSetting);
+            iniHelper.WriteValue("General", "Theme", theme);
         }
         #endregion
     }

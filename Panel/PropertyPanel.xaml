@@ -5,58 +5,89 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              mc:Ignorable="d">
     <UserControl.Resources>
-        <Style TargetType="DataGridCell">
-            <Setter Property="BorderThickness" Value="0" />
-        </Style>
     </UserControl.Resources>
-    <StackPanel Background="#FFF0F0F0">
-        <GroupBox Header="{StaticResource BasicStr}" Background="#FFF9F9F9">
-            <DataGrid Name="ComponentGrid" ItemsSource="{Binding}" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" 
+    <StackPanel Background="{DynamicResource ListBrush}">
+        <GroupBox Padding="0,24,0,0" Style="{StaticResource FlatGroupBox}" Header="{StaticResource BasicStr}">
+            <DataGrid Name="ComponentGrid" ItemsSource="{Binding}" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch"
                           GridLinesVisibility="Horizontal" ColumnWidth="Auto" SelectionMode="Single" AutoGenerateColumns="False"  CanUserAddRows="False" CanUserReorderColumns="False" CanUserSortColumns="False" 
-                      ScrollViewer.CanContentScroll="False" CanUserResizeRows="False" CellEditEnding="ComponentGrid_CellEditEnding" CanUserDeleteRows="False" BeginningEdit="ComponentGrid_BeginningEdit">
-                <DataGrid.HorizontalGridLinesBrush>
-                    <SolidColorBrush Color="{StaticResource {x:Static SystemColors.ControlColorKey}}"/>
-                </DataGrid.HorizontalGridLinesBrush>
+                      ScrollViewer.CanContentScroll="False" CanUserResizeRows="False" CellEditEnding="ComponentGrid_CellEditEnding" CanUserDeleteRows="False" BeginningEdit="ComponentGrid_BeginningEdit"
+                      HorizontalGridLinesBrush="{DynamicResource GroupBorderBrush}" BorderBrush="{DynamicResource GroupBorderBrush}" Background="{DynamicResource ListBrush}">
                 <DataGrid.Columns>
                     <DataGridTextColumn x:Name="ComponentKey" Header="{StaticResource PropertyNameStr}" IsReadOnly="True" Binding="{Binding DisplayName}" CanUserResize="False">
                         <DataGridTextColumn.CellStyle>
-                            <Style TargetType="DataGridCell">
+                            <Style TargetType="DataGridCell" BasedOn="{StaticResource {x:Type DataGridCell}}">
                                 <Setter Property="ToolTip" Value="{Binding Name}" />
+                                <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
+                                <Setter Property="Focusable" Value="False" />
                             </Style>
                         </DataGridTextColumn.CellStyle>
                     </DataGridTextColumn>
-                    <DataGridTextColumn x:Name="ComponentValue" Header="{StaticResource PropertyValueStr}" Binding="{Binding Value}" />
+                    <DataGridTextColumn x:Name="ComponentValue" Width="*" Header="{StaticResource PropertyValueStr}" Binding="{Binding Value}" />
                 </DataGrid.Columns>
+                <DataGrid.Resources>
+                    <Style TargetType="DataGridColumnHeader" BasedOn="{StaticResource {x:Type DataGridColumnHeader}}">
+                        <Setter Property="Background" Value="{DynamicResource ToolBarBrush}" />
+                        <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
+                        <Setter Property="Padding" Value="4,4"/>
+                    </Style>
+                    <Style TargetType="DataGridRowHeader" BasedOn="{StaticResource {x:Type DataGridRowHeader}}">
+                        <Setter Property="Background" Value="{DynamicResource ListBrush}" />
+                    </Style>
+                    <Style TargetType="DataGridRow" BasedOn="{StaticResource {x:Type DataGridRow}}">
+                        <Setter Property="Background" Value="{DynamicResource ListBrush}" />
+                    </Style>
+                    <Style TargetType="DataGridCell" BasedOn="{StaticResource {x:Type DataGridCell}}">
+                        <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
+                        <Setter Property="Padding" Value="4,4"/>
+                    </Style>
+                </DataGrid.Resources>
             </DataGrid>
         </GroupBox>
-        <GroupBox Header="{StaticResource ComponentStr}" Background="#FFF9F9F9">
+        <GroupBox Padding="0,24,0,0" Style="{StaticResource FlatGroupBox}" Header="{StaticResource ComponentStr}">
             <DataGrid Name="SpecificGrid" ItemsSource="{Binding}" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" 
                           GridLinesVisibility="Horizontal" ColumnWidth="Auto" SelectionMode="Single" AutoGenerateColumns="False"  CanUserAddRows="False" CanUserReorderColumns="False" CanUserSortColumns="False" 
-                      ScrollViewer.CanContentScroll="False" CanUserResizeRows="False" CellEditEnding="ComponentGrid_CellEditEnding" CanUserDeleteRows="False" BeginningEdit="ComponentGrid_BeginningEdit">
-                <DataGrid.HorizontalGridLinesBrush>
-                    <SolidColorBrush Color="{StaticResource {x:Static SystemColors.ControlColorKey}}"/>
-                </DataGrid.HorizontalGridLinesBrush>
+                      ScrollViewer.CanContentScroll="False" CanUserResizeRows="False" CellEditEnding="ComponentGrid_CellEditEnding" CanUserDeleteRows="False" BeginningEdit="ComponentGrid_BeginningEdit"
+                      HorizontalGridLinesBrush="{DynamicResource GroupBorderBrush}" BorderBrush="{DynamicResource GroupBorderBrush}" Background="{DynamicResource ListBrush}">
                 <DataGrid.Columns>
                     <DataGridTextColumn x:Name="SpecificKey" Header="{StaticResource PropertyNameStr}" IsReadOnly="True" Binding="{Binding DisplayName}" CanUserResize="False">
                         <DataGridTextColumn.CellStyle>
-                            <Style TargetType="DataGridCell">
+                            <Style TargetType="DataGridCell" BasedOn="{StaticResource {x:Type DataGridCell}}">
                                 <Setter Property="ToolTip" Value="{Binding Name}" />
+                                <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
+                                <Setter Property="Focusable" Value="False" />
                             </Style>
                         </DataGridTextColumn.CellStyle>
                     </DataGridTextColumn>
-                    <DataGridTextColumn x:Name="SepcificValue" Header="{StaticResource PropertyValueStr}" Binding="{Binding Value}" />
+                    <DataGridTextColumn x:Name="SepcificValue" Width="*" Header="{StaticResource PropertyValueStr}" Binding="{Binding Value}" />
                 </DataGrid.Columns>
+                <DataGrid.Resources>
+                    <Style TargetType="DataGridColumnHeader" BasedOn="{StaticResource {x:Type DataGridColumnHeader}}">
+                        <Setter Property="Background" Value="{DynamicResource ToolBarBrush}" />
+                        <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
+                        <Setter Property="Padding" Value="4,4"/>
+                    </Style>
+                    <Style TargetType="DataGridRowHeader" BasedOn="{StaticResource {x:Type DataGridRowHeader}}">
+                        <Setter Property="Background" Value="{DynamicResource ListBrush}" />
+                    </Style>
+                    <Style TargetType="DataGridRow" BasedOn="{StaticResource {x:Type DataGridRow}}">
+                        <Setter Property="Background" Value="{DynamicResource ListBrush}" />
+                    </Style>
+                    <Style TargetType="DataGridCell" BasedOn="{StaticResource {x:Type DataGridCell}}">
+                        <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
+                        <Setter Property="Padding" Value="4,4"/>
+                    </Style>
+                </DataGrid.Resources>
             </DataGrid>
         </GroupBox>
-        <GroupBox Name="ParticleGroup"  Header="{StaticResource ParticleStr}" Background="#FFF9F9F9">
+        <GroupBox Padding="0,24,0,0" Style="{StaticResource FlatGroupBox}" Name="ParticleGroup"  Header="{StaticResource ParticleStr}">
             <StackPanel>
-                <DockPanel>
-                    <Label Content="{StaticResource TypeStr}" HorizontalContentAlignment="Center" Margin="0,0,1,1" DockPanel.Dock="Left"/>
+                <DockPanel Margin="0,2,0,2">
+                    <Label Content="{StaticResource TypeStr}" HorizontalContentAlignment="Center" Margin="0,0,1,1" DockPanel.Dock="Left" Foreground="{DynamicResource TextBrush}"/>
                     <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
-                        <Label Content="{StaticResource RGBStr}" HorizontalContentAlignment="Center" Margin="0,0,1,1"/>
-                        <ComboBox Name="ColorCombo" Width = "60" Margin="0,1" SelectionChanged="ColorCombo_SelectionChanged" />
+                        <Label Content="{StaticResource RGBStr}" HorizontalContentAlignment="Center" Margin="0,0,1,1" Foreground="{DynamicResource TextBrush}"/>
+                        <ComboBox Style="{StaticResource FlatComboBox}" Name="ColorCombo" Width = "60" Margin="0,1" SelectionChanged="ColorCombo_SelectionChanged" />
                     </StackPanel>
-                    <ComboBox Name="TypeCombo" ItemsSource="{Binding}" Margin="0,1" SelectionChanged="TypeCombo_SelectionChanged">
+                    <ComboBox Style="{StaticResource FlatComboBox}" Name="TypeCombo" ItemsSource="{Binding}" Margin="0,1" SelectionChanged="TypeCombo_SelectionChanged">
                         <ComboBox.ToolTip>
                             <ToolTip Name="TypeComboTip" Visibility="Hidden">
                                 <Rectangle Name="TypeImageRect">
@@ -71,47 +102,80 @@
                 <DataGrid Name="ParticleGrid" ItemsSource="{Binding}" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" 
                           GridLinesVisibility="Horizontal" ColumnWidth="Auto" SelectionMode="Single" AutoGenerateColumns="False"  CanUserAddRows="False" 
                           CanUserReorderColumns="False" CanUserSortColumns="False" ScrollViewer.CanContentScroll="False" CanUserResizeRows="False" 
-                          CellEditEnding="ParticleGrid_CellEditEnding" CanUserDeleteRows="False" BeginningEdit="ParticleGrid_BeginningEdit">
-                    <DataGrid.HorizontalGridLinesBrush>
-                        <SolidColorBrush Color="{StaticResource {x:Static SystemColors.ControlColorKey}}"/>
-                    </DataGrid.HorizontalGridLinesBrush>
+                          CellEditEnding="ParticleGrid_CellEditEnding" CanUserDeleteRows="False" BeginningEdit="ParticleGrid_BeginningEdit"
+                          HorizontalGridLinesBrush="{DynamicResource GroupBorderBrush}" BorderBrush="{DynamicResource GroupBorderBrush}" Background="{DynamicResource ListBrush}">
                     <DataGrid.Columns>
                         <DataGridTextColumn x:Name="ParticleKey"  Header="{StaticResource PropertyNameStr}" IsReadOnly="True" Binding="{Binding DisplayName}" CanUserResize="False">
                             <DataGridTextColumn.CellStyle>
-                                <Style TargetType="DataGridCell">
+                                <Style TargetType="DataGridCell" BasedOn="{StaticResource {x:Type DataGridCell}}">
                                     <Setter Property="ToolTip" Value="{Binding Name}" />
+                                    <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
+                                    <Setter Property="Focusable" Value="False" />
                                 </Style>
                             </DataGridTextColumn.CellStyle>
                         </DataGridTextColumn>
-                        <DataGridTextColumn x:Name="ParticleValue"  Header="{StaticResource PropertyValueStr}" Binding="{Binding Value}" />
+                        <DataGridTextColumn x:Name="ParticleValue" Width="*" Header="{StaticResource PropertyValueStr}" Binding="{Binding Value}" />
                     </DataGrid.Columns>
+                    <DataGrid.Resources>
+                        <Style TargetType="DataGridColumnHeader" BasedOn="{StaticResource {x:Type DataGridColumnHeader}}">
+                            <Setter Property="Background" Value="{DynamicResource ToolBarBrush}" />
+                            <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
+                            <Setter Property="Padding" Value="4,4"/>
+                        </Style>
+                        <Style TargetType="DataGridRowHeader" BasedOn="{StaticResource {x:Type DataGridRowHeader}}">
+                            <Setter Property="Background" Value="{DynamicResource ListBrush}" />
+                        </Style>
+                        <Style TargetType="DataGridRow" BasedOn="{StaticResource {x:Type DataGridRow}}">
+                            <Setter Property="Background" Value="{DynamicResource ListBrush}" />
+                        </Style>
+                        <Style TargetType="DataGridCell" BasedOn="{StaticResource {x:Type DataGridCell}}">
+                            <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
+                            <Setter Property="Padding" Value="4,4"/>
+                        </Style>
+                    </DataGrid.Resources>
                 </DataGrid>
             </StackPanel>
         </GroupBox>
-        <GroupBox Header="{StaticResource VariableStr}" Background="#FFF9F9F9">
+        <GroupBox Padding="0,24,0,0" Style="{StaticResource FlatGroupBox}" Header="{StaticResource VariableStr}">
             <StackPanel>
                 <DataGrid Name="VariableGrid" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" 
                           GridLinesVisibility="Horizontal" ColumnWidth="Auto" SelectionMode="Single" CanUserReorderColumns="False" CanUserSortColumns="False" 
                       ScrollViewer.CanContentScroll="False" CanUserResizeRows="False" CanUserAddRows="False" CanUserDeleteRows="False" AutoGenerateColumns="False" 
-                          CellEditEnding="VariableGrid_CellEditEnding" BeginningEdit="Grid_BeginningEdit">
-                    <DataGrid.HorizontalGridLinesBrush>
-                        <SolidColorBrush Color="{StaticResource {x:Static SystemColors.ControlColorKey}}"/>
-                    </DataGrid.HorizontalGridLinesBrush>
+                          CellEditEnding="VariableGrid_CellEditEnding" BeginningEdit="Grid_BeginningEdit"
+                          HorizontalGridLinesBrush="{DynamicResource GroupBorderBrush}" BorderBrush="{DynamicResource GroupBorderBrush}" Background="{DynamicResource ListBrush}">
                     <DataGrid.Columns>
                         <DataGridTextColumn x:Name="VariableKey"  Header="{StaticResource VariableKeyStr}" Binding="{Binding Label}"/>
-                        <DataGridTextColumn x:Name="VariableValue"  Header="{StaticResource VariableValueStr}" Binding="{Binding Value}" />
+                        <DataGridTextColumn x:Name="VariableValue"  Width="*" Header="{StaticResource VariableValueStr}" Binding="{Binding Value}" />
                     </DataGrid.Columns>
+                    <DataGrid.Resources>
+                        <Style TargetType="DataGridColumnHeader" BasedOn="{StaticResource {x:Type DataGridColumnHeader}}">
+                            <Setter Property="Background" Value="{DynamicResource ToolBarBrush}" />
+                            <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
+                            <Setter Property="Padding" Value="4,4"/>
+                        </Style>
+                        <Style TargetType="DataGridRowHeader" BasedOn="{StaticResource {x:Type DataGridRowHeader}}">
+                            <Setter Property="Background" Value="{DynamicResource ListBrush}" />
+                        </Style>
+                        <Style TargetType="DataGridRow" BasedOn="{StaticResource {x:Type DataGridRow}}">
+                            <Setter Property="Background" Value="{DynamicResource ListBrush}" />
+                        </Style>
+                        <Style TargetType="DataGridCell" BasedOn="{StaticResource {x:Type DataGridCell}}">
+                            <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
+                            <Setter Property="Padding" Value="4,4"/>
+                        </Style>
+                    </DataGrid.Resources>
                 </DataGrid>
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" >
-                    <Button Name="AddVariable" Width ="40" Content="{StaticResource AddStr}" Margin="2,0" Click="AddVariable_Click" />
-                    <Button Name="DeleteVariable" Width ="40" Content="{StaticResource DelStr}" Click="DeleteVariable_Click" />
+                    <Button Style="{StaticResource FlatButton}" Name="AddVariable" Width ="50" Content="{StaticResource AddStr}" Margin="4,0" Click="AddVariable_Click" />
+                    <Button Style="{StaticResource FlatButton}" Name="DeleteVariable" Width ="50" Content="{StaticResource DelStr}" Click="DeleteVariable_Click" />
                 </StackPanel>
             </StackPanel>
         </GroupBox>
-        <GroupBox Header="{StaticResource ComponentEventGroupStr}" Height="130" Margin="0">
+        <GroupBox Padding="0,24,0,0" Style="{StaticResource FlatGroupBox}" Header="{StaticResource ComponentEventGroupStr}" Height="130" Margin="0">
             <TreeView Name="ComponentEventList" ItemsSource="{Binding ElementName=Name}" Padding="-12,1,1,1" 
                       PreviewMouseRightButtonDown="ComponentEventList_PreviewMouseRightButtonDown" 
-                      MouseDoubleClick="ComponentEventList_MouseDoubleClick">
+                      MouseDoubleClick="ComponentEventList_MouseDoubleClick"
+                      Background="{DynamicResource ListBrush}" BorderThickness="0,0,0,0">
                 <TreeView.ContextMenu>
                     <ContextMenu>
                         <MenuItem Name="AddComponentEvent" Header="{StaticResource AddStr}" Click="AddComponentEvent_Click"/>
@@ -129,12 +193,21 @@
                         </DockPanel>
                     </DataTemplate>
                 </TreeView.ItemTemplate>
+                <TreeView.ItemContainerStyle>
+                    <Style TargetType="TreeViewItem">
+                        <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
+                    </Style>
+                </TreeView.ItemContainerStyle>
+                <TreeView.Resources>
+                    <Style TargetType="ScrollBar" BasedOn="{StaticResource FlatScrollBarStyle}" />
+                </TreeView.Resources>
             </TreeView>
         </GroupBox>
-        <GroupBox Name="SpecificGroup" Header="{StaticResource SpecificEventGroupStr}" Height="130" Margin="0" >
+        <GroupBox Padding="0,24,0,0" Style="{StaticResource FlatGroupBox}" Name="SpecificGroup" Header="{StaticResource SpecificEventGroupStr}" Height="130" Margin="0" >
             <TreeView Name="SpecificEventList" Padding="-12,1,1,1" 
                       PreviewMouseRightButtonDown="SpecificEventList_PreviewMouseRightButtonDown" 
-                      MouseDoubleClick="SpecificEventList_MouseDoubleClick">
+                      MouseDoubleClick="SpecificEventList_MouseDoubleClick"
+                      Background="{DynamicResource ListBrush}" BorderThickness="0,0,0,0">
                 <TreeView.ContextMenu>
                     <ContextMenu>
                         <MenuItem Name="AddSpecificEvent" Header="{StaticResource AddStr}" Click="AddSpecificEvent_Click"/>
@@ -152,6 +225,14 @@
                         </DockPanel>
                     </DataTemplate>
                 </TreeView.ItemTemplate>
+                <TreeView.ItemContainerStyle>
+                    <Style TargetType="TreeViewItem">
+                        <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
+                    </Style>
+                </TreeView.ItemContainerStyle>
+                <TreeView.Resources>
+                    <Style TargetType="ScrollBar" BasedOn="{StaticResource FlatScrollBarStyle}" />
+                </TreeView.Resources>
             </TreeView>
         </GroupBox>
     </StackPanel>

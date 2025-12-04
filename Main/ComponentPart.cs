@@ -84,6 +84,11 @@ namespace CrazyStorm
             item.DataContext = component;
             item.Style = (Style)FindResource("CanCloseStyle");
             var scroll = new ScrollViewer();
+            var baseScrollBarStyle = (Style)Application.Current.FindResource("FlatScrollBarStyle");
+            var implicitScrollBarStyle = new Style(typeof(ScrollBar), baseScrollBarStyle);
+            scroll.Resources.Add(typeof(ScrollBar), implicitScrollBarStyle);
+            var trackBrush = (Brush)Application.Current.FindResource("ScrollBarTrackBrush");
+            scroll.Resources.Add(SystemColors.ControlBrushKey, trackBrush);
             scroll.VerticalScrollBarVisibility = ScrollBarVisibility.Auto;
             var particleTypes = new List<ParticleType>();
             particleTypes.AddRange(defaultParticleTypes);
@@ -232,6 +237,10 @@ namespace CrazyStorm
                     if (lastSelectedItem != null)
                         DragDrop.DoDragDrop(lastSelectedItem, sender, DragDropEffects.Move);
                 }
+            }
+            else
+            {
+                lastSelectedItem = null;
             }
         }
         private void ComponentTree_CheckDrop(object sender, DragEventArgs e)

@@ -241,6 +241,26 @@ namespace CrazyStorm
         }
         #endregion
 
+        #region Public Methods
+        public void ChangeTheme(string name)
+        {
+            var dictionaries = App.Current.Resources.MergedDictionaries;
+            var original = dictionaries.Where(d => d.Source != null && d.Source.OriginalString.StartsWith("Style\\")).ToList();
+            original.ForEach(d => dictionaries.Remove(d));
+            switch (name)
+            {
+                case "StyleDefault":
+                    dictionaries.Add(new ResourceDictionary() { Source = new Uri("Style\\Default.xaml", UriKind.Relative) });
+                    break;
+                case "StyleBlack":
+                    dictionaries.Add(new ResourceDictionary() { Source = new Uri("Style\\Black.xaml", UriKind.Relative) });
+                    break;
+            }
+            config.Theme = name;
+            config.Save();
+        }
+        #endregion
+
         #region Window EventHandlers
         private void Screen_MouseEnter(object sender, MouseEventArgs e)
         {
@@ -411,6 +431,18 @@ namespace CrazyStorm
             window.OnButtonClick += () => UpdateScreen();
             window.ShowDialog();
             window.Close();
+        }
+
+        private void StyleItem_Click(object sender, RoutedEventArgs e)
+        {
+            var clickedItem = sender as MenuItem; 
+            var parent = clickedItem.Parent as MenuItem;
+            foreach (MenuItem item in parent.Items)
+            {
+                item.IsChecked = false;
+            }
+            clickedItem.IsChecked = true;
+            ChangeTheme(clickedItem.Name);
         }
         #endregion
     }

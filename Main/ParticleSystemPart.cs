@@ -35,6 +35,7 @@ namespace CrazyStorm
             var tabItem = new TabItem();
             tabItem.Header = particle.Name;
             tabItem.Tag = particle;
+            tabItem.Style = ParticleTabControl.ItemContainerStyle;
             tabItem.Content = ParticleTabControl.ItemTemplate.LoadContent() as Canvas;
             ParticleTabControl.Items.Add(tabItem);
             ParticleTabControl.SelectedItem = tabItem;

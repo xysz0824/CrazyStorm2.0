@@ -14,6 +14,7 @@
         <local:LayerStartConverter x:Key="LayerStartConverter" />
         <local:LayerLengthConverter x:Key="LayerLengthConverter" />
         <local:ResourceValidConverter x:Key="ResourceValidConverter" />
+
         <Style TargetType="Image">
             <Style.Triggers>
                 <Trigger Property="IsEnabled" Value="False">
@@ -118,26 +119,29 @@
             </Setter>
         </Style>
         <Style TargetType="TabItem" x:Key="CanCloseStyle">
+            <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
+            <Setter Property="Background" Value="{DynamicResource TabUnselectBrush}" />
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="TabItem">
-                        <Grid>
-                            <Border Name="bd" Background="{TemplateBinding Background}" BorderBrush="#8C8E94"
-                            BorderThickness="1" CornerRadius="1,1,0,0" Margin="0,0,0,0">
-                                <DockPanel>
-                                    <TextBlock Text="{Binding Name}" Margin="8,1" DockPanel.Dock="Left"/>
-                                    <Image Name="TabClose" Source="Images/close.png" Width="11" Height="11" Margin="0,0,5,0" MouseLeftButtonDown="TabClose_MouseLeftButtonDown"
-                                           VerticalAlignment="Center" DockPanel.Dock="Right" HorizontalAlignment="Right" />
-                                </DockPanel>
-                            </Border>
-                        </Grid>
+                        <Border x:Name="Bd" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="0,0,0,0" Padding="{TemplateBinding Padding}">
+                            <DockPanel>
+                                <TextBlock Text="{Binding Name}" Margin="4,4,0,0" DockPanel.Dock="Left"/>
+                                <Image Name="TabClose" Source="Images/close.png" Width="11" Height="11" Margin="4,4,0,0" MouseLeftButtonDown="TabClose_MouseLeftButtonDown"
+                               VerticalAlignment="Center" DockPanel.Dock="Right" HorizontalAlignment="Right" />
+                            </DockPanel>
+                        </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsSelected" Value="True">
-                                <Setter TargetName="bd" Property="Background" Value="White" />
-                                <Setter TargetName="bd" Property="Margin" Value="0" />
+                                <Setter TargetName="Bd" Property="Background" Value="{DynamicResource TabSelectBrush}" />
+                                <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
                             </Trigger>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="bd" Property="Background" Value="White" />
+                                <Setter TargetName="Bd" Property="Background" Value="{DynamicResource TabSelectBrush}" />
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="Bd" Property="Opacity" Value="0.5" />
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -266,24 +270,28 @@
     </Window.CommandBindings>
     <DockPanel Height="Auto" Name="dockPanel1" Width="Auto">
         <!-- Top Menu -->
-        <Menu Height="23" Name="menu1" Width="Auto" DockPanel.Dock="Top" Padding="2,0,0,0" IsEnabled="True" Margin="0">
-            <Menu.Background>
-                <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
-                    <GradientStop Color="White" Offset="0" />
-                    <GradientStop Color="#FFF0F0F0" Offset="1" />
-                </LinearGradientBrush>
-            </Menu.Background>
-            <MenuItem  Header="{StaticResource FileStr}" Padding="10,0">
+        <Menu Height="23" Name="menu1" Width="Auto" DockPanel.Dock="Top" Padding="2,2,0,0" IsEnabled="True" Margin="0" Background="{DynamicResource TitleBarBrush}">
+            <MenuItem Padding="10,0">
+                <MenuItem.Header>
+                    <TextBlock Text="{StaticResource FileStr}" Foreground="{DynamicResource TextBrush}" />
+                </MenuItem.Header>
                 <MenuItem Name="NewItem" Header="{StaticResource NewStr}" InputGestureText="Ctrl+N" Click="NewItem_Click" />
                 <MenuItem Name="OpenItem" Header="{StaticResource OpenStr}" InputGestureText="Ctrl+O" Click="OpenItem_Click" />
                 <MenuItem Name="SaveItem" Header="{StaticResource SaveStr}" InputGestureText="Ctrl+S" Click="SaveItem_Click" />
                 <MenuItem Name="SaveToItem" Header="{StaticResource SaveToStr}" InputGestureText="Ctrl+Shift+S" Click="SaveToItem_Click" />
                 <Separator/>
                 <MenuItem Header="{StaticResource SetScreenStr}" Click="ScreenSettingItem_Click" />
+                <MenuItem Header="{StaticResource StyleStr}">
+                    <MenuItem Name="StyleDefault" Header="{StaticResource StyleDefaultStr}" IsCheckable="True" IsChecked="True" Click="StyleItem_Click" />
+                    <MenuItem Name="StyleBlack" Header="{StaticResource StyleBlackStr}" IsCheckable="True" Click="StyleItem_Click" />
+                </MenuItem>
                 <Separator/>
                 <MenuItem Header="{StaticResource ExitStr}" InputGestureText="Alt+F4"/>
             </MenuItem>
-            <MenuItem Header="{StaticResource EditStr}" Padding="10,0">
+            <MenuItem Padding="10,0">
+                <MenuItem.Header>
+                    <TextBlock Text="{StaticResource EditStr}" Foreground="{DynamicResource TextBrush}" />
+                </MenuItem.Header>
                 <MenuItem Name="UndoItem" Header="{StaticResource UndoStr}" InputGestureText="Ctrl+Z" Click="UndoItem_Click"/>
                 <MenuItem Name="RedoItem" Header="{StaticResource RedoStr}" InputGestureText="Ctrl+Y" Click="RedoItem_Click"/>
                 <Separator/>
@@ -295,12 +303,18 @@
                 <MenuItem Name="FindItem" Header="{StaticResource FindStr}" InputGestureText="Ctrl+F" Click="FindItem_Click"  />
                 <MenuItem Header="{StaticResource SelectAllStr}" InputGestureText="Ctrl+A" Click="SelectAllItem_Click"/>
             </MenuItem>
-            <MenuItem Header="{StaticResource ResourceStr}" Padding="10,0">
+            <MenuItem Padding="10,0">
+                <MenuItem.Header>
+                    <TextBlock Text="{StaticResource ResourceStr}" Foreground="{DynamicResource TextBrush}" />
+                </MenuItem.Header>
                 <MenuItem Header="{StaticResource AddImageStr}" Click="AddImageItem_Click"/>
                 <MenuItem Header="{StaticResource AddSoundStr}" Click="AddSound_Click"/>
                 <MenuItem Header="{StaticResource AddGlobalStr}" Click="AddGlobalItem_Click"/>
             </MenuItem>
-            <MenuItem Name="ParticleSystemMenu" Header="{StaticResource ParticleSystemStr}" Padding="10,0" Click="ParticleSystemMenu_Click" >
+            <MenuItem Name="ParticleSystemMenu" Padding="10,0" Click="ParticleSystemMenu_Click">
+                <MenuItem.Header>
+                    <TextBlock Text="{StaticResource ParticleSystemStr}" Foreground="{DynamicResource TextBrush}" />
+                </MenuItem.Header>
                 <MenuItem Name="AddParticleSystemItem" Header="{StaticResource AddParticleSystemStr}" />
                 <MenuItem Name="DeleteParticleSystemItem" Header="{StaticResource DeleteParticleSystemStr}" />
                 <Separator/>
@@ -308,7 +322,10 @@
                 <Separator/>
                 <MenuItem Name="SetParticleSystemItem" Header="{StaticResource SetParticleSystemStr}" />
             </MenuItem>
-            <MenuItem Name="LayerMenu"  Header="{StaticResource LayerStr}" Padding="10,0" Click="LayerMenu_Click">
+            <MenuItem Name="LayerMenu" Padding="10,0" Click="LayerMenu_Click">
+                <MenuItem.Header>
+                    <TextBlock Text="{StaticResource LayerStr}" Foreground="{DynamicResource TextBrush}" />
+                </MenuItem.Header>
                 <MenuItem Name ="AddLayerItem" Header="{StaticResource AddLayerStr}" />
                 <MenuItem Name="DeleteLayerItem" Header="{StaticResource DeleteLayerStr}" />
                 <Separator/>
@@ -316,34 +333,39 @@
                 <Separator/>
                 <MenuItem Name="SetLayerItem" Header="{StaticResource SetLayerStr}" />
             </MenuItem>
-            <MenuItem Header="{StaticResource ComponentStr}" Padding="10,0">
+            <MenuItem Padding="10,0">
+                <MenuItem.Header>
+                    <TextBlock Text="{StaticResource ComponentStr}" Foreground="{DynamicResource TextBrush}" />
+                </MenuItem.Header>
                 <MenuItem Name="BindComponentItem" Header="{StaticResource BindComponentStr}" InputGestureText="Ctrl+B" Click="BindComponentItem_Click"/>
                 <MenuItem Name="UnbindComponentItem" Header="{StaticResource UnbindComponentStr}" InputGestureText="Ctrl+U" Click="UnbindComponentItem_Click"/>
             </MenuItem>
-            <MenuItem Header="{StaticResource PlayStr}" Padding="10,0">
+            <MenuItem Padding="10,0">
+                <MenuItem.Header>
+                    <TextBlock Text="{StaticResource PlayStr}" Foreground="{DynamicResource TextBrush}" />
+                </MenuItem.Header>
                 <MenuItem Header="{StaticResource GeneratePlayFileStr}" Click="GeneratePlayFile_Click" />
                 <MenuItem Header="{StaticResource PlayCurrentStr}" InputGestureText="F5" Click="PlayItem_Click"/>
                 <Separator/>
                 <MenuItem Header="{StaticResource SetPlayStr}" Click="PlaySettingItem_Click"/>
             </MenuItem>
-            <MenuItem Header="{StaticResource HelpStr}" Padding="10,0">
+            <MenuItem Padding="10,0">
+                <MenuItem.Header>
+                    <TextBlock Text="{StaticResource HelpStr}" Foreground="{DynamicResource TextBrush}" />
+                </MenuItem.Header>
                 <MenuItem Header="{StaticResource TutorialStr}" InputGestureText="F1"/>
                 <MenuItem Header="{StaticResource AboutStr}" />
             </MenuItem>
         </Menu>
         <!-- Status Bar -->
-        <StatusBar Height="23" Width="Auto" DockPanel.Dock="Bottom" Background="#FFF0F0F0" Padding="1,0,6,0">
+        <StatusBar Height="24" Width="Auto" DockPanel.Dock="Bottom" Padding="1,0,6,0"
+                   Background="{DynamicResource TitleBarBrush}" Foreground="{DynamicResource TextBrush}">
             <StatusBarItem Name="StatusText" Content="{Binding Path=Status}" />
             <StatusBarItem Name="MousePosTip" HorizontalAlignment="Right" />
         </StatusBar>
         <!-- Tool Bar -->
-        <ToolBar Height="34" Name="ToolBar" Width="Auto" DockPanel.Dock="Top" HorizontalAlignment="Stretch" AllowDrop="False">
-            <ToolBar.Background>
-                <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
-                    <GradientStop Color="White" Offset="0" />
-                    <GradientStop Color="#FFF0F0F0" Offset="1" />
-                </LinearGradientBrush>
-            </ToolBar.Background>
+        <ToolBarTray Height="33" Width="Auto" DockPanel.Dock="Top" HorizontalAlignment="Stretch" Background="{DynamicResource ToolBarBrush}">
+            <ToolBar Height="34" Name="ToolBar" Width="Auto" DockPanel.Dock="Top" HorizontalAlignment="Stretch" AllowDrop="False" Background="{DynamicResource ToolBarBrush}" Loaded="ToolBar_Loaded">
             <Button Name="NewButton" IsDefault="False" IsCancel="False" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" 
                     ToolTip="{StaticResource NewStr}" Click="NewItem_Click">
                 <Image Source="Images/document-new-3.png" Width="24" Height="24" />
@@ -388,34 +410,254 @@
                 <Image Source="Images/arrow-right-3.png" Width="24" Height="24" />
             </Button>
         </ToolBar>
+        </ToolBarTray>
         <!-- Main Grid -->
-        <Grid Height="Auto" Width="Auto">
+        <Grid Height="Auto" Width="Auto" Background="{DynamicResource TitleBarBrush}">
             <Grid.RowDefinitions>
-                <RowDefinition/>
-                <RowDefinition Height="126"/>
+                <RowDefinition MinHeight="300"/>
+                <RowDefinition Height="126" MinHeight="126"/>
             </Grid.RowDefinitions>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition/>
-            </Grid.ColumnDefinitions>
             <Grid Grid.Row="0">
-                <Grid.RowDefinitions>
-                    <RowDefinition/>
-                </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="260"/>
-                    <ColumnDefinition/>
+                    <ColumnDefinition Width="262" MinWidth="262"/>
+                    <ColumnDefinition MinWidth="200"/>
                 </Grid.ColumnDefinitions>
-                <GridSplitter HorizontalAlignment="Right" Name="gridSplitter3" Width="1" Background="#FFDBDBDB" IsEnabled="False"/>
+                <!-- Sidebar -->
+                <DockPanel Grid.Column="0" Background="{DynamicResource TitleBarBrush}">
+                    <GroupBox DockPanel.Dock="Bottom" Header="{StaticResource SelectedStr}" Height="100" Name="SelectedGroup" Opacity="0"
+                              Style="{StaticResource FlatGroupBox}" Background="{DynamicResource SelectedGroupImageBrush}" Padding="8,8,8,0">
+                        <Canvas ClipToBounds="True" Margin="0,14,0,0">
+                            <Canvas.Background>
+                                <ImageBrush/>
+                            </Canvas.Background>
+                            <Image Name="SelectedGroupImage" RenderOptions.BitmapScalingMode="HighQuality" 
+                                   Width="42" Canvas.Left="10" Canvas.Top="10" >
+                                <Image.Effect>
+                                    <DropShadowEffect ShadowDepth="0" BlurRadius="10" Opacity="0.5"/>
+                                </Image.Effect>
+                            </Image>
+                            <TextBlock Name="SelectedGroupType" Canvas.Left="66" Canvas.Top="10" Foreground="{DynamicResource TextBrush}"/>
+                            <TextBlock Name="SelectedGroupName"  Text="{Binding Name}" Canvas.Left="66" Canvas.Top="26" FontSize="18" Foreground="{DynamicResource TextBrush}"/>
+                            <TextBlock Name="SelectedGroupTip" Canvas.Left="8" Canvas.Top="56" Foreground="#FF8B8B8B" />
+                        </Canvas>
+                    </GroupBox>
+                    <TabControl  Margin="0,0,0,0" Name="LeftTabControl" VerticalContentAlignment="Stretch" HorizontalContentAlignment="Stretch" Background="{DynamicResource TitleBarBrush}" BorderThickness="0,0,0,0" Focusable="False">
+                        <TabItem Header="{StaticResource ComponentStr}" Name="Frequent" Padding="6,5,6,1">
+                            <DockPanel Name="ComponentPanel">
+                                <GroupBox Style="{StaticResource FlatGroupBox}" DockPanel.Dock="Top" Header="{StaticResource ComponentBoardStr}" VerticalAlignment="Top" Height="80" HorizontalAlignment="Stretch" 
+                                      HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Background="{DynamicResource ToolBarBrush}">
+                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,0,0,-25">
+                                        <Button Name="MultiEmitter" Width="32" Height="32" Padding="0" Margin="1,1,2,1" Background="{x:Null}" Click="ComponentButton_Click">
+                                            <Image RenderOptions.BitmapScalingMode="NearestNeighbor" Source="Images/button-MultiEmitter.png" Stretch="Uniform" ToolTip="{StaticResource MultiEmitterStr}" 
+                                               MouseEnter="ComponentButton_MouseEnter" MouseLeave="ComponentButton_MouseLeave" Width="28" Height="28"  UseLayoutRounding="True"/>
+                                        </Button>
+                                        <Button Name="CurveEmitter" Width="32" Height="32" Background="{x:Null}" Padding="0" Margin="1,1,2,1" Click="ComponentButton_Click">
+                                            <Image RenderOptions.BitmapScalingMode="NearestNeighbor" Source="Images/button-CurveEmitter.png" Stretch="Uniform" ToolTip="{StaticResource CurveEmitterStr}" 
+                                               MouseEnter="ComponentButton_MouseEnter" MouseLeave="ComponentButton_MouseLeave" Width="28" Height="28"  UseLayoutRounding="True"/>
+                                        </Button>
+                                        <Button Name="EventField" Background="{x:Null}" Padding="0" Margin="1,1,2,1" Click="ComponentButton_Click" Width="32" Height="32">
+                                            <Image  RenderOptions.BitmapScalingMode="NearestNeighbor" Source="Images/button-EventField.png" ToolTip="{StaticResource EventFieldStr}" 
+                                               MouseEnter="ComponentButton_MouseEnter" MouseLeave="ComponentButton_MouseLeave" Width="28" Height="28" UseLayoutRounding="True">
+                                            </Image>
+                                        </Button>
+                                        <Button Name="Rebounder" Width="32" Height="32" Background="{x:Null}" Padding="0" Margin="1,1,2,1" Click="ComponentButton_Click">
+                                            <Image RenderOptions.BitmapScalingMode="NearestNeighbor" Source="Images/button-Rebounder.png" Stretch="Uniform" ToolTip="{StaticResource RebounderStr}" 
+                                               MouseEnter="ComponentButton_MouseEnter" MouseLeave="ComponentButton_MouseLeave" Width="28" Height="28"  UseLayoutRounding="True"/>
+                                        </Button>
+                                        <Button Name="ForceField" Width="32" Height="32" Background="{x:Null}" Padding="0" Margin="1,1,2,1" Click="ComponentButton_Click">
+                                            <Image RenderOptions.BitmapScalingMode="NearestNeighbor" Source="Images/button-ForceField.png" Stretch="Uniform" ToolTip="{StaticResource ForceFieldStr}" 
+                                               MouseEnter="ComponentButton_MouseEnter" MouseLeave="ComponentButton_MouseLeave" Width="28" Height="28"  UseLayoutRounding="True"/>
+                                        </Button>
+                                    </StackPanel>
+                                </GroupBox>
+                                <GroupBox Padding="0,0,0,0" Style="{StaticResource FlatGroupBox}" Header="{StaticResource ComponentTreeStr}" Name="Explorer" VerticalContentAlignment="Stretch" HorizontalContentAlignment="Stretch" >
+                                    <TreeView Name="ComponentTree" Padding="1,4,1,4" Margin="0,26,0,0" VerticalContentAlignment="Stretch" HorizontalContentAlignment="Stretch" 
+                                              AllowDrop="True" MouseMove="ComponentTree_MouseMove" MouseDoubleClick="ComponentTree_MouseDoubleClick"
+                                              DragEnter="ComponentTree_CheckDrop" DragOver="ComponentTree_CheckDrop" DragLeave="ComponentTree_CheckDrop" Drop="ComponentTree_Drop" 
+                                              IsTextSearchEnabled="True" Background="{DynamicResource ListBrush}" BorderThickness="0,0,0,0">
+                                        <TreeView.ItemTemplate >
+                                            <HierarchicalDataTemplate ItemsSource="{Binding Children}">
+                                                <TextBlock Text="{Binding Name}" MouseLeftButtonDown="ComponentTree_MouseLeftButtonDown">
+                                                    <TextBlock.Style >
+                                                        <Style TargetType="TextBlock">
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding HasOutStandingTask}" Value="true">
+                                                                    <Setter Property="Foreground" Value="DarkOrange" />
+                                                                </DataTrigger>
+                                                                <DataTrigger Binding="{Binding HasOutStandingTask}" Value="false">
+                                                                    <Setter Property="Foreground" Value="Aqua" />
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </TextBlock.Style>
+                                                </TextBlock>
+                                            </HierarchicalDataTemplate>
+                                        </TreeView.ItemTemplate>
+                                        <TreeView.ItemContainerStyle>
+                                            <Style TargetType="TreeViewItem">
+                                                <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
+                                            </Style>
+                                        </TreeView.ItemContainerStyle>
+                                        <TreeView.Resources>
+                                            <Style TargetType="ScrollBar" BasedOn="{StaticResource FlatScrollBarStyle}" />
+                                        </TreeView.Resources>
+                                    </TreeView>
+                                </GroupBox>
+                            </DockPanel>
+                        </TabItem>
+                        <TabItem Header="{StaticResource ResourceStr}" Name="Resource" Padding="6,5,6,1" Height="21" VerticalAlignment="Top">
+                            <ScrollViewer VerticalScrollBarVisibility="Auto" Background="{DynamicResource TitleBarBrush}" Focusable="False">
+                                <StackPanel>
+                                    <GroupBox Padding="0,24,0,0" Style="{StaticResource FlatGroupBox}" Header="{StaticResource ImageStr}" Height="131" Margin="0">
+                                        <TreeView Name="ImageList" Padding="-12,1,1,1" PreviewMouseRightButtonDown="ImageList_PreviewMouseRightButtonDown"
+                                                  Background="{DynamicResource ListBrush}" BorderThickness="0,0,0,0">
+                                            <TreeView.ContextMenu>
+                                                <ContextMenu>
+                                                    <MenuItem Name="AddImage" Header="{StaticResource AddImageStr}" Click="AddImageItem_Click" />
+                                                </ContextMenu>
+                                            </TreeView.ContextMenu>
+                                            <TreeView.ItemTemplate>
+                                                <DataTemplate>
+                                                    <DockPanel>
+                                                        <DockPanel.ContextMenu >
+                                                            <ContextMenu>
+                                                                <MenuItem Name="DeleteImage" Header="{StaticResource DelStr}" Click="DeleteImage_Click" />
+                                                            </ContextMenu>
+                                                        </DockPanel.ContextMenu>
+                                                        <TextBlock Text="{Binding Path=Label}">
+                                                            <TextBlock.TextDecorations>
+                                                                <Binding Path="IsValid" Converter="{StaticResource ResourceValidConverter}"/>
+                                                            </TextBlock.TextDecorations>
+                                                        </TextBlock>
+                                                        <DockPanel.ToolTip>
+                                                            <ToolTip>
+                                                                <Image Source="{Binding Path=AbsolutePath}" Stretch="Uniform" Width="128" Height="128" StretchDirection="Both" />
+                                                            </ToolTip>
+                                                        </DockPanel.ToolTip>
+                                                    </DockPanel>
+                                                </DataTemplate>
+                                            </TreeView.ItemTemplate>
+                                            <TreeView.ItemContainerStyle>
+                                                <Style TargetType="TreeViewItem">
+                                                    <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
+                                                </Style>
+                                            </TreeView.ItemContainerStyle>
+                                            <TreeView.Resources>
+                                                <Style TargetType="ScrollBar" BasedOn="{StaticResource FlatScrollBarStyle}" />
+                                            </TreeView.Resources>
+                                        </TreeView>
+                                    </GroupBox>
+                                    <GroupBox Padding="0,24,0,0" Style="{StaticResource FlatGroupBox}" Header="{StaticResource SoundStr}" Height="131" Margin="0">
+                                        <TreeView Name="SoundList" Padding="-12,1,1,1" PreviewMouseRightButtonDown="SoundList_PreviewMouseRightButtonDown"
+                                                  Background="{DynamicResource ListBrush}" BorderThickness="0,0,0,0">
+                                            <TreeView.ContextMenu>
+                                                <ContextMenu>
+                                                    <MenuItem Name="AddSound" Header="{StaticResource AddSoundStr}" Click="AddSound_Click" />
+                                                </ContextMenu>
+                                            </TreeView.ContextMenu>
+                                            <TreeView.ItemTemplate>
+                                                <DataTemplate>
+                                                    <DockPanel>
+                                                        <DockPanel.ContextMenu >
+                                                            <ContextMenu>
+                                                                <MenuItem Name="DeleteSound" Header="{StaticResource DelStr}" Click="DeleteSound_Click"/>
+                                                            </ContextMenu>
+                                                        </DockPanel.ContextMenu>
+                                                        <TextBlock Text="{Binding Path=Label}">
+                                                            <TextBlock.TextDecorations>
+                                                                <Binding Path="IsValid" Converter="{StaticResource ResourceValidConverter}"/>
+                                                            </TextBlock.TextDecorations>
+                                                        </TextBlock>
+                                                    </DockPanel>
+                                                </DataTemplate>
+                                            </TreeView.ItemTemplate>
+                                            <TreeView.ItemContainerStyle>
+                                                <Style TargetType="TreeViewItem">
+                                                    <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
+                                                </Style>
+                                            </TreeView.ItemContainerStyle>
+                                            <TreeView.Resources>
+                                                <Style TargetType="ScrollBar" BasedOn="{StaticResource FlatScrollBarStyle}" />
+                                            </TreeView.Resources>
+                                        </TreeView>
+                                    </GroupBox>
+                                    <GroupBox Padding="0,24,0,0" Style="{StaticResource FlatGroupBox}"  Header="{StaticResource GlobalStr}" Margin="0">
+                                        <StackPanel>
+                                            <DataGrid Name="VariableGrid" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" GridLinesVisibility="Horizontal" 
+                                                      ColumnWidth="Auto" SelectionMode="Single" CanUserReorderColumns="False" CanUserSortColumns="False" ScrollViewer.CanContentScroll="False" 
+                                                      CanUserResizeRows="False" CanUserAddRows="False" CanUserDeleteRows="False" AutoGenerateColumns="False" 
+                                                      CellEditEnding="VariableGrid_CellEditEnding" 
+                                                      HorizontalGridLinesBrush="{DynamicResource GroupBorderBrush}" BorderBrush="{DynamicResource GroupBorderBrush}" Background="{DynamicResource ListBrush}">
+                                                <DataGrid.Columns>
+                                                    <DataGridTextColumn x:Name="VariableKey"  Header="{StaticResource VariableKeyStr}" Binding="{Binding Label}"/>
+                                                    <DataGridTextColumn x:Name="VariableValue" Width="*" Header="{StaticResource VariableValueStr}" Binding="{Binding Value}" />
+                                                </DataGrid.Columns>
+                                                <DataGrid.Resources>
+                                                    <Style TargetType="DataGridColumnHeader" BasedOn="{StaticResource {x:Type DataGridColumnHeader}}">
+                                                        <Setter Property="Background" Value="{DynamicResource ToolBarBrush}" />
+                                                        <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
+                                                        <Setter Property="Padding" Value="4,4"/>
+                                                    </Style>
+                                                    <Style TargetType="DataGridRowHeader" BasedOn="{StaticResource {x:Type DataGridRowHeader}}">
+                                                        <Setter Property="Background" Value="{DynamicResource ListBrush}" />
+                                                    </Style>
+                                                    <Style TargetType="DataGridRow" BasedOn="{StaticResource {x:Type DataGridRow}}">
+                                                        <Setter Property="Background" Value="{DynamicResource ListBrush}" />
+                                                    </Style>
+                                                    <Style TargetType="DataGridCell" BasedOn="{StaticResource {x:Type DataGridCell}}">
+                                                        <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
+                                                        <Setter Property="Padding" Value="4,4"/>
+                                                    </Style>
+                                                </DataGrid.Resources>
+                                            </DataGrid>
+                                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" >
+                                                <Button Style="{StaticResource FlatButton}" Name="AddVariable" Width ="50" Content="{StaticResource AddStr}" Margin="4,0" Click="AddVariable_Click" />
+                                                <Button Style="{StaticResource FlatButton}" Name="DeleteVariable" Width ="50" Content="{StaticResource DelStr}" Click="DeleteVariable_Click" />
+                                            </StackPanel>
+                                        </StackPanel>
+                                    </GroupBox>
+                                </StackPanel>
+                                <ScrollViewer.Resources>
+                                    <Style TargetType="ScrollBar" BasedOn="{StaticResource FlatScrollBarStyle}" />
+                                    <SolidColorBrush x:Key="{x:Static SystemColors.ControlBrushKey}" Color="{Binding ScrollBarTrackBrush}" />
+                                </ScrollViewer.Resources>
+                            </ScrollViewer>
+                        </TabItem>
+                        <TabControl.Resources>
+                            <Style TargetType="TabItem">
+                                <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
+                                <Setter Property="Background" Value="{DynamicResource TabUnselectBrush}" />
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="TabItem">
+                                            <Border x:Name="Bd" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}"
+                                                    BorderThickness="0,0,0,0" Padding="{TemplateBinding Padding}">
+                                                <ContentPresenter ContentSource="Header" HorizontalAlignment="Center" VerticalAlignment="Center" RecognizesAccessKey="True"/>
+                                            </Border>
+                                            <ControlTemplate.Triggers>
+                                                <Trigger Property="IsSelected" Value="True">
+                                                    <Setter TargetName="Bd" Property="Background" Value="{DynamicResource TabSelectBrush}" />
+                                                    <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
+                                                </Trigger>
+                                                <Trigger Property="IsMouseOver" Value="True">
+                                                    <Setter TargetName="Bd" Property="Background" Value="{DynamicResource TabSelectBrush}" />
+                                                </Trigger>
+                                                <Trigger Property="IsEnabled" Value="False">
+                                                    <Setter TargetName="Bd" Property="Opacity" Value="0.5" />
+                                                </Trigger>
+                                            </ControlTemplate.Triggers>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
+                        </TabControl.Resources>
+                    </TabControl>
+                </DockPanel>
                 <!-- ParticleScreen -->
-                <ScrollViewer  Grid.Column="1" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+                <ScrollViewer  Grid.Column="1" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" Focusable="False" Background="{DynamicResource TitleBarBrush}">
                     <TabControl Name="ParticleTabControl" SelectionChanged="ParticleTabControl_SelectionChanged" 
-                                MouseLeave="ParticleTabControl_MouseLeave" MouseLeftButtonUp="ParticleTabControl_MouseLeftButtonUp">
-                        <TabControl.Background>
-                            <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
-                                <GradientStop Color="#FFD4D4D4" Offset="0" />
-                                <GradientStop Color="White" Offset="1" />
-                            </LinearGradientBrush>
-                        </TabControl.Background>
+                                MouseLeave="ParticleTabControl_MouseLeave" MouseLeftButtonUp="ParticleTabControl_MouseLeftButtonUp"
+                                Background="{DynamicResource ScreenBackgroundBrush}" BorderThickness="0,0,0,0">
                         <TabControl.ItemTemplate>
                             <DataTemplate>
                                 <Canvas Name="Screen" Width="{Binding Path=ScreenWidth}" Height="{Binding Path=ScreenHeight}" PreviewMouseLeftButtonDown="Screen_MouseLeftButtonDown" 
@@ -461,198 +703,53 @@
                                 </Canvas>
                             </DataTemplate>
                         </TabControl.ItemTemplate>
+                        <TabControl.ItemContainerStyle>
+                            <Style TargetType="TabItem">
+                                <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
+                                <Setter Property="Background" Value="{DynamicResource TabUnselectBrush}" />
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="TabItem">
+                                            <Border x:Name="Bd" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}"
+                                                    BorderThickness="0,0,0,0" Padding="{TemplateBinding Padding}">
+                                                <ContentPresenter ContentSource="Header" HorizontalAlignment="Center" VerticalAlignment="Center" RecognizesAccessKey="True"/>
+                                            </Border>
+                                            <ControlTemplate.Triggers>
+                                                <Trigger Property="IsSelected" Value="True">
+                                                    <Setter TargetName="Bd" Property="Background" Value="{DynamicResource TabSelectBrush}" />
+                                                    <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
+                                                </Trigger>
+                                                <Trigger Property="IsMouseOver" Value="True">
+                                                    <Setter TargetName="Bd" Property="Background" Value="{DynamicResource TabSelectBrush}" />
+                                                </Trigger>
+                                                <Trigger Property="IsEnabled" Value="False">
+                                                    <Setter TargetName="Bd" Property="Opacity" Value="0.5" />
+                                                </Trigger>
+                                            </ControlTemplate.Triggers>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
+                        </TabControl.ItemContainerStyle>
                     </TabControl>
+                    <ScrollViewer.Resources>
+                        <Style TargetType="ScrollBar" BasedOn="{StaticResource FlatScrollBarStyle}" />
+                        <SolidColorBrush x:Key="{x:Static SystemColors.ControlBrushKey}" Color="{Binding ScrollBarTrackBrush}" />
+                    </ScrollViewer.Resources>
                 </ScrollViewer>
-                <!-- Sidebar -->
-                <DockPanel>
-                    <DockPanel.Background>
-                        <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
-                            <GradientStop Color="White" Offset="0"/>
-                            <GradientStop Color="#FFF0F0F0" Offset="1"/>
-                        </LinearGradientBrush>
-                    </DockPanel.Background>
-                    <GroupBox DockPanel.Dock="Bottom" Header="{StaticResource SelectedStr}" Height="100" BorderBrush="#FFC6C6C6" Name="SelectedGroup" Opacity="0">
-                        <GroupBox.Background>
-                            <ImageBrush ImageSource="Images/selectedgroup.png"/>
-                        </GroupBox.Background>
-                        <Canvas ClipToBounds="True">
-                            <Canvas.Background>
-                                <ImageBrush/>
-                            </Canvas.Background>
-                            <Image Name="SelectedGroupImage" RenderOptions.BitmapScalingMode="HighQuality" 
-                                   Width="42" Canvas.Left="10" Canvas.Top="10" >
-                                <Image.Effect>
-                                    <DropShadowEffect ShadowDepth="0" BlurRadius="10" Opacity="0.5"/>
-                                </Image.Effect>
-                            </Image>
-                            <TextBlock Name="SelectedGroupType" Canvas.Left="66" Canvas.Top="10" />
-                            <TextBlock Name="SelectedGroupName"  Text="{Binding Name}" Canvas.Left="66" Canvas.Top="26" FontSize="18"/>
-                            <TextBlock Name="SelectedGroupTip" Canvas.Left="8" Canvas.Top="59" Foreground="#FF8B8B8B" />
-                        </Canvas>
-                    </GroupBox>
-                    <TabControl  Margin="0,0,0,0" Name="LeftTabControl" VerticalContentAlignment="Stretch" HorizontalContentAlignment="Stretch">
-                        <TabControl.Background>
-                            <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
-                                <GradientStop Color="White" Offset="0"/>
-                                <GradientStop Color="#FFF0F0F0" Offset="1"/>
-                            </LinearGradientBrush>
-                        </TabControl.Background>
-                        <TabItem Header="{StaticResource ComponentStr}" Name="Frequent" Padding="6,5,6,1">
-                            <DockPanel Name="ComponentPanel">
-                                <GroupBox DockPanel.Dock="Top" Header="{StaticResource ComponentBoardStr}" VerticalAlignment="Top" Height="60" HorizontalAlignment="Stretch" 
-                                      HorizontalContentAlignment="Center" VerticalContentAlignment="Center" BorderBrush="#FFC6C6C6">
-                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
-                                        <Button Name="MultiEmitter" Width="32" Height="32" Padding="0" Margin="1,1,2,1" Background="{x:Null}" Click="ComponentButton_Click">
-                                            <Image RenderOptions.BitmapScalingMode="NearestNeighbor" Source="Images/button-MultiEmitter.png" Stretch="Uniform" ToolTip="{StaticResource MultiEmitterStr}" 
-                                               MouseEnter="ComponentButton_MouseEnter" MouseLeave="ComponentButton_MouseLeave" Width="28" Height="28"  UseLayoutRounding="True"/>
-                                        </Button>
-                                        <Button Name="CurveEmitter" Width="32" Height="32" Background="{x:Null}" Padding="0" Margin="1,1,2,1" Click="ComponentButton_Click">
-                                            <Image RenderOptions.BitmapScalingMode="NearestNeighbor" Source="Images/button-CurveEmitter.png" Stretch="Uniform" ToolTip="{StaticResource CurveEmitterStr}" 
-                                               MouseEnter="ComponentButton_MouseEnter" MouseLeave="ComponentButton_MouseLeave" Width="28" Height="28"  UseLayoutRounding="True"/>
-                                        </Button>
-                                        <Button Name="EventField" Background="{x:Null}" Padding="0" Margin="1,1,2,1" Click="ComponentButton_Click" Width="32" Height="32">
-                                            <Image  RenderOptions.BitmapScalingMode="NearestNeighbor" Source="Images/button-EventField.png" ToolTip="{StaticResource EventFieldStr}" 
-                                               MouseEnter="ComponentButton_MouseEnter" MouseLeave="ComponentButton_MouseLeave" Width="28" Height="28" UseLayoutRounding="True">
-                                            </Image>
-                                        </Button>
-                                        <Button Name="Rebounder" Width="32" Height="32" Background="{x:Null}" Padding="0" Margin="1,1,2,1" Click="ComponentButton_Click">
-                                            <Image RenderOptions.BitmapScalingMode="NearestNeighbor" Source="Images/button-Rebounder.png" Stretch="Uniform" ToolTip="{StaticResource RebounderStr}" 
-                                               MouseEnter="ComponentButton_MouseEnter" MouseLeave="ComponentButton_MouseLeave" Width="28" Height="28"  UseLayoutRounding="True"/>
-                                        </Button>
-                                        <Button Name="ForceField" Width="32" Height="32" Background="{x:Null}" Padding="0" Margin="1,1,2,1" Click="ComponentButton_Click">
-                                            <Image RenderOptions.BitmapScalingMode="NearestNeighbor" Source="Images/button-ForceField.png" Stretch="Uniform" ToolTip="{StaticResource ForceFieldStr}" 
-                                               MouseEnter="ComponentButton_MouseEnter" MouseLeave="ComponentButton_MouseLeave" Width="28" Height="28"  UseLayoutRounding="True"/>
-                                        </Button>
-                                    </StackPanel>
-                                </GroupBox>
-                                <GroupBox Header="{StaticResource ComponentTreeStr}" Name="Explorer" VerticalContentAlignment="Stretch" HorizontalContentAlignment="Stretch" >
-                                    <TreeView Name="ComponentTree" Padding="-2,1,1,1" VerticalContentAlignment="Stretch" HorizontalContentAlignment="Stretch" 
-                                              AllowDrop="True" MouseMove="ComponentTree_MouseMove" MouseDoubleClick="ComponentTree_MouseDoubleClick"
-                                              DragEnter="ComponentTree_CheckDrop" DragOver="ComponentTree_CheckDrop" DragLeave="ComponentTree_CheckDrop" Drop="ComponentTree_Drop" 
-                                              IsTextSearchEnabled="True">
-                                        <TreeView.ItemTemplate >
-                                            <HierarchicalDataTemplate ItemsSource="{Binding Children}">
-                                                <TextBlock Text="{Binding Name}" MouseLeftButtonDown="ComponentTree_MouseLeftButtonDown">
-                                                    <TextBlock.Style >
-                                                        <Style TargetType="TextBlock">
-                                                            <Style.Triggers>
-                                                                <DataTrigger Binding="{Binding HasOutStandingTask}" Value="true">
-                                                                    <Setter Property="Foreground" Value="DarkOrange" />
-                                                                </DataTrigger>
-                                                                <DataTrigger Binding="{Binding HasOutStandingTask}" Value="false">
-                                                                    <Setter Property="Foreground" Value="Aqua" />
-                                                                </DataTrigger>
-                                                            </Style.Triggers>
-                                                        </Style>
-                                                    </TextBlock.Style>
-                                                </TextBlock>
-                                            </HierarchicalDataTemplate>
-                                        </TreeView.ItemTemplate>
-                                    </TreeView>
-                                </GroupBox>
-                            </DockPanel>
-                        </TabItem>
-                        <TabItem Header="{StaticResource ResourceStr}" Name="Resource" Padding="6,5,6,1">
-                            <ScrollViewer VerticalScrollBarVisibility="Auto">
-                                <StackPanel>
-                                    <GroupBox Header="{StaticResource ImageStr}" Height="131" Margin="0">
-                                        <TreeView Name="ImageList" Padding="-12,1,1,1" PreviewMouseRightButtonDown="ImageList_PreviewMouseRightButtonDown">
-                                            <TreeView.ContextMenu>
-                                                <ContextMenu>
-                                                    <MenuItem Name="AddImage" Header="{StaticResource AddImageStr}" Click="AddImageItem_Click" />
-                                                </ContextMenu>
-                                            </TreeView.ContextMenu>
-                                            <TreeView.ItemTemplate>
-                                                <DataTemplate>
-                                                    <DockPanel>
-                                                        <DockPanel.ContextMenu >
-                                                            <ContextMenu>
-                                                                <MenuItem Name="DeleteImage" Header="{StaticResource DelStr}" Click="DeleteImage_Click" />
-                                                            </ContextMenu>
-                                                        </DockPanel.ContextMenu>
-                                                        <TextBlock Text="{Binding Path=Label}">
-                                                            <TextBlock.TextDecorations>
-                                                                <Binding Path="IsValid" Converter="{StaticResource ResourceValidConverter}"/>
-                                                            </TextBlock.TextDecorations>
-                                                        </TextBlock>
-                                                        <DockPanel.ToolTip>
-                                                            <ToolTip>
-                                                                <Image Source="{Binding Path=AbsolutePath}" Stretch="Uniform" Width="128" Height="128" StretchDirection="Both" />
-                                                            </ToolTip>
-                                                        </DockPanel.ToolTip>
-                                                    </DockPanel>
-                                                </DataTemplate>
-                                            </TreeView.ItemTemplate>
-                                        </TreeView>
-                                    </GroupBox>
-                                    <GroupBox Header="{StaticResource SoundStr}" Height="131" Margin="0">
-                                        <TreeView Name="SoundList" Padding="-12,1,1,1" PreviewMouseRightButtonDown="SoundList_PreviewMouseRightButtonDown">
-                                            <TreeView.ContextMenu>
-                                                <ContextMenu>
-                                                    <MenuItem Name="AddSound" Header="{StaticResource AddSoundStr}" Click="AddSound_Click" />
-                                                </ContextMenu>
-                                            </TreeView.ContextMenu>
-                                            <TreeView.ItemTemplate>
-                                                <DataTemplate>
-                                                    <DockPanel>
-                                                        <DockPanel.ContextMenu >
-                                                            <ContextMenu>
-                                                                <MenuItem Name="DeleteSound" Header="{StaticResource DelStr}" Click="DeleteSound_Click"/>
-                                                            </ContextMenu>
-                                                        </DockPanel.ContextMenu>
-                                                        <TextBlock Text="{Binding Path=Label}">
-                                                            <TextBlock.TextDecorations>
-                                                                <Binding Path="IsValid" Converter="{StaticResource ResourceValidConverter}"/>
-                                                            </TextBlock.TextDecorations>
-                                                        </TextBlock>
-                                                    </DockPanel>
-                                                </DataTemplate>
-                                            </TreeView.ItemTemplate>
-                                        </TreeView>
-                                    </GroupBox>
-                                    <GroupBox Header="{StaticResource GlobalStr}" Margin="0">
-                                        <StackPanel>
-                                            <DataGrid Name="VariableGrid" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" GridLinesVisibility="Horizontal" 
-                                                      ColumnWidth="Auto" SelectionMode="Single" CanUserReorderColumns="False" CanUserSortColumns="False" ScrollViewer.CanContentScroll="False" 
-                                                      CanUserResizeRows="False" CanUserAddRows="False" CanUserDeleteRows="False" AutoGenerateColumns="False" 
-                                                      CellEditEnding="VariableGrid_CellEditEnding">
-                                                <DataGrid.HorizontalGridLinesBrush>
-                                                    <SolidColorBrush Color="{StaticResource {x:Static SystemColors.ControlColorKey}}"/>
-                                                </DataGrid.HorizontalGridLinesBrush>
-                                                <DataGrid.Columns>
-                                                    <DataGridTextColumn x:Name="VariableKey"  Header="{StaticResource VariableKeyStr}" Binding="{Binding Label}"/>
-                                                    <DataGridTextColumn x:Name="VariableValue"  Header="{StaticResource VariableValueStr}" Binding="{Binding Value}" />
-                                                </DataGrid.Columns>
-                                            </DataGrid>
-                                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" >
-                                                <Button Name="AddVariable" Width ="40" Content="{StaticResource AddStr}" Margin="2,0" Click="AddVariable_Click" />
-                                                <Button Name="DeleteVariable" Width ="40" Content="{StaticResource DelStr}" Click="DeleteVariable_Click" />
-                                            </StackPanel>
-                                        </StackPanel>
-                                    </GroupBox>
-                                </StackPanel>
-                            </ScrollViewer>
-                        </TabItem>
-                    </TabControl>
-                </DockPanel>
+                <GridSplitter Grid.Column="0" HorizontalAlignment="Right" Name="gridSplitter3" Width="3" Background="{DynamicResource GroupBorderBrush}" VerticalAlignment="Stretch"
+                              ResizeDirection="Columns" ResizeBehavior="CurrentAndNext"/>
             </Grid>
             <!-- Layerbar -->
-            <Grid Grid.Row="1" ShowGridLines="False" Margin="0">
+            <Grid Grid.Row="1" ShowGridLines="False" Margin="0" Background="{DynamicResource ListBrush}">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="250"/>
-                    <ColumnDefinition Width="10" />
-                    <ColumnDefinition/>
+                    <ColumnDefinition Width="262" MinWidth="262"/>
+                    <ColumnDefinition MinWidth="200"/>
                 </Grid.ColumnDefinitions>
-                <DockPanel Name="Layer" Grid.ColumnSpan="2">
-                    <DockPanel DockPanel.Dock="Top" Name="stackPanel2" Margin="0">
-                        <DockPanel.Background>
-                            <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
-                                <GradientStop Color="White" Offset="0" />
-                                <GradientStop Color="#FFF0F0F0" Offset="1" />
-                            </LinearGradientBrush>
-                        </DockPanel.Background>
-                        <Label  Content="{StaticResource LayerStr}" Height="28" Width="228" Name="label1" Padding="5,6,5,5" BorderBrush="{x:Null}" />
-                        <Label Name="NewLayer" Width="12" Height="12" DockPanel.Dock="Right" MouseLeftButtonUp="NewLayer_MouseUp">
+                <DockPanel Name="Layer" Grid.Column="0">
+                    <DockPanel DockPanel.Dock="Top" Name="stackPanel2" Margin="0" Background="{DynamicResource ToolBarBrush}">
+                        <Label  Content="{StaticResource LayerStr}" Height="30" Name="label1" Padding="5,6,5,5" BorderBrush="{x:Null}" Foreground="{DynamicResource TextBrush}"/>
+                        <Label Name="NewLayer" Width="12" Height="12" Margin="10,4" HorizontalAlignment="Right" DockPanel.Dock="Right" MouseLeftButtonUp="NewLayer_MouseUp">
                             <Label.Background>
                                 <ImageBrush ImageSource="Images/layernew.png" Stretch="Uniform" AlignmentX="Left" AlignmentY="Top">
                                 </ImageBrush>
@@ -664,19 +761,23 @@
                     </DockPanel>
                     <TreeView x:Name="LayerTree"  BorderBrush="White" ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                                   ScrollViewer.VerticalScrollBarVisibility="Hidden"  MouseUp="LayerTree_MouseUp" MouseDoubleClick="LayerTree_MouseDoubleClick" Margin="0" 
-                              RenderTransformOrigin="0.5,0.5" Panel.ZIndex="-1000">
+                              RenderTransformOrigin="0.5,0.5" Panel.ZIndex="-1000" Background="{x:Null}" BorderThickness="0,0,0,0"
+                              HorizontalContentAlignment="Stretch" HorizontalAlignment="Stretch">
                         <TreeView.ItemContainerStyle>
-                            <Style TargetType="{x:Type TreeViewItem}">
+                            <Style TargetType="TreeViewItem">
+                                <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
+                                <Setter Property="HorizontalContentAlignment" Value="Stretch" />
                                 <Style.Triggers>
                                     <Trigger Property="IsSelected" Value="true" >
                                         <Setter Property="FontWeight" Value="ExtraBold" />
+                                        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
                                     </Trigger>
                                 </Style.Triggers>
                             </Style>
                         </TreeView.ItemContainerStyle>
                         <TreeView.ItemTemplate>
                             <DataTemplate>
-                                <DockPanel Name="LayerElement" Width="255" Margin ="-22,0,0,0" Background="{x:Null}" 
+                                <DockPanel Name="LayerElement" Width="{Binding ElementName=LayerTree, Path=ActualWidth}" Margin ="-22,0,0,0" Background="{x:Null}"
                                                PreviewMouseRightButtonDown="LayerElement_PreviewMouseRightButtonDown" >
                                     <DockPanel.ContextMenu >
                                         <ContextMenu>
@@ -685,7 +786,7 @@
                                             <MenuItem x:Name="LayerShortDelete" Header="{StaticResource DelStr}" Click="LayerShortDelete_Click"/>
                                         </ContextMenu>
                                     </DockPanel.ContextMenu>
-                                    <Label x:Name="LayerDown" Height="12" Width="12" DockPanel.Dock="Right" MouseLeftButtonUp="LayerDown_MouseUp" >
+                                    <Label x:Name="LayerDown" Height="12" Width="12" Margin="0,0,4,0" DockPanel.Dock="Right" MouseLeftButtonUp="LayerDown_MouseUp" >
                                         <Label.Background>
                                             <ImageBrush ImageSource="Images/layerdown.png" Stretch="Uniform" AlignmentX="Left" AlignmentY="Top">
                                             </ImageBrush>
@@ -717,7 +818,7 @@
                                             </ImageBrush>
                                         </Label.Background>
                                     </Label>
-                                    <Border x:Name="border" >
+                                    <Border x:Name="border">
                                         <TextBlock Text="{Binding Path=Name}" />
                                     </Border>
                                 </DockPanel>
@@ -725,7 +826,7 @@
                         </TreeView.ItemTemplate>
                     </TreeView>
                 </DockPanel>
-                <DockPanel Grid.Column ="2" Name="TimeAxis" MouseMove="TimeAxis_MouseMove" ToolTipService.Placement="Relative" ScrollViewer.VerticalScrollBarVisibility="Disabled">
+                <DockPanel Grid.Column ="1" Name="TimeAxis" MouseMove="TimeAxis_MouseMove" ToolTipService.Placement="Relative" ScrollViewer.VerticalScrollBarVisibility="Disabled">
                     <DockPanel.Background>
                         <ImageBrush Stretch="Uniform" ImageSource="Images/rulerscale.png" TileMode="Tile" ViewportUnits="Absolute" Viewport="0,-2,30,16"/>
                     </DockPanel.Background>
@@ -734,10 +835,8 @@
                             <TextBlock></TextBlock>
                         </ToolTip>
                     </DockPanel.ToolTip>
-                    <Label DockPanel.Dock="Top" Height="30" Name="TimeScale" Padding="0" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch">
-                        <Label.Background>
-                            <ImageBrush ImageSource="Images/ruler.png" Stretch="Uniform" TileMode="Tile" Viewport="0,0,30,30" ViewportUnits="Absolute"  />
-                        </Label.Background>
+                    <Label DockPanel.Dock="Top" Height="30" Name="TimeScale" Padding="0" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch"
+                           Background="{DynamicResource RulerImageBrush}">
                     </Label>
                     <TreeView Name="LayerAxis" BorderBrush="{x:Null}" Background="{x:Null}" BorderThickness="0" VerticalContentAlignment="Top" Foreground="{x:Null}" 
                               Padding="0" PreviewMouseLeftButtonDown="LayerAxis_PreviewMouseLeftButtonDown">
@@ -760,13 +859,17 @@
                                 </Rectangle>
                             </DataTemplate>
                         </TreeView.ItemTemplate>
+                        <TreeView.Resources>
+                            <Style TargetType="ScrollBar" BasedOn="{StaticResource FlatScrollBarStyle}" />
+                            <SolidColorBrush x:Key="{x:Static SystemColors.ControlBrushKey}" Color="{Binding ScrollBarTrackBrush}" />
+                        </TreeView.Resources>
                     </TreeView>
                 </DockPanel>
-                <GridSplitter VerticalAlignment="Stretch" Name="gridSplitter4" Width="1" 
-                              HorizontalAlignment="Right" Background="#FFACACAC" Grid.Column="1" IsEnabled="False"/>
+                <GridSplitter Grid.Column="0" HorizontalAlignment="Right" Name="gridSplitter4" Width="3" Background="{DynamicResource GroupBorderBrush}" VerticalAlignment="Stretch"
+                              ResizeDirection="Columns" ResizeBehavior="CurrentAndNext"/>
             </Grid>
-            <GridSplitter Grid.Row="1"  VerticalAlignment="Top" Name="gridSplitter1" Height="1" 
-                          HorizontalAlignment="Stretch" Background="White" />
+            <GridSplitter Grid.Row="0" VerticalAlignment="Bottom" Name="gridSplitter1" Height="3" Background="{DynamicResource GroupBorderBrush}" HorizontalAlignment="Stretch"
+              ResizeDirection="Rows" ResizeBehavior="CurrentAndNext"/>
         </Grid>
     </DockPanel>
 </Window>

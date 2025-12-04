@@ -1,0 +1,45 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <LinearGradientBrush x:Key="TitleBarBrush" EndPoint="0.5,1" StartPoint="0.5,0">
+        <GradientStop Color="#FF32003F" Offset="0" />
+        <GradientStop Color="#FF1E0131" Offset="0.5" />
+        <GradientStop Color="#FF10002D" Offset="1" />
+    </LinearGradientBrush>
+    <SolidColorBrush x:Key="GroupBorderBrush" Color="#303030" />
+    <SolidColorBrush x:Key="TextBrush" Color="White" />
+    <LinearGradientBrush x:Key="ToolBarBrush" EndPoint="0.5,1" StartPoint="0.5,0">
+        <GradientStop Color="#FF2F2F2F" Offset="0" />
+        <GradientStop Color="#FF242424" Offset="0.49" />
+        <GradientStop Color="#FF1A1A1A" Offset="0.5" />
+        <GradientStop Color="#FF161616" Offset="1" />
+    </LinearGradientBrush>
+    <LinearGradientBrush x:Key="TabDisableBrush" EndPoint="0.5,1" StartPoint="0.5,0">
+        <GradientStop Color="#FF454545" Offset="0" />
+        <GradientStop Color="#FF454545" Offset="1" />
+    </LinearGradientBrush>
+    <LinearGradientBrush x:Key="TabUnselectBrush" EndPoint="0.5,1" StartPoint="0.5,0">
+        <GradientStop Color="#FF2F2F2F" Offset="0" />
+        <GradientStop Color="#FF242424" Offset="0.49" />
+        <GradientStop Color="#FF1A1A1A" Offset="0.5" />
+        <GradientStop Color="#FF161616" Offset="1" />
+    </LinearGradientBrush>
+    <LinearGradientBrush x:Key="TabSelectBrush" EndPoint="0.5,1" StartPoint="0.5,0">
+        <GradientStop Color="#FF193CC2" Offset="0" />
+        <GradientStop Color="#FF03CBF6" Offset="1" />
+    </LinearGradientBrush>
+    <LinearGradientBrush x:Key="ScreenBackgroundBrush" EndPoint="0.5,1" StartPoint="0.5,0">
+        <GradientStop Color="#FF000000" Offset="0" />
+        <GradientStop Color="#FF000000" Offset="1" />
+    </LinearGradientBrush>
+    <LinearGradientBrush x:Key="ListBrush" EndPoint="0.5,1" StartPoint="0.5,0">
+        <GradientStop Color="#FF0A000F" Offset="0" />
+        <GradientStop Color="#FF1D012A" Offset="1" />
+    </LinearGradientBrush>
+    <SolidColorBrush x:Key="ScrollBarTrackBrush" Color="#0F0F0F" />
+    <SolidColorBrush x:Key="ScrollBarThumbBrush" Color="#2F2F2F" />
+    <SolidColorBrush x:Key="ScrollBarThumbHoverBrush" Color="#404040" />
+    <SolidColorBrush x:Key="ScrollBarThumbPressedBrush" Color="#545454" />
+    <ImageBrush x:Key="SelectedGroupImageBrush" ImageSource="../Images/selectedgroup_dark.png"/>
+    <ImageBrush x:Key="RulerImageBrush" ImageSource="../Images/ruler_dark.png"
+                Stretch="Uniform" TileMode="Tile" Viewport="0,0,30,30" ViewportUnits="Absolute"/>
+</ResourceDictionary>

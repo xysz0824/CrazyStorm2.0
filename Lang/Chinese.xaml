@@ -10,6 +10,9 @@
     <sys:String x:Key="SaveStr">保存</sys:String>
     <sys:String x:Key="SaveToStr">另存为</sys:String>
     <sys:String x:Key="SetScreenStr">屏幕设置</sys:String>
+    <sys:String x:Key="StyleStr">界面主题</sys:String>
+    <sys:String x:Key="StyleDefaultStr">默认</sys:String>
+    <sys:String x:Key="StyleBlackStr">黑色</sys:String>
     <sys:String x:Key="ExitStr">退出</sys:String>
     <sys:String x:Key="EditStr">编辑</sys:String>
     <sys:String x:Key="UndoStr">撤销</sys:String>
@@ -233,5 +236,5 @@
     <sys:String x:Key="ProjectFileExtensionStr">弹幕工程文件(*.bgp)|*.bgp</sys:String>
     <sys:String x:Key="DoubleClickTipStr">继续双击进入属性面板</sys:String>
     <sys:String x:Key="ComponentUnitStr">个组件</sys:String>
-    <sys:String x:Key="ResultCountStr">查找到 {0} 个</sys:String>
+    <sys:String x:Key="ResultCountStr">找到 {0} 个</sys:String>
 </ResourceDictionary>

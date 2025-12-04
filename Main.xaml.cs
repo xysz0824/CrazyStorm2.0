@@ -136,6 +136,7 @@ namespace CrazyStorm
         {
             LoadDefaultParticleTypes();
             InitializeConfig();
+            ChangeTheme(config.Theme);
         }
         public void StartNewFile()
         {
