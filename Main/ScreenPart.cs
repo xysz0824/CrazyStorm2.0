@@ -260,6 +260,10 @@ namespace CrazyStorm
         #endregion
 
         #region Window EventHandlers
+        private void Screen_LostFocus(object sender, RoutedEventArgs e)
+        {
+            CancelAllSelection();
+        }
         private void Screen_MouseEnter(object sender, MouseEventArgs e)
         {
             MousePosTip.Visibility = Visibility.Visible;

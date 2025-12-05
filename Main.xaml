@@ -191,9 +191,13 @@
     <Window.InputBindings>
         <KeyBinding  Key="Delete" Command="{StaticResource DelComponent}" />
         <KeyBinding  Key="W" Command="{StaticResource UpComponent}" />
+        <KeyBinding  Key="Up" Command="{StaticResource UpComponent}" />
         <KeyBinding  Key="S" Command="{StaticResource DownComponent}" />
+        <KeyBinding  Key="Down" Command="{StaticResource DownComponent}" />
         <KeyBinding  Key="A" Command="{StaticResource LeftComponent}" />
+        <KeyBinding  Key="Left" Command="{StaticResource LeftComponent}" />
         <KeyBinding  Key="D" Command="{StaticResource RightComponent}" />
+        <KeyBinding  Key="Right" Command="{StaticResource RightComponent}" />
         <KeyBinding   Modifiers="Control"  Key="A" Command="{StaticResource SelectAll}" />
         <KeyBinding   Modifiers="Control"  Key="Z" Command="{StaticResource Undo}" />
         <KeyBinding   Modifiers="Control"  Key="Y" Command="{StaticResource Redo}" />
@@ -654,7 +658,7 @@
                     </TabControl>
                 </DockPanel>
                 <!-- ParticleScreen -->
-                <ScrollViewer  Grid.Column="1" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" Focusable="False" Background="{DynamicResource TitleBarBrush}">
+                <ScrollViewer  Grid.Column="1" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" Focusable="True" LostFocus="Screen_LostFocus" Background="{DynamicResource TitleBarBrush}">
                     <TabControl Name="ParticleTabControl" SelectionChanged="ParticleTabControl_SelectionChanged" 
                                 MouseLeave="ParticleTabControl_MouseLeave" MouseLeftButtonUp="ParticleTabControl_MouseLeftButtonUp"
                                 Background="{DynamicResource ScreenBackgroundBrush}" BorderThickness="0,0,0,0">
