@@ -50,11 +50,8 @@ namespace CrazyStorm
             }
             if (canvas != null)
             {
-                if (selectedComponents == null)
-                    selectedComponents = new List<Component>();
-                else
-                    selectedComponents.Clear();
-
+                if (selectedComponents == null) selectedComponents = new List<Component>();
+                else selectedComponents.Clear();
                 canvas.Children.Clear();
                 //Update binding lines
                 if (bindingLines != null)
@@ -63,6 +60,7 @@ namespace CrazyStorm
                         canvas.Children.Add(line);
                 }
                 //Update components on current screen.
+                var assembly = Assembly.GetExecutingAssembly();
                 var itemTemplate = FindResource("ComponentItem") as DataTemplate;
                 foreach (var layer in selectedSystem.Layers)
                 {
@@ -109,14 +107,14 @@ namespace CrazyStorm
                             else
                             {
                                 //Draw component mark.
-                                object marker = Assembly.GetExecutingAssembly().CreateInstance("CrazyStorm.ComponentMarker");
+                                object marker = assembly.CreateInstance("CrazyStorm.ComponentMarker");
                                 (marker as IComponentMark).Draw(canvas, component, (int)x + config.ScreenWidthOver2,
                                     (int)y + config.ScreenHeightOver2);
                                 //Draw specific mark.
                                 if (component is Emitter)
-                                    marker = Assembly.GetExecutingAssembly().CreateInstance("CrazyStorm.EmitterMarker");
+                                    marker = assembly.CreateInstance("CrazyStorm.EmitterMarker");
                                 else
-                                    marker = Assembly.GetExecutingAssembly().CreateInstance("CrazyStorm." + component.GetType().Name + "Marker");
+                                    marker = assembly.CreateInstance("CrazyStorm." + component.GetType().Name + "Marker");
 
                                 (marker as IComponentMark).Draw(canvas, component, (int)x + config.ScreenWidthOver2,
                                     (int)y + config.ScreenHeightOver2);
@@ -140,14 +138,14 @@ namespace CrazyStorm
                                     y += parent.y;
                                 }
                                 //Draw component mark.
-                                object marker = Assembly.GetExecutingAssembly().CreateInstance("CrazyStorm.ComponentMarker");
+                                object marker = assembly.CreateInstance("CrazyStorm.ComponentMarker");
                                 (marker as IComponentMark).Draw(canvas, component, (int)x + config.ScreenWidthOver2,
                                     (int)y + config.ScreenHeightOver2);
                                 //Draw specific mark.
                                 if (component is Emitter)
-                                    marker = Assembly.GetExecutingAssembly().CreateInstance("CrazyStorm.EmitterMarker");
+                                    marker = assembly.CreateInstance("CrazyStorm.EmitterMarker");
                                 else
-                                    marker = Assembly.GetExecutingAssembly().CreateInstance("CrazyStorm." + component.GetType().Name + "Marker");
+                                    marker = assembly.CreateInstance("CrazyStorm." + component.GetType().Name + "Marker");
 
                                 (marker as IComponentMark).Draw(canvas, component, (int)x + config.ScreenWidthOver2,
                                     (int)y + config.ScreenHeightOver2);

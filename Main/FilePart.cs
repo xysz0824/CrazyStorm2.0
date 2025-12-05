@@ -201,6 +201,10 @@ namespace CrazyStorm
         {
             SaveTo();
         }
+        private void CloseItem_Click(object sender, RoutedEventArgs e)
+        {
+            Close();
+        }   
         private void Window_Closing(object sender, CancelEventArgs e)
         {
             e.Cancel = !SaveTip();

@@ -235,11 +235,12 @@ namespace CrazyStorm_Player
                 }
             }
             //Load default textures and types
+            var assembly = Assembly.GetExecutingAssembly();
             defaultTextures = new List<Texture2D>();
             Environment.CurrentDirectory = System.AppDomain.CurrentDomain.SetupInformation.ApplicationBase;
-            Stream defaultTexturesStream = Assembly.GetExecutingAssembly().GetManifestResourceStream("CrazyStorm_Player.barrages.png");
+            Stream defaultTexturesStream = assembly.GetManifestResourceStream("CrazyStorm_Player.barrages.png");
             defaultTextures.Add(Texture2D.FromStream(GraphicsDevice, defaultTexturesStream));
-            Stream defaultParticleTypesStream = Assembly.GetExecutingAssembly().GetManifestResourceStream("CrazyStorm_Player.set.txt");
+            Stream defaultParticleTypesStream = assembly.GetManifestResourceStream("CrazyStorm_Player.set.txt");
             using (StreamReader reader = new StreamReader(defaultParticleTypesStream))
             {
                 defaultParticleTypes = new List<ParticleType>();
@@ -254,9 +255,9 @@ namespace CrazyStorm_Player
                     characterTexture = Texture2D.FromStream(GraphicsDevice, file);
                 }
             }
-            Stream pointTextureStream = Assembly.GetExecutingAssembly().GetManifestResourceStream("CrazyStorm_Player.point.png");
+            Stream pointTextureStream = assembly.GetManifestResourceStream("CrazyStorm_Player.point.png");
             pointTexture = Texture2D.FromStream(GraphicsDevice, pointTextureStream);
-            Stream slowModeTextureStream = Assembly.GetExecutingAssembly().GetManifestResourceStream("CrazyStorm_Player.ring.png");
+            Stream slowModeTextureStream = assembly.GetManifestResourceStream("CrazyStorm_Player.ring.png");
             slowModeTexture = Texture2D.FromStream(GraphicsDevice, slowModeTextureStream);
             //Load play file
             using (FileStream stream = new FileStream(Environment.GetCommandLineArgs()[1], FileMode.Open))

@@ -286,7 +286,7 @@
                     <MenuItem Name="StyleBlack" Header="{StaticResource StyleBlackStr}" IsCheckable="True" Click="StyleItem_Click" Loaded="StyleItem_Loaded"/>
                 </MenuItem>
                 <Separator/>
-                <MenuItem Header="{StaticResource ExitStr}" InputGestureText="Alt+F4"/>
+                <MenuItem Name="CloseItem" Header="{StaticResource ExitStr}" InputGestureText="Alt+F4" Click="CloseItem_Click"/>
             </MenuItem>
             <MenuItem Padding="10,0">
                 <MenuItem.Header>
