@@ -2,9 +2,11 @@
  * The MIT License (MIT)
  * Copyright (c) StarX 2017 
  */
+using CrazyStorm.Core;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
@@ -15,8 +17,6 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
-using System.Reflection;
-using CrazyStorm.Core;
 
 namespace CrazyStorm
 {
@@ -53,12 +53,17 @@ namespace CrazyStorm
                     SelectedGroupName.DataContext = component;
                     SelectedGroupName.SetBinding(TextBlock.TextProperty, "Name");
                     SelectedGroupTip.Text = (string)FindResource("DoubleClickTipStr");
-                    SelectedGroupImage.Source = new BitmapImage(
-                        new Uri(@"Images/button-" + component.GetType().Name + ".png", UriKind.Relative));
+                    SelectedGroupIconPath.Data = (Geometry)FindResource($"{component.GetType().Name}_Icon");
+                    var scale = (double)FindResource($"{component.GetType().Name}_Scale");
+                    var transform = new ScaleTransform(scale, scale);
+                    SelectedGroupIconPath.RenderTransform = transform;
                 }
                 else
                 {
-                    SelectedGroupImage.Source = new BitmapImage(new Uri(@"Images/group.png", UriKind.Relative));
+                    SelectedGroupIconPath.Data = (Geometry)FindResource($"Group_Icon");
+                    var scale = (double)FindResource("Group_Scale");
+                    var transform = new ScaleTransform(scale, scale);
+                    SelectedGroupIconPath.RenderTransform = transform;
                     SelectedGroupType.Text = "Group";
                     SelectedGroupName.Text = selectedComponents.Count + (string)FindResource("ComponentUnitStr");
                     SelectedGroupTip.Text = string.Empty;
@@ -201,20 +206,6 @@ namespace CrazyStorm
             {
                 emitter.Particle.Type = defaultParticleTypes[0];
             }
-        }
-        private void ComponentButton_MouseEnter(object sender, MouseEventArgs e)
-        {
-            //Light up button when mouse enter.
-            var image = sender as Image;
-            var button = VisualHelper.VisualUpwardSearch<Button>(image) as Button;
-            image.Source = new BitmapImage(new Uri(@"Images\button-" + button.Name + "-on.png", UriKind.Relative));
-        }
-        private void ComponentButton_MouseLeave(object sender, MouseEventArgs e)
-        {
-            //Reset button when mouse leave.
-            var image = sender as Image;
-            var button = VisualHelper.VisualUpwardSearch<Button>(image) as Button;
-            image.Source = new BitmapImage(new Uri(@"Images\button-" + button.Name + ".png", UriKind.Relative));
         }
         private void ComponentTree_MouseLeftButtonDown(object sender, MouseEventArgs e)
         {

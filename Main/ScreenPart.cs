@@ -70,10 +70,9 @@ namespace CrazyStorm
                         {
                             var item = itemTemplate.LoadContent() as Canvas;
                             var frame = VisualHelper.VisualDownwardSearch(item, "Frame") as Label;
-                            var icon = VisualHelper.VisualDownwardSearch(item, "Icon") as Image;
-                            var box = VisualHelper.VisualDownwardSearch(item, "Box") as Image;
+                            var icon = VisualHelper.VisualDownwardSearch(item, "Icon") as Path;
+                            var box = VisualHelper.VisualDownwardSearch(item, "Box") as Border;
                             frame.DataContext = layer;
-                            icon.DataContext = component;
                             box.Opacity = component.Selected ? 1 : 0;
                             //If component has a parent, caculate the absolute position.
                             float x = component.X;
@@ -119,7 +118,10 @@ namespace CrazyStorm
                                 (marker as IComponentMark).Draw(canvas, component, (int)x + config.ScreenWidthOver2,
                                     (int)y + config.ScreenHeightOver2);
                             }
-                            icon.Source = new BitmapImage(new Uri(@"Images/button-" + component.GetType().Name + ".png", UriKind.Relative));
+                            icon.Data = (Geometry)FindResource($"{component.GetType().Name}_Icon");
+                            var scale = (double)FindResource($"{component.GetType().Name}_Scale");
+                            var transform = new ScaleTransform(scale, scale);
+                            icon.RenderTransform = transform;
                             item.SetValue(Canvas.LeftProperty, (double)x - box.Width / 2 + config.ScreenWidthOver2);
                             item.SetValue(Canvas.TopProperty, (double)y - box.Height / 2 + config.ScreenHeightOver2);
                             canvas.Children.Add(item as UIElement);

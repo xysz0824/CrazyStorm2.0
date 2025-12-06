@@ -293,9 +293,6 @@
     <Resource Include="Images\grid.png" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Images\aimbox.png" />
-  </ItemGroup>
-  <ItemGroup>
     <Resource Include="Images\selecting.png" />
   </ItemGroup>
   <ItemGroup>
@@ -324,24 +321,6 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Images\close.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Images\group.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Images\button-CurveEmitter-on.png" />
-    <Resource Include="Images\button-CurveEmitter.png" />
-    <Resource Include="Images\button-ForceField-on.png" />
-    <Resource Include="Images\button-ForceField.png" />
-    <Resource Include="Images\button-EventField-on.png" />
-    <Resource Include="Images\button-EventField.png" />
-    <Resource Include="Images\button-MultiEmitter-on.png" />
-    <Resource Include="Images\button-MultiEmitter.png" />
-    <Resource Include="Images\button-Rebounder-on.png" />
-    <Resource Include="Images\button-Rebounder.png" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="CrazyStorm Player\CrazyStorm Player\CrazyStorm Player.csproj">
       <Project>{6969210a-fb47-48a8-b14c-52d4f0955e63}</Project>
       <Name>CrazyStorm Player</Name>
@@ -362,18 +341,6 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Images\barrages.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Images\arrow-right-3.png" />
-    <Resource Include="Images\document-export.png" />
-    <Resource Include="Images\document-new-3.png" />
-    <Resource Include="Images\document-open-2.png" />
-    <Resource Include="Images\edit-copy-3.png" />
-    <Resource Include="Images\edit-cut-3.png" />
-    <Resource Include="Images\edit-find-5.png" />
-    <Resource Include="Images\edit-paste-3.png" />
-    <Resource Include="Images\edit-redo-3.png" />
-    <Resource Include="Images\edit-undo-3.png" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="icon.ico" />

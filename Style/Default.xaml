@@ -5,7 +5,12 @@
         <GradientStop Color="#FFF0F0F0" Offset="1" />
     </LinearGradientBrush>
     <SolidColorBrush x:Key="GroupBorderBrush" Color="#C9C9C9" />
+    <SolidColorBrush x:Key="IconBrush" Color="White" />
     <SolidColorBrush x:Key="TextBrush" Color="Black" />
+    <LinearGradientBrush x:Key="HeadToolBarBrush" EndPoint="0.5,1" StartPoint="0.5,0">
+        <GradientStop Color="#FFF0F0F0" Offset="0" />
+        <GradientStop Color="#FFB4B4B4" Offset="1" />
+    </LinearGradientBrush>
     <LinearGradientBrush x:Key="ToolBarBrush" EndPoint="0.5,1" StartPoint="0.5,0">
         <GradientStop Color="White" Offset="0" />
         <GradientStop Color="#FFF0F0F0" Offset="1" />
