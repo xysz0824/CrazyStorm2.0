@@ -309,8 +309,19 @@ namespace CrazyStorm
         }
         private void TabClose_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            TabItem item = VisualHelper.VisualUpwardSearch<TabItem>(sender as DependencyObject) as TabItem;
-            LeftTabControl.Items.Remove(item);
+            var tabItem = VisualHelper.VisualUpwardSearch<TabItem>(sender as DependencyObject) as TabItem;
+            LeftTabControl.Items.Remove(tabItem);
+            var hasComponentPanel = false;
+            foreach (var item in LeftTabControl.Items)
+            {
+                tabItem = item as TabItem;
+                if (tabItem != null && tabItem.DataContext != null && tabItem.DataContext is Component)
+                {
+                    hasComponentPanel = true;
+                    LeftTabControl.SelectedItem = tabItem;
+                }
+            }
+            if (!hasComponentPanel) LeftTabControl.SelectedIndex = 0;
         }
         private void BindComponentItem_Click(object sender, RoutedEventArgs e)
         {
