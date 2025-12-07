@@ -322,12 +322,6 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Images\accelerated.png" />
-    <Resource Include="Images\decelerated.png" />
-    <Resource Include="Images\instant.png" />
-    <Resource Include="Images\linear.png" />
-  </ItemGroup>
-  <ItemGroup>
     <Resource Include="set.txt" />
   </ItemGroup>
   <ItemGroup>
@@ -341,6 +335,9 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Images\ruler_dark.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\curvegrid.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

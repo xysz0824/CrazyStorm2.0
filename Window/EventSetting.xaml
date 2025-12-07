@@ -92,19 +92,31 @@
                 </DockPanel>
                 <StackPanel Orientation="Horizontal" Margin="0,1" HorizontalAlignment="Center">
                     <StackPanel Margin="6,0">
-                        <Image Source="/CrazyStorm;component/Images/linear.png" Width="96" Height="48"/>
+                        <Grid>
+                            <Image Source="/CrazyStorm;component/Images/curvegrid.png" Width="96" Height="48"></Image>
+                            <Path Data="{StaticResource Linear_Curve}" Width="96" Height="48" Fill="#00A5F0"/>
+                        </Grid>
                         <RadioButton Name="Linear"  HorizontalAlignment="Center" Content="{StaticResource LinearStr}" Checked="Linear_Checked"></RadioButton>
                     </StackPanel>
                     <StackPanel Margin="6,0">
-                        <Image Source="/CrazyStorm;component/Images/accelerated.png" Width="96" Height="48"></Image>
+                        <Grid>
+                            <Image Source="/CrazyStorm;component/Images/curvegrid.png" Width="96" Height="48"></Image>
+                            <Path Data="{StaticResource Accelerated_Curve}" Width="96" Height="48" Fill="#00A5F0"/>
+                        </Grid>
                         <RadioButton Name="Accelerated" HorizontalAlignment="Center" Content="{StaticResource AcceleratedStr}" Checked="Accelerated_Checked"></RadioButton>
                     </StackPanel>
                     <StackPanel Margin="6,0">
-                        <Image Source="/CrazyStorm;component/Images/decelerated.png" Width="96" Height="48"></Image>
+                        <Grid>
+                            <Image Source="/CrazyStorm;component/Images/curvegrid.png" Width="96" Height="48"></Image>
+                            <Path Data="{StaticResource Decelerated_Curve}" Width="96" Height="48" Fill="#00A5F0"/>
+                        </Grid>
                         <RadioButton Name="Decelerated" HorizontalAlignment="Center" Content="{StaticResource DeceleratedStr}" Checked="Decelerated_Checked"></RadioButton>
                     </StackPanel>
                     <StackPanel Margin="6,0">
-                        <Image Source="/CrazyStorm;component/Images/instant.png" Width="96" Height="48"></Image>
+                        <Grid>
+                            <Image Source="/CrazyStorm;component/Images/curvegrid.png" Width="96" Height="48"></Image>
+                            <Path Data="{StaticResource Instant_Curve}" Width="96" Height="48" Fill="#00A5F0"/>
+                        </Grid>
                         <RadioButton Name="Instant" HorizontalAlignment="Center" Content="{StaticResource InstantStr}" Checked="Instant_Checked"></RadioButton>
                     </StackPanel>
                 </StackPanel>
