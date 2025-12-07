@@ -24,7 +24,7 @@ namespace CrazyStorm
                 rect.Width = force.HalfWidth * 2;
                 rect.Height = force.HalfHeight * 2;
                 rect.Fill = new SolidColorBrush(Colors.Red);
-                rect.Opacity = 0.5f;
+                rect.Opacity = 0.3f;
                 rect.SetValue(Canvas.LeftProperty, (double)x - force.HalfWidth);
                 rect.SetValue(Canvas.TopProperty, (double)y - force.HalfHeight);
                 canvas.Children.Add(rect);
@@ -35,7 +35,7 @@ namespace CrazyStorm
                 ellipse.Width = force.HalfWidth * 2;
                 ellipse.Height = force.HalfWidth * 2;
                 ellipse.Fill = new SolidColorBrush(Colors.Red);
-                ellipse.Opacity = 0.5f;
+                ellipse.Opacity = 0.3f;
                 ellipse.SetValue(Canvas.LeftProperty, (double)x - force.HalfWidth);
                 ellipse.SetValue(Canvas.TopProperty, (double)y - force.HalfWidth);
                 canvas.Children.Add(ellipse);

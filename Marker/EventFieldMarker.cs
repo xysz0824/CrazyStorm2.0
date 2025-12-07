@@ -24,7 +24,7 @@ namespace CrazyStorm
                 rect.Width = EventField.HalfWidth * 2;
                 rect.Height = EventField.HalfHeight * 2;
                 rect.Fill = new SolidColorBrush(Colors.Red);
-                rect.Opacity = 0.5f;
+                rect.Opacity = 0.3f;
                 rect.SetValue(Canvas.LeftProperty, (double)x - EventField.HalfWidth);
                 rect.SetValue(Canvas.TopProperty, (double)y - EventField.HalfHeight);
                 canvas.Children.Add(rect);
@@ -35,7 +35,7 @@ namespace CrazyStorm
                 ellipse.Width = EventField.HalfWidth * 2;
                 ellipse.Height = EventField.HalfWidth * 2;
                 ellipse.Fill = new SolidColorBrush(Colors.Red);
-                ellipse.Opacity = 0.5f;
+                ellipse.Opacity = 0.3f;
                 ellipse.SetValue(Canvas.LeftProperty, (double)x - EventField.HalfWidth);
                 ellipse.SetValue(Canvas.TopProperty, (double)y - EventField.HalfWidth);
                 canvas.Children.Add(ellipse);

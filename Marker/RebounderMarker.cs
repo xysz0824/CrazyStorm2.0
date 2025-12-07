@@ -23,7 +23,7 @@ namespace CrazyStorm
                 var line = new Line();
                 line.Stroke = new SolidColorBrush(Colors.Red);
                 line.StrokeThickness = 6;
-                line.Opacity = 0.5f;
+                line.Opacity = 0.3f;
                 line.X1 = x + Rebounder.Size * Math.Cos(Rebounder.Rotation / 180 * Math.PI);
                 line.Y1 = y + Rebounder.Size * Math.Sin(Rebounder.Rotation / 180 * Math.PI);
                 line.X2 = x + Rebounder.Size * Math.Cos((Rebounder.Rotation + 180) / 180 * Math.PI);
@@ -37,7 +37,7 @@ namespace CrazyStorm
                 ellipse.Height = Rebounder.Size * 2;
                 ellipse.Stroke = new SolidColorBrush(Colors.Red);
                 ellipse.StrokeThickness = 6;
-                ellipse.Opacity = 0.5f;
+                ellipse.Opacity = 0.3f;
                 ellipse.SetValue(Canvas.LeftProperty, (double)x - Rebounder.Size);
                 ellipse.SetValue(Canvas.TopProperty, (double)y - Rebounder.Size);
                 canvas.Children.Add(ellipse);
