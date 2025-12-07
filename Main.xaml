@@ -575,15 +575,13 @@
                                 <ImageBrush/>
                             </Canvas.Background>
                             <DockPanel Width="42" Height="42" Canvas.Left="10" Canvas.Top="10" Background="{StaticResource ComponentIconBrush}">
-                                <Border BorderThickness="1" BorderBrush="#737071" Padding="0">
-                                    <Border BorderThickness="1" BorderBrush="#EEEEEE" Padding="0">
-                                        <Path Name="SelectedGroupIconPath" Data="{x:Null}" Fill="White" Width="38" Height="38" Stretch="Uniform" ToolTip="{StaticResource MultiEmitterStr}"
+                                <Border BorderThickness="1" BorderBrush="#EEEEEE" Padding="0">
+                                    <Path Name="SelectedGroupIconPath" Data="{x:Null}" Fill="White" Width="38" Height="38" Stretch="Uniform" ToolTip="{StaticResource MultiEmitterStr}"
                                           RenderTransformOrigin="0.5,0.5">
-                                            <Path.Effect>
-                                                <DropShadowEffect Color="Black" Opacity="0.9" BlurRadius="5" Direction="315" ShadowDepth="0" />
-                                            </Path.Effect>
-                                        </Path>
-                                    </Border>
+                                        <Path.Effect>
+                                            <DropShadowEffect Color="Black" Opacity="0.9" BlurRadius="5" Direction="315" ShadowDepth="0" />
+                                        </Path.Effect>
+                                    </Path>
                                 </Border>
                                 <DockPanel.Effect>
                                     <DropShadowEffect ShadowDepth="0" BlurRadius="10" Opacity="0.5"/>
@@ -919,15 +917,15 @@
                 <DockPanel Name="Layer" Grid.Column="0">
                     <DockPanel DockPanel.Dock="Top" Name="stackPanel2" Margin="0" Background="{DynamicResource ToolBarBrush}">
                         <Label  Content="{StaticResource LayerStr}" Height="30" Name="label1" Padding="5,6,5,5" BorderBrush="{x:Null}" Foreground="{DynamicResource TextBrush}"/>
-                        <Label Name="NewLayer" Width="12" Height="12" Margin="10,4" HorizontalAlignment="Right" DockPanel.Dock="Right" MouseLeftButtonUp="NewLayer_MouseUp">
-                            <Label.Background>
-                                <ImageBrush ImageSource="Images/layernew.png" Stretch="Uniform" AlignmentX="Left" AlignmentY="Top">
-                                </ImageBrush>
-                            </Label.Background>
-                            <Label.ToolTip>
+                        <Path Name="NewLayer" Width="12" Height="12" Margin="10,4" HorizontalAlignment="Right" DockPanel.Dock="Right" MouseLeftButtonUp="NewLayer_MouseUp" 
+                              Data="{StaticResource NewLayer_Icon}" Fill="White" Stroke="#444444" StrokeThickness="0.5" Stretch="Uniform">
+                            <Path.Effect>
+                                <DropShadowEffect Color="Black" Opacity="1" BlurRadius="3" Direction="315" ShadowDepth="0" />
+                            </Path.Effect>
+                            <Path.ToolTip>
                                 <TextBlock Text="{StaticResource NewStr}"/>
-                            </Label.ToolTip>
-                        </Label>
+                            </Path.ToolTip>
+                        </Path>
                     </DockPanel>
                     <TreeView x:Name="LayerTree"  BorderBrush="White" ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                                   ScrollViewer.VerticalScrollBarVisibility="Hidden"  MouseUp="LayerTree_MouseUp" MouseDoubleClick="LayerTree_MouseDoubleClick" Margin="0" 
@@ -937,6 +935,7 @@
                             <Style TargetType="TreeViewItem">
                                 <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
                                 <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                                <Setter Property="Height" Value="16" />
                                 <Style.Triggers>
                                     <Trigger Property="IsSelected" Value="true" >
                                         <Setter Property="FontWeight" Value="ExtraBold" />
@@ -956,28 +955,25 @@
                                             <MenuItem x:Name="LayerShortDelete" Header="{StaticResource DelStr}" Click="LayerShortDelete_Click"/>
                                         </ContextMenu>
                                     </DockPanel.ContextMenu>
-                                    <Label x:Name="LayerDown" Height="12" Width="12" Margin="0,0,4,0" DockPanel.Dock="Right" MouseLeftButtonUp="LayerDown_MouseUp" >
-                                        <Label.Background>
-                                            <ImageBrush ImageSource="Images/layerdown.png" Stretch="Uniform" AlignmentX="Left" AlignmentY="Top">
-                                            </ImageBrush>
-                                        </Label.Background>
-                                    </Label>
-                                    <Label x:Name="LayerUp" Height="12" Width="12" DockPanel.Dock="Right" MouseLeftButtonUp="LayerUp_MouseUp" >
-                                        <Label.Background>
-                                            <ImageBrush ImageSource="Images/layerup.png" Stretch="Uniform" AlignmentX="Left" AlignmentY="Top">
-                                            </ImageBrush>
-                                        </Label.Background>
-                                    </Label>
-                                    <Label x:Name="LayerVisible" Height="12" Width="12" Margin ="2,0,2,0" DockPanel.Dock="Right" 
-                                               MouseLeftButtonUp="LayerVisible_MouseUp" >
-                                        <Label.Background>
-                                            <ImageBrush ImageSource="Images/layervisible.png" Stretch="Uniform" AlignmentX="Left" AlignmentY="Top">
-                                            </ImageBrush>
-                                        </Label.Background>
-                                        <Label.Opacity>
+                                    <Path Name="LayerDown" Width="10" Height="12" Margin="2,0,4,2" DockPanel.Dock="Right" MouseLeftButtonUp="LayerDown_MouseUp" 
+                                          Data="{StaticResource LayerDown_Icon}" Fill="Gray" Stroke="#444444" StrokeThickness="0.5" Stretch="Uniform" VerticalAlignment="Bottom">
+                                        <Path.Effect>
+                                            <DropShadowEffect Color="Black" Opacity="1" BlurRadius="3" Direction="315" ShadowDepth="0" />
+                                        </Path.Effect>
+                                    </Path>
+                                    <Path Name="LayerUp" Width="10" Height="12" Margin="2,2,0,0" DockPanel.Dock="Right" MouseLeftButtonUp="LayerUp_MouseUp" 
+                                          Data="{StaticResource LayerUp_Icon}" Fill="Gray" Stroke="#444444" StrokeThickness="0.5" Stretch="Uniform" VerticalAlignment="Top">
+                                        <Path.Effect>
+                                            <DropShadowEffect Color="Black" Opacity="1" BlurRadius="3" Direction="315" ShadowDepth="0" />
+                                        </Path.Effect>
+                                    </Path>
+                                    <Grid Name="LayerVisible" Width="13" Height="8" Margin="2,0,2,0" DockPanel.Dock="Right" MouseLeftButtonUp="LayerVisible_MouseUp">
+                                        <Path Data="{StaticResource LayerVisible_Background}" Fill="White" StrokeThickness="0" Stretch="Fill" VerticalAlignment="Center" />
+                                        <Path Data="{StaticResource LayerVisible_Icon}" Fill="Black" Stroke="#444444" StrokeThickness="0.5" Stretch="Fill" VerticalAlignment="Center" />
+                                        <Grid.Opacity>
                                             <Binding Path="Visible" />
-                                        </Label.Opacity>
-                                    </Label>
+                                        </Grid.Opacity>
+                                    </Grid>
                                     <Label x:Name="LayerColor" Height="12" Width="12" Margin ="5,0,5,0" RenderTransformOrigin="0.5,0.5" 
                                                MouseLeftButtonUp="LayerColor_MouseUp">
                                         <Label.Background>

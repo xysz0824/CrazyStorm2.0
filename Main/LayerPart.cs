@@ -102,7 +102,7 @@ namespace CrazyStorm
             else
                 return;
 
-            var visible = sender as Label;
+            var visible = sender as Grid;
             selectedLayer.Visible = visible.Opacity == 0 ? true : false;
             UpdateSelectedStatus();
         }

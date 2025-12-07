@@ -2,6 +2,7 @@
  * The MIT License (MIT)
  * Copyright (c) StarX 2017 
  */
+using CrazyStorm.Core;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,7 +16,7 @@ namespace CrazyStorm
     {
         public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
         {
-            return new Rect((float)((int)value / 7.0f) + 0.01f, 0, 0.1f, 1);
+            return new Rect((float)((int)value / (float)Enum.GetNames(typeof(LayerColor)).Length) + 0.01f, 0.01f, 0.1f, 0.99f);
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)

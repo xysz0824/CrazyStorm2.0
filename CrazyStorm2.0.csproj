@@ -280,16 +280,6 @@
     <Resource Include="Images\rulerscale.png" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Images\layervisible.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Images\layerdown.png" />
-    <Resource Include="Images\layerup.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Images\layernew.png" />
-  </ItemGroup>
-  <ItemGroup>
     <Resource Include="Images\center.png" />
     <Resource Include="Images\grid.png" />
   </ItemGroup>

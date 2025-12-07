@@ -20,7 +20,7 @@ namespace CrazyStorm
             {
                 var index = selectedParticle.LayerIndex;
                 var newLayer = new Layer("Layer" + index);
-                newLayer.Color = (LayerColor)((index + 1) % 7);
+                newLayer.Color = (LayerColor)((index + 1) % Enum.GetNames(typeof(LayerColor)).Length);
                 History[0] = newLayer;
                 selectedParticle.AddLayer(newLayer);
             }
