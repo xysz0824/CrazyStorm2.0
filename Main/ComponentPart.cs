@@ -96,7 +96,7 @@ namespace CrazyStorm
             scroll.Resources.Add(SystemColors.ControlBrushKey, trackBrush);
             scroll.VerticalScrollBarVisibility = ScrollBarVisibility.Auto;
             var particleTypes = new List<ParticleType>();
-            particleTypes.AddRange(defaultParticleTypes);
+            particleTypes.AddRange(ParticleType.DefaultTypes);
             particleTypes.AddRange(selectedSystem.CustomTypes);
             var panel = new PropertyPanel(commandStacks[selectedSystem], file, 
                 particleTypes, component, UpdateProperty);
@@ -204,7 +204,7 @@ namespace CrazyStorm
             var emitter = aimComponent as Emitter;
             if (emitter != null)
             {
-                emitter.Particle.Type = defaultParticleTypes[0];
+                emitter.Particle.Type = ParticleType.DefaultTypes.First();
             }
         }
         private void ComponentTree_MouseLeftButtonDown(object sender, MouseEventArgs e)

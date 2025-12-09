@@ -4,11 +4,13 @@
  */
 using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Collections.ObjectModel;
+using System.IO;
+using System.Linq.Expressions;
+using System.Runtime.InteropServices.WindowsRuntime;
+using System.Text;
 using System.Xml;
 using System.Xml.Serialization;
-using System.IO;
 
 namespace CrazyStorm.Core
 {
@@ -94,6 +96,164 @@ namespace CrazyStorm.Core
             XmlHelper.StoreObjectList(globals, doc, node, "Globals");            
             return node;
         }
+        public static bool CheckVersion(string filePath)
+        {
+            var doc = new XmlDocument();
+            doc.Load(filePath);
+            var root = (XmlElement)doc.SelectSingleNode(VersionInfo.AppName.Replace(" ", ""));
+            if (root == null) throw new XmlException();
+            else
+            {
+                if (!root.HasAttribute("version"))
+                {
+                    throw new System.IO.FileLoadException("FileDataError");
+                }
+                string version = root.GetAttribute("version");
+                return VersionInfo.PlayVersion == version;
+            }
+        }
+        public void RebuildComponentTree(ParticleSystem particleSystem)
+        {
+            for (int i = 0; i < particleSystem.Layers.Count; ++i)
+            {
+                particleSystem.AddLayer(particleSystem.Layers[0]);
+                particleSystem.Layers.RemoveAt(0);
+            }
+        }
+        public void RebuildComponentTree()
+        {
+            foreach (var particleSystem in ParticleSystems)
+                RebuildComponentTree(particleSystem);
+        }
+        public void RebuildObjectReference()
+        {
+            foreach (var particleSystem in ParticleSystems)
+            {
+                //Rebuild all custom types
+                foreach (var customType in particleSystem.CustomTypes)
+                    customType.RebuildReferenceFromCollection(Images);
+                //Collect all particle types
+                var particleTypes = new List<ParticleType>();
+                particleTypes.AddRange(ParticleType.DefaultTypes);
+                particleTypes.AddRange(particleSystem.CustomTypes);
+                //Collect all components
+                var components = new List<Core.Component>();
+                foreach (var layer in particleSystem.Layers)
+                    components.AddRange(layer.Components);
+                //Rebuild components reference
+                foreach (var component in components)
+                {
+                    component.RebuildReferenceFromCollection(components);
+                    //Rebuild particles reference
+                    if (component is Emitter)
+                        (component as Emitter).Particle.RebuildReferenceFromCollection(particleTypes);
+                }
+            }
+        }
+        public void Load(string filePath)
+        {
+            var doc = new XmlDocument();
+            doc.Load(filePath);
+            var root = (XmlElement)doc.SelectSingleNode(VersionInfo.AppName.Replace(" ", ""));
+            if (root == null) throw new XmlException();
+            else
+            {
+                BuildFromXml(root);
+                RebuildObjectReference();
+                RebuildComponentTree();
+            }
+        }
+        public void Save(string filePath)
+        {
+            var doc = new XmlDocument();
+            var declaration = doc.CreateXmlDeclaration("1.0", "UTF-8", null);
+            doc.AppendChild(declaration);
+            var root = doc.CreateElement(VersionInfo.AppName.Replace(" ", ""));
+            var version = doc.CreateAttribute("version");
+            version.Value = VersionInfo.PlayVersion;
+            root.Attributes.Append(version);
+            StoreAsXml(doc, root);
+            doc.AppendChild(root);
+            doc.Save(filePath);
+        }
+        void CompilePropertyExpressions(PropertyContainer container)
+        {
+            if (container is Emitter)
+                CompilePropertyExpressions((container as Emitter).Particle);
+
+            Type containerType = container.GetType();
+            foreach (var property in container.Properties)
+            {
+                if (property.Value.Expression)
+                {
+                    var lexer = new Expression.Lexer();
+                    lexer.Load(property.Value.Value);
+                    var syntaxTree = new Expression.Parser(lexer).Expression();
+                    if (syntaxTree.ContainType<Expression.Name>() || syntaxTree.ContainType<Expression.Call>())
+                    {
+                        var compiledBytes = new List<byte>();
+                        syntaxTree.Compile(compiledBytes);
+                        property.Value.CompiledExpression = compiledBytes.ToArray();
+                    }
+                    else
+                    {
+                        object value = syntaxTree.Eval(null);
+                        containerType.GetProperty(property.Key).GetSetMethod().Invoke(container, new object[] { value });
+                    }
+                }
+            }
+        }
+        void CompileEventGroups(Component component)
+        {
+            CompileEvents(component.ComponentEventGroups);
+            if (component is Emitter)
+                CompileEvents((component as Emitter).ParticleEventGroups);
+            else if (component is EventField)
+                CompileEvents((component as EventField).EventFieldEventGroups);
+            else if (component is Rebounder)
+                CompileEvents((component as Rebounder).RebounderEventGroups);
+        }
+        void CompileEvents(IList<EventGroup> eventGroups)
+        {
+            foreach (EventGroup eventGroup in eventGroups)
+            {
+                eventGroup.CompiledCondition = null;
+                if (!string.IsNullOrEmpty(eventGroup.Condition))
+                {
+                    var lexer = new Expression.Lexer();
+                    lexer.Load(eventGroup.Condition);
+                    var syntaxTree = new Expression.Parser(lexer).Expression();
+                    var compiledBytes = new List<byte>();
+                    syntaxTree.Compile(compiledBytes);
+                    eventGroup.CompiledCondition = compiledBytes.ToArray();
+                }
+                eventGroup.CompiledEvents.Clear();
+                foreach (string originalEvent in eventGroup.OriginalEvents)
+                    eventGroup.CompiledEvents.Add(EventHelper.GenerateEventData(originalEvent, (t) =>
+                    {
+                        var lexer = new Expression.Lexer();
+                        lexer.Load(t);
+                        var syntaxTree = new Expression.Parser(lexer).Expression();
+                        var compiledBytes = new List<byte>();
+                        syntaxTree.Compile(compiledBytes);
+                        return compiledBytes.ToArray();
+                    }));
+            }
+        }
+        void Compile()
+        {
+            foreach (var particleSystem in ParticleSystems)
+            {
+                foreach (var layer in particleSystem.Layers)
+                {
+                    foreach (var component in layer.Components)
+                    {
+                        CompilePropertyExpressions(component);
+                        CompileEventGroups(component);
+                    }
+                }
+            }
+        }
         public List<byte> GeneratePlayData()
         {
             var fileBytes = new List<byte>();
@@ -106,6 +266,22 @@ namespace CrazyStorm.Core
             //globals
             PlayDataHelper.GenerateObjectList(globals, fileBytes);
             return fileBytes;
+        }
+        public void GeneratePlayFile(string filePath, string fileName)
+        {
+            string genPath = Path.GetDirectoryName(filePath) + "\\" + fileName + ".bg";
+            using (FileStream stream = new FileStream(genPath, FileMode.Create))
+            {
+                var writer = new BinaryWriter(stream);
+                //Play file use UTF-8 encoding
+                //Write play file header
+                writer.Write(PlayDataHelper.GetStringBytes("BG"));
+                //Write play file version
+                writer.Write(PlayDataHelper.GetStringBytes(VersionInfo.PlayVersion));
+                //Write play file data
+                Compile();
+                writer.Write(GeneratePlayData().ToArray());
+            }
         }
         public void LoadPlayData(BinaryReader reader, float version)
         {
@@ -126,6 +302,52 @@ namespace CrazyStorm.Core
                         component.Globals = globals;
                 }
             }
+        }
+        void RebuildObjectReference(File file)
+        {
+            foreach (var particleSystem in file.ParticleSystems)
+            {
+                //Rebuild all custom types
+                foreach (var customType in particleSystem.CustomTypes)
+                    customType.RebuildReferenceFromCollection(file.Images);
+                //Collect all particle types
+                var particleTypes = new List<ParticleType>();
+                ParticleType.LoadDefaultTypes();
+                particleTypes.AddRange(ParticleType.DefaultTypes);
+                particleTypes.AddRange(particleSystem.CustomTypes);
+                //Collect all components
+                var components = new List<Component>();
+                foreach (var layer in particleSystem.Layers)
+                    components.AddRange(layer.Components);
+                //Rebuild components reference
+                foreach (var component in components)
+                {
+                    component.RebuildReferenceFromCollection(components);
+                    //Rebuild particles reference
+                    if (component is Emitter)
+                        (component as Emitter).InitialTemplate.RebuildReferenceFromCollection(particleTypes);
+                }
+            }
+        }
+        public bool LoadPlayFile(string filePath, float baseVersion)
+        {
+            using (FileStream stream = new FileStream(filePath, FileMode.Open))
+            {
+                var reader = new BinaryReader(stream);
+                //Play file use UTF-8 encoding
+                string header = PlayDataHelper.ReadString(reader);
+                if (header == "BG")
+                {
+                    float version = float.Parse(PlayDataHelper.ReadString(reader));
+                    if (version >= baseVersion)
+                    {
+                        LoadPlayData(reader, version);
+                        RebuildObjectReference(this);
+                        return true;
+                    }
+                }
+            }
+            return false;
         }
         public void SetGlobal(string label, float value)
         {

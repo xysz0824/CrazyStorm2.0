@@ -4,11 +4,12 @@
  */
 using System;
 using System.Collections.Generic;
-using System.Text;
 using System.ComponentModel;
+using System.IO;
+using System.Reflection;
+using System.Text;
 using System.Xml;
 using System.Xml.Serialization;
-using System.IO;
 
 namespace CrazyStorm.Core
 {
@@ -26,6 +27,7 @@ namespace CrazyStorm.Core
     }
     public class ParticleType : INotifyPropertyChanged, IXmlData, IRebuildReference<FileResource>, IGeneratePlayData, ILoadPlayData
     {
+        public static readonly List<ParticleType> DefaultTypes = new List<ParticleType>();
         public const int DefaultTypeIndex = 1000;
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -253,6 +255,33 @@ namespace CrazyStorm.Core
         #endregion
 
         #region Public Methods
+        public static void LoadDefaultTypes()
+        {
+            if (DefaultTypes.Count > 0) return;
+            var assembly = Assembly.GetExecutingAssembly();
+            Stream defaultParticleTypesStream = assembly.GetManifestResourceStream("CrazyStorm.Core.set.txt");
+            using (StreamReader reader = new StreamReader(defaultParticleTypesStream))
+            {
+                int i = 0;
+                while (!reader.EndOfStream)
+                {
+                    string[] splits = reader.ReadLine().Split('_');
+                    var particleType = new ParticleType(i + DefaultTypeIndex);
+                    particleType.Name = splits[0];
+                    particleType.StartPoint = new Vector2(float.Parse(splits[1]), float.Parse(splits[2]));
+                    particleType.Width = int.Parse(splits[3]);
+                    particleType.Height = int.Parse(splits[4]);
+                    particleType.CenterPoint = new Vector2(float.Parse(splits[5]), float.Parse(splits[6]));
+                    particleType.Radius = int.Parse(splits[7]);
+                    if (!StringUtil.IsNullOrWhiteSpace(splits[8]))
+                    {
+                        particleType.Color = (ParticleColor)(int.Parse(splits[8]) + 1);
+                    }
+                    DefaultTypes.Add(particleType);
+                    i++;
+                }
+            }
+        }
         public override string ToString()
         {
             return Name;
@@ -319,27 +348,6 @@ namespace CrazyStorm.Core
 
             PlayDataHelper.GenerateFields(this, particleTypeBytes);
             return PlayDataHelper.CreateBlock(particleTypeBytes);
-        }
-        public static void LoadDefaultTypes(StreamReader reader, IList<ParticleType> typeset)
-        {
-            typeset.Clear();
-            int i = 0;
-            while (!reader.EndOfStream)
-            {
-                string[] splits = reader.ReadLine().Split('_');
-                var particleType = new ParticleType(i + DefaultTypeIndex);
-                particleType.Name = splits[0];
-                particleType.StartPoint = new Vector2(float.Parse(splits[1]), float.Parse(splits[2]));
-                particleType.Width = int.Parse(splits[3]);
-                particleType.Height = int.Parse(splits[4]);
-                particleType.CenterPoint = new Vector2(float.Parse(splits[5]), float.Parse(splits[6]));
-                particleType.Radius = int.Parse(splits[7]);
-                if (!StringUtil.IsNullOrWhiteSpace(splits[8]))
-                    particleType.Color = (ParticleColor)(int.Parse(splits[8]) + 1);
-
-                typeset.Add(particleType);
-                i++;
-            }
         }
         public void LoadPlayData(BinaryReader reader, float version)
         {

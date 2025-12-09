@@ -28,7 +28,6 @@ namespace CrazyStorm
         #region Private Members
         Config config;
         File file;
-        List<ParticleType> defaultParticleTypes;
         Dictionary<ParticleSystem, CommandStack> commandStacks;
         List<Core.Component> clipBoard;
         #endregion
@@ -36,7 +35,6 @@ namespace CrazyStorm
         #region Constructor
         public Main()
         {
-            defaultParticleTypes = new List<ParticleType>();
             commandStacks = new Dictionary<ParticleSystem, CommandStack>();
             clipBoard = new List<Core.Component>();
             InitializeComponent();
@@ -48,14 +46,6 @@ namespace CrazyStorm
         {
             config = new Config("Config.ini");
             ParticleTabControl.DataContext = config;
-        }
-        void LoadDefaultParticleTypes()
-        {
-            StreamResourceInfo info = Application.GetResourceStream(new Uri("set.txt", UriKind.Relative));
-            using (System.IO.StreamReader reader = new System.IO.StreamReader(info.Stream))
-            {
-                ParticleType.LoadDefaultTypes(reader, defaultParticleTypes);
-            }
         }
         void InitializeSystem()
         {
@@ -134,7 +124,7 @@ namespace CrazyStorm
         #region Public Methods
         public void Initailize()
         {
-            LoadDefaultParticleTypes();
+            ParticleType.LoadDefaultTypes();
             InitializeConfig();
             ChangeTheme(config.Theme);
         }

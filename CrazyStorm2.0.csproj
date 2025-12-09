@@ -312,17 +312,14 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="Core\Core.csproj">
+      <Project>{1fed6550-8156-45ba-abd3-7c400fd86a03}</Project>
+      <Name>Core</Name>
+    </ProjectReference>
     <ProjectReference Include="CrazyStorm Player\CrazyStorm Player\CrazyStorm Player.csproj">
       <Project>{6969210a-fb47-48a8-b14c-52d4f0955e63}</Project>
       <Name>CrazyStorm Player</Name>
     </ProjectReference>
-    <ProjectReference Include="Script\Expression.csproj">
-      <Project>{cea93dc4-9ff2-4d90-b0bf-e1e0d8027223}</Project>
-      <Name>Expression</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="set.txt" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Images\barrages.png" />

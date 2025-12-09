@@ -87,7 +87,7 @@ namespace CrazyStorm
             foreach (var component in components)
                 component.RebuildReferenceFromCollection(components);
 
-            RebuildComponentTree(particle);
+            file.RebuildComponentTree(particle);
             file.ParticleSystems.Add(particle);
             selectedSystem = particle;
             InitializeCommandStack(particle);
@@ -96,7 +96,7 @@ namespace CrazyStorm
         void ReloadTypes()
         {
             var particleTypes = new List<ParticleType>();
-            particleTypes.AddRange(defaultParticleTypes);
+            particleTypes.AddRange(ParticleType.DefaultTypes);
             particleTypes.AddRange(selectedSystem.CustomTypes);
             for (int i = 2; i < LeftTabControl.Items.Count; ++i)
             {

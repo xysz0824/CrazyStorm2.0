@@ -12,7 +12,6 @@ namespace CrazyStorm.Core
     {
         static List<EventExecutor> executorList;
         static Dictionary<string, Dictionary<string, TypeSet>> cache = new Dictionary<string, Dictionary<string, TypeSet>>();
-        public static IList<ParticleType> DefaultTypes { get; set; }
         public static IList<ParticleType> CustomTypes { get; set; }
         public static void AddEvent(PropertyContainer propertyContainer, PropertyContainer bindingContainer, VMEventInfo eventInfo)
         {
@@ -169,9 +168,9 @@ namespace CrazyStorm.Core
                     if (typeId >= ParticleType.DefaultTypeIndex)
                     {
                         if (propertyContainer is Emitter)
-                            (propertyContainer as Emitter).Template.Type = DefaultTypes[typeId - ParticleType.DefaultTypeIndex];
+                            (propertyContainer as Emitter).Template.Type = ParticleType.DefaultTypes[typeId - ParticleType.DefaultTypeIndex];
                         else if (propertyContainer is ParticleBase)
-                            (propertyContainer as ParticleBase).Type = DefaultTypes[typeId - ParticleType.DefaultTypeIndex];
+                            (propertyContainer as ParticleBase).Type = ParticleType.DefaultTypes[typeId - ParticleType.DefaultTypeIndex];
                     }
                     else
                     {

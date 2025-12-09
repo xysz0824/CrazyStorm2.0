@@ -25,99 +25,9 @@ namespace CrazyStorm
                     MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
-            string genPath = Path.GetDirectoryName(filePath) + "\\" + fileName + ".bg";
-            using (FileStream stream = new FileStream(genPath, FileMode.Create))
-            {
-                var writer = new BinaryWriter(stream);
-                //Play file use UTF-8 encoding
-                //Write play file header
-                writer.Write(PlayDataHelper.GetStringBytes("BG"));
-                //Write play file version
-                writer.Write(PlayDataHelper.GetStringBytes(VersionInfo.PlayVersion));
-                //Write play file data
-                Compile();
-                writer.Write(file.GeneratePlayData().ToArray());
-            }
+            file.GeneratePlayFile(filePath, fileName);
             MessageBox.Show((string)FindResource("PlayFileSavedStr"), (string)FindResource("TipTitleStr"),
                 MessageBoxButton.OK, MessageBoxImage.Information);
-        }
-        void Compile()
-        {
-            foreach (var particleSystem in file.ParticleSystems)
-            {
-                foreach (var layer in particleSystem.Layers)
-                {
-                    foreach (var component in layer.Components)
-                    {
-                        CompilePropertyExpressions(component);
-                        CompileEventGroups(component);
-                    }
-                }
-            }
-        }
-        void CompilePropertyExpressions(PropertyContainer container)
-        {
-            if (container is Emitter)
-                CompilePropertyExpressions((container as Emitter).Particle);
-
-            Type containerType = container.GetType();
-            foreach (var property in container.Properties)
-            {
-                if (property.Value.Expression)
-                {
-                    var lexer = new Expression.Lexer();
-                    lexer.Load(property.Value.Value);
-                    var syntaxTree = new Expression.Parser(lexer).Expression();
-                    if (syntaxTree.ContainType<Expression.Name>() || syntaxTree.ContainType<Expression.Call>())
-                    {
-                        var compiledBytes = new List<byte>();
-                        syntaxTree.Compile(compiledBytes);
-                        property.Value.CompiledExpression = compiledBytes.ToArray();
-                    }
-                    else
-                    {
-                        object value = syntaxTree.Eval(null);
-                        containerType.GetProperty(property.Key).GetSetMethod().Invoke(container, new object[] { value });
-                    }
-                }
-            }
-        }
-        void CompileEventGroups(Component component)
-        {
-            CompileEvents(component.ComponentEventGroups);
-            if (component is Emitter)
-                CompileEvents((component as Emitter).ParticleEventGroups);
-            else if (component is EventField)
-                CompileEvents((component as EventField).EventFieldEventGroups);
-            else if (component is Rebounder)
-                CompileEvents((component as Rebounder).RebounderEventGroups);
-        }
-        void CompileEvents(IList<EventGroup> eventGroups)
-        {
-            foreach (EventGroup eventGroup in eventGroups)
-            {
-                eventGroup.CompiledCondition = null;
-                if (!string.IsNullOrEmpty(eventGroup.Condition))
-                {
-                    var lexer = new Expression.Lexer();
-                    lexer.Load(eventGroup.Condition);
-                    var syntaxTree = new Expression.Parser(lexer).Expression();
-                    var compiledBytes = new List<byte>();
-                    syntaxTree.Compile(compiledBytes);
-                    eventGroup.CompiledCondition = compiledBytes.ToArray();
-                }
-                eventGroup.CompiledEvents.Clear();
-                foreach (string originalEvent in eventGroup.OriginalEvents)
-                    eventGroup.CompiledEvents.Add(EventHelper.GenerateEventData(originalEvent, (t) =>
-                        {
-                            var lexer = new Expression.Lexer();
-                            lexer.Load(t);
-                            var syntaxTree = new Expression.Parser(lexer).Expression();
-                            var compiledBytes = new List<byte>();
-                            syntaxTree.Compile(compiledBytes);
-                            return compiledBytes.ToArray();
-                        }));
-            }
         }
         void PlayCurrent()
         {
@@ -128,28 +38,14 @@ namespace CrazyStorm
                 return;
             }
             string genPath = Path.GetDirectoryName(config.PlayerPath);
-            if (string.IsNullOrEmpty(genPath))
-                genPath = Environment.CurrentDirectory;
+            if (string.IsNullOrEmpty(genPath)) genPath = Environment.CurrentDirectory;
 
             genPath += "\\Temp\\Temp.bg";
             if (!System.IO.Directory.Exists(Path.GetDirectoryName(genPath)))
-                System.IO.Directory.CreateDirectory(Path.GetDirectoryName(genPath));
-
-            if (System.IO.File.Exists(genPath))
-                System.IO.File.Delete(genPath);
-
-            using (FileStream stream = new FileStream(genPath, FileMode.CreateNew))
             {
-                var writer = new BinaryWriter(stream);
-                //Play file use UTF-8 encoding
-                //Write play file header
-                writer.Write(PlayDataHelper.GetStringBytes("BG"));
-                //Write play file version
-                writer.Write(PlayDataHelper.GetStringBytes(VersionInfo.PlayVersion));
-                //Write play file data
-                Compile();
-                writer.Write(file.GeneratePlayData().ToArray());
+                System.IO.Directory.CreateDirectory(Path.GetDirectoryName(genPath));
             }
+            file.GeneratePlayFile(genPath, "Temp");
             int particleSystemIndex = 0;
             for (int i = 0; i < file.ParticleSystems.Count; ++i)
             {

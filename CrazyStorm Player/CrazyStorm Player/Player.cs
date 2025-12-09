@@ -106,7 +106,6 @@ namespace CrazyStorm_Player
         Vector2 backgroundScale;
         Vector2 backgroundPos;
         List<Texture2D> defaultTextures;
-        List<ParticleType> defaultParticleTypes;
         Dictionary<int, Texture2D> customTextures;
         File file;
         int selectedParticleSystemIndex;
@@ -240,13 +239,6 @@ namespace CrazyStorm_Player
             Environment.CurrentDirectory = System.AppDomain.CurrentDomain.SetupInformation.ApplicationBase;
             Stream defaultTexturesStream = assembly.GetManifestResourceStream("CrazyStorm_Player.barrages.png");
             defaultTextures.Add(Texture2D.FromStream(GraphicsDevice, defaultTexturesStream));
-            Stream defaultParticleTypesStream = assembly.GetManifestResourceStream("CrazyStorm_Player.set.txt");
-            using (StreamReader reader = new StreamReader(defaultParticleTypesStream))
-            {
-                defaultParticleTypes = new List<ParticleType>();
-                ParticleType.LoadDefaultTypes(reader, defaultParticleTypes);
-                EventManager.DefaultTypes = defaultParticleTypes;
-            }
             //Load main character texture
             if (!StringUtil.IsNullOrWhiteSpace(mainCharacter.imagePath))
             {
@@ -260,24 +252,8 @@ namespace CrazyStorm_Player
             Stream slowModeTextureStream = assembly.GetManifestResourceStream("CrazyStorm_Player.ring.png");
             slowModeTexture = Texture2D.FromStream(GraphicsDevice, slowModeTextureStream);
             //Load play file
-            using (FileStream stream = new FileStream(Environment.GetCommandLineArgs()[1], FileMode.Open))
-            {
-                var reader = new BinaryReader(stream);
-                //Play file use UTF-8 encoding
-                string header = PlayDataHelper.ReadString(reader);
-                if (header == "BG")
-                {
-                    float version = float.Parse(PlayDataHelper.ReadString(reader));
-                    if (version >= VersionInfo.BaseVersion)
-                    {
-                        file = new File(false);
-                        file.LoadPlayData(reader, version);
-                        RebuildObjectReference(file);
-                    }
-                    else
-                        throw new NotSupportedException();
-                }
-            }
+            file = new File(false);
+            file.LoadPlayFile(Environment.GetCommandLineArgs()[1], VersionInfo.BaseVersion);
             //Load custom textures and types
             Environment.CurrentDirectory = Path.GetDirectoryName(Environment.GetCommandLineArgs()[1]);
             customTextures = new Dictionary<int, Texture2D>();
@@ -313,31 +289,6 @@ namespace CrazyStorm_Player
             ParticleManager.Draw();
             lastBlendType = BlendType.None;
             spriteBatch.End();
-        }
-        void RebuildObjectReference(File file)
-        {
-            foreach (var particleSystem in file.ParticleSystems)
-            {
-                //Rebuild all custom types
-                foreach (var customType in particleSystem.CustomTypes)
-                    customType.RebuildReferenceFromCollection(file.Images);
-                //Collect all particle types
-                var particleTypes = new List<ParticleType>();
-                particleTypes.AddRange(defaultParticleTypes);
-                particleTypes.AddRange(particleSystem.CustomTypes);
-                //Collect all components
-                var components = new List<Component>();
-                foreach (var layer in particleSystem.Layers)
-                    components.AddRange(layer.Components);
-                //Rebuild components reference
-                foreach (var component in components)
-                {
-                    component.RebuildReferenceFromCollection(components);
-                    //Rebuild particles reference
-                    if (component is Emitter)
-                        (component as Emitter).InitialTemplate.RebuildReferenceFromCollection(particleTypes);
-                }
-            }
         }
     }
 }

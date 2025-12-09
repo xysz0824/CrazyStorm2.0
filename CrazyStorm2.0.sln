@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.14.36414.22 d17.14
+VisualStudioVersion = 17.14.36414.22
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CrazyStorm2.0", "CrazyStorm2.0.csproj", "{EE69285F-83AD-45D9-8D86-3F78EC496717}"
 	ProjectSection(ProjectDependencies) = postProject
@@ -10,8 +10,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CrazyStorm2.0", "CrazyStorm
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core", "Core\Core.csproj", "{1FED6550-8156-45BA-ABD3-7C400FD86A03}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Expression", "Script\Expression.csproj", "{CEA93DC4-9FF2-4D90-B0BF-E1E0D8027223}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CrazyStorm Player", "CrazyStorm Player\CrazyStorm Player\CrazyStorm Player.csproj", "{6969210A-FB47-48A8-B14C-52D4F0955E63}"
 EndProject
@@ -54,18 +52,6 @@ Global
 		{1FED6550-8156-45BA-ABD3-7C400FD86A03}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{1FED6550-8156-45BA-ABD3-7C400FD86A03}.Release|Win32.ActiveCfg = Release|Any CPU
 		{1FED6550-8156-45BA-ABD3-7C400FD86A03}.Release|x86.ActiveCfg = Release|Any CPU
-		{CEA93DC4-9FF2-4D90-B0BF-E1E0D8027223}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{CEA93DC4-9FF2-4D90-B0BF-E1E0D8027223}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{CEA93DC4-9FF2-4D90-B0BF-E1E0D8027223}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
-		{CEA93DC4-9FF2-4D90-B0BF-E1E0D8027223}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
-		{CEA93DC4-9FF2-4D90-B0BF-E1E0D8027223}.Debug|Win32.ActiveCfg = Debug|Any CPU
-		{CEA93DC4-9FF2-4D90-B0BF-E1E0D8027223}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{CEA93DC4-9FF2-4D90-B0BF-E1E0D8027223}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{CEA93DC4-9FF2-4D90-B0BF-E1E0D8027223}.Release|Any CPU.Build.0 = Release|Any CPU
-		{CEA93DC4-9FF2-4D90-B0BF-E1E0D8027223}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{CEA93DC4-9FF2-4D90-B0BF-E1E0D8027223}.Release|Mixed Platforms.Build.0 = Release|Any CPU
-		{CEA93DC4-9FF2-4D90-B0BF-E1E0D8027223}.Release|Win32.ActiveCfg = Release|Any CPU
-		{CEA93DC4-9FF2-4D90-B0BF-E1E0D8027223}.Release|x86.ActiveCfg = Release|Any CPU
 		{6969210A-FB47-48A8-B14C-52D4F0955E63}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{6969210A-FB47-48A8-B14C-52D4F0955E63}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6969210A-FB47-48A8-B14C-52D4F0955E63}.Debug|Mixed Platforms.ActiveCfg = Debug|x86

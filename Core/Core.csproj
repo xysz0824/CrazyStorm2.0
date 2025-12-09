@@ -9,7 +9,7 @@
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>CrazyStorm.Core</RootNamespace>
-    <AssemblyName>Core</AssemblyName>
+    <AssemblyName>CrazyStormCore</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile>
@@ -49,6 +49,25 @@
     <Compile Include="Event\EventGroup.cs" />
     <Compile Include="Event\EventHelper.cs" />
     <Compile Include="Event\EventManager.cs" />
+    <Compile Include="Expression\Environment\Environment.cs" />
+    <Compile Include="Expression\Environment\Function.cs" />
+    <Compile Include="Expression\Environment\RedefinitionException.cs" />
+    <Compile Include="Expression\ExpressionException.cs" />
+    <Compile Include="Expression\Lexer.cs" />
+    <Compile Include="Expression\Parser.cs" />
+    <Compile Include="Expression\Syntax\Arguments.cs" />
+    <Compile Include="Expression\Syntax\BinaryExpression.cs" />
+    <Compile Include="Expression\Syntax\Bool.cs" />
+    <Compile Include="Expression\Syntax\Call.cs" />
+    <Compile Include="Expression\Syntax\Name.cs" />
+    <Compile Include="Expression\Syntax\NegativeExpression.cs" />
+    <Compile Include="Expression\Syntax\Number.cs" />
+    <Compile Include="Expression\Syntax\RGB.cs" />
+    <Compile Include="Expression\Syntax\SyntaxTree.cs" />
+    <Compile Include="Expression\Syntax\Vector2.cs" />
+    <Compile Include="Expression\Token\IdentifierToken.cs" />
+    <Compile Include="Expression\Token\NumberToken.cs" />
+    <Compile Include="Expression\Token\Token.cs" />
     <Compile Include="Expression\VM.cs" />
     <Compile Include="IO\IGeneratePlayData.cs" />
     <Compile Include="IO\ILoadPlayData.cs" />
@@ -100,7 +119,9 @@
     <Compile Include="Utils\MathHelper.cs" />
     <Compile Include="Utils\StringHelper.cs" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <EmbeddedResource Include="set.txt" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
