@@ -207,9 +207,16 @@ namespace CrazyStorm.Core
             for (int i = 0; i < Layers.Count; ++i)
                 Layers[i].Update(CurrentFrame);
 
-            if (++CurrentFrame == totalFrame)
+            if (currentFrame != CurrentFrame)
+            {
                 Reset();
-
+                for (int i = 0; i < currentFrame; ++i) Update(i);
+                CurrentFrame = currentFrame;
+            }
+            if (++CurrentFrame == totalFrame)
+            {
+                Reset();
+            }
             return true;
         }
         public void Reset()

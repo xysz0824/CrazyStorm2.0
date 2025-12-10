@@ -13,10 +13,6 @@
         <local:LayerStartConverter x:Key="LayerStartConverter" />
         <local:LayerLengthConverter x:Key="LayerLengthConverter" />
         <local:ResourceValidConverter x:Key="ResourceValidConverter" />
-        <LinearGradientBrush x:Key="PlayIconBrush" EndPoint="0.5,1" StartPoint="0.5,0">
-            <GradientStop Color="#029615" Offset="0" />
-            <GradientStop Color="#B9FF1A" Offset="1" />
-        </LinearGradientBrush>
         <LinearGradientBrush x:Key="ComponentIconBrush" EndPoint="0.5,1" StartPoint="0.5,0">
             <GradientStop Color="#DCDCDC" Offset="0" />
             <GradientStop Color="#8F8F8F" Offset="1" />
@@ -208,6 +204,21 @@
                 </DockPanel>
             </Canvas>
         </DataTemplate>
+        <LinearGradientBrush x:Key="PlayIconBrush" EndPoint="0.5,1" StartPoint="0.5,0">
+            <GradientStop Color="#029615" Offset="0" />
+            <GradientStop Color="#B9FF1A" Offset="1" />
+        </LinearGradientBrush>
+        <Geometry x:Key="Play_Icon">M73 39c-14.8-9.1-33.4-9.4-48.5-.9S0 62.6 0 80V432c0 17.4 9.4 33.4 24.5 41.9s33.7 8.1 48.5-.9L361 297c14.3-8.7 23-24.2 23-41s-8.7-32.2-23-41L73 39z</Geometry>
+        <LinearGradientBrush x:Key="PauseIconBrush" EndPoint="0.5,1" StartPoint="0.5,0">
+            <GradientStop Color="#E0E0E0" Offset="0" />
+            <GradientStop Color="#8C8C8C" Offset="1" />
+        </LinearGradientBrush>
+        <Geometry x:Key="Pause_Icon">M48 64C21.5 64 0 85.5 0 112V400c0 26.5 21.5 48 48 48H80c26.5 0 48-21.5 48-48V112c0-26.5-21.5-48-48-48H48zm192 0c-26.5 0-48 21.5-48 48V400c0 26.5 21.5 48 48 48h32c26.5 0 48-21.5 48-48V112c0-26.5-21.5-48-48-48H240z</Geometry>
+        <LinearGradientBrush x:Key="StopIconBrush" EndPoint="0.5,1" StartPoint="0.5,0">
+            <GradientStop Color="#B40000" Offset="0" />
+            <GradientStop Color="#FF5847" Offset="1" />
+        </LinearGradientBrush>
+        <Geometry x:Key="Stop_Icon">M0 128C0 92.7 28.7 64 64 64H320c35.3 0 64 28.7 64 64V384c0 35.3-28.7 64-64 64H64c-35.3 0-64-28.7-64-64V128z</Geometry>
         <RoutedUICommand x:Key="DelComponent" Text="DelComponent"/>
         <RoutedUICommand x:Key="UpComponent" Text="UpComponent"/>
         <RoutedUICommand x:Key="DownComponent" Text="DownComponent"/>
@@ -544,16 +555,23 @@
                     </Button.Style>
                 </Button>
             <Separator/>
-            <Button Name="PlayButton" IsDefault="False" IsCancel="False" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" 
+                <Button Name="PlayButton" IsDefault="False" IsCancel="False" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" 
                     ToolTip="{StaticResource PlayStr}" Click="PlayItem_Click">
-                    <Path Data="M73 39c-14.8-9.1-33.4-9.4-48.5-.9S0 62.6 0 80V432c0 17.4 9.4 33.4 24.5 41.9s33.7 8.1 48.5-.9L361 297c14.3-8.7 23-24.2 23-41s-8.7-32.2-23-41L73 39z" 
-                          Fill="{StaticResource PlayIconBrush}" Width="24" Height="20" Stretch="Uniform">
+                    <Path Data="{StaticResource Play_Icon}" Fill="{StaticResource PlayIconBrush}" Width="24" Height="20" Stretch="Uniform">
                         <Path.Effect>
                             <DropShadowEffect Color="Black" Opacity="1" BlurRadius="3" Direction="315" ShadowDepth="0" />
                         </Path.Effect>
                     </Path>
                 </Button>
-        </ToolBar>
+                <Button Name="StopButton" IsDefault="False" IsCancel="False" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Visibility="Collapsed"
+                        ToolTip="{StaticResource StopStr}" Click="StopItem_Click">
+                    <Path Data="{StaticResource Stop_Icon}" Fill="{StaticResource StopIconBrush}" Width="24" Height="19" Stretch="Uniform">
+                        <Path.Effect>
+                            <DropShadowEffect Color="Black" Opacity="1" BlurRadius="3" Direction="315" ShadowDepth="0" />
+                        </Path.Effect>
+                    </Path>
+                </Button>
+            </ToolBar>
         </ToolBarTray>
         <!-- Main Grid -->
         <Grid Height="Auto" Width="Auto" Background="{DynamicResource TitleBarBrush}">
@@ -833,7 +851,7 @@
                                     <Canvas.Background>
                                         <SolidColorBrush Color="Black"/>
                                     </Canvas.Background>
-                                    <Canvas Width="{Binding Path=ScreenWidth}" Height="{Binding Path=ScreenHeight}">
+                                    <Canvas Name="ScreenContent" Width="{Binding Path=ScreenWidth}" Height="{Binding Path=ScreenHeight}">
                                         <Canvas.Background>
                                             <ImageBrush Stretch="Uniform" ImageSource="{Binding Path=BackgroundPath}" />
                                         </Canvas.Background>
@@ -865,6 +883,7 @@
                                             </Image.Opacity>
                                         </Image>
                                         <Canvas Name="ComponentLayer" Canvas.Top="0" Canvas.Left="0" Width="{Binding Path=ScreenWidth}" Height="{Binding Path=ScreenHeight}"/>
+                                        <!--<local:Player Name="RuntimeScreen" Width="{Binding Path=ScreenWidth}" Height="{Binding Path=ScreenHeight}" Visibility="Visible"></local:Player>-->
                                     </Canvas>
                                     <Border Name="AimBox" Opacity="0" BorderThickness="2" BorderBrush="Red" Width="32" Height="32" />
                                     <Image Name="SelectingBox" Source="Images/selecting.png" Width="0" Height="0" Stretch="Fill" />
@@ -1001,8 +1020,10 @@
                             <TextBlock></TextBlock>
                         </ToolTip>
                     </DockPanel.ToolTip>
-                    <Label DockPanel.Dock="Top" Height="30" Name="TimeScale" Padding="0" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch"
-                           Background="{DynamicResource RulerImageBrush}">
+                    <Label DockPanel.Dock="Top" Height="30" Name="TimeScale" Padding="0" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch">
+                        <Label.Background>
+                            <ImageBrush ImageSource="{DynamicResource RulerImage}" Stretch="Uniform" TileMode="Tile" Viewport="0,0,30,30" ViewportUnits="Absolute"/>
+                        </Label.Background>
                     </Label>
                     <TreeView Name="LayerAxis" BorderBrush="{x:Null}" Background="{x:Null}" BorderThickness="0" VerticalContentAlignment="Top" Foreground="{x:Null}" 
                               Padding="0" PreviewMouseLeftButtonDown="LayerAxis_PreviewMouseLeftButtonDown">

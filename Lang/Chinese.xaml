@@ -42,6 +42,7 @@
     <sys:String x:Key="UnbindComponentStr">组件解绑</sys:String>
     <sys:String x:Key="TestStr">测试</sys:String>
     <sys:String x:Key="PlayStr">播放</sys:String>
+    <sys:String x:Key="StopStr">停止</sys:String>
     <sys:String x:Key="GeneratePlayFileStr">生成播放文件</sys:String>
     <sys:String x:Key="PlayCurrentStr">播放当前粒子</sys:String>
     <sys:String x:Key="PlayAllStr">播放所有粒子</sys:String>
@@ -227,7 +228,6 @@
     <sys:String x:Key="NeedSaveFirstStr">你需要先保存工程文件，然后才能执行该操作</sys:String>
     <sys:String x:Key="PlayFileSavedStr">播放文件已保存到工程文件目录下</sys:String>
     <sys:String x:Key="SaveTipStr">要保存当前文件吗？</sys:String>
-    <sys:String x:Key="PlayerNotFoundStr">找不到指定的播放器程序，请重新设置</sys:String>
     <sys:String x:Key="ImageSizeWaringStr">该图案的尺寸大小非2次幂，请考虑更改图案尺寸，否则将会变形</sys:String>
     <sys:String x:Key="ImageTypeStr">PNG图像(*.png)|*.png</sys:String>
     <sys:String x:Key="SoundTypeStr">WAV音效(*.wav)|*.wav</sys:String>

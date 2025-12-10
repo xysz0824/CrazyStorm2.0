@@ -47,6 +47,5 @@
     <SolidColorBrush x:Key="ScrollBarThumbHoverBrush" Color="#404040" />
     <SolidColorBrush x:Key="ScrollBarThumbPressedBrush" Color="#545454" />
     <ImageBrush x:Key="SelectedGroupImageBrush" ImageSource="../Images/selectedgroup_dark.png"/>
-    <ImageBrush x:Key="RulerImageBrush" ImageSource="../Images/ruler_dark.png"
-                Stretch="Uniform" TileMode="Tile" Viewport="0,0,30,30" ViewportUnits="Absolute"/>
+    <ImageSource x:Key="RulerImage">../Images/ruler_dark.png</ImageSource>
 </ResourceDictionary>

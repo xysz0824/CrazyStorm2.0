@@ -121,8 +121,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Controllable.cs" />
     <Compile Include="Global\VersionInfo.cs" />
-    <Compile Include="Player.cs" />
+    <Compile Include="PlayerImpl.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
@@ -130,6 +131,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="StandalonePlayer.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

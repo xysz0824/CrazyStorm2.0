@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq.Expressions;
+using System.Runtime.InteropServices.ComTypes;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Text;
 using System.Xml;
@@ -267,20 +268,29 @@ namespace CrazyStorm.Core
             PlayDataHelper.GenerateObjectList(globals, fileBytes);
             return fileBytes;
         }
+        public byte[] GeneratePlayFile()
+        {
+            var stream = new MemoryStream();
+            var writer = new BinaryWriter(stream);
+            //Play file use UTF-8 encoding
+            //Write play file header
+            writer.Write(PlayDataHelper.GetStringBytes("BG"));
+            //Write play file version
+            writer.Write(PlayDataHelper.GetStringBytes(VersionInfo.PlayVersion));
+            //Write play file data
+            Compile();
+            writer.Write(GeneratePlayData().ToArray());
+            var bytes = stream.ToArray();
+            stream.Close();
+            return bytes;
+        }
         public void GeneratePlayFile(string filePath, string fileName)
         {
             string genPath = Path.GetDirectoryName(filePath) + "\\" + fileName + ".bg";
             using (FileStream stream = new FileStream(genPath, FileMode.Create))
             {
                 var writer = new BinaryWriter(stream);
-                //Play file use UTF-8 encoding
-                //Write play file header
-                writer.Write(PlayDataHelper.GetStringBytes("BG"));
-                //Write play file version
-                writer.Write(PlayDataHelper.GetStringBytes(VersionInfo.PlayVersion));
-                //Write play file data
-                Compile();
-                writer.Write(GeneratePlayData().ToArray());
+                writer.Write(GeneratePlayFile());
             }
         }
         public void LoadPlayData(BinaryReader reader, float version)
@@ -329,25 +339,27 @@ namespace CrazyStorm.Core
                 }
             }
         }
-        public bool LoadPlayFile(string filePath, float baseVersion)
+        public bool LoadPlayFile(byte[] bytes, float baseVersion)
         {
-            using (FileStream stream = new FileStream(filePath, FileMode.Open))
+            var stream = new MemoryStream(bytes);
+            var reader = new BinaryReader(stream);
+            //Play file use UTF-8 encoding
+            string header = PlayDataHelper.ReadString(reader);
+            if (header == "BG")
             {
-                var reader = new BinaryReader(stream);
-                //Play file use UTF-8 encoding
-                string header = PlayDataHelper.ReadString(reader);
-                if (header == "BG")
+                float version = float.Parse(PlayDataHelper.ReadString(reader));
+                if (version >= baseVersion)
                 {
-                    float version = float.Parse(PlayDataHelper.ReadString(reader));
-                    if (version >= baseVersion)
-                    {
-                        LoadPlayData(reader, version);
-                        RebuildObjectReference(this);
-                        return true;
-                    }
+                    LoadPlayData(reader, version);
+                    RebuildObjectReference(this);
+                    return true;
                 }
             }
             return false;
+        }
+        public bool LoadPlayFile(string filePath, float baseVersion)
+        {
+            return LoadPlayFile(System.IO.File.ReadAllBytes(filePath), baseVersion);
         }
         public void SetGlobal(string label, float value)
         {

@@ -2,24 +2,31 @@
  * The MIT License (MIT)
  * Copyright (c) StarX 2017 
  */
+using CrazyStorm.Core;
+using CrazyStorm_Player;
+using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Windows;
-using System.IO;
-using System.Reflection;
-using System.Diagnostics;
-using CrazyStorm.Core;
+using System.Windows.Controls;
+using System.Windows.Shapes;
+using System.Windows.Media;
 
 namespace CrazyStorm
 {
     public partial class Main
     {
+        #region Private Members
+        EmbeddedPlayer player;
+        #endregion
         #region Private Methods
         void GeneratePlayFile()
         {
-            if (string.IsNullOrWhiteSpace(Core.File.CurrentDirectory))
+            if (string.IsNullOrWhiteSpace(File.CurrentDirectory))
             {
                 MessageBox.Show((string)FindResource("NeedSaveFirstStr"), (string)FindResource("TipTitleStr"),
                     MessageBoxButton.OK, MessageBoxImage.Warning);
@@ -31,21 +38,6 @@ namespace CrazyStorm
         }
         void PlayCurrent()
         {
-            if (!System.IO.File.Exists(config.PlayerPath))
-            {
-                MessageBox.Show((string)FindResource("PlayerNotFoundStr"), (string)FindResource("TipTitleStr"),
-                    MessageBoxButton.OK, MessageBoxImage.Error);
-                return;
-            }
-            string genPath = Path.GetDirectoryName(config.PlayerPath);
-            if (string.IsNullOrEmpty(genPath)) genPath = Environment.CurrentDirectory;
-
-            genPath += "\\Temp\\Temp.bg";
-            if (!System.IO.Directory.Exists(Path.GetDirectoryName(genPath)))
-            {
-                System.IO.Directory.CreateDirectory(Path.GetDirectoryName(genPath));
-            }
-            file.GeneratePlayFile(genPath, "Temp");
             int particleSystemIndex = 0;
             for (int i = 0; i < file.ParticleSystems.Count; ++i)
             {
@@ -55,18 +47,35 @@ namespace CrazyStorm
                     break;
                 }
             }
-            ProcessStartInfo ps = new ProcessStartInfo(config.PlayerPath);
-            ps.Arguments = "\"" + genPath + "\" \"" + config.BackgroundPath + "\" " + particleSystemIndex + " ";
-            ps.Arguments += config.ScreenWidth + " " + config.ScreenHeight + " ";
-            ps.Arguments += config.ParticleMaximum + " " + config.CurveParticleMaximum + " ";
-            ps.Arguments += config.Windowed + " ";
-            ps.Arguments += config.CenterX + " " + config.CenterY + " ";
-            ps.Arguments += "\"" + config.SelfImagePath + "\" \"" + config.SelfSetting + "\"";
-            ps.WindowStyle = ProcessWindowStyle.Normal;
-            Process p = new Process();
-            p.StartInfo = ps;
-            p.Start();
-            p.WaitForInputIdle();
+            var screen = ParticleTabControl.SelectedItem as TabItem;
+            if (screen != null)
+            {
+                var content = screen.Content as Canvas;
+                var screenContent = VisualHelper.VisualDownwardSearch(content, "ScreenContent") as Canvas;
+                player = new EmbeddedPlayer();
+                var config = screen.DataContext as Config;
+                player.Width = config.ScreenWidth;
+                player.Height = config.ScreenHeight;
+                player.PlayerImpl = new PlayerImpl(config.ScreenWidth, config.ScreenHeight,
+                    config.ParticleMaximum, config.CurveParticleMaximum);
+                if (string.IsNullOrWhiteSpace(File.CurrentDirectory))
+                {
+                    player.PlayerImpl.ResourceDirectory = System.AppDomain.CurrentDomain.SetupInformation.ApplicationBase;
+                }
+                else
+                {
+                    player.PlayerImpl.ResourceDirectory = File.CurrentDirectory;
+                }
+                player.PlayerImpl.File = new File(false);
+                player.PlayerImpl.File.LoadPlayFile(file.GeneratePlayFile(), CrazyStorm_Player.VersionInfo.BaseVersion);
+                player.PlayerImpl.BackgroundPath = config.BackgroundPath;
+                player.PlayerImpl.SelectedParticleSystemIndex = particleSystemIndex;
+                player.PlayerImpl.CustomCenter = new Microsoft.Xna.Framework.Vector2(config.CenterX, config.CenterY);
+                player.PlayerImpl.ControllableImagePath = config.SelfImagePath;
+                player.PlayerImpl.ControllableSetting = config.SelfSetting;
+                screenContent.Children.Add(player);
+                Panel.SetZIndex(player, 1);
+            }
         }
         void OpenPlaySetting()
         {
@@ -84,8 +93,45 @@ namespace CrazyStorm
         }
         private void PlayItem_Click(object sender, RoutedEventArgs e)
         {
-            file.UpdateResource();
-            PlayCurrent();
+            var path = VisualHelper.VisualDownwardSearch<Path>(PlayButton) as Path;
+            if (player == null)
+            {
+                file.UpdateResource();
+                PlayCurrent();
+                path.Data = (Geometry)FindResource("Pause_Icon");
+                path.Fill = (Brush)FindResource("PauseIconBrush");
+                path.ToolTip = (string)FindResource("PauseStr");
+                StopButton.Visibility = Visibility.Visible;
+            }
+            else
+            {
+                player.Pause = !player.Pause;
+                if (player.Pause)
+                {
+                    path.Data = (Geometry)FindResource("Play_Icon");
+                    path.Fill = (Brush)FindResource("PlayIconBrush");
+                    path.ToolTip = (string)FindResource("PlayStr");
+                    Panel.SetZIndex(player, -1);
+                }
+                else
+                {
+                    path.Data = (Geometry)FindResource("Pause_Icon");
+                    path.Fill = (Brush)FindResource("PauseIconBrush");
+                    path.ToolTip = (string)FindResource("PauseStr");
+                    Panel.SetZIndex(player, 1);
+                }
+            }
+        }
+        private void StopItem_Click(object sender, RoutedEventArgs e)
+        {
+            if (player == null) return;
+            player.Dispose();
+            player = null;
+            StopButton.Visibility = Visibility.Collapsed;
+            var path = VisualHelper.VisualDownwardSearch<Path>(PlayButton) as Path;
+            path.Data = (Geometry)FindResource("Play_Icon");
+            path.Fill = (Brush)FindResource("PlayIconBrush");
+            path.ToolTip = (string)FindResource("PlayStr");
         }
         private void PlaySettingItem_Click(object sender, RoutedEventArgs e)
         {

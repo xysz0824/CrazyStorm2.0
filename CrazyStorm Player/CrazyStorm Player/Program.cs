@@ -28,7 +28,7 @@ namespace CrazyStorm_Player
                 return;
 
             OutputArgs(args);
-            using (Player player = new Player())
+            using (var player = new StandalonePlayer())
             {
                 player.InactiveSleepTime = new TimeSpan(0, 0, 0);
                 player.Run();

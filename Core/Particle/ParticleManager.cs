@@ -54,6 +54,9 @@ namespace CrazyStorm.Core
             searchList = new List<ParticleBase>(particleMaximum);
             for (int i = 0; i < particleMaximum; ++i)
                 searchList.Add(null);
+
+            OnParticleDraw = null;
+            OnCurveParticleDraw = null;
         }
         public static ParticleBase GetParticle(int layerID, ParticleBase template)
         {
