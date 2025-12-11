@@ -90,12 +90,16 @@ namespace CrazyStorm
             layerScroll = VisualHelper.VisualDownwardSearch<ScrollViewer>(LayerTree) as ScrollViewer;
             axisScroll.ScrollChanged += (object s, ScrollChangedEventArgs args) =>
             {
-                var imageBruch = TimeAxis.Background as ImageBrush;
-                imageBruch.Viewport = new Rect(-axisScroll.HorizontalOffset, -1 - axisScroll.VerticalOffset,
-                    imageBruch.Viewport.Width, imageBruch.Viewport.Height);
-                imageBruch = TimeScale.Background as ImageBrush;
-                imageBruch.Viewport = new Rect(-axisScroll.HorizontalOffset, imageBruch.Viewport.Y,
-                    imageBruch.Viewport.Width, imageBruch.Viewport.Height);
+                //Need this condition for strange display problem
+                if (axisScroll.HorizontalOffset != 0 || axisScroll.VerticalOffset != 0)
+                {
+                    var imageBruch = TimeAxis.Background as ImageBrush;
+                    imageBruch.Viewport = new Rect(-axisScroll.HorizontalOffset, -1 - axisScroll.VerticalOffset,
+                        imageBruch.Viewport.Width, imageBruch.Viewport.Height);
+                    imageBruch = TimeScale.Background as ImageBrush;
+                    imageBruch.Viewport = new Rect(-axisScroll.HorizontalOffset, imageBruch.Viewport.Y,
+                        imageBruch.Viewport.Width, imageBruch.Viewport.Height);
+                }
                 if (layerTimer == null || !layerTimer.IsEnabled)
                 {
                     TimeScalePointerTransform.X = (selectedFrame - 1) * 3 - axisScroll.HorizontalOffset;
@@ -106,6 +110,8 @@ namespace CrazyStorm
                 {
                     layerScroll.RenderTransform = new TranslateTransform(0, layerScroll.ScrollableHeight - axisScroll.VerticalOffset);
                 }
+                //Need manual refresh for strange display problem
+                LayerAxis.Items.Refresh();
             };
         }
         private void LayerTimer_Tick(object sender, EventArgs e)
