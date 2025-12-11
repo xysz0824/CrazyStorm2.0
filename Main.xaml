@@ -693,7 +693,7 @@
                         </TabItem>
                         <TabItem Header="{StaticResource ResourceStr}" Name="Resource" Padding="6,5,6,1" Height="21" VerticalAlignment="Top">
                             <ScrollViewer VerticalScrollBarVisibility="Auto" Background="{DynamicResource TitleBarBrush}" Focusable="False">
-                                <StackPanel>
+                                <StackPanel Name="ResourcePanel">
                                     <GroupBox Padding="0,24,0,0" Style="{StaticResource FlatGroupBox}" Header="{StaticResource ImageStr}" Height="131" Margin="0">
                                         <TreeView Name="ImageList" Padding="-12,1,1,1" PreviewMouseRightButtonDown="ImageList_PreviewMouseRightButtonDown"
                                                   Background="{DynamicResource ListBrush}" BorderThickness="0,0,0,0">
@@ -1011,7 +1011,8 @@
                         </TreeView.ItemTemplate>
                     </TreeView>
                 </DockPanel>
-                <DockPanel Grid.Column ="1" Name="TimeAxis" MouseMove="TimeAxis_MouseMove" ToolTipService.Placement="Relative" ScrollViewer.VerticalScrollBarVisibility="Disabled">
+                <DockPanel Grid.Column ="1" Name="TimeAxis" MouseMove="TimeAxis_MouseMove" MouseDown="TimeAxis_MouseDown" MouseUp="TimeAxis_MouseUp" Loaded="TimeAxis_Loaded"
+                           ToolTipService.Placement="Relative" ScrollViewer.VerticalScrollBarVisibility="Disabled">
                     <DockPanel.Background>
                         <ImageBrush Stretch="Uniform" ImageSource="Images/rulerscale.png" TileMode="Tile" ViewportUnits="Absolute" Viewport="0,-2,30,16"/>
                     </DockPanel.Background>
@@ -1020,13 +1021,19 @@
                             <TextBlock></TextBlock>
                         </ToolTip>
                     </DockPanel.ToolTip>
-                    <Label DockPanel.Dock="Top" Height="30" Name="TimeScale" Padding="0" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch">
-                        <Label.Background>
+                    <Grid DockPanel.Dock="Top" Height="30" Name="TimeScale" Margin="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ClipToBounds="True">
+                        <Grid.Background>
                             <ImageBrush ImageSource="{DynamicResource RulerImage}" Stretch="Uniform" TileMode="Tile" Viewport="0,0,30,30" ViewportUnits="Absolute"/>
-                        </Label.Background>
-                    </Label>
-                    <TreeView Name="LayerAxis" BorderBrush="{x:Null}" Background="{x:Null}" BorderThickness="0" VerticalContentAlignment="Top" Foreground="{x:Null}" 
-                              Padding="0" PreviewMouseLeftButtonDown="LayerAxis_PreviewMouseLeftButtonDown">
+                        </Grid.Background>
+                        <DockPanel>
+                            <Border Width="3" VerticalAlignment="Stretch" HorizontalAlignment="Left" Background="{StaticResource ComponentIconSelectBrush}" />
+                            <Label Name="TimeScalePointerFrame" Foreground="{DynamicResource TextBrush}" Content="1" VerticalAlignment="Stretch" HorizontalAlignment="Left" TextBlock.FontWeight="Bold" Padding="2,0,0,0"/>
+                            <DockPanel.RenderTransform>
+                                <TranslateTransform x:Name="TimeScalePointerTransform"/>
+                            </DockPanel.RenderTransform>
+                        </DockPanel>
+                    </Grid>
+                    <TreeView Name="LayerAxis" BorderBrush="{x:Null}" Background="{x:Null}" BorderThickness="0" VerticalContentAlignment="Top" Foreground="{x:Null}"  Padding="0">
                         <TreeView.ItemTemplate>
                             <DataTemplate>
                                 <Rectangle Height="16" VerticalAlignment="Top" HorizontalAlignment="Left">

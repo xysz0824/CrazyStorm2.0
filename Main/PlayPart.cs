@@ -7,14 +7,15 @@ using CrazyStorm_Player;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Shapes;
 using System.Windows.Media;
+using System.Windows.Shapes;
 
 namespace CrazyStorm
 {
@@ -73,6 +74,7 @@ namespace CrazyStorm
                 player.PlayerImpl.CustomCenter = new Microsoft.Xna.Framework.Vector2(config.CenterX, config.CenterY);
                 player.PlayerImpl.ControllableImagePath = config.SelfImagePath;
                 player.PlayerImpl.ControllableSetting = config.SelfSetting;
+                player.PlayerImpl.CurrentFrame = selectedFrame - 1;
                 screenContent.Children.Add(player);
                 Panel.SetZIndex(player, 1);
             }
@@ -82,6 +84,21 @@ namespace CrazyStorm
             Window window = new PlaySetting(config);
             window.ShowDialog();
             window.Close();
+        }
+        void SetPanelEnable(bool enable)
+        {
+            ComponentPanel.IsEnabled = enable;
+            ResourcePanel.IsEnabled = enable;
+            for (int i = 2; i < LeftTabControl.Items.Count; ++i)
+            {
+                var item = LeftTabControl.Items[i] as TabItem;
+                if (item.DataContext is CrazyStorm.Core.Component)
+                {
+                    var scroll = item.Content as ScrollViewer;
+                    var panel = scroll.Content as PropertyPanel;
+                    panel.IsEnabled = enable;
+                }
+            }
         }
         #endregion
 
@@ -102,6 +119,11 @@ namespace CrazyStorm
                 path.Fill = (Brush)FindResource("PauseIconBrush");
                 path.ToolTip = (string)FindResource("PauseStr");
                 StopButton.Visibility = Visibility.Visible;
+                TimeAxis.IsEnabled = false;
+                ScrollViewer.SetHorizontalScrollBarVisibility(LayerAxis, ScrollBarVisibility.Hidden);
+                ScrollViewer.SetVerticalScrollBarVisibility(LayerAxis, ScrollBarVisibility.Hidden);
+                SetPanelEnable(false);
+                StartLayerTimer();
             }
             else
             {
@@ -111,14 +133,24 @@ namespace CrazyStorm
                     path.Data = (Geometry)FindResource("Play_Icon");
                     path.Fill = (Brush)FindResource("PlayIconBrush");
                     path.ToolTip = (string)FindResource("PlayStr");
+                    selectedFrame = player.PlayerImpl.CurrentFrame + 1;
+                    TimeAxis.IsEnabled = true;
+                    ScrollViewer.SetHorizontalScrollBarVisibility(LayerAxis, ScrollBarVisibility.Auto);
+                    ScrollViewer.SetVerticalScrollBarVisibility(LayerAxis, ScrollBarVisibility.Auto);
                     Panel.SetZIndex(player, -1);
+                    PauseLayerTimer();
                 }
                 else
                 {
                     path.Data = (Geometry)FindResource("Pause_Icon");
                     path.Fill = (Brush)FindResource("PauseIconBrush");
                     path.ToolTip = (string)FindResource("PauseStr");
+                    player.PlayerImpl.CurrentFrame = selectedFrame - 1;
+                    TimeAxis.IsEnabled = false;
+                    ScrollViewer.SetHorizontalScrollBarVisibility(LayerAxis, ScrollBarVisibility.Hidden);
+                    ScrollViewer.SetVerticalScrollBarVisibility(LayerAxis, ScrollBarVisibility.Hidden);
                     Panel.SetZIndex(player, 1);
+                    StartLayerTimer();
                 }
             }
         }
@@ -132,6 +164,11 @@ namespace CrazyStorm
             path.Data = (Geometry)FindResource("Play_Icon");
             path.Fill = (Brush)FindResource("PlayIconBrush");
             path.ToolTip = (string)FindResource("PlayStr");
+            TimeAxis.IsEnabled = true;
+            ScrollViewer.SetHorizontalScrollBarVisibility(LayerAxis, ScrollBarVisibility.Auto);
+            ScrollViewer.SetVerticalScrollBarVisibility(LayerAxis, ScrollBarVisibility.Auto);
+            SetPanelEnable(true);
+            StopLayerTimer();
         }
         private void PlaySettingItem_Click(object sender, RoutedEventArgs e)
         {

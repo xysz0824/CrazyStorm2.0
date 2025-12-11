@@ -17,6 +17,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using System.Windows.Automation.Peers;
 using CrazyStorm.Core;
+using System.Windows.Threading;
 
 namespace CrazyStorm
 {
@@ -26,12 +27,15 @@ namespace CrazyStorm
         Layer selectedLayer;
         ScrollViewer axisScroll;
         ScrollViewer layerScroll;
+        int selectedFrame = 1;
+        bool timeAxisSelecting;
+        DispatcherTimer layerTimer;
         #endregion
 
         #region Private Methods
         void CreateNewLayer()
         {
-                new AddLayerCommand().Do(commandStacks[selectedSystem], selectedSystem);
+            new AddLayerCommand().Do(commandStacks[selectedSystem], selectedSystem);
         }
         void DeleteSelectedLayer()
         {
@@ -55,18 +59,99 @@ namespace CrazyStorm
             window.ShowDialog();
             window.Close();
         }
+        void StartLayerTimer()
+        {
+            if (layerTimer == null)
+            {
+                layerTimer = new DispatcherTimer();
+                layerTimer.Interval = new TimeSpan(0, 0, 0, 0, 16);
+                layerTimer.Tick += LayerTimer_Tick;
+            }
+            layerTimer.Start();
+        }
+        void StopLayerTimer()
+        {
+            layerTimer?.Stop();
+            layerTimer = null;
+            selectedFrame = 1;
+            TimeScalePointerFrame.Content = selectedFrame;
+            TimeScalePointerTransform.X = (selectedFrame - 1) * 3 - axisScroll.HorizontalOffset;
+        }
+        void PauseLayerTimer()
+        {
+            layerTimer?.Stop();
+        }
         #endregion
 
         #region Window EventHandlers
+        private void TimeAxis_Loaded(object sender, RoutedEventArgs e)
+        {
+            axisScroll = VisualHelper.VisualDownwardSearch<ScrollViewer>(LayerAxis) as ScrollViewer;
+            layerScroll = VisualHelper.VisualDownwardSearch<ScrollViewer>(LayerTree) as ScrollViewer;
+            axisScroll.ScrollChanged += (object s, ScrollChangedEventArgs args) =>
+            {
+                var imageBruch = TimeAxis.Background as ImageBrush;
+                imageBruch.Viewport = new Rect(-axisScroll.HorizontalOffset, -1 - axisScroll.VerticalOffset,
+                    imageBruch.Viewport.Width, imageBruch.Viewport.Height);
+                imageBruch = TimeScale.Background as ImageBrush;
+                imageBruch.Viewport = new Rect(-axisScroll.HorizontalOffset, imageBruch.Viewport.Y,
+                    imageBruch.Viewport.Width, imageBruch.Viewport.Height);
+                if (layerTimer == null || !layerTimer.IsEnabled)
+                {
+                    TimeScalePointerTransform.X = (selectedFrame - 1) * 3 - axisScroll.HorizontalOffset;
+                }
+                layerScroll.ScrollToVerticalOffset(axisScroll.VerticalOffset);
+                layerScroll.RenderTransform = new TranslateTransform(0, 0);
+                if (layerScroll.ScrollableHeight < axisScroll.VerticalOffset)
+                {
+                    layerScroll.RenderTransform = new TranslateTransform(0, layerScroll.ScrollableHeight - axisScroll.VerticalOffset);
+                }
+            };
+        }
+        private void LayerTimer_Tick(object sender, EventArgs e)
+        {
+            if (player == null) return;
+            TimeScalePointerFrame.Content = player.PlayerImpl.CurrentFrame + 1;
+            TimeScalePointerTransform.X = player.PlayerImpl.CurrentFrame * 3 - axisScroll.HorizontalOffset;
+            if (TimeScalePointerTransform.X >= TimeScale.ActualWidth)
+            {
+                axisScroll.ScrollToHorizontalOffset(axisScroll.HorizontalOffset + TimeScalePointerTransform.X - TimeScale.ActualWidth + 3);
+            }
+            else if (TimeScalePointerTransform.X <= 0)
+            {
+                axisScroll.ScrollToHorizontalOffset(axisScroll.HorizontalOffset + TimeScalePointerTransform.X);
+            }
+        }
         private void TimeAxis_MouseMove(object sender, MouseEventArgs e)
         {
-            var scrollviewer = VisualHelper.GetVisualChild<ScrollViewer>(TimeAxis);
             //Display the frame that mouse pointed on tooltip.
             var pos = e.GetPosition(TimeAxis);
+            var frame = ((int)(pos.X + axisScroll.HorizontalOffset + 1) / 3) + 1;
+            if (frame >= selectedSystem.TotalFrame)
+            {
+                frame = selectedSystem.TotalFrame;
+                pos.X = (frame - 1) * 3;
+            }
             var textBlock = axisTip.Content as TextBlock;
-            textBlock.Text = ((int)(pos.X + scrollviewer.HorizontalOffset + 1) / 3).ToString();
+            textBlock.Text = frame.ToString();
             axisTip.HorizontalOffset = pos.X + 20;
             axisTip.VerticalOffset = pos.Y + 20;
+            if (timeAxisSelecting)
+            {
+                selectedFrame = frame;
+                TimeScalePointerFrame.Content = selectedFrame.ToString();
+                TimeScalePointerTransform.X = (selectedFrame - 1) * 3 - axisScroll.HorizontalOffset;
+                if (player != null) player.PlayerImpl.CurrentFrame = selectedFrame - 1;
+            }
+        }
+        private void TimeAxis_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            timeAxisSelecting = true;
+            TimeAxis_MouseMove(sender, e);
+        }
+        private void TimeAxis_MouseUp(object sender, MouseButtonEventArgs e)
+        {
+            timeAxisSelecting = false;
         }
         private void NewLayer_MouseUp(object sender, MouseButtonEventArgs e)
         {
@@ -199,30 +284,6 @@ namespace CrazyStorm
         private void LayerElement_PreviewMouseRightButtonDown(object sender, MouseButtonEventArgs e)
         {
             VisualHelper.FocusItem<TreeViewItem>(e);
-        }
-        private void LayerAxis_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
-        {
-            if (axisScroll == null)
-            {
-                axisScroll = VisualHelper.VisualDownwardSearch<ScrollViewer>(LayerAxis) as ScrollViewer;
-                layerScroll = VisualHelper.VisualDownwardSearch<ScrollViewer>(LayerTree) as ScrollViewer;
-                axisScroll.ScrollChanged += (object s, ScrollChangedEventArgs args) =>
-                {
-                    if (axisScroll != null)
-                    {
-                        var imageBruch = TimeAxis.Background as ImageBrush;
-                        imageBruch.Viewport = new Rect(-axisScroll.HorizontalOffset, -1 - axisScroll.VerticalOffset,
-                            imageBruch.Viewport.Width, imageBruch.Viewport.Height);
-                        imageBruch = TimeScale.Background as ImageBrush;
-                        imageBruch.Viewport = new Rect(-axisScroll.HorizontalOffset, imageBruch.Viewport.Y,
-                            imageBruch.Viewport.Width, imageBruch.Viewport.Height);
-                        layerScroll.ScrollToVerticalOffset(axisScroll.VerticalOffset);
-                        layerScroll.RenderTransform = new TranslateTransform(0, 0);
-                        if (layerScroll.ScrollableHeight < axisScroll.VerticalOffset)
-                            layerScroll.RenderTransform = new TranslateTransform(0, layerScroll.ScrollableHeight - axisScroll.VerticalOffset);
-                    }
-                };
-            }
         }
         #endregion
     }

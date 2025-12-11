@@ -15,7 +15,6 @@ namespace CrazyStorm.Core
     public class ParticleSystem : IXmlData, IGeneratePlayData, ILoadPlayData, IPlayable
     {
         #region Private Members
-        int totalFrame;
         [PlayData]
         [XmlAttribute]
         string name;
@@ -36,6 +35,19 @@ namespace CrazyStorm.Core
             set { name = value; }
         }
         public int CurrentFrame { get; set; }
+        public int TotalFrame
+        {
+            get
+            {
+                var totalFrame = 0;
+                for (int i = 0; i < Layers.Count; ++i)
+                {
+                    //Set the biggest number as totalFrame 
+                    totalFrame = Layers[i].TotalFrame > totalFrame ? Layers[i].TotalFrame : totalFrame;
+                }
+                return totalFrame;
+            }
+        }
         public IList<ParticleType> CustomTypes { get { return customTypes; } }
         public IList<Layer> Layers { get { return layers; } }
         public IList<Component> ComponentTree { get { return componentTree; } }
@@ -195,8 +207,6 @@ namespace CrazyStorm.Core
                 PlayDataHelper.LoadObjectList(Layers, particleSystemReader, version);
                 for (int i = 0; i < Layers.Count; ++i)
                 {
-                    //Set the biggest number as totalFrame 
-                    totalFrame = Layers[i].TotalFrame > totalFrame ? Layers[i].TotalFrame : totalFrame;
                     //Set id of layer to components of layer
                     Layers[i].SetComponentsID(i);
                 }
@@ -204,16 +214,17 @@ namespace CrazyStorm.Core
         }
         public bool Update(int currentFrame = 0)
         {
-            for (int i = 0; i < Layers.Count; ++i)
-                Layers[i].Update(CurrentFrame);
-
             if (currentFrame != CurrentFrame)
             {
                 Reset();
                 for (int i = 0; i < currentFrame; ++i) Update(i);
                 CurrentFrame = currentFrame;
             }
-            if (++CurrentFrame == totalFrame)
+            for (int i = 0; i < Layers.Count; ++i)
+            {
+                Layers[i].Update(CurrentFrame);
+            }
+            if (++CurrentFrame == TotalFrame)
             {
                 Reset();
             }
