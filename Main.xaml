@@ -1033,24 +1033,27 @@
                             </DockPanel.RenderTransform>
                         </DockPanel>
                     </Grid>
-                    <TreeView Name="LayerAxis" BorderBrush="{x:Null}" Background="{x:Null}" BorderThickness="0" VerticalContentAlignment="Top" Foreground="{x:Null}"  Padding="0">
+                    <TreeView Name="LayerAxis" BorderBrush="{x:Null}" Background="{x:Null}" BorderThickness="0" VerticalContentAlignment="Top" Foreground="{x:Null}" Padding="0">
                         <TreeView.ItemTemplate>
                             <DataTemplate>
-                                <Rectangle Height="16" VerticalAlignment="Top" HorizontalAlignment="Left">
-                                    <Rectangle.Fill>
-                                        <ImageBrush ImageSource="Images/layercolor.png" TileMode="FlipY">
-                                            <ImageBrush.Viewbox>
-                                                <Binding Path="Color" Converter="{StaticResource LayerAxisConverter}"/>
-                                            </ImageBrush.Viewbox>
-                                        </ImageBrush>
-                                    </Rectangle.Fill>
-                                    <Rectangle.Width>
-                                        <Binding Path="TotalFrame" Converter="{StaticResource LayerLengthConverter}" />
-                                    </Rectangle.Width>
-                                    <Rectangle.Margin>
-                                        <Binding Path="BeginFrame" Converter="{StaticResource LayerStartConverter}" />
-                                    </Rectangle.Margin>
-                                </Rectangle>
+                                <Grid Margin="0" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+                                    <Rectangle Height="16" VerticalAlignment="Top" HorizontalAlignment="Left">
+                                        <Rectangle.Fill>
+                                            <ImageBrush ImageSource="Images/layercolor.png" TileMode="FlipY">
+                                                <ImageBrush.Viewbox>
+                                                    <Binding Path="Color" Converter="{StaticResource LayerAxisConverter}"/>
+                                                </ImageBrush.Viewbox>
+                                            </ImageBrush>
+                                        </Rectangle.Fill>
+                                        <Rectangle.Width>
+                                            <Binding Path="TotalFrame" Converter="{StaticResource LayerLengthConverter}" />
+                                        </Rectangle.Width>
+                                        <Rectangle.Margin>
+                                            <Binding Path="BeginFrame" Converter="{StaticResource LayerStartConverter}" />
+                                        </Rectangle.Margin>
+                                    </Rectangle>
+                                    <Label Padding="0,0,2,0" Foreground="White" TextBlock.FontWeight="Bold" Content="{Binding TotalFrame}" VerticalAlignment="Center" HorizontalAlignment="Right" />
+                                </Grid>
                             </DataTemplate>
                         </TreeView.ItemTemplate>
                         <TreeView.Resources>
