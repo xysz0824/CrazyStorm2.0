@@ -68,7 +68,8 @@ namespace CrazyStorm.Core
                     particleIndex = (particleIndex + 1) % particlePool.Count;
                 }
                 while (particlePool[particleIndex].Alive);
-                particlePool[particleIndex] = template.Copy() as Particle;
+                particlePool[particleIndex] = template.Clone() as Particle;
+                particlePool[particleIndex].Reset();
                 particlePool[particleIndex].Alive = true;
                 particlePool[particleIndex].RenderOrder = order + particleIndex * 10;
                 //particleQuadTree.Insert(particlePool[particleIndex]);
@@ -81,7 +82,8 @@ namespace CrazyStorm.Core
                     curveParticleIndex = curveParticleIndex % curveParticlePool.Count;
                 }
                 while (curveParticlePool[curveParticleIndex].Alive);
-                curveParticlePool[curveParticleIndex] = template.Copy() as CurveParticle;
+                curveParticlePool[curveParticleIndex] = template.Clone() as CurveParticle;
+                curveParticlePool[curveParticleIndex].Reset();
                 curveParticlePool[curveParticleIndex].Alive = true;
                 curveParticlePool[curveParticleIndex].RenderOrder = order + particleIndex * 10;
                 //particleQuadTree.Insert(curveParticlePool[curveParticleIndex]);

@@ -286,7 +286,8 @@ namespace CrazyStorm.Core
         }
         public override void Reset()
         {
-            Template = InitialTemplate.Copy();
+            Template = InitialTemplate.Clone() as ParticleBase;
+            Template.Reset();
             base.Reset();
             var initialState = base.initialState as Emitter;
             EmitPosition = initialState.EmitPosition;

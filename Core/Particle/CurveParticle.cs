@@ -101,10 +101,11 @@ namespace CrazyStorm.Core
             }
             return false;
         }
-        public override void Update()
+        public override bool Update(int currentFrame = 0)
         {
-            base.Update();
+            if (!base.Update()) return false;
             //TODO Curve Particle
+            return true;
         }
         #endregion
     }

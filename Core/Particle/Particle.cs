@@ -21,8 +21,11 @@ namespace CrazyStorm.Core
     }
     public class Particle : ParticleBase
     {
+        public const int AFTERIMAGE_COUNT = 25;
         #region Private Members
         ParticleData particleData;
+        int afterimageTime;
+        Vector4[] afterimageData = new Vector4[AFTERIMAGE_COUNT];
         #endregion
 
         #region Public Members
@@ -50,6 +53,7 @@ namespace CrazyStorm.Core
             get { return particleData.afterimageEffect; }
             set { particleData.afterimageEffect = value; }
         }
+        public Vector4[] AfterImageData => afterimageData;
         #endregion
 
         #region Constructor
@@ -142,20 +146,30 @@ namespace CrazyStorm.Core
                     return true;
                 case "AfterimageEffect":
                     AfterimageEffect = VM.PopBool();
+                    if (!AfterimageEffect) afterimageTime = 0;
                     return true;
             }
             return false;
         }
-        public override void Update()
+        public override bool Update(int currentFrame = 0)
         {
-            base.Update();
-            if (StickToSpeedAngle)
-                PRotation = PSpeedAngle + 90;
-
-            if (RetainScale && WidthScale != HeightScale)
-                HeightScale = WidthScale;
-
-            //TODO Particle Effect
+            if (!base.Update()) return false;
+            if (StickToSpeedAngle) PRotation = PSpeedAngle + 90;
+            if (RetainScale && WidthScale != HeightScale) HeightScale = WidthScale;
+            if (AfterimageEffect)
+            {
+                afterimageData[afterimageTime].x = 0.4f;
+                afterimageData[afterimageTime].y = PPosition.x;
+                afterimageData[afterimageTime].z = PPosition.y;
+                afterimageData[afterimageTime].w = PRotation;
+                afterimageTime = (afterimageTime + 1) % AFTERIMAGE_COUNT;
+            }
+            return true;
+        }
+        public override void Reset()
+        {
+            base.Reset();
+            afterimageData = new Vector4[AFTERIMAGE_COUNT];
         }
         #endregion
     }

@@ -20,7 +20,7 @@ namespace CrazyStorm.Core
         }
         public override string ToString()
         {
-            return "[" + r + "," + g + "," + b + "]";
+            return $"[{r},{g},{b}]";
         }
         public override bool Equals(object obj)
         {

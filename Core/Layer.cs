@@ -24,7 +24,7 @@ namespace CrazyStorm.Core
         Orange,
         Gray
     }
-    public class Layer : INotifyPropertyChanged, IXmlData, IGeneratePlayData, ILoadPlayData
+    public class Layer : INotifyPropertyChanged, IXmlData, IGeneratePlayData, ILoadPlayData, IPlayable
     {
         public event PropertyChangedEventHandler PropertyChanged;
 

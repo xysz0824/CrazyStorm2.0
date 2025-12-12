@@ -42,7 +42,7 @@ namespace CrazyStorm.Core
         public bool fadeEffect;
     }
     public abstract class ParticleBase : PropertyContainer, IXmlData, IRebuildReference<ParticleType>, IGeneratePlayData, ILoadPlayData, 
-        IComparable<ParticleBase>
+        IComparable<ParticleBase>, IPlayable
     {
         public const float FOG_TIME = 10;
         #region Private Members
@@ -525,13 +525,13 @@ namespace CrazyStorm.Core
             }
             return false;
         }
-        public virtual void Update()
+        public virtual bool Update(int currentFrame = 0)
         {
             if (PCurrentFrame >= MaxLife || (KillOutside && ParticleManager.OutOfWindow(PPosition.x, PPosition.y)))
             {
                 Alive = false;
                 Emitter.Particles.Remove(this);
-                return;
+                return false;
             }
             if (PCurrentFrame == 0)
             {
@@ -542,8 +542,9 @@ namespace CrazyStorm.Core
             PSpeedVector += PAcspeedVector;
             PPosition += PSpeedVector;
             for (int i = 0; i < ParticleEventGroups.Count; ++i)
+            {
                 ParticleEventGroups[i].Execute(this, null);
-
+            }
             ++PCurrentFrame;
             if (MaxLife <= FOG_TIME)
             {
@@ -552,8 +553,7 @@ namespace CrazyStorm.Core
             else if (PCurrentFrame < MaxLife - FOG_TIME)
             {
                 ++FogFrame;
-                if (!FogEffect || FogFrame >= FOG_TIME)
-                    FogFrame = (int)FOG_TIME;
+                if (!FogEffect || FogFrame >= FOG_TIME) FogFrame = (int)FOG_TIME;
             }
             else if (FadeEffect)
             {
@@ -561,11 +561,9 @@ namespace CrazyStorm.Core
                 if (FogFrame <= 0)
                     FogFrame = 0;
             }
+            return true;
         }
-        public ParticleBase Copy()
-        {
-            return MemberwiseClone() as ParticleBase;
-        }
+        public virtual void Reset() { }
         public int CompareTo(ParticleBase other)
         {
             return RenderOrder - other.RenderOrder;

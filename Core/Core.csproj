@@ -112,6 +112,8 @@
     <Compile Include="Resource\Resource.cs" />
     <Compile Include="Resource\VariableResource.cs" />
     <Compile Include="Property\PropertyTypeRule.cs" />
+    <Compile Include="Struct\Vector3.cs" />
+    <Compile Include="Struct\Vector4.cs" />
     <Compile Include="Utils\EnvironmentInfoHelper.cs" />
     <Compile Include="Utils\GenericContainer.cs" />
     <Compile Include="Utils\IniHelper.cs" />

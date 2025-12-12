@@ -19,7 +19,7 @@ namespace CrazyStorm.Core
         }
         public override string ToString()
         {
-            return "[" + x + "," + y + "]";
+            return $"[{x},{y}]";
         }
         public override bool Equals(object obj)
         {
@@ -118,8 +118,7 @@ namespace CrazyStorm.Core
                 try
                 {
                     var part = value.Split(',');
-                    if (part.Length != 2)
-                        return false;
+                    if (part.Length != 2) return false;
                     part[0] = part[0].Trim();
                     part[1] = part[1].Trim();
                     result.x = float.Parse(part[0]);

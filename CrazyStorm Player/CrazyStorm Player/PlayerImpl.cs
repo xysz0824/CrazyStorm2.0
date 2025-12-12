@@ -182,13 +182,25 @@ namespace CrazyStorm_Player
             Color color = new Color(particle.RGB.r / 255f, particle.RGB.g / 255f, particle.RGB.b / 255f, alpha);
             int frame = particle.PCurrentFrame / (type.Delay + 1) % type.Frames;
             Rectangle rect = new Rectangle((int)type.StartPoint.x + frame * type.Width, (int)type.StartPoint.y, type.Width, type.Height);
-            if (type.ID >= ParticleType.DefaultTypeIndex)
+            var tex = type.ID >= ParticleType.DefaultTypeIndex ? defaultTextures[0] : type.Image != null ? customTextures[type.Image.ID] : null;
+            if (tex != null)
             {
-                spriteBatch.Draw(defaultTextures[0], position, rect, color, MathHelper.ToRadians(particle.PRotation), imageCenter, scale, SpriteEffects.None, 0);
-            }
-            else if (type.Image != null)
-            {
-                spriteBatch.Draw(customTextures[type.Image.ID], position, rect, color, MathHelper.ToRadians(particle.PRotation), imageCenter, scale, SpriteEffects.None, 0);
+                var rad = MathHelper.ToRadians(particle.PRotation);
+                spriteBatch.Draw(tex, position, rect, color, rad, imageCenter, scale, SpriteEffects.None, 0);
+                if (!particle.AfterimageEffect) return;
+                for (int i = 0; i < Particle.AFTERIMAGE_COUNT; ++i)
+                {
+                    var afterImage = particle.AfterImageData[i];
+                    if (afterImage.x > 0)
+                    {
+                        afterImage.x = Math.Max(0, afterImage.x - 1.0f / Particle.AFTERIMAGE_COUNT);
+                        position = new Vector2(afterImage.y, afterImage.z) + center;
+                        rad = MathHelper.ToRadians(afterImage.w);
+                        color.A = (byte)(afterImage.x * alpha * 255f);
+                        spriteBatch.Draw(tex, position, rect, color, rad, imageCenter, scale, SpriteEffects.None, 0);
+                    }
+                    particle.AfterImageData[i] = afterImage;
+                }
             }
         }
         void DrawCurveParticle(SpriteBatch spriteBatch, CurveParticle particle)
