@@ -1058,7 +1058,7 @@
                         </TreeView.ItemTemplate>
                         <TreeView.Resources>
                             <Style TargetType="ScrollBar" BasedOn="{StaticResource FlatScrollBarStyle}" />
-                            <SolidColorBrush x:Key="{x:Static SystemColors.ControlBrushKey}" Color="{Binding ScrollBarTrackBrush}" />
+                            <SolidColorBrush x:Key="{x:Static SystemColors.ControlBrushKey}" Color="{DynamicResource ScrollBarCornerColor}" />
                         </TreeView.Resources>
                     </TreeView>
                 </DockPanel>

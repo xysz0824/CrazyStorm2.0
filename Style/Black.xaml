@@ -43,6 +43,7 @@
         <GradientStop Color="#FF1D012A" Offset="1" />
     </LinearGradientBrush>
     <SolidColorBrush x:Key="ScrollBarTrackBrush" Color="#0F0F0F" />
+    <Color x:Key="ScrollBarCornerColor">#0F0F0F</Color>
     <SolidColorBrush x:Key="ScrollBarThumbBrush" Color="#2F2F2F" />
     <SolidColorBrush x:Key="ScrollBarThumbHoverBrush" Color="#404040" />
     <SolidColorBrush x:Key="ScrollBarThumbPressedBrush" Color="#545454" />

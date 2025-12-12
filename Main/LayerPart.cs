@@ -90,16 +90,14 @@ namespace CrazyStorm
             layerScroll = VisualHelper.VisualDownwardSearch<ScrollViewer>(LayerTree) as ScrollViewer;
             axisScroll.ScrollChanged += (object s, ScrollChangedEventArgs args) =>
             {
-                //Need this condition for strange display problem
-                if (axisScroll.HorizontalOffset != 0 || axisScroll.VerticalOffset != 0)
-                {
-                    var imageBruch = TimeAxis.Background as ImageBrush;
-                    imageBruch.Viewport = new Rect(-axisScroll.HorizontalOffset, -1 - axisScroll.VerticalOffset,
-                        imageBruch.Viewport.Width, imageBruch.Viewport.Height);
-                    imageBruch = TimeScale.Background as ImageBrush;
-                    imageBruch.Viewport = new Rect(-axisScroll.HorizontalOffset, imageBruch.Viewport.Y,
-                        imageBruch.Viewport.Width, imageBruch.Viewport.Height);
-                }
+                //Need this for strange display problem
+                axisScroll.ScrollToHorizontalOffset(Math.Max(1, axisScroll.HorizontalOffset));
+                var imageBruch = TimeScale.Background as ImageBrush;
+                imageBruch.Viewport = new Rect(1 - axisScroll.HorizontalOffset, 0,
+                    imageBruch.Viewport.Width, imageBruch.Viewport.Height);
+                imageBruch = TimeAxis.Background as ImageBrush;
+                imageBruch.Viewport = new Rect(1 - axisScroll.HorizontalOffset, -2 - axisScroll.VerticalOffset,
+                    imageBruch.Viewport.Width, imageBruch.Viewport.Height);
                 if (layerTimer == null || !layerTimer.IsEnabled)
                 {
                     TimeScalePointerTransform.X = (selectedFrame - 1) * 3 - axisScroll.HorizontalOffset;
@@ -138,6 +136,11 @@ namespace CrazyStorm
                 frame = selectedSystem.TotalFrame;
                 pos.X = (frame - 1) * 3;
             }
+            else if (frame <= 1)
+            {
+                frame = 1;
+                pos.X = 0;
+            }
             var textBlock = axisTip.Content as TextBlock;
             textBlock.Text = frame.ToString();
             axisTip.HorizontalOffset = pos.X + 20;
@@ -153,11 +156,13 @@ namespace CrazyStorm
         private void TimeAxis_MouseDown(object sender, MouseButtonEventArgs e)
         {
             timeAxisSelecting = true;
+            TimeAxis.CaptureMouse();
             TimeAxis_MouseMove(sender, e);
         }
         private void TimeAxis_MouseUp(object sender, MouseButtonEventArgs e)
         {
             timeAxisSelecting = false;
+            TimeAxis.ReleaseMouseCapture();
         }
         private void NewLayer_MouseUp(object sender, MouseButtonEventArgs e)
         {

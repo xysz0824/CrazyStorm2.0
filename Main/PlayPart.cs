@@ -119,7 +119,7 @@ namespace CrazyStorm
                 path.Fill = (Brush)FindResource("PauseIconBrush");
                 path.ToolTip = (string)FindResource("PauseStr");
                 StopButton.Visibility = Visibility.Visible;
-                TimeAxis.IsEnabled = false;
+                TimeAxis.IsHitTestVisible = false;
                 ScrollViewer.SetHorizontalScrollBarVisibility(LayerAxis, ScrollBarVisibility.Hidden);
                 ScrollViewer.SetVerticalScrollBarVisibility(LayerAxis, ScrollBarVisibility.Hidden);
                 SetPanelEnable(false);
@@ -134,7 +134,7 @@ namespace CrazyStorm
                     path.Fill = (Brush)FindResource("PlayIconBrush");
                     path.ToolTip = (string)FindResource("PlayStr");
                     selectedFrame = player.PlayerImpl.CurrentFrame + 1;
-                    TimeAxis.IsEnabled = true;
+                    TimeAxis.IsHitTestVisible = true;
                     ScrollViewer.SetHorizontalScrollBarVisibility(LayerAxis, ScrollBarVisibility.Auto);
                     ScrollViewer.SetVerticalScrollBarVisibility(LayerAxis, ScrollBarVisibility.Auto);
                     Panel.SetZIndex(player, -1);
@@ -146,7 +146,7 @@ namespace CrazyStorm
                     path.Fill = (Brush)FindResource("PauseIconBrush");
                     path.ToolTip = (string)FindResource("PauseStr");
                     player.PlayerImpl.CurrentFrame = selectedFrame - 1;
-                    TimeAxis.IsEnabled = false;
+                    TimeAxis.IsHitTestVisible = false;
                     ScrollViewer.SetHorizontalScrollBarVisibility(LayerAxis, ScrollBarVisibility.Hidden);
                     ScrollViewer.SetVerticalScrollBarVisibility(LayerAxis, ScrollBarVisibility.Hidden);
                     Panel.SetZIndex(player, 1);
@@ -164,7 +164,7 @@ namespace CrazyStorm
             path.Data = (Geometry)FindResource("Play_Icon");
             path.Fill = (Brush)FindResource("PlayIconBrush");
             path.ToolTip = (string)FindResource("PlayStr");
-            TimeAxis.IsEnabled = true;
+            TimeAxis.IsHitTestVisible = true;
             ScrollViewer.SetHorizontalScrollBarVisibility(LayerAxis, ScrollBarVisibility.Auto);
             ScrollViewer.SetVerticalScrollBarVisibility(LayerAxis, ScrollBarVisibility.Auto);
             SetPanelEnable(true);
