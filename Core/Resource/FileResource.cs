@@ -49,13 +49,10 @@ namespace CrazyStorm.Core
         public override void CheckValid()
         {
             if (!StringUtil.IsNullOrWhiteSpace(File.CurrentDirectory))
+            {
                 relativePath = relativePath.Replace(File.CurrentDirectory, "");
-            
-            if (relativePath.Contains(":"))
-                absolutePath = relativePath;
-            else
-                absolutePath = File.CurrentDirectory + relativePath;
-            
+            }
+            absolutePath = relativePath.Contains(":") ? relativePath : File.CurrentDirectory + relativePath;
             isValid = System.IO.File.Exists(absolutePath);
         }
         public override object Clone()
@@ -92,6 +89,7 @@ namespace CrazyStorm.Core
             {
                 id = fileResourceReader.ReadInt32();
                 relativePath = PlayDataHelper.ReadString(fileResourceReader);
+                absolutePath = relativePath.Contains(":") ? relativePath : File.CurrentDirectory + relativePath;
             }
         }
         #endregion

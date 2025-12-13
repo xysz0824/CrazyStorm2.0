@@ -22,6 +22,8 @@ using Blend = Microsoft.Xna.Framework.Graphics.Blend;
 using Color = Microsoft.Xna.Framework.Color;
 using Rectangle = Microsoft.Xna.Framework.Rectangle;
 using SamplerState = Microsoft.Xna.Framework.Graphics.SamplerState;
+using Microsoft.Xna.Framework.Audio;
+using System.Media;
 
 namespace CrazyStorm_Player
 {
@@ -34,6 +36,7 @@ namespace CrazyStorm_Player
         Vector2 backgroundPos;
         List<Texture2D> defaultTextures;
         Dictionary<int, Texture2D> customTextures;
+        Dictionary<string, SoundEffect> sounds;
         Texture2D characterTexture;
         Texture2D pointTexture;
         Texture2D slowModeTexture;
@@ -55,6 +58,7 @@ namespace CrazyStorm_Player
             Width = width;
             Height = height;
 
+            EventManager.Initialize();
             ParticleManager.Initialize(width, height, 50, particleMaximum, curveParticleMaximum);
         }
         public void Initialize(GraphicsDevice gd)
@@ -131,7 +135,10 @@ namespace CrazyStorm_Player
                     customTextures[image.ID] = Texture2D.FromStream(gd, file);
                 }
             }
+            FrameworkDispatcher.Update();
+            sounds = new Dictionary<string, SoundEffect>();
             File.ParticleSystems[SelectedParticleSystemIndex].Reset();
+            EventManager.OnSoundPlay += PlaySound;
             ParticleManager.OnParticleDraw += (particle) => DrawParticle(spriteBatch, particle);
             ParticleManager.OnCurveParticleDraw += (particle) => DrawCurveParticle(spriteBatch, particle);
         }
@@ -140,10 +147,25 @@ namespace CrazyStorm_Player
             spriteBatch?.Dispose();
             background?.Dispose();
             foreach (var tex in defaultTextures) tex?.Dispose();
+            defaultTextures.Clear();
             foreach (var tex in customTextures.Values) tex?.Dispose();
+            customTextures.Clear();
+            foreach (var sound in sounds.Values) sound?.Dispose();
+            sounds.Clear();
             characterTexture?.Dispose();
             pointTexture?.Dispose();
             slowModeTexture?.Dispose();
+        }
+        void PlaySound(string path, float volume)
+        {
+            if (!sounds.ContainsKey(path))
+            {
+                using (var stream = new FileStream(path, FileMode.Open))
+                {
+                    sounds[path] = SoundEffect.FromStream(stream);
+                }
+            }
+            sounds[path].Play(volume / 100f, 0f, 0f);
         }
         void DrawParticle(SpriteBatch spriteBatch, Particle particle)
         {
@@ -211,10 +233,12 @@ namespace CrazyStorm_Player
         }
         public void Update(KeyboardState keyboard, GameTime gameTime)
         {
+            FrameworkDispatcher.Update();
             controllable.Update(keyboard);
             File.SetGlobal("cx", controllable.selfPosition.X);
             File.SetGlobal("cy", controllable.selfPosition.Y);
             EventManager.CustomTypes = File.ParticleSystems[SelectedParticleSystemIndex].CustomTypes;
+            EventManager.Sounds = File.Sounds;
             File.ParticleSystems[SelectedParticleSystemIndex].Update(CurrentFrame);
             ParticleManager.CheckCollision(controllable.selfPosition.X, controllable.selfPosition.Y, controllable.selfRadius);
             ParticleManager.Update();

@@ -5,19 +5,27 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Linq;
 
 namespace CrazyStorm.Core
 {
     public class EventManager
     {
+        public delegate void SoundPlayHandler(string path, float volume);
+        public static event SoundPlayHandler OnSoundPlay;
+
         static List<EventExecutor> executorList;
-        static Dictionary<string, Dictionary<string, TypeSet>> cache = new Dictionary<string, Dictionary<string, TypeSet>>();
+        static Dictionary<string, Dictionary<string, TypeSet>> cache;
         public static IList<ParticleType> CustomTypes { get; set; }
+        public static IList<FileResource> Sounds { get; set; }
+        public static void Initialize()
+        {
+            OnSoundPlay = null;
+            executorList = new List<EventExecutor>();
+            cache = new Dictionary<string, Dictionary<string, TypeSet>>();
+        }
         public static void AddEvent(PropertyContainer propertyContainer, PropertyContainer bindingContainer, VMEventInfo eventInfo)
         {
-            if (executorList == null)
-                executorList = new List<EventExecutor>();
-
             var executor = new EventExecutor();
             executor.PropertyContainer = propertyContainer;
             executor.BindingContainer = bindingContainer;
@@ -155,13 +163,20 @@ namespace CrazyStorm.Core
                     (propertyContainer as Emitter).EmitParticle();
                     break;
                 case "PlaySound":
-                    //TODO Sound
+                    if (OnSoundPlay != null)
+                    {
+                        var label = arguments[0];
+                        var volume = float.Parse(arguments[1]);
+                        var sound = Sounds.FirstOrDefault((item) => string.Equals(item.Label, label));
+                        if (sound != null)
+                        {
+                            OnSoundPlay(sound.AbsolutePath, volume);
+                        }
+                    }
                     break;
                 case "Loop":
                     VM.Execute(propertyContainer, argumentExpression);
-                    if (!VM.PopBool())
-                        return true;
-
+                    if (!VM.PopBool()) return true;
                     break;
                 case "ChangeType":
                     int typeId = int.Parse(arguments[0]) + int.Parse(arguments[1]);
@@ -185,9 +200,6 @@ namespace CrazyStorm.Core
         }
         public static void Update()
         {
-            if (executorList == null)
-                return;
-
             for (int i = 0; i < executorList.Count; ++i)
             {
                 if (executorList[i].BindingContainer == null)
@@ -204,9 +216,6 @@ namespace CrazyStorm.Core
         }
         public static bool BindingUpdate(PropertyContainer propertyContainer, PropertyContainer bindingContainer)
         {
-            if (executorList == null)
-                return false;
-
             bool updated = false;
             string id = GetUniqueKey(propertyContainer, bindingContainer);
             for (int i = 0; i < executorList.Count; ++i)
