@@ -103,6 +103,7 @@ namespace CrazyStorm
             ComponentTree.ItemsSource = selectedSystem.ComponentTree;
             BindComponentItem.IsEnabled = false;
             UnbindComponentItem.IsEnabled = false;
+            LeftTabControl.SelectedIndex = 0;
         }
         void InitializeScreen()
         {

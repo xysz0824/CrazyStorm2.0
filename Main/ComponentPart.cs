@@ -139,8 +139,9 @@ namespace CrazyStorm
             //Get all visible components in this particle system.
             var set = new List<Component>();
             foreach (var layer in selectedSystem.Layers)
-                if (layer.Visible)
-                    set.AddRange(layer.Components);
+            {
+                if (layer.Visible) set.AddRange(layer.Components);
+            }
             for (int i = 2; i < LeftTabControl.Items.Count; ++i)
             {
                 TabItem item = LeftTabControl.Items[i] as TabItem;
