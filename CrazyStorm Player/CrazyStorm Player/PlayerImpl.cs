@@ -213,12 +213,11 @@ namespace CrazyStorm_Player
                 for (int i = 0; i < Particle.AFTERIMAGE_COUNT; ++i)
                 {
                     var afterImage = particle.AfterImageData[i];
-                    if (afterImage.x > 0)
+                    if (afterImage.alpha > 0)
                     {
-                        afterImage.x = Math.Max(0, afterImage.x - 1.0f / Particle.AFTERIMAGE_COUNT);
-                        position = new Vector2(afterImage.y, afterImage.z) + center;
-                        rad = MathHelper.ToRadians(afterImage.w);
-                        color.A = (byte)(afterImage.x * alpha * 255f);
+                        position = new Vector2(afterImage.x, afterImage.y) + center;
+                        rad = MathHelper.ToRadians(afterImage.rot);
+                        color.A = (byte)(afterImage.alpha * alpha * 255f);
                         spriteBatch.Draw(tex, position, rect, color, rad, imageCenter, scale, SpriteEffects.None, 0);
                     }
                     particle.AfterImageData[i] = afterImage;

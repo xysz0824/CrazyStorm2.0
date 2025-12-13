@@ -19,13 +19,19 @@ namespace CrazyStorm.Core
         public bool retainScale;
         public bool afterimageEffect;
     }
+    public struct AfterImage
+    {
+        public float alpha;
+        public float x, y;
+        public float rot;
+    }
     public class Particle : ParticleBase
     {
         public const int AFTERIMAGE_COUNT = 25;
         #region Private Members
         ParticleData particleData;
         int afterimageTime;
-        Vector4[] afterimageData = new Vector4[AFTERIMAGE_COUNT];
+        AfterImage[] afterimageData = new AfterImage[AFTERIMAGE_COUNT];
         #endregion
 
         #region Public Members
@@ -53,7 +59,7 @@ namespace CrazyStorm.Core
             get { return particleData.afterimageEffect; }
             set { particleData.afterimageEffect = value; }
         }
-        public Vector4[] AfterImageData => afterimageData;
+        public AfterImage[] AfterImageData => afterimageData;
         #endregion
 
         #region Constructor
@@ -158,10 +164,14 @@ namespace CrazyStorm.Core
             if (RetainScale && WidthScale != HeightScale) HeightScale = WidthScale;
             if (AfterimageEffect)
             {
-                afterimageData[afterimageTime].x = 0.4f;
-                afterimageData[afterimageTime].y = PPosition.x;
-                afterimageData[afterimageTime].z = PPosition.y;
-                afterimageData[afterimageTime].w = PRotation;
+                for (int i = 0; i < AFTERIMAGE_COUNT; ++i)
+                {
+                    afterimageData[i].alpha = Math.Max(0, afterimageData[i].alpha - 1.0f / AFTERIMAGE_COUNT);
+                }
+                afterimageData[afterimageTime].alpha = 0.4f;
+                afterimageData[afterimageTime].x = PPosition.x;
+                afterimageData[afterimageTime].y = PPosition.y;
+                afterimageData[afterimageTime].rot = PRotation;
                 afterimageTime = (afterimageTime + 1) % AFTERIMAGE_COUNT;
             }
             return true;
@@ -169,7 +179,7 @@ namespace CrazyStorm.Core
         public override void Reset()
         {
             base.Reset();
-            afterimageData = new Vector4[AFTERIMAGE_COUNT];
+            afterimageData = new AfterImage[AFTERIMAGE_COUNT];
         }
         #endregion
     }
