@@ -1,6 +1,6 @@
 ﻿/*
  * The MIT License (MIT)
- * Copyright (c) StarX 2017
+ * Copyright (c) StarX 2026
  */
 using CrazyStorm.Core;
 using Microsoft.Xna.Framework;
