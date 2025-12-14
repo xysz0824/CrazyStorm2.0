@@ -88,7 +88,7 @@ namespace CrazyStorm.Core
             base.ExecuteExpression("HalfWidth");
             base.ExecuteExpression("HalfHeight");
             int count = 0;
-            List<ParticleBase> results = ParticleManager.SearchByRect(Position.x - HalfWidth, Position.x + HalfWidth,
+            var results = ParticleManager.SearchByRect(Position.x - HalfWidth, Position.x + HalfWidth,
                 Position.y - HalfHeight, Position.y + HalfHeight, out count);
             for (int i = 0;i < count; ++i)
             {

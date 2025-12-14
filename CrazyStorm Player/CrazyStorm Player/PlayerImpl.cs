@@ -29,6 +29,9 @@ namespace CrazyStorm_Player
 {
     public class PlayerImpl
     {
+        const int PARTICLE_PRESERVED_DIST = 50;
+        const int CURVE_PRESERVED_DIST = 100;
+
         SpriteBatch spriteBatch;
         BlendState substration, multiply;
         Texture2D background;
@@ -59,7 +62,8 @@ namespace CrazyStorm_Player
             Height = height;
 
             EventManager.Initialize();
-            ParticleManager.Initialize(width, height, 50, particleMaximum, curveParticleMaximum);
+            ParticleManager.Initialize(width, height, PARTICLE_PRESERVED_DIST, CURVE_PRESERVED_DIST, 
+                particleMaximum, curveParticleMaximum);
         }
         public void Initialize(GraphicsDevice gd)
         {
@@ -234,12 +238,15 @@ namespace CrazyStorm_Player
         {
             FrameworkDispatcher.Update();
             controllable.Update(keyboard);
-            File.SetGlobal("cx", controllable.selfPosition.X);
-            File.SetGlobal("cy", controllable.selfPosition.Y);
+            File.SetGlobal("cx", controllable.selfPos.X);
+            File.SetGlobal("cy", controllable.selfPos.Y);
             EventManager.CustomTypes = File.ParticleSystems[SelectedParticleSystemIndex].CustomTypes;
             EventManager.Sounds = File.Sounds;
             File.ParticleSystems[SelectedParticleSystemIndex].Update(CurrentFrame);
-            ParticleManager.CheckCollision(controllable.selfPosition.X, controllable.selfPosition.Y, controllable.selfRadius);
+            var particleCount = 0;
+            var particles = ParticleManager.CheckCollision(controllable.selfPosLast.X, controllable.selfPosLast.Y,
+                controllable.selfPos.X, controllable.selfPos.Y, controllable.selfRadius, out particleCount);
+            for (int i = 0; i < particleCount; ++i) particles[i].Die();
             ParticleManager.Update();
             EventManager.Update();
             CurrentFrame = File.ParticleSystems[SelectedParticleSystemIndex].CurrentFrame;

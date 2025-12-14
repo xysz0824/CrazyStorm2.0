@@ -157,6 +157,12 @@ namespace CrazyStorm.Core
             }
             return false;
         }
+        public override bool CheckCollision(float bx, float by, float x, float y, float r)
+        {
+            return FogFrame >= FOG_TIME &&
+                MathHelper.Judge(PPositionLast, PPosition, new Vector2(bx, by), new Vector2(x, y),
+                new Vector2(Math.Abs(WidthScale), Math.Abs(HeightScale)), r, PRotation);
+        }
         public override bool Update(int currentFrame = 0)
         {
             if (!base.Update()) return false;

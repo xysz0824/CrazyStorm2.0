@@ -78,6 +78,7 @@
     <Compile Include="IO\PlayDataHelper.cs" />
     <Compile Include="IO\XmlHelper.cs" />
     <Compile Include="IPlayable.cs" />
+    <Compile Include="Particle\Curve.cs" />
     <Compile Include="Particle\ParticleBase.cs" />
     <Compile Include="Particle\ParticleManager.cs" />
     <Compile Include="Particle\ParticleQuadTree.cs" />
@@ -119,6 +120,7 @@
     <Compile Include="Utils\IniHelper.cs" />
     <Compile Include="Utils\LogHelper.cs" />
     <Compile Include="Utils\MathHelper.cs" />
+    <Compile Include="Utils\Pool.cs" />
     <Compile Include="Utils\StringHelper.cs" />
   </ItemGroup>
   <ItemGroup>

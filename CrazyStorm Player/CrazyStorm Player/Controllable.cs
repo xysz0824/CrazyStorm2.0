@@ -15,7 +15,7 @@ namespace CrazyStorm_Player
         bool slow;
         int movableWidth;
         int movableHeight;
-        public Vector2 selfPosition;
+        public Vector2 selfPos, selfPosLast;
         public string imagePath = string.Empty;
         public Vector2 selfStart = Vector2.Zero;
         public Vector2 selfSize = Vector2.Zero;
@@ -25,12 +25,13 @@ namespace CrazyStorm_Player
         public int selfRadius = 0;
         public Controllable(int movableWidth, int movableHeight)
         {
-            selfPosition.Y = movableHeight / 3;
+            selfPos.Y = movableHeight / 3;
             this.movableWidth = movableWidth;
             this.movableHeight = movableHeight;
         }
         public void Update(KeyboardState state)
         {
+            selfPosLast = selfPos;
             Vector2 direction = Vector2.Zero;
             if (state.IsKeyDown(Keys.Left))
             {
@@ -52,20 +53,20 @@ namespace CrazyStorm_Player
             if (state.IsKeyDown(Keys.LeftShift) || state.IsKeyDown(Keys.RightShift))
             {
                 slow = true;
-                selfPosition += direction * 2.0f;
+                selfPos += direction * 2.0f;
             }
             else
             {
                 slow = false;
-                selfPosition += direction * 4.0f;
+                selfPos += direction * 4.0f;
             }
-            selfPosition.X = MathHelper.Clamp(selfPosition.X, -movableWidth / 2, movableWidth / 2);
-            selfPosition.Y = MathHelper.Clamp(selfPosition.Y, -movableHeight / 2, movableHeight / 2);
+            selfPos.X = MathHelper.Clamp(selfPos.X, -movableWidth / 2, movableWidth / 2);
+            selfPos.Y = MathHelper.Clamp(selfPos.Y, -movableHeight / 2, movableHeight / 2);
         }
         public void Draw(SpriteBatch spriteBatch, Texture2D character, Texture2D point, Texture2D slowMode)
         {
             Vector2 center = new Vector2(movableWidth / 2, movableHeight / 2);
-            Vector2 position = selfPosition + center;
+            Vector2 position = selfPos + center;
             Color color = new Color(1f, 1f, 1f, 1f);
             Rectangle rect;
             if (character != null)

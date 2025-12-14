@@ -17,6 +17,20 @@ namespace CrazyStorm.Core
             this.x = x;
             this.y = y;
         }
+        public void Normalize()
+        {
+            float num = 1f / (float)Math.Sqrt(x * x + y * y);
+            x *= num;
+            y *= num;
+        }
+        public float Length()
+        {
+            return (float)Math.Sqrt(x * x + y * y);
+        }
+        public float LengthSquared()
+        {
+            return x * x + y * y;
+        }
         public override string ToString()
         {
             return $"[{x},{y}]";
@@ -107,6 +121,13 @@ namespace CrazyStorm.Core
         public static Vector2 operator /(Vector2 lhs, float rhs)
         {
             return Divide(lhs, rhs);
+        }
+        public static Vector2 Normalize(Vector2 value)
+        {
+            float num = 1f / (float)Math.Sqrt(value.x * value.x + value.y * value.y);
+            value.x *= num;
+            value.y *= num;
+            return value;
         }
         public static bool TryParse(string value, out Vector2 result)
         {

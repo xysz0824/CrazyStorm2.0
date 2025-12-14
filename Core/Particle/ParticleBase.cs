@@ -5,6 +5,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Runtime.Remoting.Messaging;
 using System.Text;
 using System.Xml;
 
@@ -78,6 +79,7 @@ namespace CrazyStorm.Core
             get { return particleBaseData.pposition; }
             set { particleBaseData.pposition = value; }
         }
+        public Vector2 PPositionLast { get; private set; }
         public ParticleType Type
         {
             get { return type; }
@@ -525,9 +527,11 @@ namespace CrazyStorm.Core
             }
             return false;
         }
+        public virtual Vector2 GetOutPoint() => PPosition;
+        public virtual bool CheckCollision(float bx, float by, float x, float y, float r) => false;
         public virtual bool Update(int currentFrame = 0)
         {
-            if (PCurrentFrame >= MaxLife || (KillOutside && ParticleManager.OutOfWindow(PPosition.x, PPosition.y)))
+            if (PCurrentFrame >= MaxLife || (KillOutside && ParticleManager.OutOfWindow(this)))
             {
                 Alive = false;
                 Emitter.Particles.Remove(this);
@@ -539,6 +543,7 @@ namespace CrazyStorm.Core
                 MathHelper.SetVector2(ref pacspeedVector, PAcspeed, PAcspeedAngle);
             }
             //QuadTree.Update(this);
+            PPositionLast = PPosition;
             PSpeedVector += PAcspeedVector;
             PPosition += PSpeedVector;
             for (int i = 0; i < ParticleEventGroups.Count; ++i)
@@ -562,6 +567,11 @@ namespace CrazyStorm.Core
                     FogFrame = 0;
             }
             return true;
+        }
+        public virtual void Die()
+        {
+            if (!Alive) return;
+            PCurrentFrame = Math.Max(MaxLife - (int)FOG_TIME, 0);
         }
         public virtual void Reset() { }
         public int CompareTo(ParticleBase other)

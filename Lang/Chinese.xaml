@@ -112,6 +112,7 @@
     <sys:String x:Key="IgnoreReboundStr">忽略反弹板</sys:String>
     <sys:String x:Key="IgnoreForceStr">忽略力场</sys:String>
     <sys:String x:Key="LengthStr">长度</sys:String>
+    <sys:String x:Key="SegmentStr">段数</sys:String>
     <sys:String x:Key="HalfWidthStr">半长</sys:String>
     <sys:String x:Key="HalfHeightStr">半宽</sys:String>
     <sys:String x:Key="FieldShapeStr">场形状</sys:String>

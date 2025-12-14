@@ -4,6 +4,7 @@
  */
 using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using System.Text;
 
 namespace CrazyStorm.Core
@@ -20,13 +21,14 @@ namespace CrazyStorm.Core
         static int right;
         static int top;
         static int bottom;
-        static int reserved;
+        static int particlePreserved;
         static List<Particle> particlePool;
         static int particleIndex;
+        static int curvePreserved;
         static List<CurveParticle> curveParticlePool;
         static int curveParticleIndex;
-        static List<ParticleBase> searchList;
-        public static void Initialize(int windowWidth, int windowHeight, int reservedDist,
+        static ParticleBase[] searchResult;
+        public static void Initialize(int windowWidth, int windowHeight, int particlePreservedDist, int curvePreservedDist,
             int particleMaximum, int curveParticleMaximum)
         {
             //particleQuadTree = new ParticleQuadTree(-windowWidth, windowWidth, -windowHeight, windowHeight);
@@ -34,7 +36,8 @@ namespace CrazyStorm.Core
             right = windowWidth;
             top = -windowHeight;
             bottom = windowHeight;
-            reserved = reservedDist;
+            particlePreserved = particlePreservedDist;
+            curvePreserved = curvePreservedDist;
             particlePool = new List<Particle>(particleMaximum);
             for (int i = 0; i < particleMaximum; ++i)
             {
@@ -50,11 +53,8 @@ namespace CrazyStorm.Core
                 curveParticle.ID = particleMaximum + i;
                 curveParticlePool.Add(curveParticle);
             }
-
-            searchList = new List<ParticleBase>(particleMaximum);
-            for (int i = 0; i < particleMaximum; ++i)
-                searchList.Add(null);
-
+            Curve.Reset(curveParticleMaximum);
+            searchResult = new ParticleBase[particleMaximum];
             OnParticleDraw = null;
             OnCurveParticleDraw = null;
         }
@@ -79,13 +79,13 @@ namespace CrazyStorm.Core
             {
                 do
                 {
-                    curveParticleIndex = curveParticleIndex % curveParticlePool.Count;
+                    curveParticleIndex = (curveParticleIndex + 1) % curveParticlePool.Count;
                 }
                 while (curveParticlePool[curveParticleIndex].Alive);
                 curveParticlePool[curveParticleIndex] = template.Clone() as CurveParticle;
                 curveParticlePool[curveParticleIndex].Reset();
                 curveParticlePool[curveParticleIndex].Alive = true;
-                curveParticlePool[curveParticleIndex].RenderOrder = order + particleIndex * 10;
+                curveParticlePool[curveParticleIndex].RenderOrder = order + curveParticleIndex * 10;
                 //particleQuadTree.Insert(curveParticlePool[curveParticleIndex]);
                 return curveParticlePool[curveParticleIndex];
             }
@@ -94,7 +94,7 @@ namespace CrazyStorm.Core
         //{
         //    particleQuadTree.Insert(particleBase);
         //}
-        public static List<ParticleBase> SearchByRect(float left, float right, float top, float bottom, out int count)
+        public static ParticleBase[] SearchByRect(float left, float right, float top, float bottom, out int count)
         {
             int index = 0;
             for (int i = 0; i < particlePool.Count; ++i)
@@ -105,7 +105,7 @@ namespace CrazyStorm.Core
                     float y = particlePool[i].PPosition.y;
                     if (x >= left && x <= right && y >= top && y <= bottom)
                     {
-                        searchList[index++] = particlePool[i];
+                        searchResult[index++] = particlePool[i];
                     }
                 }
             }
@@ -117,41 +117,45 @@ namespace CrazyStorm.Core
                     float y = curveParticlePool[i].PPosition.y;
                     if (x >= left && x <= right && y >= top && y <= bottom)
                     {
-                        searchList[index++] = curveParticlePool[i];
+                        searchResult[index++] = curveParticlePool[i];
                     }
                 }
             }
             count = index;
-            return searchList;
+            return searchResult;
         }
-        public static void CheckCollision(float x, float y, float radius)
+        public static ParticleBase[] CheckCollision(float bx, float by, float x, float y, float r, out int count)
         {
-            int index = 0;
+            var index = 0;
             for (int i = 0; i < particlePool.Count; ++i)
             {
-                if (particlePool[i].Alive)
+                if (particlePool[i].Alive && particlePool[i].CheckCollision(bx, by, x, y, r))
                 {
-                    float px = particlePool[i].PPosition.x;
-                    float py = particlePool[i].PPosition.y;
-                    if (particlePool[i].FogFrame >= ParticleBase.FOG_TIME &&
-                        Math.Pow(px - x, 2) + Math.Pow(py - y, 2) <= Math.Pow(particlePool[i].Type.Radius + radius, 2))
-                    {
-                        particlePool[i].PCurrentFrame = Math.Max(particlePool[i].MaxLife - (int)ParticleBase.FOG_TIME, 0);
-                        searchList[index++] = particlePool[i];
-                    }
+                    searchResult[index++] = particlePool[i];
                 }
             }
-            //TODO Curve Particle
+            for (int i = 0; i < curveParticlePool.Count; ++i)
+            {
+                if (curveParticlePool[i].Alive && curveParticlePool[i].CheckCollision(bx, by, x, y, r))
+                {
+                    searchResult[index++] = curveParticlePool[i];
+                }
+            }
+            count = index;
+            return searchResult;
         }
-        public static bool OutOfWindow(float x, float y)
+        public static bool OutOfWindow(ParticleBase particle)
         {
-            return x < left / 2 - reserved || x > right / 2 + reserved ||
-            y < top / 2 - reserved || y > bottom / 2 + reserved;
+            var outPoint = particle.GetOutPoint();
+            var reserved = particle is CurveParticle ? curvePreserved : particlePreserved;
+            return outPoint.x < left / 2 - reserved || outPoint.x > right / 2 + reserved ||
+                outPoint.y < top / 2 - reserved || outPoint.y > bottom / 2 + reserved;
         }
-        private static bool OutOfRange(ParticleBase particleBase)
+        private static bool OutOfRange(ParticleBase particle)
         {
-            return particleBase.PPosition.x < left || particleBase.PPosition.x > right ||
-                particleBase.PPosition.y < top || particleBase.PPosition.y > bottom;
+            var outPoint = particle.GetOutPoint();
+            return outPoint.x < left || outPoint.x > right ||
+                outPoint.y < top || outPoint.y > bottom;
         }
         public static void Update()
         {

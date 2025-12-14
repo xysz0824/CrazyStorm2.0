@@ -14,11 +14,13 @@ namespace CrazyStorm.Core
     public struct CurveParticleData
     {
         public int length;
+        public int segment;
     }
     public class CurveParticle : ParticleBase
     {
         #region Private Members
         CurveParticleData curveParticleData;
+        Curve curve;
         #endregion
 
         #region Public Members
@@ -28,12 +30,19 @@ namespace CrazyStorm.Core
             get { return curveParticleData.length; }
             set { curveParticleData.length = value; }
         }
+        [IntProperty(1, 256)]
+        public int Segment
+        {
+            get { return curveParticleData.segment; }
+            set { curveParticleData.segment = value; }
+        }
         #endregion
 
         #region Constructor
         public CurveParticle()
         {
-            curveParticleData.length = 10;
+            curveParticleData.length = 100;
+            curveParticleData.segment = 64;
         }
         #endregion
 
@@ -72,6 +81,7 @@ namespace CrazyStorm.Core
                 using (BinaryReader dataReader = PlayDataHelper.GetBlockReader(curveParticleReader))
                 {
                     Length = dataReader.ReadInt32();
+                    Segment = dataReader.ReadInt32();
                 }
             }
         }
@@ -84,6 +94,9 @@ namespace CrazyStorm.Core
             {
                 case "Length":
                     VM.PushInt(Length);
+                    return true;
+                case "Segment":
+                    VM.PushInt(Segment);
                     return true;
             }
             return false;
@@ -98,13 +111,30 @@ namespace CrazyStorm.Core
                 case "Length":
                     Length = VM.PopInt();
                     return true;
+                case "Segment":
+                    Segment = VM.PopInt();
+                    return true;
             }
             return false;
+        }
+        public override Vector2 GetOutPoint() => curve != null ? curve.GetCurveEnd() : base.GetOutPoint();
+        bool CurveJudge(Vector2 head, Vector2 tail, float scale, Vector2 bp, Vector2 p, Vector2 s, float r, float deg)
+        {
+            if (scale < 0.3f || scale > 0.7f) return false;
+            return MathHelper.Judge(head, tail, bp, p, s, r, deg) & WidthScale >= 0.5f;
+        }
+        public override bool CheckCollision(float bx, float by, float x, float y, float r)
+        {
+            return FogFrame >= FOG_TIME && curve != null &&
+                curve.IterateSegment(CurveJudge, new Vector2(bx, by), new Vector2(x, y), new Vector2(WidthScale, WidthScale), 2, PRotation, Length);
         }
         public override bool Update(int currentFrame = 0)
         {
             if (!base.Update()) return false;
-            //TODO Curve Particle
+            PRotation = PSpeedAngle + 90;
+            var initData = new CurveInitData { pos = PPosition, segment = Segment };
+            if (curve == null) curve = Curve.Rent(initData);
+            curve.Update(PPosition, Type.Width * WidthScale, Length);
             return true;
         }
         #endregion

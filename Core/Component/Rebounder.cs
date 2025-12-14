@@ -67,7 +67,7 @@ namespace CrazyStorm.Core
             base.ExecuteExpression("Size");
             base.ExecuteExpression("Rotation");
             int count = 0;
-            List<ParticleBase> results = ParticleManager.SearchByRect(Position.x - Size, Position.x + Size,
+            var results = ParticleManager.SearchByRect(Position.x - Size, Position.x + Size,
                 Position.y - Size, Position.y + Size, out count);
             for (int i = 0; i < count; ++i)
             {

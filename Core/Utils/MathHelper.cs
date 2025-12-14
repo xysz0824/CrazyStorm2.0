@@ -7,6 +7,8 @@ namespace CrazyStorm.Core
 {
     public class MathHelper
     {
+        public const float Pi = 3.14159274F;
+        public const float PiOver2 = 1.57079637F;
         public static double DegToRad(double degree)
         {
             return degree / 180.0 * Math.PI;
@@ -39,7 +41,7 @@ namespace CrazyStorm.Core
             {
                 vf = speedVector.x >= 0 ? 0 : Math.PI;
             }
-            return (float)MathHelper.RadToDeg(vf);
+            return (float)RadToDeg(vf);
         }
         public static bool LineIntersectWithCircle(Vector2 p1, Vector2 p2, Vector2 center, float radius)
         {
@@ -71,6 +73,73 @@ namespace CrazyStorm.Core
             Vector2 v = center - point;
             double dist = (float)Math.Sqrt(v.x * v.x + v.y * v.y);
             return dist <= radius;
+        }
+        public static Vector2 Rotate(Vector2 v, float deg)
+        {
+            var rad = deg / 180 * Math.PI;
+            var cos = (float)Math.Cos(rad);
+            var sin = (float)Math.Sin(rad);
+            return new Vector2(cos * v.x - sin * v.y, cos * v.y + sin * v.y);
+        }
+        public static bool Judge(Vector2 posLast, Vector2 pos, Vector2 bodyPosLast, Vector2 bodyPos, Vector2 scale, float r, float deg)
+        {
+            if (r <= 0) return false;
+            r++;
+            bodyPosLast.x = pos.x + bodyPosLast.x - posLast.x;
+            bodyPosLast.y = pos.y + bodyPosLast.y - posLast.y;
+            float dx = (bodyPos.x - bodyPosLast.x);
+            float dy = (bodyPos.y - bodyPosLast.y);
+            float jx, jy;
+            if (dx != 0)
+            {
+                float dk = dy / dx;
+                if (dk != 0)
+                {
+                    jx = (pos.y - bodyPosLast.y + (1f / dk) * pos.x + dk * bodyPosLast.x) / (dk + 1f / dk);
+                    jy = bodyPosLast.y + dk * (jx - bodyPosLast.x);
+                }
+                else
+                {
+                    jx = pos.x; jy = bodyPos.y;
+                }
+                if (Math.Abs(Math.Abs(bodyPos.x - jx) + Math.Abs(bodyPosLast.x - jx) - Math.Abs(bodyPos.x - bodyPosLast.x)) > 0)
+                {
+                    jx = bodyPos.x; jy = bodyPos.y;
+                }
+            }
+            else if (dy != 0)
+            {
+                jx = bodyPos.x; jy = pos.y;
+                if (Math.Abs(Math.Abs(bodyPos.y - jy) + Math.Abs(bodyPosLast.y - jy) - Math.Abs(bodyPos.y - bodyPosLast.y)) > 0)
+                {
+                    jx = bodyPos.x; jy = bodyPos.y;
+                }
+            }
+            else
+            {
+                jx = bodyPos.x; jy = bodyPos.y;
+            }
+            var rad = (float)MathHelper.DegToRad(deg);
+            double vec;
+            if (jx - pos.x != 0)
+            {
+                vec = Math.Atan((jy - pos.y) / (jx - pos.x));
+                if (jx - pos.x < 0) vec += MathHelper.Pi;
+            }
+            else
+            {
+                if (jy - pos.y > 0) vec = MathHelper.PiOver2;
+                else vec = -MathHelper.PiOver2;
+            }
+            float d = (float)Math.Sqrt((pos.x - jx) * (pos.x - jx) + (pos.y - jy) * (pos.y - jy));
+            jx = pos.x + d * (float)Math.Cos(vec - rad);
+            jy = pos.y + d * (float)Math.Sin(vec - rad);
+            pos.x = (pos.x - jx) * (pos.x - jx);
+            pos.y = (pos.y - jy) * (pos.y - jy);
+            float w = (r * scale.x) * (r * scale.x);
+            float h = (r * scale.y) * (r * scale.y);
+            if (pos.x / h + pos.y / w <= 1) return true;
+            else return false;
         }
     }
 }
