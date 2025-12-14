@@ -33,6 +33,7 @@ namespace CrazyStorm_Player
         const int CURVE_PRESERVED_DIST = 100;
 
         SpriteBatch spriteBatch;
+        CurveBatch curveBatch;
         BlendState substration, multiply;
         Texture2D background;
         Vector2 backgroundScale;
@@ -68,6 +69,7 @@ namespace CrazyStorm_Player
         public void Initialize(GraphicsDevice gd)
         {
             spriteBatch = new SpriteBatch(gd);
+            curveBatch = new CurveBatch(gd);
             substration = new BlendState();
             substration.ColorSourceBlend = Blend.SourceAlpha;
             substration.AlphaSourceBlend = Blend.One;
@@ -144,7 +146,7 @@ namespace CrazyStorm_Player
             File.ParticleSystems[SelectedParticleSystemIndex].Reset();
             EventManager.OnSoundPlay += PlaySound;
             ParticleManager.OnParticleDraw += (particle) => DrawParticle(spriteBatch, particle);
-            ParticleManager.OnCurveParticleDraw += (particle) => DrawCurveParticle(spriteBatch, particle);
+            ParticleManager.OnCurveParticleDraw += (particle) => DrawCurveParticle(spriteBatch, curveBatch, particle);
         }
         public void Dispose()
         {
@@ -177,22 +179,19 @@ namespace CrazyStorm_Player
             BlendType blendType = (BlendType)(9 - particle.RenderOrder % 10);
             if (lastBlendType != blendType)
             {
+                spriteBatch.End();
                 switch (blendType)
                 {
                     case BlendType.AlphaBlend:
-                        spriteBatch.End();
                         spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied, SamplerState.LinearWrap);
                         break;
                     case BlendType.Additive:
-                        spriteBatch.End();
                         spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Additive, SamplerState.LinearWrap);
                         break;
                     case BlendType.Substraction:
-                        spriteBatch.End();
                         spriteBatch.Begin(SpriteSortMode.Deferred, substration, SamplerState.LinearWrap);
                         break;
                     case BlendType.Multiply:
-                        spriteBatch.End();
                         spriteBatch.Begin(SpriteSortMode.Deferred, multiply, SamplerState.LinearWrap);
                         break;
                 }
@@ -228,11 +227,43 @@ namespace CrazyStorm_Player
                 }
             }
         }
-        void DrawCurveParticle(SpriteBatch spriteBatch, CurveParticle particle)
+        void DrawCurveParticle(SpriteBatch spriteBatch, CurveBatch curveBatch, CurveParticle particle)
         {
             if (particle.Type == null) return;
-
-            //TODO Curve Particle
+            BlendType blendType = (BlendType)(9 - particle.RenderOrder % 10);
+            if (lastBlendType != blendType)
+            {
+                curveBatch.End();
+                spriteBatch.End();
+                switch (blendType)
+                {
+                    case BlendType.AlphaBlend:
+                        spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied, SamplerState.LinearWrap);
+                        curveBatch.Begin(BlendState.NonPremultiplied);
+                        break;
+                    case BlendType.Additive:
+                        spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Additive, SamplerState.LinearWrap);
+                        curveBatch.Begin(BlendState.Additive);
+                        break;
+                    case BlendType.Substraction:
+                        spriteBatch.Begin(SpriteSortMode.Deferred, substration, SamplerState.LinearWrap);
+                        curveBatch.Begin(substration);
+                        break;
+                    case BlendType.Multiply:
+                        spriteBatch.Begin(SpriteSortMode.Deferred, multiply, SamplerState.LinearWrap);
+                        curveBatch.Begin(multiply);
+                        break;
+                }
+            }
+            lastBlendType = blendType;
+            ParticleType type = particle.Type;
+            Vector2 center = new Vector2(Width / 2, Height / 2) + CustomCenter;
+            float alpha = particle.Opacity / 100f - (ParticleBase.FOG_TIME - particle.FogFrame) / ParticleBase.FOG_TIME;
+            Color color = new Color(particle.RGB.r / 255f, particle.RGB.g / 255f, particle.RGB.b / 255f, alpha);
+            int frame = particle.PCurrentFrame / (type.Delay + 1) % type.Frames;
+            Rectangle rect = new Rectangle((int)type.StartPoint.x + frame * type.Width, (int)type.StartPoint.y, type.Width, type.Height);
+            var tex = type.ID >= ParticleType.DefaultTypeIndex ? defaultTextures[0] : type.Image != null ? customTextures[type.Image.ID] : null;
+            if (tex != null) curveBatch.Draw(particle.Curve, tex, rect, center, color);
         }
         public void Update(KeyboardState keyboard, GameTime gameTime)
         {
@@ -255,6 +286,7 @@ namespace CrazyStorm_Player
         {
             gd.Clear(Color.Black);
             spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied, SamplerState.LinearWrap);
+            curveBatch.Begin(BlendState.NonPremultiplied);
             if (background != null)
             {
                 spriteBatch.Draw(background, Vector2.Zero, null, Color.White, 0, Vector2.Zero, backgroundScale, SpriteEffects.None, 0);
@@ -262,6 +294,7 @@ namespace CrazyStorm_Player
             controllable.Draw(spriteBatch, characterTexture, pointTexture, slowModeTexture);
             ParticleManager.Draw();
             lastBlendType = BlendType.None;
+            curveBatch.End();
             spriteBatch.End();
         }
     }

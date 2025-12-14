@@ -1,4 +1,8 @@
-﻿using System;
+﻿/*
+ * The MIT License (MIT)
+ * Copyright (c) StarX 2026
+ */
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;

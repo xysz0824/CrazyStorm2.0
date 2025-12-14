@@ -20,7 +20,6 @@ namespace CrazyStorm.Core
     {
         #region Private Members
         CurveParticleData curveParticleData;
-        Curve curve;
         #endregion
 
         #region Public Members
@@ -36,6 +35,7 @@ namespace CrazyStorm.Core
             get { return curveParticleData.segment; }
             set { curveParticleData.segment = value; }
         }
+        public Curve Curve { get; private set; }
         #endregion
 
         #region Constructor
@@ -117,7 +117,7 @@ namespace CrazyStorm.Core
             }
             return false;
         }
-        public override Vector2 GetOutPoint() => curve != null ? curve.GetCurveEnd() : base.GetOutPoint();
+        public override Vector2 GetOutPoint() => Curve != null ? Curve.GetCurveEnd() : base.GetOutPoint();
         bool CurveJudge(Vector2 head, Vector2 tail, float scale, Vector2 bp, Vector2 p, Vector2 s, float r, float deg)
         {
             if (scale < 0.3f || scale > 0.7f) return false;
@@ -125,16 +125,16 @@ namespace CrazyStorm.Core
         }
         public override bool CheckCollision(float bx, float by, float x, float y, float r)
         {
-            return FogFrame >= FOG_TIME && curve != null &&
-                curve.IterateSegment(CurveJudge, new Vector2(bx, by), new Vector2(x, y), new Vector2(WidthScale, WidthScale), 2, PRotation, Length);
+            return FogFrame >= FOG_TIME && Curve != null &&
+                Curve.IterateSegment(CurveJudge, new Vector2(bx, by), new Vector2(x, y), new Vector2(WidthScale, WidthScale), 2, PRotation, Length);
         }
         public override bool Update(int currentFrame = 0)
         {
+            var initData = new CurveInitData { pos = PPosition, segment = Segment };
+            if (Curve == null) Curve = Curve.Rent(initData);
             if (!base.Update()) return false;
             PRotation = PSpeedAngle + 90;
-            var initData = new CurveInitData { pos = PPosition, segment = Segment };
-            if (curve == null) curve = Curve.Rent(initData);
-            curve.Update(PPosition, Type.Width * WidthScale, Length);
+            Curve.Update(PPosition, Type.Width * WidthScale, Length);
             return true;
         }
         #endregion

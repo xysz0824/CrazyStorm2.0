@@ -122,6 +122,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Controllable.cs" />
+    <Compile Include="CurveBatch.cs" />
     <Compile Include="Global\VersionInfo.cs" />
     <Compile Include="PlayerImpl.cs" />
     <Compile Include="Program.cs" />
