@@ -101,57 +101,23 @@ namespace CrazyStorm
                                     DrawHelper.DrawLine(canvas, (int)x + config.ScreenWidthOver2, (int)y + config.ScreenHeightOver2,
                                         (int)tx + config.ScreenWidthOver2, (int)ty + config.ScreenHeightOver2, 2, false, Colors.White, 0.5f);
                             }
-                            if (component.Selected)
-                                selectedComponents.Add(component);
-                            else
-                            {
-                                //Draw component mark.
-                                object marker = assembly.CreateInstance("CrazyStorm.ComponentMarker");
-                                (marker as IComponentMark).Draw(canvas, component, (int)x + config.ScreenWidthOver2,
-                                    (int)y + config.ScreenHeightOver2);
-                                //Draw specific mark.
-                                if (component is Emitter)
-                                    marker = assembly.CreateInstance("CrazyStorm.EmitterMarker");
-                                else
-                                    marker = assembly.CreateInstance("CrazyStorm." + component.GetType().Name + "Marker");
-
-                                (marker as IComponentMark).Draw(canvas, component, (int)x + config.ScreenWidthOver2,
-                                    (int)y + config.ScreenHeightOver2);
-                            }
+                            if (component.Selected) selectedComponents.Add(component);
+                            //Draw component mark.
+                            object marker = assembly.CreateInstance("CrazyStorm.ComponentMarker");
+                            (marker as IComponentMark).Draw(canvas, component, (int)x + config.ScreenWidthOver2,
+                                (int)y + config.ScreenHeightOver2);
+                            //Draw specific mark.
+                            if (component is Emitter) marker = assembly.CreateInstance("CrazyStorm.EmitterMarker");
+                            else marker = assembly.CreateInstance("CrazyStorm." + component.GetType().Name + "Marker");
+                            (marker as IComponentMark).Draw(canvas, component, (int)x + config.ScreenWidthOver2,
+                                (int)y + config.ScreenHeightOver2);
                             icon.Data = (Geometry)FindResource($"{component.GetType().Name}_Icon");
                             var scale = (double)FindResource($"{component.GetType().Name}_Scale");
                             var transform = new ScaleTransform(scale, scale);
                             icon.RenderTransform = transform;
                             item.SetValue(Canvas.LeftProperty, (double)x - box.Width / 2 + config.ScreenWidthOver2);
                             item.SetValue(Canvas.TopProperty, (double)y - box.Height / 2 + config.ScreenHeightOver2);
-                            canvas.Children.Add(item as UIElement);
-                        }
-                        foreach (var component in layer.Components)
-                        {
-                            if (component.Selected)
-                            {
-                                //If component has a parent, caculate the absolute position.
-                                float x = component.X;
-                                float y = component.Y;
-                                if (component.Parent != null)
-                                {
-                                    Vector2 parent = component.Parent.GetAbsolutePosition();
-                                    x += parent.x;
-                                    y += parent.y;
-                                }
-                                //Draw component mark.
-                                object marker = assembly.CreateInstance("CrazyStorm.ComponentMarker");
-                                (marker as IComponentMark).Draw(canvas, component, (int)x + config.ScreenWidthOver2,
-                                    (int)y + config.ScreenHeightOver2);
-                                //Draw specific mark.
-                                if (component is Emitter)
-                                    marker = assembly.CreateInstance("CrazyStorm.EmitterMarker");
-                                else
-                                    marker = assembly.CreateInstance("CrazyStorm." + component.GetType().Name + "Marker");
-
-                                (marker as IComponentMark).Draw(canvas, component, (int)x + config.ScreenWidthOver2,
-                                    (int)y + config.ScreenHeightOver2);
-                            }
+                            canvas.Children.Add(item);
                         }
                     }
                 }
