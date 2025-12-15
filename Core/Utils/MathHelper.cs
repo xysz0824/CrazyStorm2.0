@@ -79,7 +79,7 @@ namespace CrazyStorm.Core
             var rad = deg / 180 * Math.PI;
             var cos = (float)Math.Cos(rad);
             var sin = (float)Math.Sin(rad);
-            return new Vector2(cos * v.x - sin * v.y, cos * v.y + sin * v.y);
+            return new Vector2(cos * v.x - sin * v.y, cos * v.y + sin * v.x);
         }
         public static bool Judge(Vector2 posLast, Vector2 pos, Vector2 bodyPosLast, Vector2 bodyPos, Vector2 scale, float r, float deg)
         {

@@ -31,7 +31,6 @@ namespace CrazyStorm_Player
             var customCenterY = Int32.Parse(Environment.GetCommandLineArgs()[10]);
             var controllableImagePath = Environment.GetCommandLineArgs()[11];
             var controllableSetting = Environment.GetCommandLineArgs()[12];
-            Environment.CurrentDirectory = System.IO.Path.GetDirectoryName(path);
 
             playerImpl = new PlayerImpl(width, height, particleMaximum, curveParticleMaximum);
             playerImpl.ResourceDirectory = Environment.CurrentDirectory;

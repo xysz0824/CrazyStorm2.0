@@ -117,7 +117,7 @@ namespace CrazyStorm.Core
                     currentLength = scaleLength;
                 }
                 else
-                {
+                { 
                     currentLength += segmentLength;
                 }
                 var left = MathHelper.Rotate(dir, -90) * halfWidth;

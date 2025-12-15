@@ -174,7 +174,10 @@ namespace CrazyStorm.Core
                 if (curveParticlePool[i].Alive && !OutOfRange(curveParticlePool[i]))
                     curveParticlePool[i].Update();
                 else if (curveParticlePool[i].Alive)
+                {
+                    Curve.Return(curveParticlePool[i].Curve);
                     curveParticlePool[i].Alive = false;
+                }
             }
         }
         public static void Draw()
