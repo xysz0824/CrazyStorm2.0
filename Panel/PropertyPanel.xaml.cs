@@ -113,27 +113,33 @@ namespace CrazyStorm
             DeleteVariable.IsEnabled = component.Locals.Count > 0;
             //Load component events.
             ComponentEventList.ItemsSource = component.ComponentEventGroups;
+            DelComponentEventButton.IsEnabled = component.ComponentEventGroups.Count > 0;
             //Load specific events.
             if (component is Emitter)
             {
                 SpecificGroup.Visibility = Visibility.Visible;
                 SpecificGroup.Header = (string)FindResource("ParticleEventGroupStr");
-                SpecificEventList.ItemsSource = (component as Emitter).ParticleEventGroups;
+                var eventGroups = (component as Emitter).ParticleEventGroups;
+                SpecificEventList.ItemsSource = eventGroups;
+                DelSpecificEventButton.IsEnabled = eventGroups.Count > 0;
             }
             else if (component is EventField)
             {
                 SpecificGroup.Visibility = Visibility.Visible;
                 SpecificGroup.Header = (string)FindResource("EventFieldEventGroupStr");
-                SpecificEventList.ItemsSource = (component as EventField).EventFieldEventGroups;
+                var eventGroups = (component as EventField).EventFieldEventGroups;
+                SpecificEventList.ItemsSource = eventGroups;
+                DelSpecificEventButton.IsEnabled = eventGroups.Count > 0;
             }
             else if (component is Rebounder)
             {
                 SpecificGroup.Visibility = Visibility.Visible;
                 SpecificGroup.Header = (string)FindResource("RebounderEventGroupStr");
-                SpecificEventList.ItemsSource = (component as Rebounder).RebounderEventGroups;
+                var eventGroups = (component as Rebounder).RebounderEventGroups;
+                SpecificEventList.ItemsSource = eventGroups;
+                DelSpecificEventButton.IsEnabled = eventGroups.Count > 0;
             }
-            else
-                SpecificGroup.Visibility = Visibility.Collapsed;
+            else SpecificGroup.Visibility = Visibility.Collapsed;
         }
         void LoadProperties(FrameworkElement element, PropertyContainer container, IList<PropertyInfo> infos)
         {
@@ -506,30 +512,30 @@ namespace CrazyStorm
         private void AddComponentEvent_Click(object sender, RoutedEventArgs e)
         {
             component.ComponentEventGroups.Add(new EventGroup());
+            DelComponentEventButton.IsEnabled = true;
         }
         private void AddSpecificEvent_Click(object sender, RoutedEventArgs e)
         {
-            if (component is Emitter)
-                (component as Emitter).ParticleEventGroups.Add(new EventGroup());
-            else if (component is EventField)
-                (component as EventField).EventFieldEventGroups.Add(new EventGroup());
-            else if (component is Rebounder)
-                (component as Rebounder).RebounderEventGroups.Add(new EventGroup());
+            if (component is Emitter) (component as Emitter).ParticleEventGroups.Add(new EventGroup());
+            else if (component is EventField) (component as EventField).EventFieldEventGroups.Add(new EventGroup());
+            else if (component is Rebounder) (component as Rebounder).RebounderEventGroups.Add(new EventGroup());
+            DelSpecificEventButton.IsEnabled = true;
         }
         private void DelComponentEvent_Click(object sender, RoutedEventArgs e)
         {
             var item = ComponentEventList.SelectedItem as EventGroup;
             component.ComponentEventGroups.Remove(item);
+            DelComponentEventButton.IsEnabled = component.ComponentEventGroups.Count > 0;
         }
         private void DelSpecificEvent_Click(object sender, RoutedEventArgs e)
         {
             var item = SpecificEventList.SelectedItem as EventGroup;
-            if (component is Emitter)
-                (component as Emitter).ParticleEventGroups.Remove(item);
-            else if (component is EventField)
-                (component as EventField).EventFieldEventGroups.Remove(item);
-            else if (component is Rebounder)
-                (component as Rebounder).RebounderEventGroups.Remove(item);
+            IList<EventGroup> eventGroups = null;
+            if (component is Emitter) eventGroups = (component as Emitter).ParticleEventGroups;
+            else if (component is EventField) eventGroups = (component as EventField).EventFieldEventGroups;
+            else if (component is Rebounder) eventGroups = (component as Rebounder).RebounderEventGroups;
+            eventGroups.Remove(item);
+            DelSpecificEventButton.IsEnabled = eventGroups.Count > 0;
         }
         private void ComponentEventList_PreviewMouseRightButtonDown(object sender, MouseButtonEventArgs e)
         {

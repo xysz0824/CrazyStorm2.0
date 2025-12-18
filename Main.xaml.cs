@@ -58,7 +58,9 @@ namespace CrazyStorm
         {
             Title = VersionInfo.AppTitle + " - " + fileName;
             ImageList.ItemsSource = file.Images;
+            DeleteImageButton.IsEnabled = file.Images.Count > 0;
             SoundList.ItemsSource = file.Sounds;
+            DeleteSoundButton.IsEnabled = file.Sounds.Count > 0;
             VariableGrid.ItemsSource = file.Globals;
             DeleteVariable.IsEnabled = file.Globals.Count > 0;
         }

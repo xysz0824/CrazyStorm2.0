@@ -48,7 +48,7 @@ namespace CrazyStorm
         {
             VisualHelper.FocusItem<TreeViewItem>(e);
         }
-        private void AddImageItem_Click(object sender, RoutedEventArgs e)
+        private void AddImage_Click(object sender, RoutedEventArgs e)
         {
             (LeftTabControl.Items[1] as TabItem).Focus();
             using (var open = new System.Windows.Forms.OpenFileDialog())
@@ -59,6 +59,7 @@ namespace CrazyStorm
                 {
                     var image = new FileResource(file.FileResourceIndex, open.SafeFileName, open.FileName);
                     file.Images.Add(image);
+                    DeleteImageButton.IsEnabled = true;
                 }
             }
         }
@@ -66,6 +67,7 @@ namespace CrazyStorm
         {
             var item = ImageList.SelectedItem as FileResource;
             file.Images.Remove(item);
+            DeleteImageButton.IsEnabled = file.Images.Count > 0;
         }
         private void AddSound_Click(object sender, RoutedEventArgs e)
         {
@@ -78,6 +80,7 @@ namespace CrazyStorm
                 {
                     var sound = new FileResource(file.FileResourceIndex,open.SafeFileName, open.FileName);
                     file.Sounds.Add(sound);
+                    DeleteSoundButton.IsEnabled = true;
                 }
             }
         }
@@ -85,6 +88,7 @@ namespace CrazyStorm
         {
             var item = SoundList.SelectedItem as FileResource;
             file.Sounds.Remove(item);
+            DeleteSoundButton.IsEnabled = file.Sounds.Count > 0;
         }
         private void AddGlobalItem_Click(object sender, RoutedEventArgs e)
         {

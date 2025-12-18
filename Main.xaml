@@ -362,7 +362,7 @@
                 <MenuItem.Header>
                     <TextBlock Text="{StaticResource ResourceStr}" Foreground="{DynamicResource TextBrush}" />
                 </MenuItem.Header>
-                <MenuItem Header="{StaticResource AddImageStr}" Click="AddImageItem_Click"/>
+                <MenuItem Header="{StaticResource AddImageStr}" Click="AddImage_Click"/>
                 <MenuItem Header="{StaticResource AddSoundStr}" Click="AddSound_Click"/>
                 <MenuItem Header="{StaticResource AddGlobalStr}" Click="AddGlobalItem_Click"/>
             </MenuItem>
@@ -699,7 +699,7 @@
                                                   Background="{DynamicResource ListBrush}" BorderThickness="0,0,0,0">
                                             <TreeView.ContextMenu>
                                                 <ContextMenu>
-                                                    <MenuItem Name="AddImage" Header="{StaticResource AddImageStr}" Click="AddImageItem_Click" />
+                                                    <MenuItem Name="AddImage" Header="{StaticResource AddImageStr}" Click="AddImage_Click" />
                                                 </ContextMenu>
                                             </TreeView.ContextMenu>
                                             <TreeView.ItemTemplate>
@@ -733,6 +733,10 @@
                                             </TreeView.Resources>
                                         </TreeView>
                                     </GroupBox>
+                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" >
+                                        <Button Style="{StaticResource FlatButton}" Name="AddImageButton" Width ="50" Content="{StaticResource AddStr}" Margin="4,0" Click="AddImage_Click" />
+                                        <Button Style="{StaticResource FlatButton}" Name="DeleteImageButton" Width ="50" Content="{StaticResource DelStr}" Click="DeleteImage_Click" />
+                                    </StackPanel>
                                     <GroupBox Padding="0,24,0,0" Style="{StaticResource FlatGroupBox}" Header="{StaticResource SoundStr}" Height="131" Margin="0">
                                         <TreeView Name="SoundList" Padding="-12,1,1,1" PreviewMouseRightButtonDown="SoundList_PreviewMouseRightButtonDown"
                                                   Background="{DynamicResource ListBrush}" BorderThickness="0,0,0,0">
@@ -767,6 +771,10 @@
                                             </TreeView.Resources>
                                         </TreeView>
                                     </GroupBox>
+                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" >
+                                        <Button Style="{StaticResource FlatButton}" Name="AddSoundButton" Width ="50" Content="{StaticResource AddStr}" Margin="4,0" Click="AddSound_Click" />
+                                        <Button Style="{StaticResource FlatButton}" Name="DeleteSoundButton" Width ="50" Content="{StaticResource DelStr}" Click="DeleteSound_Click" />
+                                    </StackPanel>
                                     <GroupBox Padding="0,24,0,0" Style="{StaticResource FlatGroupBox}"  Header="{StaticResource GlobalStr}" Margin="0">
                                         <StackPanel>
                                             <DataGrid Name="VariableGrid" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" GridLinesVisibility="Horizontal" 

@@ -203,6 +203,10 @@
                 </TreeView.Resources>
             </TreeView>
         </GroupBox>
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" >
+            <Button Style="{StaticResource FlatButton}" Name="AddComponentEventButton" Width ="50" Content="{StaticResource AddStr}" Margin="4,0" Click="AddComponentEvent_Click" />
+            <Button Style="{StaticResource FlatButton}" Name="DelComponentEventButton" Width ="50" Content="{StaticResource DelStr}" Click="DelComponentEvent_Click" />
+        </StackPanel>
         <GroupBox Padding="0,24,0,0" Style="{StaticResource FlatGroupBox}" Name="SpecificGroup" Header="{StaticResource SpecificEventGroupStr}" Height="130" Margin="0" >
             <TreeView Name="SpecificEventList" Padding="-12,1,1,1" 
                       PreviewMouseRightButtonDown="SpecificEventList_PreviewMouseRightButtonDown" 
@@ -235,5 +239,9 @@
                 </TreeView.Resources>
             </TreeView>
         </GroupBox>
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" >
+            <Button Style="{StaticResource FlatButton}" Name="AddSpecificEventButton" Width ="50" Content="{StaticResource AddStr}" Margin="4,0" Click="AddSpecificEvent_Click" />
+            <Button Style="{StaticResource FlatButton}" Name="DelSpecificEventButton" Width ="50" Content="{StaticResource DelStr}" Click="DelSpecificEvent_Click" />
+        </StackPanel>
     </StackPanel>
 </UserControl>
