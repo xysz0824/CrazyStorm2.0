@@ -4,12 +4,38 @@
  */
 using System;
 using System.Collections.Generic;
+using System.Management.Instrumentation;
 using System.Runtime.CompilerServices;
 using System.Text;
 
 namespace CrazyStorm.Core
 {
-    public class ParticleManager
+    public class ParticlePool : PoolObject<ParticlePool, NullData>
+    {
+        public Particle Instance { get; private set; }
+        public ParticlePool()
+        {
+            Instance = new Particle();
+            Instance.PoolObject = this;
+        }
+    }
+    public class CurveParticlePool : PoolObject<CurveParticlePool, NullData>
+    {
+        public CurveParticle Instance { get; private set; }
+        public CurveParticlePool()
+        {
+            Instance = new CurveParticle();
+            Instance.PoolObject = this;
+        }
+        public override void OnReturn()
+        {
+            if (Instance != null)
+            {
+                Curve.Return(Instance.Curve);
+            }
+        }
+    }
+    public static class ParticleManager
     {
         public delegate void ParticleDrawHanlder(Particle particle);
         public static event ParticleDrawHanlder OnParticleDraw;
@@ -22,12 +48,12 @@ namespace CrazyStorm.Core
         static int top;
         static int bottom;
         static int particlePreserved;
-        static List<Particle> particlePool;
-        static int particleIndex;
         static int curvePreserved;
-        static List<CurveParticle> curveParticlePool;
-        static int curveParticleIndex;
+        static int instanceID;
+        static List<ParticleBase> activeParticles;
         static ParticleBase[] searchResult;
+
+        public static int ActiveParticleCount => activeParticles != null ? activeParticles.Count : 0;
         public static void Initialize(int windowWidth, int windowHeight, int particlePreservedDist, int curvePreservedDist,
             int particleMaximum, int curveParticleMaximum)
         {
@@ -38,57 +64,38 @@ namespace CrazyStorm.Core
             bottom = windowHeight;
             particlePreserved = particlePreservedDist;
             curvePreserved = curvePreservedDist;
-            particlePool = new List<Particle>(particleMaximum);
-            for (int i = 0; i < particleMaximum; ++i)
-            {
-                var particle = new Particle();
-                particle.ID = i;
-                particlePool.Add(particle);
-            }
-
-            curveParticlePool = new List<CurveParticle>(curveParticleMaximum);
-            for (int i = 0; i < curveParticleMaximum; ++i)
-            {
-                var curveParticle = new CurveParticle();
-                curveParticle.ID = particleMaximum + i;
-                curveParticlePool.Add(curveParticle);
-            }
+            instanceID = 0;
+            ParticlePool.Reset(particleMaximum);
+            CurveParticlePool.Reset(curveParticleMaximum);
             Curve.Reset(curveParticleMaximum);
-            searchResult = new ParticleBase[particleMaximum];
+            activeParticles = new List<ParticleBase>();
+            searchResult = new ParticleBase[particleMaximum + curveParticleMaximum];
             OnParticleDraw = null;
             OnCurveParticleDraw = null;
         }
         public static ParticleBase GetParticle(int layerID, ParticleBase template)
         {
-            int order = layerID * 1000000000 + 9 - (int)template.BlendType;
+            ParticleBase particle = null;
             if (template is Particle)
             {
-                do
-                {
-                    particleIndex = (particleIndex + 1) % particlePool.Count;
-                }
-                while (particlePool[particleIndex].Alive);
-                particlePool[particleIndex] = template.Clone() as Particle;
-                particlePool[particleIndex].Reset();
-                particlePool[particleIndex].Alive = true;
-                particlePool[particleIndex].RenderOrder = order + particleIndex * 10;
-                //particleQuadTree.Insert(particlePool[particleIndex]);
-                return particlePool[particleIndex];
+                var poolObject = ParticlePool.Rent(NullData.Empty);
+                template.CopyTo(poolObject.Instance);
+                particle = poolObject.Instance;
             }
-            else
+            else if (template is CurveParticle)
             {
-                do
-                {
-                    curveParticleIndex = (curveParticleIndex + 1) % curveParticlePool.Count;
-                }
-                while (curveParticlePool[curveParticleIndex].Alive);
-                curveParticlePool[curveParticleIndex] = template.Clone() as CurveParticle;
-                curveParticlePool[curveParticleIndex].Reset();
-                curveParticlePool[curveParticleIndex].Alive = true;
-                curveParticlePool[curveParticleIndex].RenderOrder = order + curveParticleIndex * 10;
-                //particleQuadTree.Insert(curveParticlePool[curveParticleIndex]);
-                return curveParticlePool[curveParticleIndex];
+                var poolObject = CurveParticlePool.Rent(NullData.Empty);
+                template.CopyTo(poolObject.Instance);
+                particle = poolObject.Instance;
             }
+            int order = layerID * 1000000000 + 9 - (int)template.BlendType;
+            particle.RenderOrder = order + instanceID * 10;
+            particle.ID = instanceID++;
+            particle.Reset();
+            particle.Alive = true;
+            activeParticles.Add(particle);
+            //particleQuadTree.Insert(particle);
+            return particle;
         }
         //public static void Insert(ParticleBase particleBase)
         //{
@@ -97,27 +104,16 @@ namespace CrazyStorm.Core
         public static ParticleBase[] SearchByRect(float left, float right, float top, float bottom, out int count)
         {
             int index = 0;
-            for (int i = 0; i < particlePool.Count; ++i)
+            for (int i = 0; i < activeParticles.Count; ++i)
             {
-                if (particlePool[i].Alive)
+                var instance = activeParticles[i];
+                if (instance.Alive)
                 {
-                    float x = particlePool[i].PPosition.x;
-                    float y = particlePool[i].PPosition.y;
+                    float x = instance.PPosition.x;
+                    float y = instance.PPosition.y;
                     if (x >= left && x <= right && y >= top && y <= bottom)
                     {
-                        searchResult[index++] = particlePool[i];
-                    }
-                }
-            }
-            for (int i = 0; i < curveParticlePool.Count; ++i)
-            {
-                if (curveParticlePool[i].Alive)
-                {
-                    float x = curveParticlePool[i].PPosition.x;
-                    float y = curveParticlePool[i].PPosition.y;
-                    if (x >= left && x <= right && y >= top && y <= bottom)
-                    {
-                        searchResult[index++] = curveParticlePool[i];
+                        searchResult[index++] = instance;
                     }
                 }
             }
@@ -127,18 +123,12 @@ namespace CrazyStorm.Core
         public static ParticleBase[] CheckCollision(float bx, float by, float x, float y, float r, out int count)
         {
             var index = 0;
-            for (int i = 0; i < particlePool.Count; ++i)
+            for (int i = 0; i < activeParticles.Count; ++i)
             {
-                if (particlePool[i].Alive && particlePool[i].CheckCollision(bx, by, x, y, r))
+                var instance = activeParticles[i];
+                if (instance.Alive && instance.CheckCollision(bx, by, x, y, r))
                 {
-                    searchResult[index++] = particlePool[i];
-                }
-            }
-            for (int i = 0; i < curveParticlePool.Count; ++i)
-            {
-                if (curveParticlePool[i].Alive && curveParticlePool[i].CheckCollision(bx, by, x, y, r))
-                {
-                    searchResult[index++] = curveParticlePool[i];
+                    searchResult[index++] = instance;
                 }
             }
             count = index;
@@ -159,40 +149,30 @@ namespace CrazyStorm.Core
         }
         public static void Update()
         {
-            particlePool.Sort();
-            curveParticlePool.Sort();
-            for (int i = 0; i < particlePool.Count; ++i)
+            activeParticles.Sort();
+            for (int i = 0; i < activeParticles.Count; ++i)
             {
-                int order = particlePool[i].RenderOrder;
-                if (particlePool[i].Alive && !OutOfRange(particlePool[i]))
-                    particlePool[i].Update();
-                else if (particlePool[i].Alive)
-                    particlePool[i].Alive = false;
-            }
-            for (int i = 0; i < curveParticlePool.Count; ++i)
-            {
-                if (curveParticlePool[i].Alive && !OutOfRange(curveParticlePool[i]))
-                    curveParticlePool[i].Update();
-                else if (curveParticlePool[i].Alive)
+                var instance = activeParticles[i];
+                int order = instance.RenderOrder;
+                if (instance.Alive && !OutOfRange(instance)) instance.Update();
+                else if (instance.Alive) instance.Alive = false;
+                if (!instance.Alive)
                 {
-                    Curve.Return(curveParticlePool[i].Curve);
-                    curveParticlePool[i].Alive = false;
+                    if (instance is Particle) ParticlePool.Return((instance as Particle).PoolObject);
+                    else if (instance is CurveParticle) CurveParticlePool.Return((instance as CurveParticle).PoolObject);
+                    activeParticles.RemoveAt(i);
+                    i--;
                 }
             }
         }
         public static void Draw()
         {
-            if (OnParticleDraw != null)
+            for (int i = 0; i < activeParticles.Count; ++i)
             {
-                for (int i = 0; i < particlePool.Count; ++i)
-                    if (particlePool[i].Alive)
-                        OnParticleDraw(particlePool[i]);
-            }
-            if (OnCurveParticleDraw != null)
-            {
-                for (int i = 0; i < curveParticlePool.Count; ++i)
-                    if (curveParticlePool[i].Alive)
-                        OnCurveParticleDraw(curveParticlePool[i]);
+                var instance = activeParticles[i];
+                if (!instance.Alive) continue;
+                if (instance is Particle) OnParticleDraw(instance as Particle);
+                if (instance is CurveParticle) OnCurveParticleDraw(instance as CurveParticle);
             }
         }
     }

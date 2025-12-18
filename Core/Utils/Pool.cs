@@ -11,7 +11,10 @@ using System.Threading.Tasks;
 
 namespace CrazyStorm.Core
 {
-    public struct NullInitData { }
+    public struct NullData 
+    {
+        public static NullData Empty;
+    }
     public class PoolObject<T, B> where T : PoolObject<T, B>, new() where B : struct
     {
         static T[] pool;

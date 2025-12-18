@@ -60,6 +60,7 @@ namespace CrazyStorm.Core
             set { particleData.afterimageEffect = value; }
         }
         public AfterImage[] AfterImageData => afterimageData;
+        public ParticlePool PoolObject { get; set; }
         #endregion
 
         #region Constructor
@@ -181,6 +182,18 @@ namespace CrazyStorm.Core
                 afterimageTime = (afterimageTime + 1) % AFTERIMAGE_COUNT;
             }
             return true;
+        }
+        public override void CopyTo(PropertyContainer target)
+        {
+            base.CopyTo(target);
+            var particle = target as Particle;
+            if (particle == null) return;
+            particle.particleData = particleData;
+            particle.afterimageTime = 0;
+            for (int i = 0; i < AFTERIMAGE_COUNT; ++i)
+            {
+                particle.AfterImageData[i] = default;
+            }
         }
         public override void Reset()
         {

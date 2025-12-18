@@ -69,6 +69,7 @@
     <Compile Include="Expression\Token\NumberToken.cs" />
     <Compile Include="Expression\Token\Token.cs" />
     <Compile Include="Expression\VM.cs" />
+    <Compile Include="ICopyable.cs" />
     <Compile Include="IO\IGeneratePlayData.cs" />
     <Compile Include="IO\ILoadPlayData.cs" />
     <Compile Include="IO\IRebuildReference.cs" />

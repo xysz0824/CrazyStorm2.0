@@ -43,7 +43,7 @@ namespace CrazyStorm
 
             InitializeComponent();
 
-            dTimer = new DispatcherTimer();
+            dTimer = new DispatcherTimer(DispatcherPriority.Render, Dispatcher);
             dTimer.Tick += dTimer_Tick;
             dTimer.Interval = new TimeSpan(0, 0, 0, 0, 16);
             dTimer.Start();

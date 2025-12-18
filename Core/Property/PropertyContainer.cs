@@ -12,7 +12,7 @@ using System.IO;
 
 namespace CrazyStorm.Core
 {
-    public abstract class PropertyContainer : ICloneable
+    public abstract class PropertyContainer : ICloneable, ICopyable<PropertyContainer>
     {
         IDictionary<string, PropertyValue> properties;
         public IDictionary<string, PropertyValue> Properties { get { return properties; } }
@@ -62,6 +62,11 @@ namespace CrazyStorm.Core
             foreach (var pair in properties)
                 clone.properties[pair.Key] = pair.Value.Clone() as PropertyValue;
             return clone;
+        }
+        public virtual void CopyTo(PropertyContainer target)
+        {
+            target.properties = properties;
+            target.propertyExpressions = propertyExpressions;
         }
         public void BuildFromXmlElement(XmlElement node)
         {

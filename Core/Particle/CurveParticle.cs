@@ -36,6 +36,7 @@ namespace CrazyStorm.Core
             set { curveParticleData.segment = value; }
         }
         public Curve Curve { get; private set; }
+        public CurveParticlePool PoolObject { get; set; }
         #endregion
 
         #region Constructor
@@ -136,6 +137,14 @@ namespace CrazyStorm.Core
             PRotation = PSpeedAngle + 90;
             Curve.Update(PPosition, Type.Width * WidthScale, Length);
             return true;
+        }
+        public override void CopyTo(PropertyContainer target)
+        {
+            base.CopyTo(target);
+            var particle = target as CurveParticle;
+            if (particle == null) return;
+            particle.curveParticleData = curveParticleData;
+            particle.Curve = null;
         }
         #endregion
     }

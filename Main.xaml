@@ -883,6 +883,7 @@
                                             </Image.Opacity>
                                         </Image>
                                         <Canvas Name="ComponentLayer" Canvas.Top="0" Canvas.Left="0" Width="{Binding Path=ScreenWidth}" Height="{Binding Path=ScreenHeight}"/>
+                                        <Label Name="ActiveParticleCount" Content="0" Canvas.Top="5" Canvas.Left="5" Foreground="White" Panel.ZIndex="1000" Visibility="Hidden"/>
                                         <!--<local:Player Name="RuntimeScreen" Width="{Binding Path=ScreenWidth}" Height="{Binding Path=ScreenHeight}" Visibility="Visible"></local:Player>-->
                                     </Canvas>
                                     <Border Name="AimBox" Opacity="0" BorderThickness="2" BorderBrush="Red" Width="32" Height="32" />

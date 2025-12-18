@@ -58,7 +58,7 @@ namespace CrazyStorm.Core
         public int ID { get; set; }
         public int RenderOrder;
         public bool Alive;
-        public int FogFrame;
+        public int FogFrame { get; private set; }
         public Emitter Emitter { get; set; }
         //public ParticleQuadTree QuadTree { get; set; }
         [IntProperty(0, int.MaxValue)]
@@ -219,7 +219,6 @@ namespace CrazyStorm.Core
             particleBaseData.collision = true;
             particleBaseData.fogEffect = true;
             particleBaseData.fadeEffect = true;
-            ParticleEventGroups = new List<EventGroup>();
         }
         #endregion
 
@@ -572,6 +571,18 @@ namespace CrazyStorm.Core
         {
             if (!Alive) return;
             PCurrentFrame = Math.Max(MaxLife - (int)FOG_TIME, 0);
+        }
+        public override void CopyTo(PropertyContainer target)
+        {
+            base.CopyTo(target);
+            var particle = target as ParticleBase;
+            if (particle == null) return;
+            particle.type = type;
+            particle.typeID = typeID;
+            particle.particleBaseData = particleBaseData;
+            particle.Emitter = Emitter;
+            particle.FogFrame = 0;
+            particle.ParticleEventGroups = ParticleEventGroups;
         }
         public virtual void Reset() { }
         public int CompareTo(ParticleBase other)

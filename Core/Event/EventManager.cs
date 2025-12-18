@@ -9,7 +9,7 @@ using System.Linq;
 
 namespace CrazyStorm.Core
 {
-    public class EventManager
+    public static class EventManager
     {
         public delegate void SoundPlayHandler(string path, float volume);
         public static event SoundPlayHandler OnSoundPlay;

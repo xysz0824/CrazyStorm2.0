@@ -16,6 +16,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Shapes;
+using System.Windows.Threading;
 
 namespace CrazyStorm
 {
@@ -23,6 +24,8 @@ namespace CrazyStorm
     {
         #region Private Members
         EmbeddedPlayer player;
+        Label activeParticleCountLabel;
+        DispatcherTimer playTimer;
         #endregion
         #region Private Methods
         void GeneratePlayFile()
@@ -53,6 +56,11 @@ namespace CrazyStorm
             {
                 var content = screen.Content as Canvas;
                 var screenContent = VisualHelper.VisualDownwardSearch(content, "ScreenContent") as Canvas;
+                if (activeParticleCountLabel == null)
+                {
+                    activeParticleCountLabel = VisualHelper.VisualDownwardSearch(content, "ActiveParticleCount") as Label;
+                }
+                activeParticleCountLabel.Visibility = Visibility.Visible;
                 player = new EmbeddedPlayer();
                 var config = screen.DataContext as Config;
                 player.Width = config.ScreenWidth;
@@ -100,9 +108,35 @@ namespace CrazyStorm
                 }
             }
         }
+        void StartPlayTimer()
+        {
+            StartLayerTimer();
+            if (playTimer == null)
+            {
+                playTimer = new DispatcherTimer(DispatcherPriority.Render, Dispatcher);
+                playTimer.Interval = new TimeSpan(0, 0, 0, 0, 16);
+                playTimer.Tick += PlayTimer_Tick;
+            }
+            playTimer.Start();
+        }
+        void StopPlayTimer()
+        {
+            StopLayerTimer();
+            playTimer?.Stop();
+            playTimer = null;
+        }
+        void PausePlayTimer()
+        {
+            PauseLayerTimer();
+            playTimer?.Stop();
+        }
         #endregion
 
         #region Window EventHandlers
+        private void PlayTimer_Tick(object sender, EventArgs e)
+        {
+            if (activeParticleCountLabel != null) activeParticleCountLabel.Content = ParticleManager.ActiveParticleCount;
+        }
         private void GeneratePlayFile_Click(object sender, RoutedEventArgs e)
         {
             file.UpdateResource();
@@ -123,7 +157,7 @@ namespace CrazyStorm
                 ScrollViewer.SetHorizontalScrollBarVisibility(LayerAxis, ScrollBarVisibility.Hidden);
                 ScrollViewer.SetVerticalScrollBarVisibility(LayerAxis, ScrollBarVisibility.Hidden);
                 SetPanelEnable(false);
-                StartLayerTimer();
+                StartPlayTimer();
             }
             else
             {
@@ -138,7 +172,7 @@ namespace CrazyStorm
                     ScrollViewer.SetHorizontalScrollBarVisibility(LayerAxis, ScrollBarVisibility.Auto);
                     ScrollViewer.SetVerticalScrollBarVisibility(LayerAxis, ScrollBarVisibility.Auto);
                     Panel.SetZIndex(player, -1);
-                    PauseLayerTimer();
+                    PausePlayTimer();
                 }
                 else
                 {
@@ -150,7 +184,7 @@ namespace CrazyStorm
                     ScrollViewer.SetHorizontalScrollBarVisibility(LayerAxis, ScrollBarVisibility.Hidden);
                     ScrollViewer.SetVerticalScrollBarVisibility(LayerAxis, ScrollBarVisibility.Hidden);
                     Panel.SetZIndex(player, 1);
-                    StartLayerTimer();
+                    StartPlayTimer();
                 }
             }
         }
@@ -159,6 +193,7 @@ namespace CrazyStorm
             if (player == null) return;
             player.Dispose();
             player = null;
+            if (activeParticleCountLabel != null) activeParticleCountLabel.Visibility = Visibility.Hidden;
             StopButton.Visibility = Visibility.Collapsed;
             var path = VisualHelper.VisualDownwardSearch<Path>(PlayButton) as Path;
             path.Data = (Geometry)FindResource("Play_Icon");
@@ -168,7 +203,7 @@ namespace CrazyStorm
             ScrollViewer.SetHorizontalScrollBarVisibility(LayerAxis, ScrollBarVisibility.Auto);
             ScrollViewer.SetVerticalScrollBarVisibility(LayerAxis, ScrollBarVisibility.Auto);
             SetPanelEnable(true);
-            StopLayerTimer();
+            StopPlayTimer();
         }
         private void PlaySettingItem_Click(object sender, RoutedEventArgs e)
         {
