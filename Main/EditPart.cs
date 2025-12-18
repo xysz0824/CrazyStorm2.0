@@ -19,8 +19,8 @@ namespace CrazyStorm
         {
             var redoPeek = commandStacks[selectedSystem].RedoPeek();
             var undoPeek = commandStacks[selectedSystem].UndoPeek();
-            UndoButton.IsEnabled = redoPeek != null ? true : false;
-            RedoButton.IsEnabled = undoPeek != null ? true : false;
+            UndoButton.IsEnabled = redoPeek != null;
+            RedoButton.IsEnabled = undoPeek != null;
             UndoItem.IsEnabled = UndoButton.IsEnabled;
             RedoItem.IsEnabled = RedoButton.IsEnabled;
         }

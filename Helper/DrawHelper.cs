@@ -104,7 +104,7 @@ namespace CrazyStorm
                 var start = new LineSegment();
                 start.Point = new Point(x + radius * Math.Cos(startRad), y + radius * Math.Sin(startRad));
                 var arc = new ArcSegment();
-                arc.IsLargeArc = Math.Abs(endAngle - startAngle) > 180 ? true : false;
+                arc.IsLargeArc = Math.Abs(endAngle - startAngle) > 180;
                 arc.Size = new Size(radius, radius);
                 arc.Point = new Point(x + radius * Math.Cos(endRad), y + radius * Math.Sin(endRad));
                 var end = new LineSegment();

@@ -60,7 +60,7 @@ namespace CrazyStorm
             ImageList.ItemsSource = file.Images;
             SoundList.ItemsSource = file.Sounds;
             VariableGrid.ItemsSource = file.Globals;
-            DeleteVariable.IsEnabled = file.Globals.Count > 0 ? true : false;
+            DeleteVariable.IsEnabled = file.Globals.Count > 0;
         }
         void InitializeParticle()
         {

@@ -199,7 +199,7 @@ namespace CrazyStorm
                 return;
 
             var visible = sender as Grid;
-            selectedLayer.Visible = visible.Opacity == 0 ? true : false;
+            selectedLayer.Visible = visible.Opacity == 0;
             UpdateSelectedStatus();
         }
         private void LayerDown_MouseUp(object sender, MouseButtonEventArgs e)

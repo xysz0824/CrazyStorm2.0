@@ -123,7 +123,7 @@ namespace CrazyStorm
                 var item = VariableGrid.SelectedItem as VariableResource;
                 file.Globals.Remove(item);
                 UpdateGlobals(UpdateType.Delete, item);
-                DeleteVariable.IsEnabled = file.Globals.Count > 0 ? true : false;
+                DeleteVariable.IsEnabled = file.Globals.Count > 0;
             }
         }
         private void VariableGrid_CellEditEnding(object sender, DataGridCellEditEndingEventArgs e)

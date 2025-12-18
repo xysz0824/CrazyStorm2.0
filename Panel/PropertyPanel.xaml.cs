@@ -110,7 +110,7 @@ namespace CrazyStorm
             LoadTypes(types);
             //Load variables.
             VariableGrid.ItemsSource = component.Locals;
-            DeleteVariable.IsEnabled = component.Locals.Count > 0 ? true : false;
+            DeleteVariable.IsEnabled = component.Locals.Count > 0;
             //Load component events.
             ComponentEventList.ItemsSource = component.ComponentEventGroups;
             //Load specific events.
@@ -414,7 +414,7 @@ namespace CrazyStorm
             {
                 var item = VariableGrid.SelectedItem as VariableResource;
                 component.Locals.Remove(item);
-                DeleteVariable.IsEnabled = component.Locals.Count > 0 ? true : false;
+                DeleteVariable.IsEnabled = component.Locals.Count > 0;
                 //Remove this from environment.
                 environment.RemoveLocal(item.Label);
             }
