@@ -6,12 +6,18 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Windows;
 using CrazyStorm.Core;
 
 namespace CrazyStorm
 {
     class AddLayerCommand : Command
     {
+        string defaultLayerName;
+        public AddLayerCommand(string defaultLayerName)
+        {
+            this.defaultLayerName = defaultLayerName;
+        }
         public override void Redo(CommandStack stack)
         {
             base.Redo(stack);
@@ -19,7 +25,7 @@ namespace CrazyStorm
             if (History[0] == null)
             {
                 var index = selectedParticle.LayerIndex;
-                var newLayer = new Layer("Layer" + index);
+                var newLayer = new Layer(defaultLayerName);
                 newLayer.Color = (LayerColor)((index + 1) % Enum.GetNames(typeof(LayerColor)).Length);
                 History[0] = newLayer;
                 selectedParticle.AddLayer(newLayer);

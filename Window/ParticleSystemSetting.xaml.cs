@@ -128,7 +128,8 @@ namespace CrazyStorm
         }
         private void AddNewType_Click(object sender, RoutedEventArgs e)
         {
-            selectedParticle.CustomTypes.Add(new ParticleType(selectedParticle.CustomTypeIndex));
+            selectedParticle.CustomTypes.Add(new ParticleType(selectedParticle.CustomTypeIndex,
+                (string)FindResource("ParticleTypeStr")));
         }
         private void ColorPanel_MouseUp(object sender, MouseButtonEventArgs e)
         {

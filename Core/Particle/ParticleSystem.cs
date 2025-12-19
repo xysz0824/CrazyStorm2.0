@@ -68,7 +68,10 @@ namespace CrazyStorm.Core
             layers = new GenericContainer<Layer>();
             componentTree = new GenericContainer<Component>();
             componentIndex = new Dictionary<string, int>();
-            layers.Add(new Layer("Main"));
+        }
+        public ParticleSystem(string name, string defaultLayerName) : this(name)
+        {
+            layers.Add(new Layer(defaultLayerName));
         }
         #endregion
 

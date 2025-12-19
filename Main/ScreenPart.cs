@@ -326,7 +326,7 @@ namespace CrazyStorm
                 var boxY = (double)aimRect.GetValue(Canvas.TopProperty);
                 aimComponent.ID = selectedSystem.GetComponentIndex();
                 var index = selectedSystem.GetAndIncreaseComponentIndex(aimComponent.GetType().ToString());
-                aimComponent.Name = aimComponent.GetType().Name + index;
+                aimComponent.Name = (string)FindResource($"{aimComponent.GetType().Name}Str") + (index + 1);
                 aimComponent.X = (int)(boxX + (double)aimRect.GetValue(Canvas.WidthProperty) / 2 - config.ScreenWidthOver2);
                 aimComponent.Y = (int)(boxY + (double)aimRect.GetValue(Canvas.HeightProperty) / 2 - config.ScreenHeightOver2);
                 new AddComponentCommand().Do(commandStacks[selectedSystem], selectedSystem, selectedLayer, aimComponent);

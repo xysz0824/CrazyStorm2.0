@@ -511,14 +511,18 @@ namespace CrazyStorm
         }
         private void AddComponentEvent_Click(object sender, RoutedEventArgs e)
         {
-            component.ComponentEventGroups.Add(new EventGroup());
+            var eventGroup = new EventGroup();
+            eventGroup.Name = (string)FindResource("NewEventGroupStr");
+            component.ComponentEventGroups.Add(eventGroup);
             DelComponentEventButton.IsEnabled = true;
         }
         private void AddSpecificEvent_Click(object sender, RoutedEventArgs e)
         {
-            if (component is Emitter) (component as Emitter).ParticleEventGroups.Add(new EventGroup());
-            else if (component is EventField) (component as EventField).EventFieldEventGroups.Add(new EventGroup());
-            else if (component is Rebounder) (component as Rebounder).RebounderEventGroups.Add(new EventGroup());
+            var eventGroup = new EventGroup();
+            eventGroup.Name = (string)FindResource("NewEventGroupStr");
+            if (component is Emitter) (component as Emitter).ParticleEventGroups.Add(eventGroup);
+            else if (component is EventField) (component as EventField).EventFieldEventGroups.Add(eventGroup);
+            else if (component is Rebounder) (component as Rebounder).RebounderEventGroups.Add(eventGroup);
             DelSpecificEventButton.IsEnabled = true;
         }
         private void DelComponentEvent_Click(object sender, RoutedEventArgs e)

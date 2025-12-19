@@ -32,6 +32,8 @@
     <sys:String x:Key="DeleteParticleSystemStr">删除粒子系统</sys:String>
     <sys:String x:Key="CopyParticleSystemStr">复制粒子系统</sys:String>
     <sys:String x:Key="SetParticleSystemStr">粒子系统设置</sys:String>
+    <sys:String x:Key="ParticleTypeStr">弹型</sys:String>
+    <sys:String x:Key="NewLayerStr">新图层</sys:String>
     <sys:String x:Key="LayerStr">图层</sys:String>
     <sys:String x:Key="AddLayerStr">添加图层</sys:String>
     <sys:String x:Key="DeleteLayerStr">删除图层</sys:String>
@@ -202,6 +204,7 @@
     <sys:String x:Key="YOffsetStr">Y偏移</sys:String>
     <sys:String x:Key="CharacterStr">自机</sys:String>
     <sys:String x:Key="EventSettingStr">事件设置</sys:String>
+    <sys:String x:Key="NewEventGroupStr">新事件组</sys:String>
     <sys:String x:Key="EventGroupStr">事件组</sys:String>
     <sys:String x:Key="EventListStr">事件列表</sys:String>
     <sys:String x:Key="EventConditionStr">事件条件</sys:String>
@@ -238,4 +241,6 @@
     <sys:String x:Key="DoubleClickTipStr">继续双击进入属性面板</sys:String>
     <sys:String x:Key="ComponentUnitStr">个组件</sys:String>
     <sys:String x:Key="ResultCountStr">找到 {0} 个</sys:String>
+    <sys:String x:Key="UntitledStr">未命名</sys:String>
+    <sys:String x:Key="BodyPositionStr">自机</sys:String>
 </ResourceDictionary>

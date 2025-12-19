@@ -35,7 +35,7 @@ namespace CrazyStorm
         #region Private Methods
         void CreateNewLayer()
         {
-            new AddLayerCommand().Do(commandStacks[selectedSystem], selectedSystem);
+            new AddLayerCommand((string)FindResource("NewLayerStr")).Do(commandStacks[selectedSystem], selectedSystem);
         }
         void DeleteSelectedLayer()
         {
@@ -91,12 +91,12 @@ namespace CrazyStorm
             axisScroll.ScrollChanged += (object s, ScrollChangedEventArgs args) =>
             {
                 //Need this for strange display problem
-                axisScroll.ScrollToHorizontalOffset(Math.Max(1, axisScroll.HorizontalOffset));
+                axisScroll.ScrollToHorizontalOffset(Math.Max(0, axisScroll.HorizontalOffset));
                 var imageBruch = TimeScale.Background as ImageBrush;
-                imageBruch.Viewport = new Rect(1 - axisScroll.HorizontalOffset, 0,
+                imageBruch.Viewport = new Rect(0 - axisScroll.HorizontalOffset, 0,
                     imageBruch.Viewport.Width, imageBruch.Viewport.Height);
                 imageBruch = TimeAxis.Background as ImageBrush;
-                imageBruch.Viewport = new Rect(1 - axisScroll.HorizontalOffset, -2 - axisScroll.VerticalOffset,
+                imageBruch.Viewport = new Rect(0 - axisScroll.HorizontalOffset, -2 - axisScroll.VerticalOffset,
                     imageBruch.Viewport.Width, imageBruch.Viewport.Height);
                 if (layerTimer == null || !layerTimer.IsEnabled)
                 {

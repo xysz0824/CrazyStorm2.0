@@ -247,10 +247,14 @@ namespace CrazyStorm.Core
         public ParticleType(int id)
         {
             this.id = id;
-            name = "ParticleType" + id;
+            name = string.Empty;
             startPoint = Vector2.Zero;
             centerPoint = Vector2.Zero;
             frames = 1;
+        }
+        public ParticleType(int id, string name) : this(id)
+        {
+            this.name = $"{name}{id + 1}";
         }
         #endregion
 

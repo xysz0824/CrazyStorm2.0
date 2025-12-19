@@ -43,8 +43,9 @@ namespace CrazyStorm
             if (!SaveTip())
                 return;
 
-            file = new File(true);
-            fileName = "Untitled";
+            var untitledStr = (string)FindResource("UntitledStr");
+            file = new File(untitledStr, (string)FindResource("NewLayerStr"), (string)FindResource("BodyPositionStr"));
+            fileName = untitledStr;
             filePath = string.Empty;
             InitializeSystem();
             saved = true;
@@ -72,7 +73,7 @@ namespace CrazyStorm
                 {
                     return false;
                 }
-                file = new File(false);
+                file = new File();
                 file.Load(openPath);
                 filePath = openPath;
                 fileName = System.IO.Path.GetFileNameWithoutExtension(openPath);

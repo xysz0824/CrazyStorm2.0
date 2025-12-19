@@ -34,7 +34,7 @@ namespace CrazyStorm_Player
 
             playerImpl = new PlayerImpl(width, height, particleMaximum, curveParticleMaximum);
             playerImpl.ResourceDirectory = Environment.CurrentDirectory;
-            playerImpl.File = new File(false);
+            playerImpl.File = new File();
             playerImpl.File.LoadPlayFile(path, VersionInfo.BaseVersion);
             playerImpl.BackgroundPath = backgroundPath;
             playerImpl.SelectedParticleSystemIndex = selectedParticleSystemIndex;

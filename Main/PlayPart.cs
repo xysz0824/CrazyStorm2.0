@@ -75,7 +75,7 @@ namespace CrazyStorm
                 {
                     player.PlayerImpl.ResourceDirectory = File.CurrentDirectory;
                 }
-                player.PlayerImpl.File = new File(false);
+                player.PlayerImpl.File = new File();
                 player.PlayerImpl.File.LoadPlayFile(file.GeneratePlayFile(), CrazyStorm_Player.VersionInfo.BaseVersion);
                 player.PlayerImpl.BackgroundPath = config.BackgroundPath;
                 player.PlayerImpl.SelectedParticleSystemIndex = particleSystemIndex;

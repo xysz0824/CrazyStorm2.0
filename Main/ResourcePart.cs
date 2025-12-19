@@ -97,8 +97,8 @@ namespace CrazyStorm
         }
         private void AddVariable_Click(object sender, RoutedEventArgs e)
         {
-            var label = "Global_";
-            for (int i = 0; ; ++i)
+            var label = (string)FindResource("GlobalStr");
+            for (int i = 1; ; ++i)
             {
                 //To avoid repeating name, use number.
                 var name = label + i;

@@ -269,8 +269,8 @@ namespace CrazyStorm_Player
         {
             FrameworkDispatcher.Update();
             controllable.Update(keyboard);
-            File.SetGlobal("cx", controllable.selfPos.X);
-            File.SetGlobal("cy", controllable.selfPos.Y);
+            File.SetGlobal(SpecialVariableType.BodyPositionX, controllable.selfPos.X);
+            File.SetGlobal(SpecialVariableType.BodyPositionY, controllable.selfPos.Y);
             EventManager.CustomTypes = File.ParticleSystems[SelectedParticleSystemIndex].CustomTypes;
             EventManager.Sounds = File.Sounds;
             File.ParticleSystems[SelectedParticleSystemIndex].Update(CurrentFrame);

@@ -51,7 +51,7 @@ namespace CrazyStorm.Core
         #region Constructor
         public EventGroup()
         {
-            name = "NewEventGroup";
+            name = string.Empty;
             condition = string.Empty;
             originalEvents = new GenericContainer<string>();
             translatedEvents = new GenericContainer<string>();

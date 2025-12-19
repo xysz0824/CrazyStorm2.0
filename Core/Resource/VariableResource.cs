@@ -9,15 +9,25 @@ using System.ComponentModel;
 using System.Xml;
 using System.Xml.Serialization;
 using System.IO;
+using System.CodeDom;
 
 namespace CrazyStorm.Core
 {
+    public enum SpecialVariableType
+    {
+        None,
+        BodyPositionX,
+        BodyPositionY,
+    }
     public class VariableResource : Resource
     {
         #region Private Members
         [PlayData]
         [XmlAttribute]
         float value;
+        [PlayData]
+        [XmlAttribute]
+        SpecialVariableType type;
         #endregion
 
         #region Public Members
@@ -26,13 +36,20 @@ namespace CrazyStorm.Core
             get { return value; }
             set { this.value = value; }
         }
+        public SpecialVariableType Type
+        {
+            get { return type; }
+            set { type = value; }
+        }
         #endregion
 
         #region Constructor
         public VariableResource() { }
-        public VariableResource(string label)
-            : base(label)
+        public VariableResource(string label) : base(label) { }
+        public VariableResource(string label, SpecialVariableType type)
+            : this(label)
         {
+            Type = type;
         }
         #endregion
 
@@ -74,6 +91,7 @@ namespace CrazyStorm.Core
             using (BinaryReader variableResourceReader = PlayDataHelper.GetBlockReader(reader))
             {
                 value = variableResourceReader.ReadSingle();
+                type = PlayDataHelper.ReadEnum<SpecialVariableType>(variableResourceReader);
             }
         }
         #endregion

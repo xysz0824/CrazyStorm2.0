@@ -39,19 +39,19 @@ namespace CrazyStorm.Core
         #endregion
 
         #region Constructor
-        public File(bool newFile)
+        public File()
         {
             CurrentDirectory = string.Empty;
             particleSystems = new List<ParticleSystem>();
             images = new GenericContainer<FileResource>();
             sounds = new GenericContainer<FileResource>();
             globals = new GenericContainer<VariableResource>();
-            if (newFile)
-            {
-                particleSystems.Add(new ParticleSystem("Untitled"));
-                globals.Add(new VariableResource("cx"));
-                globals.Add(new VariableResource("cy"));
-            }
+        }
+        public File(string defaultParticleSystemName, string defaultLayerName, string defaultBodyPositionName) : this()
+        {
+            particleSystems.Add(new ParticleSystem(defaultParticleSystemName, defaultLayerName));
+            globals.Add(new VariableResource($"{defaultBodyPositionName}x", SpecialVariableType.BodyPositionX));
+            globals.Add(new VariableResource($"{defaultBodyPositionName}y", SpecialVariableType.BodyPositionY));
         }
         #endregion
 
@@ -361,11 +361,11 @@ namespace CrazyStorm.Core
         {
             return LoadPlayFile(System.IO.File.ReadAllBytes(filePath), baseVersion);
         }
-        public void SetGlobal(string label, float value)
+        public void SetGlobal(SpecialVariableType type, float value)
         {
             for (int i = 0; i < globals.Count; ++i)
             {
-                if (globals[i].Label == label)
+                if (globals[i].Type == type)
                 {
                     globals[i].Value = value;
                 }
