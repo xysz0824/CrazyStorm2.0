@@ -18,6 +18,7 @@ using System.Windows.Shapes;
 using System.Windows.Controls.Primitives;
 using CrazyStorm.Core;
 using CrazyStorm.Expression;
+using System.Windows.Documents.Serialization;
 
 namespace CrazyStorm
 {
@@ -198,12 +199,12 @@ namespace CrazyStorm
             if (LeftValue.ToolTip != null || RightValue.ToolTip != null)
                 return false;
 
-            if (LeftLessThan.IsChecked == true)
-                eventInfo.leftOperator = "<";
-            else if (LeftEqual.IsChecked == true)
-                eventInfo.leftOperator = "=";
-            else if (LeftMoreThan.IsChecked == true)
-                eventInfo.leftOperator = ">";
+            if (LeftLessThan.IsChecked == true && LeftEqual.IsChecked == true) eventInfo.leftOperator = "<=";
+            else if (LeftMoreThan.IsChecked == true && LeftEqual.IsChecked == true) eventInfo.leftOperator = ">=";
+            else if (LeftLessThan.IsChecked == true && LeftMoreThan.IsChecked == true) eventInfo.leftOperator = "!=";
+            else if (LeftLessThan.IsChecked == true) eventInfo.leftOperator = "<";
+            else if (LeftEqual.IsChecked == true) eventInfo.leftOperator = "=";
+            else if (LeftMoreThan.IsChecked == true) eventInfo.leftOperator = ">";
 
             if (LeftConditionComboBox.SelectedItem != null && !String.IsNullOrEmpty(LeftValue.Text) &&
                 !String.IsNullOrEmpty(eventInfo.leftOperator))
@@ -213,12 +214,12 @@ namespace CrazyStorm
                 eventInfo.leftType = GetValueType(selectedItem.Name);
                 eventInfo.leftValue = LeftValue.Text;
             }
-            if (RightLessThan.IsChecked == true)
-                eventInfo.rightOperator = "<";
-            else if (RightEqual.IsChecked == true)
-                eventInfo.rightOperator = "=";
-            else if (RightMoreThan.IsChecked == true)
-                eventInfo.rightOperator = ">";
+            if (RightLessThan.IsChecked == true && RightEqual.IsChecked == true) eventInfo.rightOperator = "<=";
+            else if (RightMoreThan.IsChecked == true && RightEqual.IsChecked == true) eventInfo.rightOperator = ">=";
+            else if (RightLessThan.IsChecked == true && RightMoreThan.IsChecked == true) eventInfo.rightOperator = "!=";
+            else if (RightLessThan.IsChecked == true) eventInfo.rightOperator = "<";
+            else if (RightEqual.IsChecked == true) eventInfo.rightOperator = "=";
+            else if (RightMoreThan.IsChecked == true) eventInfo.rightOperator = ">";
 
             if (RightConditionComboBox.SelectedItem != null && !String.IsNullOrEmpty(RightValue.Text) &&
                 !String.IsNullOrEmpty(eventInfo.rightOperator))
@@ -400,23 +401,29 @@ namespace CrazyStorm
         void MapEventText(string text)
         {
             ResetAll();
-            Dictionary<string, RadioButton> buttonMap = new Dictionary<string, RadioButton>();
-            buttonMap[">"] = LeftMoreThan;
-            buttonMap["="] = LeftEqual;
-            buttonMap["<"] = LeftLessThan;
-            buttonMap["&"] = And;
-            buttonMap["|"] = Or;
-            buttonMap["ChangeTo"] = ChangeTo;
-            buttonMap["Increase"] = Increase;
-            buttonMap["Decrease"] = Decrease;
-            buttonMap["Linear"] = Linear;
-            buttonMap["Accelerated"] = Accelerated;
-            buttonMap["Decelerated"] = Decelerated;
-            buttonMap["Instant"] = Instant;
-            buttonMap["EmitParticle"] = EmitParticle;
-            buttonMap["PlaySound"] = PlaySound;
-            buttonMap["Loop"] = Loop;
-            buttonMap["ChangeType"] = ChangeType;
+            LeftEqual.IsChecked = false;
+            RightEqual.IsChecked = false;
+            var checkBoxMap = new Dictionary<string, CheckBox[]>();
+            checkBoxMap[">"] = new[] { LeftMoreThan };
+            checkBoxMap["="] = new[] { LeftEqual };
+            checkBoxMap["<"] = new[] { LeftLessThan };
+            checkBoxMap[">="] = new[] { LeftMoreThan, LeftEqual };
+            checkBoxMap["<="] = new[] { LeftLessThan, LeftEqual };
+            checkBoxMap["!="] = new[] { LeftLessThan, LeftMoreThan };
+            var buttonMap = new Dictionary<string, RadioButton[]>();
+            buttonMap["&"] = new[] { And };
+            buttonMap["|"] = new[] { Or };
+            buttonMap["ChangeTo"] = new[] { ChangeTo };
+            buttonMap["Increase"] = new[] { Increase };
+            buttonMap["Decrease"] = new[] { Decrease };
+            buttonMap["Linear"] = new[] { Linear };
+            buttonMap["Accelerated"] = new[] { Accelerated };
+            buttonMap["Decelerated"] = new[] { Decelerated };
+            buttonMap["Instant"] = new[] { Instant };
+            buttonMap["EmitParticle"] = new[] { EmitParticle };
+            buttonMap["PlaySound"] = new[] { PlaySound };
+            buttonMap["Loop"] = new[] { Loop };
+            buttonMap["ChangeType"] = new[] { ChangeType };
             EventInfo eventInfo = EventHelper.SplitEvent(text);
             //Backfill condition
             if (eventInfo.hasCondition)
@@ -429,19 +436,22 @@ namespace CrazyStorm
                         if (item.Name == eventInfo.leftProperty)
                             LeftConditionComboBox.SelectedIndex = i;
                     }
-                    buttonMap[eventInfo.leftOperator].IsChecked = true;
+                    foreach (var checkBox in checkBoxMap[eventInfo.leftOperator]) checkBox.IsChecked = true;
                     LeftValue.Text = eventInfo.leftValue;
-                    buttonMap[eventInfo.midOperator].IsChecked = true;
+                    foreach (var checkBox in checkBoxMap[eventInfo.midOperator]) checkBox.IsChecked = true;
                     for (int i = 0; i < RightConditionComboBox.Items.Count; ++i)
                     {
                         var item = RightConditionComboBox.Items[i] as VariableComboBoxItem;
                         if (item.Name == eventInfo.rightProperty)
                             RightConditionComboBox.SelectedIndex = i;
                     }
-                    buttonMap[">"] = RightMoreThan;
-                    buttonMap["="] = RightEqual;
-                    buttonMap["<"] = RightLessThan;
-                    buttonMap[eventInfo.rightOperator].IsChecked = true;
+                    checkBoxMap[">"] = new[] { RightMoreThan };
+                    checkBoxMap["="] = new[] { RightEqual };
+                    checkBoxMap["<"] = new[] { RightLessThan };
+                    checkBoxMap[">="] = new[] { RightMoreThan, RightEqual };
+                    checkBoxMap["<="] = new[] { RightLessThan, RightEqual };
+                    checkBoxMap["!="] = new[] { RightLessThan, RightMoreThan };
+                    foreach (var checkBox in checkBoxMap[eventInfo.rightOperator]) checkBox.IsChecked = true;
                     RightValue.Text = eventInfo.rightValue;
                 }
                 else
@@ -452,7 +462,7 @@ namespace CrazyStorm
                         if (item.Name == eventInfo.leftProperty)
                             LeftConditionComboBox.SelectedIndex = i;
                     }
-                    buttonMap[eventInfo.leftOperator].IsChecked = true;
+                    foreach (var checkBox in checkBoxMap[eventInfo.leftOperator]) checkBox.IsChecked = true;
                     LeftValue.Text = eventInfo.leftValue;
                 }
             }
@@ -466,14 +476,14 @@ namespace CrazyStorm
                         PropertyComboBox.SelectedIndex = i;
                 }
                 isExpressionResult = eventInfo.isExpressionResult;
-                buttonMap[eventInfo.changeType].IsChecked = true;
+                foreach (var button in buttonMap[eventInfo.changeType]) button.IsChecked = true;
                 ResultValue.Text = eventInfo.resultValue;
-                buttonMap[eventInfo.changeMode].IsChecked = true;
+                foreach (var button in buttonMap[eventInfo.changeMode]) button.IsChecked = true;
                 ChangeTime.Text = eventInfo.changeTime;
             }
             else
             {
-                buttonMap[eventInfo.specialEvent].IsChecked = true;
+                foreach (var button in buttonMap[eventInfo.specialEvent]) button.IsChecked = true;
                 string[] split = eventInfo.arguments.Split(',');
                 if (eventInfo.specialEvent == "PlaySound")
                 {
@@ -1008,6 +1018,70 @@ namespace CrazyStorm
                 return;
 
             MapEventText(eventGroup.OriginalEvents[EventList.SelectedIndex]);
+        }
+        private void LeftOperator_Checked(object sender, RoutedEventArgs e)
+        {
+            if (LeftMoreThan.IsChecked == true && LeftLessThan.IsChecked == true && LeftEqual.IsChecked == true)
+            {
+                if (sender == LeftMoreThan)
+                {
+                    LeftLessThan.IsChecked = false;
+                }
+                else if (sender == LeftLessThan)
+                {
+                    LeftMoreThan.IsChecked = false;
+                }
+                else if (sender == LeftEqual)
+                {
+                    LeftMoreThan.IsChecked = false;
+                }
+            }
+        }
+        private void LeftOperator_Unchecked(object sender, RoutedEventArgs e)
+        {
+            if (LeftMoreThan.IsChecked == false && LeftLessThan.IsChecked == false && LeftEqual.IsChecked == false)
+            {
+                if (sender == LeftMoreThan || sender == LeftLessThan)
+                {
+                    LeftEqual.IsChecked = true;
+                }
+                else if (sender == LeftEqual)
+                {
+                    LeftMoreThan.IsChecked = true;
+                }
+            }
+        }
+        private void RightOperator_Checked(object sender, RoutedEventArgs e)
+        {
+            if (RightMoreThan.IsChecked == true && RightLessThan.IsChecked == true && RightEqual.IsChecked == true)
+            {
+                if (sender == RightMoreThan)
+                {
+                    RightLessThan.IsChecked = false;
+                }
+                else if (sender == RightLessThan)
+                {
+                    RightMoreThan.IsChecked = false;
+                }
+                else if (sender == RightEqual)
+                {
+                    RightMoreThan.IsChecked = false;
+                }
+            }
+        }
+        private void RightOperator_Unchecked(object sender, RoutedEventArgs e)
+        {
+            if (RightMoreThan.IsChecked == false && RightLessThan.IsChecked == false && RightEqual.IsChecked == false)
+            {
+                if (sender == RightMoreThan || sender == RightLessThan)
+                {
+                    RightEqual.IsChecked = true;
+                }
+                else if (sender == RightEqual)
+                {
+                    RightMoreThan.IsChecked = true;
+                }
+            }
         }
         #endregion
     }

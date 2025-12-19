@@ -3,6 +3,90 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:local ="clr-namespace:CrazyStorm"
         Title="{StaticResource EventSettingStr}" Height="650" Width="450" WindowStyle="ToolWindow" WindowStartupLocation="CenterScreen" ResizeMode="NoResize" Background="#FFF0F0F0">
+    <Window.Resources>
+        <Style x:Key="FocusVisual">
+            <Setter Property="Control.Template">
+                <Setter.Value>
+                    <ControlTemplate>
+                        <Rectangle Margin="2" StrokeDashArray="1 2" Stroke="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}" SnapsToDevicePixels="true" StrokeThickness="1"/>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="OptionMarkFocusVisual">
+            <Setter Property="Control.Template">
+                <Setter.Value>
+                    <ControlTemplate>
+                        <Rectangle Margin="14,0,0,0" StrokeDashArray="1 2" Stroke="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}" SnapsToDevicePixels="true" StrokeThickness="1"/>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <SolidColorBrush x:Key="RadioButton.Static.Background" Color="#FFFFFFFF"/>
+        <SolidColorBrush x:Key="RadioButton.Static.Border" Color="#FF707070"/>
+        <SolidColorBrush x:Key="RadioButton.Static.Glyph" Color="#FF212121"/>
+        <SolidColorBrush x:Key="RadioButton.MouseOver.Background" Color="#FFF3F9FF"/>
+        <SolidColorBrush x:Key="RadioButton.MouseOver.Border" Color="#FF5593FF"/>
+        <SolidColorBrush x:Key="RadioButton.MouseOver.Glyph" Color="#FF212121"/>
+        <SolidColorBrush x:Key="RadioButton.Pressed.Background" Color="#FFD9ECFF"/>
+        <SolidColorBrush x:Key="RadioButton.Pressed.Border" Color="#FF3C77DD"/>
+        <SolidColorBrush x:Key="RadioButton.Pressed.Glyph" Color="#FF212121"/>
+        <SolidColorBrush x:Key="RadioButton.Disabled.Background" Color="#FFE6E6E6"/>
+        <SolidColorBrush x:Key="RadioButton.Disabled.Border" Color="#FFBCBCBC"/>
+        <SolidColorBrush x:Key="RadioButton.Disabled.Glyph" Color="#FF707070"/>
+        <Style x:Key="RadioLikeStyle" TargetType="{x:Type CheckBox}">
+            <Setter Property="FocusVisualStyle" Value="{StaticResource FocusVisual}"/>
+            <Setter Property="Background" Value="{StaticResource RadioButton.Static.Background}"/>
+            <Setter Property="BorderBrush" Value="{StaticResource RadioButton.Static.Border}"/>
+            <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type CheckBox}">
+                        <Grid x:Name="templateRoot" Background="Transparent" SnapsToDevicePixels="True">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Border x:Name="radioButtonBorder" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="100" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" Margin="1,1,2,1" VerticalAlignment="{TemplateBinding VerticalContentAlignment}">
+                                <Grid x:Name="markGrid" Margin="2">
+                                    <Ellipse x:Name="optionMark" Fill="{StaticResource RadioButton.Static.Glyph}" MinWidth="6" MinHeight="6" Opacity="0"/>
+                                </Grid>
+                            </Border>
+                            <ContentPresenter x:Name="contentPresenter" Grid.Column="1" Focusable="False" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" Margin="{TemplateBinding Padding}" RecognizesAccessKey="True" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="HasContent" Value="true">
+                                <Setter Property="FocusVisualStyle" Value="{StaticResource OptionMarkFocusVisual}"/>
+                                <Setter Property="Padding" Value="4,-1,0,0"/>
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="true">
+                                <Setter Property="Background" TargetName="radioButtonBorder" Value="{StaticResource RadioButton.MouseOver.Background}"/>
+                                <Setter Property="BorderBrush" TargetName="radioButtonBorder" Value="{StaticResource RadioButton.MouseOver.Border}"/>
+                                <Setter Property="Fill" TargetName="optionMark" Value="{StaticResource RadioButton.MouseOver.Glyph}"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="false">
+                                <Setter Property="Background" TargetName="radioButtonBorder" Value="{StaticResource RadioButton.Disabled.Background}"/>
+                                <Setter Property="BorderBrush" TargetName="radioButtonBorder" Value="{StaticResource RadioButton.Disabled.Border}"/>
+                                <Setter Property="Fill" TargetName="optionMark" Value="{StaticResource RadioButton.Disabled.Glyph}"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="true">
+                                <Setter Property="Background" TargetName="radioButtonBorder" Value="{StaticResource RadioButton.Pressed.Background}"/>
+                                <Setter Property="BorderBrush" TargetName="radioButtonBorder" Value="{StaticResource RadioButton.Pressed.Border}"/>
+                                <Setter Property="Fill" TargetName="optionMark" Value="{StaticResource RadioButton.Pressed.Glyph}"/>
+                            </Trigger>
+                            <Trigger Property="IsChecked" Value="true">
+                                <Setter Property="Opacity" TargetName="optionMark" Value="1"/>
+                            </Trigger>
+                            <Trigger Property="IsChecked" Value="{x:Null}">
+                                <Setter Property="Opacity" TargetName="optionMark" Value="0.56"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
     <StackPanel>
         <GroupBox Name="GroupBox" Header="{StaticResource EventGroupStr}">
             <StackPanel>
@@ -49,9 +133,9 @@
                     </ComboBox.ItemTemplate>
                 </ComboBox>
                 <StackPanel Margin="5,0">
-                    <RadioButton Name="LeftMoreThan" Content="&gt;" />
-                    <RadioButton Name="LeftEqual" Content="=" />
-                    <RadioButton Name="LeftLessThan" Content="&lt;" />
+                    <CheckBox Style="{StaticResource RadioLikeStyle}" Name="LeftMoreThan" Content="&gt;" Checked="LeftOperator_Checked" Unchecked="LeftOperator_Unchecked"/>
+                    <CheckBox Style="{StaticResource RadioLikeStyle}" Name="LeftEqual" Content="="  Checked="LeftOperator_Checked" Unchecked="LeftOperator_Unchecked"/>
+                    <CheckBox Style="{StaticResource RadioLikeStyle}" Name="LeftLessThan" Content="&lt;"  Checked="LeftOperator_Checked" Unchecked="LeftOperator_Unchecked"/>
                 </StackPanel>
                 <TextBox Name="LeftValue" Width="50" VerticalContentAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Center" Height="25" 
                          PreviewLostKeyboardFocus="LeftValue_PreviewLostKeyboardFocus" MaxLines="1" PreviewGotKeyboardFocus="LeftValue_PreviewGotKeyboardFocus" />
@@ -67,9 +151,9 @@
                     </ComboBox.ItemTemplate>
                 </ComboBox>
                 <StackPanel Margin="5,0">
-                    <RadioButton Name="RightMoreThan"  Content="&gt;" />
-                    <RadioButton Name="RightEqual" Content="=" />
-                    <RadioButton Name="RightLessThan" Content="&lt;" />
+                    <CheckBox Style="{StaticResource RadioLikeStyle}" Name="RightMoreThan"  Content="&gt;" Checked="RightOperator_Checked" Unchecked="RightOperator_Unchecked"/>
+                    <CheckBox Style="{StaticResource RadioLikeStyle}" Name="RightEqual" Content="=" Checked="RightOperator_Checked" Unchecked="RightOperator_Unchecked"/>
+                    <CheckBox Style="{StaticResource RadioLikeStyle}" Name="RightLessThan" Content="&lt;" Checked="RightOperator_Checked" Unchecked="RightOperator_Unchecked"/>
                 </StackPanel>
                 <TextBox Name="RightValue" Width="50" VerticalContentAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Center" Height="25" 
                          PreviewLostKeyboardFocus="RightValue_PreviewLostKeyboardFocus" MaxLines="1" PreviewGotKeyboardFocus="RightValue_PreviewGotKeyboardFocus"/>

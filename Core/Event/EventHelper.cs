@@ -16,7 +16,10 @@ namespace CrazyStorm.Core
         Less,
         Equal,
         And,
-        Or
+        Or,
+        MoreEqual,
+        LessEqual,
+        NotEqual,
     }
     public enum EventKeyword : byte
     {
@@ -213,6 +216,9 @@ namespace CrazyStorm.Core
             operatorMap["<"] = EventOperator.Less;
             operatorMap["&"] = EventOperator.And;
             operatorMap["|"] = EventOperator.Or;
+            operatorMap[">="] = EventOperator.MoreEqual;
+            operatorMap["<="] = EventOperator.LessEqual;
+            operatorMap["!="] = EventOperator.NotEqual;
             keywordMap["ChangeTo"] = EventKeyword.ChangeTo;
             keywordMap["Increase"] = EventKeyword.Increase;
             keywordMap["Decrease"] = EventKeyword.Decrease;
@@ -411,15 +417,29 @@ namespace CrazyStorm.Core
                         return VM.PopInt() < value.intValue;
                     else if (operators == EventOperator.Equal)
                         return VM.PopInt() == value.intValue;
-                    else
+                    else if (operators == EventOperator.More)
                         return VM.PopInt() > value.intValue;
+                    else if (operators == EventOperator.LessEqual)
+                        return VM.PopInt() <= value.intValue;
+                    else if (operators == EventOperator.NotEqual)
+                        return VM.PopInt() != value.intValue;
+                    else if (operators == EventOperator.MoreEqual)
+                        return VM.PopInt() >= value.intValue;
+                    else return false;
                 case PropertyType.Single:
                     if (operators == EventOperator.Less)
                         return VM.PopFloat() < value.floatValue;
                     else if (operators == EventOperator.Equal)
                         return VM.PopFloat() == value.floatValue;
-                    else
+                    else if (operators == EventOperator.More)
                         return VM.PopFloat() > value.floatValue;
+                    else if (operators == EventOperator.LessEqual)
+                        return VM.PopFloat() <= value.floatValue;
+                    else if (operators == EventOperator.NotEqual)
+                        return VM.PopFloat() != value.floatValue;
+                    else if (operators == EventOperator.MoreEqual)
+                        return VM.PopFloat() >= value.floatValue;
+                    else return false;
                 case PropertyType.Enum:
                     return VM.PopEnum() == value.enumValue;
                 case PropertyType.Vector2:
