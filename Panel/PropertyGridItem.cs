@@ -16,31 +16,25 @@ namespace CrazyStorm
         public event PropertyChangedEventHandler PropertyChanged;
 
         private PropertyInfo info;
-        private string name;
         private string displayName;
-        private string value;
+        private string displayValue;
 
         public PropertyInfo Info
         {
             get { return info; }
             set { info = value; }
         }
-        public string Name
-        {
-            get { return name; }
-            set { name = value; }
-        }
         public string DisplayName
         {
             get { return displayName; }
             set { displayName = value; }
         }
-        public string Value
+        public string DisplayValue
         {
-            get { return value; }
+            get { return displayValue; }
             set
             {
-                this.value = value;
+                this.displayValue = value;
                 if (PropertyChanged != null)
                     PropertyChanged(this, new PropertyChangedEventArgs("Value"));
             }

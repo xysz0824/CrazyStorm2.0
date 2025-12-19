@@ -13,15 +13,16 @@ namespace CrazyStorm.Expression
 {
     public class Lexer
     {
-        static Regex NumberTokenRegex = new Regex(@"[0-9]+\.[0-9]+|[0-9]+");
-        static Regex IdentifierTokenRegex = new Regex(@"[A-Z_a-z][A-Z_a-z0-9\.]*");
+        static Regex NumberTokenRegex = new Regex(@"(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?");
+        static Regex IdentifierTokenRegex = new Regex(@"^(?:[_\p{L}])(?:[_\p{L}\p{Nd}])*");
         static Regex OperatorTokenRegex = new Regex(@"[><!]=|[+\-*/%>=<&|(,)\[\]]");
         List<Token> tokens;
+        public List<Token> Tokens => tokens;
 
         public void Load(string content)
         {
             tokens = new List<Token>();
-            byte[] stringBytes = Encoding.Default.GetBytes(content);
+            byte[] stringBytes = Encoding.UTF8.GetBytes(content);
             using (MemoryStream stream = new MemoryStream(stringBytes))
             {
                 StreamReader reader = new StreamReader(stream);
@@ -83,6 +84,23 @@ namespace CrazyStorm.Expression
                 return null;
 
             return tokens[index];
+        }
+        public string Output()
+        {
+            var builder = new StringBuilder();
+            int lineNumber = 1;
+            while (tokens.Exists((token) => token.LineNumber == lineNumber))
+            {
+                var lineTokens = tokens.Where((token) => token.LineNumber == lineNumber);
+                foreach (var token in lineTokens)
+                {
+                    builder.Append(token.GetValue());
+                }
+                builder.Append("\n");
+                lineNumber++;
+            }
+            builder.Remove(builder.Length - 1, 1);
+            return builder.ToString();
         }
     }
 }

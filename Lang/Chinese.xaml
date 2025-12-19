@@ -243,4 +243,10 @@
     <sys:String x:Key="ResultCountStr">找到 {0} 个</sys:String>
     <sys:String x:Key="UntitledStr">未命名</sys:String>
     <sys:String x:Key="BodyPositionStr">自机</sys:String>
+    <sys:String x:Key="TrueStr">开</sys:String>
+    <sys:String x:Key="FalseStr">关</sys:String>
+    <sys:String x:Key="AlphaBlendStr">透明度混合</sys:String>
+    <sys:String x:Key="AdditiveStr">加法混合</sys:String>
+    <sys:String x:Key="SubstractionStr">减法混合</sys:String>
+    <sys:String x:Key="MultiplyStr">乘法混合</sys:String>
 </ResourceDictionary>

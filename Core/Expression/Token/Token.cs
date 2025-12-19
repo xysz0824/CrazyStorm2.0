@@ -24,6 +24,7 @@ namespace CrazyStorm.Expression
         }
 
         public abstract object GetValue();
+        public abstract void SetValue(object value);
 
         public int CompareTo(object obj)
         {

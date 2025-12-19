@@ -101,14 +101,8 @@ namespace CrazyStorm
             var panel = new PropertyPanel(commandStacks[selectedSystem], file, 
                 particleTypes, component, UpdateProperty);
             scroll.Content = panel;
-            panel.OnBeginEditing += () =>
-            {
-                editingProperties = true;
-            };
-            panel.OnEndEditing += () =>
-            {
-                editingProperties = false;
-            };
+            panel.OnBeginEditing += () => editingProperties = true;
+            panel.OnEndEditing += () => editingProperties = false;
             item.Content = scroll;
             LeftTabControl.Items.Add(item);
             item.Focus();

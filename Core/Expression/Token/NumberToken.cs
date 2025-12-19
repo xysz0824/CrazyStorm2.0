@@ -10,7 +10,7 @@ using System.Text.RegularExpressions;
 
 namespace CrazyStorm.Expression
 {
-    class NumberToken : Token
+    public class NumberToken : Token
     {
         float value;
         public NumberToken(int lineNumber, int index, float value)
@@ -22,6 +22,10 @@ namespace CrazyStorm.Expression
         public override object GetValue()
         {
             return value;
+        }
+        public override void SetValue(object value)
+        {
+            this.value = (float)value;
         }
     }
 }

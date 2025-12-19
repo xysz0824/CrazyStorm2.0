@@ -16,13 +16,12 @@
                     <DataGridTextColumn x:Name="ComponentKey" Header="{StaticResource PropertyNameStr}" IsReadOnly="True" Binding="{Binding DisplayName}" CanUserResize="False">
                         <DataGridTextColumn.CellStyle>
                             <Style TargetType="DataGridCell" BasedOn="{StaticResource {x:Type DataGridCell}}">
-                                <Setter Property="ToolTip" Value="{Binding Name}" />
                                 <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
                                 <Setter Property="Focusable" Value="False" />
                             </Style>
                         </DataGridTextColumn.CellStyle>
                     </DataGridTextColumn>
-                    <DataGridTextColumn x:Name="ComponentValue" Width="*" Header="{StaticResource PropertyValueStr}" Binding="{Binding Value}" />
+                    <DataGridTextColumn x:Name="ComponentValue" Width="*" Header="{StaticResource PropertyValueStr}" Binding="{Binding DisplayValue}" />
                 </DataGrid.Columns>
                 <DataGrid.Resources>
                     <Style TargetType="DataGridColumnHeader" BasedOn="{StaticResource {x:Type DataGridColumnHeader}}">
@@ -52,13 +51,12 @@
                     <DataGridTextColumn x:Name="SpecificKey" Header="{StaticResource PropertyNameStr}" IsReadOnly="True" Binding="{Binding DisplayName}" CanUserResize="False">
                         <DataGridTextColumn.CellStyle>
                             <Style TargetType="DataGridCell" BasedOn="{StaticResource {x:Type DataGridCell}}">
-                                <Setter Property="ToolTip" Value="{Binding Name}" />
                                 <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
                                 <Setter Property="Focusable" Value="False" />
                             </Style>
                         </DataGridTextColumn.CellStyle>
                     </DataGridTextColumn>
-                    <DataGridTextColumn x:Name="SepcificValue" Width="*" Header="{StaticResource PropertyValueStr}" Binding="{Binding Value}" />
+                    <DataGridTextColumn x:Name="SepcificValue" Width="*" Header="{StaticResource PropertyValueStr}" Binding="{Binding DisplayValue}" />
                 </DataGrid.Columns>
                 <DataGrid.Resources>
                     <Style TargetType="DataGridColumnHeader" BasedOn="{StaticResource {x:Type DataGridColumnHeader}}">
@@ -108,13 +106,12 @@
                         <DataGridTextColumn x:Name="ParticleKey"  Header="{StaticResource PropertyNameStr}" IsReadOnly="True" Binding="{Binding DisplayName}" CanUserResize="False">
                             <DataGridTextColumn.CellStyle>
                                 <Style TargetType="DataGridCell" BasedOn="{StaticResource {x:Type DataGridCell}}">
-                                    <Setter Property="ToolTip" Value="{Binding Name}" />
                                     <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
                                     <Setter Property="Focusable" Value="False" />
                                 </Style>
                             </DataGridTextColumn.CellStyle>
                         </DataGridTextColumn>
-                        <DataGridTextColumn x:Name="ParticleValue" Width="*" Header="{StaticResource PropertyValueStr}" Binding="{Binding Value}" />
+                        <DataGridTextColumn x:Name="ParticleValue" Width="*" Header="{StaticResource PropertyValueStr}" Binding="{Binding DisplayValue}" />
                     </DataGrid.Columns>
                     <DataGrid.Resources>
                         <Style TargetType="DataGridColumnHeader" BasedOn="{StaticResource {x:Type DataGridColumnHeader}}">

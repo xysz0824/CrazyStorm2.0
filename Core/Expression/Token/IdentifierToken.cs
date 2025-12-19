@@ -9,7 +9,7 @@ using System.Text;
 
 namespace CrazyStorm.Expression
 {
-    class IdentifierToken : Token
+    public class IdentifierToken : Token
     {
         string value;
         bool isOperator;
@@ -25,6 +25,10 @@ namespace CrazyStorm.Expression
         public override object GetValue()
         {
             return value;
+        }
+        public override void SetValue(object value)
+        {
+            this.value = (string)value;
         }
     }
 }

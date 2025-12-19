@@ -28,8 +28,7 @@ namespace CrazyStorm
             var newValue = Parameter[4] as string;
             var attribute = Parameter[5] as PropertyAttribute;
             var updateFunc = Parameter[6] as Action;
-            if (History[0] == null)
-                History[0] = property.Value;
+            if (History[0] == null) History[0] = container.Properties[property.Info.Name].Value;
             History[1] = SetProperty(environment, container, property.Info, cell, newValue, attribute, updateFunc);
         }
         public override void Undo(CommandStack stack)
@@ -44,8 +43,7 @@ namespace CrazyStorm
             var updateFunc = Parameter[6] as Action;
             SetProperty(environment, container, property.Info, cell, newValue, attribute, updateFunc);
             //If set invalid value, pop undo stack to prevent for redoing again.
-            if (History[1] != null && !(bool)History[1])
-                stack.UndoPop();
+            if (History[1] != null && !(bool)History[1]) stack.UndoPop();
         }
         static bool SetProperty(Expression.Environment environment, PropertyContainer container, 
             PropertyInfo propertyInfo, DataGridCell cell, string newValue, PropertyAttribute attribute, Action updateFunc)
@@ -62,19 +60,16 @@ namespace CrazyStorm
                     updateFunc();
                     return true;
                 }
-                if (attribute is StringPropertyAttribute)
-                    throw new ExpressionException("IllegalInput");
-
+                if (attribute is StringPropertyAttribute) throw new ExpressionException("IllegalInput");
                 var lexer = new Lexer();
                 lexer.Load(newValue);
                 var syntaxTree = new Parser(lexer).Expression();
-                if (syntaxTree is Number)
-                    throw new ExpressionException("IllegalInput");
-
+                if (syntaxTree is Number) throw new ExpressionException("IllegalInput");
                 var result = syntaxTree.Eval(environment);
                 if (!PropertyTypeRule.IsMatchWith(propertyInfo.PropertyType, result.GetType()))
+                {
                     throw new ExpressionException("TypeError");
-
+                }
                 container.Properties[propertyInfo.Name].Expression = true;
                 container.Properties[propertyInfo.Name].Value = newValue;
                 cell.ToolTip = null;

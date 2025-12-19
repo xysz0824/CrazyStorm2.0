@@ -19,6 +19,8 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using CrazyStorm.Core;
 using System.Collections.ObjectModel;
+using CrazyStorm.Expression;
+using System.Collections;
 
 namespace CrazyStorm
 {
@@ -141,6 +143,68 @@ namespace CrazyStorm
             }
             else SpecificGroup.Visibility = Visibility.Collapsed;
         }
+        string TranslateValue(string value)
+        {
+            var lexer = new Lexer();
+            lexer.Load(value);
+            for (int i = 0; i < lexer.Tokens.Count; ++i)
+            {
+                var token = lexer.Tokens[i] as IdentifierToken;
+                if (token != null && !token.IsOperator)
+                {
+                    var original = $"{token.GetValue()}Str";
+                    var merged = App.Current.Resources.MergedDictionaries;
+                    var lang = merged.Where(d => d.Source != null && d.Source.OriginalString.StartsWith("Lang\\"));
+                    foreach (var langE in lang)
+                    {
+                        foreach (DictionaryEntry e in langE)
+                        {
+                            var resourceKey = e.Key as string;
+                            if (resourceKey == null) continue;
+                            var resourceValue = e.Value as string;
+                            if (resourceValue == null) continue;
+                            if (resourceKey == original)
+                            {
+                                token.SetValue(resourceValue);
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+            return lexer.Output();
+        }
+        string ReverseTranslateValue(string value)
+        {
+            var lexer = new Lexer();
+            lexer.Load(value);
+            for (int i = 0; i < lexer.Tokens.Count; ++i)
+            {
+                var token = lexer.Tokens[i] as IdentifierToken;
+                if (token != null && !token.IsOperator)
+                {
+                    var translated = token.GetValue() as string;
+                    var merged = App.Current.Resources.MergedDictionaries;
+                    var lang = merged.Where(d => d.Source != null && d.Source.OriginalString.StartsWith("Lang\\"));
+                    foreach (var langE in lang)
+                    {
+                        foreach (DictionaryEntry e in langE)
+                        {
+                            var resourceKey = e.Key as string;
+                            if (resourceKey == null) continue;
+                            var resourceValue = e.Value as string;
+                            if (resourceValue == null) continue;
+                            if (resourceValue == translated)
+                            {
+                                token.SetValue(resourceKey.Replace("Str", ""));
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+            return lexer.Output();
+        }
         void LoadProperties(FrameworkElement element, PropertyContainer container, IList<PropertyInfo> infos)
         {
             var propertyItems = new ObservableCollection<PropertyGridItem>();
@@ -152,9 +216,8 @@ namespace CrazyStorm
                     var property = new PropertyGridItem()
                     {
                         Info = item,
-                        Name = item.Name,
                         DisplayName = (string)FindResource(item.Name + "Str"),
-                        Value = container.Properties[item.Name].Value
+                        DisplayValue = TranslateValue(container.Properties[item.Name].Value)
                     };
                     propertyItems.Add(property);
                 }
@@ -170,7 +233,7 @@ namespace CrazyStorm
                 var property = e.Row.Item as PropertyGridItem;
                 var presenter = VisualHelper.GetVisualChild<DataGridCellsPresenter>(e.Row);
                 var cell = (DataGridCell)presenter.ItemContainerGenerator.ContainerFromIndex(1);
-                var newValue = (e.EditingElement as TextBox).Text;
+                var newValue = ReverseTranslateValue((e.EditingElement as TextBox).Text);
                 var attribute = property.Info.GetCustomAttributes(false)[0] as PropertyAttribute;
                 new SetPropertyCommand().Do(commandStack, environment, container, property, cell, newValue, attribute, updateFunc);
             }
@@ -184,7 +247,7 @@ namespace CrazyStorm
                     var result = item.Info.GetGetMethod().Invoke(container, null).ToString();
                     container.Properties[item.Info.Name].Value = result;
                 }
-                item.Value = container.Properties[item.Info.Name].Value;
+                item.DisplayValue = TranslateValue(container.Properties[item.Info.Name].Value);
             }
         }
         void InitializeColorCombo()
@@ -220,14 +283,14 @@ namespace CrazyStorm
             var listView = new ListView();
             if (property.Info.PropertyType == typeof(bool))
             {
-                listView.Items.Add(true.ToString());
-                listView.Items.Add(false.ToString());
+                listView.Items.Add((string)FindResource($"{true}Str"));
+                listView.Items.Add((string)FindResource($"{false}Str"));
             }
             else if (property.Info.PropertyType.IsSubclassOf(typeof(Enum)))
             {
                 Array array = Enum.GetValues(property.Info.PropertyType);
                 foreach (var item in array)
-                    listView.Items.Add(item.ToString());
+                    listView.Items.Add((string)FindResource($"{item}Str"));
             }
             if (!listView.Items.IsEmpty)
             {
