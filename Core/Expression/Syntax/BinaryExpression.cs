@@ -29,54 +29,87 @@ namespace CrazyStorm.Expression
             var left = GetLeftChild().Eval(e);
             var right = GetRightChild().Eval(e);
             var op = (string)Token.GetValue();
-            if (!(left is float) || !(right is float))
+            if (left is float && right is float)
             {
-                if (left is bool && right is bool)
+                switch (op)
                 {
-                    switch (op)
-                    {
-                        case "&":
-                            return (bool)left && (bool)right;
-                        case "|":
-                            return (bool)left || (bool)right;
-                        case "=":
-                            return (bool)left == (bool)right;
-                        case "!=":
-                            return (bool)left != (bool)right;
-                    }
+                    case "+":
+                        return (float)left + (float)right;
+                    case "-":
+                        return (float)left - (float)right;
+                    case "*":
+                        return (float)left * (float)right;
+                    case "/":
+                        if (GetRightChild() is Number && Convert.ToSingle(right) == 0)
+                        {
+                            throw new ExpressionException("DividedByZero");
+                        }
+                        return (float)left / (float)right;
+                    case "%":
+                        if (GetRightChild() is Number && Convert.ToSingle(right) == 0)
+                        {
+                            throw new ExpressionException("DividedByZero");
+                        }
+                        return (float)left % (float)right;
+                    case ">":
+                        return (float)left > (float)right;
+                    case ">=":
+                        return (float)left >= (float)right;
+                    case "<":
+                        return (float)left < (float)right;
+                    case "<=":
+                        return (float)left <= (float)right;
+                    case "=":
+                        return (float)left == (float)right;
+                    case "!=":
+                        return (float)left != (float)right;
                 }
-                return new ExpressionException("TypeError");
             }
-            switch (op)
+            else if (left is bool && right is bool)
             {
-                case "+":
-                    return (float)left + (float)right;
-                case "-":
-                    return (float)left - (float)right;
-                case "*":
-                    return (float)left * (float)right;
-                case "/":
-                    if (GetRightChild() is Number && Convert.ToSingle(right) == 0)
-                        throw new ExpressionException("DividedByZero");
-
-                    return (float)left / (float)right;
-                case "%":
-                    if (GetRightChild() is Number && Convert.ToSingle(right) == 0)
-                        throw new ExpressionException("DividedByZero");
-
-                    return (float)left % (float)right;
-                case ">":
-                    return (float)left > (float)right;
-                case ">=":
-                    return (float)left >= (float)right;
-                case "<":
-                    return (float)left < (float)right;
-                case "<=":
-                    return (float)left <= (float)right;
-                case "=":
-                    return (float)left == (float)right;
-                case "!=":
-                    return (float)left != (float)right;
+                switch (op)
+                {
+                    case "&":
+                        return (bool)left && (bool)right;
+                    case "|":
+                        return (bool)left || (bool)right;
+                    case "=":
+                        return (bool)left == (bool)right;
+                    case "!=":
+                        return (bool)left != (bool)right;
+                }
+            }
+            else if (left is Core.Vector2 && right is Core.Vector2)
+            {
+                switch (op)
+                {
+                    case "+":
+                        return (Core.Vector2)left + (Core.Vector2)right;
+                    case "-":
+                        return (Core.Vector2)left - (Core.Vector2)right;
+                    case "=":
+                        return (Core.Vector2)left == (Core.Vector2)right;
+                    case "!=":
+                        return (Core.Vector2)left != (Core.Vector2)right;
+                }
+            }
+            else if (left is Core.Vector2 && right is float)
+            {
+                switch (op)
+                {
+                    case "+":
+                        return (Core.Vector2)left + (float)right;
+                    case "-":
+                        return (Core.Vector2)left - (float)right;
+                    case "*":
+                        return (Core.Vector2)left * (float)right;
+                    case "/":
+                        if (GetRightChild() is Number && Convert.ToSingle(right) == 0)
+                        {
+                            throw new ExpressionException("DividedByZero");
+                        }
+                        return (Core.Vector2)left / (float)right;
+                }
             }
             return new ExpressionException("TypeError");
         }

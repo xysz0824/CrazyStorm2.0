@@ -22,11 +22,10 @@ namespace CrazyStorm.Expression
 
         public override object Eval(Environment e)
         {
-            var num = GetExpression().Eval(e);
-            if (num is float)
-                return -(float)num;
-            else
-                throw new ExpressionException("TypeError");
+            var v = GetExpression().Eval(e);
+            if (v is float) return -(float)v;
+            else if (v is Core.Vector2) return -(Core.Vector2)v;
+            throw new ExpressionException("TypeError");
         }
 
         public override void Compile(List<byte> codeStream)
