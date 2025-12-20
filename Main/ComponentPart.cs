@@ -150,6 +150,20 @@ namespace CrazyStorm
                     (item.Content as FinderPanel).Update(selectedSystem);
             }
         }
+        void ResetLeftTab()
+        {
+            var hasComponentPanel = false;
+            foreach (var item in LeftTabControl.Items)
+            {
+                var tabItem = item as TabItem;
+                if (tabItem != null && tabItem.DataContext != null && tabItem.DataContext is Component)
+                {
+                    hasComponentPanel = true;
+                    LeftTabControl.SelectedItem = tabItem;
+                }
+            }
+            if (!hasComponentPanel) LeftTabControl.SelectedIndex = 0;
+        }
         void BindComponent()
         {
             bindingLines = new List<Line>();
@@ -306,17 +320,7 @@ namespace CrazyStorm
         {
             var tabItem = VisualHelper.VisualUpwardSearch<TabItem>(sender as DependencyObject) as TabItem;
             LeftTabControl.Items.Remove(tabItem);
-            var hasComponentPanel = false;
-            foreach (var item in LeftTabControl.Items)
-            {
-                tabItem = item as TabItem;
-                if (tabItem != null && tabItem.DataContext != null && tabItem.DataContext is Component)
-                {
-                    hasComponentPanel = true;
-                    LeftTabControl.SelectedItem = tabItem;
-                }
-            }
-            if (!hasComponentPanel) LeftTabControl.SelectedIndex = 0;
+            ResetLeftTab();
         }
         private void BindComponentItem_Click(object sender, RoutedEventArgs e)
         {

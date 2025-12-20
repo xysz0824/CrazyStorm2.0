@@ -79,6 +79,7 @@ namespace CrazyStorm
         {
             new DelComponentCommand().Do(commandStacks[selectedSystem], selectedSystem, selectedComponents);
             UpdateSelectedStatus();
+            ResetLeftTab();
         }
         void Find()
         {
