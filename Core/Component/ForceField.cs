@@ -210,10 +210,10 @@ namespace CrazyStorm.Core
                     VM.PushFloat(HalfHeight);
                     return true;
                 case "FieldShape":
-                    VM.PushEnum((int)FieldShape);
+                    VM.PushInt((int)FieldShape);
                     return true;
                 case "Reach":
-                    VM.PushEnum((int)Reach);
+                    VM.PushInt((int)Reach);
                     return true;
                 case "TargetName":
                     VM.PushString(TargetName);
@@ -225,7 +225,7 @@ namespace CrazyStorm.Core
                     VM.PushFloat(Direction);
                     return true;
                 case "ForceType":
-                    VM.PushEnum((int)ForceType);
+                    VM.PushInt((int)ForceType);
                     return true;
             }
             return false;
@@ -244,10 +244,10 @@ namespace CrazyStorm.Core
                     HalfHeight = VM.PopFloat();
                     return true;
                 case "FieldShape":
-                    FieldShape = (FieldShape)VM.PopEnum();
+                    FieldShape = (FieldShape)VM.PopInt();
                     return true;
                 case "Reach":
-                    Reach = (Reach)VM.PopEnum();
+                    Reach = (Reach)VM.PopInt();
                     return true;
                 case "TargetName":
                     TargetName = VM.PopString();
@@ -259,7 +259,7 @@ namespace CrazyStorm.Core
                     Direction = VM.PopFloat();
                     return true;
                 case "ForceType":
-                    ForceType = (ForceType)VM.PopEnum();
+                    ForceType = (ForceType)VM.PopInt();
                     return true;
             }
             return false;

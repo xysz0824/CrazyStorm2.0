@@ -53,8 +53,7 @@ namespace CrazyStorm.Expression
 
         bool IsBool(IdentifierToken token)
         {
-            return (string)token.GetValue() == "True" ||
-                (string)token.GetValue() == "False";
+            return (string)token.GetValue() == "True" || (string)token.GetValue() == "False";
         }
 
         bool IsIdentifierToken(string name)

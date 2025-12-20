@@ -124,11 +124,9 @@ namespace CrazyStorm.Expression
             {
                 object result = Eval(null);
                 byte[] scode = null;
-                if (result is bool)
-                    scode = VM.CreateInstruction(VMCode.BOOL, (bool)result);
-                else
-                    scode = VM.CreateInstruction(VMCode.NUMBER, (float)result);
-
+                if (result is bool) scode = VM.CreateInstruction(VMCode.BOOL, (bool)result);
+                else if (result is float) scode = VM.CreateInstruction(VMCode.VECTOR, new Vector3((float)result));
+                else if (result is Core.Vector2) scode = VM.CreateInstruction(VMCode.VECTOR, new Vector3((Core.Vector2)result));
                 codeStream.AddRange(scode);
                 return;
             }
@@ -136,11 +134,9 @@ namespace CrazyStorm.Expression
             {
                 object result = left.Eval(null);
                 byte[] scode = null;
-                if (result is bool)
-                    scode = VM.CreateInstruction(VMCode.BOOL, (bool)result);
-                else
-                    scode = VM.CreateInstruction(VMCode.NUMBER, (float)result);
-
+                if (result is bool) scode = VM.CreateInstruction(VMCode.BOOL, (bool)result);
+                else if (result is float) scode = VM.CreateInstruction(VMCode.VECTOR, new Vector3((float)result));
+                else if (result is Core.Vector2) scode = VM.CreateInstruction(VMCode.VECTOR, new Vector3((Core.Vector2)result));
                 codeStream.AddRange(scode);
             }
             else
@@ -150,11 +146,9 @@ namespace CrazyStorm.Expression
             {
                 object result = right.Eval(null);
                 byte[] scode = null;
-                if (result is bool)
-                    scode = VM.CreateInstruction(VMCode.BOOL, (bool)result);
-                else
-                    scode = VM.CreateInstruction(VMCode.NUMBER, (float)result);
-
+                if (result is bool) scode = VM.CreateInstruction(VMCode.BOOL, (bool)result);
+                else if (result is float) scode = VM.CreateInstruction(VMCode.VECTOR, new Vector3((float)result));
+                else if (result is Core.Vector2) scode = VM.CreateInstruction(VMCode.VECTOR, new Vector3((Core.Vector2)result));
                 codeStream.AddRange(scode);
             }
             else

@@ -38,7 +38,7 @@ namespace CrazyStorm.Expression
             foreach (var item in GetArguments())
                 item.Compile(codeStream);
 
-            byte[] code = VM.CreateInstruction(VMCode.ARGUMENTS, Count);
+            byte[] code = VM.CreateInstruction(VMCode.VECTOR, new Vector3(Count));
             codeStream.AddRange(code);
         }
     }

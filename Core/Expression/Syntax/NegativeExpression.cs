@@ -31,18 +31,23 @@ namespace CrazyStorm.Expression
         public override void Compile(List<byte> codeStream)
         {
             SyntaxTree expression = GetExpression();
-            if (expression.ContainType<Expression.Name>() || expression.ContainType<Expression.Call>())
+            if (expression is Expression.Number)
             {
-                byte[] code1 = VM.CreateInstruction(VMCode.NUMBER, 0);
+                byte[] code = VM.CreateInstruction(VMCode.VECTOR, new Vector3((float)Eval(null)));
+                codeStream.AddRange(code);
+            }
+            else if (expression is Expression.Vector2)
+            {
+                byte[] code = VM.CreateInstruction(VMCode.VECTOR, new Vector3((Core.Vector2)Eval(null)));
+                codeStream.AddRange(code);
+            }
+            else
+            {
+                byte[] code1 = VM.CreateInstruction(VMCode.VECTOR, new Vector3(0));
                 codeStream.AddRange(code1);
                 expression.Compile(codeStream);
                 byte[] code2 = VM.CreateInstruction(VMCode.SUB);
                 codeStream.AddRange(code2);
-            }
-            else
-            {
-                byte[] code = VM.CreateInstruction(VMCode.NUMBER, (float)Eval(null));
-                codeStream.AddRange(code);
             }
         }
     }

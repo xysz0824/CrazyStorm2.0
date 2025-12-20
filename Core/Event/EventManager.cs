@@ -68,8 +68,8 @@ namespace CrazyStorm.Core
 
                         break;
                     case PropertyType.Enum:
-                        targetValue.enumValue = VM.PopEnum();
-                        initialValue.enumValue = VM.PopEnum();
+                        targetValue.enumValue = VM.PopInt();
+                        initialValue.enumValue = VM.PopInt();
                         break;
                     case PropertyType.Vector2:
                         Vector2 resultVector2 = VM.PopVector2();
@@ -123,7 +123,7 @@ namespace CrazyStorm.Core
 
                         break;
                     case PropertyType.Enum:
-                        initialValue.enumValue = VM.PopEnum();
+                        initialValue.enumValue = VM.PopInt();
                         break;
                     case PropertyType.Vector2:
                         initialValue.vector2Value = VM.PopVector2();
@@ -261,7 +261,7 @@ namespace CrazyStorm.Core
                         VM.PushFloat(item.Value.floatValue);
                         break;
                     case PropertyType.Enum:
-                        VM.PushEnum(item.Value.enumValue);
+                        VM.PushInt(item.Value.enumValue);
                         break;
                     case PropertyType.Vector2:
                         VM.PushVector2(item.Value.vector2Value);

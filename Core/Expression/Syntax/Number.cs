@@ -25,7 +25,7 @@ namespace CrazyStorm.Expression
 
         public override void Compile(List<byte> codeStream)
         {
-            byte[] code = VM.CreateInstruction(VMCode.NUMBER, Eval(null));
+            byte[] code = VM.CreateInstruction(VMCode.VECTOR, new Vector3((float)Eval(null)));
             codeStream.AddRange(code);
         }
     }

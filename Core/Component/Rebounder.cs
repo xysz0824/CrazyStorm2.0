@@ -193,7 +193,7 @@ namespace CrazyStorm.Core
                     VM.PushInt(Size);
                     return true;
                 case "RebounderShape":
-                    VM.PushEnum((int)RebounderShape);
+                    VM.PushInt((int)RebounderShape);
                     return true;
                 case "Rotation":
                     VM.PushFloat(Rotation);
@@ -212,7 +212,7 @@ namespace CrazyStorm.Core
                     Size = VM.PopInt();
                     return true;
                 case "RebounderShape":
-                    RebounderShape = (RebounderShape)VM.PopEnum();
+                    RebounderShape = (RebounderShape)VM.PopInt();
                     return true;
                 case "Rotation":
                     Rotation = VM.PopFloat();

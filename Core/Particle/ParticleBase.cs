@@ -382,7 +382,7 @@ namespace CrazyStorm.Core
                     VM.PushFloat(PRotation);
                     return true;
                 case "BlendType":
-                    VM.PushEnum((int)BlendType);
+                    VM.PushInt((int)BlendType);
                     return true;
                 case "KillOutside":
                     VM.PushBool(KillOutside);
@@ -484,7 +484,7 @@ namespace CrazyStorm.Core
                     PRotation = VM.PopFloat();
                     return true;
                 case "BlendType":
-                    BlendType = (BlendType)VM.PopEnum();
+                    BlendType = (BlendType)VM.PopInt();
                     return true;
                 case "KillOutside":
                     KillOutside = VM.PopBool();

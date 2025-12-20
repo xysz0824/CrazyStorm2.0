@@ -18,12 +18,15 @@ namespace CrazyStorm.Core
             this.y = y;
             this.z = z;
         }
+        public Vector3(float x, float y) : this(x, y, 0) { }
+        public Vector3(float x) : this(x, x, x) { }
         public Vector3(Vector2 xy, float z)
         {
             this.x = xy.x;
             this.y = xy.y;
             this.z = z;
         }
+        public Vector3(Vector2 xy) : this(xy, 0) { }
         public override string ToString()
         {
             return $"[{x},{y},{z}]";

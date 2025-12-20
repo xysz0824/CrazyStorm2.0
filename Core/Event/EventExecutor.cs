@@ -50,7 +50,7 @@ namespace CrazyStorm.Core
                     break;
                 case PropertyType.Enum:
                     currentValue.enumValue = TargetValue.enumValue;
-                    VM.PushEnum(currentValue.enumValue);
+                    VM.PushInt(currentValue.enumValue);
                     break;
                 case PropertyType.Vector2:
                     Vector2 newVector2;

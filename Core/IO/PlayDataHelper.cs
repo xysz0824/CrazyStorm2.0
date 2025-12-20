@@ -23,6 +23,8 @@ namespace CrazyStorm.Core
                 return BitConverter.GetBytes((float)obj);
             else if (obj is Vector2)
                 return GetVector2Bytes((Vector2)obj);
+            else if (obj is Vector3)
+                return GetVector3Bytes((Vector3)obj);
             else if (obj is RGB)
                 return GetRGBBytes((RGB)obj);
             else if (obj is string)
@@ -35,6 +37,14 @@ namespace CrazyStorm.Core
             List<byte> bytes = new List<byte>();
             bytes.AddRange(BitConverter.GetBytes(v.x));
             bytes.AddRange(BitConverter.GetBytes(v.y));
+            return bytes.ToArray();
+        }
+        public static byte[] GetVector3Bytes(Vector3 v)
+        {
+            List<byte> bytes = new List<byte>();
+            bytes.AddRange(BitConverter.GetBytes(v.x));
+            bytes.AddRange(BitConverter.GetBytes(v.y));
+            bytes.AddRange(BitConverter.GetBytes(v.z));
             return bytes.ToArray();
         }
         public static byte[] GetRGBBytes(RGB rgb)

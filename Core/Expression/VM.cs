@@ -7,17 +7,15 @@ using System.Collections.Generic;
 using System.Text;
 using CrazyStorm.Core;
 using System.Runtime.InteropServices;
+using System.Data;
 
 namespace CrazyStorm.Core
 {
     public enum VMCode : byte
     {
-        NUMBER,
+        VECTOR,
         BOOL,
         NAME,
-        VECTOR2,
-        RGB,
-        ARGUMENTS,
         CALL,
         AND,
         OR,
@@ -31,7 +29,9 @@ namespace CrazyStorm.Core
         LESS,
         MOREOREQUAL,
         LESSOREQUAL,
-        NOTEQUAL
+        NOTEQUAL,
+        VECTOR2,
+        RGB,
     }
     [StructLayout(LayoutKind.Explicit)]
     public struct VMInstruction
@@ -39,44 +39,31 @@ namespace CrazyStorm.Core
         [FieldOffset(0)]
         public VMCode code;
         [FieldOffset(1)]
-        public int intOperand;
-        [FieldOffset(1)]
-        public float floatOperand;
+        public Vector3 vectorOperand;
         [FieldOffset(1)]
         public bool boolOperand;
-        [FieldOffset(8)]
+        [FieldOffset(16)]
         public string stringOperand;
     }
     public class VM
     {
         static Random random = new Random();
-        static Stack<float> floatStack = new Stack<float>();
-        static Stack<int> enumStack = new Stack<int>();
-        static Stack<Vector2> vector2Stack = new Stack<Vector2>();
-        static Stack<RGB> rgbStack = new Stack<RGB>();
+        static Stack<Vector3> vectorStack = new Stack<Vector3>();
+        static Stack<bool> boolStack = new Stack<bool>();
         static Stack<string> stringStack = new Stack<string>();
         public static byte[] CreateInstruction(VMCode code, object operand)
         {
-            List<byte> bytes = new List<byte>();
+            var bytes = new List<byte>();
             bytes.Add((byte)code);
             if (operand != null)
             {
                 switch (code)
                 {
-                    case VMCode.NUMBER:
-                        bytes.AddRange(PlayDataHelper.GetBytes((float)operand));
-                        break;
+                    case VMCode.VECTOR:
                     case VMCode.BOOL:
-                        bytes.AddRange(PlayDataHelper.GetBytes((bool)operand));
-                        break;
                     case VMCode.NAME:
-                        bytes.AddRange(PlayDataHelper.GetBytes((string)operand));
-                        break;
                     case VMCode.CALL:
-                        bytes.AddRange(PlayDataHelper.GetBytes((string)operand));
-                        break;
-                    case VMCode.ARGUMENTS:
-                        bytes.AddRange(PlayDataHelper.GetBytes((int)operand));
+                        bytes.AddRange(PlayDataHelper.GetBytes(operand));
                         break;
                 }
             }
@@ -99,15 +86,19 @@ namespace CrazyStorm.Core
                 VMCode code = (VMCode)bytes[position++];
                 switch (code)
                 {
-                    case VMCode.NUMBER:
-                        float floatOperand = BitConverter.ToSingle(bytes, position);
+                    case VMCode.VECTOR:
+                        float x = BitConverter.ToSingle(bytes, position);
                         position += sizeof(float);
-                        list.Add(new VMInstruction { code = code, floatOperand = floatOperand });
+                        float y = BitConverter.ToSingle(bytes, position);
+                        position += sizeof(float);
+                        float z = BitConverter.ToSingle(bytes, position);
+                        position += sizeof(float);
+                        list.Add(new VMInstruction { code = code, vectorOperand = new Vector3(x, y, z) });
                         break;
                     case VMCode.BOOL:
-                        bool boolOperand = BitConverter.ToBoolean(bytes, position);
+                        bool b = BitConverter.ToBoolean(bytes, position);
                         position += sizeof(bool);
-                        list.Add(new VMInstruction { code = code, boolOperand = boolOperand });
+                        list.Add(new VMInstruction { code = code, boolOperand = b });
                         break;
                     case VMCode.NAME:
                         string name = PlayDataHelper.ReadString(bytes, position);
@@ -118,11 +109,6 @@ namespace CrazyStorm.Core
                         string func = PlayDataHelper.ReadString(bytes, position);
                         position += func.Length + 1;
                         list.Add(new VMInstruction { code = code, stringOperand = func });
-                        break;
-                    case VMCode.ARGUMENTS:
-                        int intOperand = BitConverter.ToInt32(bytes, position);
-                        position += sizeof(int);
-                        list.Add(new VMInstruction { code = code, intOperand = intOperand });
                         break;
                     default:
                         list.Add(new VMInstruction { code = code });
@@ -137,51 +123,35 @@ namespace CrazyStorm.Core
             {
                 switch (instructions[i].code)
                 {
-                    case VMCode.NUMBER:
-                        VM.PushFloat(instructions[i].floatOperand);
-                        break;
-                    case VMCode.BOOL:
-                        VM.PushBool(instructions[i].boolOperand);
+                    case VMCode.VECTOR:
+                        VM.PushVector(instructions[i].vectorOperand);
                         break;
                     case VMCode.NAME:
                         propertyContainer.PushProperty(instructions[i].stringOperand);
                         break;
-                    case VMCode.VECTOR2:
-                        float y = VM.PopFloat();
-                        float x = VM.PopFloat();
-                        VM.PushVector2(new Vector2(x, y));
-                        break;
-                    case VMCode.RGB:
-                        float b = VM.PopFloat();
-                        float g = VM.PopFloat();
-                        float r = VM.PopFloat();
-                        VM.PushRGB(new RGB(r, g, b));
-                        break;
-                    case VMCode.ARGUMENTS:
-                        VM.PushFloat(instructions[i].intOperand);
-                        break;
                     case VMCode.CALL:
-                        float count = VM.PopFloat();
+                        float count = VM.PopInt();
                         switch (instructions[i].stringOperand)
                         {
                             case "abs":
-                                VM.PushFloat(Math.Abs(VM.PopFloat()));
+                                var v = VM.PopVector();
+                                VM.PushVector(new Vector3(Math.Abs(v.x), Math.Abs(v.y), Math.Abs(v.z)));
                                 break;
                             case "dist":
-                                Vector2 v = VM.PopVector2() - VM.PopVector2();
-                                VM.PushFloat((float)Math.Sqrt(v.x * v.x + v.y * v.y));
+                                var v2 = VM.PopVector2() - VM.PopVector2();
+                                VM.PushFloat((float)Math.Sqrt(v2.x * v2.x + v2.y * v2.y));
                                 break;
                             case "angle":
-                                v = VM.PopVector2() - VM.PopVector2();
-                                VM.PushFloat(MathHelper.GetDegree(v));
+                                v2 = VM.PopVector2() - VM.PopVector2();
+                                VM.PushFloat(MathHelper.GetDegree(new Vector2(v2.x, v2.y)));
                                 break;
                             case "rand":
                                 float ratio = (float)random.NextDouble();
-                                VM.PushFloat((1 - ratio) * VM.PopFloat() + ratio * VM.PopFloat());
+                                VM.PushVector(VM.PopVector() * (1 - ratio) + VM.PopVector() * ratio);
                                 break;
                             case "randi":
-                                int i2 = VM.PopInt();
-                                int i1 = VM.PopInt();
+                                int i2 = (int)VM.PopInt();
+                                int i1 = (int)VM.PopInt();
                                 if (i1 > i2)
                                 {
                                     int temp = i1;
@@ -218,7 +188,9 @@ namespace CrazyStorm.Core
                                 VM.PushFloat((float)Math.Exp(VM.PopFloat()));
                                 break;
                             case "log":
-                                VM.PushFloat((float)Math.Log(VM.PopFloat(), VM.PopFloat()));
+                                var newBase = VM.PopFloat();
+                                var a = VM.PopFloat();
+                                VM.PushFloat((float)Math.Log(a, newBase));
                                 break;
                             case "pow":
                                 float power = VM.PopFloat();
@@ -237,34 +209,34 @@ namespace CrazyStorm.Core
                         VM.PushBool(VM.PopBool() | VM.PopBool());
                         break;
                     case VMCode.EQUAL:
-                        VM.PushBool(VM.PopFloat() == VM.PopFloat());
+                        VM.PushBool(VM.PopVector() == VM.PopVector());
                         break;
                     case VMCode.ADD:
-                        VM.PushFloat(VM.PopFloat() + VM.PopFloat());
+                        VM.PushVector(VM.PopVector() + VM.PopVector());
                         break;
                     case VMCode.SUB:
-                        float subtrahend = VM.PopFloat();
-                        float minuend = VM.PopFloat();
-                        VM.PushFloat(minuend - subtrahend);
+                        var subtrahend = VM.PopVector();
+                        var minuend = VM.PopVector();
+                        VM.PushVector(minuend - subtrahend);
                         break;
                     case VMCode.MUL:
-                        float one = VM.PopFloat();
-                        float another = VM.PopFloat();
-                        VM.PushFloat(one * another);
+                        var vA = VM.PopVector();
+                        var vB = VM.PopVector();
+                        VM.PushVector(new Vector3(vA.x * vB.x, vA.y * vB.y, vA.z * vB.z));
                         break;
                     case VMCode.DIV:
-                        float divisor = VM.PopFloat();
-                        float dividend = VM.PopFloat();
-                        VM.PushFloat(dividend / divisor);
+                        var divisor = VM.PopVector();
+                        var dividend = VM.PopVector();
+                        VM.PushVector(new Vector3(dividend.x / divisor.x, dividend.y / divisor.y, dividend.z / divisor.z));
                         break;
                     case VMCode.MOD:
-                        divisor = VM.PopFloat();
-                        float number = VM.PopFloat();
-                        VM.PushFloat(number % divisor);
+                        divisor = VM.PopVector();
+                        var number = VM.PopVector();
+                        VM.PushVector(new Vector3(number.x % divisor.x, number.y % divisor.y, number.z % divisor.z));
                         break;
                     case VMCode.MORE:
-                        float right = VM.PopFloat();
-                        float left = VM.PopFloat();
+                        var right = VM.PopFloat();
+                        var left = VM.PopFloat();
                         VM.PushBool(left > right);
                         break;
                     case VMCode.LESS:
@@ -283,28 +255,55 @@ namespace CrazyStorm.Core
                         VM.PushBool(left <= right);
                         break;
                     case VMCode.NOTEQUAL:
-                        right = VM.PopFloat();
-                        left = VM.PopFloat();
-                        VM.PushBool(left != right);
+                        VM.PushBool(VM.PopVector() != VM.PopVector());
+                        break;
+                    case VMCode.VECTOR2:
+                        float y = VM.PopFloat();
+                        float x = VM.PopFloat();
+                        VM.PushVector2(new Vector2(x, y));
+                        break;
+                    case VMCode.RGB:
+                        float b = VM.PopFloat();
+                        float g = VM.PopFloat();
+                        float r = VM.PopFloat();
+                        VM.PushRGB(new RGB(r, g, b));
                         break;
                 }
             }
         }
-        public static void PushBool(bool value)
+        public static void PushVector(Vector3 value)
         {
-            floatStack.Push(value ? 1 : 0);
+            if (float.IsNaN(value.x) || float.IsNaN(value.y) || float.IsNaN(value.z))
+            {
+                throw new NotFiniteNumberException();
+            }
+            vectorStack.Push(value);
         }
-        public static bool PopBool()
+        public static Vector3 PopVector()
         {
-            return floatStack.Pop() == 1;
+            return vectorStack.Pop();
         }
-        public static void PushInt(int value)
+        public static void PushRGB(RGB value)
         {
-            floatStack.Push(value);
+            vectorStack.Push(new Vector3(value.r, value.g, value.b));
         }
-        public static int PopInt()
+        public static RGB PopRGB()
         {
-            return (int)floatStack.Pop();
+            var v = vectorStack.Pop();
+            return new RGB(v.x, v.y, v.z);
+        }
+        public static void PushVector2(Vector2 value)
+        {
+            if (float.IsNaN(value.x) || float.IsNaN(value.y))
+            {
+                throw new NotFiniteNumberException();
+            }
+            vectorStack.Push(new Vector3(value));
+        }
+        public static Vector2 PopVector2()
+        {
+            var v = vectorStack.Pop();
+            return new Vector2(v.x, v.y);
         }
         public static void PushFloat(float value)
         {
@@ -312,35 +311,27 @@ namespace CrazyStorm.Core
             {
                 throw new NotFiniteNumberException();
             }
-            floatStack.Push(value);
+            vectorStack.Push(new Vector3(value));
         }
         public static float PopFloat()
         {
-            return floatStack.Pop();
+            return PopVector().x;
         }
-        public static void PushEnum(int value)
+        public static void PushInt(int value)
         {
-            enumStack.Push(value);
+            vectorStack.Push(new Vector3(value));
         }
-        public static int PopEnum()
+        public static int PopInt()
         {
-            return enumStack.Pop();
+            return (int)PopVector().x;
         }
-        public static void PushVector2(Vector2 value)
+        public static void PushBool(bool value)
         {
-            vector2Stack.Push(value);
+            boolStack.Push(value);
         }
-        public static Vector2 PopVector2()
+        public static bool PopBool()
         {
-            return vector2Stack.Pop();
-        }
-        public static void PushRGB(RGB value)
-        {
-            rgbStack.Push(value);
-        }
-        public static RGB PopRGB()
-        {
-            return rgbStack.Pop();
+            return boolStack.Pop();
         }
         public static void PushString(string value)
         {

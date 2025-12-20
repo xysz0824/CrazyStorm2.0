@@ -441,7 +441,7 @@ namespace CrazyStorm.Core
                         return VM.PopFloat() >= value.floatValue;
                     else return false;
                 case PropertyType.Enum:
-                    return VM.PopEnum() == value.enumValue;
+                    return VM.PopInt() == value.enumValue;
                 case PropertyType.Vector2:
                     return VM.PopVector2() == value.vector2Value;
                 case PropertyType.RGB:
