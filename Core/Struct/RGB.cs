@@ -63,14 +63,6 @@ namespace CrazyStorm.Core
             return Add(lhs, rhs);
         }
         //-
-        public static RGB Negate(RGB value)
-        {
-            return new RGB(-value.r, -value.g, -value.b);
-        }
-        public static RGB operator -(RGB value)
-        {
-            return Negate(value);
-        }
         public static RGB Subtract(RGB lhs, RGB rhs)
         {
             return new RGB(lhs.r - rhs.r, lhs.g - rhs.g, lhs.b - rhs.b);
@@ -95,6 +87,15 @@ namespace CrazyStorm.Core
         public static RGB operator *(RGB lhs, float rhs)
         {
             return Multiply(lhs, rhs);
+        }
+        ///
+        public static RGB Divide(RGB lhs, float rhs)
+        {
+            return new RGB(lhs.r / rhs, lhs.g / rhs, lhs.b / rhs);
+        }
+        public static RGB operator /(RGB lhs, float rhs)
+        {
+            return Divide(lhs, rhs);
         }
         public static bool TryParse(string value, out RGB result)
         {

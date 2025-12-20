@@ -111,6 +111,38 @@ namespace CrazyStorm.Expression
                         return (Core.Vector2)left / (float)right;
                 }
             }
+            else if (left is Core.RGB && right is Core.RGB)
+            {
+                switch (op)
+                {
+                    case "+":
+                        return (Core.RGB)left + (Core.RGB)right;
+                    case "-":
+                        return (Core.RGB)left - (Core.RGB)right;
+                    case "=":
+                        return (Core.RGB)left == (Core.RGB)right;
+                    case "!=":
+                        return (Core.RGB)left != (Core.RGB)right;
+                }
+            }
+            else if (left is Core.RGB && right is float)
+            {
+                switch (op)
+                {
+                    case "+":
+                        return (Core.RGB)left + (float)right;
+                    case "-":
+                        return (Core.RGB)left - (float)right;
+                    case "*":
+                        return (Core.RGB)left * (float)right;
+                    case "/":
+                        if (GetRightChild() is Number && Convert.ToSingle(right) == 0)
+                        {
+                            throw new ExpressionException("DividedByZero");
+                        }
+                        return (Core.RGB)left / (float)right;
+                }
+            }
             return new ExpressionException("TypeError");
         }
 
@@ -127,6 +159,11 @@ namespace CrazyStorm.Expression
                 if (result is bool) scode = VM.CreateInstruction(VMCode.BOOL, (bool)result);
                 else if (result is float) scode = VM.CreateInstruction(VMCode.VECTOR, new Vector3((float)result));
                 else if (result is Core.Vector2) scode = VM.CreateInstruction(VMCode.VECTOR, new Vector3((Core.Vector2)result));
+                else if (result is Core.RGB)
+                {
+                    var rgb = (Core.RGB)result;
+                    scode = VM.CreateInstruction(VMCode.VECTOR, new Vector3(rgb.r, rgb.g, rgb.b));
+                }
                 codeStream.AddRange(scode);
                 return;
             }
@@ -137,6 +174,11 @@ namespace CrazyStorm.Expression
                 if (result is bool) scode = VM.CreateInstruction(VMCode.BOOL, (bool)result);
                 else if (result is float) scode = VM.CreateInstruction(VMCode.VECTOR, new Vector3((float)result));
                 else if (result is Core.Vector2) scode = VM.CreateInstruction(VMCode.VECTOR, new Vector3((Core.Vector2)result));
+                else if (result is Core.RGB)
+                {
+                    var rgb = (Core.RGB)result;
+                    scode = VM.CreateInstruction(VMCode.VECTOR, new Vector3(rgb.r, rgb.g, rgb.b));
+                }
                 codeStream.AddRange(scode);
             }
             else
@@ -149,6 +191,11 @@ namespace CrazyStorm.Expression
                 if (result is bool) scode = VM.CreateInstruction(VMCode.BOOL, (bool)result);
                 else if (result is float) scode = VM.CreateInstruction(VMCode.VECTOR, new Vector3((float)result));
                 else if (result is Core.Vector2) scode = VM.CreateInstruction(VMCode.VECTOR, new Vector3((Core.Vector2)result));
+                else if (result is Core.RGB)
+                {
+                    var rgb = (Core.RGB)result;
+                    scode = VM.CreateInstruction(VMCode.VECTOR, new Vector3(rgb.r, rgb.g, rgb.b));
+                }
                 codeStream.AddRange(scode);
             }
             else
