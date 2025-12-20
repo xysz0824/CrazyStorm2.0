@@ -2,6 +2,7 @@
  * The MIT License (MIT)
  * Copyright (c) StarX 2026
  */
+using CrazyStorm.Expression;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -179,9 +180,7 @@ namespace CrazyStorm.Core
         }
         void CompilePropertyExpressions(PropertyContainer container)
         {
-            if (container is Emitter)
-                CompilePropertyExpressions((container as Emitter).Particle);
-
+            if (container is Emitter) CompilePropertyExpressions((container as Emitter).Particle);
             Type containerType = container.GetType();
             foreach (var property in container.Properties)
             {
@@ -190,7 +189,7 @@ namespace CrazyStorm.Core
                     var lexer = new Expression.Lexer();
                     lexer.Load(property.Value.Value);
                     var syntaxTree = new Expression.Parser(lexer).Expression();
-                    if (syntaxTree.ContainType<Expression.Name>() || syntaxTree.ContainType<Expression.Call>())
+                    if (!SyntaxTree.CanEval(syntaxTree))
                     {
                         var compiledBytes = new List<byte>();
                         syntaxTree.Compile(compiledBytes);
@@ -198,8 +197,15 @@ namespace CrazyStorm.Core
                     }
                     else
                     {
-                        object value = syntaxTree.Eval(null);
-                        containerType.GetProperty(property.Key).GetSetMethod().Invoke(container, new object[] { value });
+                        var value = syntaxTree.Eval(null);
+                        var propertyInfo = containerType.GetProperty(property.Key);
+                        //Casting
+                        if (propertyInfo.PropertyType == typeof(int) && value is float)
+                        {
+                            value = (int)(float)value;
+                        }
+                        propertyInfo.GetSetMethod().Invoke(container, new object[] { value });
+                        property.Value.Expression = false;
                     }
                 }
             }

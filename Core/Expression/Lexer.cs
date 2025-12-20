@@ -15,7 +15,7 @@ namespace CrazyStorm.Expression
     {
         static Regex NumberTokenRegex = new Regex(@"(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?");
         static Regex IdentifierTokenRegex = new Regex(@"(?:[_\p{L}])(?:[_\p{L}\p{Nd}])*");
-        static Regex OperatorTokenRegex = new Regex(@"[><!]=|[+\-*/%>=<&|(,)\[\]]");
+        static Regex OperatorTokenRegex = new Regex(@"[><!]=|[+\-*/%>=<&|(,)\[\]{}]");
         List<Token> tokens;
         public List<Token> Tokens => tokens;
 

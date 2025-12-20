@@ -50,6 +50,12 @@ namespace CrazyStorm.Expression
             }
             return false;
         }
+        public static bool CanEval(SyntaxTree syntaxTree)
+        {
+            return !syntaxTree.ContainType<Expression.Name>() &&
+                !syntaxTree.ContainType<Expression.Call>() &&
+                !syntaxTree.ContainType<Expression.Rand>();
+        }
 
         public abstract object Eval(Environment e);
 

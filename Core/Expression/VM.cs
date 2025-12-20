@@ -32,6 +32,7 @@ namespace CrazyStorm.Core
         NOTEQUAL,
         VECTOR2,
         RGB,
+        RAND,
     }
     [StructLayout(LayoutKind.Explicit)]
     public struct VMInstruction
@@ -267,6 +268,12 @@ namespace CrazyStorm.Core
                         float g = VM.PopFloat();
                         float r = VM.PopFloat();
                         VM.PushRGB(new RGB(r, g, b));
+                        break;
+                    case VMCode.RAND:
+                        right = VM.PopFloat();
+                        left = VM.PopFloat();
+                        float t = (float)random.NextDouble();
+                        VM.PushFloat(left * (1 - t) + right * t);
                         break;
                 }
             }

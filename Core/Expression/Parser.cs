@@ -129,6 +129,24 @@ namespace CrazyStorm.Expression
                 throw new ExpressionException("SyntaxError");
         }
 
+        public SyntaxTree Rand()
+        {
+            SyntaxTree expression = Expression();
+            List<SyntaxTree> coordinateList = new List<SyntaxTree>();
+            coordinateList.Add(expression);
+            int dimension = 1;
+            while (IsIdentifierToken(","))
+            {
+                dimension++;
+                IdentifierToken(",");
+                coordinateList.Add(Expression());
+            }
+            if (dimension == 2)
+                return new Rand(coordinateList[0], coordinateList[1]);
+            else
+                throw new ExpressionException("SyntaxError");
+        }
+
         public SyntaxTree Factor()
         {
             if (IsIdentifierToken("-"))
@@ -152,6 +170,13 @@ namespace CrazyStorm.Expression
                 SyntaxTree vector = Vector();
                 IdentifierToken("]");
                 return vector;
+            }
+            else if (IsIdentifierToken("{"))
+            {
+                IdentifierToken("{");
+                SyntaxTree rand = Rand();
+                IdentifierToken("}");
+                return rand;
             }
             else
             {

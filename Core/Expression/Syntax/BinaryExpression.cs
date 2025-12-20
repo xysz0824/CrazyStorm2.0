@@ -150,8 +150,8 @@ namespace CrazyStorm.Expression
         {
             SyntaxTree left = GetLeftChild();
             SyntaxTree right = GetRightChild();
-            bool leftCanEval = !left.ContainType<Expression.Name>() && !left.ContainType<Expression.Call>();
-            bool rightCanEval = !right.ContainType<Expression.Name>() && !right.ContainType<Expression.Call>();
+            bool leftCanEval = CanEval(left);
+            bool rightCanEval = CanEval(right);
             if (leftCanEval && rightCanEval)
             {
                 object result = Eval(null);

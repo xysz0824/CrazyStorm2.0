@@ -62,6 +62,7 @@
     <Compile Include="Expression\Syntax\Name.cs" />
     <Compile Include="Expression\Syntax\NegativeExpression.cs" />
     <Compile Include="Expression\Syntax\Number.cs" />
+    <Compile Include="Expression\Syntax\Rand.cs" />
     <Compile Include="Expression\Syntax\RGB.cs" />
     <Compile Include="Expression\Syntax\SyntaxTree.cs" />
     <Compile Include="Expression\Syntax\Vector2.cs" />
