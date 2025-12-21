@@ -1,0 +1,15 @@
+﻿<Window x:Class="CrazyStorm.JumpToFrame"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:CrazyStorm"
+        mc:Ignorable="d"
+        Title="{StaticResource JumpToFrameStr}" Height="130" Width="300" WindowStyle="ToolWindow" WindowStartupLocation="CenterScreen" ResizeMode="NoResize" Background="#FFF0F0F0">
+    <StackPanel>
+        <Label Name="FrameNumber" Content="{DynamicResource FrameNumberStr}" HorizontalAlignment="Left" Margin="10,0,0,0"/>
+        <TextBox Name="FrameInputBox" TextWrapping="NoWrap" Text="1" Height="25" Margin="15,0,15,10" HorizontalAlignment="Stretch" VerticalContentAlignment="Center" 
+                 PreviewTextInput="FrameInputBox_PreviewTextInput" KeyDown="FrameInputBox_KeyDown"/>
+        <Button Name="Confirm" Content="{DynamicResource ConfirmStr}" Width="80" HorizontalAlignment="Right" Margin="0,0,15,15" Click="Confirm_Click"/>
+    </StackPanel>
+</Window>

@@ -130,6 +130,12 @@ namespace CrazyStorm
             PauseLayerTimer();
             playTimer?.Stop();
         }
+        void OpenJumpToFrame()
+        {
+            var window = new JumpToFrame(selectedFrame, selectedSystem.TotalFrame);
+            window.ShowDialog();
+            if (window.Confirmed) JumpToFrame(window.TargetFrame);
+        }
         #endregion
 
         #region Window EventHandlers
@@ -208,6 +214,10 @@ namespace CrazyStorm
         private void PlaySettingItem_Click(object sender, RoutedEventArgs e)
         {
             OpenPlaySetting();
+        }
+        private void JumpToFrame_Click(object sender, RoutedEventArgs e)
+        {
+            OpenJumpToFrame();
         }
         #endregion
     }

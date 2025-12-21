@@ -278,4 +278,5 @@
     <Geometry x:Key="Linear_Curve">m93.418 0-93.418 44.805v3.1953h2.582l93.418-44.805v-3.1953h-2.582z</Geometry>
     <Geometry x:Key="Accelerated_Curve">m93.219 0c-14.509 31.089-57.461 43.101-93.219 44.824v3.1762c36.383-1.7229 78.477-12.951 96-45.444v-2.5564z</Geometry>
     <Geometry x:Key="Decelerated_Curve">m0 44.7v3.3002c1.7722-0.02311 0.024224-0.12609 2.2939-0.12395 28.247-31.695 62.482-45.239 93.706-43.956v-3.9199c-31.697 0-65.622 11.02-96 44.7z</Geometry>
+    <Geometry x:Key="Cross_Icon">M7 7.00006L17 17.0001M7 17.0001L17 7.00006</Geometry>
 </ResourceDictionary>

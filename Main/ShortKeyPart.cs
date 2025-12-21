@@ -116,6 +116,9 @@ namespace CrazyStorm
                 case "PlayCurrent":
                     PlayCurrent();
                     break;
+                case "JumpToFrame":
+                    OpenJumpToFrame();
+                    break;
             }
         }
         #endregion

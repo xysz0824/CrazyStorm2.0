@@ -48,6 +48,8 @@
     <sys:String x:Key="GeneratePlayFileStr">生成播放文件</sys:String>
     <sys:String x:Key="PlayCurrentStr">播放当前粒子</sys:String>
     <sys:String x:Key="PlayAllStr">播放所有粒子</sys:String>
+    <sys:String x:Key="JumpToFrameStr">跳转到指定帧</sys:String>
+    <sys:String x:Key="FrameNumberStr">帧号（1-{0})：</sys:String>
     <sys:String x:Key="SetPlayStr">播放设置</sys:String>
     <sys:String x:Key="HelpStr">帮助</sys:String>
     <sys:String x:Key="TutorialStr">教程</sys:String>

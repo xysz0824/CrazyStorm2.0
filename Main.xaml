@@ -158,9 +158,10 @@
                         BorderThickness="0,0,0,0" Padding="{TemplateBinding Padding}">
                             <DockPanel>
                                 <TextBlock Text="{Binding Name}" Margin="4,3,0,0" DockPanel.Dock="Left"/>
-                                <Path Width="9" Height="9" Stroke="Black" Margin="4,4,0,0" StrokeThickness="2" Data="M7 7.00006L17 17.0001M7 17.0001L17 7.00006" 
-                                      MouseLeftButtonDown="TabClose_MouseLeftButtonDown"
+                                <Grid Width="16" VerticalAlignment="Stretch" MouseLeftButtonDown="TabClose_MouseLeftButtonDown">
+                                    <Path Width="9" Height="9" Stroke="Black" Margin="4,4,0,0" StrokeThickness="2" Data="{StaticResource Cross_Icon}" 
                                       VerticalAlignment="Center" DockPanel.Dock="Right" HorizontalAlignment="Right" Stretch="Uniform"/>
+                                </Grid>
                             </DockPanel>
                         </Border>
                         <ControlTemplate.Triggers>
@@ -238,6 +239,7 @@
         <RoutedUICommand x:Key="Save" Text="Save"/>
         <RoutedUICommand x:Key="SaveTo" Text="SaveTo"/>
         <RoutedUICommand x:Key="PlayCurrent" Text="PlayCurrent"/>
+        <RoutedUICommand x:Key="JumpToFrame" Text="JumpToFrame"/>
     </Window.Resources>
     <Window.InputBindings>
         <KeyBinding  Key="Delete" Command="{StaticResource DelComponent}" />
@@ -263,6 +265,7 @@
         <KeyBinding   Modifiers="Control"  Key="S" Command="{StaticResource Save}" />
         <KeyBinding   Modifiers="Control+Shift"  Key="S" Command="{StaticResource SaveTo}" />
         <KeyBinding   Key="F5" Command="{StaticResource PlayCurrent}" />
+        <KeyBinding   Modifiers="Control" Key="G" Command="{StaticResource JumpToFrame}" />
     </Window.InputBindings>
     <Window.CommandBindings>
         <CommandBinding Command="{StaticResource DelComponent}"
@@ -322,6 +325,9 @@
         <CommandBinding Command="{StaticResource PlayCurrent}"
                                             CanExecute="CommandBinding_CanExecute"
                                             Executed="CommandBinding_Executed" />
+        <CommandBinding Command="{StaticResource JumpToFrame}"
+                                    CanExecute="CommandBinding_CanExecute"
+                                    Executed="CommandBinding_Executed" />
     </Window.CommandBindings>
     <DockPanel Height="Auto" Name="dockPanel1" Width="Auto">
         <!-- Top Menu -->
@@ -399,8 +405,9 @@
                 <MenuItem.Header>
                     <TextBlock Text="{StaticResource PlayStr}" Foreground="{DynamicResource TextBrush}" />
                 </MenuItem.Header>
-                <MenuItem Header="{StaticResource GeneratePlayFileStr}" Click="GeneratePlayFile_Click" />
                 <MenuItem Header="{StaticResource PlayCurrentStr}" InputGestureText="F5" Click="PlayItem_Click"/>
+                <MenuItem Header="{StaticResource GeneratePlayFileStr}" Click="GeneratePlayFile_Click" />
+                <MenuItem Header="{StaticResource JumpToFrameStr}" InputGestureText="Ctrl+G" Click="JumpToFrame_Click"/>
                 <Separator/>
                 <MenuItem Header="{StaticResource SetPlayStr}" Click="PlaySettingItem_Click"/>
             </MenuItem>
@@ -945,7 +952,7 @@
                 <DockPanel Name="Layer" Grid.Column="0">
                     <DockPanel DockPanel.Dock="Top" Name="stackPanel2" Margin="0" Background="{DynamicResource ToolBarBrush}">
                         <Label  Content="{StaticResource LayerStr}" Height="30" Name="label1" Padding="5,6,5,5" BorderBrush="{x:Null}" Foreground="{DynamicResource TextBrush}"/>
-                        <Path Name="NewLayer" Width="12" Height="12" Margin="10,4" HorizontalAlignment="Right" DockPanel.Dock="Right" MouseLeftButtonUp="NewLayer_MouseUp" 
+                        <Path Name="NewLayer" Width="12" Height="12" Margin="4,4,10,4" HorizontalAlignment="Right" DockPanel.Dock="Right" MouseLeftButtonUp="NewLayer_MouseUp" 
                               Data="{StaticResource NewLayer_Icon}" Fill="White" Stroke="#444444" StrokeThickness="0.5" Stretch="Uniform">
                             <Path.Effect>
                                 <DropShadowEffect Color="Black" Opacity="1" BlurRadius="3" Direction="315" ShadowDepth="0" />
@@ -954,6 +961,14 @@
                                 <TextBlock Text="{StaticResource NewStr}"/>
                             </Path.ToolTip>
                         </Path>
+                        <Grid Width="16" DockPanel.Dock="Right" HorizontalAlignment="Right" MouseLeftButtonDown="LayerShortDelete_Click">
+                            <Path Width="9" Height="9" Stroke="{DynamicResource TextBrush}" Margin="0,0,0,0" StrokeThickness="1.5" Data="{StaticResource Cross_Icon}" 
+                                  VerticalAlignment="Center" Stretch="Uniform">
+                                <Path.Effect>
+                                    <DropShadowEffect Color="#DDDDDD" Opacity="1" BlurRadius="3" Direction="315" ShadowDepth="0" />
+                                </Path.Effect>
+                            </Path>
+                        </Grid>
                     </DockPanel>
                     <TreeView x:Name="LayerTree"  BorderBrush="White" ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                                   ScrollViewer.VerticalScrollBarVisibility="Hidden"  MouseUp="LayerTree_MouseUp" MouseDoubleClick="LayerTree_MouseDoubleClick" Margin="0" 

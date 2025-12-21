@@ -68,18 +68,36 @@ namespace CrazyStorm
                 layerTimer.Tick += LayerTimer_Tick;
             }
             layerTimer.Start();
+            FitAxisScroll(selectedFrame);
+        }
+        void FitAxisScroll(int frame)
+        {
+            TimeScalePointerFrame.Content = frame;
+            TimeScalePointerTransform.X = (frame - 1) * 3 - axisScroll.HorizontalOffset;
+            if (TimeScalePointerTransform.X >= TimeScale.ActualWidth)
+            {
+                axisScroll.ScrollToHorizontalOffset(axisScroll.HorizontalOffset + TimeScalePointerTransform.X - TimeScale.ActualWidth + 3);
+            }
+            else if (TimeScalePointerTransform.X <= 0)
+            {
+                axisScroll.ScrollToHorizontalOffset(axisScroll.HorizontalOffset + TimeScalePointerTransform.X);
+            }
         }
         void StopLayerTimer()
         {
             layerTimer?.Stop();
             layerTimer = null;
             selectedFrame = 1;
-            TimeScalePointerFrame.Content = selectedFrame;
-            TimeScalePointerTransform.X = (selectedFrame - 1) * 3 - axisScroll.HorizontalOffset;
+            FitAxisScroll(selectedFrame);
         }
         void PauseLayerTimer()
         {
             layerTimer?.Stop();
+        }
+        void JumpToFrame(int frame)
+        {
+            selectedFrame = frame;
+            FitAxisScroll(selectedFrame);
         }
         #endregion
 
@@ -91,7 +109,7 @@ namespace CrazyStorm
             axisScroll.ScrollChanged += (object s, ScrollChangedEventArgs args) =>
             {
                 //Need this for strange display problem
-                axisScroll.ScrollToHorizontalOffset(Math.Max(0, axisScroll.HorizontalOffset));
+                axisScroll.ScrollToHorizontalOffset(Math.Max(1, axisScroll.HorizontalOffset));
                 var imageBruch = TimeScale.Background as ImageBrush;
                 imageBruch.Viewport = new Rect(0 - axisScroll.HorizontalOffset, 0,
                     imageBruch.Viewport.Width, imageBruch.Viewport.Height);
@@ -115,16 +133,7 @@ namespace CrazyStorm
         private void LayerTimer_Tick(object sender, EventArgs e)
         {
             if (player == null) return;
-            TimeScalePointerFrame.Content = player.PlayerImpl.CurrentFrame + 1;
-            TimeScalePointerTransform.X = player.PlayerImpl.CurrentFrame * 3 - axisScroll.HorizontalOffset;
-            if (TimeScalePointerTransform.X >= TimeScale.ActualWidth)
-            {
-                axisScroll.ScrollToHorizontalOffset(axisScroll.HorizontalOffset + TimeScalePointerTransform.X - TimeScale.ActualWidth + 3);
-            }
-            else if (TimeScalePointerTransform.X <= 0)
-            {
-                axisScroll.ScrollToHorizontalOffset(axisScroll.HorizontalOffset + TimeScalePointerTransform.X);
-            }
+            FitAxisScroll(player.PlayerImpl.CurrentFrame + 1);
         }
         private void TimeAxis_MouseMove(object sender, MouseEventArgs e)
         {

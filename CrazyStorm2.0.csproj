@@ -168,6 +168,9 @@
     <Compile Include="Edit\Command\Property\SetPropertyCommand.cs" />
     <Compile Include="Helper\VisualHelper.cs" />
     <Compile Include="EmbeddedPlayer.cs" />
+    <Compile Include="Window\JumpToFrame.xaml.cs">
+      <DependentUpon>JumpToFrame.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Window\PlaySetting.xaml.cs">
       <DependentUpon>PlaySetting.xaml</DependentUpon>
     </Compile>
@@ -189,6 +192,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Window\EventSetting.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Window\JumpToFrame.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
