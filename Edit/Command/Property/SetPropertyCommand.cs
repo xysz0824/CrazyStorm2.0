@@ -54,6 +54,7 @@ namespace CrazyStorm
                 if (attribute.IsLegal(newValue, out value))
                 {
                     container.Properties[propertyInfo.Name].Expression = false;
+                    container.Properties[propertyInfo.Name].Value = newValue;
                     propertyInfo.GetSetMethod().Invoke(container, new object[] { value });
                     cell.ToolTip = null;
                     cell.BorderThickness = new Thickness(0);

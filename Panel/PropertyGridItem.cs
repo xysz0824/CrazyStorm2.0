@@ -36,7 +36,7 @@ namespace CrazyStorm
             {
                 this.displayValue = value;
                 if (PropertyChanged != null)
-                    PropertyChanged(this, new PropertyChangedEventArgs("Value"));
+                    PropertyChanged(this, new PropertyChangedEventArgs("DisplayValue"));
             }
         }
     }

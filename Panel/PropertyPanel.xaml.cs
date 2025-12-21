@@ -143,8 +143,9 @@ namespace CrazyStorm
             }
             else SpecificGroup.Visibility = Visibility.Collapsed;
         }
-        string TranslateValue(string value)
+        string TranslateValue(Type type, string value)
         {
+            if (type == typeof(string)) return value;
             var lexer = new Lexer();
             lexer.Load(value);
             for (int i = 0; i < lexer.Tokens.Count; ++i)
@@ -174,8 +175,9 @@ namespace CrazyStorm
             }
             return lexer.Output();
         }
-        string ReverseTranslateValue(string value)
+        string ReverseTranslateValue(Type type, string value)
         {
+            if (type == typeof(string)) return value;
             var lexer = new Lexer();
             lexer.Load(value);
             for (int i = 0; i < lexer.Tokens.Count; ++i)
@@ -217,7 +219,7 @@ namespace CrazyStorm
                     {
                         Info = item,
                         DisplayName = (string)FindResource(item.Name + "Str"),
-                        DisplayValue = TranslateValue(container.Properties[item.Name].Value)
+                        DisplayValue = TranslateValue(item.PropertyType, container.Properties[item.Name].Value)
                     };
                     propertyItems.Add(property);
                 }
@@ -233,7 +235,7 @@ namespace CrazyStorm
                 var property = e.Row.Item as PropertyGridItem;
                 var presenter = VisualHelper.GetVisualChild<DataGridCellsPresenter>(e.Row);
                 var cell = (DataGridCell)presenter.ItemContainerGenerator.ContainerFromIndex(1);
-                var newValue = ReverseTranslateValue((e.EditingElement as TextBox).Text);
+                var newValue = ReverseTranslateValue(property.Info.PropertyType, (e.EditingElement as TextBox).Text);
                 var attribute = property.Info.GetCustomAttributes(false)[0] as PropertyAttribute;
                 new SetPropertyCommand().Do(commandStack, environment, container, property, cell, newValue, attribute, updateFunc);
             }
@@ -247,7 +249,7 @@ namespace CrazyStorm
                     var result = item.Info.GetGetMethod().Invoke(container, null).ToString();
                     container.Properties[item.Info.Name].Value = result;
                 }
-                item.DisplayValue = TranslateValue(container.Properties[item.Info.Name].Value);
+                item.DisplayValue = TranslateValue(item.Info.PropertyType, container.Properties[item.Info.Name].Value);
             }
         }
         void InitializeColorCombo()

@@ -11,12 +11,15 @@ namespace CrazyStorm
 {
     public class CommandStack
     {
-        public event Action StackChanged;
+        const int MaxSize = 32;
 
         #region Private Members
-        const int MaxSize = 32;
         List<Command> redoCommands;
         List<Command> undoCommands;
+        #endregion
+
+        #region Public Events
+        public event Action StackChanged;
         #endregion
 
         #region Constructor
