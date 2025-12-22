@@ -9,7 +9,7 @@ using System.Text;
 
 namespace CrazyStorm
 {
-    class VariableComboBoxItem
+    public class VariableComboBoxItem
     {
         private string name;
         private string displayName;

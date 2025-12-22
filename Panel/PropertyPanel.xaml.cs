@@ -279,40 +279,11 @@ namespace CrazyStorm
             var presenter = VisualHelper.GetVisualChild<DataGridCellsPresenter>(e.Row);
             var cell = (DataGridCell)presenter.ItemContainerGenerator.ContainerFromIndex(1);
             popup = new Popup();
-            popup.PlacementTarget = cell;
-            popup.Placement = PlacementMode.Bottom;
-            popup.PopupAnimation = PopupAnimation.Fade;
-            var listView = new ListView();
-            if (property.Info.PropertyType == typeof(bool))
-            {
-                listView.Items.Add((string)FindResource($"{true}Str"));
-                listView.Items.Add((string)FindResource($"{false}Str"));
-            }
-            else if (property.Info.PropertyType.IsSubclassOf(typeof(Enum)))
-            {
-                Array array = Enum.GetValues(property.Info.PropertyType);
-                foreach (var item in array)
-                    listView.Items.Add((string)FindResource($"{item}Str"));
-            }
-            if (!listView.Items.IsEmpty)
-            {
-                listView.PreviewMouseLeftButtonDown += (sender, args) =>
-                {
-                    args.Handled = true;
-                    if (!(args.OriginalSource is TextBlock))
-                        return;
-
-                    var textBox = cell.Content as TextBox;
-                    textBox.Text = (args.OriginalSource as TextBlock).Text;
-                };
-                popup.Child = listView;
-                popup.IsOpen = true;
-            }
+            UIHelper.ShowIntellisense(popup, property.Info.PropertyType, cell);
         }
         void HideIntellisense()
         {
-            popup.Child = null;
-            popup.IsOpen = false;
+            UIHelper.HideIntellisense(popup);
         }
         #endregion
 

@@ -2,6 +2,7 @@
  * The MIT License (MIT)
  * Copyright (c) StarX 2026
  */
+using CrazyStorm.Core;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -157,6 +158,13 @@ namespace CrazyStorm.Expression
         public Function GetFunction(string name)
         {
             return functions.ContainsKey(name) ? functions[name] : null;
+        }
+        public PropertyType GetValueType(string name)
+        {
+            object value = GetProperty(name);
+            if (value == null) GetLocal(name);
+            if (value == null) GetGlobal(name);
+            return PropertyTypeRule.GetValueType(value);
         }
         #endregion
     }

@@ -151,6 +151,7 @@
     <Compile Include="Edit\Command\Layer\CopyLayerCommand.cs" />
     <Compile Include="Edit\Command\Component\PasteComponentCommand.cs" />
     <Compile Include="Edit\Command\Component\UnbindComponentCommand.cs" />
+    <Compile Include="Helper\UIHelper.cs" />
     <Compile Include="Main\FilePart.cs" />
     <Compile Include="Main\PlayPart.cs" />
     <Compile Include="Main\ToolBarPart.cs" />
@@ -161,6 +162,9 @@
     <Compile Include="Helper\DrawHelper.cs" />
     <Compile Include="Marker\EventFieldMarker.cs" />
     <Compile Include="Marker\RebounderMarker.cs" />
+    <Compile Include="Panel\ConditionPanel.xaml.cs">
+      <DependentUpon>ConditionPanel.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Panel\FinderPanel.xaml.cs">
       <DependentUpon>FinderPanel.xaml</DependentUpon>
     </Compile>
@@ -176,6 +180,10 @@
     </Compile>
     <Compile Include="Window\VariableComboBoxItem.cs" />
     <Page Include="Common.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Panel\ConditionPanel.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
