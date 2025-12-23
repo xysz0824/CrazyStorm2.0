@@ -48,7 +48,6 @@ namespace CrazyStorm
             InitializeComponent();
             InitializeSetting(emitter, aboutParticle);
             LoadContent();
-            TranslateEvents();
             ResetAll();
         }
         #endregion
@@ -56,21 +55,23 @@ namespace CrazyStorm
         #region Private Methods
         void InitializeSetting(bool emitter, bool aboutParticle)
         {
-            GroupBox.DataContext = eventGroup;
-            EventList.ItemsSource = eventGroup.TranslatedEvents;
+            EventGroupBox.DataContext = eventGroup;
+            EventList.ItemsSource = eventGroup.Events;
             EmitParticle.Visibility = emitter ? Visibility.Visible : Visibility.Collapsed;
             ChangeType.Visibility = aboutParticle ? Visibility.Visible : Visibility.Collapsed;
         }
         void LoadContent()
         {
+            GroupCondition.Environment = environment;
             EventCondition.Environment = environment;
             //Load properties.
             foreach (var property in environment.Properties)
             {
                 var item = new VariableComboBoxItem();
                 item.Name = property.Key;
-                var displayName = TranslateProperty(property.Key);
+                var displayName = ExpressionHelper.TranslateProperty(property.Key);
                 item.DisplayName = displayName != null ? displayName : property.Key;
+                GroupCondition.AddConditionVariable(item);
                 EventCondition.AddConditionVariable(item);
                 PropertyComboBox.Items.Add(item);
             }
@@ -80,6 +81,7 @@ namespace CrazyStorm
                 var item = new VariableComboBoxItem();
                 item.Name = local.Key;
                 item.DisplayName = item.Name;
+                GroupCondition.AddConditionVariable(item);
                 EventCondition.AddConditionVariable(item);
                 PropertyComboBox.Items.Add(item);
             }
@@ -89,6 +91,7 @@ namespace CrazyStorm
                 var item = new VariableComboBoxItem();
                 item.Name = global.Key;
                 item.DisplayName = item.Name;
+                GroupCondition.AddConditionVariable(item);
                 EventCondition.AddConditionVariable(item);
                 PropertyComboBox.Items.Add(item);
             }
@@ -116,77 +119,27 @@ namespace CrazyStorm
             TypeCombo.ItemsSource = typesNorepeat;
             //Create sorted variable list for translating event
             var varaibleList = new List<VariableComboBoxItem>();
-            foreach (VariableComboBoxItem item in PropertyComboBox.Items)
-                varaibleList.Add(item);
+            foreach (VariableComboBoxItem item in PropertyComboBox.Items) varaibleList.Add(item);
             //Longer name first
             sortedVaraibles = varaibleList.OrderByDescending(s => s.Name.Length);
-        }
-        string TranslateProperty(string properyName)
-        {
-            string[] split = properyName.Split('.');
-            var displayName = (string)TryFindResource(split[0] + "Str");
-            if (displayName != null && split.Length > 1)
-                displayName += "." + split[1];
-            else if (displayName == null)
-                displayName = split[0];
-
-            return displayName;
-        }
-        string TranslateEvent(string originalEvent)
-        {
-            var info = EventHelper.SplitEvent(originalEvent);
-            if (info.leftProperty != null)
-                info.leftProperty = TranslateProperty(info.leftProperty);
-
-            if (info.rightProperty != null)
-                info.rightProperty = TranslateProperty(info.rightProperty);
-
-            if (!info.isSpecialEvent)
-            {
-                info.resultProperty = TranslateProperty(info.resultProperty);
-                string[] keywords = {"Linear", "Accelerated", "Decelerated", "Instant", "ChangeTo", "Increase", "Decrease"};
-                foreach (string item in keywords)
-                {
-                    if (info.changeType == item)
-                        info.changeType = (string)FindResource(item + "Str");
-
-                    if (info.changeMode == item)
-                        info.changeMode = (string)FindResource(item + "Str");
-                }
-            }
-            else
-            {
-                string[] keywords = {"EmitParticle", "PlaySound", "Loop", "ChangeType"};
-                foreach (string item in keywords)
-                {
-                    if (info.specialEvent == item)
-                        info.specialEvent = (string)FindResource(item + "Str");
-                }
-            }
-            return EventHelper.BuildEvent(info, false);
-        }
-        void TranslateEvents()
-        {
-            if (eventGroup.TranslatedEvents.Count != 0) return;
-            foreach (string originalEvent in eventGroup.OriginalEvents)
-                eventGroup.TranslatedEvents.Add(TranslateEvent(originalEvent));
         }
         bool BuildEvent(out string text)
         {
             text = string.Empty;
             var eventInfo = new EventInfo();
             //Check if there have errors
-            if (ResultValue.ToolTip != null || ChangeTime.ToolTip != null) return false;
-            if (!EventCondition.SetConditionInfo(environment, eventInfo)) return false;
-            if (ChangeTo.IsChecked == true) eventInfo.changeType = "ChangeTo";
-            else if (Increase.IsChecked == true) eventInfo.changeType = "Increase";
-            else if (Decrease.IsChecked == true) eventInfo.changeType = "Decrease";
-            if (Linear.IsChecked == true) eventInfo.changeMode = "Linear";
-            else if (Accelerated.IsChecked == true) eventInfo.changeMode = "Accelerated";
-            else if (Decelerated.IsChecked == true) eventInfo.changeMode = "Decelerated";
-            else if (Instant.IsChecked == true) eventInfo.changeMode = "Instant";
+            if (UIHelper.HasError(ResultValue) || UIHelper.HasError(ChangeTime)) return false;
+            eventInfo.condition = EventCondition.BuildCondition();
+            if (EventCondition.HasError()) return false;
+            if (ChangeTo.IsChecked == true) eventInfo.changeType = Enum.GetName(typeof(EventChangeType), EventChangeType.ChangeTo);
+            else if (Increase.IsChecked == true) eventInfo.changeType = Enum.GetName(typeof(EventChangeType), EventChangeType.Increase);
+            else if (Decrease.IsChecked == true) eventInfo.changeType = Enum.GetName(typeof(EventChangeType), EventChangeType.Decrease);
+            if (Linear.IsChecked == true) eventInfo.changeMode = Enum.GetName(typeof(EventChangeMode), EventChangeMode.Linear);
+            else if (Accelerated.IsChecked == true) eventInfo.changeMode = Enum.GetName(typeof(EventChangeMode), EventChangeMode.Accelerated);
+            else if (Decelerated.IsChecked == true) eventInfo.changeMode = Enum.GetName(typeof(EventChangeMode), EventChangeMode.Decelerated);
+            else if (Instant.IsChecked == true) eventInfo.changeMode = Enum.GetName(typeof(EventChangeMode), EventChangeMode.Instant);
             if (PropertyComboBox.SelectedItem != null && !String.IsNullOrEmpty(ResultValue.Text) &&
-                !String.IsNullOrEmpty(eventInfo.changeType) && !String.IsNullOrEmpty(eventInfo.changeMode) && 
+                !String.IsNullOrEmpty(eventInfo.changeType) && !String.IsNullOrEmpty(eventInfo.changeMode) &&
                 (!String.IsNullOrEmpty(ChangeTime.Text) || Instant.IsChecked == true))
             {
                 var selectedItem = PropertyComboBox.SelectedItem as VariableComboBoxItem;
@@ -205,7 +158,8 @@ namespace CrazyStorm
         {
             text = string.Empty;
             var eventInfo = new EventInfo();
-            if (!EventCondition.SetConditionInfo(environment, eventInfo)) return false;
+            eventInfo.condition = EventCondition.BuildCondition();
+            if (EventCondition.HasError()) return false;
             if (EmitParticle.IsChecked == true)
             {
                 eventInfo.specialEvent = "EmitParticle";
@@ -220,7 +174,7 @@ namespace CrazyStorm
             else if (Loop.IsChecked == true)
             {
                 //Check if there have errors
-                if (StopCondition.ToolTip != null || String.IsNullOrEmpty(StopCondition.Text)) return false;
+                if (UIHelper.HasError(StopCondition)) return false;
                 string arguments = string.Empty;
                 arguments = StopCondition.Text;
                 eventInfo.specialEvent = "Loop";
@@ -239,7 +193,6 @@ namespace CrazyStorm
         }
         void ResetAll()
         {
-            EventCondition.Reset();
             PropertyComboBox.SelectedIndex = -1;
             ChangeTo.IsChecked = true;
             Increase.IsChecked = false;
@@ -269,20 +222,20 @@ namespace CrazyStorm
         {
             ResetAll();
             var buttonMap = new Dictionary<string, RadioButton[]>();
-            buttonMap["ChangeTo"] = new[] { ChangeTo };
-            buttonMap["Increase"] = new[] { Increase };
-            buttonMap["Decrease"] = new[] { Decrease };
-            buttonMap["Linear"] = new[] { Linear };
-            buttonMap["Accelerated"] = new[] { Accelerated };
-            buttonMap["Decelerated"] = new[] { Decelerated };
-            buttonMap["Instant"] = new[] { Instant };
+            buttonMap[Enum.GetName(typeof(EventChangeType), EventChangeType.ChangeTo)] = new[] { ChangeTo };
+            buttonMap[Enum.GetName(typeof(EventChangeType), EventChangeType.Increase)] = new[] { Increase };
+            buttonMap[Enum.GetName(typeof(EventChangeType), EventChangeType.Decrease)] = new[] { Decrease };
+            buttonMap[Enum.GetName(typeof(EventChangeMode), EventChangeMode.Linear)] = new[] { Linear };
+            buttonMap[Enum.GetName(typeof(EventChangeMode), EventChangeMode.Accelerated)] = new[] { Accelerated };
+            buttonMap[Enum.GetName(typeof(EventChangeMode), EventChangeMode.Decelerated)] = new[] { Decelerated };
+            buttonMap[Enum.GetName(typeof(EventChangeMode), EventChangeMode.Instant)] = new[] { Instant };
             buttonMap["EmitParticle"] = new[] { EmitParticle };
             buttonMap["PlaySound"] = new[] { PlaySound };
             buttonMap["Loop"] = new[] { Loop };
             buttonMap["ChangeType"] = new[] { ChangeType };
             EventInfo eventInfo = EventHelper.SplitEvent(text);
             //Backfill condition
-            EventCondition.MapConditionInfo(eventInfo);
+            EventCondition.MapCondition(eventInfo.condition);
             //Backfill event
             if (!eventInfo.isSpecialEvent)
             {
@@ -347,15 +300,9 @@ namespace CrazyStorm
             var item = EventList.SelectedItem;
             if (item != null)
             {
-                eventGroup.OriginalEvents.RemoveAt(EventList.SelectedIndex);
-                eventGroup.TranslatedEvents.RemoveAt(EventList.SelectedIndex);
+                eventGroup.Events.RemoveAt(EventList.SelectedIndex);
             }
-            else if (eventGroup.TranslatedEvents.Count > 0)
-            {
-                eventGroup.OriginalEvents.RemoveAt(0);
-                eventGroup.TranslatedEvents.RemoveAt(0);
-            }
-            EventList.ItemsSource = eventGroup.TranslatedEvents;
+            EventList.ItemsSource = eventGroup.Events;
         }
         void ShowIntellisense(object property, UIElement element)
         {
@@ -429,8 +376,7 @@ namespace CrazyStorm
             {
                 if (BuildEvent(out text))
                 {
-                    eventGroup.OriginalEvents[EventList.SelectedIndex] = text;
-                    eventGroup.TranslatedEvents[EventList.SelectedIndex] = TranslateEvent(text);
+                    eventGroup.Events[EventList.SelectedIndex] = text;
                     editingPanel.Background = null;
                     EventList.IsEnabled = true;
                     AddEvent.Content = (string)FindResource("AddStr");
@@ -444,13 +390,11 @@ namespace CrazyStorm
             {
                 if (EventList.SelectedIndex != -1 && EventList.Items.Count - 1 > EventList.SelectedIndex)
                 {
-                    eventGroup.OriginalEvents.Insert(EventList.SelectedIndex + 1, text);
-                    eventGroup.TranslatedEvents.Insert(EventList.SelectedIndex + 1, TranslateEvent(text));
+                    eventGroup.Events.Insert(EventList.SelectedIndex + 1, text);
                 }
                 else
                 {
-                    eventGroup.OriginalEvents.Add(text);
-                    eventGroup.TranslatedEvents.Add(TranslateEvent(text));
+                    eventGroup.Events.Add(text);
                 }
             }
         }
@@ -461,8 +405,7 @@ namespace CrazyStorm
             {
                 if (BuildSpecialEvent(out text))
                 {
-                    eventGroup.OriginalEvents[EventList.SelectedIndex] = text;
-                    eventGroup.TranslatedEvents[EventList.SelectedIndex] = TranslateEvent(text);
+                    eventGroup.Events[EventList.SelectedIndex] = text;
                     editingPanel.Background = null;
                     EventList.IsEnabled = true;
                     AddEvent.Content = (string)FindResource("AddStr");
@@ -476,13 +419,11 @@ namespace CrazyStorm
             {
                 if (EventList.SelectedIndex != -1 && EventList.Items.Count - 1 > EventList.SelectedIndex)
                 {
-                    eventGroup.OriginalEvents.Insert(EventList.SelectedIndex + 1, text);
-                    eventGroup.TranslatedEvents.Insert(EventList.SelectedIndex + 1, TranslateEvent(text));
+                    eventGroup.Events.Insert(EventList.SelectedIndex + 1, text);
                 }
                 else
                 {
-                    eventGroup.OriginalEvents.Add(text);
-                    eventGroup.TranslatedEvents.Add(TranslateEvent(text));
+                    eventGroup.Events.Add(text);
                 }
             }
         }
@@ -579,32 +520,6 @@ namespace CrazyStorm
             else if (value <= 0)
                 ChangeTime.Text = "1";
         }
-        private void Condition_PreviewLostKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
-        {
-            UIHelper.SetErrorToolTip(Condition, null);
-            Condition.Text = Condition.Text.Trim();
-            string input = Condition.Text;
-            if (String.IsNullOrEmpty(input))
-            {
-                eventGroup.Condition = input;
-                return;
-            }
-            try
-            {
-                var lexer = new Lexer();
-                lexer.Load(input);
-                var syntaxTree = new Parser(lexer).Expression();
-                var result = syntaxTree.Eval(environment);
-                if (!(result is bool))
-                    throw new ExpressionException("TypeError");
-                
-                eventGroup.Condition = input;
-            }
-            catch (ExpressionException error)
-            {
-                UIHelper.SetErrorToolTip(Condition, error);
-            }
-        }
         private void StopCondition_PreviewLostKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
         {
             UIHelper.SetErrorToolTip(StopCondition, null);
@@ -686,8 +601,9 @@ namespace CrazyStorm
             if (EventList.SelectedIndex == -1)
                 return;
 
-            MapEventText(eventGroup.OriginalEvents[EventList.SelectedIndex]);
+            MapEventText(eventGroup.Events[EventList.SelectedIndex]);
+
+            #endregion
         }
-        #endregion
     }
 }

@@ -5,27 +5,20 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 
 namespace CrazyStorm.Core
 {
-    public enum EventOperator : byte
-    {
-        More,
-        Less,
-        Equal,
-        And,
-        Or,
-        MoreEqual,
-        LessEqual,
-        NotEqual,
-    }
-    public enum EventKeyword : byte
+    public enum EventChangeType : byte
     {
         ChangeTo,
         Increase,
         Decrease,
+    }
+    public enum EventChangeMode : byte
+    {
         Linear,
         Accelerated,
         Decelerated,
@@ -55,16 +48,7 @@ namespace CrazyStorm.Core
     }
     public class EventInfo
     {
-        public bool hasCondition;
-        public string leftProperty;
-        public string leftOperator;
-        public PropertyType leftType;
-        public string leftValue;
-        public string midOperator;
-        public string rightProperty;
-        public string rightOperator;
-        public PropertyType rightType;
-        public string rightValue;
+        public string condition;
         public bool isSpecialEvent;
         public string resultProperty;
         public string changeType;
@@ -78,24 +62,15 @@ namespace CrazyStorm.Core
     }
     public class VMEventInfo
     {
-        public bool hasCondition;
-        public string leftProperty;
-        public EventOperator leftOperator;
-        public PropertyType leftType;
-        public TypeSet leftValue;
-        public EventOperator midOperator;
-        public string rightProperty;
-        public EventOperator rightOperator;
-        public PropertyType rightType;
-        public TypeSet rightValue;
+        public VMInstruction[] conditionExpression;
         public bool isSpecialEvent;
         public string resultProperty;
-        public EventKeyword changeType;
+        public EventChangeType changeType;
         public bool isExpressionResult;
         public PropertyType resultType;
         public TypeSet resultValue;
         public VMInstruction[] resultExpression;
-        public EventKeyword changeMode;
+        public EventChangeMode changeMode;
         public int changeTime;
         public string specialEvent;
         public string[] arguments;
@@ -105,34 +80,21 @@ namespace CrazyStorm.Core
     {
         public static string BuildEvent(EventInfo eventInfo, bool addTypeFlag)
         {
-            string eventString = string.Empty;
-            if (eventInfo.hasCondition)
+            StringBuilder eventString = new StringBuilder();
+            if (!string.IsNullOrEmpty(eventInfo.condition))
             {
-                eventString += string.Format("{0} {1} {2} ", eventInfo.leftProperty, eventInfo.leftOperator, eventInfo.leftValue);
-                if (eventInfo.midOperator != null)
-                    eventString += string.Format("{0} {1} {2} {3} ", eventInfo.midOperator, eventInfo.rightProperty,
-                        eventInfo.rightOperator, eventInfo.rightValue);
-
-                eventString += ": ";
+                eventString.Append(eventInfo.condition);
+                eventString.Append(": ");
             }
             if (!eventInfo.isSpecialEvent)
             {
-                if (eventInfo.isExpressionResult)
-                    eventInfo.resultValue = "(" + eventInfo.resultValue + ")";
-
-                eventString += string.Format("{0} {1} {2}, {3}, {4}", eventInfo.resultProperty, eventInfo.changeType,
-                    eventInfo.resultValue, eventInfo.changeMode, eventInfo.changeTime);
+                if (eventInfo.isExpressionResult) eventInfo.resultValue = "(" + eventInfo.resultValue + ")";
+                eventString.Append(string.Format("{0} {1} {2}, {3}, {4}", eventInfo.resultProperty, eventInfo.changeType,
+                    eventInfo.resultValue, eventInfo.changeMode, eventInfo.changeTime));
             }
-            else
-                eventString += string.Format("{0}({1})", eventInfo.specialEvent, eventInfo.arguments);
-
-            if (addTypeFlag)
-            {
-                eventString += (char)eventInfo.leftType;
-                eventString += (char)eventInfo.rightType;
-                eventString += (char)eventInfo.resultType;
-            }
-            return eventString;
+            else eventString.Append(string.Format("{0}({1})", eventInfo.specialEvent, eventInfo.arguments));
+            if (addTypeFlag) eventString.Append((char)eventInfo.resultType);
+            return eventString.ToString();
         }
         public static EventInfo SplitEvent(string text)
         {
@@ -141,26 +103,17 @@ namespace CrazyStorm.Core
             string eventText = string.Empty;
             if (parts.Length == 2)
             {
-                info.hasCondition = true;
-                string condition = parts[0];
-                string[] split = condition.Split(' ');
-                info.leftProperty = split[0];
-                info.leftOperator = split[1];
-                info.leftValue = split[2];
-                if (split.Length == 8)
-                {
-                    info.midOperator = split[3];
-                    info.rightProperty = split[4];
-                    info.rightOperator = split[5];
-                    info.rightValue = split[6];
-                }
+                info.condition = parts[0];
                 eventText = parts[1].Trim();
             }
             else
             {
                 eventText = parts[0].Trim();
             }
-            if (eventText.Contains("ChangeTo") || eventText.Contains("Increase") || eventText.Contains("Decrease"))
+            var changeTypeNames = Enum.GetNames(typeof(EventChangeType));
+            var changeModeNames = Enum.GetNames(typeof(EventChangeMode));
+            var changeType = changeTypeNames.FirstOrDefault((str) => eventText.Contains(str));
+            if (changeType != null)
             {
                 string[] split = eventText.Split(' ');
                 info.resultProperty = split[0];
@@ -170,15 +123,13 @@ namespace CrazyStorm.Core
                 for (int i = 0; i < split.Length; ++i)
                 {
                     split[i] = split[i].Trim();
-                    if (split[i] == "Linear" || split[i] == "Instant" ||
-                        split[i] == "Accelerated" || split[i] == "Decelerated")
+                    var changeMode = changeModeNames.FirstOrDefault((str) => split[i] == str);
+                    if (changeMode != null)
                     {
                         info.changeMode = split[i];
                         string temp = split[i + 1].Trim();
-                        info.leftType = (PropertyType)temp[temp.Length - 3];
-                        info.rightType = (PropertyType)temp[temp.Length - 2];
                         info.resultType = (PropertyType)temp[temp.Length - 1];
-                        info.changeTime = temp.Remove(temp.Length - 3, 3);
+                        info.changeTime = temp.Remove(temp.Length - 1, 1);
                         break;
                     }
                     else
@@ -199,9 +150,7 @@ namespace CrazyStorm.Core
                 info.specialEvent = split[0];
                 split = split[1].Split(')');
                 info.arguments = split[0];
-                info.leftType = (PropertyType)split[1][0];
-                info.rightType = (PropertyType)split[1][1];
-                info.resultType = (PropertyType)split[1][2];
+                info.resultType = (PropertyType)split[1][0];
             }
             return info;
         }
@@ -209,49 +158,22 @@ namespace CrazyStorm.Core
         public static byte[] GenerateEventData(string text, CompileFunc compileFunc)
         {
             EventInfo eventInfo = SplitEvent(text);
-            Dictionary<string, EventOperator> operatorMap = new Dictionary<string,EventOperator>();
-            Dictionary<string, EventKeyword> keywordMap = new Dictionary<string, EventKeyword>();
-            operatorMap[">"] = EventOperator.More;
-            operatorMap["="] = EventOperator.Equal;
-            operatorMap["<"] = EventOperator.Less;
-            operatorMap["&"] = EventOperator.And;
-            operatorMap["|"] = EventOperator.Or;
-            operatorMap[">="] = EventOperator.MoreEqual;
-            operatorMap["<="] = EventOperator.LessEqual;
-            operatorMap["!="] = EventOperator.NotEqual;
-            keywordMap["ChangeTo"] = EventKeyword.ChangeTo;
-            keywordMap["Increase"] = EventKeyword.Increase;
-            keywordMap["Decrease"] = EventKeyword.Decrease;
-            keywordMap["Linear"] = EventKeyword.Linear;
-            keywordMap["Accelerated"] = EventKeyword.Accelerated;
-            keywordMap["Decelerated"] = EventKeyword.Decelerated;
-            keywordMap["Instant"] = EventKeyword.Instant;
             List<byte> bytes = new List<byte>();
-            bytes.AddRange(PlayDataHelper.GetBytes(eventInfo.hasCondition));
-            if (eventInfo.hasCondition)
+            if (eventInfo.condition != null)
             {
-                bytes.AddRange(PlayDataHelper.GetBytes(eventInfo.leftProperty));
-                bytes.Add((byte)operatorMap[eventInfo.leftOperator]);
-                bytes.Add((byte)eventInfo.leftType);
-                bytes.AddRange(PlayDataHelper.GetBytes(PropertyTypeRule.Parse(eventInfo.leftType, eventInfo.leftProperty,
-                    eventInfo.leftValue)));
-                if (eventInfo.midOperator != null)
-                {
-                    bytes.Add((byte)operatorMap[eventInfo.midOperator]);
-                    bytes.AddRange(PlayDataHelper.GetBytes(eventInfo.rightProperty));
-                    bytes.Add((byte)operatorMap[eventInfo.rightOperator]);
-                    bytes.Add((byte)eventInfo.rightType);
-                    bytes.AddRange(PlayDataHelper.GetBytes(PropertyTypeRule.Parse(eventInfo.rightType, eventInfo.rightProperty, 
-                        eventInfo.rightValue)));
-                }
-                else
-                    bytes.Add(0);
+                byte[] compiledExpression = compileFunc(eventInfo.condition);
+                bytes.AddRange(PlayDataHelper.GetBytes(compiledExpression.Length));
+                bytes.AddRange(compiledExpression);
+            }
+            else
+            {
+                bytes.AddRange(PlayDataHelper.GetBytes(0));
             }
             bytes.AddRange(PlayDataHelper.GetBytes(eventInfo.isSpecialEvent));
             if (!eventInfo.isSpecialEvent)
             {
                 bytes.AddRange(PlayDataHelper.GetBytes(eventInfo.resultProperty));
-                bytes.Add((byte)keywordMap[eventInfo.changeType]);
+                bytes.Add((byte)Enum.Parse(typeof(EventChangeType), eventInfo.changeType));
                 bytes.AddRange(PlayDataHelper.GetBytes(eventInfo.isExpressionResult));
                 bytes.Add((byte)eventInfo.resultType);
                 if (eventInfo.isExpressionResult)
@@ -264,7 +186,7 @@ namespace CrazyStorm.Core
                     bytes.AddRange(PlayDataHelper.GetBytes(PropertyTypeRule.Parse(eventInfo.resultType, eventInfo.resultProperty, 
                         eventInfo.resultValue)));
 
-                bytes.Add((byte)keywordMap[eventInfo.changeMode]);
+                bytes.Add((byte)Enum.Parse(typeof(EventChangeMode), eventInfo.changeMode));
                 bytes.AddRange(PlayDataHelper.GetBytes(int.Parse(eventInfo.changeTime)));
             }
             else
@@ -291,27 +213,16 @@ namespace CrazyStorm.Core
             VMEventInfo eventInfo = new VMEventInfo();
             using (BinaryReader reader = new BinaryReader(new MemoryStream(bytes)))
             {
-                eventInfo.hasCondition = reader.ReadBoolean();
-                if (eventInfo.hasCondition)
+                var conditionLength = reader.ReadInt32();
+                if (conditionLength > 0)
                 {
-                    eventInfo.leftProperty = PlayDataHelper.ReadString(reader);
-                    eventInfo.leftOperator = (EventOperator)reader.ReadByte();
-                    eventInfo.leftType = (PropertyType)reader.ReadByte();
-                    eventInfo.leftValue = ReadValue(reader, eventInfo.leftType);
-                    eventInfo.midOperator = (EventOperator)reader.ReadByte();
-                    if (eventInfo.midOperator != 0)
-                    {
-                        eventInfo.rightProperty = PlayDataHelper.ReadString(reader);
-                        eventInfo.rightOperator = (EventOperator)reader.ReadByte();
-                        eventInfo.rightType = (PropertyType)reader.ReadByte();
-                        eventInfo.rightValue = ReadValue(reader, eventInfo.rightType);
-                    }
+                    eventInfo.conditionExpression = VM.Decode(reader.ReadBytes(conditionLength));
                 }
                 eventInfo.isSpecialEvent = reader.ReadBoolean();
                 if (!eventInfo.isSpecialEvent)
                 {
                     eventInfo.resultProperty = PlayDataHelper.ReadString(reader);
-                    eventInfo.changeType = (EventKeyword)reader.ReadByte();
+                    eventInfo.changeType = (EventChangeType)reader.ReadByte();
                     eventInfo.isExpressionResult = reader.ReadBoolean();
                     eventInfo.resultType = (PropertyType)reader.ReadByte();
                     if (eventInfo.isExpressionResult)
@@ -322,7 +233,7 @@ namespace CrazyStorm.Core
                     else
                         eventInfo.resultValue = ReadValue(reader, eventInfo.resultType);
 
-                    eventInfo.changeMode = (EventKeyword)reader.ReadByte();
+                    eventInfo.changeMode = (EventChangeMode)reader.ReadByte();
                     eventInfo.changeTime = reader.ReadInt32();
                 }
                 else
@@ -377,21 +288,11 @@ namespace CrazyStorm.Core
         }
         public static bool Execute(PropertyContainer propertyContainer, PropertyContainer bindingContainer, VMEventInfo eventInfo)
         {
-            if (eventInfo.hasCondition)
+            if (eventInfo.conditionExpression != null)
             {
-                bool result = TestCondition(propertyContainer, eventInfo.leftProperty, eventInfo.leftOperator,
-                    eventInfo.leftType, eventInfo.leftValue);
-                if (eventInfo.rightProperty != null)
-                {
-                    if (eventInfo.midOperator == EventOperator.And)
-                        result &= TestCondition(propertyContainer, eventInfo.rightProperty, eventInfo.rightOperator,
-                            eventInfo.rightType, eventInfo.rightValue);
-                    else if (eventInfo.midOperator == EventOperator.Or)
-                        result |= TestCondition(propertyContainer, eventInfo.rightProperty, eventInfo.rightOperator,
-                            eventInfo.rightType, eventInfo.rightValue);
-                }
-                if (!result)
-                    return false;
+                VM.Execute(propertyContainer, eventInfo.conditionExpression);
+                bool result = VM.PopBool();
+                if (!result) return false;
             }
             if (!eventInfo.isSpecialEvent)
             {
@@ -402,54 +303,6 @@ namespace CrazyStorm.Core
             {
                 return EventManager.ExecuteSpecialEvent(propertyContainer, eventInfo.specialEvent, eventInfo.arguments,
                     eventInfo.argumentExpression);
-            }
-        }
-        static bool TestCondition(PropertyContainer propertyContainer, string property, EventOperator operators,
-            PropertyType type, TypeSet value)
-        {
-            propertyContainer.PushProperty(property);
-            switch (type)
-            {
-                case PropertyType.Boolean:
-                    return VM.PopBool() == value.boolValue;
-                case PropertyType.Int32:
-                    if (operators == EventOperator.Less)
-                        return VM.PopInt() < value.intValue;
-                    else if (operators == EventOperator.Equal)
-                        return VM.PopInt() == value.intValue;
-                    else if (operators == EventOperator.More)
-                        return VM.PopInt() > value.intValue;
-                    else if (operators == EventOperator.LessEqual)
-                        return VM.PopInt() <= value.intValue;
-                    else if (operators == EventOperator.NotEqual)
-                        return VM.PopInt() != value.intValue;
-                    else if (operators == EventOperator.MoreEqual)
-                        return VM.PopInt() >= value.intValue;
-                    else return false;
-                case PropertyType.Single:
-                    if (operators == EventOperator.Less)
-                        return VM.PopFloat() < value.floatValue;
-                    else if (operators == EventOperator.Equal)
-                        return VM.PopFloat() == value.floatValue;
-                    else if (operators == EventOperator.More)
-                        return VM.PopFloat() > value.floatValue;
-                    else if (operators == EventOperator.LessEqual)
-                        return VM.PopFloat() <= value.floatValue;
-                    else if (operators == EventOperator.NotEqual)
-                        return VM.PopFloat() != value.floatValue;
-                    else if (operators == EventOperator.MoreEqual)
-                        return VM.PopFloat() >= value.floatValue;
-                    else return false;
-                case PropertyType.Enum:
-                    return VM.PopInt() == value.enumValue;
-                case PropertyType.Vector2:
-                    return VM.PopVector2() == value.vector2Value;
-                case PropertyType.RGB:
-                    return VM.PopRGB() == value.rgbValue;
-                case PropertyType.String:
-                    return VM.PopString() == value.stringValue;
-                default:
-                    return false;
             }
         }
     }

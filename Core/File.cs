@@ -235,7 +235,7 @@ namespace CrazyStorm.Core
                     eventGroup.CompiledCondition = compiledBytes.ToArray();
                 }
                 eventGroup.CompiledEvents.Clear();
-                foreach (string originalEvent in eventGroup.OriginalEvents)
+                foreach (string originalEvent in eventGroup.Events)
                     eventGroup.CompiledEvents.Add(EventHelper.GenerateEventData(originalEvent, (t) =>
                     {
                         var lexer = new Expression.Lexer();

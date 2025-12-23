@@ -15,7 +15,7 @@ namespace CrazyStorm.Core
         public PropertyContainer PropertyContainer { get; set; }
         public PropertyContainer BindingContainer { get; set; }
         public string PropertyName { get; set; }
-        public EventKeyword ChangeMode { get; set; }
+        public EventChangeMode ChangeMode { get; set; }
         public TypeSet InitialValue { get; set; }
         public TypeSet CurrentValue { get { return currentValue; } }
         public TypeSet TargetValue { get; set; }
@@ -28,9 +28,9 @@ namespace CrazyStorm.Core
         public void Update()
         {
             float ratio = (currentTime + 1) / ChangeTime;
-            if (ChangeMode == EventKeyword.Accelerated)
+            if (ChangeMode == EventChangeMode.Accelerated)
                 ratio *= ratio;
-            else if (ChangeMode == EventKeyword.Decelerated)
+            else if (ChangeMode == EventChangeMode.Decelerated)
                 ratio *= (2 - ratio);
 
             currentValue.type = InitialValue.type;

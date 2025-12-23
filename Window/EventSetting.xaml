@@ -4,25 +4,22 @@
         xmlns:local ="clr-namespace:CrazyStorm"
         Title="{StaticResource EventSettingStr}" Height="650" Width="450" WindowStyle="ToolWindow" WindowStartupLocation="CenterScreen" ResizeMode="NoResize" Background="#FFF0F0F0">
     <Window.Resources>
+        <local:EventConverter x:Key="EventConverter"/>
     </Window.Resources>
     <StackPanel>
-        <GroupBox Name="GroupBox" Header="{StaticResource EventGroupStr}">
+        <GroupBox Name="EventGroupBox" Header="{StaticResource EventGroupStr}">
             <StackPanel>
                 <DockPanel Margin="0,1">
                     <Label Content="{StaticResource NameStr}" />
                     <TextBox Text="{Binding Path=Name}" VerticalContentAlignment="Center" MaxLines="1" />
                 </DockPanel>
-                <DockPanel Name="GroupConditionPanel" Margin="0,1">
-                    <Label Content="{StaticResource ConditionStr}" />
-                    <TextBox Name="Condition" Text="{Binding Path=Condition, Mode=OneWay}" VerticalContentAlignment="Center" 
-                             PreviewLostKeyboardFocus="Condition_PreviewLostKeyboardFocus" Background="White" MaxLines="1" />
-                </DockPanel>
+                <local:ConditionPanel x:Name="GroupCondition" Header="{StaticResource ConditionStr}"></local:ConditionPanel>
             </StackPanel>
         </GroupBox>
         <GroupBox Header="{StaticResource EventListStr}">
             <StackPanel>
                 <StackPanel>
-                    <ListView Name="EventList" ItemsSource="{Binding }" Height="180" SelectionMode="Single" 
+                    <ListView Name="EventList" ItemsSource="{Binding}" Height="180" SelectionMode="Single" 
                              KeyDown="EventList_KeyDown" SelectionChanged="EventList_SelectionChanged" >
                         <ListView.ItemTemplate>
                             <DataTemplate>
@@ -33,7 +30,7 @@
                                             <MenuItem Name="DeleteEvent" Header="删除" Click="DeleteEvent_Click" />
                                         </ContextMenu>
                                     </DockPanel.ContextMenu>
-                                    <TextBlock Text="{Binding}"/>
+                                    <TextBlock Text="{Binding Converter={StaticResource EventConverter}}"/>
                                 </DockPanel>
                             </DataTemplate>
                         </ListView.ItemTemplate>
@@ -41,9 +38,7 @@
                 </StackPanel>
             </StackPanel>
         </GroupBox>
-        <GroupBox Name="ConditionSetting" Header="{StaticResource EventConditionStr}">
-            <local:ConditionPanel x:Name="EventCondition"></local:ConditionPanel>
-        </GroupBox>
+        <local:ConditionPanel x:Name="EventCondition" Header="{StaticResource EventConditionStr}" Margin="4,0,7,0"></local:ConditionPanel>
         <GroupBox Name="PropertyEventPanel" Header="{StaticResource EventContentStr}">
             <StackPanel>
                 <DockPanel Margin="0,1">
@@ -59,36 +54,36 @@
                     <RadioButton Name="Decrease" Content="{StaticResource DecreaseStr}" VerticalAlignment="Center" Margin="5,0,5,0"></RadioButton>
                     <TextBox Name="ResultValue" VerticalContentAlignment="Center" Height="25" PreviewLostKeyboardFocus="ResultValue_PreviewLostKeyboardFocus" MaxLines="1" PreviewGotKeyboardFocus="ResultValue_PreviewGotKeyboardFocus"/>
                 </DockPanel>
-                <StackPanel Orientation="Horizontal" Margin="0,1" HorizontalAlignment="Center">
-                    <StackPanel Margin="6,0">
+                <UniformGrid Rows="1" Margin="0,1">
+                    <StackPanel>
                         <Grid>
-                            <Image Source="/CrazyStorm;component/Images/curvegrid.png" Width="96" Height="48"></Image>
-                            <Path Data="{StaticResource Linear_Curve}" Width="96" Height="48" Fill="#00A5F0"/>
+                            <Image Source="/CrazyStorm;component/Images/curvegrid.png" Width="48" Height="24"></Image>
+                            <Path Data="{StaticResource Linear_Curve}" Width="48" Height="24" Fill="#00A5F0" Stretch="Uniform"/>
                         </Grid>
                         <RadioButton Name="Linear"  HorizontalAlignment="Center" Content="{StaticResource LinearStr}" Checked="Linear_Checked"></RadioButton>
                     </StackPanel>
-                    <StackPanel Margin="6,0">
+                    <StackPanel>
                         <Grid>
-                            <Image Source="/CrazyStorm;component/Images/curvegrid.png" Width="96" Height="48"></Image>
-                            <Path Data="{StaticResource Accelerated_Curve}" Width="96" Height="48" Fill="#00A5F0"/>
+                            <Image Source="/CrazyStorm;component/Images/curvegrid.png" Width="48" Height="24"></Image>
+                            <Path Data="{StaticResource Accelerated_Curve}" Width="48" Height="24" Fill="#00A5F0" Stretch="Uniform"/>
                         </Grid>
                         <RadioButton Name="Accelerated" HorizontalAlignment="Center" Content="{StaticResource AcceleratedStr}" Checked="Accelerated_Checked"></RadioButton>
                     </StackPanel>
-                    <StackPanel Margin="6,0">
+                    <StackPanel>
                         <Grid>
-                            <Image Source="/CrazyStorm;component/Images/curvegrid.png" Width="96" Height="48"></Image>
-                            <Path Data="{StaticResource Decelerated_Curve}" Width="96" Height="48" Fill="#00A5F0"/>
+                            <Image Source="/CrazyStorm;component/Images/curvegrid.png" Width="48" Height="24"></Image>
+                            <Path Data="{StaticResource Decelerated_Curve}" Width="48" Height="24" Fill="#00A5F0" Stretch="Uniform"/>
                         </Grid>
                         <RadioButton Name="Decelerated" HorizontalAlignment="Center" Content="{StaticResource DeceleratedStr}" Checked="Decelerated_Checked"></RadioButton>
                     </StackPanel>
-                    <StackPanel Margin="6,0">
+                    <StackPanel>
                         <Grid>
-                            <Image Source="/CrazyStorm;component/Images/curvegrid.png" Width="96" Height="48"></Image>
-                            <Path Data="{StaticResource Instant_Curve}" Width="96" Height="48" Fill="#00A5F0"/>
+                            <Image Source="/CrazyStorm;component/Images/curvegrid.png" Width="48" Height="24"></Image>
+                            <Path Data="{StaticResource Instant_Curve}" Width="48" Height="24" Fill="#00A5F0" Stretch="Uniform"/>
                         </Grid>
                         <RadioButton Name="Instant" HorizontalAlignment="Center" Content="{StaticResource InstantStr}" Checked="Instant_Checked"></RadioButton>
                     </StackPanel>
-                </StackPanel>
+                </UniformGrid>
                 <StackPanel Name="ChangeTimePanel" Orientation="Horizontal" Margin="0,1" HorizontalAlignment="Right">
                     <Label Content="{StaticResource ChangeTimeStr}" Margin="4,0,0,0"/>
                     <TextBox x:Name="ChangeTime" Width="50" VerticalContentAlignment="Center" VerticalAlignment="Center" HorizontalAlignment="Center" Height="26" 

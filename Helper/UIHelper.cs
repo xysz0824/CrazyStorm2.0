@@ -17,6 +17,7 @@ namespace CrazyStorm
 {
     public static class UIHelper
     {
+        public static readonly Color ErrorColor = Color.FromRgb(255, 190, 190);
         public static void ShowIntellisense(Popup popup, Type type, UIElement target)
         {
             if (popup == null) return;
@@ -65,13 +66,18 @@ namespace CrazyStorm
                 tipText.Text = (string)source.FindResource(error.Message + "Str");
                 tip.Content = tipText;
                 source.ToolTip = tip;
-                source.Background = new SolidColorBrush(Color.FromRgb(255, 190, 190));
+                source.Background = new SolidColorBrush(ErrorColor);
             }
             else
             {
                 source.ToolTip = null;
                 source.Background = new SolidColorBrush(Colors.White);
             }
+        }
+        public static bool HasError(Control source)
+        {
+            var brush = source.Background as SolidColorBrush;
+            return source.ToolTip != null && brush != null && brush.Color == ErrorColor;
         }
     }
 }

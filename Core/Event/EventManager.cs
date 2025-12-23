@@ -48,9 +48,9 @@ namespace CrazyStorm.Core
                     case PropertyType.Int32:
                         int resultInt = (int)VM.PopFloat();
                         initialValue.intValue = (int)VM.PopFloat();
-                        if (eventInfo.changeType == EventKeyword.ChangeTo)
+                        if (eventInfo.changeType == EventChangeType.ChangeTo)
                             targetValue.intValue = resultInt;
-                        else if (eventInfo.changeType == EventKeyword.Increase)
+                        else if (eventInfo.changeType == EventChangeType.Increase)
                             targetValue.intValue = initialValue.intValue + resultInt;
                         else
                             targetValue.intValue = initialValue.intValue - resultInt;
@@ -59,9 +59,9 @@ namespace CrazyStorm.Core
                     case PropertyType.Single:
                         float resultFloat = VM.PopFloat();
                         initialValue.floatValue = VM.PopFloat();
-                        if (eventInfo.changeType == EventKeyword.ChangeTo)
+                        if (eventInfo.changeType == EventChangeType.ChangeTo)
                             targetValue.floatValue = resultFloat;
-                        else if (eventInfo.changeType == EventKeyword.Increase)
+                        else if (eventInfo.changeType == EventChangeType.Increase)
                             targetValue.floatValue = initialValue.floatValue + resultFloat;
                         else
                             targetValue.floatValue = initialValue.floatValue - resultFloat;
@@ -74,9 +74,9 @@ namespace CrazyStorm.Core
                     case PropertyType.Vector2:
                         Vector2 resultVector2 = VM.PopVector2();
                         initialValue.vector2Value = VM.PopVector2();
-                        if (eventInfo.changeType == EventKeyword.ChangeTo)
+                        if (eventInfo.changeType == EventChangeType.ChangeTo)
                             targetValue.vector2Value = resultVector2;
-                        else if (eventInfo.changeType == EventKeyword.Increase)
+                        else if (eventInfo.changeType == EventChangeType.Increase)
                             targetValue.vector2Value = initialValue.vector2Value + resultVector2;
                         else
                             targetValue.vector2Value = initialValue.vector2Value - resultVector2;
@@ -85,9 +85,9 @@ namespace CrazyStorm.Core
                     case PropertyType.RGB:
                         RGB resultRGB = VM.PopRGB();
                         initialValue.rgbValue = VM.PopRGB();
-                        if (eventInfo.changeType == EventKeyword.ChangeTo)
+                        if (eventInfo.changeType == EventChangeType.ChangeTo)
                             targetValue.rgbValue = resultRGB;
-                        else if (eventInfo.changeType == EventKeyword.Increase)
+                        else if (eventInfo.changeType == EventChangeType.Increase)
                             targetValue.rgbValue = initialValue.rgbValue + resultRGB;
                         else
                             targetValue.rgbValue = initialValue.rgbValue - resultRGB;
@@ -108,17 +108,17 @@ namespace CrazyStorm.Core
                         break;
                     case PropertyType.Int32:
                         initialValue.intValue = VM.PopInt();
-                        if (eventInfo.changeType == EventKeyword.Increase)
+                        if (eventInfo.changeType == EventChangeType.Increase)
                             targetValue.intValue = initialValue.intValue + targetValue.intValue;
-                        else if (eventInfo.changeType == EventKeyword.Decrease)
+                        else if (eventInfo.changeType == EventChangeType.Decrease)
                             targetValue.intValue = initialValue.intValue - targetValue.intValue;
 
                         break;
                     case PropertyType.Single:
                         initialValue.floatValue = VM.PopFloat();
-                        if (eventInfo.changeType == EventKeyword.Increase)
+                        if (eventInfo.changeType == EventChangeType.Increase)
                             targetValue.floatValue = initialValue.floatValue + targetValue.floatValue;
-                        else if (eventInfo.changeType == EventKeyword.Decrease)
+                        else if (eventInfo.changeType == EventChangeType.Decrease)
                             targetValue.floatValue = initialValue.floatValue - targetValue.floatValue;
 
                         break;
@@ -127,17 +127,17 @@ namespace CrazyStorm.Core
                         break;
                     case PropertyType.Vector2:
                         initialValue.vector2Value = VM.PopVector2();
-                        if (eventInfo.changeType == EventKeyword.Increase)
+                        if (eventInfo.changeType == EventChangeType.Increase)
                             targetValue.vector2Value = initialValue.vector2Value + targetValue.vector2Value;
-                        else if (eventInfo.changeType == EventKeyword.Decrease)
+                        else if (eventInfo.changeType == EventChangeType.Decrease)
                             targetValue.vector2Value = initialValue.vector2Value - targetValue.vector2Value;
 
                         break;
                     case PropertyType.RGB:
                         initialValue.rgbValue = VM.PopRGB();
-                        if (eventInfo.changeType == EventKeyword.Increase)
+                        if (eventInfo.changeType == EventChangeType.Increase)
                             targetValue.rgbValue = initialValue.rgbValue + targetValue.rgbValue;
-                        else if (eventInfo.changeType == EventKeyword.Decrease)
+                        else if (eventInfo.changeType == EventChangeType.Decrease)
                             targetValue.rgbValue = initialValue.rgbValue - targetValue.rgbValue;
 
                         break;
@@ -148,7 +148,7 @@ namespace CrazyStorm.Core
             }
             executor.InitialValue = initialValue;
             executor.TargetValue = targetValue;
-            if (executor.ChangeMode == EventKeyword.Instant)
+            if (executor.ChangeMode == EventChangeMode.Instant)
             {
                 executor.Update();
             }

@@ -1,4 +1,5 @@
 ﻿<UserControl x:Class="CrazyStorm.ConditionPanel"
+             x:Name="Root"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -88,38 +89,56 @@
             </Setter>
         </Style>
     </UserControl.Resources>
-    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-        <ComboBox Name="LeftConditionComboBox" Width="100" VerticalAlignment="Center" SelectionChanged="LeftConditionComboBox_SelectionChanged">
-            <ComboBox.ItemTemplate>
-                <DataTemplate>
-                    <TextBlock Text="{Binding DisplayName}" />
-                </DataTemplate>
-            </ComboBox.ItemTemplate>
-        </ComboBox>
-        <StackPanel Margin="5,0">
-            <CheckBox Style="{StaticResource RadioLikeStyle}" Name="LeftMoreThan" Content="&gt;" Checked="LeftOperator_Checked" Unchecked="LeftOperator_Unchecked"/>
-            <CheckBox Style="{StaticResource RadioLikeStyle}" Name="LeftEqual" Content="="  Checked="LeftOperator_Checked" Unchecked="LeftOperator_Unchecked" IsChecked="True"/>
-            <CheckBox Style="{StaticResource RadioLikeStyle}" Name="LeftLessThan" Content="&lt;"  Checked="LeftOperator_Checked" Unchecked="LeftOperator_Unchecked"/>
+    <StackPanel>
+        <StackPanel Name="ConditionMenu">
+            <DockPanel>
+                <Label Content="{Binding Header, ElementName=Root}" />
+                <Button Padding="5,0" VerticalAlignment="Stretch" HorizontalAlignment="Left" Click="SwitchToFunction_Click">
+                    <Path Data="{StaticResource Function_Icon}" Fill="Black" Width="14" Height="14" Stretch="Uniform"/>
+                </Button>
+            </DockPanel>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                <ComboBox Name="LeftConditionComboBox" Width="100" VerticalAlignment="Center" SelectionChanged="LeftConditionComboBox_SelectionChanged">
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding DisplayName}" />
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                </ComboBox>
+                <StackPanel Margin="5,0">
+                    <CheckBox Style="{StaticResource RadioLikeStyle}" Name="LeftMoreThan" Content="&gt;" Checked="LeftOperator_Checked" Unchecked="LeftOperator_Unchecked"/>
+                    <CheckBox Style="{StaticResource RadioLikeStyle}" Name="LeftEqual" Content="="  Checked="LeftOperator_Checked" Unchecked="LeftOperator_Unchecked" IsChecked="True"/>
+                    <CheckBox Style="{StaticResource RadioLikeStyle}" Name="LeftLessThan" Content="&lt;"  Checked="LeftOperator_Checked" Unchecked="LeftOperator_Unchecked"/>
+                </StackPanel>
+                <TextBox Name="LeftValue" Width="50" VerticalContentAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Center" Height="25" 
+                         PreviewLostKeyboardFocus="LeftValue_PreviewLostKeyboardFocus" MaxLines="1" PreviewGotKeyboardFocus="LeftValue_PreviewGotKeyboardFocus" />
+                <StackPanel Margin="5,0" VerticalAlignment="Center">
+                    <RadioButton Name="And" Content="{StaticResource AndStr}" IsChecked="True"/>
+                    <RadioButton Name="Or" Content="{StaticResource OrStr}" />
+                </StackPanel>
+                <ComboBox Name="RightConditionComboBox" Width="100" VerticalAlignment="Center" SelectionChanged="RightConditionComboBox_SelectionChanged">
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding DisplayName}" />
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                </ComboBox>
+                <StackPanel Margin="5,0">
+                    <CheckBox Style="{StaticResource RadioLikeStyle}" Name="RightMoreThan"  Content="&gt;" Checked="RightOperator_Checked" Unchecked="RightOperator_Unchecked"/>
+                    <CheckBox Style="{StaticResource RadioLikeStyle}" Name="RightEqual" Content="=" Checked="RightOperator_Checked" Unchecked="RightOperator_Unchecked" IsChecked="True"/>
+                    <CheckBox Style="{StaticResource RadioLikeStyle}" Name="RightLessThan" Content="&lt;" Checked="RightOperator_Checked" Unchecked="RightOperator_Unchecked"/>
+                </StackPanel>
+                <TextBox Name="RightValue" Width="50" VerticalContentAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Center" Height="25" 
+     PreviewLostKeyboardFocus="RightValue_PreviewLostKeyboardFocus" MaxLines="1" PreviewGotKeyboardFocus="RightValue_PreviewGotKeyboardFocus"/>
+            </StackPanel>
         </StackPanel>
-        <TextBox Name="LeftValue" Width="50" VerticalContentAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Center" Height="25" 
-             PreviewLostKeyboardFocus="LeftValue_PreviewLostKeyboardFocus" MaxLines="1" PreviewGotKeyboardFocus="LeftValue_PreviewGotKeyboardFocus" />
-        <StackPanel Margin="5,0" VerticalAlignment="Center">
-            <RadioButton Name="And" Content="{StaticResource AndStr}" IsChecked="True"/>
-            <RadioButton Name="Or" Content="{StaticResource OrStr}" />
-        </StackPanel>
-        <ComboBox Name="RightConditionComboBox" Width="100" VerticalAlignment="Center" SelectionChanged="RightConditionComboBox_SelectionChanged">
-            <ComboBox.ItemTemplate>
-                <DataTemplate>
-                    <TextBlock Text="{Binding DisplayName}" />
-                </DataTemplate>
-            </ComboBox.ItemTemplate>
-        </ComboBox>
-        <StackPanel Margin="5,0">
-            <CheckBox Style="{StaticResource RadioLikeStyle}" Name="RightMoreThan"  Content="&gt;" Checked="RightOperator_Checked" Unchecked="RightOperator_Unchecked"/>
-            <CheckBox Style="{StaticResource RadioLikeStyle}" Name="RightEqual" Content="=" Checked="RightOperator_Checked" Unchecked="RightOperator_Unchecked" IsChecked="True"/>
-            <CheckBox Style="{StaticResource RadioLikeStyle}" Name="RightLessThan" Content="&lt;" Checked="RightOperator_Checked" Unchecked="RightOperator_Unchecked"/>
-        </StackPanel>
-        <TextBox Name="RightValue" Width="50" VerticalContentAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Center" Height="25" 
-             PreviewLostKeyboardFocus="RightValue_PreviewLostKeyboardFocus" MaxLines="1" PreviewGotKeyboardFocus="RightValue_PreviewGotKeyboardFocus"/>
+        <DockPanel Name="ConditionFunction" Visibility="Collapsed">
+            <Label Content="{Binding Header, ElementName=Root}" />
+            <Button Padding="5,0" VerticalAlignment="Stretch" HorizontalAlignment="Left" Click="SwitchToConditionMenu_Click">
+                <Path Data="{StaticResource ConditionMenu_Icon}" Fill="Black" Width="14" Height="14" Stretch="Uniform"/>
+            </Button>
+            <TextBox Name="ConditionFunctionContent" Text="" VerticalContentAlignment="Center" 
+                 PreviewLostKeyboardFocus="ConditionFunctionContent_PreviewLostKeyboardFocus" Background="White" MaxLines="1" />
+        </DockPanel>
     </StackPanel>
 </UserControl>

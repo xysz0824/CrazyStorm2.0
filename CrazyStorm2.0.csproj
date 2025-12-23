@@ -147,10 +147,12 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Converter\EventConverter.cs" />
     <Compile Include="Edit\Command\Component\BindComponentCommand.cs" />
     <Compile Include="Edit\Command\Layer\CopyLayerCommand.cs" />
     <Compile Include="Edit\Command\Component\PasteComponentCommand.cs" />
     <Compile Include="Edit\Command\Component\UnbindComponentCommand.cs" />
+    <Compile Include="Helper\ExpressionHelper.cs" />
     <Compile Include="Helper\UIHelper.cs" />
     <Compile Include="Main\FilePart.cs" />
     <Compile Include="Main\PlayPart.cs" />

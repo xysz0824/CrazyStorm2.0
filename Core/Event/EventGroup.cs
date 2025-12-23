@@ -20,8 +20,7 @@ namespace CrazyStorm.Core
         [XmlAttribute]
         string condition;
         byte[] compiledCondition;
-        IList<string> originalEvents;
-        IList<string> translatedEvents;
+        IList<string> events;
         IList<byte[]> compiledEvents;
         #endregion
 
@@ -43,8 +42,7 @@ namespace CrazyStorm.Core
         }
         public VMInstruction[] VMCondition { get; set; }
         public IList<VMEventInfo> VMEvents { get; set; }
-        public IList<string> OriginalEvents { get { return originalEvents; } }
-        public IList<string> TranslatedEvents { get { return translatedEvents; } }
+        public IList<string> Events { get { return events; } }
         public IList<byte[]> CompiledEvents { get { return compiledEvents; } }
         #endregion
 
@@ -53,8 +51,7 @@ namespace CrazyStorm.Core
         {
             name = string.Empty;
             condition = string.Empty;
-            originalEvents = new GenericContainer<string>();
-            translatedEvents = new GenericContainer<string>();
+            events = new GenericContainer<string>();
             compiledEvents = new List<byte[]>();
             VMEvents = new List<VMEventInfo>();
         }
@@ -64,14 +61,8 @@ namespace CrazyStorm.Core
         public object Clone()
         {
             var clone = MemberwiseClone() as EventGroup;
-            clone.originalEvents = new GenericContainer<string>();
-            foreach (var item in originalEvents)
-                clone.originalEvents.Add(item);
-
-            clone.translatedEvents = new GenericContainer<string>();
-            foreach (var item in translatedEvents)
-                clone.translatedEvents.Add(item);
-
+            clone.events = new GenericContainer<string>();
+            foreach (var item in events) clone.events.Add(item);
             clone.compiledCondition = null;
             clone.compiledEvents = new List<byte[]>();
             return clone;
@@ -85,7 +76,7 @@ namespace CrazyStorm.Core
 
             XmlHelper.BuildFromFields(this, eventGroupNode);
             //events
-            XmlHelper.BuildFromList(originalEvents, eventGroupNode, "Events");
+            XmlHelper.BuildFromList(events, eventGroupNode, "Events");
             return eventGroupNode;
         }
         public XmlElement StoreAsXml(XmlDocument doc, XmlElement node)
@@ -93,7 +84,7 @@ namespace CrazyStorm.Core
             var eventGroupNode = doc.CreateElement("EventGroup");
             XmlHelper.StoreFields(this, doc, eventGroupNode);
             //events
-            XmlHelper.StoreList(originalEvents, doc, eventGroupNode, "Events");
+            XmlHelper.StoreList(events, doc, eventGroupNode, "Events");
             node.AppendChild(eventGroupNode);
             return eventGroupNode;
         }
