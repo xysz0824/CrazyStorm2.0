@@ -44,5 +44,9 @@ namespace CrazyStorm.Expression
             byte[] code = VM.CreateInstruction(VMCode.RGB);
             codeStream.AddRange(code);
         }
+        public override string ToString()
+        {
+            return $"[{GetR()},{GetG()},{GetB()}]";
+        }
     }
 }

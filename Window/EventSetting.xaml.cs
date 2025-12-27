@@ -95,6 +95,8 @@ namespace CrazyStorm
                 EventCondition.AddConditionVariable(item);
                 PropertyComboBox.Items.Add(item);
             }
+            //backfill group condition
+            GroupCondition.MapCondition(eventGroup.Condition);
             //Load sounds.
             foreach (FileResource sound in sounds)
             {
@@ -146,7 +148,7 @@ namespace CrazyStorm
                 eventInfo.resultProperty = selectedItem.Name;
                 eventInfo.isExpressionResult = isExpressionResult;
                 eventInfo.resultType = environment.GetValueType(selectedItem.Name);
-                eventInfo.resultValue = ResultValue.Text;
+                eventInfo.resultValue = ExpressionHelper.ReverseTranslate(ResultValue.Text);
                 if (Instant.IsChecked == true) eventInfo.changeTime = "1";
                 else eventInfo.changeTime = ChangeTime.Text;
             }
@@ -243,11 +245,14 @@ namespace CrazyStorm
                 {
                     var item = PropertyComboBox.Items[i] as VariableComboBoxItem;
                     if (item.Name == eventInfo.resultProperty)
+                    {
                         PropertyComboBox.SelectedIndex = i;
+                        break;
+                    }
                 }
                 isExpressionResult = eventInfo.isExpressionResult;
                 foreach (var button in buttonMap[eventInfo.changeType]) button.IsChecked = true;
-                ResultValue.Text = eventInfo.resultValue;
+                ResultValue.Text = ExpressionHelper.Translate(eventInfo.resultValue);
                 foreach (var button in buttonMap[eventInfo.changeMode]) button.IsChecked = true;
                 ChangeTime.Text = eventInfo.changeTime;
             }
@@ -316,6 +321,10 @@ namespace CrazyStorm
         #endregion
 
         #region Window EventHandlers
+        private void GroupCondition_ConditionChanged(object sender, ConditionChangedEventArgs e)
+        {
+            eventGroup.Condition = e.ModifiedCondition;
+        }
         private void Linear_Checked(object sender, RoutedEventArgs e)
         {
             Accelerated.IsChecked = false;
@@ -453,10 +462,8 @@ namespace CrazyStorm
             HideIntellisense();
             UIHelper.SetErrorToolTip(ResultValue, null);
             ResultValue.Text = ResultValue.Text.Trim();
-            string input = ResultValue.Text;
-            if (String.IsNullOrEmpty(input))
-                return;
-
+            string input = ExpressionHelper.ReverseTranslate(ResultValue.Text);
+            if (String.IsNullOrEmpty(input)) return;
             if (PropertyComboBox.SelectedItem != null)
             {
                 try
@@ -468,20 +475,16 @@ namespace CrazyStorm
                         object output = null;
                         if (PropertyTypeRule.TryParse(value, input, out output))
                         {
-                            ResultValue.Text = output.ToString();
+                            ResultValue.Text = ExpressionHelper.Translate(output.ToString());
                             isExpressionResult = false;
                             return;
                         }
                         var lexer = new Lexer();
                         lexer.Load(input);
                         var syntaxTree = new Parser(lexer).Expression();
-                        if (syntaxTree is Number)
-                            throw new ExpressionException("TypeError");
-
+                        if (syntaxTree is Number) throw new ExpressionException("TypeError");
                         var result = syntaxTree.Eval(environment);
-                        if (!(PropertyTypeRule.IsMatchWith(value.GetType(), result.GetType())))
-                            throw new ExpressionException("TypeError");
-
+                        if (!(PropertyTypeRule.IsMatchWith(value.GetType(), result.GetType()))) throw new ExpressionException("TypeError");
                         isExpressionResult = true;
                         return;
                     }
@@ -494,9 +497,7 @@ namespace CrazyStorm
                         lexer.Load(input);
                         var syntaxTree = new Parser(lexer).Expression();
                         var result = syntaxTree.Eval(environment);
-                        if (!(result is float))
-                            throw new ExpressionException("TypeError");
-
+                        if (!(result is float)) throw new ExpressionException("TypeError");
                         isExpressionResult = true;
                     }
                 }
@@ -511,31 +512,24 @@ namespace CrazyStorm
             UIHelper.SetErrorToolTip(ChangeTime, null);
             ChangeTime.Text = ChangeTime.Text.Trim();
             string input = ChangeTime.Text;
-            if (String.IsNullOrEmpty(input))
-                return;
-
+            if (String.IsNullOrEmpty(input)) return;
             int value;
-            if (!int.TryParse(input, out value))
-                UIHelper.SetErrorToolTip(ChangeTime, new ExpressionException("TypeError"));
-            else if (value <= 0)
-                ChangeTime.Text = "1";
+            if (!int.TryParse(input, out value)) UIHelper.SetErrorToolTip(ChangeTime, new ExpressionException("TypeError"));
+            else if (value <= 0) ChangeTime.Text = "1";
         }
         private void StopCondition_PreviewLostKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
         {
             UIHelper.SetErrorToolTip(StopCondition, null);
             StopCondition.Text = StopCondition.Text.Trim();
             string input = StopCondition.Text;
-            if (String.IsNullOrEmpty(input))
-                return;
-
+            if (String.IsNullOrEmpty(input)) return;
             try
             {
                 var lexer = new Lexer();
                 lexer.Load(input);
                 var syntaxTree = new Parser(lexer).Expression();
                 var result = syntaxTree.Eval(environment);
-                if (!(result is bool))
-                    throw new ExpressionException("TypeError");
+                if (!(result is bool)) throw new ExpressionException("TypeError");
             }
             catch (ExpressionException error)
             {
@@ -588,21 +582,16 @@ namespace CrazyStorm
         private void EventItem_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             //If mouse double clicked
-            if (e.ClickCount == 2)
-                EditEvent((e.OriginalSource as FrameworkElement).Parent as DockPanel);
+            if (e.ClickCount == 2) EditEvent((e.OriginalSource as FrameworkElement).Parent as DockPanel);
         }
         private void EventList_KeyDown(object sender, KeyEventArgs e)
         {
-            if (e.Key == Key.Delete)
-                DeleteEvent();
+            if (e.Key == Key.Delete) DeleteEvent();
         }
         private void EventList_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (EventList.SelectedIndex == -1)
-                return;
-
+            if (EventList.SelectedIndex == -1) return;
             MapEventText(eventGroup.Events[EventList.SelectedIndex]);
-
             #endregion
         }
     }

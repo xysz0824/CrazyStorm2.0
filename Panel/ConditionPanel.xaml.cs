@@ -50,6 +50,7 @@ namespace CrazyStorm
         }
         public static readonly DependencyProperty HeaderProperty = DependencyProperty.Register(nameof(Header),
                 typeof(string), typeof(ConditionPanel), new PropertyMetadata(string.Empty));
+        public event EventHandler<ConditionChangedEventArgs> ConditionChanged;
         #endregion
 
         #region Constructor
@@ -60,9 +61,8 @@ namespace CrazyStorm
         #endregion
 
         #region Public Methods
-        void Reset()
+        void ResetConditionMenu()
         {
-            SwitchToConditionMenu_Click(null, null);
             LeftLessThan.IsChecked = LeftEqual.IsChecked = LeftMoreThan.IsChecked = false;
             LeftConditionComboBox.SelectedIndex = -1;
             LeftValue.Text = string.Empty;
@@ -71,7 +71,6 @@ namespace CrazyStorm
             RightLessThan.IsChecked = RightEqual.IsChecked = RightMoreThan.IsChecked = false;
             RightConditionComboBox.SelectedIndex = -1;
             RightValue.Text = string.Empty;
-            ConditionFunctionContent.Text = string.Empty;
         }
         public void AddConditionVariable(VariableComboBoxItem item)
         {
@@ -85,11 +84,17 @@ namespace CrazyStorm
         }
         public string BuildCondition()
         {
+            if (!IsInitialized) return null;
             UIHelper.SetErrorToolTip(ConditionFunctionContent, null);
+            UIHelper.HideIntellisense(popup);
+            UIHelper.SetErrorToolTip(LeftValue, null);
+            UIHelper.SetErrorToolTip(RightValue, null);
             if (ConditionFunction.Visibility == Visibility.Visible)
             {
                 var lexer = new Lexer();
-                lexer.Load(ExpressionHelper.ReverseTranslate(ConditionFunctionContent.Text));
+                ConditionFunctionContent.Text = ConditionFunctionContent.Text.Trim();
+                var input = ExpressionHelper.ReverseTranslate(ConditionFunctionContent.Text);
+                lexer.Load(input);
                 var expression = new Parser(lexer).Expression();
                 if (expression is Number)
                 {
@@ -98,13 +103,14 @@ namespace CrazyStorm
                 }
                 try
                 {
-                    var result = expression.Eval(Environment);
-                    if (!PropertyTypeRule.IsMatchWith(typeof(bool), result.GetType()))
+                    var v = expression.Eval(Environment);
+                    if (!PropertyTypeRule.IsMatchWith(typeof(bool), v.GetType()))
                     {
                         UIHelper.SetErrorToolTip(ConditionFunctionContent, new ExpressionException("TypeError"));
                         return null;
                     }
-                    return ExpressionHelper.ReverseTranslate(ConditionFunctionContent.Text);
+                    MapConditionToMenu(input, true);
+                    return input;
                 }
                 catch (ExpressionException e)
                 {
@@ -126,11 +132,72 @@ namespace CrazyStorm
                 if (LeftConditionComboBox.SelectedItem != null && !String.IsNullOrEmpty(LeftValue.Text) &&
                     !String.IsNullOrEmpty(leftOperator))
                 {
-                    var selectedItem = LeftConditionComboBox.SelectedItem as VariableComboBoxItem;
-                    leftProperty = selectedItem.Name;
-                    leftValue = LeftValue.Text;
+                    var item = LeftConditionComboBox.SelectedItem as VariableComboBoxItem;
+                    var finalText = default(string);
+                    LeftValue.Text = LeftValue.Text.Trim();
+                    var input = ExpressionHelper.ReverseTranslate(LeftValue.Text);
+                    try
+                    {
+                        if (!string.IsNullOrEmpty(input))
+                        {
+                            object value = Environment.GetProperty(item.Name);
+                            if (value != null)
+                            {
+                                if (PropertyTypeRule.TryParse(value, input, out value))
+                                {
+                                    finalText = ExpressionHelper.Translate(value.ToString());
+                                }
+                                else
+                                {
+                                    var lexer = new Lexer();
+                                    lexer.Load(input);
+                                    var syntaxTree = new Parser(lexer).Expression();
+                                    if (syntaxTree is Number)
+                                    {
+                                        UIHelper.SetErrorToolTip(LeftValue, new ExpressionException("TypeError"));
+                                    }
+                                    else
+                                    {
+                                        var eval = syntaxTree.Eval(Environment);
+                                        if (!(PropertyTypeRule.IsMatchWith(value.GetType(), eval.GetType())))
+                                        {
+                                            UIHelper.SetErrorToolTip(LeftValue, new ExpressionException("TypeError"));
+                                        }
+                                        else
+                                        {
+                                            finalText = LeftValue.Text;
+                                        }
+                                    }
+                                }
+                            }
+                            if (value == null) value = Environment.GetLocal(item.Name);
+                            if (value == null) value = Environment.GetGlobal(item.Name);
+                            if (value != null)
+                            {
+                                //Fields of support struct must be float type.
+                                var lexer = new Lexer();
+                                lexer.Load(input);
+                                var syntaxTree = new Parser(lexer).Expression();
+                                var eval = syntaxTree.Eval(Environment);
+                                if (!(eval is float))
+                                {
+                                    UIHelper.SetErrorToolTip(LeftValue, new ExpressionException("TypeError"));
+                                }
+                                else finalText = LeftValue.Text;
+                            }
+                        }
+                    }
+                    catch (ExpressionException e)
+                    {
+                        UIHelper.SetErrorToolTip(LeftValue, e);
+                    } 
+                    if (!string.IsNullOrEmpty(finalText))
+                    {
+                        leftProperty = item.Name;
+                        leftValue = LeftValue.Text;
+                    }
                 }
-                else leftOperator = default(string);
+                else leftOperator = default;
                 var rightOperator = default(string);
                 var rightProperty = default(string);
                 var rightValue = default(string);
@@ -143,30 +210,91 @@ namespace CrazyStorm
                 if (RightConditionComboBox.SelectedItem != null && !String.IsNullOrEmpty(RightValue.Text) &&
                     !String.IsNullOrEmpty(rightOperator))
                 {
-                    var selectedItem = RightConditionComboBox.SelectedItem as VariableComboBoxItem;
-                    rightProperty = selectedItem.Name;
-                    rightValue = RightValue.Text;
+                    var item = RightConditionComboBox.SelectedItem as VariableComboBoxItem;
+                    var finalText = default(string);
+                    RightValue.Text = RightValue.Text.Trim();
+                    var input = ExpressionHelper.ReverseTranslate(RightValue.Text);
+                    try
+                    {
+                        if (!string.IsNullOrEmpty(input))
+                        {
+                            object value = Environment.GetProperty(item.Name);
+                            if (value != null)
+                            {
+                                if (PropertyTypeRule.TryParse(value, input, out value))
+                                {
+                                    finalText = ExpressionHelper.Translate(value.ToString());
+                                }
+                                else
+                                {
+                                    var lexer = new Lexer();
+                                    lexer.Load(input);
+                                    var syntaxTree = new Parser(lexer).Expression();
+                                    if (syntaxTree is Number)
+                                    {
+                                        UIHelper.SetErrorToolTip(RightValue, new ExpressionException("TypeError"));
+                                    }
+                                    else
+                                    {
+                                        var eval = syntaxTree.Eval(Environment);
+                                        if (!(PropertyTypeRule.IsMatchWith(value.GetType(), eval.GetType())))
+                                        {
+                                            UIHelper.SetErrorToolTip(RightValue, new ExpressionException("TypeError"));
+                                        }
+                                        else
+                                        {
+                                            finalText = RightValue.Text;
+                                        }
+                                    }
+                                }
+                            }
+                            if (value == null) value = Environment.GetLocal(item.Name);
+                            if (value == null) value = Environment.GetGlobal(item.Name);
+                            if (value != null)
+                            {
+                                //Fields of support struct must be float type.
+                                var lexer = new Lexer();
+                                lexer.Load(input);
+                                var syntaxTree = new Parser(lexer).Expression();
+                                var eval = syntaxTree.Eval(Environment);
+                                if (!(eval is float))
+                                {
+                                    UIHelper.SetErrorToolTip(RightValue, new ExpressionException("TypeError"));
+                                }
+                                else finalText = RightValue.Text;
+                            }
+                        }
+                    }
+                    catch (ExpressionException e)
+                    {
+                        UIHelper.SetErrorToolTip(RightValue, e);
+                    }
+                    if (!string.IsNullOrEmpty(finalText))
+                    {
+                        rightProperty = item.Name;
+                        rightValue = RightValue.Text;
+                    }
                 }
-                else rightOperator = default(string);
+                else rightOperator = default;
                 //Allow empty condition
                 if (String.IsNullOrEmpty(leftProperty) && String.IsNullOrEmpty(rightProperty)) return null;
                 var midOperator = default(string);
                 if (!String.IsNullOrEmpty(leftProperty) && !String.IsNullOrEmpty(rightProperty))
                 {
-                    if (And.IsChecked == true) midOperator = "&";
-                    else if (Or.IsChecked == true) midOperator = "|";
+                    if (And.IsChecked == true) midOperator = " & ";
+                    else if (Or.IsChecked == true) midOperator = " | ";
                 }
-                return string.Format("{0}{1}{2} {3} {4}{5}{6}", leftProperty, leftOperator, leftValue, midOperator,
+                var result = string.Format("{0}{1}{2}{3}{4}{5}{6}", leftProperty, leftOperator, leftValue, midOperator,
                     rightProperty, rightOperator, rightValue).Trim();
+                ConditionFunctionContent.Text = ExpressionHelper.Translate(result);
+                return result;
             }
             return null;
         }
-        public void MapCondition(string condition)
+        private void MapConditionToMenu(string condition, bool internalMap)
         {
-            if (condition == null) return;
             internalSetting = true;
-            Reset();
-            ConditionFunctionContent.Text = ExpressionHelper.Translate(condition);
+            ResetConditionMenu();
             var checkBoxMap = new Dictionary<string, CheckBox[]>();
             checkBoxMap[">"] = new[] { LeftMoreThan };
             checkBoxMap["="] = new[] { LeftEqual };
@@ -180,7 +308,7 @@ namespace CrazyStorm
             var lexer = new Lexer();
             lexer.Load(condition);
             var expression = new Parser(lexer).Expression() as BinaryExpression;
-            if (expression.LeafExpression)
+            if (expression.SimpleLeftExpression)
             {
                 var leftProperty = expression.GetLeftChild() as Name;
                 if (leftProperty == null) return;
@@ -189,19 +317,22 @@ namespace CrazyStorm
                 {
                     var item = LeftConditionComboBox.Items[i] as VariableComboBoxItem;
                     if (item.Name == leftPropertyName)
+                    {
                         LeftConditionComboBox.SelectedIndex = i;
+                        break;
+                    }
                 }
                 var op = (expression.Token as IdentifierToken).GetValue() as string;
                 foreach (var checkBox in checkBoxMap[op]) checkBox.IsChecked = true;
                 var leftValue = expression.GetRightChild();
-                LeftValue.Text = leftValue.Token.GetValue().ToString();
-                SwitchToConditionMenu_Click(null, null);
+                LeftValue.Text = leftValue.ToString();
+                if (!internalMap) SwitchToConditionMenu_Click(null, null);
             }
             else
             {
                 var left = expression.GetLeftChild() as BinaryExpression;
                 var right = expression.GetRightChild() as BinaryExpression;
-                if (left != null && left.LeafExpression && right != null && right.LeafExpression)
+                if (left != null && left.SimpleLeftExpression && right != null && right.SimpleLeftExpression)
                 {
                     var leftProperty = left.GetLeftChild() as Name;
                     if (leftProperty == null) return;
@@ -210,12 +341,15 @@ namespace CrazyStorm
                     {
                         var item = LeftConditionComboBox.Items[i] as VariableComboBoxItem;
                         if (item.Name == leftPropertyName)
+                        {
                             LeftConditionComboBox.SelectedIndex = i;
+                            break;
+                        }
                     }
                     var leftOp = (left.Token as IdentifierToken).GetValue() as string;
                     foreach (var checkBox in checkBoxMap[leftOp]) checkBox.IsChecked = true;
                     var leftValue = left.GetRightChild();
-                    LeftValue.Text = leftValue.Token.GetValue().ToString();
+                    LeftValue.Text = leftValue.ToString();
 
                     var midOp = (expression.Token as IdentifierToken).GetValue() as string;
                     foreach (var button in buttonMap[midOp]) button.IsChecked = true;
@@ -233,30 +367,41 @@ namespace CrazyStorm
                     {
                         var item = RightConditionComboBox.Items[i] as VariableComboBoxItem;
                         if (item.Name == rightPropertyName)
+                        {
                             RightConditionComboBox.SelectedIndex = i;
+                            break;
+                        }
                     }
                     var rightOp = (right.Token as IdentifierToken).GetValue() as string;
                     foreach (var checkBox in checkBoxMap[rightOp]) checkBox.IsChecked = true;
                     var rightValue = right.GetRightChild();
-                    RightValue.Text = rightValue.Token.GetValue().ToString();
-                    SwitchToConditionMenu_Click(null, null);
+                    RightValue.Text = rightValue.ToString();
+                    if (!internalMap) SwitchToConditionMenu_Click(null, null);
                 }
                 else
                 {
-                    SwitchToFunction_Click(null, null);
+                    if (!internalMap) SwitchToFunction_Click(null, null);
                 }
             }
             internalSetting = false;
+        }
+        public void MapCondition(string condition)
+        {
+            if (string.IsNullOrEmpty(condition)) return;
+            ConditionFunctionContent.Text = ExpressionHelper.Translate(condition);
+            MapConditionToMenu(condition, false);
         }
         #endregion
 
         #region Window EventHandlers
         private void LeftConditionComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
+            if (internalSetting) return;
             LeftValue_PreviewLostKeyboardFocus(sender, null);
         }
         private void RightConditionComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
+            if (internalSetting) return;
             RightValue_PreviewLostKeyboardFocus(sender, null);
         }
         private void LeftValue_PreviewGotKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
@@ -271,36 +416,10 @@ namespace CrazyStorm
         }
         private void LeftValue_PreviewLostKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
         {
-            UIHelper.HideIntellisense(popup);
-            UIHelper.SetErrorToolTip(LeftValue, null);
-            LeftValue.Text = LeftValue.Text.Trim();
-            string input = LeftValue.Text;
-            if (String.IsNullOrEmpty(input)) return;
-            if (LeftConditionComboBox.SelectedItem != null)
+            var condition = BuildCondition();
+            if (!string.IsNullOrEmpty(condition))
             {
-                var item = LeftConditionComboBox.SelectedItem as VariableComboBoxItem;
-                object value = Environment.GetProperty(item.Name);
-                if (value != null)
-                {
-                    if (!PropertyTypeRule.TryParse(value, input, out value))
-                    {
-                        UIHelper.SetErrorToolTip(LeftValue, new ExpressionException("TypeError"));
-                        return;
-                    }
-                    LeftValue.Text = value.ToString();
-                    return;
-                }
-                if (value == null) value = Environment.GetLocal(item.Name);
-                if (value == null) value = Environment.GetGlobal(item.Name);
-                if (value != null)
-                {
-                    float testValue;
-                    if (!float.TryParse(input, out testValue))
-                    {
-                        UIHelper.SetErrorToolTip(LeftValue, new ExpressionException("TypeError"));
-                        return;
-                    }
-                }
+                ConditionChanged?.Invoke(this, new ConditionChangedEventArgs(condition));
             }
         }
         private void RightValue_PreviewGotKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
@@ -315,36 +434,10 @@ namespace CrazyStorm
         }
         private void RightValue_PreviewLostKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
         {
-            UIHelper.HideIntellisense(popup);
-            UIHelper.SetErrorToolTip(RightValue, null);
-            RightValue.Text = RightValue.Text.Trim();
-            string input = RightValue.Text;
-            if (String.IsNullOrEmpty(input)) return;
-            if (RightConditionComboBox.SelectedItem != null)
+            var condition = BuildCondition();
+            if (!string.IsNullOrEmpty(condition))
             {
-                var item = RightConditionComboBox.SelectedItem as VariableComboBoxItem;
-                object value = Environment.GetProperty(item.Name);
-                if (value != null)
-                {
-                    if (!PropertyTypeRule.TryParse(value, input, out value))
-                    {
-                        UIHelper.SetErrorToolTip(RightValue, new ExpressionException("TypeError"));
-                        return;
-                    }
-                    RightValue.Text = value.ToString();
-                    return;
-                }
-                if (value == null) value = Environment.GetLocal(item.Name);
-                if (value == null) value = Environment.GetGlobal(item.Name);
-                if (value != null)
-                {
-                    float testValue;
-                    if (!float.TryParse(input, out testValue))
-                    {
-                        UIHelper.SetErrorToolTip(RightValue, new ExpressionException("TypeError"));
-                        return;
-                    }
-                }
+                ConditionChanged?.Invoke(this, new ConditionChangedEventArgs(condition));
             }
         }
         private void LeftOperator_Checked(object sender, RoutedEventArgs e)
@@ -365,6 +458,11 @@ namespace CrazyStorm
                     LeftMoreThan.IsChecked = false;
                 }
             }
+            var condition = BuildCondition();
+            if (!string.IsNullOrEmpty(condition))
+            {
+                ConditionChanged?.Invoke(this, new ConditionChangedEventArgs(condition));
+            }
         }
         private void LeftOperator_Unchecked(object sender, RoutedEventArgs e)
         {
@@ -379,6 +477,11 @@ namespace CrazyStorm
                 {
                     LeftMoreThan.IsChecked = true;
                 }
+            }
+            var condition = BuildCondition();
+            if (!string.IsNullOrEmpty(condition))
+            {
+                ConditionChanged?.Invoke(this, new ConditionChangedEventArgs(condition));
             }
         }
         private void RightOperator_Checked(object sender, RoutedEventArgs e)
@@ -399,6 +502,11 @@ namespace CrazyStorm
                     RightMoreThan.IsChecked = false;
                 }
             }
+            var condition = BuildCondition();
+            if (!string.IsNullOrEmpty(condition))
+            {
+                ConditionChanged?.Invoke(this, new ConditionChangedEventArgs(condition));
+            }
         }
         private void RightOperator_Unchecked(object sender, RoutedEventArgs e)
         {
@@ -414,6 +522,11 @@ namespace CrazyStorm
                     RightMoreThan.IsChecked = true;
                 }
             }
+            var condition = BuildCondition();
+            if (!string.IsNullOrEmpty(condition))
+            {
+                ConditionChanged?.Invoke(this, new ConditionChangedEventArgs(condition));
+            }
         }
         private void SwitchToFunction_Click(object sender, RoutedEventArgs e)
         {
@@ -427,21 +540,10 @@ namespace CrazyStorm
         }
         private void ConditionFunctionContent_PreviewLostKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
         {
-            UIHelper.SetErrorToolTip(ConditionFunctionContent, null);
-            ConditionFunctionContent.Text = ConditionFunctionContent.Text.Trim();
-            string input = ExpressionHelper.ReverseTranslate(ConditionFunctionContent.Text);
-            if (String.IsNullOrEmpty(input)) return;
-            try
+            var condition = BuildCondition();
+            if (!string.IsNullOrEmpty(condition))
             {
-                var lexer = new Lexer();
-                lexer.Load(input);
-                var syntaxTree = new Parser(lexer).Expression();
-                var result = syntaxTree.Eval(Environment);
-                if (!(result is bool)) throw new ExpressionException("TypeError");
-            }
-            catch (ExpressionException error)
-            {
-                UIHelper.SetErrorToolTip(ConditionFunctionContent, error);
+                ConditionChanged?.Invoke(this, new ConditionChangedEventArgs(condition));
             }
         }
         #endregion

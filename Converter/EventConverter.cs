@@ -25,6 +25,7 @@ namespace CrazyStorm
                 info.resultProperty = ExpressionHelper.TranslateProperty(info.resultProperty);
                 info.changeType = ExpressionHelper.FindTranslation(info.changeType);
                 info.changeMode = ExpressionHelper.FindTranslation(info.changeMode);
+                info.resultValue = ExpressionHelper.Translate(info.resultValue);
             }
             else
             {

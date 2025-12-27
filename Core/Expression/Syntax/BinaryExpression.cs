@@ -23,17 +23,16 @@ namespace CrazyStorm.Expression
         public SyntaxTree GetLeftChild() { return GetChildren()[0]; }
 
         public SyntaxTree GetRightChild() { return GetChildren()[1]; }
-        public bool LeafExpression
+        public bool SimpleLeftExpression
         {
             get
             {
                 var left = GetLeftChild();
                 var right = GetRightChild();
-                return (!(left is BinaryExpression)) && (!(right is BinaryExpression)) &&
-                    (!(left is NegativeExpression)) && (!(right is NegativeExpression));
+                return (!(left is BinaryExpression)) && (!(left is NegativeExpression)) &&
+                    (!(left is Call));
             }
-        }
-
+        }   
         public override object Eval(Environment e)
         {
             var left = GetLeftChild().Eval(e);
@@ -257,5 +256,9 @@ namespace CrazyStorm.Expression
             }
             codeStream.AddRange(code);
         }
+        public override string ToString()
+        {
+            return $"{GetLeftChild()}{(string)Token.GetValue()}{GetRightChild()}";
+        }   
     }
 }

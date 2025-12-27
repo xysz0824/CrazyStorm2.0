@@ -27,9 +27,7 @@ namespace CrazyStorm.Expression
         {
             var list = GetArguments();
             var resultList = new List<object>();
-            foreach (var item in list)
-                resultList.Add(item.Eval(e));
-
+            foreach (var item in list) resultList.Add(item.Eval(e));
             return resultList;
         }
 
@@ -40,6 +38,17 @@ namespace CrazyStorm.Expression
 
             byte[] code = VM.CreateInstruction(VMCode.VECTOR, new Vector3(Count));
             codeStream.AddRange(code);
+        }
+        public override string ToString()
+        {
+            var args = GetArguments();
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < args.Count; ++i)
+            {
+                sb.Append(args[i].ToString());
+                if (i != args.Count - 1) sb.Append(",");
+            }
+            return sb.ToString();
         }
     }
 }

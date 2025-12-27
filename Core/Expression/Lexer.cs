@@ -99,7 +99,7 @@ namespace CrazyStorm.Expression
                 builder.Append("\n");
                 lineNumber++;
             }
-            builder.Remove(builder.Length - 1, 1);
+            if (lineNumber > 1) builder.Remove(builder.Length - 1, 1);
             return builder.ToString();
         }
     }

@@ -50,5 +50,9 @@ namespace CrazyStorm.Expression
                 codeStream.AddRange(code2);
             }
         }
+        public override string ToString()
+        {
+            return $"-{GetExpression()}";
+        }
     }
 }

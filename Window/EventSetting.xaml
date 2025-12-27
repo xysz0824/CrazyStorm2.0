@@ -13,7 +13,8 @@
                     <Label Content="{StaticResource NameStr}" />
                     <TextBox Text="{Binding Path=Name}" VerticalContentAlignment="Center" MaxLines="1" />
                 </DockPanel>
-                <local:ConditionPanel x:Name="GroupCondition" Header="{StaticResource ConditionStr}"></local:ConditionPanel>
+                <local:ConditionPanel x:Name="GroupCondition" Header="{StaticResource ConditionStr}" 
+                                      ConditionChanged="GroupCondition_ConditionChanged"></local:ConditionPanel>
             </StackPanel>
         </GroupBox>
         <GroupBox Header="{StaticResource EventListStr}">
