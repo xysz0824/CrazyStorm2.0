@@ -51,6 +51,7 @@ namespace CrazyStorm
         public static readonly DependencyProperty HeaderProperty = DependencyProperty.Register(nameof(Header),
                 typeof(string), typeof(ConditionPanel), new PropertyMetadata(string.Empty));
         public event EventHandler<ConditionChangedEventArgs> ConditionChanged;
+        public event EventHandler ConditionConfirmed;
         #endregion
 
         #region Constructor
@@ -93,6 +94,11 @@ namespace CrazyStorm
             {
                 var lexer = new Lexer();
                 ConditionFunctionContent.Text = ConditionFunctionContent.Text.Trim();
+                if (string.IsNullOrEmpty(ConditionFunctionContent.Text))
+                {
+                    MapEmptyConditionToMenu();
+                    return string.Empty;
+                }
                 var input = ExpressionHelper.ReverseTranslate(ConditionFunctionContent.Text);
                 lexer.Load(input);
                 var expression = new Parser(lexer).Expression();
@@ -291,6 +297,12 @@ namespace CrazyStorm
             }
             return null;
         }
+        private void MapEmptyConditionToMenu()
+        {
+            internalSetting = true;
+            ResetConditionMenu();
+            internalSetting = false;    
+        }
         private void MapConditionToMenu(string condition, bool internalMap)
         {
             internalSetting = true;
@@ -417,7 +429,7 @@ namespace CrazyStorm
         private void LeftValue_PreviewLostKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
         {
             var condition = BuildCondition();
-            if (!string.IsNullOrEmpty(condition))
+            if (condition != null)
             {
                 ConditionChanged?.Invoke(this, new ConditionChangedEventArgs(condition));
             }
@@ -435,7 +447,7 @@ namespace CrazyStorm
         private void RightValue_PreviewLostKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
         {
             var condition = BuildCondition();
-            if (!string.IsNullOrEmpty(condition))
+            if (condition != null)
             {
                 ConditionChanged?.Invoke(this, new ConditionChangedEventArgs(condition));
             }
@@ -459,7 +471,7 @@ namespace CrazyStorm
                 }
             }
             var condition = BuildCondition();
-            if (!string.IsNullOrEmpty(condition))
+            if (condition != null)
             {
                 ConditionChanged?.Invoke(this, new ConditionChangedEventArgs(condition));
             }
@@ -479,7 +491,7 @@ namespace CrazyStorm
                 }
             }
             var condition = BuildCondition();
-            if (!string.IsNullOrEmpty(condition))
+            if (condition != null)
             {
                 ConditionChanged?.Invoke(this, new ConditionChangedEventArgs(condition));
             }
@@ -503,7 +515,7 @@ namespace CrazyStorm
                 }
             }
             var condition = BuildCondition();
-            if (!string.IsNullOrEmpty(condition))
+            if (condition != null)
             {
                 ConditionChanged?.Invoke(this, new ConditionChangedEventArgs(condition));
             }
@@ -523,7 +535,7 @@ namespace CrazyStorm
                 }
             }
             var condition = BuildCondition();
-            if (!string.IsNullOrEmpty(condition))
+            if (condition != null)
             {
                 ConditionChanged?.Invoke(this, new ConditionChangedEventArgs(condition));
             }
@@ -541,9 +553,45 @@ namespace CrazyStorm
         private void ConditionFunctionContent_PreviewLostKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
         {
             var condition = BuildCondition();
-            if (!string.IsNullOrEmpty(condition))
+            if (condition != null)
             {
                 ConditionChanged?.Invoke(this, new ConditionChangedEventArgs(condition));
+            }
+        }
+        private void ConditionFunctionContent_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter)
+            {
+                var condition = BuildCondition();
+                if (condition != null)
+                {
+                    ConditionChanged?.Invoke(this, new ConditionChangedEventArgs(condition));
+                    ConditionConfirmed?.Invoke(this, e);
+                }
+            }
+        }
+        private void LeftValue_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter)
+            {
+                var condition = BuildCondition();
+                if (condition != null)
+                {
+                    ConditionChanged?.Invoke(this, new ConditionChangedEventArgs(condition));
+                    ConditionConfirmed?.Invoke(this, e);
+                }
+            }
+        }
+        private void RightValue_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter)
+            {
+                var condition = BuildCondition();
+                if (condition != null)
+                {
+                    ConditionChanged?.Invoke(this, new ConditionChangedEventArgs(condition));
+                    ConditionConfirmed?.Invoke(this, e);
+                }
             }
         }
         #endregion

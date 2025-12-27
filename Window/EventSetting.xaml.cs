@@ -178,7 +178,7 @@ namespace CrazyStorm
                 //Check if there have errors
                 if (UIHelper.HasError(StopCondition)) return false;
                 string arguments = string.Empty;
-                arguments = StopCondition.Text;
+                arguments = ExpressionHelper.ReverseTranslate(StopCondition.Text);
                 eventInfo.specialEvent = "Loop";
                 eventInfo.arguments = arguments;
             }
@@ -298,6 +298,8 @@ namespace CrazyStorm
             EventList.IsEnabled = false;
             AddEvent.Content = (string)FindResource("ModifyStr");
             AddSpecialEvent.Content = AddEvent.Content;
+            DelEvent.IsEnabled = false;
+            DelSpecialEvent.IsEnabled = false;
             isEditing = true;
         }
         void DeleteEvent()
@@ -308,6 +310,8 @@ namespace CrazyStorm
                 eventGroup.Events.RemoveAt(EventList.SelectedIndex);
             }
             EventList.ItemsSource = eventGroup.Events;
+            DelEvent.IsEnabled = EventList.SelectedItem != null;
+            DelSpecialEvent.IsEnabled = EventList.SelectedItem != null;
         }
         void ShowIntellisense(object property, UIElement element)
         {
@@ -392,6 +396,8 @@ namespace CrazyStorm
                     PropertyEventPanel.IsEnabled = true;
                     AddSpecialEvent.Content = AddEvent.Content;
                     SpecialEventPanel.IsEnabled = true;
+                    DelEvent.IsEnabled = EventList.SelectedItem != null;
+                    DelSpecialEvent.IsEnabled = EventList.SelectedItem != null;
                     isEditing = false;
                 }
             }
@@ -406,6 +412,10 @@ namespace CrazyStorm
                     eventGroup.Events.Add(text);
                 }
             }
+        }
+        private void DelEvent_Click(object sender, RoutedEventArgs e)
+        {
+            DeleteEvent();
         }
         private void AddSpecialEvent_Click(object sender, RoutedEventArgs e)
         {
@@ -444,6 +454,10 @@ namespace CrazyStorm
         {
             DeleteEvent();
         }
+        private void DelSpecialEvent_Click(object sender, RoutedEventArgs e)
+        {
+            DeleteEvent();
+        }   
         private void PropertyComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             ResultValue_PreviewLostKeyboardFocus(sender, null);
@@ -521,7 +535,7 @@ namespace CrazyStorm
         {
             UIHelper.SetErrorToolTip(StopCondition, null);
             StopCondition.Text = StopCondition.Text.Trim();
-            string input = StopCondition.Text;
+            string input = ExpressionHelper.Translate(StopCondition.Text);
             if (String.IsNullOrEmpty(input)) return;
             try
             {
@@ -586,13 +600,59 @@ namespace CrazyStorm
         }
         private void EventList_KeyDown(object sender, KeyEventArgs e)
         {
-            if (e.Key == Key.Delete) DeleteEvent();
+            if (e.Key == Key.Enter && EventList.SelectedItem != null)
+            {
+                var container = EventList.ItemContainerGenerator.ContainerFromItem(EventList.SelectedItem) as ListViewItem;
+                if (container == null) return;
+                EditEvent(VisualHelper.GetVisualChild<DockPanel>(container));
+            }
+            else if (e.Key == Key.Delete) DeleteEvent();
         }
         private void EventList_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (EventList.SelectedIndex == -1) return;
             MapEventText(eventGroup.Events[EventList.SelectedIndex]);
-            #endregion
+            DelEvent.IsEnabled = EventList.SelectedItem != null;
+            DelSpecialEvent.IsEnabled = EventList.SelectedItem != null;
         }
+        private void EventCondition_ConditionConfirmed(object sender, EventArgs e)
+        {
+            if (isEditing)
+            {
+                AddEvent_Click(null, null);
+                AddEvent.Focus();
+            }
+        }
+        private void ResultValue_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (isEditing && e.Key == Key.Enter)
+            {
+                ResultValue_PreviewLostKeyboardFocus(null, null);
+                if (UIHelper.HasError(ResultValue)) return;
+                AddEvent_Click(null, null);
+                AddEvent.Focus();
+            }
+        }
+        private void ChangeTime_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (isEditing && e.Key == Key.Enter)
+            {
+                ChangeTime_PreviewLostKeyboardFocus(null, null);
+                if (UIHelper.HasError(ChangeTime)) return;
+                AddEvent_Click(null, null);
+                AddEvent.Focus();
+            }
+        }
+        private void StopCondition_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (isEditing && e.Key == Key.Enter)
+            {
+                StopCondition_PreviewLostKeyboardFocus(null, null);
+                if (UIHelper.HasError(StopCondition)) return;
+                AddSpecialEvent_Click(null, null);
+                AddSpecialEvent.Focus();
+            }
+        }
+        #endregion
     }
 }

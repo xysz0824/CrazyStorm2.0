@@ -110,8 +110,9 @@
                     <CheckBox Style="{StaticResource RadioLikeStyle}" Name="LeftEqual" Content="="  Checked="LeftOperator_Checked" Unchecked="LeftOperator_Unchecked" IsChecked="True"/>
                     <CheckBox Style="{StaticResource RadioLikeStyle}" Name="LeftLessThan" Content="&lt;"  Checked="LeftOperator_Checked" Unchecked="LeftOperator_Unchecked"/>
                 </StackPanel>
-                <TextBox Name="LeftValue" Width="50" VerticalContentAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Center" Height="25" 
-                         PreviewLostKeyboardFocus="LeftValue_PreviewLostKeyboardFocus" MaxLines="1" PreviewGotKeyboardFocus="LeftValue_PreviewGotKeyboardFocus" />
+                <TextBox Name="LeftValue" Width="50" VerticalContentAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Center" Height="25" MaxLines="1"
+                         PreviewLostKeyboardFocus="LeftValue_PreviewLostKeyboardFocus" PreviewGotKeyboardFocus="LeftValue_PreviewGotKeyboardFocus" 
+                         KeyDown="LeftValue_KeyDown"/>
                 <StackPanel Margin="5,0" VerticalAlignment="Center">
                     <RadioButton Name="And" Content="{StaticResource AndStr}" IsChecked="True"/>
                     <RadioButton Name="Or" Content="{StaticResource OrStr}" />
@@ -128,8 +129,9 @@
                     <CheckBox Style="{StaticResource RadioLikeStyle}" Name="RightEqual" Content="=" Checked="RightOperator_Checked" Unchecked="RightOperator_Unchecked" IsChecked="True"/>
                     <CheckBox Style="{StaticResource RadioLikeStyle}" Name="RightLessThan" Content="&lt;" Checked="RightOperator_Checked" Unchecked="RightOperator_Unchecked"/>
                 </StackPanel>
-                <TextBox Name="RightValue" Width="50" VerticalContentAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Center" Height="25" 
-     PreviewLostKeyboardFocus="RightValue_PreviewLostKeyboardFocus" MaxLines="1" PreviewGotKeyboardFocus="RightValue_PreviewGotKeyboardFocus"/>
+                <TextBox Name="RightValue" Width="50" VerticalContentAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Center" Height="25" MaxLines="1"
+                         PreviewLostKeyboardFocus="RightValue_PreviewLostKeyboardFocus" PreviewGotKeyboardFocus="RightValue_PreviewGotKeyboardFocus" 
+                         KeyDown="RightValue_KeyDown"/>
             </StackPanel>
         </StackPanel>
         <DockPanel Name="ConditionFunction" Visibility="Collapsed">
@@ -137,8 +139,8 @@
             <Button Padding="5,0" VerticalAlignment="Stretch" HorizontalAlignment="Left" Click="SwitchToConditionMenu_Click">
                 <Path Data="{StaticResource ConditionMenu_Icon}" Fill="Black" Width="14" Height="14" Stretch="Uniform"/>
             </Button>
-            <TextBox Name="ConditionFunctionContent" Text="" VerticalContentAlignment="Center" 
-                 PreviewLostKeyboardFocus="ConditionFunctionContent_PreviewLostKeyboardFocus" Background="White" MaxLines="1" />
+            <TextBox Name="ConditionFunctionContent" Text="" VerticalContentAlignment="Center" Background="White" MaxLines="1" 
+                 PreviewLostKeyboardFocus="ConditionFunctionContent_PreviewLostKeyboardFocus" KeyDown="ConditionFunctionContent_KeyDown"/>
         </DockPanel>
     </StackPanel>
 </UserControl>
