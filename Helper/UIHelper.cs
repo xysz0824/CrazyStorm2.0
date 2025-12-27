@@ -46,6 +46,7 @@ namespace CrazyStorm
                     if (textBox == null && target is ContentControl) textBox = (target as ContentControl).Content as TextBox;
                     if (textBox == null) return;
                     textBox.Text = (args.OriginalSource as TextBlock).Text;
+                    if (args.ClickCount == 2) HideIntellisense(popup);
                 };
                 popup.Child = listView;
                 popup.IsOpen = true;
