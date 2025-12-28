@@ -79,7 +79,7 @@ namespace CrazyStorm
                 player.PlayerImpl.File.LoadPlayFile(file.GeneratePlayFile(), CrazyStorm_Player.VersionInfo.BaseVersion);
                 player.PlayerImpl.BackgroundPath = config.BackgroundPath;
                 player.PlayerImpl.SelectedParticleSystemIndex = particleSystemIndex;
-                player.PlayerImpl.CustomCenter = new Microsoft.Xna.Framework.Vector2(config.CenterX, config.CenterY);
+                player.PlayerImpl.CustomCenter = new Microsoft.Xna.Framework.Vector2(0, 0);
                 player.PlayerImpl.ControllableImagePath = config.SelfImagePath;
                 player.PlayerImpl.ControllableSetting = config.SelfSetting;
                 player.PlayerImpl.CurrentFrame = selectedFrame - 1;

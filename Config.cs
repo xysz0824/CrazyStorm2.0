@@ -23,13 +23,9 @@ namespace CrazyStorm
         string backgroundPath;
         bool gridAlignment;
         bool centerDisplay;
-        string playerPath;
         int particleMaximum;
         int curveParticleMaximum;
         bool windowed;
-        bool screenCenter;
-        int centerX;
-        int centerY;
         string selfImagePath;
         string selfSetting;
         string theme;
@@ -97,16 +93,6 @@ namespace CrazyStorm
                     PropertyChanged(this, new PropertyChangedEventArgs("CenterDisplay"));
             }
         }
-        public string PlayerPath
-        {
-            get { return playerPath; }
-            set
-            {
-                playerPath = value != null ? value : playerPath;
-                if (PropertyChanged != null)
-                    PropertyChanged(this, new PropertyChangedEventArgs("PlayerPath"));
-            }
-        }
         public int ParticleMaximum
         {
             get { return particleMaximum; }
@@ -139,40 +125,6 @@ namespace CrazyStorm
                 windowed = value;
                 if (PropertyChanged != null)
                     PropertyChanged(this, new PropertyChangedEventArgs("Windowed"));
-            }
-        }
-        public bool ScreenCenter
-        {
-            get { return screenCenter; }
-            set
-            {
-                screenCenter = value;
-                if (PropertyChanged != null)
-                    PropertyChanged(this, new PropertyChangedEventArgs("ScreenCenter"));
-            }
-        }
-        public int CenterX
-        {
-            get { return centerX; }
-            set
-            {
-                centerX = value;
-                if (PropertyChanged != null)
-                {
-                    PropertyChanged(this, new PropertyChangedEventArgs("CenterX"));
-                }
-            }
-        }
-        public int CenterY
-        {
-            get { return centerY; }
-            set
-            {
-                centerY = value;
-                if (PropertyChanged != null)
-                {
-                    PropertyChanged(this, new PropertyChangedEventArgs("CenterY"));
-                }
             }
         }
         public string SelfImagePath
@@ -228,13 +180,9 @@ namespace CrazyStorm
             backgroundPath = iniHelper.ReadValue("Screen", "BackgroundPath", string.Empty);
             gridAlignment = iniHelper.ReadValue("Screen", "GridAlignment", true);
             centerDisplay = iniHelper.ReadValue("Screen", "CenterDisplay", true);
-            playerPath = iniHelper.ReadValue("Play", "PlayerPath", "CrazyStorm Player.exe");
             particleMaximum = iniHelper.ReadValue("Play", "ParticleMaximum", 3000);
             curveParticleMaximum = iniHelper.ReadValue("Play", "CurveParticleMaximum", 200);
             windowed = iniHelper.ReadValue("Play", "Windowed", true);
-            screenCenter = iniHelper.ReadValue("Play", "ScreenCenter", true);
-            centerX = iniHelper.ReadValue("Play", "CenterX", 0);
-            centerY = iniHelper.ReadValue("Play", "CenterY", 0);
             selfImagePath = iniHelper.ReadValue("Play", "SelfImagePath", string.Empty);
             selfSetting = iniHelper.ReadValue("Play", "SelfSetting", string.Empty);
             theme = iniHelper.ReadValue("General", "Theme", "StyleDefault");
@@ -246,13 +194,9 @@ namespace CrazyStorm
             iniHelper.WriteValue("Screen", "BackgroundPath", backgroundPath);
             iniHelper.WriteValue("Screen", "GridAlignment", gridAlignment);
             iniHelper.WriteValue("Screen", "CenterDisplay", centerDisplay);
-            iniHelper.WriteValue("Play", "PlayerPath", playerPath);
             iniHelper.WriteValue("Play", "ParticleMaximum", particleMaximum);
             iniHelper.WriteValue("Play", "CurveParticleMaximum", curveParticleMaximum);
             iniHelper.WriteValue("Play", "Windowed", windowed);
-            iniHelper.WriteValue("Play", "ScreenCenter", screenCenter);
-            iniHelper.WriteValue("Play", "CenterX", centerX);
-            iniHelper.WriteValue("Play", "CenterY", centerY);
             iniHelper.WriteValue("Play", "SelfImagePath", selfImagePath);
             iniHelper.WriteValue("Play", "SelfSetting", selfSetting);
             iniHelper.WriteValue("General", "Theme", theme);

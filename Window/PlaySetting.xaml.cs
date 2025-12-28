@@ -39,16 +39,8 @@ namespace CrazyStorm
             Setting.DataContext = config;
             selfSettingBoxes = new TextBox[] { SelfStartX, SelfStartY, SelfWidth, SelfHeight, SelfCenterX, SelfCenterY,
                 SelfFrames, SelfDelay, SelfRadius};
-            if (config.Windowed)
-                Windowed.IsChecked = true;
-            else
-                FullScreen.IsChecked = true;
-
-            if (config.ScreenCenter)
-                ScreenCenter.IsChecked = true;
-            else
-                CustomCenter.IsChecked = true;
-
+            if (config.Windowed) Windowed.IsChecked = true;
+            else FullScreen.IsChecked = true;
             if (!string.IsNullOrWhiteSpace(config.SelfSetting))
             {
                 string[] split = config.SelfSetting.Split(',');
@@ -66,16 +58,6 @@ namespace CrazyStorm
         #endregion
 
         #region Window EventHandlers
-        private void PlayerBrowse_Click(object sender, RoutedEventArgs e)
-        {
-            using (var open = new System.Windows.Forms.OpenFileDialog())
-            {
-                open.InitialDirectory = AppDomain.CurrentDomain.BaseDirectory;
-                open.Filter = (string)FindResource("PlayerTypeStr");
-                if (open.ShowDialog() == System.Windows.Forms.DialogResult.OK)
-                    PlayerPath.Text = open.FileName;
-            }
-        }
         private void SelfImageBrowse_Click(object sender, RoutedEventArgs e)
         {
             using (var open = new System.Windows.Forms.OpenFileDialog())
@@ -89,18 +71,12 @@ namespace CrazyStorm
         private void Button_Click(object sender, RoutedEventArgs e)
         {
             int particleMaximum, curveParticleMaximum;
-            int centerX, centerY;
             if (Int32.TryParse(ParticleMaximum.Text, out particleMaximum) && 
-                Int32.TryParse(CurveParticleMaximum.Text, out curveParticleMaximum) && 
-                Int32.TryParse(CenterX.Text, out centerX) && Int32.TryParse(CenterY.Text, out centerY))
+                Int32.TryParse(CurveParticleMaximum.Text, out curveParticleMaximum))
             {
-                config.PlayerPath = PlayerPath.Text;
                 config.ParticleMaximum = particleMaximum;
                 config.CurveParticleMaximum = curveParticleMaximum;
                 config.Windowed = Windowed.IsChecked == true;
-                config.ScreenCenter = ScreenCenter.IsChecked == true;
-                config.CenterX = centerX;
-                config.CenterY = centerY;
                 config.SelfImagePath = SelfImagePath.Text;
             }
             else
