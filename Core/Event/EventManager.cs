@@ -148,10 +148,7 @@ namespace CrazyStorm.Core
             }
             executor.InitialValue = initialValue;
             executor.TargetValue = targetValue;
-            if (executor.ChangeMode == EventChangeMode.Instant)
-            {
-                executor.Update();
-            }
+            executor.Update();
             executorList.Add(executor);
         }
         public static bool ExecuteSpecialEvent(PropertyContainer propertyContainer, string eventName, string[] arguments,

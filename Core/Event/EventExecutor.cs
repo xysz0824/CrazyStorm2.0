@@ -27,7 +27,7 @@ namespace CrazyStorm.Core
         }
         public void Update()
         {
-            float ratio = (currentTime + 1) / ChangeTime;
+            float ratio = currentTime / ChangeTime;
             if (ChangeMode == EventChangeMode.Accelerated) ratio *= ratio;
             else if (ChangeMode == EventChangeMode.Decelerated) ratio *= (2 - ratio);
             else if (ChangeMode == EventChangeMode.Sin) ratio = (float)Math.Sin(ratio * Math.PI * 2);

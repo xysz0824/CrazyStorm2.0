@@ -273,13 +273,13 @@ namespace CrazyStorm_Player
             File.SetGlobal(SpecialVariableType.BodyPositionY, controllable.selfPos.Y);
             EventManager.CustomTypes = File.ParticleSystems[SelectedParticleSystemIndex].CustomTypes;
             EventManager.Sounds = File.Sounds;
-            File.ParticleSystems[SelectedParticleSystemIndex].Update(CurrentFrame);
-            var particleCount = 0;
-            var particles = ParticleManager.CheckCollision(controllable.selfPosLast.X, controllable.selfPosLast.Y,
-                controllable.selfPos.X, controllable.selfPos.Y, controllable.selfRadius, out particleCount);
-            for (int i = 0; i < particleCount; ++i) particles[i].Die();
-            ParticleManager.Update();
             EventManager.Update();
+            File.ParticleSystems[SelectedParticleSystemIndex].Update(CurrentFrame);
+            var collidedCount = 0;
+            var particles = ParticleManager.CheckCollision(controllable.selfPosLast.X, controllable.selfPosLast.Y,
+                controllable.selfPos.X, controllable.selfPos.Y, controllable.selfRadius, out collidedCount);
+            for (int i = 0; i < collidedCount; ++i) particles[i].Die();
+            ParticleManager.Update();
             CurrentFrame = File.ParticleSystems[SelectedParticleSystemIndex].CurrentFrame;
         }
         public void Draw(GraphicsDevice gd, GameTime gameTime)
