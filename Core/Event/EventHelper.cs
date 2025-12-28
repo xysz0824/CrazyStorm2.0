@@ -22,6 +22,8 @@ namespace CrazyStorm.Core
         Linear,
         Accelerated,
         Decelerated,
+        Sin,
+        Cos,
         Instant
     }
     public enum PropertyType : byte

@@ -82,6 +82,20 @@
                     <StackPanel>
                         <Grid>
                             <Image Source="/CrazyStorm;component/Images/curvegrid.png" Width="48" Height="24"></Image>
+                            <Path Data="{StaticResource Sin_Curve}" Width="48" Height="24" Fill="Transparent" Stroke="#00A5F0" StrokeThickness="2" Stretch="Uniform"/>
+                        </Grid>
+                        <RadioButton Name="Sin" HorizontalAlignment="Center" Content="{StaticResource SinStr}" Checked="Sin_Checked"></RadioButton>
+                    </StackPanel>
+                    <StackPanel>
+                        <Grid>
+                            <Image Source="/CrazyStorm;component/Images/curvegrid.png" Width="48" Height="24"></Image>
+                            <Path Data="{StaticResource Cos_Curve}" Width="48" Height="24" Fill="Transparent" Stroke="#00A5F0" StrokeThickness="2" Stretch="Uniform"/>
+                        </Grid>
+                        <RadioButton Name="Cos" HorizontalAlignment="Center" Content="{StaticResource CosStr}" Checked="Cos_Checked"></RadioButton>
+                    </StackPanel>
+                    <StackPanel>
+                        <Grid>
+                            <Image Source="/CrazyStorm;component/Images/curvegrid.png" Width="48" Height="24"></Image>
                             <Path Data="{StaticResource Instant_Curve}" Width="48" Height="24" Fill="#00A5F0" Stretch="Uniform"/>
                         </Grid>
                         <RadioButton Name="Instant" HorizontalAlignment="Center" Content="{StaticResource InstantStr}" Checked="Instant_Checked"></RadioButton>

@@ -132,6 +132,8 @@
     <sys:String x:Key="LinearStr">线性</sys:String>
     <sys:String x:Key="AcceleratedStr">加速</sys:String>
     <sys:String x:Key="DeceleratedStr">减速</sys:String>
+    <sys:String x:Key="SinStr">正弦</sys:String>
+    <sys:String x:Key="CosStr">余弦</sys:String>
     <sys:String x:Key="InstantStr">瞬时</sys:String>
     <sys:String x:Key="ChangeToStr">变化到</sys:String>
     <sys:String x:Key="IncreaseStr">增加</sys:String>

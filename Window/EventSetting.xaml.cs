@@ -139,6 +139,8 @@ namespace CrazyStorm
             if (Linear.IsChecked == true) eventInfo.changeMode = Enum.GetName(typeof(EventChangeMode), EventChangeMode.Linear);
             else if (Accelerated.IsChecked == true) eventInfo.changeMode = Enum.GetName(typeof(EventChangeMode), EventChangeMode.Accelerated);
             else if (Decelerated.IsChecked == true) eventInfo.changeMode = Enum.GetName(typeof(EventChangeMode), EventChangeMode.Decelerated);
+            else if (Sin.IsChecked == true) eventInfo.changeMode = Enum.GetName(typeof(EventChangeMode), EventChangeMode.Sin);
+            else if (Cos.IsChecked == true) eventInfo.changeMode = Enum.GetName(typeof(EventChangeMode), EventChangeMode.Cos);  
             else if (Instant.IsChecked == true) eventInfo.changeMode = Enum.GetName(typeof(EventChangeMode), EventChangeMode.Instant);
             if (PropertyComboBox.SelectedItem != null && !String.IsNullOrEmpty(ResultValue.Text) &&
                 !String.IsNullOrEmpty(eventInfo.changeType) && !String.IsNullOrEmpty(eventInfo.changeMode) &&
@@ -203,6 +205,8 @@ namespace CrazyStorm
             Linear.IsChecked = true;
             Accelerated.IsChecked = false;
             Decelerated.IsChecked = false;
+            Sin.IsChecked = false;
+            Cos.IsChecked = false;
             Instant.IsChecked = false;
             ChangeTime.Text = string.Empty;
             EmitParticle.IsChecked = false;
@@ -230,6 +234,8 @@ namespace CrazyStorm
             buttonMap[Enum.GetName(typeof(EventChangeMode), EventChangeMode.Linear)] = new[] { Linear };
             buttonMap[Enum.GetName(typeof(EventChangeMode), EventChangeMode.Accelerated)] = new[] { Accelerated };
             buttonMap[Enum.GetName(typeof(EventChangeMode), EventChangeMode.Decelerated)] = new[] { Decelerated };
+            buttonMap[Enum.GetName(typeof(EventChangeMode), EventChangeMode.Sin)] = new[] { Sin };
+            buttonMap[Enum.GetName(typeof(EventChangeMode), EventChangeMode.Cos)] = new[] { Cos };
             buttonMap[Enum.GetName(typeof(EventChangeMode), EventChangeMode.Instant)] = new[] { Instant };
             buttonMap["EmitParticle"] = new[] { EmitParticle };
             buttonMap["PlaySound"] = new[] { PlaySound };
@@ -333,6 +339,8 @@ namespace CrazyStorm
         {
             Accelerated.IsChecked = false;
             Decelerated.IsChecked = false;
+            Sin.IsChecked = false;
+            Cos.IsChecked = false;
             Instant.IsChecked = false;
             ChangeTimePanel.Visibility = Visibility.Visible;
         }
@@ -340,13 +348,35 @@ namespace CrazyStorm
         {
             Linear.IsChecked = false;
             Decelerated.IsChecked = false;
+            Sin.IsChecked = false;
+            Cos.IsChecked = false;
             Instant.IsChecked = false;
             ChangeTimePanel.Visibility = Visibility.Visible;
         }
         private void Decelerated_Checked(object sender, RoutedEventArgs e)
         {
             Accelerated.IsChecked = false;
+            Sin.IsChecked = false;
+            Cos.IsChecked = false;
             Linear.IsChecked = false;
+            Instant.IsChecked = false;
+            ChangeTimePanel.Visibility = Visibility.Visible;
+        }
+        private void Sin_Checked(object sender, RoutedEventArgs e)
+        {
+            Linear.IsChecked = false;
+            Accelerated.IsChecked = false;
+            Decelerated.IsChecked = false;
+            Cos.IsChecked = false;
+            Instant.IsChecked = false;
+            ChangeTimePanel.Visibility = Visibility.Visible;
+        }
+        private void Cos_Checked(object sender, RoutedEventArgs e)
+        {
+            Linear.IsChecked = false;
+            Accelerated.IsChecked = false;
+            Decelerated.IsChecked = false;
+            Sin.IsChecked = false;
             Instant.IsChecked = false;
             ChangeTimePanel.Visibility = Visibility.Visible;
         }
@@ -354,6 +384,8 @@ namespace CrazyStorm
         {
             Accelerated.IsChecked = false;
             Decelerated.IsChecked = false;
+            Sin.IsChecked = false;
+            Cos.IsChecked = false;
             Linear.IsChecked = false;
             ChangeTimePanel.Visibility = Visibility.Collapsed;
             ChangeTime.Text = string.Empty;
