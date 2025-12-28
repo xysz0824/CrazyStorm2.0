@@ -53,7 +53,6 @@ namespace CrazyStorm_Player
         public int Height { get; set; }
         public string BackgroundPath { get; set; }
         public int SelectedParticleSystemIndex { get; set; }
-        public Vector2 CustomCenter { get; set; }
         public string ControllableImagePath { get; set; }
         public string ControllableSetting { get; set; }
         public int CurrentFrame { get; set; }
@@ -198,7 +197,7 @@ namespace CrazyStorm_Player
             }
             lastBlendType = blendType;
             ParticleType type = particle.Type;
-            Vector2 center = new Vector2(Width / 2, Height / 2) + CustomCenter;
+            Vector2 center = new Vector2(Width / 2, Height / 2);
             Vector2 imageCenter = new Vector2(type.CenterPoint.x, type.CenterPoint.y);
             float fogScale = (ParticleBase.FOG_TIME - particle.FogFrame) / 15.0f;
             Vector2 scale = new Vector2(particle.WidthScale + fogScale, particle.HeightScale + fogScale);
@@ -257,7 +256,7 @@ namespace CrazyStorm_Player
             }
             lastBlendType = blendType;
             ParticleType type = particle.Type;
-            Vector2 center = new Vector2(Width / 2, Height / 2) + CustomCenter;
+            Vector2 center = new Vector2(Width / 2, Height / 2);
             float alpha = particle.Opacity / 100f - (ParticleBase.FOG_TIME - particle.FogFrame) / ParticleBase.FOG_TIME;
             Color color = new Color(particle.RGB.r / 255f, particle.RGB.g / 255f, particle.RGB.b / 255f, alpha);
             int frame = particle.PCurrentFrame / (type.Delay + 1) % type.Frames;

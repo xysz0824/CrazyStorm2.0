@@ -27,10 +27,8 @@ namespace CrazyStorm_Player
             var particleMaximum = Int32.Parse(Environment.GetCommandLineArgs()[6]);
             var curveParticleMaximum = Int32.Parse(Environment.GetCommandLineArgs()[7]);
             var windowed = bool.Parse(Environment.GetCommandLineArgs()[8]);
-            var customCenterX = Int32.Parse(Environment.GetCommandLineArgs()[9]);
-            var customCenterY = Int32.Parse(Environment.GetCommandLineArgs()[10]);
-            var controllableImagePath = Environment.GetCommandLineArgs()[11];
-            var controllableSetting = Environment.GetCommandLineArgs()[12];
+            var controllableImagePath = Environment.GetCommandLineArgs()[9];
+            var controllableSetting = Environment.GetCommandLineArgs()[10];
 
             playerImpl = new PlayerImpl(width, height, particleMaximum, curveParticleMaximum);
             playerImpl.ResourceDirectory = Environment.CurrentDirectory;
@@ -38,7 +36,6 @@ namespace CrazyStorm_Player
             playerImpl.File.LoadPlayFile(path, VersionInfo.BaseVersion);
             playerImpl.BackgroundPath = backgroundPath;
             playerImpl.SelectedParticleSystemIndex = selectedParticleSystemIndex;
-            playerImpl.CustomCenter = new Microsoft.Xna.Framework.Vector2(customCenterX, customCenterY);
             playerImpl.ControllableImagePath = controllableImagePath;
             playerImpl.ControllableSetting = controllableSetting;
 
