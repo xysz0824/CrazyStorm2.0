@@ -464,11 +464,9 @@ namespace CrazyStorm.Core
             //componentData
             PlayDataHelper.GenerateStruct(componentData, componentBytes);
             //parent
-            if (parent != null) componentBytes.AddRange(BitConverter.GetBytes(parent.ID));
-            else componentBytes.AddRange(BitConverter.GetBytes(-1));
+            componentBytes.AddRange(BitConverter.GetBytes(parent != null ? parent.ID : -1));
             //bindingTarget
-            if (bindingTarget != null) componentBytes.AddRange(BitConverter.GetBytes(bindingTarget.ID));
-            else componentBytes.AddRange(BitConverter.GetBytes(-1));
+            componentBytes.AddRange(BitConverter.GetBytes(bindingTarget != null ? bindingTarget.ID : -1));
             //variables
             PlayDataHelper.GenerateObjectList(Locals, componentBytes);
             //componentEventGroups

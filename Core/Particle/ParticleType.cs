@@ -345,8 +345,7 @@ namespace CrazyStorm.Core
         public List<byte> GeneratePlayData()
         {
             var particleTypeBytes = new List<byte>();
-            if (image != null) particleTypeBytes.AddRange(BitConverter.GetBytes(image.ID));
-            else particleTypeBytes.AddRange(BitConverter.GetBytes(-1));
+            particleTypeBytes.AddRange(BitConverter.GetBytes(image != null ? image.ID : -1));
             PlayDataHelper.GeneratePlayDataFields(this, particleTypeBytes);
             return PlayDataHelper.CreateBlock(particleTypeBytes);
         }

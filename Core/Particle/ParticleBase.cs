@@ -272,8 +272,7 @@ namespace CrazyStorm.Core
             //properties
             base.GeneratePropertyExpressions(particleBaseBytes);
             //type
-            if (type != null) particleBaseBytes.AddRange(BitConverter.GetBytes(type.ID));
-            else particleBaseBytes.AddRange(BitConverter.GetBytes(-1));
+            particleBaseBytes.AddRange(BitConverter.GetBytes(type != null ? type.ID : -1));
             //particleBaseData
             PlayDataHelper.GenerateStruct(particleBaseData, particleBaseBytes);
             return PlayDataHelper.CreateBlock(particleBaseBytes);
