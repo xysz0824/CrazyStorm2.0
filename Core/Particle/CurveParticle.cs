@@ -5,12 +5,14 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Xml;
 using System.Xml.Serialization;
 
 namespace CrazyStorm.Core
 {
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public struct CurveParticleData
     {
         public int length;
@@ -77,14 +79,8 @@ namespace CrazyStorm.Core
         public override void LoadPlayData(BinaryReader reader, float version)
         {
             base.LoadPlayData(reader, version);
-            using (BinaryReader curveParticleReader = PlayDataHelper.GetBlockReader(reader))
-            {
-                using (BinaryReader dataReader = PlayDataHelper.GetBlockReader(curveParticleReader))
-                {
-                    Length = dataReader.ReadInt32();
-                    Segment = dataReader.ReadInt32();
-                }
-            }
+            //curveParticleData
+            curveParticleData = PlayDataHelper.ReadStruct<CurveParticleData>(reader);
         }
         public override bool PushProperty(string propertyName)
         {

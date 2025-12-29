@@ -113,7 +113,7 @@ namespace CrazyStorm
                                 (int)y + config.ScreenHeightOver2);
                             icon.Data = (Geometry)FindResource($"{component.GetType().Name}_Icon");
                             var scale = (double)FindResource($"{component.GetType().Name}_Scale");
-                            var transform = new ScaleTransform(scale, scale);
+                            var transform = new ScaleTransform(scale, scale, icon.ActualWidth / 2, icon.ActualHeight / 2);
                             icon.RenderTransform = transform;
                             item.SetValue(Canvas.LeftProperty, (double)x - box.Width / 2 + config.ScreenWidthOver2);
                             item.SetValue(Canvas.TopProperty, (double)y - box.Height / 2 + config.ScreenHeightOver2);

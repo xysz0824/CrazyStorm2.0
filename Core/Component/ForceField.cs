@@ -5,6 +5,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Xml;
 using System.Xml.Serialization;
@@ -17,13 +18,13 @@ namespace CrazyStorm.Core
         Inner,
         Outer
     }
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public struct ForceFieldData
     {
         public float halfWidth;
         public float halfHeight;
         public FieldShape fieldShape;
         public Reach reach;
-        public string targetName;
         public float force;
         public float direction;
         public ForceType forceType;
@@ -31,6 +32,9 @@ namespace CrazyStorm.Core
     public class ForceField : Component
     {
         #region Private Members
+        [PlayData]
+        [XmlAttribute]
+        public string targetName;
         ForceFieldData forceFieldData;
         #endregion
 
@@ -80,15 +84,15 @@ namespace CrazyStorm.Core
         [StringProperty(1, 15, true, true, false, false)]
         public string TargetName
         {
-            get { return forceFieldData.targetName; }
-            set { forceFieldData.targetName = value; }
+            get { return targetName; }
+            set { targetName = value; }
         }
         #endregion
 
         #region Constructor
         public ForceField()
         {
-            forceFieldData.targetName = string.Empty;
+            targetName = string.Empty;
             forceFieldData.halfWidth = 50;
             forceFieldData.halfHeight = 50;
             forceFieldData.force = 0.1f;
@@ -98,10 +102,6 @@ namespace CrazyStorm.Core
         #region Private Methods
         void Update()
         {
-            base.ExecuteExpression("HalfWidth");
-            base.ExecuteExpression("HalfHeight");
-            base.ExecuteExpression("Force");
-            base.ExecuteExpression("Direction");
             int count = 0;
             var results = ParticleManager.SearchByRect(Position.x - HalfWidth, Position.x + HalfWidth,
                 Position.y - HalfHeight, Position.y + HalfHeight, out count);
@@ -156,6 +156,7 @@ namespace CrazyStorm.Core
         {
             node = base.BuildFromXml(node);
             var forceFieldNode = (XmlElement)node.SelectSingleNode("ForceField");
+            XmlHelper.BuildFromFields(typeof(ForceField), this, forceFieldNode);
             //forceFieldData
             XmlHelper.BuildFromStruct(ref forceFieldData, forceFieldNode, "ForceFieldData");
             return forceFieldNode;
@@ -164,6 +165,7 @@ namespace CrazyStorm.Core
         {
             node = base.StoreAsXml(doc, node);
             var forceFieldNode = doc.CreateElement("ForceField");
+            XmlHelper.StoreFields(typeof(ForceField), this, doc, forceFieldNode);
             //forceFieldData
             XmlHelper.StoreStruct(forceFieldData, doc, forceFieldNode, "ForceFieldData");
             node.AppendChild(forceFieldNode);
@@ -173,6 +175,7 @@ namespace CrazyStorm.Core
         {
             var bytes = base.GeneratePlayData();
             var forceFieldBytes = new List<byte>();
+            PlayDataHelper.GeneratePlayDataFields(this, forceFieldBytes);
             //forceFieldData
             PlayDataHelper.GenerateStruct(forceFieldData, forceFieldBytes);
             bytes.AddRange(PlayDataHelper.CreateBlock(forceFieldBytes));
@@ -183,17 +186,9 @@ namespace CrazyStorm.Core
             base.LoadPlayData(reader, version);
             using (BinaryReader forceFieldReader = PlayDataHelper.GetBlockReader(reader))
             {
-                using (BinaryReader dataReader = PlayDataHelper.GetBlockReader(forceFieldReader))
-                {
-                    HalfWidth = dataReader.ReadSingle();
-                    HalfHeight = dataReader.ReadSingle();
-                    FieldShape = PlayDataHelper.ReadEnum<FieldShape>(dataReader);
-                    Reach = PlayDataHelper.ReadEnum<Reach>(dataReader);
-                    TargetName = PlayDataHelper.ReadString(dataReader);
-                    Force = dataReader.ReadSingle();
-                    Direction = dataReader.ReadSingle();
-                    ForceType = PlayDataHelper.ReadEnum<ForceType>(dataReader);
-                }
+                PlayDataHelper.ReadPlayDataFields(this, forceFieldReader);
+                //forceFieldData
+                forceFieldData = PlayDataHelper.ReadStruct<ForceFieldData>(forceFieldReader);
             }
         }
         public override bool PushProperty(string propertyName)

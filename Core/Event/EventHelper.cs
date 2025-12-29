@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.Remoting.Messaging;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -164,48 +165,49 @@ namespace CrazyStorm.Core
             if (eventInfo.condition != null)
             {
                 byte[] compiledExpression = compileFunc(eventInfo.condition);
-                bytes.AddRange(PlayDataHelper.GetBytes(compiledExpression.Length));
+                bytes.AddRange(BitConverter.GetBytes(compiledExpression.Length));
                 bytes.AddRange(compiledExpression);
             }
             else
             {
-                bytes.AddRange(PlayDataHelper.GetBytes(0));
+                bytes.AddRange(BitConverter.GetBytes(0));
             }
-            bytes.AddRange(PlayDataHelper.GetBytes(eventInfo.isSpecialEvent));
+            bytes.AddRange(BitConverter.GetBytes(eventInfo.isSpecialEvent));
             if (!eventInfo.isSpecialEvent)
             {
-                bytes.AddRange(PlayDataHelper.GetBytes(eventInfo.resultProperty));
+                bytes.AddRange(PlayDataHelper.GetStringBytes(eventInfo.resultProperty));
                 bytes.Add((byte)Enum.Parse(typeof(EventChangeType), eventInfo.changeType));
-                bytes.AddRange(PlayDataHelper.GetBytes(eventInfo.isExpressionResult));
+                bytes.AddRange(BitConverter.GetBytes(eventInfo.isExpressionResult));
                 bytes.Add((byte)eventInfo.resultType);
                 if (eventInfo.isExpressionResult)
                 {
                     byte[] compiledExpression = compileFunc(eventInfo.resultValue);
-                    bytes.AddRange(PlayDataHelper.GetBytes(compiledExpression.Length));
+                    bytes.AddRange(BitConverter.GetBytes(compiledExpression.Length));
                     bytes.AddRange(compiledExpression);
                 }
                 else
-                    bytes.AddRange(PlayDataHelper.GetBytes(PropertyTypeRule.Parse(eventInfo.resultType, eventInfo.resultProperty, 
-                        eventInfo.resultValue)));
-
+                {
+                    bytes.AddRange(GetBytes(eventInfo.resultType,
+                        PropertyTypeRule.Parse(eventInfo.resultType, eventInfo.resultProperty, eventInfo.resultValue)));
+                }
                 bytes.Add((byte)Enum.Parse(typeof(EventChangeMode), eventInfo.changeMode));
-                bytes.AddRange(PlayDataHelper.GetBytes(int.Parse(eventInfo.changeTime)));
+                bytes.AddRange(BitConverter.GetBytes(int.Parse(eventInfo.changeTime)));
             }
             else
             {
-                bytes.AddRange(PlayDataHelper.GetBytes(eventInfo.specialEvent));
+                bytes.AddRange(PlayDataHelper.GetStringBytes(eventInfo.specialEvent));
                 string[] split = eventInfo.arguments.Split(',');
-                bytes.AddRange(PlayDataHelper.GetBytes(split.Length));
+                bytes.AddRange(BitConverter.GetBytes(split.Length));
                 if (eventInfo.specialEvent == "Loop")
                 {
                     byte[] compiledExpression = compileFunc(split[0]);
-                    bytes.AddRange(PlayDataHelper.GetBytes(compiledExpression.Length));
+                    bytes.AddRange(BitConverter.GetBytes(compiledExpression.Length));
                     bytes.AddRange(compiledExpression);
                 }
                 else
                 {
                     for (int i = 0; i < split.Length; ++i)
-                        bytes.AddRange(PlayDataHelper.GetBytes(split[i]));
+                        bytes.AddRange(PlayDataHelper.GetStringBytes(split[i]));
                 }
             }
             return bytes.ToArray();
@@ -259,6 +261,27 @@ namespace CrazyStorm.Core
             }
             return eventInfo;
         }
+        public static byte[] GetBytes(PropertyType type, object value)
+        {
+            switch (type)
+            {
+                case PropertyType.Boolean:
+                    return BitConverter.GetBytes((bool)value);
+                case PropertyType.Int32:
+                    return BitConverter.GetBytes((int)value);
+                case PropertyType.Single:
+                    return BitConverter.GetBytes((float)value);
+                case PropertyType.Enum:
+                    return BitConverter.GetBytes((int)value);
+                case PropertyType.Vector2:
+                    return PlayDataHelper.GetStructBytes((Vector2)value);
+                case PropertyType.RGB:
+                    return PlayDataHelper.GetStructBytes((RGB)value);
+                case PropertyType.String:
+                    return PlayDataHelper.GetStringBytes((string)value);
+            }
+            return new byte[0];
+        }
         public static TypeSet ReadValue(BinaryReader reader, PropertyType type)
         {
             var set = new TypeSet();
@@ -277,10 +300,10 @@ namespace CrazyStorm.Core
                     set.enumValue = reader.ReadInt32();
                     break;
                 case PropertyType.Vector2:
-                    set.vector2Value = PlayDataHelper.ReadVector2(reader);
+                    set.vector2Value = PlayDataHelper.ReadStruct<Vector2>(reader);
                     break;
                 case PropertyType.RGB:
-                    set.rgbValue = PlayDataHelper.ReadRGB(reader);
+                    set.rgbValue = PlayDataHelper.ReadStruct<RGB>(reader);
                     break;
                 case PropertyType.String:
                     set.stringValue = PlayDataHelper.ReadString(reader);

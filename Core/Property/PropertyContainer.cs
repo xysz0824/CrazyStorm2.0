@@ -111,7 +111,7 @@ namespace CrazyStorm.Core
             }
             return propertiesNode;
         }
-        public void GeneratePlayData(List<byte> data)
+        public void GeneratePropertyExpressions(List<byte> data)
         {
             List<byte> newData = new List<byte>();
             foreach (var pair in properties)
@@ -119,7 +119,7 @@ namespace CrazyStorm.Core
                 if (pair.Value.Expression)
                 {
                     List<byte> pairData = new List<byte>();
-                    pairData.AddRange(PlayDataHelper.GetBytes(pair.Key));
+                    pairData.AddRange(PlayDataHelper.GetStringBytes(pair.Key));
                     pairData.AddRange(pair.Value.CompiledExpression);
                     newData.AddRange(PlayDataHelper.CreateBlock(pairData));
                 }
@@ -148,14 +148,6 @@ namespace CrazyStorm.Core
                 VM.Execute(this, expression.Value);
                 SetProperty(expression.Key);
             }
-        }
-        public void ExecuteExpression(string propertyName)
-        {
-            if (!PropertyExpressions.ContainsKey(propertyName))
-                return;
-
-            VM.Execute(this, PropertyExpressions[propertyName]);
-            SetProperty(propertyName);
         }
         public abstract bool PushProperty(string propertyName);
         public abstract bool SetProperty(string propertyName);

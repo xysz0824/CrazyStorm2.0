@@ -8,12 +8,14 @@ using System.Text;
 using CrazyStorm.Core;
 using System.Reflection;
 using System.IO;
+using System.Runtime.InteropServices;
+using System.Linq;
 
 namespace CrazyStorm.Core
 {
     public class PlayDataHelper
     {
-        public static byte[] GetBytes(object obj)
+        static byte[] GetBytes(object obj)
         {
             if (obj is bool)
                 return BitConverter.GetBytes((bool)obj);
@@ -21,39 +23,10 @@ namespace CrazyStorm.Core
                 return BitConverter.GetBytes((int)obj);
             else if (obj is float)
                 return BitConverter.GetBytes((float)obj);
-            else if (obj is Vector2)
-                return GetVector2Bytes((Vector2)obj);
-            else if (obj is Vector3)
-                return GetVector3Bytes((Vector3)obj);
-            else if (obj is RGB)
-                return GetRGBBytes((RGB)obj);
             else if (obj is string)
                 return GetStringBytes((string)obj);
             else
                 throw new PlayDataException();
-        }
-        public static byte[] GetVector2Bytes(Vector2 v)
-        {
-            List<byte> bytes = new List<byte>();
-            bytes.AddRange(BitConverter.GetBytes(v.x));
-            bytes.AddRange(BitConverter.GetBytes(v.y));
-            return bytes.ToArray();
-        }
-        public static byte[] GetVector3Bytes(Vector3 v)
-        {
-            List<byte> bytes = new List<byte>();
-            bytes.AddRange(BitConverter.GetBytes(v.x));
-            bytes.AddRange(BitConverter.GetBytes(v.y));
-            bytes.AddRange(BitConverter.GetBytes(v.z));
-            return bytes.ToArray();
-        }
-        public static byte[] GetRGBBytes(RGB rgb)
-        {
-            List<byte> bytes = new List<byte>();
-            bytes.AddRange(BitConverter.GetBytes(rgb.r));
-            bytes.AddRange(BitConverter.GetBytes(rgb.g));
-            bytes.AddRange(BitConverter.GetBytes(rgb.b));
-            return bytes.ToArray();
         }
         public static byte[] GetStringBytes(string s)
         {
@@ -64,6 +37,13 @@ namespace CrazyStorm.Core
             bytes.Add(0);
             return bytes.ToArray();
         }
+        public unsafe static byte[] GetStructBytes<T>(T s) where T : unmanaged
+        {
+            int size = sizeof(T);
+            Span<byte> bytes = stackalloc byte[size];
+            MemoryMarshal.Write(bytes, ref s);
+            return bytes.ToArray();
+        }
         public static List<byte> CreateBlock(List<byte> content)
         {
             List<byte> block = new List<byte>();
@@ -72,10 +52,18 @@ namespace CrazyStorm.Core
             block.AddRange(content);
             return block;
         }
-        public static void GenerateFields(Type type, object source, List<byte> data)
+        public static List<byte> CreateBlock(byte[] content)
+        {
+            List<byte> block = new List<byte>();
+            //The header is a integer representing block size.
+            block.AddRange(BitConverter.GetBytes(content.Length));
+            block.AddRange(content);
+            return block;
+        }
+        public static void GeneratePlayDataFields(object source, List<byte> data)
         {
             BindingFlags flags = BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly;
-            FieldInfo[] fieldInfos = type.GetFields(flags);
+            var fieldInfos = source.GetType().GetFields(flags).OrderBy(f => f.MetadataToken);
             foreach (var info in fieldInfos)
             {
                 object[] attributes = info.GetCustomAttributes(false);
@@ -89,18 +77,9 @@ namespace CrazyStorm.Core
                 }
             }
         }
-        public static void GenerateFields(object source, List<byte> data)
+        public unsafe static void GenerateStruct<T>(T source, List<byte> data) where T : unmanaged
         {
-            GenerateFields(source.GetType(), source, data);
-        }
-        public static void GenerateStruct<T>(T source, List<byte> data)
-        {
-            var structBytes = new List<byte>();
-            FieldInfo[] fieldInfos = source.GetType().GetFields();
-            foreach (var info in fieldInfos)
-                structBytes.AddRange(GetBytes(info.GetValue(source)));
-            
-            data.AddRange(CreateBlock(structBytes));
+            data.AddRange(CreateBlock(GetStructBytes(source)));
         }
         public static void GenerateObjectList<T>(IList<T> source, List<byte> data)
             where T : IGeneratePlayData
@@ -111,20 +90,44 @@ namespace CrazyStorm.Core
 
             data.AddRange(CreateBlock(objectListBytes));
         }
-        public static Vector2 ReadVector2(BinaryReader reader)
+        static object ReadBytes(Type type, BinaryReader reader)
         {
-            var vector = new Vector2();
-            vector.x = reader.ReadSingle();
-            vector.y = reader.ReadSingle();
-            return vector;
+            if (type == typeof(bool))
+                return reader.ReadBoolean();
+            else if (type == typeof(int) || type.IsEnum)
+                return reader.ReadInt32();
+            else if (type == typeof(float))
+                return reader.ReadSingle();
+            else if (type == typeof(string))
+                return ReadString(reader);
+            else
+                throw new PlayDataException();
         }
-        public static RGB ReadRGB(BinaryReader reader)
+        public static void ReadPlayDataFields(object source, BinaryReader reader)
         {
-            var rgb = new RGB();
-            rgb.r = reader.ReadSingle();
-            rgb.g = reader.ReadSingle();
-            rgb.b = reader.ReadSingle();
-            return rgb;
+            BindingFlags flags = BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly;
+            var fieldInfos = source.GetType().GetFields(flags).OrderBy(f => f.MetadataToken);
+            foreach (var info in fieldInfos)
+            {
+                object[] attributes = info.GetCustomAttributes(false);
+                for (int i = 0; i < attributes.Length; ++i)
+                {
+                    if (attributes[i] is PlayDataAttribute)
+                    {
+                        info.SetValue(source, ReadBytes(info.DeclaringType, reader));
+                        break;
+                    }
+                }
+            }
+        }
+        public static T ReadStructBytes<T>(byte[] bytes, int startIndex) where T : unmanaged
+        {
+            return MemoryMarshal.Read<T>(bytes.AsSpan(startIndex));
+        }
+        public static T ReadStruct<T>(BinaryReader reader) where T : unmanaged
+        {
+            var bytes = GetBlock(reader);
+            return MemoryMarshal.Read<T>(bytes.AsSpan());
         }
         public static T ReadEnum<T>(BinaryReader reader)
         {
@@ -136,10 +139,8 @@ namespace CrazyStorm.Core
             while (true)
             {
                 byte stringByte = reader.ReadByte();
-                if (stringByte != '\0')
-                    bytes.Add(stringByte);
-                else
-                    break;
+                if (stringByte != '\0') bytes.Add(stringByte);
+                else break;
             }
             return Encoding.UTF8.GetString(bytes.ToArray());
         }
@@ -149,10 +150,8 @@ namespace CrazyStorm.Core
             while (true)
             {
                 byte stringByte = bytes[startIndex++];
-                if (stringByte != '\0')
-                    stringBytes.Add(stringByte);
-                else
-                    break;
+                if (stringByte != '\0') stringBytes.Add(stringByte);
+                else break;
             }
             return Encoding.UTF8.GetString(stringBytes.ToArray());
         }
@@ -170,7 +169,7 @@ namespace CrazyStorm.Core
         {
             return reader.BaseStream.Position == reader.BaseStream.Length;
         }
-        public static void LoadObjectList<T>(IList<T> source, BinaryReader reader, float version)
+        public static void ReadObjectList<T>(IList<T> source, BinaryReader reader, float version)
             where T : ILoadPlayData, new()
         {
             using (BinaryReader objectListReader = GetBlockReader(reader))

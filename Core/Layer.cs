@@ -163,7 +163,7 @@ namespace CrazyStorm.Core
         public List<byte> GeneratePlayData()
         {
             var layerBytes = new List<byte>();
-            PlayDataHelper.GenerateFields(this, layerBytes);
+            PlayDataHelper.GeneratePlayDataFields(this, layerBytes);
             //components
             PlayDataHelper.GenerateObjectList(components, layerBytes);
             return PlayDataHelper.CreateBlock(layerBytes);
@@ -172,10 +172,7 @@ namespace CrazyStorm.Core
         {
             using (BinaryReader layerReader = PlayDataHelper.GetBlockReader(reader))
             {
-                Name = PlayDataHelper.ReadString(layerReader);
-                Visible = layerReader.ReadBoolean();
-                BeginFrame = layerReader.ReadInt32();
-                TotalFrame = layerReader.ReadInt32();
+                PlayDataHelper.ReadPlayDataFields(this, layerReader);
                 //components
                 using (BinaryReader componentsReader = PlayDataHelper.GetBlockReader(layerReader))
                 {

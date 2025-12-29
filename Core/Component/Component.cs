@@ -15,10 +15,9 @@ using System.IO;
 
 namespace CrazyStorm.Core
 {
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public struct ComponentData
     {
-        public int layerFrame;
-        public int currentFrame;
         public int beginFrame;
         public int totalFrame;
         public Vector2 position;
@@ -75,17 +74,9 @@ namespace CrazyStorm.Core
         public string LayerName { get; set; }
         public int LayerID { get; set; }
         [RuntimeProperty]
-        public int LayerFrame
-        {
-            get { return componentData.layerFrame; }
-            set { componentData.layerFrame = value; }
-        }
+        public int LayerFrame { get; set; }
         [RuntimeProperty]
-        public int CurrentFrame
-        {
-            get { return componentData.currentFrame; }
-            set { componentData.currentFrame = value; }
-        }
+        public int CurrentFrame { get; set; }
         [IntProperty(0, int.MaxValue)]
         public int BeginFrame
         {
@@ -465,23 +456,21 @@ namespace CrazyStorm.Core
         public virtual List<byte> GeneratePlayData()
         {
             var componentBytes = new List<byte>();
-            //type
-            componentBytes.AddRange(PlayDataHelper.GetStringBytes(GetType().Name));
-            PlayDataHelper.GenerateFields(typeof(Component), this, componentBytes);
+            PlayDataHelper.GeneratePlayDataFields(this, componentBytes);
             //properties
-            base.GeneratePlayData(componentBytes);
+            base.GeneratePropertyExpressions(componentBytes);
             //componentData
             PlayDataHelper.GenerateStruct(componentData, componentBytes);
             //parent
             if (parent != null)
-                componentBytes.AddRange(PlayDataHelper.GetBytes(parent.ID));
+                componentBytes.AddRange(BitConverter.GetBytes(parent.ID));
             else
-                componentBytes.AddRange(PlayDataHelper.GetBytes(-1));
+                componentBytes.AddRange(BitConverter.GetBytes(-1));
             //bindingTarget
             if (bindingTarget != null)
-                componentBytes.AddRange(PlayDataHelper.GetBytes(bindingTarget.ID));
+                componentBytes.AddRange(BitConverter.GetBytes(bindingTarget.ID));
             else
-                componentBytes.AddRange(PlayDataHelper.GetBytes(-1));
+                componentBytes.AddRange(BitConverter.GetBytes(-1));
             //variables
             PlayDataHelper.GenerateObjectList(Locals, componentBytes);
             //componentEventGroups
@@ -492,32 +481,19 @@ namespace CrazyStorm.Core
         {
             using (BinaryReader componentReader = PlayDataHelper.GetBlockReader(reader))
             {
-                string specificType = PlayDataHelper.ReadString(componentReader);
-                ID = componentReader.ReadInt32();
-                Name = PlayDataHelper.ReadString(componentReader);
+                PlayDataHelper.ReadPlayDataFields(this, reader);
                 //properties
                 base.LoadPropertyExpressions(componentReader);
-                using (BinaryReader dataReader = PlayDataHelper.GetBlockReader(componentReader))
-                {
-                    LayerFrame = dataReader.ReadInt32();
-                    CurrentFrame = dataReader.ReadInt32();
-                    BeginFrame = dataReader.ReadInt32();
-                    TotalFrame = dataReader.ReadInt32();
-                    Position = PlayDataHelper.ReadVector2(dataReader);
-                    Speed = dataReader.ReadSingle();
-                    SpeedAngle = dataReader.ReadSingle();
-                    Acspeed = dataReader.ReadSingle();
-                    AcspeedAngle = dataReader.ReadSingle();
-                    Visibility = dataReader.ReadBoolean();
-                }
+                //componentData
+                componentData = PlayDataHelper.ReadStruct<ComponentData>(componentReader);
                 //parent
                 ParentID = componentReader.ReadInt32();
                 //bindingTarget
                 BindingTargetID = componentReader.ReadInt32();
                 //variables
-                PlayDataHelper.LoadObjectList(Locals, componentReader, version);
+                PlayDataHelper.ReadObjectList(Locals, componentReader, version);
                 //componentEventGroups
-                PlayDataHelper.LoadObjectList(ComponentEventGroups, componentReader, version);
+                PlayDataHelper.ReadObjectList(ComponentEventGroups, componentReader, version);
             }
         }
         public Vector2 GetAbsolutePositionRuntime()
@@ -669,6 +645,7 @@ namespace CrazyStorm.Core
         }
         public virtual bool Update(int currentFrame)
         {
+            ExecuteExpressions();
             LayerFrame = currentFrame;
             if (BindingTarget == null || CheckCircularBinding())
             {

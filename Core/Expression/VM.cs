@@ -61,10 +61,14 @@ namespace CrazyStorm.Core
                 switch (code)
                 {
                     case VMCode.VECTOR:
+                        bytes.AddRange(PlayDataHelper.GetStructBytes((Vector3)operand));
+                        break;
                     case VMCode.BOOL:
+                        bytes.AddRange(BitConverter.GetBytes((bool)operand));
+                        break;
                     case VMCode.NAME:
                     case VMCode.CALL:
-                        bytes.AddRange(PlayDataHelper.GetBytes(operand));
+                        bytes.AddRange(PlayDataHelper.GetStringBytes((string)operand));
                         break;
                 }
             }
@@ -78,7 +82,7 @@ namespace CrazyStorm.Core
         {
             random = new Random(seed);
         }
-        public static VMInstruction[] Decode(byte[] bytes)
+        public unsafe static VMInstruction[] Decode(byte[] bytes)
         {
             List<VMInstruction> list = new List<VMInstruction>();
             int position = 0;
@@ -88,13 +92,9 @@ namespace CrazyStorm.Core
                 switch (code)
                 {
                     case VMCode.VECTOR:
-                        float x = BitConverter.ToSingle(bytes, position);
-                        position += sizeof(float);
-                        float y = BitConverter.ToSingle(bytes, position);
-                        position += sizeof(float);
-                        float z = BitConverter.ToSingle(bytes, position);
-                        position += sizeof(float);
-                        list.Add(new VMInstruction { code = code, vectorOperand = new Vector3(x, y, z) });
+                        var v = PlayDataHelper.ReadStructBytes<Vector3>(bytes, position);
+                        position += sizeof(Vector3);
+                        list.Add(new VMInstruction { code = code, vectorOperand = v });
                         break;
                     case VMCode.BOOL:
                         bool b = BitConverter.ToBoolean(bytes, position);

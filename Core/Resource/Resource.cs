@@ -68,14 +68,14 @@ namespace CrazyStorm.Core
         public virtual List<byte> GeneratePlayData()
         {
             var resourceBytes = new List<byte>();
-            PlayDataHelper.GenerateFields(typeof(Resource), this, resourceBytes);
+            PlayDataHelper.GeneratePlayDataFields(this, resourceBytes);
             return PlayDataHelper.CreateBlock(resourceBytes);
         }
         public virtual void LoadPlayData(BinaryReader reader, float version)
         {
             using (BinaryReader resourceReader = PlayDataHelper.GetBlockReader(reader))
             {
-                label = PlayDataHelper.ReadString(resourceReader);
+                PlayDataHelper.ReadPlayDataFields(this, resourceReader);
             }
         }
     }

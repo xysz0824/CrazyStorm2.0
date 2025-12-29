@@ -302,14 +302,14 @@ namespace CrazyStorm.Core
         public void LoadPlayData(BinaryReader reader, float version)
         {
             //ParticleSystems
-            PlayDataHelper.LoadObjectList(ParticleSystems, reader, version);
+            PlayDataHelper.ReadObjectList(ParticleSystems, reader, version);
             //Images
-            PlayDataHelper.LoadObjectList(Images, reader, version);
+            PlayDataHelper.ReadObjectList(Images, reader, version);
             //Sounds
-            PlayDataHelper.LoadObjectList(Sounds, reader, version);
+            PlayDataHelper.ReadObjectList(Sounds, reader, version);
             //Globals
             globals = new List<VariableResource>();
-            PlayDataHelper.LoadObjectList(globals, reader, version);
+            PlayDataHelper.ReadObjectList(globals, reader, version);
             foreach (var particleSystem in ParticleSystems)
             {
                 foreach (var layer in particleSystem.Layers)

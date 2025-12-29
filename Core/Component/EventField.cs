@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Xml;
 using System.Xml.Serialization;
@@ -23,17 +24,20 @@ namespace CrazyStorm.Core
         Layer,
         Name
     }
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public struct EventFieldData
     {
         public float halfWidth;
         public float halfHeight;
         public FieldShape fieldShape;
         public Reach reach;
-        public string targetName;
     }
     public class EventField : Component
     {
         #region Private Members
+        [PlayData]
+        [XmlAttribute]
+        string targetName;
         EventFieldData eventFieldData;
         IList<EventGroup> eventFieldEventGroups;
         #endregion
@@ -66,8 +70,8 @@ namespace CrazyStorm.Core
         [StringProperty(1, 15, true, true, false, false)]
         public string TargetName
         {
-            get { return eventFieldData.targetName; }
-            set { eventFieldData.targetName = value; }
+            get { return targetName; }
+            set { targetName = value; }
         }
         public IList<EventGroup> EventFieldEventGroups { get { return eventFieldEventGroups; } }
         #endregion
@@ -75,7 +79,7 @@ namespace CrazyStorm.Core
         #region Constructor
         public EventField()
         {
-            eventFieldData.targetName = string.Empty;
+            targetName = string.Empty;
             eventFieldData.halfWidth = 50;
             eventFieldData.halfHeight = 50;
             eventFieldEventGroups = new GenericContainer<EventGroup>();
@@ -85,8 +89,6 @@ namespace CrazyStorm.Core
         #region Private Methods
         void Update()
         {
-            base.ExecuteExpression("HalfWidth");
-            base.ExecuteExpression("HalfHeight");
             int count = 0;
             var results = ParticleManager.SearchByRect(Position.x - HalfWidth, Position.x + HalfWidth,
                 Position.y - HalfHeight, Position.y + HalfHeight, out count);
@@ -134,6 +136,7 @@ namespace CrazyStorm.Core
         {
             node = base.BuildFromXml(node);
             var eventFieldNode = (XmlElement)node.SelectSingleNode("EventField");
+            XmlHelper.BuildFromFields(typeof(EventField), this, eventFieldNode);
             //eventFieldData
             XmlHelper.BuildFromStruct(ref eventFieldData, eventFieldNode, "EventFieldData");
             //eventFieldEventGroups
@@ -144,6 +147,7 @@ namespace CrazyStorm.Core
         {
             node = base.StoreAsXml(doc, node);
             var eventFieldNode = doc.CreateElement("EventField");
+            XmlHelper.StoreFields(typeof(EventField), this, doc, eventFieldNode);
             //eventFieldData
             XmlHelper.StoreStruct(eventFieldData, doc, eventFieldNode, "EventFieldData");
             //eventFieldEventGroups
@@ -155,6 +159,7 @@ namespace CrazyStorm.Core
         {
             var bytes = base.GeneratePlayData();
             var eventFieldBytes = new List<byte>();
+            PlayDataHelper.GeneratePlayDataFields(this, eventFieldBytes);
             //eventFieldData
             PlayDataHelper.GenerateStruct(eventFieldData, eventFieldBytes);
             //eventFieldEventGroups
@@ -167,16 +172,11 @@ namespace CrazyStorm.Core
             base.LoadPlayData(reader, version);
             using (BinaryReader eventFieldReader = PlayDataHelper.GetBlockReader(reader))
             {
-                using (BinaryReader dataReader = PlayDataHelper.GetBlockReader(eventFieldReader))
-                {
-                    HalfWidth = dataReader.ReadSingle();
-                    HalfHeight = dataReader.ReadSingle();
-                    FieldShape = PlayDataHelper.ReadEnum<FieldShape>(dataReader);
-                    Reach = PlayDataHelper.ReadEnum<Reach>(dataReader);
-                    TargetName = PlayDataHelper.ReadString(dataReader);
-                }
+                PlayDataHelper.ReadPlayDataFields(this, eventFieldReader);
+                //eventFieldData
+                eventFieldData = PlayDataHelper.ReadStruct<EventFieldData>(eventFieldReader);
                 //eventFieldEventGroups
-                PlayDataHelper.LoadObjectList(EventFieldEventGroups, eventFieldReader, version);
+                PlayDataHelper.ReadObjectList(EventFieldEventGroups, eventFieldReader, version);
             }
         }
         public override bool PushProperty(string propertyName)

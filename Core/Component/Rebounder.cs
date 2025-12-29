@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Xml;
 using System.Xml.Serialization;
@@ -17,6 +18,7 @@ namespace CrazyStorm.Core
         Line,
         Circle
     }
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public struct RebounderData
     {
         public int size;
@@ -64,8 +66,6 @@ namespace CrazyStorm.Core
         #region Private Methods
         void Update()
         {
-            base.ExecuteExpression("Size");
-            base.ExecuteExpression("Rotation");
             int count = 0;
             var results = ParticleManager.SearchByRect(Position.x - Size, Position.x + Size,
                 Position.y - Size, Position.y + Size, out count);
@@ -171,15 +171,11 @@ namespace CrazyStorm.Core
             base.LoadPlayData(reader, version);
             using (BinaryReader rebounderReader = PlayDataHelper.GetBlockReader(reader))
             {
-                using (BinaryReader dataReader = PlayDataHelper.GetBlockReader(rebounderReader))
-                {
-                    Size = dataReader.ReadInt32();
-                    RebounderShape = PlayDataHelper.ReadEnum<RebounderShape>(dataReader);
-                    Rotation = dataReader.ReadSingle();
-                    lastRotation = Rotation;
-                }
+                //rebounderData
+                rebounderData = PlayDataHelper.ReadStruct<RebounderData>(rebounderReader);
+                lastRotation = Rotation;
                 //rebounderEventGroups
-                PlayDataHelper.LoadObjectList(RebounderEventGroups, rebounderReader, version);
+                PlayDataHelper.ReadObjectList(RebounderEventGroups, rebounderReader, version);
             }
         }
         public override bool PushProperty(string propertyName)

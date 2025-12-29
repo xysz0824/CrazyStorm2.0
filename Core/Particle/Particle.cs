@@ -4,14 +4,16 @@
  */
 using System;
 using System.Collections.Generic;
-using System.Text;
+using System.IO;
 using System.Reflection;
+using System.Runtime.InteropServices;
+using System.Text;
 using System.Xml;
 using System.Xml.Serialization;
-using System.IO;
 
 namespace CrazyStorm.Core
 {
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public struct ParticleData
     {
         public bool stickToSpeedAngle;
@@ -104,13 +106,8 @@ namespace CrazyStorm.Core
             base.LoadPlayData(reader, version);
             using (BinaryReader particleReader = PlayDataHelper.GetBlockReader(reader))
             {
-                using (BinaryReader dataReader = PlayDataHelper.GetBlockReader(particleReader))
-                {
-                    StickToSpeedAngle = dataReader.ReadBoolean();
-                    HeightScale = dataReader.ReadSingle();
-                    RetainScale = dataReader.ReadBoolean();
-                    AfterimageEffect = dataReader.ReadBoolean();
-                }
+                //particleData
+                particleData = PlayDataHelper.ReadStruct<ParticleData>(particleReader);
             }
         }
         public override bool PushProperty(string propertyName)

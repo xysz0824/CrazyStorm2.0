@@ -169,8 +169,6 @@
     <sys:String x:Key="StartPointYStr">起点Y</sys:String>
     <sys:String x:Key="WidthStr">宽度</sys:String>
     <sys:String x:Key="HeightStr">高度</sys:String>
-    <sys:String x:Key="CenterPointXStr">中心X</sys:String>
-    <sys:String x:Key="CenterPointYStr">中心Y</sys:String>
     <sys:String x:Key="FramesStr">帧数</sys:String>
     <sys:String x:Key="DelayStr">延迟</sys:String>
     <sys:String x:Key="HitRadiusStr">判定半径</sys:String>
@@ -201,9 +199,6 @@
     <sys:String x:Key="DisplayStr">显示</sys:String>
     <sys:String x:Key="WindowStr">窗口</sys:String>
     <sys:String x:Key="FullScreenStr">全屏</sys:String>
-    <sys:String x:Key="CenterPositionStr">中心位置</sys:String>
-    <sys:String x:Key="ScreenCenterStr">屏幕中心</sys:String>
-    <sys:String x:Key="OffsetCenterStr">偏移中心</sys:String>
     <sys:String x:Key="XOffsetStr">X偏移</sys:String>
     <sys:String x:Key="YOffsetStr">Y偏移</sys:String>
     <sys:String x:Key="CharacterStr">自机</sys:String>

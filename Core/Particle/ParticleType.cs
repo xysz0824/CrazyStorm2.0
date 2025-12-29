@@ -345,12 +345,9 @@ namespace CrazyStorm.Core
         public List<byte> GeneratePlayData()
         {
             var particleTypeBytes = new List<byte>();
-            if (image != null)
-                particleTypeBytes.AddRange(PlayDataHelper.GetBytes(image.ID));
-            else
-                particleTypeBytes.AddRange(PlayDataHelper.GetBytes(-1));
-
-            PlayDataHelper.GenerateFields(this, particleTypeBytes);
+            if (image != null) particleTypeBytes.AddRange(BitConverter.GetBytes(image.ID));
+            else particleTypeBytes.AddRange(BitConverter.GetBytes(-1));
+            PlayDataHelper.GeneratePlayDataFields(this, particleTypeBytes);
             return PlayDataHelper.CreateBlock(particleTypeBytes);
         }
         public void LoadPlayData(BinaryReader reader, float version)
@@ -358,14 +355,7 @@ namespace CrazyStorm.Core
             using (BinaryReader particleTypeReader = PlayDataHelper.GetBlockReader(reader))
             {
                 imageID = particleTypeReader.ReadInt32();
-                ID = particleTypeReader.ReadInt32();
-                StartPoint = PlayDataHelper.ReadVector2(particleTypeReader);
-                Width = particleTypeReader.ReadInt32();
-                Height = particleTypeReader.ReadInt32();
-                CenterPoint = PlayDataHelper.ReadVector2(particleTypeReader);
-                Frames = particleTypeReader.ReadInt32();
-                Delay = particleTypeReader.ReadInt32();
-                Radius = particleTypeReader.ReadInt32();
+                PlayDataHelper.ReadPlayDataFields(this, particleTypeReader);
             }
         }
         #endregion

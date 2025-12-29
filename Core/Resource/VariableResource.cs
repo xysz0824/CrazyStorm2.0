@@ -81,7 +81,7 @@ namespace CrazyStorm.Core
         {
             var bytes = base.GeneratePlayData();
             var variableResourceBytes = new List<byte>();
-            PlayDataHelper.GenerateFields(typeof(VariableResource), this, variableResourceBytes);
+            PlayDataHelper.GeneratePlayDataFields(this, variableResourceBytes);
             bytes.AddRange(PlayDataHelper.CreateBlock(variableResourceBytes));
             return bytes;
         }
@@ -90,8 +90,7 @@ namespace CrazyStorm.Core
             base.LoadPlayData(reader, version);
             using (BinaryReader variableResourceReader = PlayDataHelper.GetBlockReader(reader))
             {
-                value = variableResourceReader.ReadSingle();
-                type = PlayDataHelper.ReadEnum<SpecialVariableType>(variableResourceReader);
+                PlayDataHelper.ReadPlayDataFields(this, variableResourceReader);
             }
         }
         #endregion

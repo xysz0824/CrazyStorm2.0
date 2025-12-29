@@ -5,6 +5,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Runtime.InteropServices;
 using System.Runtime.Remoting.Messaging;
 using System.Text;
 using System.Xml;
@@ -19,17 +20,15 @@ namespace CrazyStorm.Core
         Multiply,
         None
     }
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public struct ParticleBaseData
     {
         public int maxLife;
-        public int pcurrentFrame;
-        public Vector2 pposition;
         public float widthScale;
         public RGB rgb;
         public float mass;
         public float opacity;
         public float pspeed;
-        public float pspeedAngle;
         public float pacspeed;
         public float pacspeedAngle;
         public float protation;
@@ -68,17 +67,9 @@ namespace CrazyStorm.Core
             set { particleBaseData.maxLife = value; }
         }
         [RuntimeProperty]
-        public int PCurrentFrame
-        {
-            get { return particleBaseData.pcurrentFrame; }
-            set { particleBaseData.pcurrentFrame = value; }
-        }
+        public int PCurrentFrame { get; set; }
         [RuntimeProperty]
-        public Vector2 PPosition
-        {
-            get { return particleBaseData.pposition; }
-            set { particleBaseData.pposition = value; }
-        }
+        public Vector2 PPosition { get; set; }
         public Vector2 PPositionLast { get; private set; }
         public ParticleType Type
         {
@@ -125,11 +116,7 @@ namespace CrazyStorm.Core
             set { particleBaseData.pspeed = value; }
         }
         [RuntimeProperty]
-        public float PSpeedAngle
-        {
-            get { return particleBaseData.pspeedAngle; }
-            set { particleBaseData.pspeedAngle = value; }
-        }
+        public float PSpeedAngle { get; set; }
         [FloatProperty(float.MinValue, float.MaxValue)]
         public float PAcspeed
         {
@@ -283,13 +270,10 @@ namespace CrazyStorm.Core
         {
             var particleBaseBytes = new List<byte>();
             //properties
-            base.GeneratePlayData(particleBaseBytes);
+            base.GeneratePropertyExpressions(particleBaseBytes);
             //type
-            if (type != null)
-                particleBaseBytes.AddRange(PlayDataHelper.GetBytes(type.ID));
-            else
-                particleBaseBytes.AddRange(PlayDataHelper.GetBytes(-1));
-
+            if (type != null) particleBaseBytes.AddRange(BitConverter.GetBytes(type.ID));
+            else particleBaseBytes.AddRange(BitConverter.GetBytes(-1));
             //particleBaseData
             PlayDataHelper.GenerateStruct(particleBaseData, particleBaseBytes);
             return PlayDataHelper.CreateBlock(particleBaseBytes);
@@ -301,29 +285,8 @@ namespace CrazyStorm.Core
                 //properties
                 base.LoadPropertyExpressions(particleBaseReader);
                 typeID = particleBaseReader.ReadInt32();
-                using (BinaryReader dataReader = PlayDataHelper.GetBlockReader(particleBaseReader))
-                {
-                    MaxLife = dataReader.ReadInt32();
-                    PCurrentFrame = dataReader.ReadInt32();
-                    PPosition = PlayDataHelper.ReadVector2(dataReader);
-                    WidthScale = dataReader.ReadSingle();
-                    RGB = PlayDataHelper.ReadRGB(dataReader);
-                    Mass = dataReader.ReadSingle();
-                    Opacity = dataReader.ReadSingle();
-                    PSpeed = dataReader.ReadSingle();
-                    PSpeedAngle = dataReader.ReadSingle();
-                    PAcspeed = dataReader.ReadSingle();
-                    PAcspeedAngle = dataReader.ReadSingle();
-                    PRotation = dataReader.ReadSingle();
-                    BlendType = PlayDataHelper.ReadEnum<BlendType>(dataReader);
-                    KillOutside = dataReader.ReadBoolean();
-                    Collision = dataReader.ReadBoolean();
-                    IgnoreMask = dataReader.ReadBoolean();
-                    IgnoreRebound = dataReader.ReadBoolean();
-                    IgnoreForce = dataReader.ReadBoolean();
-                    FogEffect = dataReader.ReadBoolean();
-                    FadeEffect = dataReader.ReadBoolean();
-                }
+                //particleBaseData
+                particleBaseData = PlayDataHelper.ReadStruct<ParticleBaseData>(particleBaseReader);
             }
         }
         public override bool PushProperty(string propertyName)
@@ -530,6 +493,7 @@ namespace CrazyStorm.Core
         public virtual bool CheckCollision(float bx, float by, float x, float y, float r) => false;
         public virtual bool Update(int currentFrame = 0)
         {
+            ExecuteExpressions();
             if (PCurrentFrame >= MaxLife || (KillOutside && ParticleManager.OutOfWindow(this)))
             {
                 Alive = false;
@@ -580,6 +544,9 @@ namespace CrazyStorm.Core
             particle.type = type;
             particle.typeID = typeID;
             particle.particleBaseData = particleBaseData;
+            particle.PCurrentFrame = PCurrentFrame;
+            particle.PPosition = PPosition;
+            particle.PSpeedAngle = PSpeedAngle;
             particle.Emitter = Emitter;
             particle.FogFrame = 0;
             particle.ParticleEventGroups = ParticleEventGroups;

@@ -94,15 +94,15 @@ namespace CrazyStorm.Core
             //compiledCondition
             if (compiledCondition != null)
             {
-                eventGroupBytes.AddRange(PlayDataHelper.GetBytes(compiledCondition.Length));
+                eventGroupBytes.AddRange(BitConverter.GetBytes(compiledCondition.Length));
                 eventGroupBytes.AddRange(compiledCondition);
             }
             else
-                eventGroupBytes.AddRange(PlayDataHelper.GetBytes(0));
+                eventGroupBytes.AddRange(BitConverter.GetBytes(0));
             //compiledEvents
             for (int i = 0; i < compiledEvents.Count; ++i)
             {
-                eventGroupBytes.AddRange(PlayDataHelper.GetBytes(CompiledEvents[i].Length));
+                eventGroupBytes.AddRange(BitConverter.GetBytes(CompiledEvents[i].Length));
                 eventGroupBytes.AddRange(compiledEvents[i]);
             }
             return PlayDataHelper.CreateBlock(eventGroupBytes);

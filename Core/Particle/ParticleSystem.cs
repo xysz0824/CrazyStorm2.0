@@ -192,7 +192,7 @@ namespace CrazyStorm.Core
         public List<byte> GeneratePlayData()
         {
             var particleSystemBytes = new List<Byte>();
-            PlayDataHelper.GenerateFields(this, particleSystemBytes);
+            PlayDataHelper.GeneratePlayDataFields(this, particleSystemBytes);
             //customTypes
             PlayDataHelper.GenerateObjectList(customTypes, particleSystemBytes);
             //layers
@@ -203,11 +203,11 @@ namespace CrazyStorm.Core
         {
             using (BinaryReader particleSystemReader = PlayDataHelper.GetBlockReader(reader))
             {
-                Name = PlayDataHelper.ReadString(particleSystemReader);
+                PlayDataHelper.ReadPlayDataFields(this, particleSystemReader);
                 //customTypes
-                PlayDataHelper.LoadObjectList(CustomTypes, particleSystemReader, version);
+                PlayDataHelper.ReadObjectList(CustomTypes, particleSystemReader, version);
                 //layers
-                PlayDataHelper.LoadObjectList(Layers, particleSystemReader, version);
+                PlayDataHelper.ReadObjectList(Layers, particleSystemReader, version);
                 for (int i = 0; i < Layers.Count; ++i)
                 {
                     //Set id of layer to components of layer

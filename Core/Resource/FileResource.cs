@@ -78,7 +78,7 @@ namespace CrazyStorm.Core
         {
             var bytes = base.GeneratePlayData();
             var fileResourceBytes = new List<byte>();
-            PlayDataHelper.GenerateFields(typeof(FileResource), this, fileResourceBytes);
+            PlayDataHelper.GeneratePlayDataFields(this, fileResourceBytes);
             bytes.AddRange(PlayDataHelper.CreateBlock(fileResourceBytes));
             return bytes;
         }
@@ -87,8 +87,7 @@ namespace CrazyStorm.Core
             base.LoadPlayData(reader, version);
             using (BinaryReader fileResourceReader = PlayDataHelper.GetBlockReader(reader))
             {
-                id = fileResourceReader.ReadInt32();
-                relativePath = PlayDataHelper.ReadString(fileResourceReader);
+                PlayDataHelper.ReadPlayDataFields(this, fileResourceReader);
                 absolutePath = relativePath.Contains(":") ? relativePath : File.CurrentDirectory + relativePath;
             }
         }

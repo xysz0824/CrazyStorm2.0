@@ -6,12 +6,14 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Xml;
 using System.Xml.Serialization;
 
 namespace CrazyStorm.Core
 {
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public struct EmitterData
     {
         public Vector2 emitPosition;
@@ -102,12 +104,6 @@ namespace CrazyStorm.Core
         }
         void Emit()
         {
-            base.ExecuteExpression("EmitCycle");
-            base.ExecuteExpression("EmitRange");
-            base.ExecuteExpression("EmitCount");
-            base.ExecuteExpression("EmitAngle");
-            base.ExecuteExpression("EmitPosition");
-            base.ExecuteExpression("EmitRadius");
             Template.ExecuteExpressions();
             float increment = EmitRange / EmitCount;
             float angle = EmitAngle - (EmitRange + increment) / 2;
@@ -179,20 +175,13 @@ namespace CrazyStorm.Core
             base.LoadPlayData(reader, version);
             using (BinaryReader emitterReader = PlayDataHelper.GetBlockReader(reader))
             {
-                using (BinaryReader dataReader = PlayDataHelper.GetBlockReader(emitterReader))
-                {
-                    EmitPosition = PlayDataHelper.ReadVector2(dataReader);
-                    EmitCount = dataReader.ReadInt32();
-                    EmitCycle = dataReader.ReadInt32();
-                    EmitAngle = dataReader.ReadSingle();
-                    EmitRange = dataReader.ReadSingle();
-                    EmitRadius = dataReader.ReadSingle();
-                }
+                //emitterData
+                emitterData = PlayDataHelper.ReadStruct<EmitterData>(emitterReader);
                 //particle
                 InitialTemplate.LoadPlayData(emitterReader, version);
                 InitialTemplate.Emitter = this;
                 //emitterEventGroups
-                PlayDataHelper.LoadObjectList(EmitterEventGroups, emitterReader, version);
+                PlayDataHelper.ReadObjectList(EmitterEventGroups, emitterReader, version);
                 InitialTemplate.ParticleEventGroups = EmitterEventGroups;
             }
         }
