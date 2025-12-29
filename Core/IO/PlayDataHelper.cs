@@ -129,10 +129,6 @@ namespace CrazyStorm.Core
             var bytes = GetBlock(reader);
             return MemoryMarshal.Read<T>(bytes.AsSpan());
         }
-        public static T ReadEnum<T>(BinaryReader reader)
-        {
-            return (T)(object)reader.ReadInt32();
-        }
         public static string ReadString(BinaryReader reader)
         {
             var bytes = new List<byte>();
