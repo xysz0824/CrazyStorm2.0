@@ -114,7 +114,7 @@ namespace CrazyStorm.Core
                 {
                     if (attributes[i] is PlayDataAttribute)
                     {
-                        info.SetValue(source, ReadBytes(info.DeclaringType, reader));
+                        info.SetValue(source, ReadBytes(info.FieldType, reader));
                         break;
                     }
                 }

@@ -456,21 +456,19 @@ namespace CrazyStorm.Core
         public virtual List<byte> GeneratePlayData()
         {
             var componentBytes = new List<byte>();
+            //type for factory
+            componentBytes.AddRange(PlayDataHelper.GetStringBytes(GetType().Name));
             PlayDataHelper.GeneratePlayDataFields(this, componentBytes);
             //properties
             base.GeneratePropertyExpressions(componentBytes);
             //componentData
             PlayDataHelper.GenerateStruct(componentData, componentBytes);
             //parent
-            if (parent != null)
-                componentBytes.AddRange(BitConverter.GetBytes(parent.ID));
-            else
-                componentBytes.AddRange(BitConverter.GetBytes(-1));
+            if (parent != null) componentBytes.AddRange(BitConverter.GetBytes(parent.ID));
+            else componentBytes.AddRange(BitConverter.GetBytes(-1));
             //bindingTarget
-            if (bindingTarget != null)
-                componentBytes.AddRange(BitConverter.GetBytes(bindingTarget.ID));
-            else
-                componentBytes.AddRange(BitConverter.GetBytes(-1));
+            if (bindingTarget != null) componentBytes.AddRange(BitConverter.GetBytes(bindingTarget.ID));
+            else componentBytes.AddRange(BitConverter.GetBytes(-1));
             //variables
             PlayDataHelper.GenerateObjectList(Locals, componentBytes);
             //componentEventGroups
@@ -481,6 +479,8 @@ namespace CrazyStorm.Core
         {
             using (BinaryReader componentReader = PlayDataHelper.GetBlockReader(reader))
             {
+                //Must swallow type string here
+                PlayDataHelper.ReadString(componentReader);
                 PlayDataHelper.ReadPlayDataFields(this, reader);
                 //properties
                 base.LoadPropertyExpressions(componentReader);
