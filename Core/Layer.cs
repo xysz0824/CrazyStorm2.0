@@ -118,9 +118,7 @@ namespace CrazyStorm.Core
         {
             var clone = MemberwiseClone() as Layer;
             clone.components = new GenericContainer<Component>();
-            foreach (var component in components)
-                clone.components.Add(component.Clone() as Component);
-            
+            foreach (var component in components) clone.components.Add(component.Clone() as Component);
             return clone;
         }
         public XmlElement BuildFromXml(XmlElement node)
@@ -163,6 +161,8 @@ namespace CrazyStorm.Core
             var layerBytes = new List<byte>();
             //stringDataFields
             PlayDataHelper.GenerateStringDataFields(this, layerBytes);
+            //layerData
+            PlayDataHelper.GenerateStruct(layerData, layerBytes);
             //components
             PlayDataHelper.GenerateObjectList(components, layerBytes);
             return PlayDataHelper.CreateBlock(layerBytes);
@@ -173,6 +173,8 @@ namespace CrazyStorm.Core
             {
                 //stringDataFields
                 PlayDataHelper.ReadStringDataFields(this, layerReader);
+                //layerData
+                layerData = PlayDataHelper.ReadStruct<LayerData>(layerReader);
                 //components
                 using (BinaryReader componentsReader = PlayDataHelper.GetBlockReader(layerReader))
                 {
