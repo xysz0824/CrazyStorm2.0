@@ -14,13 +14,13 @@ namespace CrazyStorm.Core
 {
     public class XmlHelper
     {
-        public static void BuildFromFields(Type type, object source, XmlElement node)
+        public static void BuildFromFields<T>(T source, XmlElement node)
         {
             if (node == null)
                 return;
 
             BindingFlags flags = BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly;
-            var fieldInfos = type.GetFields(flags).OrderBy(f => f.MetadataToken);
+            var fieldInfos = typeof(T).GetFields(flags).OrderBy(f => f.MetadataToken);
             foreach (var info in fieldInfos)
             {
                 object[] attributes = info.GetCustomAttributes(false);
@@ -43,14 +43,10 @@ namespace CrazyStorm.Core
                 }
             }
         }
-        public static void BuildFromFields(object source, XmlElement node)
-        {
-            BuildFromFields(source.GetType(), source, node);
-        }
-        public static void StoreFields(Type type, object source, XmlDocument doc, XmlElement node)
+        public static void StoreFields<T>(T source, XmlDocument doc, XmlElement node)
         {
             BindingFlags flags = BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly;
-            var fieldInfos = type.GetFields(flags).OrderBy(f => f.MetadataToken);
+            var fieldInfos = typeof(T).GetFields(flags).OrderBy(f => f.MetadataToken);
             foreach (var info in fieldInfos)
             {
                 object[] attributes = info.GetCustomAttributes(false);
@@ -65,10 +61,6 @@ namespace CrazyStorm.Core
                     }
                 }
             }
-        }
-        public static void StoreFields(object source, XmlDocument doc, XmlElement node)
-        {
-            StoreFields(source.GetType(), source, doc, node);
         }
         public static void BuildFromStruct<T>(ref T source, XmlElement node)
         {

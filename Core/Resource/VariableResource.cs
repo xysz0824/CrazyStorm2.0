@@ -66,7 +66,7 @@ namespace CrazyStorm.Core
         {
             node = base.BuildFromXml(node);
             var variableResourceNode = (XmlElement)node.SelectSingleNode("VariableResource");
-            XmlHelper.BuildFromFields(typeof(VariableResource), this, variableResourceNode);
+            XmlHelper.BuildFromFields(this, variableResourceNode);
             //variableResourceData
             XmlHelper.BuildFromStruct(ref data, variableResourceNode);
             return variableResourceNode;
@@ -75,7 +75,7 @@ namespace CrazyStorm.Core
         {
             node = base.StoreAsXml(doc, node);
             var variableResourceNode = doc.CreateElement("VariableResource");
-            XmlHelper.StoreFields(typeof(VariableResource), this, doc, variableResourceNode);
+            XmlHelper.StoreFields(this, doc, variableResourceNode);
             //variableResourceData
             XmlHelper.StoreStruct(data, doc, variableResourceNode);
             node.AppendChild(variableResourceNode);

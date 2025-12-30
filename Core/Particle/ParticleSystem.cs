@@ -146,18 +146,12 @@ namespace CrazyStorm.Core
         {
             var clone = MemberwiseClone() as ParticleSystem;
             clone.customTypes = new GenericContainer<ParticleType>();
-            foreach (var type in customTypes)
-                clone.customTypes.Add(type.Clone() as ParticleType);
-
+            foreach (var type in customTypes) clone.customTypes.Add(type.Clone() as ParticleType);
             clone.layers = new GenericContainer<Layer>();
             clone.componentTree = new GenericContainer<Component>();
-            foreach (var layer in layers)
-                clone.layers.Add(layer.Clone() as Layer);
-
+            foreach (var layer in layers) clone.layers.Add(layer.Clone() as Layer);
             clone.componentIndex = new Dictionary<string, int>();
-            foreach (var index in componentIndex)
-                clone.componentIndex[index.Key] = index.Value;
-
+            foreach (var index in componentIndex) clone.componentIndex[index.Key] = index.Value;
             return clone;
         }
         public XmlElement BuildFromXml(XmlElement node)

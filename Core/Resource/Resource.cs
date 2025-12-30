@@ -51,14 +51,14 @@ namespace CrazyStorm.Core
             var nodeName = "Resource";
             var resourceNode = (XmlElement)node.SelectSingleNode(nodeName);
             if (node.Name == nodeName) resourceNode = node;
-            XmlHelper.BuildFromFields(typeof(Resource), this, resourceNode);
+            XmlHelper.BuildFromFields(this, resourceNode);
             return resourceNode;
         }
 
         public virtual XmlElement StoreAsXml(XmlDocument doc, XmlElement node)
         {
             var resourceNode = doc.CreateElement("Resource");
-            XmlHelper.StoreFields(typeof(Resource), this, doc, resourceNode);
+            XmlHelper.StoreFields(this, doc, resourceNode);
             node.AppendChild(resourceNode);
             return resourceNode;
         }

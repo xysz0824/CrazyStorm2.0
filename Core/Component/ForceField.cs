@@ -156,7 +156,7 @@ namespace CrazyStorm.Core
         {
             node = base.BuildFromXml(node);
             var forceFieldNode = (XmlElement)node.SelectSingleNode("ForceField");
-            XmlHelper.BuildFromFields(typeof(ForceField), this, forceFieldNode);
+            XmlHelper.BuildFromFields(this, forceFieldNode);
             //forceFieldData
             XmlHelper.BuildFromStruct(ref forceFieldData, forceFieldNode);
             return forceFieldNode;
@@ -165,7 +165,7 @@ namespace CrazyStorm.Core
         {
             node = base.StoreAsXml(doc, node);
             var forceFieldNode = doc.CreateElement("ForceField");
-            XmlHelper.StoreFields(typeof(ForceField), this, doc, forceFieldNode);
+            XmlHelper.StoreFields(this, doc, forceFieldNode);
             //forceFieldData
             XmlHelper.StoreStruct(forceFieldData, doc, forceFieldNode);
             node.AppendChild(forceFieldNode);

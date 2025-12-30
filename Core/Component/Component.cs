@@ -320,7 +320,7 @@ namespace CrazyStorm.Core
             if (node.Name == nodeName)
                 componentNode = node;
 
-            XmlHelper.BuildFromFields(typeof(Component), this, componentNode);
+            XmlHelper.BuildFromFields(this, componentNode);
             //properties
             base.BuildFromXmlElement(componentNode);
             //componentData
@@ -369,7 +369,7 @@ namespace CrazyStorm.Core
             var specificTypeAttribute = doc.CreateAttribute("specificType");
             specificTypeAttribute.Value = GetType().Name;
             componentNode.Attributes.Append(specificTypeAttribute);
-            XmlHelper.StoreFields(typeof(Component), this, doc, componentNode);
+            XmlHelper.StoreFields(this, doc, componentNode);
             //properties
             componentNode.AppendChild(base.GetXmlElement(doc));
             //componentData

@@ -47,10 +47,10 @@ namespace CrazyStorm.Core
             block.AddRange(content);
             return block;
         }
-        public static void GenerateStringDataFields(object source, List<byte> data)
+        public static void GenerateStringDataFields<T>(T source, List<byte> data)
         {
             BindingFlags flags = BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly;
-            var fieldInfos = source.GetType().GetFields(flags).OrderBy(f => f.MetadataToken);
+            var fieldInfos = typeof(T).GetFields(flags).OrderBy(f => f.MetadataToken);
             foreach (var info in fieldInfos)
             {
                 object[] attributes = info.GetCustomAttributes(false);
@@ -108,10 +108,10 @@ namespace CrazyStorm.Core
             }
             return Encoding.UTF8.GetString(stringBytes.ToArray());
         }
-        public static void ReadStringDataFields(object source, BinaryReader reader)
+        public static void ReadStringDataFields<T>(T source, BinaryReader reader)
         {
             BindingFlags flags = BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly;
-            var fieldInfos = source.GetType().GetFields(flags).OrderBy(f => f.MetadataToken);
+            var fieldInfos = typeof(T).GetFields(flags).OrderBy(f => f.MetadataToken);
             foreach (var info in fieldInfos)
             {
                 object[] attributes = info.GetCustomAttributes(false);

@@ -62,14 +62,14 @@ namespace CrazyStorm.Core
         {
             node = base.BuildFromXml(node);
             var fileResourceNode = (XmlElement)node.SelectSingleNode("FileResource");
-            XmlHelper.BuildFromFields(typeof(FileResource), this, fileResourceNode);
+            XmlHelper.BuildFromFields(this, fileResourceNode);
             return fileResourceNode;
         }
         public override XmlElement StoreAsXml(XmlDocument doc, XmlElement node)
         {
             node = base.StoreAsXml(doc, node);
             var fileResourceNode = doc.CreateElement("FileResource");
-            XmlHelper.StoreFields(typeof(FileResource), this, doc, fileResourceNode);
+            XmlHelper.StoreFields(this, doc, fileResourceNode);
             node.AppendChild(fileResourceNode);
             return fileResourceNode;
         }

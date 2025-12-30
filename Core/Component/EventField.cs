@@ -136,7 +136,7 @@ namespace CrazyStorm.Core
         {
             node = base.BuildFromXml(node);
             var eventFieldNode = (XmlElement)node.SelectSingleNode("EventField");
-            XmlHelper.BuildFromFields(typeof(EventField), this, eventFieldNode);
+            XmlHelper.BuildFromFields(this, eventFieldNode);
             //eventFieldData
             XmlHelper.BuildFromStruct(ref eventFieldData, eventFieldNode);
             //eventFieldEventGroups
@@ -147,7 +147,7 @@ namespace CrazyStorm.Core
         {
             node = base.StoreAsXml(doc, node);
             var eventFieldNode = doc.CreateElement("EventField");
-            XmlHelper.StoreFields(typeof(EventField), this, doc, eventFieldNode);
+            XmlHelper.StoreFields(this, doc, eventFieldNode);
             //eventFieldData
             XmlHelper.StoreStruct(eventFieldData, doc, eventFieldNode);
             //eventFieldEventGroups
