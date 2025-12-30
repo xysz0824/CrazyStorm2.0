@@ -32,7 +32,7 @@ namespace CrazyStorm.Core
     public class ForceField : Component
     {
         #region Private Members
-        [PlayData]
+        [StringData]
         [XmlAttribute]
         public string targetName;
         ForceFieldData forceFieldData;
@@ -158,7 +158,7 @@ namespace CrazyStorm.Core
             var forceFieldNode = (XmlElement)node.SelectSingleNode("ForceField");
             XmlHelper.BuildFromFields(typeof(ForceField), this, forceFieldNode);
             //forceFieldData
-            XmlHelper.BuildFromStruct(ref forceFieldData, forceFieldNode, "ForceFieldData");
+            XmlHelper.BuildFromStruct(ref forceFieldData, forceFieldNode);
             return forceFieldNode;
         }
         public override XmlElement StoreAsXml(XmlDocument doc, XmlElement node)
@@ -167,7 +167,7 @@ namespace CrazyStorm.Core
             var forceFieldNode = doc.CreateElement("ForceField");
             XmlHelper.StoreFields(typeof(ForceField), this, doc, forceFieldNode);
             //forceFieldData
-            XmlHelper.StoreStruct(forceFieldData, doc, forceFieldNode, "ForceFieldData");
+            XmlHelper.StoreStruct(forceFieldData, doc, forceFieldNode);
             node.AppendChild(forceFieldNode);
             return forceFieldNode;
         }
@@ -175,7 +175,8 @@ namespace CrazyStorm.Core
         {
             var bytes = base.GeneratePlayData();
             var forceFieldBytes = new List<byte>();
-            PlayDataHelper.GeneratePlayDataFields(this, forceFieldBytes);
+            //stringDataFields
+            PlayDataHelper.GenerateStringDataFields(this, forceFieldBytes);
             //forceFieldData
             PlayDataHelper.GenerateStruct(forceFieldData, forceFieldBytes);
             bytes.AddRange(PlayDataHelper.CreateBlock(forceFieldBytes));
@@ -186,7 +187,8 @@ namespace CrazyStorm.Core
             base.LoadPlayData(reader, version);
             using (BinaryReader forceFieldReader = PlayDataHelper.GetBlockReader(reader))
             {
-                PlayDataHelper.ReadPlayDataFields(this, forceFieldReader);
+                //stringDataFields
+                PlayDataHelper.ReadStringDataFields(this, forceFieldReader);
                 //forceFieldData
                 forceFieldData = PlayDataHelper.ReadStruct<ForceFieldData>(forceFieldReader);
             }

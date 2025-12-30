@@ -15,7 +15,7 @@ namespace CrazyStorm.Core
     public class ParticleSystem : IXmlData, IGeneratePlayData, ILoadPlayData, IPlayable
     {
         #region Private Members
-        [PlayData]
+        [StringData]
         [XmlAttribute]
         string name;
         IList<ParticleType> customTypes;
@@ -164,9 +164,7 @@ namespace CrazyStorm.Core
         {
             var nodeName = "ParticleSystem";
             var particleSystemNode = (XmlElement)node.SelectSingleNode(nodeName);
-            if (node.Name == nodeName)
-                particleSystemNode = node;
-
+            if (node.Name == nodeName) particleSystemNode = node;
             XmlHelper.BuildFromFields(this, particleSystemNode);
             //customTypes
             XmlHelper.BuildFromObjectList(customTypes, new ParticleType(0), particleSystemNode, "CustomTypes");
@@ -191,8 +189,9 @@ namespace CrazyStorm.Core
         }
         public List<byte> GeneratePlayData()
         {
-            var particleSystemBytes = new List<Byte>();
-            PlayDataHelper.GeneratePlayDataFields(this, particleSystemBytes);
+            var particleSystemBytes = new List<byte>();
+            //stringDataField
+            PlayDataHelper.GenerateStringDataFields(this, particleSystemBytes);
             //customTypes
             PlayDataHelper.GenerateObjectList(customTypes, particleSystemBytes);
             //layers
@@ -203,7 +202,8 @@ namespace CrazyStorm.Core
         {
             using (BinaryReader particleSystemReader = PlayDataHelper.GetBlockReader(reader))
             {
-                PlayDataHelper.ReadPlayDataFields(this, particleSystemReader);
+                //stringDataFields
+                PlayDataHelper.ReadStringDataFields(this, particleSystemReader);
                 //customTypes
                 PlayDataHelper.ReadObjectList(CustomTypes, particleSystemReader, version);
                 //layers

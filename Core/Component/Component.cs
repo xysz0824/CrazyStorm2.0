@@ -18,6 +18,7 @@ namespace CrazyStorm.Core
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public struct ComponentData
     {
+        public int id;
         public int beginFrame;
         public int totalFrame;
         public Vector2 position;
@@ -32,16 +33,13 @@ namespace CrazyStorm.Core
         public event PropertyChangedEventHandler PropertyChanged;
 
         #region Private Members
+        [StringData]
+        [XmlAttribute]
+        string name;
         Vector2 parentAbsolutePosition;
         Vector2 speedVector;
         Vector2 acspeedVector;
         ComponentData componentData;
-        [PlayData]
-        [XmlAttribute]
-        int id;
-        [PlayData]
-        [XmlAttribute]
-        string name;
         bool selected;
         Component parent;
         Emitter bindingTarget;
@@ -57,8 +55,8 @@ namespace CrazyStorm.Core
         #region Public Members
         public int ID
         {
-            get { return id; }
-            set { id = value; }
+            get { return componentData.id; }
+            set { componentData.id = value; }
         }
         [StringProperty(1, 15, true, true, false, false)]
         public string Name
@@ -292,11 +290,11 @@ namespace CrazyStorm.Core
             var clone = base.Clone() as Component;
             clone.parent = null;
             if (parent != null)
-                clone.ParentID = parent.id;
+                clone.ParentID = parent.ID;
 
             clone.bindingTarget = null;
             if (bindingTarget != null)
-                clone.BindingTargetID = bindingTarget.id;
+                clone.BindingTargetID = bindingTarget.ID;
 
             clone.Locals = new GenericContainer<VariableResource>();
             foreach (var variable in Locals)
@@ -326,7 +324,7 @@ namespace CrazyStorm.Core
             //properties
             base.BuildFromXmlElement(componentNode);
             //componentData
-            XmlHelper.BuildFromStruct(ref componentData, componentNode, "ComponentData");
+            XmlHelper.BuildFromStruct(ref componentData, componentNode);
             //parent
             if (componentNode.HasAttribute("parent"))
             {
@@ -375,7 +373,7 @@ namespace CrazyStorm.Core
             //properties
             componentNode.AppendChild(base.GetXmlElement(doc));
             //componentData
-            XmlHelper.StoreStruct(componentData, doc, componentNode, "ComponentData");
+            XmlHelper.StoreStruct(componentData, doc, componentNode);
             //parent
             if (parent != null)
             {
@@ -458,7 +456,8 @@ namespace CrazyStorm.Core
             var componentBytes = new List<byte>();
             //type for factory
             componentBytes.AddRange(PlayDataHelper.GetStringBytes(GetType().Name));
-            PlayDataHelper.GeneratePlayDataFields(this, componentBytes);
+            //stringDataFields
+            PlayDataHelper.GenerateStringDataFields(this, componentBytes);
             //properties
             base.GeneratePropertyExpressions(componentBytes);
             //componentData
@@ -479,7 +478,8 @@ namespace CrazyStorm.Core
             {
                 //Must swallow type string here
                 PlayDataHelper.ReadString(componentReader);
-                PlayDataHelper.ReadPlayDataFields(this, reader);
+                //stringDataFields
+                PlayDataHelper.ReadStringDataFields(this, componentReader);
                 //properties
                 base.LoadPropertyExpressions(componentReader);
                 //componentData

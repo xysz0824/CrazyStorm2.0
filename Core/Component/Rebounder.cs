@@ -139,7 +139,7 @@ namespace CrazyStorm.Core
             node = base.BuildFromXml(node);
             var rebounderNode = (XmlElement)node.SelectSingleNode("Rebounder");
             //rebounderData
-            XmlHelper.BuildFromStruct(ref rebounderData, rebounderNode, "RebounderData");
+            XmlHelper.BuildFromStruct(ref rebounderData, rebounderNode);
             //rebounderEventGroups
             XmlHelper.BuildFromObjectList(rebounderEventGroups, new EventGroup(), rebounderNode, "RebounderEventGroups");
             return rebounderNode;
@@ -149,7 +149,7 @@ namespace CrazyStorm.Core
             node = base.StoreAsXml(doc, node);
             var rebounderNode = doc.CreateElement("Rebounder");
             //rebounderData
-            XmlHelper.StoreStruct(rebounderData, doc, rebounderNode, "RebounderData");
+            XmlHelper.StoreStruct(rebounderData, doc, rebounderNode);
             //rebounderEventGroups
             XmlHelper.StoreObjectList(rebounderEventGroups, doc, rebounderNode, "RebounderEventGroups");
             node.AppendChild(rebounderNode);

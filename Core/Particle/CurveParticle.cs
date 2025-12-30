@@ -55,7 +55,7 @@ namespace CrazyStorm.Core
             node = base.BuildFromXml(node);
             var curveParticleNode = (XmlElement)node.SelectSingleNode("CurveParticle");
             //curveParticleData
-            XmlHelper.BuildFromStruct(ref curveParticleData, curveParticleNode, "CurveParticleData");
+            XmlHelper.BuildFromStruct(ref curveParticleData, curveParticleNode);
             return curveParticleNode;
         }
         public override XmlElement StoreAsXml(XmlDocument doc, XmlElement node)
@@ -63,7 +63,7 @@ namespace CrazyStorm.Core
             node = base.StoreAsXml(doc, node);
             var curveParticleNode = doc.CreateElement("CurveParticle");
             //curveParticleData
-            XmlHelper.StoreStruct(curveParticleData, doc, curveParticleNode, "CurveParticleData");
+            XmlHelper.StoreStruct(curveParticleData, doc, curveParticleNode);
             node.AppendChild(curveParticleNode);
             return curveParticleNode;
         }

@@ -35,7 +35,7 @@ namespace CrazyStorm.Core
     public class EventField : Component
     {
         #region Private Members
-        [PlayData]
+        [StringData]
         [XmlAttribute]
         string targetName;
         EventFieldData eventFieldData;
@@ -138,7 +138,7 @@ namespace CrazyStorm.Core
             var eventFieldNode = (XmlElement)node.SelectSingleNode("EventField");
             XmlHelper.BuildFromFields(typeof(EventField), this, eventFieldNode);
             //eventFieldData
-            XmlHelper.BuildFromStruct(ref eventFieldData, eventFieldNode, "EventFieldData");
+            XmlHelper.BuildFromStruct(ref eventFieldData, eventFieldNode);
             //eventFieldEventGroups
             XmlHelper.BuildFromObjectList(eventFieldEventGroups, new EventGroup(), eventFieldNode, "EventFieldEventGroups");
             return eventFieldNode;
@@ -149,7 +149,7 @@ namespace CrazyStorm.Core
             var eventFieldNode = doc.CreateElement("EventField");
             XmlHelper.StoreFields(typeof(EventField), this, doc, eventFieldNode);
             //eventFieldData
-            XmlHelper.StoreStruct(eventFieldData, doc, eventFieldNode, "EventFieldData");
+            XmlHelper.StoreStruct(eventFieldData, doc, eventFieldNode);
             //eventFieldEventGroups
             XmlHelper.StoreObjectList(eventFieldEventGroups, doc, eventFieldNode, "EventFieldEventGroups");
             node.AppendChild(eventFieldNode);
@@ -159,7 +159,8 @@ namespace CrazyStorm.Core
         {
             var bytes = base.GeneratePlayData();
             var eventFieldBytes = new List<byte>();
-            PlayDataHelper.GeneratePlayDataFields(this, eventFieldBytes);
+            //stringDataFields
+            PlayDataHelper.GenerateStringDataFields(this, eventFieldBytes);
             //eventFieldData
             PlayDataHelper.GenerateStruct(eventFieldData, eventFieldBytes);
             //eventFieldEventGroups
@@ -172,7 +173,8 @@ namespace CrazyStorm.Core
             base.LoadPlayData(reader, version);
             using (BinaryReader eventFieldReader = PlayDataHelper.GetBlockReader(reader))
             {
-                PlayDataHelper.ReadPlayDataFields(this, eventFieldReader);
+                //stringDataFields
+                PlayDataHelper.ReadStringDataFields(this, eventFieldReader);
                 //eventFieldData
                 eventFieldData = PlayDataHelper.ReadStruct<EventFieldData>(eventFieldReader);
                 //eventFieldEventGroups

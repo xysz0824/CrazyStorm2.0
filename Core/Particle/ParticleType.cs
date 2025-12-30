@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Xml;
 using System.Xml.Serialization;
@@ -25,6 +26,19 @@ namespace CrazyStorm.Core
         Orange,
         Gray
     }
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
+    public struct ParticleTypeData
+    {
+        public int id;
+        public Vector2 startPoint;
+        public int width;
+        public int height;
+        public Vector2 centerPoint;
+        public int frames;
+        public int delay;
+        public int radius;
+        public ParticleColor color;
+    }
     public class ParticleType : INotifyPropertyChanged, IXmlData, IRebuildReference<FileResource>, IGeneratePlayData, ILoadPlayData
     {
         public static readonly List<ParticleType> DefaultTypes = new List<ParticleType>();
@@ -32,43 +46,18 @@ namespace CrazyStorm.Core
         public event PropertyChangedEventHandler PropertyChanged;
 
         #region Private Members
-        FileResource image;
-        int imageID = -1;
-        [PlayData]
-        [XmlAttribute]
-        int id;
         [XmlAttribute]
         string name;
-        [PlayData]
-        [XmlAttribute]
-        Vector2 startPoint;
-        [PlayData]
-        [XmlAttribute]
-        int width;
-        [PlayData]
-        [XmlAttribute]
-        int height;
-        [PlayData]
-        [XmlAttribute]
-        Vector2 centerPoint;
-        [PlayData]
-        [XmlAttribute]
-        int frames;
-        [PlayData]
-        [XmlAttribute]
-        int delay;
-        [PlayData]
-        [XmlAttribute]
-        int radius;
-        [XmlAttribute]
-        ParticleColor color;
+        FileResource image;
+        int imageID = -1;
+        ParticleTypeData data;
         #endregion
 
         #region Public Members
         public int ID
         {
-            get { return id; }
-            set { id = value; }
+            get { return data.id; }
+            set { data.id = value; }
         }
         public string Name
         {
@@ -92,20 +81,20 @@ namespace CrazyStorm.Core
         }
         public Vector2 StartPoint
         {
-            get { return startPoint; }
+            get { return data.startPoint; }
             set
             {
-                startPoint = value;
+                data.startPoint = value;
                 if (PropertyChanged != null)
                     PropertyChanged(this, new PropertyChangedEventArgs("StartPoint"));
             }
         }
         public float StartPointX
         {
-            get { return startPoint.x; }
+            get { return data.startPoint.x; }
             set
             {
-                startPoint.x = value >= 0 ? value : 0;
+                data.startPoint.x = value >= 0 ? value : 0;
                 if (PropertyChanged != null)
                 {
                     PropertyChanged(this, new PropertyChangedEventArgs("StartPointX"));
@@ -115,10 +104,10 @@ namespace CrazyStorm.Core
         }
         public float StartPointY
         {
-            get { return startPoint.y; }
+            get { return data.startPoint.y; }
             set
             {
-                startPoint.y = value >= 0 ? value : 0;
+                data.startPoint.y = value >= 0 ? value : 0;
                 if (PropertyChanged != null)
                 {
                     PropertyChanged(this, new PropertyChangedEventArgs("StartPointY"));
@@ -128,40 +117,40 @@ namespace CrazyStorm.Core
         }
         public int Width
         {
-            get { return width; }
+            get { return data.width; }
             set
             {
-                width = value >= 0 ? value : 0;
+                data.width = value >= 0 ? value : 0;
                 if (PropertyChanged != null)
                     PropertyChanged(this, new PropertyChangedEventArgs("Width"));
             }
         }
         public int Height
         {
-            get { return height; }
+            get { return data.height; }
             set
             {
-                height = value >= 0 ? value : 0;
+                data.height = value >= 0 ? value : 0;
                 if (PropertyChanged != null)
                     PropertyChanged(this, new PropertyChangedEventArgs("Height"));
             }
         }
         public Vector2 CenterPoint
         {
-            get { return centerPoint; }
+            get { return data.centerPoint; }
             set
             {
-                centerPoint = value;
+                data.centerPoint = value;
                 if (PropertyChanged != null)
                     PropertyChanged(this, new PropertyChangedEventArgs("CenterPoint"));
             }
         }
         public float CenterPointX
         {
-            get { return centerPoint.x; }
+            get { return data.centerPoint.x; }
             set
             {
-                centerPoint.x = value >= 0 ? value : 0;
+                data.centerPoint.x = value >= 0 ? value : 0;
                 if (PropertyChanged != null)
                 {
                     PropertyChanged(this, new PropertyChangedEventArgs("CenterPointX"));
@@ -175,10 +164,10 @@ namespace CrazyStorm.Core
         }
         public float CenterPointY
         {
-            get { return centerPoint.y; }
+            get { return data.centerPoint.y; }
             set
             {
-                centerPoint.y = value >= 0 ? value : 0;
+                data.centerPoint.y = value >= 0 ? value : 0;
                 if (PropertyChanged != null)
                 {
                     PropertyChanged(this, new PropertyChangedEventArgs("CenterPointY"));
@@ -192,30 +181,30 @@ namespace CrazyStorm.Core
         }
         public int Frames
         {
-            get { return frames; }
+            get { return data.frames; }
             set
             {
-                frames = value >= 1 ? value : 1;
+                data.frames = value >= 1 ? value : 1;
                 if (PropertyChanged != null)
                     PropertyChanged(this, new PropertyChangedEventArgs("Frames"));
             }
         }
         public int Delay
         {
-            get { return delay; }
+            get { return data.delay; }
             set
             {
-                delay = value >= 0 ? value : 0;
+                data.delay = value >= 0 ? value : 0;
                 if (PropertyChanged != null)
                     PropertyChanged(this, new PropertyChangedEventArgs("Delay"));
             }
         }
         public int Radius
         {
-            get { return radius; }
+            get { return data.radius; }
             set
             {
-                radius = value >= 0 ? value : 0;
+                data.radius = value >= 0 ? value : 0;
                 if (PropertyChanged != null)
                 {
                     PropertyChanged(this, new PropertyChangedEventArgs("Radius"));
@@ -225,13 +214,13 @@ namespace CrazyStorm.Core
                 }
             }
         }
-        public int Diameter { get { return radius * 2; }}
+        public int Diameter { get { return data.radius * 2; }}
         public ParticleColor Color
         {
-            get { return color; }
+            get { return data.color; }
             set
             {
-                color = value;
+                data.color = value;
                 if (PropertyChanged != null)
                     PropertyChanged(this, new PropertyChangedEventArgs("Color"));
             }
@@ -241,16 +230,14 @@ namespace CrazyStorm.Core
         #region Constructor
         public ParticleType()
         {
-            frames = 1;
+            data.frames = 1;
             imageID = -1;
         }
         public ParticleType(int id)
         {
-            this.id = id;
+            data.id = id;
             name = string.Empty;
-            startPoint = Vector2.Zero;
-            centerPoint = Vector2.Zero;
-            frames = 1;
+            data.frames = 1;
         }
         public ParticleType(int id, string name) : this(id)
         {
@@ -298,19 +285,17 @@ namespace CrazyStorm.Core
         {
             var nodeName = "ParticleType";
             var particleTypeNode = (XmlElement)node.SelectSingleNode(nodeName);
-            if (node.Name == nodeName)
-                particleTypeNode = node;
-
+            if (node.Name == nodeName) particleTypeNode = node;
             if (particleTypeNode.HasAttribute("image"))
             {
                 string fileResourceAttribute = particleTypeNode.GetAttribute("image");
                 int parsedID;
-                if (int.TryParse(fileResourceAttribute, out parsedID))
-                    imageID = parsedID;
-                else
-                    throw new System.IO.FileLoadException("FileDataError");
+                if (int.TryParse(fileResourceAttribute, out parsedID)) imageID = parsedID;
+                else throw new System.IO.FileLoadException("FileDataError");
             }
             XmlHelper.BuildFromFields(this, particleTypeNode);
+            //particleTypeData
+            XmlHelper.BuildFromStruct(ref data, particleTypeNode);
             return particleTypeNode;
         }
         public XmlElement StoreAsXml(XmlDocument doc, XmlElement node)
@@ -323,6 +308,8 @@ namespace CrazyStorm.Core
                 particleTypeNode.Attributes.Append(fileResourceAttribute);
             }
             XmlHelper.StoreFields(this, doc, particleTypeNode);
+            //particleTypeData
+            XmlHelper.StoreStruct(data, doc, particleTypeNode);
             node.AppendChild(particleTypeNode);
             return particleTypeNode;
         }
@@ -346,7 +333,9 @@ namespace CrazyStorm.Core
         {
             var particleTypeBytes = new List<byte>();
             particleTypeBytes.AddRange(BitConverter.GetBytes(image != null ? image.ID : -1));
-            PlayDataHelper.GeneratePlayDataFields(this, particleTypeBytes);
+            PlayDataHelper.GenerateStringDataFields(this, particleTypeBytes);
+            //particleTypeData
+            PlayDataHelper.GenerateStruct(data, particleTypeBytes);
             return PlayDataHelper.CreateBlock(particleTypeBytes);
         }
         public void LoadPlayData(BinaryReader reader, float version)
@@ -354,7 +343,9 @@ namespace CrazyStorm.Core
             using (BinaryReader particleTypeReader = PlayDataHelper.GetBlockReader(reader))
             {
                 imageID = particleTypeReader.ReadInt32();
-                PlayDataHelper.ReadPlayDataFields(this, particleTypeReader);
+                PlayDataHelper.ReadStringDataFields(this, particleTypeReader);
+                //particleTypeData
+                data = PlayDataHelper.ReadStruct<ParticleTypeData>(particleTypeReader);
             }
         }
         #endregion

@@ -19,27 +19,27 @@ namespace CrazyStorm.Core
         BodyPositionX,
         BodyPositionY,
     }
+    public struct VariableResourceData
+    {
+        public float value;
+        public SpecialVariableType type;
+    }
     public class VariableResource : Resource
     {
         #region Private Members
-        [PlayData]
-        [XmlAttribute]
-        float value;
-        [PlayData]
-        [XmlAttribute]
-        SpecialVariableType type;
+        VariableResourceData data;
         #endregion
 
         #region Public Members
         public float Value 
         { 
-            get { return value; }
-            set { this.value = value; }
+            get { return data.value; }
+            set { data.value = value; }
         }
         public SpecialVariableType Type
         {
-            get { return type; }
-            set { type = value; }
+            get { return data.type; }
+            set { data.type = value; }
         }
         #endregion
 
@@ -67,6 +67,8 @@ namespace CrazyStorm.Core
             node = base.BuildFromXml(node);
             var variableResourceNode = (XmlElement)node.SelectSingleNode("VariableResource");
             XmlHelper.BuildFromFields(typeof(VariableResource), this, variableResourceNode);
+            //variableResourceData
+            XmlHelper.BuildFromStruct(ref data, variableResourceNode);
             return variableResourceNode;
         }
         public override XmlElement StoreAsXml(XmlDocument doc, XmlElement node)
@@ -74,6 +76,8 @@ namespace CrazyStorm.Core
             node = base.StoreAsXml(doc, node);
             var variableResourceNode = doc.CreateElement("VariableResource");
             XmlHelper.StoreFields(typeof(VariableResource), this, doc, variableResourceNode);
+            //variableResourceData
+            XmlHelper.StoreStruct(data, doc, variableResourceNode);
             node.AppendChild(variableResourceNode);
             return variableResourceNode;
         }
@@ -81,7 +85,8 @@ namespace CrazyStorm.Core
         {
             var bytes = base.GeneratePlayData();
             var variableResourceBytes = new List<byte>();
-            PlayDataHelper.GeneratePlayDataFields(this, variableResourceBytes);
+            //variableResourceData
+            PlayDataHelper.GenerateStruct(data, variableResourceBytes);
             bytes.AddRange(PlayDataHelper.CreateBlock(variableResourceBytes));
             return bytes;
         }
@@ -90,7 +95,8 @@ namespace CrazyStorm.Core
             base.LoadPlayData(reader, version);
             using (BinaryReader variableResourceReader = PlayDataHelper.GetBlockReader(reader))
             {
-                PlayDataHelper.ReadPlayDataFields(this, variableResourceReader);
+                //variableResourceData
+                data = PlayDataHelper.ReadStruct<VariableResourceData>(variableResourceReader);
             }
         }
         #endregion

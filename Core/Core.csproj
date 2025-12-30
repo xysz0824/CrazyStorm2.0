@@ -89,7 +89,7 @@
     <Compile Include="IO\ILoadPlayData.cs" />
     <Compile Include="IO\IRebuildReference.cs" />
     <Compile Include="IO\IXmlData.cs" />
-    <Compile Include="IO\PlayDataAttribute.cs" />
+    <Compile Include="IO\StringDataAttribute.cs" />
     <Compile Include="IO\PlayDataException.cs" />
     <Compile Include="IO\PlayDataHelper.cs" />
     <Compile Include="IO\XmlHelper.cs" />

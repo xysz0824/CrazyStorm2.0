@@ -137,7 +137,7 @@ namespace CrazyStorm.Core
             node = base.BuildFromXml(node);
             var emitterNode = (XmlElement)node.SelectSingleNode("Emitter");
             //emitterData
-            XmlHelper.BuildFromStruct(ref emitterData, emitterNode, "EmitterData");
+            XmlHelper.BuildFromStruct(ref emitterData, emitterNode);
             //particle
             particle.BuildFromXml(emitterNode);
             //particleEventGroups
@@ -149,7 +149,7 @@ namespace CrazyStorm.Core
             node = base.StoreAsXml(doc, node);
             var emitterNode = doc.CreateElement("Emitter");
             //emitterData
-            XmlHelper.StoreStruct(emitterData, doc, emitterNode, "EmitterData");
+            XmlHelper.StoreStruct(emitterData, doc, emitterNode);
             //particle
             particle.StoreAsXml(doc, emitterNode);
             //particleEventGroups

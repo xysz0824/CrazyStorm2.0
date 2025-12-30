@@ -15,19 +15,6 @@ namespace CrazyStorm.Core
 {
     public class PlayDataHelper
     {
-        static byte[] GetBytes(object obj)
-        {
-            if (obj is bool)
-                return BitConverter.GetBytes((bool)obj);
-            else if (obj is int || obj is Enum)
-                return BitConverter.GetBytes((int)obj);
-            else if (obj is float)
-                return BitConverter.GetBytes((float)obj);
-            else if (obj is string)
-                return GetStringBytes((string)obj);
-            else
-                throw new PlayDataException();
-        }
         public static byte[] GetStringBytes(string s)
         {
             List<byte> bytes = new List<byte>();
@@ -60,7 +47,7 @@ namespace CrazyStorm.Core
             block.AddRange(content);
             return block;
         }
-        public static void GeneratePlayDataFields(object source, List<byte> data)
+        public static void GenerateStringDataFields(object source, List<byte> data)
         {
             BindingFlags flags = BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly;
             var fieldInfos = source.GetType().GetFields(flags).OrderBy(f => f.MetadataToken);
@@ -69,9 +56,9 @@ namespace CrazyStorm.Core
                 object[] attributes = info.GetCustomAttributes(false);
                 for (int i = 0; i < attributes.Length; ++i)
                 {
-                    if (attributes[i] is PlayDataAttribute)
+                    if (attributes[i] is StringDataAttribute)
                     {
-                        data.AddRange(GetBytes(info.GetValue(source)));
+                        data.AddRange(GetStringBytes((string)info.GetValue(source)));
                         break;
                     }
                 }
@@ -89,36 +76,6 @@ namespace CrazyStorm.Core
                 objectListBytes.AddRange((obj as IGeneratePlayData).GeneratePlayData());
 
             data.AddRange(CreateBlock(objectListBytes));
-        }
-        static object ReadBytes(Type type, BinaryReader reader)
-        {
-            if (type == typeof(bool))
-                return reader.ReadBoolean();
-            else if (type == typeof(int) || type.IsEnum)
-                return reader.ReadInt32();
-            else if (type == typeof(float))
-                return reader.ReadSingle();
-            else if (type == typeof(string))
-                return ReadString(reader);
-            else
-                throw new PlayDataException();
-        }
-        public static void ReadPlayDataFields(object source, BinaryReader reader)
-        {
-            BindingFlags flags = BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly;
-            var fieldInfos = source.GetType().GetFields(flags).OrderBy(f => f.MetadataToken);
-            foreach (var info in fieldInfos)
-            {
-                object[] attributes = info.GetCustomAttributes(false);
-                for (int i = 0; i < attributes.Length; ++i)
-                {
-                    if (attributes[i] is PlayDataAttribute)
-                    {
-                        info.SetValue(source, ReadBytes(info.FieldType, reader));
-                        break;
-                    }
-                }
-            }
         }
         public static T ReadStructBytes<T>(byte[] bytes, int startIndex) where T : unmanaged
         {
@@ -150,6 +107,23 @@ namespace CrazyStorm.Core
                 else break;
             }
             return Encoding.UTF8.GetString(stringBytes.ToArray());
+        }
+        public static void ReadStringDataFields(object source, BinaryReader reader)
+        {
+            BindingFlags flags = BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly;
+            var fieldInfos = source.GetType().GetFields(flags).OrderBy(f => f.MetadataToken);
+            foreach (var info in fieldInfos)
+            {
+                object[] attributes = info.GetCustomAttributes(false);
+                for (int i = 0; i < attributes.Length; ++i)
+                {
+                    if (attributes[i] is StringDataAttribute)
+                    {
+                        info.SetValue(source, ReadString(reader));
+                        break;
+                    }
+                }
+            }
         }
         public static byte[] GetBlock(BinaryReader reader)
         {

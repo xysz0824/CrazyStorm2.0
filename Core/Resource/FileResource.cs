@@ -15,11 +15,10 @@ namespace CrazyStorm.Core
     public class FileResource : Resource
     {
         #region Private Members
-        [PlayData]
         [XmlAttribute]
         int id;
         string absolutePath;
-        [PlayData]
+        [StringData]
         [XmlAttribute]
         string relativePath;
         #endregion
@@ -78,7 +77,8 @@ namespace CrazyStorm.Core
         {
             var bytes = base.GeneratePlayData();
             var fileResourceBytes = new List<byte>();
-            PlayDataHelper.GeneratePlayDataFields(this, fileResourceBytes);
+            bytes.AddRange(BitConverter.GetBytes(id));
+            PlayDataHelper.GenerateStringDataFields(this, fileResourceBytes);
             bytes.AddRange(PlayDataHelper.CreateBlock(fileResourceBytes));
             return bytes;
         }
@@ -87,7 +87,8 @@ namespace CrazyStorm.Core
             base.LoadPlayData(reader, version);
             using (BinaryReader fileResourceReader = PlayDataHelper.GetBlockReader(reader))
             {
-                PlayDataHelper.ReadPlayDataFields(this, fileResourceReader);
+                id = fileResourceReader.ReadInt32();
+                PlayDataHelper.ReadStringDataFields(this, fileResourceReader);
                 absolutePath = relativePath.Contains(":") ? relativePath : File.CurrentDirectory + relativePath;
             }
         }

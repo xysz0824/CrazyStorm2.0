@@ -8,6 +8,7 @@ using System.Text;
 using System.Xml;
 using System.Xml.Serialization;
 using System.Reflection;
+using System.Linq;
 
 namespace CrazyStorm.Core
 {
@@ -19,7 +20,7 @@ namespace CrazyStorm.Core
                 return;
 
             BindingFlags flags = BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly;
-            FieldInfo[] fieldInfos = type.GetFields(flags);
+            var fieldInfos = type.GetFields(flags).OrderBy(f => f.MetadataToken);
             foreach (var info in fieldInfos)
             {
                 object[] attributes = info.GetCustomAttributes(false);
@@ -49,7 +50,7 @@ namespace CrazyStorm.Core
         public static void StoreFields(Type type, object source, XmlDocument doc, XmlElement node)
         {
             BindingFlags flags = BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly;
-            FieldInfo[] fieldInfos = type.GetFields(flags);
+            var fieldInfos = type.GetFields(flags).OrderBy(f => f.MetadataToken);
             foreach (var info in fieldInfos)
             {
                 object[] attributes = info.GetCustomAttributes(false);
@@ -69,19 +70,13 @@ namespace CrazyStorm.Core
         {
             StoreFields(source.GetType(), source, doc, node);
         }
-        public static void BuildFromStruct<T>(ref T source, XmlElement node, string name)
+        public static void BuildFromStruct<T>(ref T source, XmlElement node)
         {
-            XmlElement structNode = (XmlElement)node.SelectSingleNode(name);
-            if (structNode == null)
-                return;
-
-            FieldInfo[] fieldInfos = source.GetType().GetFields();
+            var fieldInfos = source.GetType().GetFields().OrderBy(f => f.MetadataToken);
             foreach (var info in fieldInfos)
             {
-                if (!structNode.HasAttribute(info.Name))
-                    continue;
-
-                var text = structNode.GetAttribute(info.Name);
+                if (!node.HasAttribute(info.Name)) continue;
+                var text = node.GetAttribute(info.Name);
                 object value;
                 if (PropertyTypeRule.TryParse(info.GetValue(source), text, out value))
                     info.SetValueDirect(__makeref(source), value);
@@ -89,17 +84,15 @@ namespace CrazyStorm.Core
                     throw new System.IO.FileLoadException("FileDataError");
             }
         }
-        public static void StoreStruct<T>(T source, XmlDocument doc, XmlElement node, string name)
+        public static void StoreStruct<T>(T source, XmlDocument doc, XmlElement node)
         {
-            var structNode = doc.CreateElement(name);
-            FieldInfo[] fieldInfos = source.GetType().GetFields();
+            var fieldInfos = source.GetType().GetFields().OrderBy(f => f.MetadataToken);
             foreach (var info in fieldInfos)
             {
                 var xmlAttribute = doc.CreateAttribute(info.Name);
                 xmlAttribute.Value = info.GetValue(source).ToString();
-                structNode.Attributes.Append(xmlAttribute);
+                node.Attributes.Append(xmlAttribute);
             }
-            node.AppendChild(structNode);
         }
         public static void BuildFromList(IList<string> source, XmlElement node, string name)
         {

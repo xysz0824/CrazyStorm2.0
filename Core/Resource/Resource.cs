@@ -15,7 +15,7 @@ namespace CrazyStorm.Core
     public abstract class Resource : INotifyPropertyChanged, IXmlData, IGeneratePlayData, ILoadPlayData
     {
         public event PropertyChangedEventHandler PropertyChanged;
-        [PlayData]
+        [StringData]
         [XmlAttribute]
         private string label;
         protected bool isValid;
@@ -50,9 +50,7 @@ namespace CrazyStorm.Core
         {
             var nodeName = "Resource";
             var resourceNode = (XmlElement)node.SelectSingleNode(nodeName);
-            if (node.Name == nodeName)
-                resourceNode = node;
-
+            if (node.Name == nodeName) resourceNode = node;
             XmlHelper.BuildFromFields(typeof(Resource), this, resourceNode);
             return resourceNode;
         }
@@ -68,14 +66,14 @@ namespace CrazyStorm.Core
         public virtual List<byte> GeneratePlayData()
         {
             var resourceBytes = new List<byte>();
-            PlayDataHelper.GeneratePlayDataFields(this, resourceBytes);
+            PlayDataHelper.GenerateStringDataFields(this, resourceBytes);
             return PlayDataHelper.CreateBlock(resourceBytes);
         }
         public virtual void LoadPlayData(BinaryReader reader, float version)
         {
             using (BinaryReader resourceReader = PlayDataHelper.GetBlockReader(reader))
             {
-                PlayDataHelper.ReadPlayDataFields(this, resourceReader);
+                PlayDataHelper.ReadStringDataFields(this, resourceReader);
             }
         }
     }

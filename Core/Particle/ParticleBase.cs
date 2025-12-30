@@ -230,7 +230,7 @@ namespace CrazyStorm.Core
                     throw new System.IO.FileLoadException("FileDataError");
             }
             //particleBaseData
-            XmlHelper.BuildFromStruct(ref particleBaseData, particleBaseNode, "ParticleBaseData");
+            XmlHelper.BuildFromStruct(ref particleBaseData, particleBaseNode);
             return particleBaseNode;
         }
         public virtual XmlElement StoreAsXml(XmlDocument doc, XmlElement node)
@@ -246,7 +246,7 @@ namespace CrazyStorm.Core
                 particleBaseNode.Attributes.Append(typeAttribute);
             }
             //particleBaseData
-            XmlHelper.StoreStruct(particleBaseData, doc, particleBaseNode, "ParticleBaseData");
+            XmlHelper.StoreStruct(particleBaseData, doc, particleBaseNode);
             node.AppendChild(particleBaseNode);
             return particleBaseNode;
         }

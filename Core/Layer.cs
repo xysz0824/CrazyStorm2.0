@@ -11,6 +11,7 @@ using System.Xml;
 using System.Xml.Serialization;
 using System.IO;
 using System.Reflection;
+using System.Runtime.InteropServices;
 
 namespace CrazyStorm.Core
 {
@@ -24,25 +25,23 @@ namespace CrazyStorm.Core
         Orange,
         Gray
     }
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
+    public struct LayerData
+    {
+        public bool visible;
+        public LayerColor color;
+        public int beginFrame;
+        public int totalFrame;
+    }
     public class Layer : INotifyPropertyChanged, IXmlData, IGeneratePlayData, ILoadPlayData, IPlayable
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
         #region Private Members
-        [PlayData]
+        [StringData]
         [XmlAttribute]
         string name;
-        [PlayData]
-        [XmlAttribute]
-        bool visible;
-        [XmlAttribute]
-        LayerColor color;
-        [PlayData]
-        [XmlAttribute]
-        int beginFrame;
-        [PlayData]
-        [XmlAttribute]
-        int totalFrame;
+        LayerData layerData;
         IList<Component> components;
         #endregion
 
@@ -59,40 +58,40 @@ namespace CrazyStorm.Core
         }
         public bool Visible
         {
-            get { return visible; }
+            get { return layerData.visible; }
             set 
             { 
-                visible = value;
+                layerData.visible = value;
                 if (PropertyChanged != null)
                     PropertyChanged(this, new PropertyChangedEventArgs("Visible"));
             }
         }
         public LayerColor Color 
         { 
-            get { return color; }
+            get { return layerData.color; }
             set 
             { 
-                color = value;
+                layerData.color = value;
                 if (PropertyChanged != null)
                     PropertyChanged(this, new PropertyChangedEventArgs("Color"));
             }
         }
         public int BeginFrame 
         { 
-            get { return beginFrame; }
+            get { return layerData.beginFrame; }
             set 
             { 
-                beginFrame = value >= 0 ? value : 0;
+                layerData.beginFrame = value >= 0 ? value : 0;
                 if (PropertyChanged != null)
                     PropertyChanged(this, new PropertyChangedEventArgs("BeginFrame"));
             }
         }
         public int TotalFrame
         {
-            get { return totalFrame; }
+            get { return layerData.totalFrame; }
             set 
             {
-                totalFrame = value > 0 ? value : 1;
+                layerData.totalFrame = value > 0 ? value : 1;
                 if (PropertyChanged != null)
                     PropertyChanged(this, new PropertyChangedEventArgs("TotalFrame"));
             }
@@ -108,8 +107,8 @@ namespace CrazyStorm.Core
         public Layer(string name)
         {
             this.name = name;
-            visible = true;
-            totalFrame = 200;
+            layerData.visible = true;
+            layerData.totalFrame = 200;
             components = new GenericContainer<Component>();
         }
         #endregion
@@ -128,15 +127,13 @@ namespace CrazyStorm.Core
         {
             var nodeName = "Layer";
             var layerNode = (XmlElement)node.SelectSingleNode(nodeName);
-            if (node.Name == nodeName)
-                layerNode = node;
-
+            if (node.Name == nodeName) layerNode = node;
             XmlHelper.BuildFromFields(this, layerNode);
+            //layerData
+            XmlHelper.BuildFromStruct(ref layerData, layerNode);
             //components
             var componentsNode = layerNode.SelectSingleNode("Components");
-            if (componentsNode == null)
-                throw new System.IO.FileLoadException("FileDataError");
-
+            if (componentsNode == null) throw new System.IO.FileLoadException("FileDataError");
             foreach (XmlElement componentNode in componentsNode.ChildNodes)
             {
                 string specificType = componentNode.GetAttribute("specificType");
@@ -146,8 +143,7 @@ namespace CrazyStorm.Core
                     component.BuildFromXml(componentNode);
                     components.Add(component);
                 }
-                else
-                    throw new System.IO.FileLoadException("FileDataError");
+                else throw new System.IO.FileLoadException("FileDataError");
             }
             return layerNode;
         }
@@ -155,6 +151,8 @@ namespace CrazyStorm.Core
         {
             var layerNode = doc.CreateElement("Layer");
             XmlHelper.StoreFields(this, doc, layerNode);
+            //layerData
+            XmlHelper.StoreStruct(layerData, doc, layerNode);
             //components
             XmlHelper.StoreObjectList(components, doc, layerNode, "Components");
             node.AppendChild(layerNode);
@@ -163,7 +161,8 @@ namespace CrazyStorm.Core
         public List<byte> GeneratePlayData()
         {
             var layerBytes = new List<byte>();
-            PlayDataHelper.GeneratePlayDataFields(this, layerBytes);
+            //stringDataFields
+            PlayDataHelper.GenerateStringDataFields(this, layerBytes);
             //components
             PlayDataHelper.GenerateObjectList(components, layerBytes);
             return PlayDataHelper.CreateBlock(layerBytes);
@@ -172,7 +171,8 @@ namespace CrazyStorm.Core
         {
             using (BinaryReader layerReader = PlayDataHelper.GetBlockReader(reader))
             {
-                PlayDataHelper.ReadPlayDataFields(this, layerReader);
+                //stringDataFields
+                PlayDataHelper.ReadStringDataFields(this, layerReader);
                 //components
                 using (BinaryReader componentsReader = PlayDataHelper.GetBlockReader(layerReader))
                 {

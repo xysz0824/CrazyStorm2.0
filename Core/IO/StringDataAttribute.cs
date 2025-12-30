@@ -9,7 +9,7 @@ using System.Text;
 namespace CrazyStorm.Core
 {
     [AttributeUsage(AttributeTargets.Field, AllowMultiple = false, Inherited = false)]
-    public class PlayDataAttribute : Attribute
+    public class StringDataAttribute : Attribute
     {
     }
 }
