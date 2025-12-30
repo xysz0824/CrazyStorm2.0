@@ -11,6 +11,47 @@ namespace CrazyStorm.Core
 {
     public static class EventManager
     {
+        public static readonly Dictionary<string, Func<PropertyContainer, string[], VMInstruction[], bool>> SpecialEvents =
+            new Dictionary<string, Func<PropertyContainer, string[], VMInstruction[], bool>>()
+            {
+                { "EmitParticle", (pc, args, expr) => 
+                {
+                    (pc as Emitter).EmitParticle();
+                    return false;
+                } },
+                { "PlaySound", (pc, args, expr) =>
+                {
+                    if (OnSoundPlay != null)
+                    {
+                        var label = args[0];
+                        var volume = float.Parse(args[1]);
+                        var sound = Sounds.FirstOrDefault((item) => string.Equals(item.Label, label));
+                        if (sound != null) OnSoundPlay(sound.AbsolutePath, volume);
+                    }
+                    return false;
+                } },
+                { "Loop", (pc, args, expr) =>
+                {
+                    VM.Execute(pc, expr);
+                    if (!VM.PopBool()) return true;
+                    return false;
+                } },
+                { "ChangeType", (pc, args, expr) =>
+                {
+                    int typeId = int.Parse(args[0]) + int.Parse(args[1]);
+                    if (typeId >= ParticleType.DefaultTypeIndex)
+                    {
+                        if (pc is Emitter) (pc as Emitter).Template.Type = ParticleType.DefaultTypes[typeId - ParticleType.DefaultTypeIndex];
+                        else if (pc is ParticleBase) (pc as ParticleBase).Type = ParticleType.DefaultTypes[typeId - ParticleType.DefaultTypeIndex];
+                    }
+                    else
+                    {
+                        if (pc is Emitter) (pc as Emitter).Template.Type = CustomTypes[typeId];
+                        else if (pc is ParticleBase) (pc as ParticleBase).Type = CustomTypes[typeId];
+                    }
+                    return false;
+                } },
+            };
         public delegate void SoundPlayHandler(string path, float volume);
         public static event SoundPlayHandler OnSoundPlay;
 
@@ -154,46 +195,7 @@ namespace CrazyStorm.Core
         public static bool ExecuteSpecialEvent(PropertyContainer propertyContainer, string eventName, string[] arguments,
             VMInstruction[] argumentExpression)
         {
-            switch (eventName)
-            {
-                case "EmitParticle":
-                    (propertyContainer as Emitter).EmitParticle();
-                    break;
-                case "PlaySound":
-                    if (OnSoundPlay != null)
-                    {
-                        var label = arguments[0];
-                        var volume = float.Parse(arguments[1]);
-                        var sound = Sounds.FirstOrDefault((item) => string.Equals(item.Label, label));
-                        if (sound != null)
-                        {
-                            OnSoundPlay(sound.AbsolutePath, volume);
-                        }
-                    }
-                    break;
-                case "Loop":
-                    VM.Execute(propertyContainer, argumentExpression);
-                    if (!VM.PopBool()) return true;
-                    break;
-                case "ChangeType":
-                    int typeId = int.Parse(arguments[0]) + int.Parse(arguments[1]);
-                    if (typeId >= ParticleType.DefaultTypeIndex)
-                    {
-                        if (propertyContainer is Emitter)
-                            (propertyContainer as Emitter).Template.Type = ParticleType.DefaultTypes[typeId - ParticleType.DefaultTypeIndex];
-                        else if (propertyContainer is ParticleBase)
-                            (propertyContainer as ParticleBase).Type = ParticleType.DefaultTypes[typeId - ParticleType.DefaultTypeIndex];
-                    }
-                    else
-                    {
-                        if (propertyContainer is Emitter)
-                            (propertyContainer as Emitter).Template.Type = CustomTypes[typeId];
-                        else if (propertyContainer is ParticleBase)
-                            (propertyContainer as ParticleBase).Type = CustomTypes[typeId];
-                    }
-                    break;
-            }
-            return false;
+            return SpecialEvents[eventName](propertyContainer, arguments, argumentExpression);
         }
         public static void Update()
         {

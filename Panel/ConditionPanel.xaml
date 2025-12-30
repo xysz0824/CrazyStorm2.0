@@ -114,7 +114,7 @@
                          PreviewLostKeyboardFocus="LeftValue_PreviewLostKeyboardFocus" PreviewGotKeyboardFocus="LeftValue_PreviewGotKeyboardFocus" 
                          KeyDown="LeftValue_KeyDown"/>
                 <StackPanel Margin="5,0" VerticalAlignment="Center">
-                    <RadioButton Name="And" Content="{StaticResource AndStr}" IsChecked="True"/>
+                    <RadioButton Name="And" Content="{StaticResource AndStr}" />
                     <RadioButton Name="Or" Content="{StaticResource OrStr}" />
                 </StackPanel>
                 <ComboBox Name="RightConditionComboBox" Width="100" VerticalAlignment="Center" SelectionChanged="RightConditionComboBox_SelectionChanged">
@@ -126,7 +126,7 @@
                 </ComboBox>
                 <StackPanel Margin="5,0">
                     <CheckBox Style="{StaticResource RadioLikeStyle}" Name="RightMoreThan"  Content="&gt;" Checked="RightOperator_Checked" Unchecked="RightOperator_Unchecked"/>
-                    <CheckBox Style="{StaticResource RadioLikeStyle}" Name="RightEqual" Content="=" Checked="RightOperator_Checked" Unchecked="RightOperator_Unchecked" IsChecked="True"/>
+                    <CheckBox Style="{StaticResource RadioLikeStyle}" Name="RightEqual" Content="=" Checked="RightOperator_Checked" Unchecked="RightOperator_Unchecked" />
                     <CheckBox Style="{StaticResource RadioLikeStyle}" Name="RightLessThan" Content="&lt;" Checked="RightOperator_Checked" Unchecked="RightOperator_Unchecked"/>
                 </StackPanel>
                 <TextBox Name="RightValue" Width="50" VerticalContentAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Center" Height="25" MaxLines="1"

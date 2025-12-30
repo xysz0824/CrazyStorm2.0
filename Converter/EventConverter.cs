@@ -30,6 +30,7 @@ namespace CrazyStorm
             else
             {
                 info.specialEvent = ExpressionHelper.FindTranslation(info.specialEvent);
+                info.arguments = ExpressionHelper.Translate(info.arguments);
             }
             return EventHelper.BuildEvent(info, false);
         }

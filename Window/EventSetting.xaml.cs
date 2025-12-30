@@ -30,11 +30,8 @@ namespace CrazyStorm
         IList<FileResource> sounds;
         IList<ParticleType> types;
         bool isPlaySound;
-        bool isEditing;
         bool isExpressionResult;
-        DockPanel editingPanel;
         Popup popup;
-        IOrderedEnumerable<VariableComboBoxItem> sortedVaraibles;
         #endregion
 
         #region Constructor
@@ -122,8 +119,6 @@ namespace CrazyStorm
             //Create sorted variable list for translating event
             var varaibleList = new List<VariableComboBoxItem>();
             foreach (VariableComboBoxItem item in PropertyComboBox.Items) varaibleList.Add(item);
-            //Longer name first
-            sortedVaraibles = varaibleList.OrderByDescending(s => s.Name.Length);
         }
         bool BuildEvent(out string text)
         {
@@ -177,6 +172,7 @@ namespace CrazyStorm
             }
             else if (Loop.IsChecked == true)
             {
+                if (string.IsNullOrEmpty(StopCondition.Text)) return false;
                 //Check if there have errors
                 if (UIHelper.HasError(StopCondition)) return false;
                 string arguments = string.Empty;
@@ -194,6 +190,30 @@ namespace CrazyStorm
             eventInfo.isSpecialEvent = true;
             text = EventHelper.BuildEvent(eventInfo, true);
             return true;
+        }
+        void EditEvent()
+        {
+            if (BuildEvent(out string text) && EventList.SelectedIndex != -1)
+            {
+                var index = EventList.SelectedIndex;
+                if (text != eventGroup.Events[index])
+                {
+                    eventGroup.Events[index] = text;
+                    EventList.SelectedIndex = index;
+                }
+            }
+        }
+        void EditSpecialEvent()
+        {
+            if (BuildSpecialEvent(out string text) && EventList.SelectedIndex != -1)
+            {
+                var index = EventList.SelectedIndex;
+                if (text != eventGroup.Events[index])
+                {
+                    eventGroup.Events[index] = text;
+                    EventList.SelectedIndex = index;
+                }
+            }
         }
         void ResetAll()
         {
@@ -280,7 +300,7 @@ namespace CrazyStorm
                 }
                 else if (eventInfo.specialEvent == "Loop")
                 {
-                    StopCondition.Text = split[0].Trim();
+                    StopCondition.Text = ExpressionHelper.Translate(split[0].Trim());
                 }
                 else if (eventInfo.specialEvent == "ChangeType")
                 {
@@ -296,17 +316,6 @@ namespace CrazyStorm
                         ColorCombo.SelectedIndex = int.Parse(split[1].Trim());
                 }
             }
-        }
-        void EditEvent(DockPanel editingPanel)
-        {
-            this.editingPanel = editingPanel;
-            editingPanel.Background = SystemColors.HighlightBrush;
-            EventList.IsEnabled = false;
-            AddEvent.Content = (string)FindResource("ModifyStr");
-            AddSpecialEvent.Content = AddEvent.Content;
-            DelEvent.IsEnabled = false;
-            DelSpecialEvent.IsEnabled = false;
-            isEditing = true;
         }
         void DeleteEvent()
         {
@@ -343,6 +352,7 @@ namespace CrazyStorm
             Cos.IsChecked = false;
             Instant.IsChecked = false;
             ChangeTimePanel.Visibility = Visibility.Visible;
+            EditEvent();
         }
         private void Accelerated_Checked(object sender, RoutedEventArgs e)
         {
@@ -352,6 +362,7 @@ namespace CrazyStorm
             Cos.IsChecked = false;
             Instant.IsChecked = false;
             ChangeTimePanel.Visibility = Visibility.Visible;
+            EditEvent();
         }
         private void Decelerated_Checked(object sender, RoutedEventArgs e)
         {
@@ -361,6 +372,7 @@ namespace CrazyStorm
             Linear.IsChecked = false;
             Instant.IsChecked = false;
             ChangeTimePanel.Visibility = Visibility.Visible;
+            EditEvent();
         }
         private void Sin_Checked(object sender, RoutedEventArgs e)
         {
@@ -370,6 +382,7 @@ namespace CrazyStorm
             Cos.IsChecked = false;
             Instant.IsChecked = false;
             ChangeTimePanel.Visibility = Visibility.Visible;
+            EditEvent();
         }
         private void Cos_Checked(object sender, RoutedEventArgs e)
         {
@@ -379,6 +392,7 @@ namespace CrazyStorm
             Sin.IsChecked = false;
             Instant.IsChecked = false;
             ChangeTimePanel.Visibility = Visibility.Visible;
+            EditEvent();
         }
         private void Instant_Checked(object sender, RoutedEventArgs e)
         {
@@ -389,51 +403,40 @@ namespace CrazyStorm
             Linear.IsChecked = false;
             ChangeTimePanel.Visibility = Visibility.Collapsed;
             ChangeTime.Text = string.Empty;
+            EditEvent();
         }
         private void EmitParticleButton_Checked(object sender, RoutedEventArgs e)
         {
             PlaySoundPanel.Visibility = Visibility.Collapsed;
             LoopPanel.Visibility = Visibility.Collapsed;
             ChangeTypePanel.Visibility = Visibility.Collapsed;
+            EditSpecialEvent();
         }
         private void PlaySoundButton_Checked(object sender, RoutedEventArgs e)
         {
             PlaySoundPanel.Visibility = Visibility.Visible;
             LoopPanel.Visibility = Visibility.Collapsed;
             ChangeTypePanel.Visibility = Visibility.Collapsed;
+            EditSpecialEvent();
         }
         private void LoopButton_Checked(object sender, RoutedEventArgs e)
         {
             PlaySoundPanel.Visibility = Visibility.Collapsed;
             LoopPanel.Visibility = Visibility.Visible;
             ChangeTypePanel.Visibility = Visibility.Collapsed;
+            EditSpecialEvent();
         }
         private void ChangeTypeButton_Checked(object sender, RoutedEventArgs e)
         {
             PlaySoundPanel.Visibility = Visibility.Collapsed;
             LoopPanel.Visibility = Visibility.Collapsed;
             ChangeTypePanel.Visibility = Visibility.Visible;
+            EditSpecialEvent();
         }
         private void AddEvent_Click(object sender, RoutedEventArgs e)
         {
             string text;
-            if (isEditing)
-            {
-                if (BuildEvent(out text))
-                {
-                    eventGroup.Events[EventList.SelectedIndex] = text;
-                    editingPanel.Background = null;
-                    EventList.IsEnabled = true;
-                    AddEvent.Content = (string)FindResource("AddStr");
-                    PropertyEventPanel.IsEnabled = true;
-                    AddSpecialEvent.Content = AddEvent.Content;
-                    SpecialEventPanel.IsEnabled = true;
-                    DelEvent.IsEnabled = EventList.SelectedItem != null;
-                    DelSpecialEvent.IsEnabled = EventList.SelectedItem != null;
-                    isEditing = false;
-                }
-            }
-            else if (BuildEvent(out text))
+            if (BuildEvent(out text))
             {
                 if (EventList.SelectedIndex != -1 && EventList.Items.Count - 1 > EventList.SelectedIndex)
                 {
@@ -444,6 +447,8 @@ namespace CrazyStorm
                     eventGroup.Events.Add(text);
                 }
             }
+            DelEvent.IsEnabled = EventList.SelectedItem != null;
+            DelSpecialEvent.IsEnabled = EventList.SelectedItem != null;
         }
         private void DelEvent_Click(object sender, RoutedEventArgs e)
         {
@@ -452,21 +457,7 @@ namespace CrazyStorm
         private void AddSpecialEvent_Click(object sender, RoutedEventArgs e)
         {
             string text;
-            if (isEditing)
-            {
-                if (BuildSpecialEvent(out text))
-                {
-                    eventGroup.Events[EventList.SelectedIndex] = text;
-                    editingPanel.Background = null;
-                    EventList.IsEnabled = true;
-                    AddEvent.Content = (string)FindResource("AddStr");
-                    PropertyEventPanel.IsEnabled = true;
-                    AddSpecialEvent.Content = AddEvent.Content;
-                    SpecialEventPanel.IsEnabled = true;
-                    isEditing = false;
-                }
-            }
-            else if (BuildSpecialEvent(out text))
+            if (BuildSpecialEvent(out text))
             {
                 if (EventList.SelectedIndex != -1 && EventList.Items.Count - 1 > EventList.SelectedIndex)
                 {
@@ -477,10 +468,8 @@ namespace CrazyStorm
                     eventGroup.Events.Add(text);
                 }
             }
-        }
-        private void EditEvent_Click(object sender, RoutedEventArgs e)
-        {
-            EditEvent((((e.OriginalSource as FrameworkElement).Parent as ContextMenu).PlacementTarget) as DockPanel);
+            DelEvent.IsEnabled = EventList.SelectedItem != null;
+            DelSpecialEvent.IsEnabled = EventList.SelectedItem != null;
         }
         private void DeleteEvent_Click(object sender, RoutedEventArgs e)
         {
@@ -493,6 +482,10 @@ namespace CrazyStorm
         private void PropertyComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             ResultValue_PreviewLostKeyboardFocus(sender, null);
+        }
+        private void ChangeTypeRadioButton_Click(object sender, RoutedEventArgs e)
+        {
+            EditEvent();
         }
         private void ResultValue_PreviewGotKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
         {
@@ -523,6 +516,7 @@ namespace CrazyStorm
                         {
                             ResultValue.Text = ExpressionHelper.Translate(output.ToString());
                             isExpressionResult = false;
+                            EditEvent();
                             return;
                         }
                         var lexer = new Lexer();
@@ -532,6 +526,7 @@ namespace CrazyStorm
                         var result = syntaxTree.Eval(environment);
                         if (!(PropertyTypeRule.IsMatchWith(value.GetType(), result.GetType()))) throw new ExpressionException("TypeError");
                         isExpressionResult = true;
+                        EditEvent();
                         return;
                     }
                     if (value == null) value = environment.GetLocal(item.Name);
@@ -546,6 +541,7 @@ namespace CrazyStorm
                         if (!(result is float)) throw new ExpressionException("TypeError");
                         isExpressionResult = true;
                     }
+                    EditEvent();
                 }
                 catch (ExpressionException error)
                 {
@@ -562,12 +558,13 @@ namespace CrazyStorm
             int value;
             if (!int.TryParse(input, out value)) UIHelper.SetErrorToolTip(ChangeTime, new ExpressionException("TypeError"));
             else if (value <= 0) ChangeTime.Text = "1";
+            EditEvent();
         }
         private void StopCondition_PreviewLostKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
         {
             UIHelper.SetErrorToolTip(StopCondition, null);
             StopCondition.Text = StopCondition.Text.Trim();
-            string input = ExpressionHelper.Translate(StopCondition.Text);
+            string input = ExpressionHelper.ReverseTranslate(StopCondition.Text);
             if (String.IsNullOrEmpty(input)) return;
             try
             {
@@ -576,6 +573,7 @@ namespace CrazyStorm
                 var syntaxTree = new Parser(lexer).Expression();
                 var result = syntaxTree.Eval(environment);
                 if (!(result is bool)) throw new ExpressionException("TypeError");
+                EditSpecialEvent();
             }
             catch (ExpressionException error)
             {
@@ -598,6 +596,18 @@ namespace CrazyStorm
                     }
                 }
             }
+        }
+        private void ColorCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (ColorCombo.SelectedItem != null) EditSpecialEvent();
+        }
+        private void SoundCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (SoundCombo.SelectedItem != null) EditSpecialEvent();
+        }
+        private void VolumeSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            EditSpecialEvent();
         }
         private void SoundTestButton_Click(object sender, RoutedEventArgs e)
         {
@@ -625,20 +635,9 @@ namespace CrazyStorm
             SoundTestButton.Content = (string)FindResource("TestStr");
             MediaPlayer.Stop();
         }
-        private void EventItem_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
-        {
-            //If mouse double clicked
-            if (e.ClickCount == 2) EditEvent((e.OriginalSource as FrameworkElement).Parent as DockPanel);
-        }
         private void EventList_KeyDown(object sender, KeyEventArgs e)
         {
-            if (e.Key == Key.Enter && EventList.SelectedItem != null)
-            {
-                var container = EventList.ItemContainerGenerator.ContainerFromItem(EventList.SelectedItem) as ListViewItem;
-                if (container == null) return;
-                EditEvent(VisualHelper.GetVisualChild<DockPanel>(container));
-            }
-            else if (e.Key == Key.Delete) DeleteEvent();
+            if (e.Key == Key.Delete) DeleteEvent();
         }
         private void EventList_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
@@ -647,42 +646,36 @@ namespace CrazyStorm
             DelEvent.IsEnabled = EventList.SelectedItem != null;
             DelSpecialEvent.IsEnabled = EventList.SelectedItem != null;
         }
-        private void EventCondition_ConditionConfirmed(object sender, EventArgs e)
+        private void EventCondition_ConditionChanged(object sender, ConditionChangedEventArgs e)
         {
-            if (isEditing)
-            {
-                AddEvent_Click(null, null);
-                AddEvent.Focus();
-            }
+            if (EventList.SelectedIndex == -1) return;
+            var text = eventGroup.Events[EventList.SelectedIndex];
+            var specialEvent = CrazyStorm.Core.EventManager.SpecialEvents.Keys.FirstOrDefault((se) => text.Contains(se));
+            if (specialEvent != null) EditSpecialEvent();
+            else EditEvent();
         }
         private void ResultValue_KeyDown(object sender, KeyEventArgs e)
         {
-            if (isEditing && e.Key == Key.Enter)
+            if (e.Key == Key.Enter)
             {
                 ResultValue_PreviewLostKeyboardFocus(null, null);
-                if (UIHelper.HasError(ResultValue)) return;
-                AddEvent_Click(null, null);
-                AddEvent.Focus();
+                ResultValue.CaretIndex = ResultValue.Text.Length;
             }
         }
         private void ChangeTime_KeyDown(object sender, KeyEventArgs e)
         {
-            if (isEditing && e.Key == Key.Enter)
+            if (e.Key == Key.Enter)
             {
                 ChangeTime_PreviewLostKeyboardFocus(null, null);
-                if (UIHelper.HasError(ChangeTime)) return;
-                AddEvent_Click(null, null);
-                AddEvent.Focus();
+                ChangeTime.CaretIndex = ChangeTime.Text.Length;
             }
         }
         private void StopCondition_KeyDown(object sender, KeyEventArgs e)
         {
-            if (isEditing && e.Key == Key.Enter)
+            if (e.Key == Key.Enter)
             {
                 StopCondition_PreviewLostKeyboardFocus(null, null);
-                if (UIHelper.HasError(StopCondition)) return;
-                AddSpecialEvent_Click(null, null);
-                AddSpecialEvent.Focus();
+                StopCondition.CaretIndex = StopCondition.Text.Length;
             }
         }
         #endregion

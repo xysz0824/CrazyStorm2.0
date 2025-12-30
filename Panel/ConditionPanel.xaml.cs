@@ -568,6 +568,7 @@ namespace CrazyStorm
                     ConditionChanged?.Invoke(this, new ConditionChangedEventArgs(condition));
                     ConditionConfirmed?.Invoke(this, e);
                 }
+                ConditionFunctionContent.CaretIndex = ConditionFunctionContent.Text.Length;
             }
         }
         private void LeftValue_KeyDown(object sender, KeyEventArgs e)
@@ -580,6 +581,7 @@ namespace CrazyStorm
                     ConditionChanged?.Invoke(this, new ConditionChangedEventArgs(condition));
                     ConditionConfirmed?.Invoke(this, e);
                 }
+                LeftValue.CaretIndex = LeftValue.Text.Length;
             }
         }
         private void RightValue_KeyDown(object sender, KeyEventArgs e)
@@ -592,6 +594,7 @@ namespace CrazyStorm
                     ConditionChanged?.Invoke(this, new ConditionChangedEventArgs(condition));
                     ConditionConfirmed?.Invoke(this, e);
                 }
+                RightValue.CaretIndex = RightValue.Text.Length;
             }
         }
         #endregion
