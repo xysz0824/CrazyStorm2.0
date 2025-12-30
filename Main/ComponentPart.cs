@@ -250,64 +250,15 @@ namespace CrazyStorm
         private void ComponentTree_Drop(object sender, DragEventArgs e)
         {
             var sourceComponent = ((TextBlock)lastSelectedItem).DataContext as Component;
-            if (!(e.OriginalSource is TextBlock))
-                return;
+            if (!(e.OriginalSource is TextBlock)) return;
 
             var targetComponent = ((TextBlock)e.OriginalSource).DataContext as Component;
-            if (sourceComponent == targetComponent)
-                return;
+            if (sourceComponent == targetComponent) return;
 
-            if (sourceComponent.Children.Contains(targetComponent))
-                return;
+            if (sourceComponent.Children.Contains(targetComponent)) return;
 
-            if (targetComponent.Children.Contains(sourceComponent))
-            {
-                //A way to change the node from parenthood to brotherhood. 
-                var tree = new Component();
-                foreach (Component item in selectedSystem.ComponentTree)
-                    tree.Children.Add(item);
-
-                var parent = tree.FindParent(targetComponent);
-                if (parent != null)
-                {
-                    if (parent == tree)
-                    {
-                        selectedSystem.ComponentTree.Add(sourceComponent);
-                        sourceComponent.TransPositiontoAbsolute();
-                        sourceComponent.Parent = null;
-                    }
-                    else
-                    {
-                        parent.Children.Add(sourceComponent);
-                        sourceComponent.TransPositiontoAbsolute();
-                        sourceComponent.Parent = parent;
-                        sourceComponent.TransPositiontoRelative();
-                    }
-                    targetComponent.Children.Remove(sourceComponent);
-                }
-            }
-            else
-            {
-                //Add source component to target component as child
-                var tree = new Component();
-                foreach (Component item in selectedSystem.ComponentTree)
-                    tree.Children.Add(item);
-
-                var parent = tree.FindParent(sourceComponent);
-                if (parent != null)
-                {
-                    if (parent == tree)
-                        selectedSystem.ComponentTree.Remove(sourceComponent);
-                    else
-                        parent.Children.Remove(sourceComponent);
-
-                    targetComponent.Children.Add(sourceComponent);
-                    sourceComponent.TransPositiontoAbsolute();
-                    sourceComponent.Parent = targetComponent;
-                    sourceComponent.TransPositiontoRelative();
-                }
-            }
-            UpdateProperty();
+            new ComponentTreeCommand().Do(commandStacks[selectedSystem],
+                selectedSystem, sourceComponent, targetComponent, new Action(UpdateProperty));
         }
         private void ComponentTree_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {

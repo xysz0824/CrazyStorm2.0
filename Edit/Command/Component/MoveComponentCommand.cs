@@ -74,13 +74,10 @@ namespace CrazyStorm
                 //so they should be copyed.
                 selectedComponents = new List<Component>();
                 var temp = Parameter[0] as List<Component>;
-                foreach (var item in temp)
-                    selectedComponents.Add(item);
+                foreach (var item in temp) selectedComponents.Add(item);
                 History[0] = selectedComponents;
             }
-            else
-                selectedComponents = History[0] as List<Component>;
-
+            else selectedComponents = History[0] as List<Component>;
             foreach (var item in selectedComponents)
             {
                 item.X += move.x;
