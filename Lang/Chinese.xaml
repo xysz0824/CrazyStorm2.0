@@ -168,6 +168,8 @@
     <sys:String x:Key="CustomTypeStr">自定义类型</sys:String>
     <sys:String x:Key="StartPointXStr">起点X</sys:String>
     <sys:String x:Key="StartPointYStr">起点Y</sys:String>
+    <sys:String x:Key="CenterPointXStr">中心X</sys:String>
+    <sys:String x:Key="CenterPointYStr">中心Y</sys:String>
     <sys:String x:Key="WidthStr">宽度</sys:String>
     <sys:String x:Key="HeightStr">高度</sys:String>
     <sys:String x:Key="FramesStr">帧数</sys:String>

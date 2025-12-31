@@ -60,6 +60,7 @@ namespace CrazyStorm.Core
         {
             customTypes = new GenericContainer<ParticleType>();
             layers = new GenericContainer<Layer>();
+            componentTree = new GenericContainer<Component>();
         }
         public ParticleSystem(string name)
         {
@@ -217,15 +218,24 @@ namespace CrazyStorm.Core
                 for (int i = 0; i < currentFrame; ++i) Update(i);
                 CurrentFrame = currentFrame;
             }
-            for (int i = 0; i < Layers.Count; ++i)
+            for (int i = 0; i < ComponentTree.Count; ++i)
             {
-                Layers[i].Update(CurrentFrame);
+                UpdateComponent(ComponentTree[i], CurrentFrame);
             }
             if (++CurrentFrame == TotalFrame)
             {
                 Reset();
             }
             return true;
+        }
+        public void UpdateComponent(Component component, int currentFrame)
+        {
+            var layer = Layers[component.LayerID];
+            if (layer.NeedUpdate(currentFrame)) component.Update(currentFrame);
+            for (int i = 0; i < component.Children.Count; ++i)
+            {
+                UpdateComponent(component.Children[i], currentFrame);
+            }
         }
         public void Reset()
         {

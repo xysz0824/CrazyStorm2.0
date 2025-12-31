@@ -33,7 +33,7 @@ namespace CrazyStorm.Core
         public int beginFrame;
         public int totalFrame;
     }
-    public class Layer : INotifyPropertyChanged, IXmlData, IGeneratePlayData, ILoadPlayData, IPlayable
+    public class Layer : INotifyPropertyChanged, IXmlData, IGeneratePlayData, ILoadPlayData
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -189,6 +189,7 @@ namespace CrazyStorm.Core
                             componentsReader.BaseStream.Position = startPosition;
                             component.LoadPlayData(componentsReader, version);
                             component.LayerName = Name;
+                            
                             Components.Add(component);
                         }
                     }
@@ -202,17 +203,11 @@ namespace CrazyStorm.Core
                 components[i].LayerID = id;
             }
         }
-        public bool Update(int currentFrame)
+        public bool NeedUpdate(int currentFrame)
         {
-            if (Visible)
-            {
-                if (currentFrame < BeginFrame || currentFrame >= BeginFrame + TotalFrame)
-                    return false;
-
-                for (int i = 0; i < Components.Count; ++i)
-                    Components[i].Update(currentFrame - BeginFrame);
-            }
-            return Visible;
+            if (!Visible) return false;
+            if (currentFrame < BeginFrame || currentFrame >= BeginFrame + TotalFrame) return false;
+            return true;
         }
         public void Reset()
         {

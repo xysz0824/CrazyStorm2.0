@@ -45,7 +45,6 @@ namespace CrazyStorm.Core
         Emitter bindingTarget;
         IList<EventGroup> componentEventGroups;
         IList<Component> children;
-        IList<int> childrenIDs;
         #endregion
 
         #region Protected Members
@@ -308,9 +307,8 @@ namespace CrazyStorm.Core
             clone.children = new GenericContainer<Component>();
             if (children.Count > 0)
             {
-                clone.childrenIDs = new List<int>();
                 foreach (var child in children)
-                    clone.childrenIDs.Add(child.ID);
+                    clone.children.Add(child);
             }
             return clone;
         }
@@ -350,18 +348,6 @@ namespace CrazyStorm.Core
             XmlHelper.BuildFromObjectList(Locals, new VariableResource(""), componentNode, "Variables");
             //componentEventGroups
             XmlHelper.BuildFromObjectList(componentEventGroups, new EventGroup(), componentNode, "ComponentEventGroups");
-            //children
-            childrenIDs = new List<int>();
-            var childrenNode = componentNode.SelectSingleNode("Children");
-            foreach (XmlElement childNode in childrenNode.ChildNodes)
-            {
-                string idAttribute = childNode.GetAttribute("id");
-                int parsedID;
-                if (int.TryParse(idAttribute, out parsedID))
-                    childrenIDs.Add(parsedID);
-                else
-                    throw new System.IO.FileLoadException("FileDataError");
-            }
             return componentNode;
         }
         public virtual XmlElement StoreAsXml(XmlDocument doc, XmlElement node)
@@ -417,6 +403,7 @@ namespace CrazyStorm.Core
                     if (ParentID == target.ID)
                     {
                         parent = target;
+                        parent.children.Add(this);
                         break;
                     }
                 }
@@ -434,22 +421,6 @@ namespace CrazyStorm.Core
                     }
                 }
                 BindingTargetID = -1;
-            }
-            //children
-            if (childrenIDs != null)
-            {
-                foreach (var childrenID in childrenIDs)
-                {
-                    foreach (var target in collection)
-                    {
-                        if (childrenID == target.ID)
-                        {
-                            children.Add(target);
-                            break;
-                        }
-                    }
-                }
-                childrenIDs = null;
             }
         }
         public virtual List<byte> GeneratePlayData()

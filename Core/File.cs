@@ -358,6 +358,7 @@ namespace CrazyStorm.Core
                 {
                     LoadPlayData(reader, version);
                     RebuildObjectReference(this);
+                    RebuildComponentTree();
                     return true;
                 }
             }
