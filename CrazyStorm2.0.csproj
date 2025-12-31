@@ -150,6 +150,9 @@
     <Compile Include="Converter\EventConverter.cs" />
     <Compile Include="Edit\Command\Component\BindComponentCommand.cs" />
     <Compile Include="Edit\Command\Component\ComponentTreeCommand.cs" />
+    <Compile Include="Edit\Command\EventGroup\AddEventGroupCommand.cs" />
+    <Compile Include="Edit\Command\EventGroup\CopyEventGroupCommand.cs" />
+    <Compile Include="Edit\Command\EventGroup\DelEventGroupCommand.cs" />
     <Compile Include="Edit\Command\Layer\CopyLayerCommand.cs" />
     <Compile Include="Edit\Command\Component\PasteComponentCommand.cs" />
     <Compile Include="Edit\Command\Component\UnbindComponentCommand.cs" />

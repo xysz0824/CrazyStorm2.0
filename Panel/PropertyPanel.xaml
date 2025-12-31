@@ -183,6 +183,7 @@
                         <DockPanel>
                             <DockPanel.ContextMenu>
                                 <ContextMenu>
+                                    <MenuItem Name="CopyComponentEvent" Header="{StaticResource CopyStr}" Click="CopyComponentEvent_Click" />
                                     <MenuItem Name="DelComponentEvent" Header="{StaticResource DelStr}" Click="DelComponentEvent_Click" />
                                 </ContextMenu>
                             </DockPanel.ContextMenu>
@@ -219,6 +220,7 @@
                         <DockPanel>
                             <DockPanel.ContextMenu>
                                 <ContextMenu>
+                                    <MenuItem Name="CopySpecificEvent" Header="{StaticResource CopyStr}" Click="CopySpecificEvent_Click" />
                                     <MenuItem Name="DelSpecificEvent" Header="{StaticResource DelStr}" Click="DelSpecificEvent_Click" />
                                 </ContextMenu>
                             </DockPanel.ContextMenu>
