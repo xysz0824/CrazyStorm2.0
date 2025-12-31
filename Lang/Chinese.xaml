@@ -251,4 +251,5 @@
     <sys:String x:Key="AdditiveStr">加法混合</sys:String>
     <sys:String x:Key="SubstractionStr">减法混合</sys:String>
     <sys:String x:Key="MultiplyStr">乘法混合</sys:String>
+    <sys:String x:Key="LocalStr">局部变量</sys:String>
 </ResourceDictionary>

@@ -371,7 +371,7 @@ namespace CrazyStorm
         }
         private void AddVariable_Click(object sender, RoutedEventArgs e)
         {
-            var label = "Local_";
+            var label = (string)FindResource("LocalStr");
             for (int i = 0;; ++i)
             {
                 //To avoid repeating name, use number.

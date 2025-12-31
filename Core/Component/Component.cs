@@ -379,17 +379,6 @@ namespace CrazyStorm.Core
             XmlHelper.StoreObjectList(Locals, doc, componentNode, "Variables");
             //componentEventGroups
             XmlHelper.StoreObjectList(componentEventGroups, doc, componentNode, "ComponentEventGroups");
-            //children
-            var childrenNode = doc.CreateElement("Children");
-            foreach (var component in children)
-            {
-                var childNode = doc.CreateElement("Component");
-                var idAttribute = doc.CreateAttribute("id");
-                idAttribute.Value = component.ID.ToString();
-                childNode.Attributes.Append(idAttribute);
-                childrenNode.AppendChild(childNode);
-            }
-            componentNode.AppendChild(childrenNode);
             node.AppendChild(componentNode);
             return componentNode;
         }
