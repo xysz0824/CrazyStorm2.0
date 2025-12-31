@@ -103,14 +103,12 @@ namespace CrazyStorm
                             }
                             if (component.Selected) selectedComponents.Add(component);
                             //Draw component mark.
-                            object marker = assembly.CreateInstance("CrazyStorm.ComponentMarker");
-                            (marker as IComponentMark).Draw(canvas, component, (int)x + config.ScreenWidthOver2,
-                                (int)y + config.ScreenHeightOver2);
+                            var marker = assembly.CreateInstance("CrazyStorm.ComponentMarker") as IComponentMark;
+                            marker.Draw(canvas, component, (int)x + config.ScreenWidthOver2, (int)y + config.ScreenHeightOver2);
                             //Draw specific mark.
-                            if (component is Emitter) marker = assembly.CreateInstance("CrazyStorm.EmitterMarker");
-                            else marker = assembly.CreateInstance("CrazyStorm." + component.GetType().Name + "Marker");
-                            (marker as IComponentMark).Draw(canvas, component, (int)x + config.ScreenWidthOver2,
-                                (int)y + config.ScreenHeightOver2);
+                            if (component is Emitter) marker = assembly.CreateInstance("CrazyStorm.EmitterMarker") as IComponentMark;
+                            else marker = assembly.CreateInstance("CrazyStorm." + component.GetType().Name + "Marker") as IComponentMark;
+                            marker?.Draw(canvas, component, (int)x + config.ScreenWidthOver2, (int)y + config.ScreenHeightOver2);
                             icon.Data = (Geometry)FindResource($"{component.GetType().Name}_Icon");
                             var scale = (double)FindResource($"{component.GetType().Name}_Scale");
                             var transform = new ScaleTransform(scale, scale, icon.ActualWidth / 2, icon.ActualHeight / 2);

@@ -620,47 +620,77 @@
                     <TabControl  Margin="0,0,0,0" Name="LeftTabControl" VerticalContentAlignment="Stretch" HorizontalContentAlignment="Stretch" Background="{DynamicResource TitleBarBrush}" BorderThickness="0,0,0,0" Focusable="False">
                         <TabItem Header="{StaticResource ComponentStr}" Name="Frequent" Padding="6,5,6,1">
                             <DockPanel Name="ComponentPanel">
-                                <GroupBox Style="{StaticResource FlatGroupBox}" DockPanel.Dock="Top" Header="{StaticResource ComponentBoardStr}" VerticalAlignment="Top" Height="80" HorizontalAlignment="Stretch" 
+                                <GroupBox Style="{StaticResource FlatGroupBox}" DockPanel.Dock="Top" Header="{StaticResource ComponentBoardStr}" VerticalAlignment="Top" Height="116" HorizontalAlignment="Stretch" 
                                       HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Background="{DynamicResource ToolBarBrush}">
-                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,0,0,-25">
-                                        <Button Style="{StaticResource FlatComponentButton}" Name="MultiEmitter" Width="32" Height="32" Click="ComponentButton_Click">
-                                            <Path Data="{StaticResource MultiEmitter_Icon}"
+                                    <StackPanel Margin="0,25,0,0">
+                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" >
+                                            <Button Style="{StaticResource FlatComponentButton}" Name="MultiEmitter" Width="32" Height="32" Click="ComponentButton_Click">
+                                                <Path Data="{StaticResource MultiEmitter_Icon}"
                                                   Fill="White" Width="28" Height="28" Stretch="Uniform" ToolTip="{StaticResource MultiEmitterStr}">
-                                                <Path.Effect>
-                                                    <DropShadowEffect Color="Black" Opacity="0.9" BlurRadius="5" Direction="315" ShadowDepth="0" />
-                                                </Path.Effect>
-                                            </Path>
-                                        </Button>
-                                        <Button Style="{StaticResource FlatComponentButton}" Name="CurveEmitter" Width="32" Height="32" Click="ComponentButton_Click">
-                                            <Path Data="{StaticResource CurveEmitter_Icon}" Fill="White" Width="28" Height="28" Stretch="Uniform" ToolTip="{StaticResource CurveEmitterStr}">
-                                                <Path.Effect>
-                                                    <DropShadowEffect Color="Black" Opacity="0.9" BlurRadius="5" Direction="315" ShadowDepth="0" />
-                                                </Path.Effect>
-                                            </Path>
-                                        </Button>
-                                        <Button Style="{StaticResource FlatComponentButton}" Name="EventField" Click="ComponentButton_Click" Width="32" Height="32">
-                                            <Path Data="{StaticResource EventField_Icon}" Fill="White" Width="26" Height="26" Stretch="Uniform" ToolTip="{StaticResource EventFieldStr}">
-                                                <Path.Effect>
-                                                    <DropShadowEffect Color="Black" Opacity="0.9" BlurRadius="5" Direction="315" ShadowDepth="0" />
-                                                </Path.Effect>
-                                            </Path>
-                                        </Button>
-                                        <Button Style="{StaticResource FlatComponentButton}" Name="Rebounder" Width="32" Height="32" Click="ComponentButton_Click">
-                                            <Path Data="{StaticResource Rebounder_Icon}" 
-                                                  Fill="White" Width="26" Height="26" Stretch="Uniform" ToolTip="{StaticResource RebounderStr}">
-                                                <Path.Effect>
-                                                    <DropShadowEffect Color="Black" Opacity="0.9" BlurRadius="5" Direction="315" ShadowDepth="0" />
-                                                </Path.Effect>
-                                            </Path>
-                                        </Button>
-                                        <Button Style="{StaticResource FlatComponentButton}" Name="ForceField" Width="32" Height="32" Click="ComponentButton_Click">
-                                            <Path Data="{StaticResource ForceField_Icon}" 
-                                                  Fill="White" Width="24" Height="24" Stretch="Uniform" ToolTip="{StaticResource ForceFieldStr}">
-                                                <Path.Effect>
-                                                    <DropShadowEffect Color="Black" Opacity="0.9" BlurRadius="5" Direction="315" ShadowDepth="0" />
-                                                </Path.Effect>
-                                            </Path>
-                                        </Button>
+                                                    <Path.Effect>
+                                                        <DropShadowEffect Color="Black" Opacity="0.9" BlurRadius="5" Direction="315" ShadowDepth="0" />
+                                                    </Path.Effect>
+                                                    <Path.RenderTransform>
+                                                        <ScaleTransform CenterX="14" CenterY="14" ScaleX="{StaticResource MultiEmitter_Scale}" ScaleY="{StaticResource MultiEmitter_Scale}"/>
+                                                    </Path.RenderTransform>
+                                                </Path>
+                                            </Button>
+                                            <Button Style="{StaticResource FlatComponentButton}" Name="CurveEmitter" Width="32" Height="32" Click="ComponentButton_Click">
+                                                <Path Data="{StaticResource CurveEmitter_Icon}" Fill="White" Width="28" Height="28" Stretch="Uniform" ToolTip="{StaticResource CurveEmitterStr}">
+                                                    <Path.Effect>
+                                                        <DropShadowEffect Color="Black" Opacity="0.9" BlurRadius="5" Direction="315" ShadowDepth="0" />
+                                                    </Path.Effect>
+                                                    <Path.RenderTransform>
+                                                        <ScaleTransform CenterX="14" CenterY="14" ScaleX="{StaticResource CurveEmitter_Scale}" ScaleY="{StaticResource CurveEmitter_Scale}"/>
+                                                    </Path.RenderTransform>
+                                                </Path>
+                                            </Button>
+                                            <Button Style="{StaticResource FlatComponentButton}" Name="EventField" Click="ComponentButton_Click" Width="32" Height="32">
+                                                <Path Data="{StaticResource EventField_Icon}" Fill="White" Width="28" Height="28" Stretch="Uniform" ToolTip="{StaticResource EventFieldStr}">
+                                                    <Path.Effect>
+                                                        <DropShadowEffect Color="Black" Opacity="0.9" BlurRadius="5" Direction="315" ShadowDepth="0" />
+                                                    </Path.Effect>
+                                                    <Path.RenderTransform>
+                                                        <ScaleTransform CenterX="14" CenterY="14" ScaleX="{StaticResource EventField_Scale}" ScaleY="{StaticResource EventField_Scale}"/>
+                                                    </Path.RenderTransform>
+                                                </Path>
+                                            </Button>
+                                            <Button Style="{StaticResource FlatComponentButton}" Name="Rebounder" Width="32" Height="32" Click="ComponentButton_Click">
+                                                <Path Data="{StaticResource Rebounder_Icon}" 
+                                                  Fill="White" Width="28" Height="28" Stretch="Uniform" ToolTip="{StaticResource RebounderStr}">
+                                                    <Path.Effect>
+                                                        <DropShadowEffect Color="Black" Opacity="0.9" BlurRadius="5" Direction="315" ShadowDepth="0" />
+                                                    </Path.Effect>
+                                                    <Path.RenderTransform>
+                                                        <ScaleTransform CenterX="14" CenterY="14" ScaleX="{StaticResource Rebounder_Scale}" ScaleY="{StaticResource Rebounder_Scale}"/>
+                                                    </Path.RenderTransform>
+                                                </Path>
+                                            </Button>
+                                            <Button Style="{StaticResource FlatComponentButton}" Name="ForceField" Width="32" Height="32" Click="ComponentButton_Click">
+                                                <Path Data="{StaticResource ForceField_Icon}" 
+                                                  Fill="White" Width="28" Height="28" Stretch="Uniform" ToolTip="{StaticResource ForceFieldStr}">
+                                                    <Path.Effect>
+                                                        <DropShadowEffect Color="Black" Opacity="0.9" BlurRadius="5" Direction="315" ShadowDepth="0" />
+                                                    </Path.Effect>
+                                                    <Path.RenderTransform>
+                                                        <ScaleTransform CenterX="14" CenterY="14" ScaleX="{StaticResource ForceField_Scale}" ScaleY="{StaticResource ForceField_Scale}"/>
+                                                    </Path.RenderTransform>
+                                                </Path>
+                                            </Button>
+                                        </StackPanel>
+                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,5,0,0">
+                                            <Button Style="{StaticResource FlatComponentButton}" Name="Center" Width="32" Height="32" Click="ComponentButton_Click">
+                                                <Path Data="{StaticResource Center_Icon}"
+                                                  Fill="White" Width="28" Height="28" Stretch="Uniform" ToolTip="{StaticResource CenterStr}">
+                                                    <Path.Effect>
+                                                        <DropShadowEffect Color="Black" Opacity="0.9" BlurRadius="5" Direction="315" ShadowDepth="0" />
+                                                    </Path.Effect>
+                                                    <Path.RenderTransform>
+                                                        <ScaleTransform CenterX="14" CenterY="14" ScaleX="{StaticResource Center_Scale}" ScaleY="{StaticResource Center_Scale}"/>
+                                                    </Path.RenderTransform>
+                                                </Path>
+                                            </Button>
+                                        </StackPanel>
                                     </StackPanel>
                                 </GroupBox>
                                 <GroupBox Padding="0,0,0,0" Style="{StaticResource FlatGroupBox}" Header="{StaticResource ComponentTreeStr}" Name="Explorer" VerticalContentAlignment="Stretch" HorizontalContentAlignment="Stretch" >

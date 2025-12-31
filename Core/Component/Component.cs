@@ -211,6 +211,7 @@ namespace CrazyStorm.Core
                 SpeedAngle = particle.PSpeedAngle;
                 Acspeed = particle.PAcspeed;
                 AcspeedAngle = particle.PAcspeedAngle;
+                ExecuteExpressions();
                 for (int i = 0; i < ComponentEventGroups.Count; ++i)
                 {
                     ComponentEventGroups[i].Execute(this, particle);
@@ -664,7 +665,6 @@ namespace CrazyStorm.Core
         }
         public virtual void Reset()
         {
-            parentAbsolutePosition = Vector2.Zero;
             if (initialState == null)
             {
                 initialState = this.MemberwiseClone() as Component;
@@ -692,6 +692,8 @@ namespace CrazyStorm.Core
             }
             MathHelper.SetVector2(ref speedVector, Speed, SpeedAngle);
             MathHelper.SetVector2(ref acspeedVector, Acspeed, AcspeedAngle);
+            parentAbsolutePosition = Vector2.Zero;
+            Position = GetAbsolutePositionRuntime();
         }
         #endregion
     }

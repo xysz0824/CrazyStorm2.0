@@ -71,6 +71,7 @@
     <sys:String x:Key="EventFieldStr">事件场</sys:String>
     <sys:String x:Key="RebounderStr">反弹板</sys:String>
     <sys:String x:Key="ForceFieldStr">力场</sys:String>
+    <sys:String x:Key="CenterStr">中心</sys:String>
     <sys:String x:Key="ParticleEventGroupStr">粒子事件组</sys:String>
     <sys:String x:Key="EventFieldEventGroupStr">事件场事件组</sys:String>
     <sys:String x:Key="RebounderEventGroupStr">反弹板事件组</sys:String>

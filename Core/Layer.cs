@@ -135,7 +135,7 @@ namespace CrazyStorm.Core
             foreach (XmlElement componentNode in componentsNode.ChildNodes)
             {
                 string specificType = componentNode.GetAttribute("specificType");
-                if (XmlHelper.FindNode(componentNode, specificType) != null)
+                if (!string.IsNullOrEmpty(specificType))
                 {
                     Component component = ComponentFactory.Create(specificType);
                     component.BuildFromXml(componentNode);

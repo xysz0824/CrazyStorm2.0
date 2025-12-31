@@ -84,10 +84,11 @@ namespace CrazyStorm
                 specificPropertyList = component.InitializeAndGetProperties(component.GetType());
 
             LoadProperties(SpecificGrid, component, specificPropertyList);
+            SpecificPropertyGroup.Visibility = specificPropertyList.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
             //Load particle properties.
             if (component is Emitter)
             {
-                ParticleGroup.Visibility = Visibility.Visible;
+                ParticlePropertyGroup.Visibility = Visibility.Visible;
                 particlePropertyList = (component as Emitter).Particle.InitializeAndGetProperties(typeof(ParticleBase));
                 if (component is MultiEmitter)
                     particlePropertyList.AddRange((component as Emitter).Particle.InitializeAndGetProperties(typeof(Particle)));
@@ -98,7 +99,7 @@ namespace CrazyStorm
             }
             else
             {
-                ParticleGroup.Visibility = Visibility.Collapsed;
+                ParticlePropertyGroup.Visibility = Visibility.Collapsed;
                 if (component is EventField || component is Rebounder)
                 {
                     //Only emitter have particles, but special event of event field or rebounder need it.
@@ -141,7 +142,12 @@ namespace CrazyStorm
                 SpecificEventList.ItemsSource = eventGroups;
                 DelSpecificEventButton.IsEnabled = eventGroups.Count > 0;
             }
-            else SpecificGroup.Visibility = Visibility.Collapsed;
+            else
+            {
+                SpecificGroup.Visibility = Visibility.Collapsed;
+                AddSpecificEventButton.Visibility = Visibility.Collapsed;
+                DelSpecificEventButton.Visibility = Visibility.Collapsed;
+            }
         }
         void LoadProperties(FrameworkElement element, PropertyContainer container, IList<PropertyInfo> infos)
         {
