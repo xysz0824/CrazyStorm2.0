@@ -21,6 +21,7 @@ using CrazyStorm.Core;
 using System.Collections.ObjectModel;
 using CrazyStorm.Expression;
 using System.Collections;
+using SharpDX;
 
 namespace CrazyStorm
 {
@@ -38,7 +39,6 @@ namespace CrazyStorm
         Action updateFunc;
         string editText;
         Popup popup;
-        bool initializeType;
         #endregion
 
         #region Public Members
@@ -206,7 +206,7 @@ namespace CrazyStorm
                 if (item.Name == selectedItem.Name)
                 {
                     var color = new ComboBoxItem();
-                    color.Content = (string)FindResource(item.Color.ToString() + "Str");
+                    color.Content = ExpressionHelper.Translate(item.Color.ToString());
                     ColorCombo.Items.Add(color);
                 }
             }
@@ -306,7 +306,7 @@ namespace CrazyStorm
                 //Select specific color.
                 InitializeColorCombo();
                 for (int i = 0; i < ColorCombo.Items.Count; ++i)
-                    if ((string)FindResource(type.Color.ToString() + "Str") == (string)((ColorCombo.Items[i] as ComboBoxItem).Content))
+                    if (ExpressionHelper.Translate(type.Color.ToString()) == (string)((ColorCombo.Items[i] as ComboBoxItem).Content))
                     {
                         ColorCombo.SelectedIndex = i;
                         break;
@@ -455,6 +455,7 @@ namespace CrazyStorm
                 var selectedType = TypeCombo.SelectedItem as ParticleType;
                 //Refresh color combobox.
                 InitializeColorCombo();
+                if (ColorCombo.Items.Count > 0) ColorCombo.SelectedIndex = 0;
                 //Show default type preview
                 if (selectedType.ID >= ParticleType.DefaultTypeIndex)
                 {
@@ -472,23 +473,44 @@ namespace CrazyStorm
                     TypeComboTip.Visibility = Visibility.Hidden;
             }
         }
+        bool typeChangingByUI;
+        private void ColorCombo_SelectionChanging(object sender, InputEventArgs e)
+        {
+            typeChangingByUI = true;
+        }
         private void ColorCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (ColorCombo.SelectedItem != null && !initializeType)
+            var selectedType = TypeCombo.SelectedItem as ParticleType;
+            ParticleColor selectedColor = default;
+            if (ColorCombo.SelectedItem != null)
             {
-                var selectedType = TypeCombo.SelectedItem as ParticleType;
-                var selectedColor = ColorCombo.SelectedItem as ComboBoxItem;
-                foreach (var item in types)
+                var str = (string)(ColorCombo.SelectedItem as ComboBoxItem).Content;
+                str = ExpressionHelper.ReverseTranslate(str);
+                selectedColor = (ParticleColor)Enum.Parse(typeof(ParticleColor), str);
+                if (typeChangingByUI)
                 {
-                    if (item.Name == selectedType.Name && 
-                        (string)FindResource(item.Color.ToString() + "Str") == (string)selectedColor.Content)
-                    {
-                        (component as Emitter).Particle.Type = item;
-                        break;
-                    }
+                    new SetParticleTypeCommand().Do(commandStack, component as Emitter, selectedType, selectedColor,
+                        new Action<Emitter, ParticleType, ParticleColor>(ParticleTypeUpdate));
+                    typeChangingByUI = false;
+                    ColorCombo.Focusable = false;
                 }
             }
-            initializeType = false;
+        }
+        private void ParticleTypeUpdate(Emitter emitter, ParticleType type, ParticleColor color)
+        {
+            if (this == null) return;
+            foreach (var item in types)
+            {
+                if (item.Name == type.Name && item.Color == color)
+                {
+                    emitter.Particle.Type = item;
+                    TypeCombo.SelectedItem = item;
+                    ColorCombo.SelectedIndex = ColorCombo.Items.IndexOf(
+                        ColorCombo.Items.Cast<ComboBoxItem>().First(i => (string)i.Content == 
+                        ExpressionHelper.Translate(item.Color.ToString())));
+                    break;
+                }
+            }
         }
         private void AddComponentEvent_Click(object sender, RoutedEventArgs e)
         {

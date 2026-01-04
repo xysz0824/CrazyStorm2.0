@@ -83,7 +83,8 @@
                     <Label Content="{StaticResource TypeStr}" HorizontalContentAlignment="Center" Margin="0,0,1,1" DockPanel.Dock="Left" Foreground="{DynamicResource TextBrush}"/>
                     <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
                         <Label Content="{StaticResource RGBStr}" HorizontalContentAlignment="Center" Margin="0,0,1,1" Foreground="{DynamicResource TextBrush}"/>
-                        <ComboBox Style="{StaticResource FlatComboBox}" Name="ColorCombo" Width = "60" Margin="0,1" SelectionChanged="ColorCombo_SelectionChanged" />
+                        <ComboBox Style="{StaticResource FlatComboBox}" Name="ColorCombo" Width = "60" Margin="0,1" SelectionChanged="ColorCombo_SelectionChanged" 
+                                  PreviewMouseDown="ColorCombo_SelectionChanging" PreviewKeyDown="ColorCombo_SelectionChanging"/>
                     </StackPanel>
                     <ComboBox Style="{StaticResource FlatComboBox}" Name="TypeCombo" ItemsSource="{Binding}" Margin="0,1" SelectionChanged="TypeCombo_SelectionChanged">
                         <ComboBox.ToolTip>
