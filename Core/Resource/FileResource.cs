@@ -30,7 +30,7 @@ namespace CrazyStorm.Core
             set { id = value; }
         }
         public string AbsolutePath { get { return absolutePath; } }
-        public string RelatviePath { get { return relativePath; } }
+        public string RelatviePath { get { return relativePath; }  set { relativePath = value; } }
         #endregion
 
         #region Constructor

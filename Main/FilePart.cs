@@ -44,6 +44,7 @@ namespace CrazyStorm
                 return;
 
             var untitledStr = (string)FindResource("UntitledStr");
+            File.CurrentDirectory = string.Empty;
             file = new File(untitledStr, (string)FindResource("NewLayerStr"), (string)FindResource("BodyPositionStr"));
             fileName = untitledStr;
             filePath = string.Empty;
@@ -73,11 +74,11 @@ namespace CrazyStorm
                 {
                     return false;
                 }
+                File.CurrentDirectory = System.IO.Path.GetDirectoryName(openPath) + '\\';
                 file = new File();
                 file.Load(openPath);
                 filePath = openPath;
                 fileName = System.IO.Path.GetFileNameWithoutExtension(openPath);
-                File.CurrentDirectory = System.IO.Path.GetDirectoryName(openPath) + '\\';
                 InitializeSystem();
                 saved = true;
                 return true;

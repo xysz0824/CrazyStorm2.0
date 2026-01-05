@@ -42,7 +42,6 @@ namespace CrazyStorm.Core
         #region Constructor
         public File()
         {
-            CurrentDirectory = string.Empty;
             particleSystems = new List<ParticleSystem>();
             images = new GenericContainer<FileResource>();
             sounds = new GenericContainer<FileResource>();

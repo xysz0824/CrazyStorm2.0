@@ -251,7 +251,7 @@ namespace CrazyStorm.Core
             if (DefaultTypes.Count > 0) return;
             var assembly = Assembly.GetExecutingAssembly();
             Stream defaultParticleTypesStream = assembly.GetManifestResourceStream("CrazyStorm.Core.set.txt");
-            using (StreamReader reader = new StreamReader(defaultParticleTypesStream))
+            using (StreamReader reader = new StreamReader(defaultParticleTypesStream, Encoding.UTF8))
             {
                 int i = 0;
                 while (!reader.EndOfStream)
