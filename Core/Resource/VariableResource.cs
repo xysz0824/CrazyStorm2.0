@@ -34,7 +34,11 @@ namespace CrazyStorm.Core
         public float Value 
         { 
             get { return data.value; }
-            set { data.value = value; }
+            set 
+            { 
+                data.value = value;
+                OnPropertyChanged("Value");
+            }
         }
         public SpecialVariableType Type
         {

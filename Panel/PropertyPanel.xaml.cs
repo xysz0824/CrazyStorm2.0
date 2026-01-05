@@ -386,11 +386,7 @@ namespace CrazyStorm
 
                 if (ok)
                 {
-                    var newVar = new VariableResource(name);
-                    component.Locals.Add(newVar);
-                    DeleteVariable.IsEnabled = true;
-                    //Put this into environment.
-                    environment.PutLocal(newVar.Label, newVar.Value);
+                    new AddLocalCommand().Do(commandStack, name, component, environment, DeleteVariable);
                     return;
                 }
             }
@@ -400,14 +396,12 @@ namespace CrazyStorm
             if (VariableGrid.SelectedItem != null)
             {
                 var item = VariableGrid.SelectedItem as VariableResource;
-                component.Locals.Remove(item);
-                DeleteVariable.IsEnabled = component.Locals.Count > 0;
-                //Remove this from environment.
-                environment.RemoveLocal(item.Label);
+                new DelLocalCommand().Do(commandStack, item, component, environment, DeleteVariable);
             }
         }
         private void VariableGrid_CellEditEnding(object sender, DataGridCellEditEndingEventArgs e)
         {
+            Grid_CellEditEnding(sender, e);
             if (e.EditAction == DataGridEditAction.Commit)
             {
                 var editItem = e.EditingElement.DataContext as VariableResource;
@@ -425,9 +419,7 @@ namespace CrazyStorm
                             (e.EditingElement as TextBox).Text = editItem.Label;
                             return;
                         }
-                    //Modify local variable name
-                    environment.RemoveLocal(editItem.Label);
-                    environment.PutLocal(newValue, editItem.Value);
+                    new ModifyLocalCommand().Do(commandStack, editItem, newValue, editItem.Value.ToString(), environment);
                 }
                 else if (e.Column.SortMemberPath == "Value")
                 {
@@ -442,9 +434,7 @@ namespace CrazyStorm
                         (e.EditingElement as TextBox).Text = editItem.Value.ToString();
                         return;
                     }
-                    //Modify local variable value
-                    environment.RemoveLocal(editItem.Label);
-                    environment.PutLocal(editItem.Label, value);
+                    new ModifyLocalCommand().Do(commandStack, editItem, editItem.Label, value.ToString(), environment);
                 }
             }
         }

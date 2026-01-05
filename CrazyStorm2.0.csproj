@@ -156,6 +156,9 @@
     <Compile Include="Edit\Command\Layer\CopyLayerCommand.cs" />
     <Compile Include="Edit\Command\Component\PasteComponentCommand.cs" />
     <Compile Include="Edit\Command\Component\UnbindComponentCommand.cs" />
+    <Compile Include="Edit\Command\Local\DelLocalCommand.cs" />
+    <Compile Include="Edit\Command\Local\AddLocalCommand.cs" />
+    <Compile Include="Edit\Command\Local\ModifyLocalCommand.cs" />
     <Compile Include="Edit\Command\Property\SetParticleTypeCommand.cs" />
     <Compile Include="Helper\ExpressionHelper.cs" />
     <Compile Include="Helper\UIHelper.cs" />

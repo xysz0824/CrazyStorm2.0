@@ -25,8 +25,7 @@ namespace CrazyStorm.Core
             set
             {
                 label = value;
-                if (PropertyChanged != null)
-                    PropertyChanged(this, new PropertyChangedEventArgs("Label"));
+                OnPropertyChanged("Label");
             }
         }
         public bool IsValid { get { CheckValid(); return isValid; } }
@@ -75,6 +74,10 @@ namespace CrazyStorm.Core
             {
                 PlayDataHelper.ReadStringDataFields(this, resourceReader);
             }
+        }
+        protected void OnPropertyChanged(string propertyName)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }
 }
