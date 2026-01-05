@@ -42,6 +42,8 @@ namespace CrazyStorm
         void InitializeDataBinding()
         {
             ParticleSystemName.DataContext = selectedParticle;
+            FirstAsTop.IsChecked = selectedParticle.OrderType == OrderType.FirstAsTop;
+            LastAsTop.IsChecked = selectedParticle.OrderType == OrderType.LastAsTop;
             TypeList.ItemsSource = selectedParticle.CustomTypes;
             file.UpdateResource();
             //Load images.
@@ -174,6 +176,14 @@ namespace CrazyStorm
                     return;
                 }
             }
+        }
+        private void FirstAsTop_Checked(object sender, RoutedEventArgs e)
+        {
+            selectedParticle.OrderType = OrderType.FirstAsTop;
+        }
+        private void LastAsTop_Checked(object sender, RoutedEventArgs e)
+        {
+            selectedParticle.OrderType = OrderType.LastAsTop;
         }
         #endregion
     }

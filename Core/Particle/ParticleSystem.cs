@@ -12,12 +12,19 @@ using System.IO;
 
 namespace CrazyStorm.Core
 {
+    public enum OrderType
+    {
+        FirstAsTop,
+        LastAsTop
+    }
     public class ParticleSystem : IXmlData, IGeneratePlayData, ILoadPlayData, IPlayable
     {
         #region Private Members
         [StringData]
         [XmlAttribute]
         string name;
+        [XmlAttribute]
+        OrderType orderType;
         IList<ParticleType> customTypes;
         IList<Layer> layers;
         IList<Component> componentTree;
@@ -33,6 +40,11 @@ namespace CrazyStorm.Core
         { 
             get { return name; }
             set { name = value; }
+        }
+        public OrderType OrderType
+        {
+            get { return orderType; }
+            set { orderType = value; }
         }
         public int CurrentFrame { get; set; }
         public int TotalFrame
@@ -185,6 +197,8 @@ namespace CrazyStorm.Core
         public List<byte> GeneratePlayData()
         {
             var particleSystemBytes = new List<byte>();
+            //orderType
+            PlayDataHelper.GenerateStruct(orderType, particleSystemBytes);
             //stringDataField
             PlayDataHelper.GenerateStringDataFields(this, particleSystemBytes);
             //customTypes
@@ -197,6 +211,8 @@ namespace CrazyStorm.Core
         {
             using (BinaryReader particleSystemReader = PlayDataHelper.GetBlockReader(reader))
             {
+                //orderType
+                orderType = PlayDataHelper.ReadStruct<OrderType>(particleSystemReader);
                 //stringDataFields
                 PlayDataHelper.ReadStringDataFields(this, particleSystemReader);
                 //customTypes

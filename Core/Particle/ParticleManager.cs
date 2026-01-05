@@ -149,11 +149,9 @@ namespace CrazyStorm.Core
         }
         public static void Update()
         {
-            activeParticles.Sort();
             for (int i = 0; i < activeParticles.Count; ++i)
             {
                 var instance = activeParticles[i];
-                int order = instance.RenderOrder;
                 if (instance.Alive && !OutOfRange(instance)) instance.Update();
                 else if (instance.Alive) instance.Alive = false;
                 if (!instance.Alive)
@@ -165,8 +163,10 @@ namespace CrazyStorm.Core
                 }
             }
         }
-        public static void Draw()
+        public static void Draw(OrderType orderType)
         {
+            if (orderType == OrderType.FirstAsTop) activeParticles.Sort();
+            else activeParticles.Sort((a, b) => b.CompareTo(a));
             for (int i = 0; i < activeParticles.Count; ++i)
             {
                 var instance = activeParticles[i];

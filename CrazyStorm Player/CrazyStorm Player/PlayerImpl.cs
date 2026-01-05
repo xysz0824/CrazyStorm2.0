@@ -291,7 +291,7 @@ namespace CrazyStorm_Player
                 spriteBatch.Draw(background, Vector2.Zero, null, Color.White, 0, Vector2.Zero, backgroundScale, SpriteEffects.None, 0);
             }
             controllable.Draw(spriteBatch, characterTexture, pointTexture, slowModeTexture);
-            ParticleManager.Draw();
+            ParticleManager.Draw(File.ParticleSystems[SelectedParticleSystemIndex].OrderType);
             lastBlendType = BlendType.None;
             curveBatch.End();
             spriteBatch.End();

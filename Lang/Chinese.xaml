@@ -32,6 +32,9 @@
     <sys:String x:Key="DeleteParticleSystemStr">删除粒子系统</sys:String>
     <sys:String x:Key="CopyParticleSystemStr">复制粒子系统</sys:String>
     <sys:String x:Key="SetParticleSystemStr">粒子系统设置</sys:String>
+    <sys:String x:Key="OrderTypeStr">渲染顺序</sys:String>
+    <sys:String x:Key="FirstAsTopStr">后发在上</sys:String>
+    <sys:String x:Key="LastAsTopStr">先发在上</sys:String>
     <sys:String x:Key="ParticleTypeStr">弹型</sys:String>
     <sys:String x:Key="NewLayerStr">新图层</sys:String>
     <sys:String x:Key="LayerStr">图层</sys:String>

@@ -7,10 +7,19 @@
     </Window.Resources>
     <DockPanel>
         <GroupBox DockPanel.Dock="Top" Header="{StaticResource BasicStr}">
-            <StackPanel Orientation="Horizontal" >
-                <Label Content="{StaticResource ParticleSystemNameStr}"/>
-                <TextBox Name="ParticleSystemName" Text="{Binding Path=Name, Mode=OneTime}" Width="100" VerticalContentAlignment="Center" MaxLength="20" MaxLines="1"/>
-                <Button Content="{StaticResource ModifyStr}" Width="42" Click="Button_Click" Margin="4,0"/>
+            <StackPanel Orientation="Vertical" >
+                <StackPanel Orientation="Horizontal">
+                    <Label Content="{StaticResource ParticleSystemNameStr}"/>
+                    <TextBox Name="ParticleSystemName" Text="{Binding Path=Name, Mode=OneTime}" Width="100" VerticalContentAlignment="Center" MaxLength="20" MaxLines="1"/>
+                    <Button Content="{StaticResource ModifyStr}" Width="42" Click="Button_Click" Margin="4,0"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+                    <Label Content="{StaticResource OrderTypeStr}"/>
+                    <RadioButton Name="FirstAsTop" Content="{StaticResource FirstAsTopStr}" Margin="22,0" VerticalAlignment="Center"
+                                 Checked="FirstAsTop_Checked"/>
+                    <RadioButton Name="LastAsTop" Content="{StaticResource LastAsTopStr}" Margin="0,0" VerticalAlignment="Center"
+                                 Checked="LastAsTop_Checked"/>
+                </StackPanel>
             </StackPanel>
         </GroupBox>
         <TabControl>
