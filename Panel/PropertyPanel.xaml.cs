@@ -211,10 +211,11 @@ namespace CrazyStorm
                 }
             }
         }
-        void OpenEventSetting(EventGroup eventGroup, Expression.Environment environment, bool emitter, bool aboutParticle)
+        void OpenEventSetting(EventGroup eventGroup, Expression.Environment environment, 
+            bool emitter, bool aboutParticle, bool center)
         {
             file.UpdateResource();
-            Window window = new EventSetting(eventGroup, environment, file.Sounds, types, emitter, aboutParticle);
+            Window window = new EventSetting(eventGroup, environment, file.Sounds, types, emitter, aboutParticle, center);
             window.ShowDialog();
             window.Close();
         }
@@ -578,7 +579,7 @@ namespace CrazyStorm
                         environment.RemoveProperty(item.Name);
                 }
                 OpenEventSetting(ComponentEventList.SelectedItem as EventGroup, environment, 
-                    component is Emitter, component is Emitter);
+                    component is Emitter, component is Emitter, component is Center);
             }
         }
         private void SpecificEventList_MouseDoubleClick(object sender, MouseButtonEventArgs e)
@@ -593,7 +594,7 @@ namespace CrazyStorm
                 foreach (var item in specificPropertyList)
                     environment.RemoveProperty(item.Name);
                
-                OpenEventSetting(SpecificEventList.SelectedItem as EventGroup, environment, false, true);
+                OpenEventSetting(SpecificEventList.SelectedItem as EventGroup, environment, false, true, false);
             }
         }
         #endregion

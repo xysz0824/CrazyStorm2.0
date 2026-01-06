@@ -118,6 +118,7 @@
                     <RadioButton Name="PlaySound" Content="{StaticResource PlaySoundStr}" Margin="5,0" Checked="PlaySoundButton_Checked" />
                     <RadioButton Name="Loop" Content="{StaticResource LoopStr}" Margin="5,0,8,0" Checked="LoopButton_Checked" />
                     <RadioButton Name="ChangeType" Content="{StaticResource ChangeTypeStr}" Margin="5,0,8,0" Checked="ChangeTypeButton_Checked" />
+                    <RadioButton Name="GlobalEvent" Content="{StaticResource GlobalEventStr}" Margin="5,0,8,0" Checked="GlobalEventButton_Checked" />
                 </StackPanel>
                 <DockPanel Name="PlaySoundPanel" Margin="0,1" Visibility="Collapsed">
                     <Label Content="{StaticResource SoundResourceStr}" />
@@ -137,6 +138,18 @@
                     <ComboBox Name="TypeCombo" Width="150" SelectionChanged="TypeCombo_SelectionChanged"/>
                     <Label  Content="{StaticResource RGBStr}" />
                     <ComboBox Name="ColorCombo" Width="80" SelectionChanged="ColorCombo_SelectionChanged"/>
+                </StackPanel>
+                <StackPanel Name="GlobalEventPanel" Margin="0,1" Orientation="Horizontal" Visibility="Collapsed">
+                    <Label  Content="{StaticResource TypeStr}" />
+                    <ComboBox Name="GlobalEventTypeCombo" Width="100" SelectionChanged="GlobalEventTypeCombo_SelectionChanged"/>
+                    <StackPanel Orientation="Horizontal" Name="GlobalEventParamPanel">
+                        <Label Name="GlobalEventParam1Name" Content="变量1" />
+                        <TextBox Name="GlobalEventParam1Value" VerticalAlignment="Center" Width="50" 
+                             PreviewLostKeyboardFocus="GlobalEventParamValue_PreviewLostKeyboardFocus" KeyDown="GlobalEventParamValue_KeyDown"/>
+                        <Label Name="GlobalEventParam2Name" Content="变量2" />
+                        <TextBox Name="GlobalEventParam2Value" VerticalAlignment="Center" Width="50"
+                             PreviewLostKeyboardFocus="GlobalEventParamValue_PreviewLostKeyboardFocus" KeyDown="GlobalEventParamValue_KeyDown"/>
+                    </StackPanel>
                 </StackPanel>
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,1">
                     <Button Name="AddSpecialEvent" Width ="40" Content="{StaticResource AddStr}" Margin="2,0" Click="AddSpecialEvent_Click" />

@@ -152,18 +152,18 @@ namespace CrazyStorm.Core
             }
         }
         public void Load(string filePath)
-        {
-            var doc = new XmlDocument();
-            doc.Load(filePath);
-            var root = (XmlElement)doc.SelectSingleNode(VersionInfo.AppName.Replace(" ", ""));
-            if (root == null) throw new XmlException();
-            else
             {
-                BuildFromXml(root);
-                RebuildObjectReference();
-                RebuildComponentTree();
+                var doc = new XmlDocument();
+                doc.Load(filePath);
+                var root = (XmlElement)doc.SelectSingleNode(VersionInfo.AppName.Replace(" ", ""));
+                if (root == null) throw new XmlException();
+                else
+                {
+                    BuildFromXml(root);
+                    RebuildObjectReference();
+                    RebuildComponentTree();
+                }
             }
-        }
         public void Save(string filePath)
         {
             var doc = new XmlDocument();
@@ -235,15 +235,9 @@ namespace CrazyStorm.Core
                 }
                 eventGroup.CompiledEvents.Clear();
                 foreach (string originalEvent in eventGroup.Events)
-                    eventGroup.CompiledEvents.Add(EventHelper.GenerateEventData(originalEvent, (t) =>
-                    {
-                        var lexer = new Expression.Lexer();
-                        lexer.Load(t);
-                        var syntaxTree = new Expression.Parser(lexer).Expression();
-                        var compiledBytes = new List<byte>();
-                        syntaxTree.Compile(compiledBytes);
-                        return compiledBytes.ToArray();
-                    }));
+                {
+                    eventGroup.CompiledEvents.Add(EventHelper.GenerateEventData(originalEvent));
+                }
             }
         }
         void Compile()

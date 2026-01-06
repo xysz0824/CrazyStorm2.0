@@ -24,6 +24,12 @@ namespace CrazyStorm
 {
     public partial class EventSetting : Window
     {
+        static readonly string[] GlobalEventStrings = new string[]
+        {
+            "GotoFrame", "Target", "Count",
+            "QuakeScreen", "Strength", "Duration",
+            "StopScreen", "Intensity", "Duration",
+        };
         #region Private Members
         EventGroup eventGroup;
         Expression.Environment environment;
@@ -36,26 +42,36 @@ namespace CrazyStorm
 
         #region Constructor
         public EventSetting(EventGroup eventGroup, Expression.Environment environment,
-            IList<FileResource> sounds, IList<ParticleType> types, bool emitter, bool aboutParticle)
+            IList<FileResource> sounds, IList<ParticleType> types, bool emitter, bool aboutParticle, bool center)
         {
             this.eventGroup = eventGroup;
             this.environment = environment;
             this.sounds = sounds;
             this.types = types;
             InitializeComponent();
-            InitializeSetting(emitter, aboutParticle);
+            InitializeSetting(emitter, aboutParticle, center);
             LoadContent();
             ResetAll();
         }
         #endregion
 
         #region Private Methods
-        void InitializeSetting(bool emitter, bool aboutParticle)
+        void InitializeSetting(bool emitter, bool aboutParticle, bool center)
         {
             EventGroupBox.DataContext = eventGroup;
             EventList.ItemsSource = eventGroup.Events;
             EmitParticle.Visibility = emitter ? Visibility.Visible : Visibility.Collapsed;
             ChangeType.Visibility = aboutParticle ? Visibility.Visible : Visibility.Collapsed;
+            GlobalEvent.Visibility = center ? Visibility.Visible : Visibility.Collapsed;
+            if (center)
+            {
+                for (int i = 0; i < GlobalEventStrings.Length / 3; ++i)
+                {
+                    var item = new ComboBoxItem();
+                    item.Content = ExpressionHelper.Translate(GlobalEventStrings[i * 3]);
+                    GlobalEventTypeCombo.Items.Add(item);
+                }
+            }
         }
         void LoadContent()
         {
@@ -186,6 +202,14 @@ namespace CrazyStorm
                 eventInfo.specialEvent = "ChangeType";
                 eventInfo.arguments = (TypeCombo.SelectedItem as ParticleType).ID + "," + ColorCombo.SelectedIndex;
             }
+            else if (GlobalEvent.IsChecked == true)
+            {
+                if (GlobalEventTypeCombo.SelectedItem == null) return false;
+                if (string.IsNullOrEmpty(GlobalEventParam1Value.Text) || string.IsNullOrEmpty(GlobalEventParam2Value.Text)) return false;
+                if (UIHelper.HasError(GlobalEventParam1Value) || UIHelper.HasError(GlobalEventParam2Value)) return false;
+                eventInfo.specialEvent = GlobalEventStrings[GlobalEventTypeCombo.SelectedIndex * 3];
+                eventInfo.arguments = GlobalEventParam1Value.Text + "," + GlobalEventParam2Value.Text;
+            }
             else return false;
             eventInfo.isSpecialEvent = true;
             text = EventHelper.BuildEvent(eventInfo, true);
@@ -241,6 +265,10 @@ namespace CrazyStorm
             StopCondition.Text = string.Empty;
             ChangeTypePanel.Visibility = Visibility.Collapsed;
             ChangeType.IsChecked = false;
+            GlobalEvent.IsChecked = false;
+            GlobalEventTypeCombo.SelectedIndex = -1;
+            GlobalEventParam1Value.Text = string.Empty;
+            GlobalEventParam2Value.Text = string.Empty;
             TypeCombo.SelectedIndex = -1;
             ColorCombo.SelectedIndex = -1;
         }
@@ -261,6 +289,10 @@ namespace CrazyStorm
             buttonMap["PlaySound"] = new[] { PlaySound };
             buttonMap["Loop"] = new[] { Loop };
             buttonMap["ChangeType"] = new[] { ChangeType };
+            for (int i = 0; i < GlobalEventStrings.Length / 3; ++i)
+            {
+                buttonMap[GlobalEventStrings[i * 3]] = new[] { GlobalEvent };
+            }
             EventInfo eventInfo = EventHelper.SplitEvent(text);
             //Backfill condition
             EventCondition.MapCondition(eventInfo.condition);
@@ -314,6 +346,19 @@ namespace CrazyStorm
                     }
                     if (TypeCombo.SelectedItem != null)
                         ColorCombo.SelectedIndex = int.Parse(split[1].Trim());
+                }
+                else
+                {
+                    for (int i = 0; i < GlobalEventStrings.Length / 3; ++i)
+                    {
+                        if (eventInfo.specialEvent == GlobalEventStrings[i * 3])
+                        {
+                            GlobalEventTypeCombo.SelectedIndex = i;
+                            GlobalEventParam1Value.Text = split[0].Trim();
+                            GlobalEventParam2Value.Text = split[1].Trim();
+                            break;
+                        }
+                    }
                 }
             }
         }
@@ -417,6 +462,7 @@ namespace CrazyStorm
             PlaySoundPanel.Visibility = Visibility.Visible;
             LoopPanel.Visibility = Visibility.Collapsed;
             ChangeTypePanel.Visibility = Visibility.Collapsed;
+            GlobalEventPanel.Visibility = Visibility.Collapsed;
             EditSpecialEvent();
         }
         private void LoopButton_Checked(object sender, RoutedEventArgs e)
@@ -424,6 +470,7 @@ namespace CrazyStorm
             PlaySoundPanel.Visibility = Visibility.Collapsed;
             LoopPanel.Visibility = Visibility.Visible;
             ChangeTypePanel.Visibility = Visibility.Collapsed;
+            GlobalEventPanel.Visibility = Visibility.Collapsed;
             EditSpecialEvent();
         }
         private void ChangeTypeButton_Checked(object sender, RoutedEventArgs e)
@@ -431,6 +478,15 @@ namespace CrazyStorm
             PlaySoundPanel.Visibility = Visibility.Collapsed;
             LoopPanel.Visibility = Visibility.Collapsed;
             ChangeTypePanel.Visibility = Visibility.Visible;
+            EditSpecialEvent();
+        }
+        private void GlobalEventButton_Checked(object sender, RoutedEventArgs e)
+        {
+            PlaySoundPanel.Visibility = Visibility.Collapsed;
+            LoopPanel.Visibility = Visibility.Collapsed;
+            GlobalEventPanel.Visibility = Visibility.Visible;
+            GlobalEventParamPanel.Visibility = GlobalEventTypeCombo.SelectedItem != null ? 
+                Visibility.Visible : Visibility.Collapsed;
             EditSpecialEvent();
         }
         private void AddEvent_Click(object sender, RoutedEventArgs e)
@@ -580,6 +636,22 @@ namespace CrazyStorm
                 UIHelper.SetErrorToolTip(StopCondition, error);
             }
         }
+        private void GlobalEventParamValue_PreviewLostKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
+        {
+            var textBox = sender as TextBox;
+            UIHelper.SetErrorToolTip(textBox, null);
+            textBox.Text = textBox.Text.Trim();
+            if (String.IsNullOrEmpty(textBox.Text)) return;
+            try
+            {
+                float.Parse(textBox.Text);
+                EditSpecialEvent();
+            }
+            catch (Exception ex)
+            {
+                UIHelper.SetErrorToolTip(textBox, new ExpressionException("TypeError"));
+            }
+        }
         private void TypeCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (TypeCombo.SelectedItem != null)
@@ -635,6 +707,14 @@ namespace CrazyStorm
             SoundTestButton.Content = (string)FindResource("TestStr");
             MediaPlayer.Stop();
         }
+        private void GlobalEventTypeCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (GlobalEventTypeCombo.SelectedItem == null) return;
+            GlobalEventParamPanel.Visibility = Visibility.Visible;
+            GlobalEventParam1Name.Content = ExpressionHelper.Translate(GlobalEventStrings[GlobalEventTypeCombo.SelectedIndex * 3 + 1]);
+            GlobalEventParam2Name.Content = ExpressionHelper.Translate(GlobalEventStrings[GlobalEventTypeCombo.SelectedIndex * 3 + 2]);
+            EditSpecialEvent();
+        }
         private void EventList_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.Delete) DeleteEvent();
@@ -676,6 +756,15 @@ namespace CrazyStorm
             {
                 StopCondition_PreviewLostKeyboardFocus(null, null);
                 StopCondition.CaretIndex = StopCondition.Text.Length;
+            }
+        }
+        private void GlobalEventParamValue_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter)
+            {
+                GlobalEventParamValue_PreviewLostKeyboardFocus(sender, null);
+                var textBox = sender as TextBox;
+                textBox.CaretIndex = textBox.Text.Length;
             }
         }
         #endregion

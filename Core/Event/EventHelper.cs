@@ -157,14 +157,22 @@ namespace CrazyStorm.Core
             }
             return info;
         }
-        public delegate byte[] CompileFunc(string str);
-        public static byte[] GenerateEventData(string text, CompileFunc compileFunc)
+        public static byte[] Compile(string str)
+        {
+            var lexer = new Expression.Lexer();
+            lexer.Load(str);
+            var syntaxTree = new Expression.Parser(lexer).Expression();
+            var compiledBytes = new List<byte>();
+            syntaxTree.Compile(compiledBytes);
+            return compiledBytes.ToArray();
+        }
+        public static byte[] GenerateEventData(string text)
         {
             EventInfo eventInfo = SplitEvent(text);
             List<byte> bytes = new List<byte>();
             if (eventInfo.condition != null)
             {
-                byte[] compiledExpression = compileFunc(eventInfo.condition);
+                byte[] compiledExpression = Compile(eventInfo.condition);
                 bytes.AddRange(BitConverter.GetBytes(compiledExpression.Length));
                 bytes.AddRange(compiledExpression);
             }
@@ -181,7 +189,7 @@ namespace CrazyStorm.Core
                 bytes.Add((byte)eventInfo.resultType);
                 if (eventInfo.isExpressionResult)
                 {
-                    byte[] compiledExpression = compileFunc(eventInfo.resultValue);
+                    byte[] compiledExpression = Compile(eventInfo.resultValue);
                     bytes.AddRange(BitConverter.GetBytes(compiledExpression.Length));
                     bytes.AddRange(compiledExpression);
                 }
@@ -200,7 +208,7 @@ namespace CrazyStorm.Core
                 bytes.AddRange(BitConverter.GetBytes(split.Length));
                 if (eventInfo.specialEvent == "Loop")
                 {
-                    byte[] compiledExpression = compileFunc(split[0]);
+                    byte[] compiledExpression = Compile(split[0]);
                     bytes.AddRange(BitConverter.GetBytes(compiledExpression.Length));
                     bytes.AddRange(compiledExpression);
                 }

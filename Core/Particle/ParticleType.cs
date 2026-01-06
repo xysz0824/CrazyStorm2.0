@@ -331,7 +331,6 @@ namespace CrazyStorm.Core
         public ParticleType()
         {
             data.frames = 1;
-            imageID = -1;
         }
         public ParticleType(int id)
         {
