@@ -275,9 +275,11 @@ namespace CrazyStorm_Player
             EventManager.Update();
             File.ParticleSystems[SelectedParticleSystemIndex].Update(CurrentFrame);
             var collidedCount = 0;
-            var particles = ParticleManager.CheckCollision(controllable.selfPosLast.X, controllable.selfPosLast.Y,
-                controllable.selfPos.X, controllable.selfPos.Y, controllable.selfRadius, out collidedCount);
+            Vector2 newPos = default;
+            var particles = ParticleManager.CheckCollision(false, controllable.selfPosLast.X, controllable.selfPosLast.Y,
+                controllable.selfPos.X, controllable.selfPos.Y, controllable.selfRadius, out collidedCount, out newPos.X, out newPos.Y);
             for (int i = 0; i < collidedCount; ++i) particles[i].Die();
+            controllable.selfPos = newPos;
             ParticleManager.Update();
             CurrentFrame = File.ParticleSystems[SelectedParticleSystemIndex].CurrentFrame;
         }

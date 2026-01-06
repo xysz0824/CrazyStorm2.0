@@ -155,11 +155,19 @@ namespace CrazyStorm.Core
             }
             return false;
         }
-        public override bool CheckCollision(float bx, float by, float x, float y, float r)
+        public override bool CheckCollision(Vector2 playerLast, Vector2 player, float r)
         {
             return FogFrame >= FOG_TIME &&
-                MathHelper.Judge(PPositionLast, PPosition, new Vector2(bx, by), new Vector2(x, y),
+                MathHelper.Judge(PPositionLast, PPosition, playerLast, player,
                 new Vector2(Math.Abs(WidthScale), Math.Abs(HeightScale)), r, PRotation);
+        }
+        public override bool CheckVolume(bool playerDead, Vector2 playerLast, Vector2 player, out Vector2 newPlayerPos)
+        {
+            newPlayerPos = player;
+            return FogFrame >= FOG_TIME && 
+                MathHelper.VolumeJudge(playerDead, playerLast, player, PPositionLast, PPosition, PRotation, Type.CenterPoint, 
+                new Vector2(WidthScale, HeightScale), Type.VolumeStart, new Vector2(Type.VolumeWidth, Type.VolumeHeight), 
+                Type.VolumeJudgeArea, out newPlayerPos);
         }
         public override bool Update(int currentFrame = 0)
         {

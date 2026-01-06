@@ -86,7 +86,8 @@
                         <ComboBox Style="{StaticResource FlatComboBox}" Name="ColorCombo" Width = "60" Margin="0,1" SelectionChanged="ColorCombo_SelectionChanged" 
                                   PreviewMouseDown="ColorCombo_SelectionChanging" PreviewKeyDown="ColorCombo_SelectionChanging"/>
                     </StackPanel>
-                    <ComboBox Style="{StaticResource FlatComboBox}" Name="TypeCombo" ItemsSource="{Binding}" Margin="0,1" SelectionChanged="TypeCombo_SelectionChanged">
+                    <ComboBox Style="{StaticResource FlatComboBox}" Name="TypeCombo" ItemsSource="{Binding}" Margin="0,1" 
+                              PreviewMouseDown="ColorCombo_SelectionChanging" SelectionChanged="TypeCombo_SelectionChanged">
                         <ComboBox.ToolTip>
                             <ToolTip Name="TypeComboTip" Visibility="Hidden">
                                 <Rectangle Name="TypeImageRect">

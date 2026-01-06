@@ -120,10 +120,10 @@ namespace CrazyStorm.Core
             if (scale < 0.3f || scale > 0.7f) return false;
             return MathHelper.Judge(head, tail, bp, p, s, r, deg) & WidthScale >= 0.5f;
         }
-        public override bool CheckCollision(float bx, float by, float x, float y, float r)
+        public override bool CheckCollision(Vector2 playerLast, Vector2 player, float r)
         {
             return FogFrame >= FOG_TIME && Curve != null &&
-                Curve.IterateSegment(CurveJudge, new Vector2(bx, by), new Vector2(x, y), new Vector2(WidthScale, WidthScale), 2, PRotation, Length);
+                Curve.IterateSegment(CurveJudge, playerLast, player, new Vector2(WidthScale, WidthScale), 2, PRotation, Length);
         }
         public override bool Update(int currentFrame = 0)
         {

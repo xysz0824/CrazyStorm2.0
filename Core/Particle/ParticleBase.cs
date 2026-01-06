@@ -489,7 +489,12 @@ namespace CrazyStorm.Core
             return false;
         }
         public virtual Vector2 GetOutPoint() => PPosition;
-        public virtual bool CheckCollision(float bx, float by, float x, float y, float r) => false;
+        public virtual bool CheckCollision(Vector2 playerLast, Vector2 player, float r) => false;
+        public virtual bool CheckVolume(bool playerDead, Vector2 playerLast, Vector2 player, out Vector2 newPlayerPos)
+        {
+            newPlayerPos = player;
+            return false;
+        }
         public virtual bool Update(int currentFrame = 0)
         {
             ExecuteExpressions();

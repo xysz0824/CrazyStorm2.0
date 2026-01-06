@@ -77,7 +77,7 @@ namespace CrazyStorm.Core
         {
             var bytes = base.GeneratePlayData();
             var fileResourceBytes = new List<byte>();
-            bytes.AddRange(BitConverter.GetBytes(id));
+            fileResourceBytes.AddRange(BitConverter.GetBytes(id));
             PlayDataHelper.GenerateStringDataFields(this, fileResourceBytes);
             bytes.AddRange(PlayDataHelper.CreateBlock(fileResourceBytes));
             return bytes;
