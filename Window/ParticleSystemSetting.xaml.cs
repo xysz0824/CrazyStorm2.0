@@ -66,15 +66,11 @@ namespace CrazyStorm
         }
         void UpdatePreview()
         {
-            if (Setting.DataContext == null)
-                return;
-
+            if (Setting.DataContext == null) return;
             int frame = 0, width = 0, height = 0, startPointX = 0, startPointY = 0;
             if (!int.TryParse(Frames.Text, out frame) || !int.TryParse(RectWidth.Text, out width) ||
                 !int.TryParse(RectHeight.Text, out height) || !int.TryParse(StartPointX.Text, out startPointX) ||
-                !int.TryParse(StartPointY.Text, out startPointY))
-                return;
-
+                !int.TryParse(StartPointY.Text, out startPointY)) return;
             for (int i = 0; i < Preview.Children.Count;++i)
             {
                 if (((FrameworkElement)Preview.Children[i]).Name == "FrameRect")
@@ -132,6 +128,7 @@ namespace CrazyStorm
         {
             selectedParticle.CustomTypes.Add(new ParticleType(selectedParticle.CustomTypeIndex,
                 (string)FindResource("ParticleTypeStr")));
+            DelType.IsEnabled = true;
         }
         private void ColorPanel_MouseUp(object sender, MouseButtonEventArgs e)
         {
@@ -149,10 +146,18 @@ namespace CrazyStorm
         private void DeleteType_Click(object sender, RoutedEventArgs e)
         {
             selectedParticle.CustomTypes.Remove(selectedType);
+            DelType.IsEnabled = selectedParticle.CustomTypes.Count > 0;
         }
         private void TextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
             UpdatePreview();
+        }
+        private void TextBox_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter)
+            {
+                AddType.Focus();
+            }
         }
         private void ImageCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {

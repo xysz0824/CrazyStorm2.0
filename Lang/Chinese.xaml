@@ -177,6 +177,11 @@
     <sys:String x:Key="HeightStr">高度</sys:String>
     <sys:String x:Key="FramesStr">帧数</sys:String>
     <sys:String x:Key="DelayStr">延迟</sys:String>
+    <sys:String x:Key="VolumeStartXStr">体积X</sys:String>
+    <sys:String x:Key="VolumeStartYStr">体积Y</sys:String>
+    <sys:String x:Key="VolumeWidthStr">体宽</sys:String>
+    <sys:String x:Key="VolumeHeightStr">体长</sys:String>
+    <sys:String x:Key="VolumeJudgeAreaStr">体积判面</sys:String>
     <sys:String x:Key="HitRadiusStr">判定半径</sys:String>
     <sys:String x:Key="LayerNameStr">图层名称</sys:String>
     <sys:String x:Key="LayerColorStr">图层颜色</sys:String>

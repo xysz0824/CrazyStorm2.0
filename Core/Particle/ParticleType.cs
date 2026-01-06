@@ -38,6 +38,10 @@ namespace CrazyStorm.Core
         public int delay;
         public int radius;
         public ParticleColor color;
+        public Vector2 volumeStart;
+        public int volumeWidth;
+        public int volumeHeight;
+        public int volumeJudgeArea;
     }
     public class ParticleType : INotifyPropertyChanged, IXmlData, IRebuildReference<FileResource>, IGeneratePlayData, ILoadPlayData
     {
@@ -223,6 +227,102 @@ namespace CrazyStorm.Core
                 data.color = value;
                 if (PropertyChanged != null)
                     PropertyChanged(this, new PropertyChangedEventArgs("Color"));
+            }
+        }
+        public Vector2 VolumeStart
+        {
+            get { return data.volumeStart; }
+            set
+            {
+                data.volumeStart = value;
+                if (PropertyChanged != null)
+                    PropertyChanged(this, new PropertyChangedEventArgs("VolumeStart"));
+            }
+        }
+        public float VolumeStartX
+        {
+            get { return data.volumeStart.x; }
+            set
+            {
+                data.volumeStart.x = value >= 0 ? value : 0;
+                if (PropertyChanged != null)
+                {
+                    PropertyChanged(this, new PropertyChangedEventArgs("VolumeStartX"));
+                    PropertyChanged(this, new PropertyChangedEventArgs("VolumeJudgeX"));
+                }
+            }
+        }
+        public float VolumeJudgeX
+        {
+            get { return data.volumeStart.x + data.volumeWidth / 2 * (1f - data.volumeJudgeArea / 100f); }
+        }
+        public float VolumeStartY
+        {
+            get { return data.volumeStart.y; }
+            set
+            {
+                data.volumeStart.y = value >= 0 ? value : 0;
+                if (PropertyChanged != null)
+                {
+                    PropertyChanged(this, new PropertyChangedEventArgs("VolumeStartY"));
+                    PropertyChanged(this, new PropertyChangedEventArgs("VolumeJudgeY"));
+                }
+            }
+        }
+        public float VolumeJudgeY
+        {
+            get { return data.volumeStart.y + data.volumeHeight / 2 * (1f - data.volumeJudgeArea / 100f); }
+        }
+        public int VolumeWidth
+        {
+            get { return data.volumeWidth; }
+            set
+            {
+                data.volumeWidth = value >= 0 ? value : 0;
+                if (PropertyChanged != null)
+                {
+                    PropertyChanged(this, new PropertyChangedEventArgs("VolumeWidth"));
+                    PropertyChanged(this, new PropertyChangedEventArgs("VolumeJudgeX"));
+                    PropertyChanged(this, new PropertyChangedEventArgs("VolumeJudgeWidth"));
+                }
+            }
+        }
+        public int VolumeJudgeWidth
+        {
+            get { return (int)(data.volumeWidth * (data.volumeJudgeArea / 100f)); }
+        }
+        public int VolumeHeight
+        {
+            get { return data.volumeHeight; }
+            set
+            {
+                data.volumeHeight = value >= 0 ? value : 0;
+                if (PropertyChanged != null)
+                {
+                    PropertyChanged(this, new PropertyChangedEventArgs("VolumeHeight"));
+                    PropertyChanged(this, new PropertyChangedEventArgs("VolumeJudgeY"));
+                    PropertyChanged(this, new PropertyChangedEventArgs("VolumeJudgeHeight"));
+                }
+            }
+        }
+        public int VolumeJudgeHeight
+        {
+            get { return (int)(data.volumeHeight * (data.volumeJudgeArea / 100f)); }
+        }
+        public int VolumeJudgeArea
+        {
+            get { return data.volumeJudgeArea; }
+            set
+            {
+                data.volumeJudgeArea = Math.Min(Math.Max(value, 0), 100);
+                if (PropertyChanged != null)
+                {
+                    PropertyChanged(this, new PropertyChangedEventArgs("VolumeJudgeArea"));
+                    PropertyChanged(this, new PropertyChangedEventArgs("VolumeJudgeX"));
+                    PropertyChanged(this, new PropertyChangedEventArgs("VolumeJudgeY"));
+                    PropertyChanged(this, new PropertyChangedEventArgs("VolumeJudgeWidth"));
+                    PropertyChanged(this, new PropertyChangedEventArgs("VolumeJudgeHeight"));
+                }
             }
         }
         #endregion
