@@ -51,6 +51,21 @@ namespace CrazyStorm.Core
                     }
                     return false;
                 } },
+                { "GotoFrame", (pc, args, expr) =>
+                {
+                    //TODO : GotoFrame
+                    return false;
+                } },
+                { "QuakeScreen", (pc, args, expr) =>
+                {
+                    //TODO : QuakeScreen
+                    return false;
+                } },
+                { "StopScreen", (pc, args, expr) =>
+                {
+                    //TODO : StopScreen
+                    return false;
+                } },
             };
         public delegate void SoundPlayHandler(string path, float volume);
         public static event SoundPlayHandler OnSoundPlay;

@@ -153,7 +153,6 @@ namespace CrazyStorm.Core
                 info.specialEvent = split[0];
                 split = split[1].Split(')');
                 info.arguments = split[0];
-                info.resultType = (PropertyType)split[1][0];
             }
             return info;
         }

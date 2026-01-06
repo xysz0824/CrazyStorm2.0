@@ -212,7 +212,7 @@ namespace CrazyStorm
             }
             else return false;
             eventInfo.isSpecialEvent = true;
-            text = EventHelper.BuildEvent(eventInfo, true);
+            text = EventHelper.BuildEvent(eventInfo, false);
             return true;
         }
         void EditEvent()
