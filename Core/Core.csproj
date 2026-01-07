@@ -88,7 +88,6 @@
     <Compile Include="ICopyable.cs" />
     <Compile Include="IO\IGeneratePlayData.cs" />
     <Compile Include="IO\ILoadPlayData.cs" />
-    <Compile Include="IO\IRebuildReference.cs" />
     <Compile Include="IO\IXmlData.cs" />
     <Compile Include="IO\StringDataAttribute.cs" />
     <Compile Include="IO\PlayDataException.cs" />

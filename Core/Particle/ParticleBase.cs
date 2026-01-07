@@ -41,7 +41,7 @@ namespace CrazyStorm.Core
         public bool fogEffect;
         public bool fadeEffect;
     }
-    public abstract class ParticleBase : PropertyContainer, IXmlData, IRebuildReference<ParticleType>, IGeneratePlayData, ILoadPlayData, 
+    public abstract class ParticleBase : PropertyContainer, IXmlData, IGeneratePlayData, ILoadPlayData, 
         IComparable<ParticleBase>, IPlayable
     {
         public const float FOG_TIME = 10;

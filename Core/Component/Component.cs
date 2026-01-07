@@ -28,7 +28,7 @@ namespace CrazyStorm.Core
         public float acspeedAngle;
         public bool visibility;
     }
-    public class Component : PropertyContainer, INotifyPropertyChanged, IXmlData, IRebuildReference<Component>, IGeneratePlayData, IPlayable
+    public class Component : PropertyContainer, INotifyPropertyChanged, IXmlData, IGeneratePlayData, IPlayable
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
