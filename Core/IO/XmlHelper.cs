@@ -138,40 +138,34 @@ namespace CrazyStorm.Core
 
             node.AppendChild(objectListNode);
         }
-        public static void BuildFromDictionary<K>(IDictionary<string, K> source, XmlElement node, string name)
-            where K : new()
+        public static void BuildFromDictionary<T, K>(IDictionary<T, K> source, XmlElement node, string name)
         {
             source.Clear();
             var dictionaryNode = (XmlElement)node.SelectSingleNode(name);
-            if (dictionaryNode == null)
-                return;
-
+            if (dictionaryNode == null) return;
             foreach (XmlElement childNode in dictionaryNode.ChildNodes)
             {
-                if (!childNode.HasAttribute("Key"))
-                    continue;
-
-                string key = childNode.GetAttribute("Key");
-                if (!childNode.HasAttribute("Value"))
-                    throw new System.IO.FileLoadException("FileDataError");
-
+                if (!childNode.HasAttribute("Key")) continue;
+                string keyStr = childNode.GetAttribute("Key");
+                T key = default;
+                object obj;
+                if (PropertyTypeRule.TryParse(key, keyStr, out obj)) key = (T)obj;
+                else throw new System.IO.FileLoadException("FileDataError");
+                if (!childNode.HasAttribute("Value")) throw new System.IO.FileLoadException("FileDataError");
                 string valueStr = childNode.GetAttribute("Value");
-                K temp = new K();
-                object value;
-                if (PropertyTypeRule.TryParse(temp, valueStr, out value))
-                    source[key] = (K)value;
-                else
-                    throw new System.IO.FileLoadException("FileDataError");
+                K value = default;
+                if (PropertyTypeRule.TryParse(value, valueStr, out obj)) source[key] = (K)obj;
+                else throw new System.IO.FileLoadException("FileDataError");
             }
         }
-        public static void StoreDictionary<K>(IDictionary<string,K> source, XmlDocument doc, XmlElement node, string name)
+        public static void StoreDictionary<T, K>(IDictionary<T, K> source, XmlDocument doc, XmlElement node, string name)
         {
             var dictionaryNode = doc.CreateElement(name);
             foreach (var pair in source)
             {
                 var pairNode = doc.CreateElement("Dictionary");
                 var keyAttribute = doc.CreateAttribute("Key");
-                keyAttribute.Value = pair.Key;
+                keyAttribute.Value = pair.Key.ToString();
                 pairNode.Attributes.Append(keyAttribute);
                 var valueAttribute = doc.CreateAttribute("Value");
                 valueAttribute.Value = pair.Value.ToString();

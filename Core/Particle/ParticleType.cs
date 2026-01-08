@@ -54,8 +54,6 @@ namespace CrazyStorm.Core
         string name;
         FileResource image;
         int imageID = -1;
-        FileResource sound;
-        int soundID = -1;
         ParticleTypeData data;
         #endregion
 
@@ -83,16 +81,6 @@ namespace CrazyStorm.Core
                 image = value;
                 if (PropertyChanged != null)
                     PropertyChanged(this, new PropertyChangedEventArgs("Image"));
-            }
-        }
-        public FileResource Sound
-        {
-            get { return sound; }
-            set
-            {
-                sound = value;
-                if (PropertyChanged != null)
-                    PropertyChanged(this, new PropertyChangedEventArgs("Sound"));
             }
         }
         public Vector2 StartPoint
@@ -404,13 +392,6 @@ namespace CrazyStorm.Core
                 if (int.TryParse(fileResourceAttribute, out parsedID)) imageID = parsedID;
                 else throw new System.IO.FileLoadException("FileDataError");
             }
-            if (particleTypeNode.HasAttribute("sound"))
-            {
-                string fileResourceAttribute = particleTypeNode.GetAttribute("sound");
-                int parsedID;
-                if (int.TryParse(fileResourceAttribute, out parsedID)) soundID = parsedID;
-                else throw new System.IO.FileLoadException("FileDataError");
-            }
             XmlHelper.BuildFromFields(this, particleTypeNode);
             //particleTypeData
             XmlHelper.BuildFromStruct(ref data, particleTypeNode);
@@ -423,12 +404,6 @@ namespace CrazyStorm.Core
             {
                 var fileResourceAttribute = doc.CreateAttribute("image");
                 fileResourceAttribute.Value = image.ID.ToString();
-                particleTypeNode.Attributes.Append(fileResourceAttribute);
-            }
-            if (sound != null)
-            {
-                var fileResourceAttribute = doc.CreateAttribute("sound");
-                fileResourceAttribute.Value = sound.ID.ToString();
                 particleTypeNode.Attributes.Append(fileResourceAttribute);
             }
             XmlHelper.StoreFields(this, doc, particleTypeNode);
@@ -452,25 +427,10 @@ namespace CrazyStorm.Core
                 imageID = -1;
             }
         }
-        public void RebuildSoundReferenceFromCollection(IList<FileResource> collection)
-        {
-            if (soundID != -1)
-            {
-                foreach (var target in collection)
-                {
-                    if (soundID == target.ID)
-                    {
-                        sound = target;
-                    }
-                }
-                soundID = -1;
-            }
-        }
         public List<byte> GeneratePlayData()
         {
             var particleTypeBytes = new List<byte>();
             particleTypeBytes.AddRange(BitConverter.GetBytes(image != null ? image.ID : -1));
-            particleTypeBytes.AddRange(BitConverter.GetBytes(sound != null ? sound.ID : -1));
             PlayDataHelper.GenerateStringDataFields(this, particleTypeBytes);
             //particleTypeData
             PlayDataHelper.GenerateStruct(data, particleTypeBytes);
@@ -481,7 +441,6 @@ namespace CrazyStorm.Core
             using (BinaryReader particleTypeReader = PlayDataHelper.GetBlockReader(reader))
             {
                 imageID = particleTypeReader.ReadInt32();
-                soundID = particleTypeReader.ReadInt32();
                 PlayDataHelper.ReadStringDataFields(this, particleTypeReader);
                 //particleTypeData
                 data = PlayDataHelper.ReadStruct<ParticleTypeData>(particleTypeReader);

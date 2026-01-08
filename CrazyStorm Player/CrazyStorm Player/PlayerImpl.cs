@@ -161,7 +161,7 @@ namespace CrazyStorm_Player
             pointTexture?.Dispose();
             slowModeTexture?.Dispose();
         }
-        void PlaySound(string path, float volume)
+        void PlaySound(string path)
         {
             if (!sounds.ContainsKey(path))
             {
@@ -170,7 +170,7 @@ namespace CrazyStorm_Player
                     sounds[path] = SoundEffect.FromStream(stream);
                 }
             }
-            sounds[path].Play(volume / 100f, 0f, 0f);
+            sounds[path].Play(0.5f, 0f, 0f);
         }
         void DrawParticle(SpriteBatch spriteBatch, Particle particle)
         {
@@ -272,6 +272,7 @@ namespace CrazyStorm_Player
             File.SetGlobal(SpecialVariableType.BodyPositionY, controllable.selfPos.Y);
             EventManager.CustomTypes = File.ParticleSystems[SelectedParticleSystemIndex].CustomTypes;
             EventManager.Sounds = File.Sounds;
+            EventManager.TypeSoundMap = File.ParticleSystems[SelectedParticleSystemIndex].TypeSoundMap;
             EventManager.Update();
             File.ParticleSystems[SelectedParticleSystemIndex].Update(CurrentFrame);
             var collidedCount = 0;

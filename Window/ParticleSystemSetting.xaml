@@ -161,6 +161,20 @@
                     </ScrollViewer>
                 </DockPanel>
             </TabItem>
+            <TabItem Header="{StaticResource SoundStr}">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <ListView Name="TypeSoundList" SelectionMode="Single" Grid.Row="0" ItemsSource="{Binding TypeSounds}" 
+                              SelectionChanged="TypeSoundList_SelectionChanged"/>
+                    <StackPanel Grid.Row="1" HorizontalAlignment="Right" VerticalAlignment="Bottom" Orientation="Horizontal" Margin="0,1" Height="20">
+                        <Button Name="AddTypeSound" Content="{StaticResource AddStr}" Width="40" Margin="2,0" Click="AddTypeSound_Click"/>
+                        <Button Name="DelTypeSound" Content="{StaticResource DelStr}" Width="40" Margin="2,0 " Click="DelTypeSound_Click" IsEnabled="False"/>
+                    </StackPanel>
+                </Grid>
+            </TabItem>
         </TabControl>
     </DockPanel>
 </Window>

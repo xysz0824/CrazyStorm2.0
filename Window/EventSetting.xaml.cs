@@ -113,7 +113,8 @@ namespace CrazyStorm
             //Load sounds.
             foreach (FileResource sound in sounds)
             {
-                if (sound.IsValid) SoundCombo.Items.Add(sound);
+                sound.CheckValid();
+                SoundCombo.Items.Add(sound);
             }
             //Load particle types.
             //First needs to merge repeated type name.
@@ -184,7 +185,7 @@ namespace CrazyStorm
             {
                 if (SoundCombo.SelectedItem == null) return false;
                 eventInfo.specialEvent = "PlaySound";
-                eventInfo.arguments = SoundCombo.SelectedItem + ", " + VolumeSlider.Value;
+                eventInfo.arguments = SoundCombo.SelectedItem.ToString();
             }
             else if (Loop.IsChecked == true)
             {
@@ -328,7 +329,6 @@ namespace CrazyStorm
                             break;
                         }
                     }
-                    VolumeSlider.Value = int.Parse(split[1]);
                 }
                 else if (eventInfo.specialEvent == "Loop")
                 {
@@ -647,7 +647,7 @@ namespace CrazyStorm
                 float.Parse(textBox.Text);
                 EditSpecialEvent();
             }
-            catch (Exception ex)
+            catch
             {
                 UIHelper.SetErrorToolTip(textBox, new ExpressionException("TypeError"));
             }
@@ -676,10 +676,6 @@ namespace CrazyStorm
         private void SoundCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (SoundCombo.SelectedItem != null) EditSpecialEvent();
-        }
-        private void VolumeSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
-        {
-            EditSpecialEvent();
         }
         private void SoundTestButton_Click(object sender, RoutedEventArgs e)
         {

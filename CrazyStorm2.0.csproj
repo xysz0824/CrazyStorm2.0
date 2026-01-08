@@ -182,6 +182,9 @@
     <Compile Include="Edit\Command\Property\SetPropertyCommand.cs" />
     <Compile Include="Helper\VisualHelper.cs" />
     <Compile Include="EmbeddedPlayer.cs" />
+    <Compile Include="Panel\TypeSoundPanel.xaml.cs">
+      <DependentUpon>TypeSoundPanel.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Window\JumpToFrame.xaml.cs">
       <DependentUpon>JumpToFrame.xaml</DependentUpon>
     </Compile>
@@ -198,6 +201,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Panel\FinderPanel.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Panel\TypeSoundPanel.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

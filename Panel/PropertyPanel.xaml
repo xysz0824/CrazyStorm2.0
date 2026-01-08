@@ -92,7 +92,7 @@
                             <ToolTip Name="TypeComboTip" Visibility="Hidden">
                                 <Rectangle Name="TypeImageRect">
                                     <Rectangle.Fill>
-                                        <ImageBrush ImageSource="../Images/barrages.png" TileMode="FlipY" />
+                                        <ImageBrush TileMode="FlipY" />
                                     </Rectangle.Fill>
                                 </Rectangle>
                             </ToolTip>

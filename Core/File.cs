@@ -134,7 +134,6 @@ namespace CrazyStorm.Core
                 foreach (var customType in particleSystem.CustomTypes)
                 {
                     customType.RebuildImageReferenceFromCollection(Images);
-                    customType.RebuildSoundReferenceFromCollection(Sounds);
                 }
                 //Collect all particle types
                 var particleTypes = new List<ParticleType>();
@@ -323,7 +322,6 @@ namespace CrazyStorm.Core
                 foreach (var customType in particleSystem.CustomTypes)
                 {
                     customType.RebuildImageReferenceFromCollection(file.Images);
-                    customType.RebuildSoundReferenceFromCollection(file.Sounds);
                 }
                 //Collect all particle types
                 var particleTypes = new List<ParticleType>();

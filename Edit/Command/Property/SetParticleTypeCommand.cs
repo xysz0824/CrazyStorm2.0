@@ -19,20 +19,17 @@ namespace CrazyStorm
             base.Redo(stack);
             var emitter = Parameter[0] as Emitter;
             var newType = Parameter[1] as ParticleType;
-            var newColor = Parameter[2] as ParticleColor?;
-            var update = Parameter[3] as Action<Emitter, ParticleType, ParticleColor>;
+            var update = Parameter[2] as Action<Emitter, ParticleType>;
             History[0] = emitter.Particle.Type;
-            History[1] = emitter.Particle.Type.Color;
-            update(emitter, newType, newColor.Value);
+            update(emitter, newType);
         }
         public override void Undo(CommandStack stack)
         {
             base.Undo(stack);
             var emitter = Parameter[0] as Emitter;
             var oldType = History[0] as ParticleType;
-            var oldColor = History[1] as ParticleColor?;
-            var update = Parameter[3] as Action<Emitter, ParticleType, ParticleColor>;
-            update(emitter, oldType, oldColor.Value);
+            var update = Parameter[2] as Action<Emitter, ParticleType>;
+            update(emitter, oldType);
         }
     }
 }

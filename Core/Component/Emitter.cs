@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Xml;
@@ -117,6 +118,12 @@ namespace CrazyStorm.Core
                 ParticleBase newParticle = ParticleManager.GetParticle(LayerID, Template);
                 newParticle.ParticleEventGroups = EmitterEventGroups;
                 Particles.AddLast(newParticle);
+            }
+            if (EventManager.Sounds != null && EventManager.TypeSoundMap != null && 
+                EventManager.TypeSoundMap.ContainsKey(Template.Type.ID))
+            {
+                var sound = EventManager.Sounds.FirstOrDefault((item) => item.ID == EventManager.TypeSoundMap[Template.Type.ID]);
+                if (sound != null) EventManager.PlaySound(sound.AbsolutePath);
             }
         }
         #endregion

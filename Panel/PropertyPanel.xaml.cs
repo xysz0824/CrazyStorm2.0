@@ -2,10 +2,11 @@
  * The MIT License (MIT)
  * Copyright (c) StarX 2026
  */
+using CrazyStorm.Core;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
-using System.Text;
 using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
@@ -17,11 +18,6 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using CrazyStorm.Core;
-using System.Collections.ObjectModel;
-using CrazyStorm.Expression;
-using System.Collections;
-using SharpDX;
 
 namespace CrazyStorm
 {
@@ -280,8 +276,7 @@ namespace CrazyStorm
                         break;
                     }
 
-                if (!exist)
-                    typesNorepeat.Add(item);
+                if (!exist) typesNorepeat.Add(item);
             }
             TypeCombo.ItemsSource = typesNorepeat;
             ParticleType type = null;
@@ -299,29 +294,30 @@ namespace CrazyStorm
             {
                 //Select specific type.
                 foreach (var item in typesNorepeat)
+                {
                     if (item.Name == type.Name)
                     {
                         TypeCombo.SelectedItem = item;
                         break;
                     }
+                }
                 //Select specific color.
                 InitializeColorCombo();
                 for (int i = 0; i < ColorCombo.Items.Count; ++i)
+                {
                     if (ExpressionHelper.Translate(type.Color.ToString()) == (string)((ColorCombo.Items[i] as ComboBoxItem).Content))
                     {
                         ColorCombo.SelectedIndex = i;
                         break;
                     }
-            }
-            else
-            {
-                if (component is Emitter)
-                {
-                    (component as Emitter).Particle.Type = types[0];
-                    type = (component as Emitter).Particle.Type;
-                    TypeCombo.SelectedItem = typesNorepeat[0];
-                    ColorCombo.SelectedIndex = 0;
                 }
+            }
+            else if (component is Emitter)
+            {
+                (component as Emitter).Particle.Type = types[0];
+                type = (component as Emitter).Particle.Type;
+                TypeCombo.SelectedItem = typesNorepeat[0];
+                ColorCombo.SelectedIndex = 0;
             }
         }
         #endregion
@@ -448,20 +444,25 @@ namespace CrazyStorm
                 InitializeColorCombo();
                 if (ColorCombo.Items.Count > 0) ColorCombo.SelectedIndex = 0;
                 //Show default type preview
+                TypeComboTip.Visibility = Visibility.Visible;
+                TypeImageRect.Width = selectedType.Width;
+                TypeImageRect.Height = selectedType.Height;
+                var imageBrush = TypeImageRect.Fill as ImageBrush;
                 if (selectedType.ID >= ParticleType.DefaultTypeIndex)
                 {
-                    TypeComboTip.Visibility = Visibility.Visible;
-                    TypeImageRect.Width = selectedType.Width;
-                    TypeImageRect.Height = selectedType.Height;
-                    var imageBrush = TypeImageRect.Fill as ImageBrush;
-                    var bitmap = imageBrush.ImageSource as BitmapFrame;
-                    imageBrush.Viewbox = new Rect(selectedType.StartPointX / bitmap.PixelWidth,
-                        selectedType.StartPointY / bitmap.PixelHeight,
-                        (float)selectedType.Width / bitmap.PixelWidth,
-                        (float)selectedType.Height / bitmap.PixelHeight);
+                    var path = "pack://application:,,,/Images/barrages.png";
+                    imageBrush.ImageSource = new BitmapImage(new Uri(path, UriKind.Absolute));
                 }
                 else
-                    TypeComboTip.Visibility = Visibility.Hidden;
+                {
+                    var path = selectedType.Image.AbsolutePath;
+                    imageBrush.ImageSource = new BitmapImage(new Uri(path));
+                }
+                var bitmap = imageBrush.ImageSource as BitmapImage;
+                imageBrush.Viewbox = new Rect(selectedType.StartPointX / bitmap.PixelWidth,
+                    selectedType.StartPointY / bitmap.PixelHeight,
+                    (float)selectedType.Width / bitmap.PixelWidth, 
+                    (float)selectedType.Height / bitmap.PixelHeight);
             }
         }
         bool typeChangingByUI;
@@ -478,30 +479,39 @@ namespace CrazyStorm
                 var str = (string)(ColorCombo.SelectedItem as ComboBoxItem).Content;
                 str = ExpressionHelper.ReverseTranslate(str);
                 selectedColor = (ParticleColor)Enum.Parse(typeof(ParticleColor), str);
+                foreach (var type in types)
+                {
+                    if (type.Name == selectedType.Name && type.Color == selectedColor)
+                    {
+                        selectedType = type;
+                        break;
+                    }
+                }
                 if (typeChangingByUI)
                 {
-                    new SetParticleTypeCommand().Do(commandStack, component as Emitter, selectedType, selectedColor,
-                        new Action<Emitter, ParticleType, ParticleColor>(ParticleTypeUpdate));
+                    new SetParticleTypeCommand().Do(commandStack, component as Emitter, selectedType,
+                        new Action<Emitter, ParticleType>(ParticleTypeUpdate));
                     typeChangingByUI = false;
                     ColorCombo.Focusable = false;
                 }
             }
         }
-        private void ParticleTypeUpdate(Emitter emitter, ParticleType type, ParticleColor color)
+        private void ParticleTypeUpdate(Emitter emitter, ParticleType type)
         {
             if (this == null) return;
+            emitter.Particle.Type = type;
+            var types = TypeCombo.ItemsSource as List<ParticleType>;
             foreach (var item in types)
             {
-                if (item.Name == type.Name && item.Color == color)
+                if (item.Name == type.Name)
                 {
-                    emitter.Particle.Type = item;
                     TypeCombo.SelectedItem = item;
-                    ColorCombo.SelectedIndex = ColorCombo.Items.IndexOf(
-                        ColorCombo.Items.Cast<ComboBoxItem>().First(i => (string)i.Content == 
-                        ExpressionHelper.Translate(item.Color.ToString())));
                     break;
                 }
             }
+            ColorCombo.SelectedIndex = ColorCombo.Items.IndexOf(
+                ColorCombo.Items.Cast<ComboBoxItem>().First(i => (string)i.Content == 
+                ExpressionHelper.Translate(type.Color.ToString())));
         }
         private void AddComponentEvent_Click(object sender, RoutedEventArgs e)
         {

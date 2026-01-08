@@ -32,7 +32,8 @@ namespace CrazyStorm.Core
         int customTypeIndex;
         [XmlAttribute]
         int layerIndex;
-        IDictionary<string, int> componentIndex;
+        IDictionary<int, int> componentIndex;
+        IDictionary<int, int> typeSoundMap;
         #endregion
 
         #region Public Members
@@ -65,6 +66,7 @@ namespace CrazyStorm.Core
         public IList<Component> ComponentTree { get { return componentTree; } }
         public int CustomTypeIndex { get { return customTypeIndex++; } }
         public int LayerIndex { get { return layerIndex++; } }
+        public IDictionary<int, int> TypeSoundMap { get { return typeSoundMap; } }
         #endregion
 
         #region Constructor
@@ -80,7 +82,8 @@ namespace CrazyStorm.Core
             customTypes = new GenericContainer<ParticleType>();
             layers = new GenericContainer<Layer>();
             componentTree = new GenericContainer<Component>();
-            componentIndex = new Dictionary<string, int>();
+            componentIndex = new Dictionary<int, int>();
+            typeSoundMap = new Dictionary<int, int>();
         }
         public ParticleSystem(string name, string defaultLayerName) : this(name)
         {
@@ -92,17 +95,16 @@ namespace CrazyStorm.Core
         public int GetComponentIndex()
         {
             int index = 0;
-            foreach (var pair in componentIndex)
-                index += pair.Value;
-            
+            foreach (var pair in componentIndex) index += pair.Value;
             return index;
         }
         public int GetAndIncreaseComponentIndex(string componentType)
         {
-            if (!componentIndex.ContainsKey(componentType))
-                componentIndex[componentType] = 0;
+            var typeHash = StringUtil.StableHash32_Fnv1a(componentType);
+            if (!componentIndex.ContainsKey(typeHash))
+                componentIndex[typeHash] = 0;
 
-            return componentIndex[componentType]++;
+            return componentIndex[typeHash]++;
         }
         public void AddComponentToLayer(Layer layer, Component component)
         {
@@ -163,8 +165,10 @@ namespace CrazyStorm.Core
             clone.layers = new GenericContainer<Layer>();
             clone.componentTree = new GenericContainer<Component>();
             foreach (var layer in layers) clone.layers.Add(layer.Clone() as Layer);
-            clone.componentIndex = new Dictionary<string, int>();
-            foreach (var index in componentIndex) clone.componentIndex[index.Key] = index.Value;
+            clone.componentIndex = new Dictionary<int, int>();
+            foreach (var kv in componentIndex) clone.componentIndex[kv.Key] = kv.Value;
+            clone.typeSoundMap = new Dictionary<int, int>();
+            foreach (var kv in typeSoundMap) clone.typeSoundMap[kv.Key] = kv.Value;
             return clone;
         }
         public XmlElement BuildFromXml(XmlElement node)
@@ -179,6 +183,8 @@ namespace CrazyStorm.Core
             XmlHelper.BuildFromObjectList(layers, new Layer(""), particleSystemNode, "Layers");
             //componentIndex
             XmlHelper.BuildFromDictionary(componentIndex, particleSystemNode, "ComponentIndex");
+            //typeSoundMap
+            XmlHelper.BuildFromDictionary(typeSoundMap, particleSystemNode, "TypeSoundMap");
             return particleSystemNode;
         }
         public XmlElement StoreAsXml(XmlDocument doc, XmlElement node)
@@ -191,6 +197,8 @@ namespace CrazyStorm.Core
             XmlHelper.StoreObjectList(layers, doc, particleSystemNode, "Layers");
             //componentIndex
             XmlHelper.StoreDictionary(componentIndex, doc, particleSystemNode, "ComponentIndex");
+            //typeSoundMap
+            XmlHelper.StoreDictionary(typeSoundMap, doc, particleSystemNode, "TypeSoundMap");
             node.AppendChild(particleSystemNode);
             return particleSystemNode;
         }
@@ -205,6 +213,13 @@ namespace CrazyStorm.Core
             PlayDataHelper.GenerateObjectList(customTypes, particleSystemBytes);
             //layers
             PlayDataHelper.GenerateObjectList(layers, particleSystemBytes);
+            //typeSoundMap
+            particleSystemBytes.AddRange(BitConverter.GetBytes(typeSoundMap.Count));
+            foreach (var typeSound in typeSoundMap)
+            {
+                particleSystemBytes.AddRange(BitConverter.GetBytes(typeSound.Key));
+                particleSystemBytes.AddRange(BitConverter.GetBytes(typeSound.Value));
+            }
             return PlayDataHelper.CreateBlock(particleSystemBytes);
         }
         public void LoadPlayData(BinaryReader reader, float version)
@@ -223,6 +238,15 @@ namespace CrazyStorm.Core
                 {
                     //Set id of layer to components of layer
                     Layers[i].SetComponentsID(i);
+                }
+                //typeSoundMap
+                typeSoundMap = new Dictionary<int, int>();
+                var count = particleSystemReader.ReadInt32();
+                for (int i = 0; i < count; ++i)
+                {
+                    var key = particleSystemReader.ReadInt32();
+                    var value = particleSystemReader.ReadInt32();
+                    typeSoundMap.Add(key, value);
                 }
             }
         }

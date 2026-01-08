@@ -2,8 +2,11 @@
  * The MIT License (MIT)
  * Copyright (c) StarX 2026
  */
+using CrazyStorm.Core;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Windows;
@@ -14,7 +17,6 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
-using CrazyStorm.Core;
 
 namespace CrazyStorm
 {
@@ -25,6 +27,8 @@ namespace CrazyStorm
         ParticleSystem selectedParticle;
         ParticleType selectedType;
         TabItem selectedTab;
+        List<ParticleType> types;
+        List<FileResource> sounds;
         #endregion
 
         #region Constructor
@@ -47,10 +51,24 @@ namespace CrazyStorm
             TypeList.ItemsSource = selectedParticle.CustomTypes;
             file.UpdateResource();
             //Load images.
-            foreach (FileResource item in file.Images)
+            foreach (var image in file.Images)
             {
-                if (item.IsValid)
-                    ImageCombo.Items.Add(item);
+                image.CheckValid();
+                ImageCombo.Items.Add(image);
+            }
+            types = new List<ParticleType>();
+            foreach (var type in ParticleType.DefaultTypes) types.Add(type);
+            foreach (var type in selectedParticle.CustomTypes) types.Add(type);
+            sounds = new List<FileResource>();
+            foreach (var sound in file.Sounds) sounds.Add(sound);
+            //Load type sounds
+            foreach (var typeSound in selectedParticle.TypeSoundMap)
+            {
+                var type = types.FirstOrDefault((item) => item.ID == typeSound.Key);
+                var sound = sounds.FirstOrDefault((item) => item.ID == typeSound.Value);
+                var typeSoundPanel = new TypeSoundPanel(types, sounds, selectedParticle, type, type.Color, sound);
+                TypeSoundList.Items.Add(typeSoundPanel);
+                typeSoundPanel.CanChangeMap = true;
             }
         }
         void UpdateColor()
@@ -189,6 +207,30 @@ namespace CrazyStorm
         private void LastAsTop_Checked(object sender, RoutedEventArgs e)
         {
             selectedParticle.OrderType = OrderType.LastAsTop;
+        }
+        private void TypeSoundList_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (TypeSoundList.SelectedItem != null) DelTypeSound.IsEnabled = true;
+        }
+        private void AddTypeSound_Click(object sender, RoutedEventArgs e)
+        {
+            var newTypeSoundPanel = new TypeSoundPanel(types, sounds, selectedParticle, null, default, null);
+            TypeSoundList.Items.Add(newTypeSoundPanel);
+            newTypeSoundPanel.CanChangeMap = true;
+            DelTypeSound.IsEnabled = true;
+        }
+        private void DelTypeSound_Click(object sender, RoutedEventArgs e)
+        {
+            var selectedPanel = TypeSoundList.SelectedItem as TypeSoundPanel;
+            if (selectedPanel != null)
+            {
+                var selectedType = selectedPanel.TypeCombo.SelectedItem as ParticleType;
+                if (selectedType != null) selectedParticle.TypeSoundMap.Remove(selectedType.ID);
+                var index = TypeSoundList.SelectedIndex;
+                TypeSoundList.Items.Remove(selectedPanel);
+                TypeSoundList.SelectedIndex = index - 1;
+            }
+            DelTypeSound.IsEnabled = TypeSoundList.Items.Count > 0;
         }
         #endregion
     }

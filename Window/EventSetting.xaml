@@ -126,8 +126,7 @@
                     <MediaElement Name="MediaPlayer" MediaEnded="MediaPlayer_MediaEnded"></MediaElement>
                     <Button Margin="1,0" Name="SoundTestButton" Content="{StaticResource TestStr}" Click="SoundTestButton_Click"/>
                     <Label Content="{StaticResource SoundVolumeStr}" />
-                    <Slider Name="VolumeSlider" VerticalAlignment="Center" AutoToolTipPlacement="BottomRight" Maximum="100" Value="50" IsSnapToTickEnabled="True" SmallChange="1"
-                            ValueChanged="VolumeSlider_ValueChanged"></Slider>
+                    <Slider Name="VolumeSlider" VerticalAlignment="Center" AutoToolTipPlacement="BottomRight" Maximum="100" Value="50" IsSnapToTickEnabled="True" SmallChange="1"></Slider>
                 </DockPanel>
                 <DockPanel Name="LoopPanel" Margin="0,1" Visibility="Collapsed">
                     <Label Content="{StaticResource StopConditionStr}" />

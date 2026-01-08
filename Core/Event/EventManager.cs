@@ -24,9 +24,8 @@ namespace CrazyStorm.Core
                     if (OnSoundPlay != null)
                     {
                         var label = args[0];
-                        var volume = float.Parse(args[1]);
                         var sound = Sounds.FirstOrDefault((item) => string.Equals(item.Label, label));
-                        if (sound != null) OnSoundPlay(sound.AbsolutePath, volume);
+                        if (sound != null) OnSoundPlay(sound.AbsolutePath);
                     }
                     return false;
                 } },
@@ -67,13 +66,15 @@ namespace CrazyStorm.Core
                     return false;
                 } },
             };
-        public delegate void SoundPlayHandler(string path, float volume);
+        public delegate void SoundPlayHandler(string path);
         public static event SoundPlayHandler OnSoundPlay;
+        public static bool CanSoundPlay => OnSoundPlay != null;
 
         static List<EventExecutor> executorList;
         static Dictionary<string, Dictionary<string, TypeSet>> cache;
         public static IList<ParticleType> CustomTypes { get; set; }
         public static IList<FileResource> Sounds { get; set; }
+        public static IDictionary<int, int> TypeSoundMap { get; set; }
         public static void Initialize()
         {
             OnSoundPlay = null;
@@ -294,6 +295,10 @@ namespace CrazyStorm.Core
         private static string GetUniqueKey(PropertyContainer propertyContainer, PropertyContainer bindingContainer)
         {
             return (propertyContainer as Component).ID + "_" + (bindingContainer as ParticleBase).ID;
+        }
+        public static void PlaySound(string path)
+        {
+            OnSoundPlay?.Invoke(path);
         }
     }
 }

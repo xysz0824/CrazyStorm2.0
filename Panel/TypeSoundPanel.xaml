@@ -1,0 +1,34 @@
+﻿<UserControl x:Class="CrazyStorm.TypeSoundPanel"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:CrazyStorm"
+             mc:Ignorable="d">
+    <GroupBox HorizontalContentAlignment="Stretch">
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch">
+            <Label Content="{StaticResource TypeStr}" HorizontalContentAlignment="Center"/>
+            <ComboBox Name="TypeCombo" Width="120" VerticalContentAlignment="Center" 
+                      SelectionChanged="TypeCombo_SelectionChanged" DisplayMemberPath="Name">
+                <ComboBox.ToolTip>
+                    <ToolTip Name="TypeComboTip" Visibility="Hidden">
+                        <Rectangle Name="TypeImageRect">
+                            <Rectangle.Fill>
+                                <ImageBrush TileMode="FlipY" />
+                            </Rectangle.Fill>
+                        </Rectangle>
+                    </ToolTip>
+                </ComboBox.ToolTip>
+            </ComboBox>
+            <Label Content="{StaticResource RGBStr}" HorizontalContentAlignment="Center"/>
+            <ComboBox Name="ColorCombo" Width="50" Margin="0,1" VerticalContentAlignment="Center" SelectionChanged="ColorCombo_SelectionChanged" />
+            <Label Content="{StaticResource SoundResourceStr}" />
+            <ComboBox Name="SoundCombo" VerticalContentAlignment="Center" Width="80" SelectionChanged="SoundCombo_SelectionChanged"
+                      DisplayMemberPath="Label"/>
+            <MediaElement Name="MediaPlayer" MediaEnded="MediaPlayer_MediaEnded"></MediaElement>
+            <Button Margin="1,0" Name="SoundTestButton" Content="{StaticResource TestStr}" Click="SoundTestButton_Click"/>
+            <Label Content="{StaticResource SoundVolumeStr}" />
+            <Slider Name="VolumeSlider" VerticalAlignment="Center" Width="50" AutoToolTipPlacement="BottomRight" Maximum="100" Value="50" IsSnapToTickEnabled="True" SmallChange="1"></Slider>
+        </StackPanel>
+    </GroupBox>
+</UserControl>
