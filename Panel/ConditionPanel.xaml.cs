@@ -399,7 +399,11 @@ namespace CrazyStorm
         }
         public void MapCondition(string condition)
         {
-            if (string.IsNullOrEmpty(condition)) return;
+            if (string.IsNullOrEmpty(condition))
+            {
+                MapEmptyConditionToMenu();
+                return;
+            }
             ConditionFunctionContent.Text = ExpressionHelper.Translate(condition);
             MapConditionToMenu(condition, false);
         }

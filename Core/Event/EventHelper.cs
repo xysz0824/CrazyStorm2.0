@@ -344,10 +344,10 @@ namespace CrazyStorm.Core
             {
                 if (str.Contains($" {name} "))
                 {
-                    return true;
+                    return false;
                 }
             }
-            return false;
+            return true;
         }
     }
 }

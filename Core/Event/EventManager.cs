@@ -116,6 +116,7 @@ namespace CrazyStorm.Core
                     return false;
                 } },
             };
+        public static Func<string, PropertyContainer, string[], VMInstruction[], bool> OnFunctionCall;
         public delegate void SoundPlayHandler(string path);
         public static event SoundPlayHandler OnSoundPlay;
         public static bool CanSoundPlay => OnSoundPlay != null;
@@ -261,7 +262,11 @@ namespace CrazyStorm.Core
         public static bool ExecuteSpecialEvent(PropertyContainer propertyContainer, string eventName, string[] arguments,
             VMInstruction[] argumentExpression)
         {
-            if (!SpecialEvents.ContainsKey(eventName)) return false;
+            if (!SpecialEvents.ContainsKey(eventName))
+            {
+                if (OnFunctionCall!= null) return OnFunctionCall.Invoke(eventName, propertyContainer, arguments, argumentExpression);
+                else return false;
+            }
             return SpecialEvents[eventName](propertyContainer, arguments, argumentExpression);
         }
         public static void Update()
