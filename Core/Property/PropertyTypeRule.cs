@@ -11,6 +11,26 @@ namespace CrazyStorm.Core
 {
     public class PropertyTypeRule
     {
+        public static PropertyType GetValueType(Type type, string name)
+        {
+            var properties = type.GetProperties();
+            foreach (var property in properties)
+            {
+                if (property.Name != name) continue;
+                var attributes = property.GetCustomAttributes(false);
+                foreach (var attribute in attributes)
+                {
+                    if (attribute is StringPropertyAttribute) return PropertyType.String;
+                    if (attribute is BoolPropertyAttribute) return PropertyType.Boolean;
+                    if (attribute is IntPropertyAttribute) return PropertyType.Int32;
+                    if (attribute is FloatPropertyAttribute) return PropertyType.Single;
+                    if (attribute is Vector2PropertyAttribute) return PropertyType.Vector2;
+                    if (attribute is RGBPropertyAttribute) return PropertyType.RGB;
+                    if (attribute is EnumPropertyAttribute) return PropertyType.Enum;
+                }
+            }
+            return PropertyType.IllegalType;
+        }
         public static PropertyType GetValueType(object value)
         {
             if (value is bool)

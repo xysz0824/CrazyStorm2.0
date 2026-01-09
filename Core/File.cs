@@ -16,7 +16,7 @@ using System.Xml.Serialization;
 
 namespace CrazyStorm.Core
 {
-    public class File : IXmlData, IGeneratePlayData, ILoadPlayData
+    public partial class File : IXmlData, IGeneratePlayData, ILoadPlayData
     {
         #region Private Members
         IList<ParticleSystem> particleSystems;
@@ -111,6 +111,7 @@ namespace CrazyStorm.Core
         }
         public static bool CheckVersion(string filePath)
         {
+            if (IsCS1(filePath)) return true;
             var doc = new XmlDocument();
             doc.Load(filePath);
             var root = (XmlElement)doc.SelectSingleNode(VersionInfo.AppName.Replace(" ", ""));
@@ -166,6 +167,9 @@ namespace CrazyStorm.Core
             }
         }
         public void Load(string filePath)
+        {
+            if (IsCS1(filePath)) ConvertFromCS1(filePath);
+            else
             {
                 var doc = new XmlDocument();
                 doc.Load(filePath);
@@ -178,6 +182,7 @@ namespace CrazyStorm.Core
                     RebuildComponentTree();
                 }
             }
+        }
         public void Save(string filePath)
         {
             var doc = new XmlDocument();

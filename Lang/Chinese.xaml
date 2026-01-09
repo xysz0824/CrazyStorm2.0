@@ -257,7 +257,7 @@
     <sys:String x:Key="SoundTypeStr">WAV音效(*.wav)|*.wav</sys:String>
     <sys:String x:Key="BackGroundImageTypeStr">JPEG图像(*.jpg)|*.jpg|PNG图像(*.png)|*.png</sys:String>
     <sys:String x:Key="PlayerTypeStr">播放器程序(*.exe)|*.exe</sys:String>
-    <sys:String x:Key="ProjectFileExtensionStr">弹幕工程文件(*.bgp)|*.bgp</sys:String>
+    <sys:String x:Key="ProjectFileExtensionStr">弹幕工程文件(*.bgp)|*.bgp|旧版弹幕文件(*.mbg)|*.mbg</sys:String>
     <sys:String x:Key="DoubleClickTipStr">继续双击进入属性面板</sys:String>
     <sys:String x:Key="ComponentUnitStr">个组件</sys:String>
     <sys:String x:Key="ResultCountStr">找到 {0} 个</sys:String>

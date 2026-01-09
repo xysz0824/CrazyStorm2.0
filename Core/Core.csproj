@@ -60,6 +60,7 @@
     <Compile Include="Component\Center.cs" />
     <Compile Include="Component\ComponentFactory.cs" />
     <Compile Include="Component\Emitter.cs" />
+    <Compile Include="ConvertPart.cs" />
     <Compile Include="Event\EventExecutor.cs" />
     <Compile Include="Event\EventGroup.cs" />
     <Compile Include="Event\EventHelper.cs" />
