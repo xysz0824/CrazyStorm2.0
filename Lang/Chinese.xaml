@@ -147,6 +147,7 @@
     <sys:String x:Key="LoopStr">循环执行</sys:String>
     <sys:String x:Key="ChangeTypeStr">改变类型</sys:String>
     <sys:String x:Key="GlobalEventStr">全局事件</sys:String>
+    <sys:String x:Key="RecoverStr">恢复初始</sys:String>
     <sys:String x:Key="GotoFrameStr">跳转</sys:String>
     <sys:String x:Key="QuakeScreenStr">震屏</sys:String>
     <sys:String x:Key="StopScreenStr">停滞</sys:String>

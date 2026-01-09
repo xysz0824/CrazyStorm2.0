@@ -14,9 +14,9 @@ namespace CrazyStorm.Core
         public static readonly Dictionary<string, Func<PropertyContainer, string[], VMInstruction[], bool>> SpecialEvents =
             new Dictionary<string, Func<PropertyContainer, string[], VMInstruction[], bool>>()
             {
-                { "EmitParticle", (pc, args, expr) => 
+                { "EmitParticle", (pc, args, expr) =>
                 {
-                    (pc as Emitter).EmitParticle();
+                    (pc as Emitter)?.EmitParticle();
                     return false;
                 } },
                 { "PlaySound", (pc, args, expr) =>
@@ -63,6 +63,11 @@ namespace CrazyStorm.Core
                 { "StopScreen", (pc, args, expr) =>
                 {
                     //TODO : StopScreen
+                    return false;
+                } },
+                { "Recover", (pc, args, expr) =>
+                {
+                    (pc as Component)?.Reset();
                     return false;
                 } },
             };

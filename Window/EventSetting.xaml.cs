@@ -211,6 +211,11 @@ namespace CrazyStorm
                 eventInfo.specialEvent = GlobalEventStrings[GlobalEventTypeCombo.SelectedIndex * 3];
                 eventInfo.arguments = GlobalEventParam1Value.Text + "," + GlobalEventParam2Value.Text;
             }
+            else if (Recover.IsChecked == true)
+            {
+                eventInfo.specialEvent = "Recover";
+                eventInfo.arguments = string.Empty;
+            }
             else return false;
             eventInfo.isSpecialEvent = true;
             text = EventHelper.BuildEvent(eventInfo, false);
@@ -272,6 +277,7 @@ namespace CrazyStorm
             GlobalEventParam2Value.Text = string.Empty;
             TypeCombo.SelectedIndex = -1;
             ColorCombo.SelectedIndex = -1;
+            Recover.IsChecked = false;
         }
         void MapEventText(string text)
         {
@@ -290,6 +296,7 @@ namespace CrazyStorm
             buttonMap["PlaySound"] = new[] { PlaySound };
             buttonMap["Loop"] = new[] { Loop };
             buttonMap["ChangeType"] = new[] { ChangeType };
+            buttonMap["Recover"] = new[] { Recover };
             for (int i = 0; i < GlobalEventStrings.Length / 3; ++i)
             {
                 buttonMap[GlobalEventStrings[i * 3]] = new[] { GlobalEvent };
@@ -487,6 +494,14 @@ namespace CrazyStorm
             GlobalEventPanel.Visibility = Visibility.Visible;
             GlobalEventParamPanel.Visibility = GlobalEventTypeCombo.SelectedItem != null ? 
                 Visibility.Visible : Visibility.Collapsed;
+            EditSpecialEvent();
+        }
+        private void RecoverButton_Checked(object sender, RoutedEventArgs e)
+        {
+            PlaySoundPanel.Visibility = Visibility.Collapsed;
+            LoopPanel.Visibility = Visibility.Collapsed;
+            ChangeTypePanel.Visibility = Visibility.Collapsed;
+            GlobalEventPanel.Visibility = Visibility.Collapsed;
             EditSpecialEvent();
         }
         private void AddEvent_Click(object sender, RoutedEventArgs e)
