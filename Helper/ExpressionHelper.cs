@@ -13,7 +13,7 @@ namespace CrazyStorm
     {
         public static string FindTranslation(string original)
         {
-            original = $"{original}Str";
+            var str = $"{original}Str";
             var merged = App.Current.Resources.MergedDictionaries;
             var lang = merged.Where(d => d.Source != null && d.Source.OriginalString.StartsWith("Lang\\"));
             foreach (var langE in lang)
@@ -24,13 +24,13 @@ namespace CrazyStorm
                     if (resourceKey == null) continue;
                     var resourceValue = e.Value as string;
                     if (resourceValue == null) continue;
-                    if (resourceKey == original)
+                    if (resourceKey == str)
                     {
                         return resourceValue;
                     }
                 }
             }
-            return null;
+            return original;
         }
         public static string FindReverseTranslation(string translated)
         {
@@ -50,7 +50,7 @@ namespace CrazyStorm
                     }
                 }
             }
-            return null;
+            return translated;
         }
         public static string TranslateProperty(string properyName)
         {

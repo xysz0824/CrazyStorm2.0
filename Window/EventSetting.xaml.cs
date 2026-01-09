@@ -190,7 +190,6 @@ namespace CrazyStorm
             else if (Loop.IsChecked == true)
             {
                 if (string.IsNullOrEmpty(StopCondition.Text)) return false;
-                //Check if there have errors
                 if (UIHelper.HasError(StopCondition)) return false;
                 string arguments = string.Empty;
                 arguments = ExpressionHelper.ReverseTranslate(StopCondition.Text);
@@ -211,10 +210,14 @@ namespace CrazyStorm
                 eventInfo.specialEvent = GlobalEventStrings[GlobalEventTypeCombo.SelectedIndex * 3];
                 eventInfo.arguments = GlobalEventParam1Value.Text + "," + GlobalEventParam2Value.Text;
             }
-            else if (Recover.IsChecked == true)
+            else if (OtherFunction.IsChecked == true)
             {
-                eventInfo.specialEvent = "Recover";
-                eventInfo.arguments = string.Empty;
+                if (string.IsNullOrEmpty(OtherFunctionLine.Text)) return false;
+                if (UIHelper.HasError(OtherFunctionLine)) return false;
+                var line = ExpressionHelper.ReverseTranslate(OtherFunctionLine.Text);
+                var split = line.Split('(');
+                eventInfo.specialEvent = split[0];
+                eventInfo.arguments = split.Length >= 2 ? split[1].Split(')')[0] : string.Empty;
             }
             else return false;
             eventInfo.isSpecialEvent = true;
@@ -277,7 +280,8 @@ namespace CrazyStorm
             GlobalEventParam2Value.Text = string.Empty;
             TypeCombo.SelectedIndex = -1;
             ColorCombo.SelectedIndex = -1;
-            Recover.IsChecked = false;
+            OtherFunction.IsChecked = false;
+            OtherFunctionLine.Text = string.Empty;
         }
         void MapEventText(string text)
         {
@@ -296,7 +300,6 @@ namespace CrazyStorm
             buttonMap["PlaySound"] = new[] { PlaySound };
             buttonMap["Loop"] = new[] { Loop };
             buttonMap["ChangeType"] = new[] { ChangeType };
-            buttonMap["Recover"] = new[] { Recover };
             for (int i = 0; i < GlobalEventStrings.Length / 3; ++i)
             {
                 buttonMap[GlobalEventStrings[i * 3]] = new[] { GlobalEvent };
@@ -324,7 +327,17 @@ namespace CrazyStorm
             }
             else
             {
-                foreach (var button in buttonMap[eventInfo.specialEvent]) button.IsChecked = true;
+                if (buttonMap.ContainsKey(eventInfo.specialEvent))
+                {
+                    foreach (var button in buttonMap[eventInfo.specialEvent]) button.IsChecked = true;
+                }
+                else
+                {
+                    OtherFunction.IsChecked = true;
+                    OtherFunctionLine.Text = ExpressionHelper.Translate(string.Format("{0}({1})", eventInfo.specialEvent,
+                        eventInfo.arguments));
+                    return;
+                }
                 string[] split = eventInfo.arguments.Split(',');
                 if (eventInfo.specialEvent == "PlaySound")
                 {
@@ -333,13 +346,14 @@ namespace CrazyStorm
                         if ((SoundCombo.Items[i] as FileResource).Label == split[0])
                         {
                             SoundCombo.SelectedIndex = i;
-                            break;
+                            return;
                         }
                     }
                 }
                 else if (eventInfo.specialEvent == "Loop")
                 {
                     StopCondition.Text = ExpressionHelper.Translate(split[0].Trim());
+                    return;
                 }
                 else if (eventInfo.specialEvent == "ChangeType")
                 {
@@ -351,8 +365,8 @@ namespace CrazyStorm
                             break;
                         }
                     }
-                    if (TypeCombo.SelectedItem != null)
-                        ColorCombo.SelectedIndex = int.Parse(split[1].Trim());
+                    if (TypeCombo.SelectedItem != null) ColorCombo.SelectedIndex = int.Parse(split[1].Trim());
+                    return;
                 }
                 else
                 {
@@ -363,7 +377,7 @@ namespace CrazyStorm
                             GlobalEventTypeCombo.SelectedIndex = i;
                             GlobalEventParam1Value.Text = split[0].Trim();
                             GlobalEventParam2Value.Text = split[1].Trim();
-                            break;
+                            return;
                         }
                     }
                 }
@@ -462,6 +476,7 @@ namespace CrazyStorm
             PlaySoundPanel.Visibility = Visibility.Collapsed;
             LoopPanel.Visibility = Visibility.Collapsed;
             ChangeTypePanel.Visibility = Visibility.Collapsed;
+            OtherFunctionPanel.Visibility = Visibility.Collapsed;
             EditSpecialEvent();
         }
         private void PlaySoundButton_Checked(object sender, RoutedEventArgs e)
@@ -470,6 +485,7 @@ namespace CrazyStorm
             LoopPanel.Visibility = Visibility.Collapsed;
             ChangeTypePanel.Visibility = Visibility.Collapsed;
             GlobalEventPanel.Visibility = Visibility.Collapsed;
+            OtherFunctionPanel.Visibility = Visibility.Collapsed;
             EditSpecialEvent();
         }
         private void LoopButton_Checked(object sender, RoutedEventArgs e)
@@ -478,6 +494,7 @@ namespace CrazyStorm
             LoopPanel.Visibility = Visibility.Visible;
             ChangeTypePanel.Visibility = Visibility.Collapsed;
             GlobalEventPanel.Visibility = Visibility.Collapsed;
+            OtherFunctionPanel.Visibility = Visibility.Collapsed;
             EditSpecialEvent();
         }
         private void ChangeTypeButton_Checked(object sender, RoutedEventArgs e)
@@ -485,6 +502,7 @@ namespace CrazyStorm
             PlaySoundPanel.Visibility = Visibility.Collapsed;
             LoopPanel.Visibility = Visibility.Collapsed;
             ChangeTypePanel.Visibility = Visibility.Visible;
+            OtherFunctionPanel.Visibility = Visibility.Collapsed;
             EditSpecialEvent();
         }
         private void GlobalEventButton_Checked(object sender, RoutedEventArgs e)
@@ -494,14 +512,16 @@ namespace CrazyStorm
             GlobalEventPanel.Visibility = Visibility.Visible;
             GlobalEventParamPanel.Visibility = GlobalEventTypeCombo.SelectedItem != null ? 
                 Visibility.Visible : Visibility.Collapsed;
+            OtherFunctionPanel.Visibility = Visibility.Collapsed;
             EditSpecialEvent();
         }
-        private void RecoverButton_Checked(object sender, RoutedEventArgs e)
+        private void OtherFunctionButton_Checked(object sender, RoutedEventArgs e)
         {
             PlaySoundPanel.Visibility = Visibility.Collapsed;
             LoopPanel.Visibility = Visibility.Collapsed;
             ChangeTypePanel.Visibility = Visibility.Collapsed;
             GlobalEventPanel.Visibility = Visibility.Collapsed;
+            OtherFunctionPanel.Visibility = Visibility.Visible;
             EditSpecialEvent();
         }
         private void AddEvent_Click(object sender, RoutedEventArgs e)
@@ -651,6 +671,25 @@ namespace CrazyStorm
                 UIHelper.SetErrorToolTip(StopCondition, error);
             }
         }
+        private void OtherFunctionLine_PreviewLostKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
+        {
+            UIHelper.SetErrorToolTip(OtherFunctionLine, null);
+            OtherFunctionLine.Text = OtherFunctionLine.Text.Trim();
+            string input = ExpressionHelper.ReverseTranslate(OtherFunctionLine.Text);
+            if (string.IsNullOrEmpty(input)) return;
+            try
+            {
+                var lexer = new Lexer();
+                lexer.Load(input);
+                var syntaxTree = new Parser(lexer).Expression();
+                if (!(syntaxTree is Call)) throw new ExpressionException("IllegalInput");
+                EditSpecialEvent();
+            }
+            catch (ExpressionException error)
+            {
+                UIHelper.SetErrorToolTip(OtherFunctionLine, error);
+            }
+        }
         private void GlobalEventParamValue_PreviewLostKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
         {
             var textBox = sender as TextBox;
@@ -741,8 +780,7 @@ namespace CrazyStorm
         {
             if (EventList.SelectedIndex == -1) return;
             var text = eventGroup.Events[EventList.SelectedIndex];
-            var specialEvent = CrazyStorm.Core.EventManager.SpecialEvents.Keys.FirstOrDefault((se) => text.Contains(se));
-            if (specialEvent != null) EditSpecialEvent();
+            if (EventHelper.IsSpecialEvent(text)) EditSpecialEvent();
             else EditEvent();
         }
         private void ResultValue_KeyDown(object sender, KeyEventArgs e)
@@ -767,6 +805,14 @@ namespace CrazyStorm
             {
                 StopCondition_PreviewLostKeyboardFocus(null, null);
                 StopCondition.CaretIndex = StopCondition.Text.Length;
+            }
+        }
+        private void OtherFunctionLine_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter)
+            {
+                OtherFunctionLine_PreviewLostKeyboardFocus(null, null);
+                OtherFunctionLine.CaretIndex = OtherFunctionLine.Text.Length;
             }
         }
         private void GlobalEventParamValue_KeyDown(object sender, KeyEventArgs e)

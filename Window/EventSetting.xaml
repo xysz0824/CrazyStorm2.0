@@ -119,7 +119,7 @@
                     <RadioButton Name="Loop" Content="{StaticResource LoopStr}" Margin="5,0,8,0" Checked="LoopButton_Checked" />
                     <RadioButton Name="ChangeType" Content="{StaticResource ChangeTypeStr}" Margin="5,0,8,0" Checked="ChangeTypeButton_Checked" />
                     <RadioButton Name="GlobalEvent" Content="{StaticResource GlobalEventStr}" Margin="5,0,8,0" Checked="GlobalEventButton_Checked" />
-                    <RadioButton Name="Recover" Content="{StaticResource RecoverStr}" Margin="5,0,8,0" Checked="RecoverButton_Checked" />
+                    <RadioButton Name="OtherFunction" Content="{StaticResource OtherFunctionStr}" Margin="5,0,8,0" Checked="OtherFunctionButton_Checked" />
                 </StackPanel>
                 <DockPanel Name="PlaySoundPanel" Margin="0,1" Visibility="Collapsed">
                     <Label Content="{StaticResource SoundResourceStr}" />
@@ -151,6 +151,10 @@
                              PreviewLostKeyboardFocus="GlobalEventParamValue_PreviewLostKeyboardFocus" KeyDown="GlobalEventParamValue_KeyDown"/>
                     </StackPanel>
                 </StackPanel>
+                <DockPanel Name="OtherFunctionPanel" Margin="0,1" Visibility="Collapsed">
+                    <Label Content="{StaticResource FunctionLineStr}" />
+                    <TextBox Name="OtherFunctionLine" VerticalContentAlignment="Center" PreviewLostKeyboardFocus="OtherFunctionLine_PreviewLostKeyboardFocus" KeyDown="OtherFunctionLine_KeyDown"/>
+                </DockPanel>
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,1">
                     <Button Name="AddSpecialEvent" Width ="40" Content="{StaticResource AddStr}" Margin="2,0" Click="AddSpecialEvent_Click" />
                     <Button Name="DelSpecialEvent" Width ="40" Content="{StaticResource DelStr}" Margin="2,0" Click="DelSpecialEvent_Click" IsEnabled="False"/>

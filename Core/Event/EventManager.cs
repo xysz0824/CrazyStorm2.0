@@ -261,6 +261,7 @@ namespace CrazyStorm.Core
         public static bool ExecuteSpecialEvent(PropertyContainer propertyContainer, string eventName, string[] arguments,
             VMInstruction[] argumentExpression)
         {
+            if (!SpecialEvents.ContainsKey(eventName)) return false;
             return SpecialEvents[eventName](propertyContainer, arguments, argumentExpression);
         }
         public static void Update()

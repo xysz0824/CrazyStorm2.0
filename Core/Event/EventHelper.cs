@@ -337,5 +337,17 @@ namespace CrazyStorm.Core
                     eventInfo.argumentExpression);
             }
         }
+        public static bool IsSpecialEvent(string str)
+        {
+            var changeTypeNames = Enum.GetNames(typeof(EventChangeType));
+            foreach (var name in changeTypeNames)
+            {
+                if (str.Contains($" {name} "))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
     }
 }

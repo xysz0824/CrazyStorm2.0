@@ -304,13 +304,13 @@ namespace CrazyStorm.Core
                 var content = ConvertEvent(split[1]);
                 var eventInfo = new EventInfo();
                 eventInfo.condition = condition;
-                var specialEvent = EventManager.SpecialEvents.Keys.FirstOrDefault((se) => content.Contains(se));
-                if (specialEvent != null)
+                if (EventHelper.IsSpecialEvent(content))
                 {
                     eventInfo.isSpecialEvent = true;
-                    eventInfo.specialEvent = specialEvent;
-                    eventInfo.arguments = content.Replace($"{specialEvent}(", "").Replace(")", "")
-                        .Replace($"{specialEvent}，", "").Replace(specialEvent, "").Replace("，", ",");
+                    split = content.Split('(');
+                    eventInfo.specialEvent = split[0];
+                    eventInfo.arguments = content.Replace($"{eventInfo.specialEvent}(", "").Replace(")", "")
+                        .Replace($"{eventInfo.specialEvent}，", "").Replace(eventInfo.specialEvent, "").Replace("，", ",");
                 }
                 else
                 {
