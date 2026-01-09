@@ -35,6 +35,20 @@ namespace CrazyStorm.Core
         public IList<FileResource> Images { get { return images; } }
         public IList<FileResource> Sounds { get { return sounds; } }
         public IList<VariableResource> Globals { get { return globals; } }
+        public Vector2 BodyPosition
+        {
+            set
+            {
+                foreach (var particleSystem in ParticleSystems)
+                {
+                    foreach (var layer in particleSystem.Layers)
+                    {
+                        foreach (var component in layer.Components)
+                            component.BodyPosition = value;
+                    }
+                }
+            }
+        }
         public int ParticleIndex { get { return particleIndex++; } }
         public int FileResourceIndex { get { return fileResourceIndex++; } }
         #endregion
@@ -50,8 +64,6 @@ namespace CrazyStorm.Core
         public File(string defaultParticleSystemName, string defaultLayerName, string defaultBodyPositionName) : this()
         {
             particleSystems.Add(new ParticleSystem(defaultParticleSystemName, defaultLayerName));
-            globals.Add(new VariableResource($"{defaultBodyPositionName}x", SpecialVariableType.BodyPositionX));
-            globals.Add(new VariableResource($"{defaultBodyPositionName}y", SpecialVariableType.BodyPositionY));
         }
         #endregion
 
@@ -364,16 +376,6 @@ namespace CrazyStorm.Core
         public bool LoadPlayFile(string filePath, float baseVersion)
         {
             return LoadPlayFile(System.IO.File.ReadAllBytes(filePath), baseVersion);
-        }
-        public void SetGlobal(SpecialVariableType type, float value)
-        {
-            for (int i = 0; i < globals.Count; ++i)
-            {
-                if (globals[i].Type == type)
-                {
-                    globals[i].Value = value;
-                }
-            }
         }
         #endregion
     }

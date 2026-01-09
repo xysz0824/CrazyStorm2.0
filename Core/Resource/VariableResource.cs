@@ -13,16 +13,9 @@ using System.CodeDom;
 
 namespace CrazyStorm.Core
 {
-    public enum SpecialVariableType
-    {
-        None,
-        BodyPositionX,
-        BodyPositionY,
-    }
     public struct VariableResourceData
     {
         public float value;
-        public SpecialVariableType type;
     }
     public class VariableResource : Resource
     {
@@ -40,21 +33,11 @@ namespace CrazyStorm.Core
                 OnPropertyChanged("Value");
             }
         }
-        public SpecialVariableType Type
-        {
-            get { return data.type; }
-            set { data.type = value; }
-        }
         #endregion
 
         #region Constructor
         public VariableResource() { }
         public VariableResource(string label) : base(label) { }
-        public VariableResource(string label, SpecialVariableType type)
-            : this(label)
-        {
-            Type = type;
-        }
         #endregion
 
         #region Public Methods

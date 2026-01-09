@@ -141,8 +141,9 @@ namespace CrazyStorm_Player
                 }
             }
             FrameworkDispatcher.Update();
-            sounds = new Dictionary<string, SoundEffect>();
+            File.BodyPosition = new CrazyStorm.Core.Vector2(controllable.selfPos.X, controllable.selfPos.Y);
             File.ParticleSystems[SelectedParticleSystemIndex].Reset();
+            sounds = new Dictionary<string, SoundEffect>();
             EventManager.OnSoundPlay += PlaySound;
             ParticleManager.OnParticleDraw += (particle) => DrawParticle(spriteBatch, particle);
             ParticleManager.OnCurveParticleDraw += (particle) => DrawCurveParticle(spriteBatch, curveBatch, particle);
@@ -268,8 +269,7 @@ namespace CrazyStorm_Player
         {
             FrameworkDispatcher.Update();
             controllable.Update(keyboard);
-            File.SetGlobal(SpecialVariableType.BodyPositionX, controllable.selfPos.X);
-            File.SetGlobal(SpecialVariableType.BodyPositionY, controllable.selfPos.Y);
+            File.BodyPosition = new CrazyStorm.Core.Vector2(controllable.selfPos.X, controllable.selfPos.Y);
             EventManager.CustomTypes = File.ParticleSystems[SelectedParticleSystemIndex].CustomTypes;
             EventManager.Sounds = File.Sounds;
             EventManager.TypeSoundMap = File.ParticleSystems[SelectedParticleSystemIndex].TypeSoundMap;

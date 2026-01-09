@@ -31,6 +31,7 @@ namespace CrazyStorm.Expression
             globals = new Dictionary<string, float>();
             locals = new Dictionary<string, float>();
             properties = new Dictionary<string, object>();
+            InitializeSystemProperty();
             functions = new Dictionary<string, Function>();
             InitializeSystemFunctions();
         }
@@ -59,6 +60,17 @@ namespace CrazyStorm.Expression
         #endregion
 
         #region Private Methods
+        void InitializeSystemProperty()
+        {
+            PutProperty("BodyPosition", Core.Vector2.Zero);
+            PutProperty("BodyPosition.x", default(float));
+            PutProperty("BodyPosition.y", default(float));
+            PutProperty("BodyAngle", default(float));
+            PutProperty("CenterPosition", Core.Vector2.Zero);
+            PutProperty("CenterPosition.x", default(float));
+            PutProperty("CenterPosition.y", default(float));
+            PutProperty("CenterAngle", default(float));
+        }
         void InitializeSystemFunctions()
         {
             PutFunction("abs", new Expression.Function(typeof(float)));

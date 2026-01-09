@@ -166,6 +166,8 @@ namespace CrazyStorm.Core
         public int BindingTargetID { get; private set; }
         public IList<VariableResource> Locals { get; set; }
         public IList<VariableResource> Globals { get; set; }
+        public Vector2 BodyPosition { get; set; }
+        public Vector2 CenterPosition { get; set; }
         public IList<EventGroup> ComponentEventGroups { get { return componentEventGroups; } }
         public IList<Component> Children { get { return children; } }
         #endregion
@@ -474,8 +476,40 @@ namespace CrazyStorm.Core
             }
             return Position;
         }
+        bool PushSystemProperty(string propertyName)
+        {
+            switch (propertyName)
+            {
+                case "BodyPosition":
+                    VM.PushVector2(BodyPosition);
+                    break;
+                case "BodyPosition.x":
+                    VM.PushFloat(BodyPosition.x);
+                    break;
+                case "BodyPosition.y":
+                    VM.PushFloat(BodyPosition.y);
+                    break;
+                case "BodyAngle":
+                    VM.PushFloat(MathHelper.GetDegree(BodyPosition - Position));
+                    break;
+                case "CenterPosition":
+                    VM.PushVector2(CenterPosition);
+                    break;
+                case "CenterPosition.x":
+                    VM.PushFloat(CenterPosition.x);
+                    break;
+                case "CenterPosition.y":
+                    VM.PushFloat(CenterPosition.y);
+                    break;
+                case "CenterAngle":
+                    VM.PushFloat(MathHelper.GetDegree(CenterPosition - Position));
+                    break;
+            }
+            return false;
+        }
         public override bool PushProperty(string propertyName)
         {
+            if (PushSystemProperty(propertyName)) return true;
             switch (propertyName)
             {
                 case "Name":

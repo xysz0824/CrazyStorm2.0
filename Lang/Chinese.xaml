@@ -263,6 +263,9 @@
     <sys:String x:Key="ResultCountStr">找到 {0} 个</sys:String>
     <sys:String x:Key="UntitledStr">未命名</sys:String>
     <sys:String x:Key="BodyPositionStr">自机</sys:String>
+    <sys:String x:Key="BodyAngleStr">自机角</sys:String>
+    <sys:String x:Key="CenterPositionStr">中心</sys:String>
+    <sys:String x:Key="CenterAngleStr">中心角</sys:String>
     <sys:String x:Key="TrueStr">开</sys:String>
     <sys:String x:Key="FalseStr">关</sys:String>
     <sys:String x:Key="AlphaBlendStr">透明度混合</sys:String>

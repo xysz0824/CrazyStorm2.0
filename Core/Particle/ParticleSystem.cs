@@ -250,6 +250,18 @@ namespace CrazyStorm.Core
                 }
             }
         }
+        public Vector2 GetCenterPositionOrDefault()
+        {
+            for (int i = 0; i < Layers.Count; ++i)
+            {
+                var layer = Layers[i];
+                for (int k = 0; k < layer.Components.Count; ++k)
+                {
+                    if (layer.Components[k] is Center) return layer.Components[k].Position;
+                }
+            }
+            return Vector2.Zero;
+        }
         public bool Update(int currentFrame = 0)
         {
             if (currentFrame != CurrentFrame)
@@ -258,8 +270,10 @@ namespace CrazyStorm.Core
                 for (int i = 0; i < currentFrame; ++i) Update(i);
                 CurrentFrame = currentFrame;
             }
+            var centerPosition = GetCenterPositionOrDefault();
             for (int i = 0; i < ComponentTree.Count; ++i)
             {
+                ComponentTree[i].CenterPosition = centerPosition;
                 UpdateComponent(ComponentTree[i], CurrentFrame);
             }
             if (++CurrentFrame == TotalFrame)
