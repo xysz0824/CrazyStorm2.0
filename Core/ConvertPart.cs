@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -18,8 +19,7 @@ namespace CrazyStorm.Core
         static readonly Regex RenderingOrderMatch = new Regex(@"RenderingOrder:(\d+)", RegexOptions.Compiled);
         static readonly Regex ExternalMatch = new Regex(@"(?<!\w)(?:[A-Za-z]:\\|\.{1,2}\\)?(?:[^\\/:*?""<>|\r\n]+\\)*[^\\/:*?""<>|\r\n]+\.(png|dat)", RegexOptions.Compiled);
         static readonly Regex TypeCountMatch = new Regex(@"(\d+) Types:", RegexOptions.Compiled);
-        static readonly Regex TypeMatch = new Regex(
-            @"^(?<name>[^_]+)_" + 
+        static readonly Regex TypeMatch = new Regex(@"^(?<name>[^_]+)_" + 
             @"(?<texid>[^_]+)_" +
             @"(?<rectx>[^_]+)_(?<recty>[^_]+)_(?<rectwidth>[^_]+)_(?<rectheight>[^_]+)_" +
             @"(?<ox>[^_]+)_(?<oy>[^_]+)_" +
@@ -28,14 +28,12 @@ namespace CrazyStorm.Core
             @"(?:_(?<frames>[^_]+))?(?:_(?<interval>[^_]+))?" +
             @"(?:_(?<volumex>[^_]+))?(?:_(?<volumey>[^_]+))?(?:_(?<volumewidth>[^_]+))?(?:_(?<volumeheight>[^_]+))?(?:_(?<volumejudgearea>[^_]+))?$", RegexOptions.Compiled);
         static readonly Regex GlobalEventCountMatch = new Regex(@"(\d+) GlobalEvents:", RegexOptions.Compiled);
-        static readonly Regex GlobalEventMatch = new Regex(
-            @"^(?<frame>[^_]+)_" +
+        static readonly Regex GlobalEventMatch = new Regex(@"^(?<frame>[^_]+)_" +
             @"(?<gotocondition>[^_]+)_(?<gotooperator>[^_]+)_(?<gotovalue>[^_]+)_(?<isgoto>[^_]+)_(?<gototime>[^_]+)_(?<gotowhere>[^_]+)_" +
             @"(?<quakecondition>[^_]+)_(?<quakeoperator>[^_]+)_(?<quakevalue>[^_]+)_(?<isquake>[^_]+)_(?<quaketime>[^_]+)_(?<quakelevel>[^_]+)_" +
             @"(?<stopcondition>[^_]+)_(?<stopoperator>[^_]+)_(?<stopvalue>[^_]+)_(?<isstop>[^_]+)_(?<stoptime>[^_]+)_(?<stoplevel>[^_]+)$", RegexOptions.Compiled);
         static readonly Regex SoundCountMatch = new Regex(@"(\d+) Sounds:", RegexOptions.Compiled);
-        static readonly Regex SoundMatch = new Regex(
-            @"^(?<typeid>[^_]+)_(?<path>[^_]+)_(?<volume>[^_]+)$", RegexOptions.Compiled);
+        static readonly Regex SoundMatch = new Regex(@"^(?<typeid>[^_]+)_(?<path>[^_]+)_(?<volume>[^_]+)$", RegexOptions.Compiled);
         static readonly Regex CenterMatch = new Regex(@"^Center:(?:False,(?<events>.*)|" +
             @"(?<x>[^,]+),(?<y>[^,]+)" +
             @"(?:,(?<speed>[^,]+))?(?:,(?<speedd>[^,]+))?(?:,(?<aspeed>[^,]+))?(?:,(?<aspeedd>[^,]+))?,(?<events>.*))$", RegexOptions.Compiled);
@@ -51,6 +49,32 @@ namespace CrazyStorm.Core
             { "跟随自机慢", "FollowBodySlow" }, { "跟随自机", "FollowBody" },
             { "范围移动慢", "RandomMoveSlow" }, { "范围移动", "RandomMove" }, { "范围飘动", "RandomWalk" },
         };
+        static readonly Regex LayerMatch = new Regex(@"^Layer(?<num>[^:]+):" +
+            @"(?<name>[^,]+),(?<begin>[^,]+),(?<end>[^,]+)," +
+            @"(?<batchcount>[^,]+),(?<lasecount>[^,]+),(?<covercount>[^,]+),(?<reboundcount>[^,]+),(?<forcecount>[^,]+)", RegexOptions.Compiled);
+        static readonly Regex BatchMatch = new Regex(@"^(?<id>[^,]+),(?<layerid>[^,]+)," +
+            @"(?<binding>[^,]+),(?<bindid>[^,]+),(?<bindwithspeedd>[^,]+),," +
+            @"(?<x>[^,]+),(?<y>[^,]+),(?<begin>[^,]+),(?<life>[^,]+)," +
+            @"(?<fx>[^,]+),(?<fy>[^,]+),(?<r>[^,]+),(?<rdirection>[^,]+),(?<rdirections>[^,]+)," +
+            @"(?<tiao>[^,]+),(?<t>[^,]+),(?<fdirection>[^,]+),(?<fdirections>[^,]+),(?<range>[^,]+)," +
+            @"(?<speed>[^,]+),(?<speedd>[^,]+),(?<speedds>[^,]+)," +
+            @"(?<aspeed>[^,]+),(?<aspeedd>[^,]+),(?<aspeedds>[^,]+)," +
+            @"(?<sonlife>[^,]+),(?<typeid>[^,]+),(?<wscale>[^,]+),(?<hscale>[^,]+)," +
+            @"(?<colorR>[^,]+),(?<colorG>[^,]+),(?<colorB>[^,]+),(?<alpha>[^,]+)," +
+            @"(?<head>[^,]+),(?<heads>[^,]+),(?<withspeedd>[^,]+)," +
+            @"(?<sonspeed>[^,]+),(?<sonspeedd>[^,]+),(?<sondspeedds>[^,]+)," +
+            @"(?<sonaspeed>[^,]+),(?<sonaspeedd>[^,]+),(?<sondaspeedds>[^,]+)," +
+            @"(?<xscale>[^,]+),(?<yscale>[^,]+)," +
+            @"(?<mist>[^,]+),(?<dispel>[^,]+),(?<blend>[^,]+),(?<afterimage>[^,]+),(?<outdispel>[^,]+),(?<invincible>[^,]+)," +
+            @"(?<events>[^,]+),(?<sonevents>[^,]+)," +
+            @"(?<randfx>[^,]+),(?<randfy>[^,]+),(?<randr>[^,]+),(?<randrdirection>[^,]+)," +
+            @"(?<randtiao>[^,]+),(?<randt>[^,]+),(?<randfdirection>[^,]+),(?<randrange>[^,]+)," +
+            @"(?<randspeed>[^,]+),(?<randspeedd>[^,]+),(?<randaspeed>[^,]+),(?<randaspeedd>[^,]+),(?<randhead>[^,]+)," +
+            @"(?<randsonspeed>[^,]+),(?<randsonspeedd>[^,]+),(?<randsonaspeed>[^,]+),(?<randsonaspeedd>[^,]+)" +
+            @"(?:,(?<affectByCover>[^,]+))?(?:,(?<affectByRebound>[^,]+))?(?:,(?<affectByForce>[^,]+))?" +
+            @"(?:,(?<deepbind>[^,]+))?" +
+            @"(?:,(?<randwscale>[^,]+))?(?:,(?<randhscale>[^,]+))?(?:,(?<syncScale>[^,]+))?" +
+            @"(?:,(?<instantMovement>[^,]+))?$", RegexOptions.Compiled);
         public static bool IsCS1(string filePath)
         {
             using (var reader = new StreamReader(filePath, Encoding.UTF8))
@@ -225,6 +249,7 @@ namespace CrazyStorm.Core
                 //center
                 match = CenterMatch.Match(line);
                 var center = match.Success ? new Center() : null;
+                center.ID = particleSystem.GetComponentIndex();
                 if (center != null)
                 {
                     center.Visibility = match.Groups["x"].Success;
@@ -235,6 +260,7 @@ namespace CrazyStorm.Core
                         eventgroup.Name = "CenterEvents";
                         center.ComponentEventGroups.Add(eventgroup);
                     }
+                    line = reader.ReadLine().Trim();
                 }
                 if (center.Visibility)
                 {
@@ -245,8 +271,159 @@ namespace CrazyStorm.Core
                     center.Acspeed = float.Parse(match.Groups["aspeed"].Value);
                     center.AcspeedAngle = float.Parse(match.Groups["aspeedd"].Value);
                 }
+                //totalframe
+                if (line.StartsWith("Totalframe:"))
+                {
+                    line = reader.ReadLine().Trim();
+                }
+                //layers
+                do
+                {
+                    match = LayerMatch.Match(line);
+                    if (match.Success)
+                    {
+                        var layer = new Layer(match.Groups["name"].Value);
+                        layer.BeginFrame = int.Parse(match.Groups["begin"].Value) - 1;
+                        layer.TotalFrame = int.Parse(match.Groups["end"].Value) - layer.BeginFrame;
+                        var batchCount = int.Parse(match.Groups["batchcount"].Value);
+                        for (int i = 0; i < batchCount; ++i)
+                        {
+                            //batchs
+                            line = reader.ReadLine().Trim();
+                            match = BatchMatch.Match(line);
+                            if (!match.Success) continue;
+                            var batch = new MultiEmitter();
+                            batch.ID = particleSystem.GetComponentIndex();
+                            batch.Parent = center;
+                            batch.Position = ConvertVector2(float.Parse(match.Groups["x"].Value), float.Parse(match.Groups["y"].Value),
+                                batch, "Position") - OldCenter;
+                            batch.BeginFrame = int.Parse(match.Groups["begin"].Value);
+                            batch.TotalFrame = int.Parse(match.Groups["life"].Value);
+                            batch.EmitPosition = ConvertVector2(float.Parse(match.Groups["fx"].Value), float.Parse(match.Groups["fy"].Value),
+                                batch, "EmitPosition") - OldCenter;
+                            batch.EmitRadius = float.Parse(match.Groups["r"].Value);
+                            batch.EmitRoundAngle = ConvertAngle(float.Parse(match.Groups["rdirection"].Value),
+                                match.Groups["rdirections"].Value, batch, "EmitRoundAngle");
+                            batch.EmitCount = int.Parse(match.Groups["tiao"].Value);
+                            batch.EmitCycle = int.Parse(match.Groups["t"].Value);
+                            batch.EmitAngle = ConvertAngle(float.Parse(match.Groups["fdirection"].Value),
+                                match.Groups["fdirections"].Value, batch, "EmitAngle");
+                            batch.EmitRange = int.Parse(match.Groups["range"].Value);
+                            batch.Speed = float.Parse(match.Groups["speed"].Value);
+                            batch.SpeedAngle = ConvertAngle(float.Parse(match.Groups["speedd"].Value),
+                                match.Groups["speedds"].Value, batch, "SpeedAngle");
+                            batch.Acspeed = float.Parse(match.Groups["aspeed"].Value);
+                            batch.AcspeedAngle = ConvertAngle(float.Parse(match.Groups["aspeedd"].Value),
+                                match.Groups["aspeedds"].Value, batch, "AcspeedAngle");
+                            var particle = batch.Particle as Particle;
+                            particle.MaxLife = int.Parse(match.Groups["sonlife"].Value);
+                            var typeId = int.Parse(match.Groups["typeid"].Value);
+                            if (typeId < ParticleType.DefaultTypes.Count)
+                            {
+                                particle.Type = ParticleType.DefaultTypes[typeId];
+                            }
+                            else if (typeId < particleSystem.CustomTypes.Count)
+                            {
+                                particle.Type = particleSystem.CustomTypes[typeId];
+                            }
+                            particle.WidthScale = float.Parse(match.Groups["wscale"].Value);
+                            particle.HeightScale = float.Parse(match.Groups["hscale"].Value);
+                            particle.RGB = new RGB(float.Parse(match.Groups["colorR"].Value),
+                                float.Parse(match.Groups["colorG"].Value), float.Parse(match.Groups["colorB"].Value));
+                            particle.Opacity = float.Parse(match.Groups["alpha"].Value);
+                            particle.PRotation = ConvertAngle(float.Parse(match.Groups["head"].Value),
+                                match.Groups["heads"].Value, batch, "PRotation");
+                            particle.StickToSpeedAngle = bool.Parse(match.Groups["withspeedd"].Value);
+                            particle.PSpeed = float.Parse(match.Groups["sonspeed"].Value);
+                            particle.PSpeedAngle = ConvertAngle(float.Parse(match.Groups["sonspeedd"].Value),
+                                match.Groups["sonspeedds"].Value, batch, "PSpeedAngle");
+                            particle.PAcspeed = float.Parse(match.Groups["sonaspeed"].Value);
+                            particle.PAcspeedAngle = ConvertAngle(float.Parse(match.Groups["sonaspeedd"].Value),
+                                match.Groups["sonaspeedds"].Value, batch, "PAcspeedAngle");
+                            particle.PSpeedHScale = float.Parse(match.Groups["xscale"].Value);
+                            particle.PSpeedVScale = float.Parse(match.Groups["yscale"].Value);
+                            particle.FadeEffect = bool.Parse(match.Groups["dispel"].Value);
+                            particle.BlendType = bool.Parse(match.Groups["blend"].Value) ? 
+                                BlendType.Additive : BlendType.AlphaBlend;
+                            particle.AfterimageEffect = bool.Parse(match.Groups["afterimage"].Value);
+                            particle.KillOutside = bool.Parse(match.Groups["outdispel"].Value);
+                            particle.Collision = bool.Parse(match.Groups["invincible"].Value);
+                            //events
+                            
+                            layer.Components.Add(batch);
+                        }
+                        //binding
+                        //TODO : Binding
+                        if (particleSystem.Layers.Count == 0)
+                        {
+                            layer.Components.Add(center);
+                        }
+                        particleSystem.Layers.Add(layer);
+                    }
+                    line = reader.ReadLine().Trim();
+                }
+                while (!reader.EndOfStream);
                 ParticleSystems.Add(particleSystem);
             }
+        }
+        public static Vector2 ConvertVector2(float x, float y, PropertyContainer propertyContainer, string name)
+        {
+            if (x == -99998 && y == -99998)
+            {
+                propertyContainer.Properties[name] = new PropertyValue()
+                {
+                    Value = "Position",
+                    Expression = true,
+                };
+                return Vector2.Zero;
+            }
+            else if (x == -99999 && y == -99999)
+            {
+                propertyContainer.Properties[name] = new PropertyValue()
+                {
+                    Value = "BodyPosition",
+                    Expression = true,
+                };
+                return Vector2.Zero;
+            }
+            else if (x <= -99998 || y <= -99998)
+            {
+                propertyContainer.Properties[name] = new PropertyValue()
+                {
+                    Value = $"[{(x == -99998 ? "Position.x" : x == -99999 ? "BodyPosition.x" : x.ToString())}," +
+                    $"{(y == -99998 ? "Position.y" : y == -99999 ? "BodyPosition.x" : y.ToString())}]",
+                    Expression = true,
+                };
+                return Vector2.Zero;
+            }
+            else return new Vector2(x, y);
+        }
+        public static float ConvertAngle(float deg, string vecStr, PropertyContainer propertyContainer, string name)
+        {
+            if (deg == -100000)
+            {
+                //This expression is not implemented, just ignore it
+                return 0;
+            }
+            else if (deg == -99999)
+            {
+                propertyContainer.Properties[name] = new PropertyValue
+                {
+                    Value = "BodyAngle",
+                    Expression = true,
+                };
+                return 0;
+            }
+            else if (deg == -99998)
+            {
+                propertyContainer.Properties[name] = new PropertyValue
+                {
+                    Value = "SelfAngle",
+                    Expression = true,
+                };
+                return 0;
+            }
+            else return deg;
         }
         public static string ConvertEvent(string str)
         {
@@ -265,12 +442,9 @@ namespace CrazyStorm.Core
             switch (value)
             {
                 case "自身":
-                    if (type == PropertyType.Single) return "0";
-                    else if (type == PropertyType.Vector2)
-                    {
-                        expressionResult = true;
-                        return "Position";
-                    }
+                    expressionResult = true;
+                    if (type == PropertyType.Single) return "SelfAngle";
+                    else if (type == PropertyType.Vector2) return "Position";
                     break;
                 case "自机":
                     expressionResult = true;

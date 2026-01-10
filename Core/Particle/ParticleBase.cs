@@ -31,6 +31,8 @@ namespace CrazyStorm.Core
         public float pspeed;
         public float pacspeed;
         public float pacspeedAngle;
+        public float pspeedHScale;
+        public float pspeedVScale;
         public float protation;
         public BlendType blendType;
         public bool killOutside;
@@ -130,6 +132,18 @@ namespace CrazyStorm.Core
             set { particleBaseData.pacspeedAngle = value; }
         }
         [FloatProperty(float.MinValue, float.MaxValue)]
+        public float PSpeedHScale
+        {
+            get { return particleBaseData.pspeedHScale; }
+            set { particleBaseData.pspeedHScale = value; }
+        }
+        [FloatProperty(float.MinValue, float.MaxValue)]
+        public float PSpeedVScale
+        {
+            get { return particleBaseData.pspeedVScale; }
+            set { particleBaseData.pspeedVScale = value; }
+        }
+        [FloatProperty(float.MinValue, float.MaxValue)]
         public float PRotation
         {
             get { return particleBaseData.protation; }
@@ -202,6 +216,8 @@ namespace CrazyStorm.Core
             particleBaseData.mass = 1;
             particleBaseData.opacity = 100;
             particleBaseData.pspeed = 5;
+            particleBaseData.pspeedHScale = 1;
+            particleBaseData.pspeedVScale = 1;
             particleBaseData.killOutside = true;
             particleBaseData.collision = true;
             particleBaseData.fogEffect = true;
@@ -340,6 +356,12 @@ namespace CrazyStorm.Core
                 case "PAcspeedAngle":
                     VM.PushFloat(PAcspeedAngle);
                     return true;
+                case "PSpeedHScale":
+                    VM.PushFloat(PSpeedHScale);
+                    return true;
+                case "PSpeedVScale":
+                    VM.PushFloat(PSpeedVScale);
+                    return true;
                 case "PRotation":
                     VM.PushFloat(PRotation);
                     return true;
@@ -428,19 +450,29 @@ namespace CrazyStorm.Core
                     return true;
                 case "PSpeed":
                     PSpeed = VM.PopFloat();
-                    MathHelper.SetVector2(ref pspeedVector, PSpeed, PSpeedAngle);
+                    MathHelper.SetVector2(ref pspeedVector, PSpeed, PSpeedAngle, 
+                        new Vector2(PSpeedHScale, PSpeedVScale));
                     return true;
                 case "PSpeedAngle":
                     PSpeedAngle = VM.PopFloat();
-                    MathHelper.SetVector2(ref pspeedVector, PSpeed, PSpeedAngle);
+                    MathHelper.SetVector2(ref pspeedVector, PSpeed, PSpeedAngle, 
+                        new Vector2(PSpeedHScale, PSpeedVScale));
                     return true;
                 case "PAcspeed":
                     PAcspeed = VM.PopFloat();
-                    MathHelper.SetVector2(ref pacspeedVector, PAcspeed, PAcspeedAngle);
+                    MathHelper.SetVector2(ref pacspeedVector, PAcspeed, PAcspeedAngle, 
+                        new Vector2(PSpeedHScale, PSpeedVScale));
                     return true;
                 case "PAcspeedAngle":
                     PAcspeedAngle = VM.PopFloat();
-                    MathHelper.SetVector2(ref pacspeedVector, PAcspeed, PAcspeedAngle);
+                    MathHelper.SetVector2(ref pacspeedVector, PAcspeed, PAcspeedAngle, 
+                        new Vector2(PSpeedHScale, PSpeedVScale));
+                    return true;
+                case "PSpeedHScale":
+                    PSpeedHScale = VM.PopFloat();
+                    return true;
+                case "PSpeedVScale":
+                    PSpeedVScale = VM.PopFloat();
                     return true;
                 case "PRotation":
                     PRotation = VM.PopFloat();
@@ -506,8 +538,10 @@ namespace CrazyStorm.Core
             }
             if (PCurrentFrame == 0)
             {
-                MathHelper.SetVector2(ref pspeedVector, PSpeed, PSpeedAngle);
-                MathHelper.SetVector2(ref pacspeedVector, PAcspeed, PAcspeedAngle);
+                MathHelper.SetVector2(ref pspeedVector, PSpeed, PSpeedAngle,
+                    new Vector2(PSpeedHScale, PSpeedVScale));
+                MathHelper.SetVector2(ref pacspeedVector, PAcspeed, PAcspeedAngle,
+                    new Vector2(PSpeedHScale, PSpeedVScale));
             }
             //QuadTree.Update(this);
             PPositionLast = PPosition;

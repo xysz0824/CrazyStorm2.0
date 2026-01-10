@@ -18,10 +18,14 @@ namespace CrazyStorm.Core
         {
             return radian / Math.PI * 180.0;
         }
+        public static void SetVector2(ref Vector2 v, float size, float angle, Vector2 scale)
+        {
+            v.x = (float)(scale.x * size * Math.Cos(MathHelper.DegToRad(angle)));
+            v.y = (float)(scale.y * size * Math.Sin(MathHelper.DegToRad(angle)));
+        }
         public static void SetVector2(ref Vector2 v, float size, float angle)
         {
-            v.x = (float)(size * Math.Cos(MathHelper.DegToRad(angle)));
-            v.y = (float)(size * Math.Sin(MathHelper.DegToRad(angle)));
+            SetVector2(ref v, size, angle, Vector2.One);
         }
         public static Vector2 GetVector2(float size, float angle)
         {

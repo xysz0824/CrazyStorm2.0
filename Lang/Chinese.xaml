@@ -95,6 +95,7 @@
     <sys:String x:Key="EmitAngleStr">发射角</sys:String>
     <sys:String x:Key="EmitRangeStr">发射范围</sys:String>
     <sys:String x:Key="EmitRadiusStr">发射半径</sys:String>
+    <sys:String x:Key="EmitRoundAngleStr">发射圆方位角</sys:String>
     <sys:String x:Key="PCurrentFrameStr">粒子当前帧</sys:String>
     <sys:String x:Key="PPositionStr">粒子坐标</sys:String>
     <sys:String x:Key="MaxLifeStr">生命</sys:String>
@@ -110,6 +111,8 @@
     <sys:String x:Key="PSpeedAngleStr">粒子速度角</sys:String>
     <sys:String x:Key="PAcspeedStr">粒子加速度</sys:String>
     <sys:String x:Key="PAcspeedAngleStr">粒子加速度角</sys:String>
+    <sys:String x:Key="PSpeedHScaleStr">粒子速度横比</sys:String>
+    <sys:String x:Key="PSpeedVScaleStr">粒子速度纵比</sys:String>
     <sys:String x:Key="FogEffectStr">雾化效果</sys:String>
     <sys:String x:Key="FadeEffectStr">消弹效果</sys:String>
     <sys:String x:Key="AfterimageEffectStr">拖影效果</sys:String>
@@ -264,6 +267,7 @@
     <sys:String x:Key="ComponentUnitStr">个组件</sys:String>
     <sys:String x:Key="ResultCountStr">找到 {0} 个</sys:String>
     <sys:String x:Key="UntitledStr">未命名</sys:String>
+    <sys:String x:Key="SelfAngleStr">自身角</sys:String>
     <sys:String x:Key="BodyPositionStr">自机</sys:String>
     <sys:String x:Key="BodyAngleStr">自机角</sys:String>
     <sys:String x:Key="CenterPositionStr">中心</sys:String>

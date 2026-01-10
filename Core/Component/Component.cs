@@ -476,34 +476,37 @@ namespace CrazyStorm.Core
             }
             return Position;
         }
-        bool PushSystemProperty(string propertyName)
+        protected virtual bool PushSystemProperty(string propertyName)
         {
             switch (propertyName)
             {
+                case "SelfAngle":
+                    VM.PushFloat(0);
+                    return true;
                 case "BodyPosition":
                     VM.PushVector2(BodyPosition);
-                    break;
+                    return true;
                 case "BodyPosition.x":
                     VM.PushFloat(BodyPosition.x);
-                    break;
+                    return true;
                 case "BodyPosition.y":
                     VM.PushFloat(BodyPosition.y);
-                    break;
+                    return true;
                 case "BodyAngle":
                     VM.PushFloat(MathHelper.GetDegree(BodyPosition - Position));
-                    break;
+                    return true;
                 case "CenterPosition":
                     VM.PushVector2(CenterPosition);
-                    break;
+                    return true;
                 case "CenterPosition.x":
                     VM.PushFloat(CenterPosition.x);
-                    break;
+                    return true;
                 case "CenterPosition.y":
                     VM.PushFloat(CenterPosition.y);
-                    break;
+                    return true;
                 case "CenterAngle":
                     VM.PushFloat(MathHelper.GetDegree(CenterPosition - Position));
-                    break;
+                    return true;
             }
             return false;
         }

@@ -23,6 +23,7 @@ namespace CrazyStorm.Core
         public float emitAngle;
         public float emitRange;
         public float emitRadius;
+        public float emitRoundAngle;
     }
     public abstract class Emitter : Component
     {
@@ -76,6 +77,12 @@ namespace CrazyStorm.Core
             get { return emitterData.emitRadius; }
             set { emitterData.emitRadius = value; }
         }
+        [FloatProperty(float.MinValue, float.MaxValue)]
+        public float EmitRoundAngle
+        {
+            get { return emitterData.emitRoundAngle; }
+            set { emitterData.emitRoundAngle = value; }
+        }
         public ParticleBase Particle { get { return particle; } }
         public IList<EventGroup> ParticleEventGroups { get { return particleEventGroups; } }
         #endregion
@@ -112,8 +119,8 @@ namespace CrazyStorm.Core
             {
                 angle += increment;
                 Template.PPosition = new Vector2(
-                    EmitPosition.x + EmitRadius * (float)Math.Cos(MathHelper.DegToRad(angle)),
-                    EmitPosition.y + EmitRadius * (float)Math.Sin(MathHelper.DegToRad(angle)));
+                    EmitPosition.x + EmitRadius * (float)Math.Cos(MathHelper.DegToRad(EmitRoundAngle)),
+                    EmitPosition.y + EmitRadius * (float)Math.Sin(MathHelper.DegToRad(EmitRoundAngle)));
                 Template.PSpeedAngle = angle;
                 ParticleBase newParticle = ParticleManager.GetParticle(LayerID, Template);
                 newParticle.ParticleEventGroups = EmitterEventGroups;
@@ -192,11 +199,20 @@ namespace CrazyStorm.Core
                 InitialTemplate.ParticleEventGroups = EmitterEventGroups;
             }
         }
+        protected override bool PushSystemProperty(string propertyName)
+        {
+            if (base.PushSystemProperty(propertyName)) return true;
+            switch (propertyName)
+            {
+                case "SelfAngle":
+                    VM.PushFloat(MathHelper.GetDegree(Position - EmitPosition));
+                    return true;
+            }
+            return false;
+        }
         public override bool PushProperty(string propertyName)
         {
-            if (base.PushProperty(propertyName))
-                return true;
-
+            if (base.PushProperty(propertyName)) return true;
             switch (propertyName)
             {
                 case "EmitPosition":
@@ -222,6 +238,9 @@ namespace CrazyStorm.Core
                     return true;
                 case "EmitRadius":
                     VM.PushFloat(EmitRadius);
+                    return true;
+                case "EmitRoundAngle":
+                    VM.PushFloat(EmitRoundAngle);
                     return true;
             }
             if (Template == null)
@@ -261,6 +280,9 @@ namespace CrazyStorm.Core
                 case "EmitRadius":
                     EmitRadius = VM.PopFloat();
                     return true;
+                case "EmitRoundAngle":
+                    EmitRoundAngle = VM.PopFloat();
+                    return true;
             }
             if (Template == null)
             {
@@ -292,6 +314,7 @@ namespace CrazyStorm.Core
             EmitAngle = initialState.EmitAngle;
             EmitRange = initialState.EmitRange;
             EmitRadius = initialState.EmitRadius;
+            EmitRoundAngle = initialState.EmitRoundAngle;
         }
         public void EmitParticle()
         {
