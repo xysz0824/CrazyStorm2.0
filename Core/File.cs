@@ -168,7 +168,10 @@ namespace CrazyStorm.Core
         }
         public void Load(string filePath)
         {
-            if (IsCS1(filePath)) ConvertFromCS1(filePath);
+            if (IsCS1(filePath))
+            {
+                ConvertFromCS1(filePath);
+            }
             else
             {
                 var doc = new XmlDocument();
@@ -178,10 +181,10 @@ namespace CrazyStorm.Core
                 else
                 {
                     BuildFromXml(root);
-                    RebuildObjectReference();
-                    RebuildComponentTree();
                 }
             }
+            RebuildObjectReference();
+            RebuildComponentTree();
         }
         public void Save(string filePath)
         {

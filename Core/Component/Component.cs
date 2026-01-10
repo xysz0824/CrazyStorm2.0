@@ -157,7 +157,7 @@ namespace CrazyStorm.Core
             get { return parent; }
             set { parent = value; }
         }
-        public int ParentID { get; private set; }
+        public int ParentID { get; set; }
         public Emitter BindingTarget
         {
             get { return bindingTarget; }

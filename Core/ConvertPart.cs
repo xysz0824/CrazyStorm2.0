@@ -280,7 +280,9 @@ namespace CrazyStorm.Core
                 //center
                 match = CenterMatch.Match(line);
                 var center = match.Success ? new Center() : null;
+                center.Name = "0";
                 center.ID = particleSystem.GetComponentIndex();
+                particleSystem.GetAndIncreaseComponentIndex(center.GetType().ToString());
                 if (center != null)
                 {
                     center.Visibility = match.Groups["x"].Success;
@@ -314,6 +316,7 @@ namespace CrazyStorm.Core
                     if (match.Success)
                     {
                         var layer = new Layer(match.Groups["name"].Value);
+                        layer.Color = (LayerColor)(int.Parse(match.Groups["num"].Value) - 1);
                         layer.BeginFrame = int.Parse(match.Groups["begin"].Value) - 1;
                         layer.TotalFrame = int.Parse(match.Groups["end"].Value) - layer.BeginFrame;
                         var batchCount = int.Parse(match.Groups["batchcount"].Value);
@@ -324,8 +327,10 @@ namespace CrazyStorm.Core
                             match = BatchMatch.Match(line);
                             if (!match.Success) continue;
                             var batch = new MultiEmitter();
+                            batch.Name = match.Groups["id"].Value;
                             batch.ID = particleSystem.GetComponentIndex();
-                            batch.Parent = center;
+                            particleSystem.GetAndIncreaseComponentIndex(batch.GetType().ToString());
+                            batch.ParentID = center.ID;
                             batch.Position = ConvertVector2(float.Parse(match.Groups["x"].Value), float.Parse(match.Groups["y"].Value),
                                 batch, "Position") - OldCenter;
                             batch.BeginFrame = int.Parse(match.Groups["begin"].Value);
@@ -576,6 +581,11 @@ namespace CrazyStorm.Core
                     split = content.Split('，');
                     eventInfo.changeMode = ConvertKeyword(split[1]);
                     eventInfo.changeTime = split[2].Replace("帧", "");
+                    if (eventInfo.changeTime.Contains("(") && eventInfo.changeTime.EndsWith(")"))
+                    {
+                        //Event execution time is not supported
+                        eventInfo.changeTime = eventInfo.changeTime.Split('(')[0];
+                    }
                     split = AdjustEventText(split[0]).Split(' ');
                     if (particleEvents) split[0] = ConvertParticleEventProperty(split[0]);
                     eventInfo.resultProperty = ConvertKeyword(split[0]);
