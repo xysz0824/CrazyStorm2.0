@@ -27,6 +27,11 @@ namespace CrazyStorm.Core
                     if (attribute is Vector2PropertyAttribute) return PropertyType.Vector2;
                     if (attribute is RGBPropertyAttribute) return PropertyType.RGB;
                     if (attribute is EnumPropertyAttribute) return PropertyType.Enum;
+                    if (attribute is RuntimePropertyAttribute)
+                    {
+                        var obj = Activator.CreateInstance(property.PropertyType);
+                        return GetValueType(obj);
+                    }
                 }
             }
             return PropertyType.IllegalType;

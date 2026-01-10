@@ -38,16 +38,47 @@ namespace CrazyStorm.Core
             @"(?<x>[^,]+),(?<y>[^,]+)" +
             @"(?:,(?<speed>[^,]+))?(?:,(?<speedd>[^,]+))?(?:,(?<aspeed>[^,]+))?(?:,(?<aspeedd>[^,]+))?,(?<events>.*))$", RegexOptions.Compiled);
         static readonly Vector2 OldCenter = new Vector2(480, 360);
-        static readonly Dictionary<string, string> Words = new Dictionary<string, string>()
+        static readonly List<string> ConditionKeyWords = new List<string>
         {
-            { "当前帧", "CurrentFrame" }, { "且", " & " }, { "或", " | "},
+            "且", "或", "=", ">", "<",
+        };
+        static readonly List<string> NormalEventKeyWords = new List<string>()
+        {
+            "变化到", "增加", "减少",
+        };
+        static readonly Dictionary<string, string> KeywordMap = new Dictionary<string, string>()
+        {
+            { "当前帧", "CurrentFrame" }, { "且", "&" }, { "或", "|"},
             { "额外发射", "EmitParticle" }, { "恢复", "Recover"},
-            { "变化到", " ChangeTo " }, { "增加", " Increase " }, { "减少", " Decrease " },
+            { "变化到", "ChangeTo" }, { "增加", "Increase" }, { "减少", "Decrease" },
             { "正比", "Linear" }, { "固定", "Instant"}, { "正弦", "Sin"}, { "无缝正弦", "Sin"},
-            { "加速度方向", "AcspeedAngle" }, { "速度方向", "SpeedAngle" }, { "加速度", "Acspeed" }, { "速度", "Speed" },
             { "跟随自机X慢", "FollowBodyXSlow" }, { "跟随自机X", "FollowBodyX" }, { "跟随自机Y慢", "FollowBodyYSlow" }, { "跟随自机Y", "FollowBodyY" },
             { "跟随自机慢", "FollowBodySlow" }, { "跟随自机", "FollowBody" },
             { "范围移动慢", "RandomMoveSlow" }, { "范围移动", "RandomMove" }, { "范围飘动", "RandomWalk" },
+            { "子弹X坐标", "PPosition.x" }, { "子弹Y坐标", "PPosition.y" },
+            { "X坐标", "Position.x" }, { "Y坐标", "Position.y" }, { "半径方向", "EmitRoundAngle" }, { "半径", "EmitRadius" },
+            { "条数", "EmitCount" }, { "周期", "EmitCycle" }, { "角度", "EmitAngle" }, { "范围", "EmitRange" },
+            { "子弹加速度方向", "PAcspeedAngle" }, { "子弹加速度", "PAcspeed" }, { "子弹速度方向", "PSpeedAngle" }, { "子弹速度", "PSpeed" },
+            { "加速度方向", "AcspeedAngle" }, { "加速度", "Acspeed" }, { "速度方向", "SpeedAngle" }, { "速度", "Speed" },
+            { "生命", "MaxLife" }, { "宽比", "WidthScale" }, { "高比", "HeightScale" }, 
+            { "R", "RGB.r" }, { "G", "RGB.g" }, { "B", "RGB.b" },
+            { "不透明度", "Opacity" }, { "朝向", "PRotation" },
+            { "横比", "PSpeedHScale" }, { "纵比", "PSpeedVScale" },
+            { "消除效果", "FadeEffect" }, { "拖影效果", "AfterimageEffect" }, { "出屏即消", "KillOutside" }, { "无敌状态", "Collision" },
+        };
+        static readonly Dictionary<string, string> BoolValueMap = new Dictionary<string, string>()
+        {
+            { "1", "True" }, { "0", "False" },
+        };
+        static readonly string TypeKeyword = "类型";
+        static readonly string BlendKeyword = "高光效果";
+        static readonly Dictionary<string, string> BlendValueMap = new Dictionary<string, string>()
+        {
+            { "1", "Additive" }, { "0", "AlphaBlend" },
+        };
+        static readonly Dictionary<string, string> ParticleKeywordMap = new Dictionary<string, string>()
+        {
+            { "X坐标", "子弹X坐标" }, { "Y坐标", "子弹Y坐标" },
         };
         static readonly Regex LayerMatch = new Regex(@"^Layer(?<num>[^:]+):" +
             @"(?<name>[^,]+),(?<begin>[^,]+),(?<end>[^,]+)," +
@@ -66,7 +97,7 @@ namespace CrazyStorm.Core
             @"(?<sonaspeed>[^,]+),(?<sonaspeedd>[^,]+),(?<sondaspeedds>[^,]+)," +
             @"(?<xscale>[^,]+),(?<yscale>[^,]+)," +
             @"(?<mist>[^,]+),(?<dispel>[^,]+),(?<blend>[^,]+),(?<afterimage>[^,]+),(?<outdispel>[^,]+),(?<invincible>[^,]+)," +
-            @"(?<events>[^,]+),(?<sonevents>[^,]+)," +
+            @"(?:(?<events>[^,]+))?,(?:(?<sonevents>[^,]+))?," +
             @"(?<randfx>[^,]+),(?<randfy>[^,]+),(?<randr>[^,]+),(?<randrdirection>[^,]+)," +
             @"(?<randtiao>[^,]+),(?<randt>[^,]+),(?<randfdirection>[^,]+),(?<randrange>[^,]+)," +
             @"(?<randspeed>[^,]+),(?<randspeedd>[^,]+),(?<randaspeed>[^,]+),(?<randaspeedd>[^,]+),(?<randhead>[^,]+)," +
@@ -254,7 +285,7 @@ namespace CrazyStorm.Core
                 {
                     center.Visibility = match.Groups["x"].Success;
                     center.ComponentEventGroups.Add(globalEvents);
-                    var eventgroup = GetEventGroup(typeof(Center), match.Groups["events"].Value);
+                    var eventgroup = GetEventGroup(typeof(Center), match.Groups["events"].Value, false);
                     if (eventgroup.Events.Count > 0)
                     {
                         eventgroup.Name = "CenterEvents";
@@ -349,7 +380,11 @@ namespace CrazyStorm.Core
                             particle.KillOutside = bool.Parse(match.Groups["outdispel"].Value);
                             particle.Collision = bool.Parse(match.Groups["invincible"].Value);
                             //events
-                            
+                            var eventGroups = GetEventGroups(typeof(MultiEmitter), match.Groups["events"].Value, false);
+                            foreach (var eventGroup in eventGroups) batch.ComponentEventGroups.Add(eventGroup);
+                            //sonevents
+                            eventGroups = GetEventGroups(typeof(Particle), match.Groups["sonevents"].Value, true);
+                            foreach (var eventGroup in eventGroups) batch.ParticleEventGroups.Add(eventGroup);
                             layer.Components.Add(batch);
                         }
                         //binding
@@ -425,11 +460,36 @@ namespace CrazyStorm.Core
             }
             else return deg;
         }
-        public static string ConvertEvent(string str)
+        public static string ConvertKeyword(string str)
         {
-            foreach (var word in Words)
+            foreach (var word in KeywordMap)
             {
-                if (str.Contains(word.Key))
+                if (str == word.Key)
+                {
+                    str = str.Replace(word.Key, word.Value);
+                }
+            }
+            return str;
+        }
+        public static string ConvertCondition(string str)
+        {
+            foreach (var keyword in ConditionKeyWords)
+            {
+                if (str.Contains(keyword)) str = str.Replace(keyword, $" {keyword} ");
+            }
+            var split = str.Split(' ');
+            str = "";
+            for (int i = 0; i < split.Length; ++i)
+            {
+                str += ConvertKeyword(split[i]);
+            }
+            return str;
+        }
+        public static string ConvertParticleEventProperty(string str)
+        {
+            foreach (var word in ParticleKeywordMap)
+            {
+                if (str == word.Key)
                 {
                     str = str.Replace(word.Key, word.Value);
                 }
@@ -457,9 +517,31 @@ namespace CrazyStorm.Core
                     else if (type == PropertyType.Vector2) return "CenterPosition";
                     break;
             }
-            return value;
+            if (type == PropertyType.Boolean && BoolValueMap.ContainsKey(value)) return BoolValueMap[value];
+            if (value.Contains("+"))
+            {
+                var split = value.Split('+');
+                return $"{split[0]}+{{-{split[1]},{split[1]}}}";
+            }
+            else return value;
         }
-        public static EventGroup GetEventGroup(Type componentType, string str)
+        public static bool IsSpecialEvent(string str)
+        {
+            foreach (var keyword in NormalEventKeyWords)
+            {
+                if (str.Contains(keyword)) return false;
+            }
+            return true;
+        }
+        public static string AdjustEventText(string str)
+        {
+            foreach (var keyword in NormalEventKeyWords)
+            {
+                if (str.Contains(keyword)) return str.Replace(keyword, $" {keyword} ");
+            }
+            return str;
+        }
+        public static EventGroup GetEventGroup(Type componentType, string str, bool particleEvents)
         {
             EventGroup group = new EventGroup();
             var split = str.Split('|');
@@ -474,41 +556,60 @@ namespace CrazyStorm.Core
             {
                 if (string.IsNullOrEmpty(e)) continue;
                 split = e.Split('：');
-                var condition = ConvertEvent(split[0]);
-                var content = ConvertEvent(split[1]);
+                //TODO : Process t and addtime
+                var condition = split[0];
+                var content = split[1];
                 var eventInfo = new EventInfo();
-                eventInfo.condition = condition;
-                if (EventHelper.IsSpecialEvent(content))
+                eventInfo.condition = ConvertCondition(condition);
+                if (IsSpecialEvent(content))
                 {
                     eventInfo.isSpecialEvent = true;
-                    split = content.Split('(');
-                    eventInfo.specialEvent = split[0];
-                    eventInfo.arguments = content.Replace($"{eventInfo.specialEvent}(", "").Replace(")", "")
-                        .Replace($"{eventInfo.specialEvent}，", "").Replace(eventInfo.specialEvent, "").Replace("，", ",");
+                    if (!content.Contains('(')) split = content.Split('，');
+                    else split = content.Split('(');
+                    if (particleEvents) split[0] = ConvertParticleEventProperty(split[0]);
+                    eventInfo.specialEvent = ConvertKeyword(split[0]);
+                    eventInfo.arguments = ConvertKeyword(content.Replace($"{split[0]}(", "").Replace(")", "")
+                        .Replace($"{split[0]}，", "").Replace(split[0], "").Replace("，", ","));
                 }
                 else
                 {
                     split = content.Split('，');
-                    eventInfo.changeMode = split[1];
+                    eventInfo.changeMode = ConvertKeyword(split[1]);
                     eventInfo.changeTime = split[2].Replace("帧", "");
-                    split = split[0].Split(' ');
-                    eventInfo.resultProperty = split[0];
-                    eventInfo.resultType = PropertyTypeRule.GetValueType(componentType, eventInfo.resultProperty);
-                    eventInfo.changeType = split[1];
-                    eventInfo.resultValue = ConvertSpecialValue(eventInfo.resultType, split[2], out eventInfo.isExpressionResult);
+                    split = AdjustEventText(split[0]).Split(' ');
+                    if (particleEvents) split[0] = ConvertParticleEventProperty(split[0]);
+                    eventInfo.resultProperty = ConvertKeyword(split[0]);
+                    if (eventInfo.resultProperty == TypeKeyword)
+                    {
+                        //TODO : Increase/Decrease Type
+                        eventInfo.isSpecialEvent = true;
+                        eventInfo.specialEvent = "ChangeType";
+                        eventInfo.arguments = "0,0";
+                    }
+                    else
+                    {
+                        if (eventInfo.resultProperty == BlendKeyword)
+                        {
+                            eventInfo.resultValue = BlendValueMap[eventInfo.resultValue];
+                        }
+                        eventInfo.resultType = PropertyTypeRule.GetValueType(componentType, eventInfo.resultProperty);
+                        eventInfo.changeType = ConvertKeyword(split[1]);
+                        eventInfo.resultValue = ConvertSpecialValue(eventInfo.resultType, ConvertKeyword(split[2]), out eventInfo.isExpressionResult);
+                    }
                 }
-                group.Events.Add(EventHelper.BuildEvent(eventInfo, eventInfo.isSpecialEvent));
+                var eventText = EventHelper.BuildEvent(eventInfo, !eventInfo.isSpecialEvent);
+                group.Events.Add(eventText);
             }
             return group;
         }
-        public static List<EventGroup> GetEventGroups(Type componentType, string str)
+        public static List<EventGroup> GetEventGroups(Type componentType, string str, bool particleEvents)
         {
             var split = str.Split('&');
             var groups = new List<EventGroup>();
             foreach (var groupStr in split)
             {
                 if (string.IsNullOrEmpty(groupStr)) continue;
-                groups.Add(GetEventGroup(componentType, groupStr));
+                groups.Add(GetEventGroup(componentType, groupStr, particleEvents));
             }
             return groups;
         }
