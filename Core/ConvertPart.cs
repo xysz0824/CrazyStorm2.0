@@ -102,7 +102,7 @@ namespace CrazyStorm.Core
             @"(?<randtiao>[^,]+),(?<randt>[^,]+),(?<randfdirection>[^,]+),(?<randrange>[^,]+)," +
             @"(?<randspeed>[^,]+),(?<randspeedd>[^,]+),(?<randaspeed>[^,]+),(?<randaspeedd>[^,]+),(?<randhead>[^,]+)," +
             @"(?<randsonspeed>[^,]+),(?<randsonspeedd>[^,]+),(?<randsonaspeed>[^,]+),(?<randsonaspeedd>[^,]+)" +
-            @"(?:,(?<affectByCover>[^,]+))?(?:,(?<affectByRebound>[^,]+))?(?:,(?<affectByForce>[^,]+))?" +
+            @"(?:,(?<affectedByCover>[^,]+))?(?:,(?<affectedByRebound>[^,]+))?(?:,(?<affectedByForce>[^,]+))?" +
             @"(?:,(?<deepbind>[^,]+))?" +
             @"(?:,(?<randwscale>[^,]+))?(?:,(?<randhscale>[^,]+))?(?:,(?<syncScale>[^,]+))?" +
             @"(?:,(?<instantMovement>[^,]+))?$", RegexOptions.Compiled);
@@ -357,6 +357,7 @@ namespace CrazyStorm.Core
                                 batch, "Acspeed");
                             batch.AcspeedAngle = ConvertAngle(float.Parse(match.Groups["aspeedd"].Value), float.Parse(match.Groups["randaspeedd"].Value),
                                 batch, "AcspeedAngle");
+                            batch.InstantMovement = match.Groups["instantmovement"].Success ? bool.Parse(match.Groups["instantmovement"].Value) : false;
                             var particle = batch.Particle as Particle;
                             particle.MaxLife = int.Parse(match.Groups["sonlife"].Value);
                             var typeId = int.Parse(match.Groups["typeid"].Value);
@@ -368,22 +369,25 @@ namespace CrazyStorm.Core
                             {
                                 particle.Type = particleSystem.CustomTypes[typeId];
                             }
-                            particle.WidthScale = float.Parse(match.Groups["wscale"].Value);
-                            particle.HeightScale = float.Parse(match.Groups["hscale"].Value);
+                            particle.WidthScale = ConvertFloat(float.Parse(match.Groups["wscale"].Value), match.Groups["randwscale"].Success ?
+                                float.Parse(match.Groups["randwscale"].Value) : 0f, particle, "WidthScale");
+                            particle.HeightScale = ConvertFloat(float.Parse(match.Groups["hscale"].Value), match.Groups["randhscale"].Success ?
+                                float.Parse(match.Groups["randhscale"].Value) : 0f, particle, "HeightScale");
+                            particle.RetainScale = match.Groups["syncScale"].Success ? bool.Parse(match.Groups["syncScale"].Value) : true;
                             particle.RGB = new RGB(float.Parse(match.Groups["colorR"].Value),
                                 float.Parse(match.Groups["colorG"].Value), float.Parse(match.Groups["colorB"].Value));
                             particle.Opacity = float.Parse(match.Groups["alpha"].Value);
                             particle.PRotation = ConvertAngle(float.Parse(match.Groups["head"].Value), float.Parse(match.Groups["randhead"].Value),
-                                batch, "PRotation");
+                                particle, "PRotation");
                             particle.StickToSpeedAngle = bool.Parse(match.Groups["withspeedd"].Value);
                             particle.PSpeed = ConvertFloat(float.Parse(match.Groups["sonspeed"].Value), float.Parse(match.Groups["randsonspeed"].Value),
-                                batch, "PSpeed");
+                                particle, "PSpeed");
                             particle.PSpeedAngle = ConvertAngle(float.Parse(match.Groups["sonspeedd"].Value), float.Parse(match.Groups["randsonspeedd"].Value),
-                                batch, "PSpeedAngle");
+                                particle, "PSpeedAngle");
                             particle.PAcspeed = ConvertFloat(float.Parse(match.Groups["sonaspeed"].Value), float.Parse(match.Groups["randsonaspeed"].Value),
-                                batch, "PAcspeed");
-                            particle.PAcspeedAngle = ConvertAngle(float.Parse(match.Groups["sonaspeedd"].Value), float.Parse(match.Groups["randsonaspeedd"].Value), 
-                                batch, "PAcspeedAngle");
+                                particle, "PAcspeed");
+                            particle.PAcspeedAngle = ConvertAngle(float.Parse(match.Groups["sonaspeedd"].Value), float.Parse(match.Groups["randsonaspeedd"].Value),
+                                particle, "PAcspeedAngle");
                             particle.PSpeedHScale = float.Parse(match.Groups["xscale"].Value);
                             particle.PSpeedVScale = float.Parse(match.Groups["yscale"].Value);
                             particle.FadeEffect = bool.Parse(match.Groups["dispel"].Value);
@@ -392,13 +396,15 @@ namespace CrazyStorm.Core
                             particle.AfterimageEffect = bool.Parse(match.Groups["afterimage"].Value);
                             particle.KillOutside = bool.Parse(match.Groups["outdispel"].Value);
                             particle.Collision = bool.Parse(match.Groups["invincible"].Value);
+                            particle.IgnoreMask = match.Groups["affectedByCover"].Success ? !bool.Parse(match.Groups["affectedByCover"].Value) : false;
+                            particle.IgnoreRebound = match.Groups["affectedByRebound"].Success ? !bool.Parse(match.Groups["affectedByRebound"].Value) : false;
+                            particle.IgnoreForce = match.Groups["affectedByForce"].Success ? !bool.Parse(match.Groups["affectedByForce"].Value) : false;
                             //events
                             var eventGroups = GetEventGroups(typeof(MultiEmitter), match.Groups["events"].Value, false);
                             foreach (var eventGroup in eventGroups) batch.ComponentEventGroups.Add(eventGroup);
                             //sonevents
                             eventGroups = GetEventGroups(typeof(Particle), match.Groups["sonevents"].Value, true);
                             foreach (var eventGroup in eventGroups) batch.ParticleEventGroups.Add(eventGroup);
-
                             layer.Components.Add(batch);
                         }
                         //binding

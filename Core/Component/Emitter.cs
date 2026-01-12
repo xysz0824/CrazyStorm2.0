@@ -3,6 +3,7 @@
  * Copyright (c) StarX 2026
  */
 using System;
+using System.Buffers;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
@@ -24,12 +25,14 @@ namespace CrazyStorm.Core
         public float emitRange;
         public float emitRadius;
         public float emitRoundAngle;
+        public bool instantMovement;
     }
     public abstract class Emitter : Component
     {
         #region Private Members
         EmitterData emitterData;
         IList<EventGroup> particleEventGroups;
+        Vector2[] lastSpawn;
         #endregion
 
         #region Protected Members
@@ -83,6 +86,12 @@ namespace CrazyStorm.Core
             get { return emitterData.emitRoundAngle; }
             set { emitterData.emitRoundAngle = value; }
         }
+        [BoolProperty]
+        public bool InstantMovement
+        {
+            get { return emitterData.instantMovement; }
+            set { emitterData.instantMovement = value; }
+        }
         public ParticleBase Particle { get { return particle; } }
         public IList<EventGroup> ParticleEventGroups { get { return particleEventGroups; } }
         #endregion
@@ -101,6 +110,7 @@ namespace CrazyStorm.Core
             Particles = new LinkedList<ParticleBase>();
             EmitterEventGroups = new List<EventGroup>();
             particleEventGroups = new GenericContainer<EventGroup>();
+            lastSpawn = null;
         }
         #endregion
 
@@ -123,6 +133,19 @@ namespace CrazyStorm.Core
                     EmitPosition.y + EmitRadius * (float)Math.Sin(MathHelper.DegToRad(EmitRoundAngle)));
                 Template.PSpeedAngle = angle;
                 ParticleBase newParticle = ParticleManager.GetParticle(LayerID, Template);
+                if (InstantMovement)
+                {
+                    newParticle.MaxLife = 1;
+                    var pool = ArrayPool<Vector2>.Shared;
+                    if (lastSpawn == null) lastSpawn = pool.Rent(EmitCount);
+                    else if (lastSpawn != null && lastSpawn.Length < EmitCount)
+                    {
+                        pool.Return(lastSpawn, true);
+                        lastSpawn = pool.Rent(EmitCount);
+                    }
+                    newParticle.PPositionLast = lastSpawn[i] == default ? newParticle.PPosition : lastSpawn[i];
+                    lastSpawn[i] = newParticle.PPosition;
+                }
                 newParticle.ParticleEventGroups = EmitterEventGroups;
                 Particles.AddLast(newParticle);
             }
@@ -242,6 +265,9 @@ namespace CrazyStorm.Core
                 case "EmitRoundAngle":
                     VM.PushFloat(EmitRoundAngle);
                     return true;
+                case "InstanceMovement":
+                    VM.PushBool(InstantMovement);
+                    return true;
             }
             if (Template == null)
             {
@@ -283,6 +309,15 @@ namespace CrazyStorm.Core
                 case "EmitRoundAngle":
                     EmitRoundAngle = VM.PopFloat();
                     return true;
+                case "InstantMovement":
+                    InstantMovement = VM.PopBool();
+                    if (!InstantMovement && lastSpawn != null)
+                    {
+                        var pool = ArrayPool<Vector2>.Shared;
+                        pool.Return(lastSpawn);
+                        lastSpawn = null;
+                    }
+                    return true;
             }
             if (Template == null)
             {
@@ -292,14 +327,9 @@ namespace CrazyStorm.Core
         }
         public override bool Update(int currentFrame)
         {
-            if (!base.Update(currentFrame))
-                return false;
-
-            if (BindingTarget == null || CheckCircularBinding())
-                EmitCyclically();
-            else
-                BindingUpdate(EmitCyclically);
-
+            if (!base.Update(currentFrame)) return false;
+            if (BindingTarget == null || CheckCircularBinding()) EmitCyclically();
+            else BindingUpdate(EmitCyclically);
             return true;
         }
         public override void Reset()
@@ -315,6 +345,7 @@ namespace CrazyStorm.Core
             EmitRange = initialState.EmitRange;
             EmitRadius = initialState.EmitRadius;
             EmitRoundAngle = initialState.EmitRoundAngle;
+            InstantMovement = initialState.InstantMovement;
         }
         public void EmitParticle()
         {

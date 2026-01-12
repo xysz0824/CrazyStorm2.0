@@ -72,7 +72,7 @@ namespace CrazyStorm.Core
         public int PCurrentFrame { get; set; }
         [RuntimeProperty]
         public Vector2 PPosition { get; set; }
-        public Vector2 PPositionLast { get; private set; }
+        public Vector2 PPositionLast { get; set; }
         public ParticleType Type
         {
             get { return type; }
