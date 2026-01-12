@@ -16,6 +16,10 @@ namespace CrazyStorm.Core
 {
     public partial class File
     {
+        static readonly LayerColor[] LayerColorMap = new LayerColor[]
+        {
+            LayerColor.Blue, LayerColor.Yellow, LayerColor.Pink, LayerColor.Green, LayerColor.Purple, LayerColor.Red, LayerColor.Orange, 
+        };
         static readonly Regex RenderingOrderMatch = new Regex(@"RenderingOrder:(\d+)", RegexOptions.Compiled);
         static readonly Regex ExternalMatch = new Regex(@"(?<!\w)(?:[A-Za-z]:\\|\.{1,2}\\)?(?:[^\\/:*?""<>|\r\n]+\\)*[^\\/:*?""<>|\r\n]+\.(png|dat)", RegexOptions.Compiled);
         static readonly Regex TypeCountMatch = new Regex(@"(\d+) Types:", RegexOptions.Compiled);
@@ -316,7 +320,7 @@ namespace CrazyStorm.Core
                     if (match.Success)
                     {
                         var layer = new Layer(match.Groups["name"].Value);
-                        layer.Color = (LayerColor)(int.Parse(match.Groups["num"].Value) - 1);
+                        layer.Color = LayerColorMap[int.Parse(match.Groups["num"].Value) - 1];
                         layer.BeginFrame = int.Parse(match.Groups["begin"].Value) - 1;
                         layer.TotalFrame = int.Parse(match.Groups["end"].Value) - layer.BeginFrame;
                         var batchCount = int.Parse(match.Groups["batchcount"].Value);

@@ -181,7 +181,7 @@
             </Setter>
         </Style>
         <DataTemplate x:Key="ComponentItem" >
-            <Canvas>
+            <Canvas Width="32" Height="32">
                 <Label Name="Frame" Width="32" Height="32">
                     <Label.Background>
                         <ImageBrush ImageSource="Images/layercolor.png" TileMode="FlipY">
@@ -196,13 +196,15 @@
                         <DropShadowEffect ShadowDepth="0" BlurRadius="8" />
                     </Border.Effect>
                 </Border>
-                <DockPanel Canvas.Left="0" Canvas.Top="0" Margin="2" Background="{StaticResource ComponentIconBrush}">
+                <DockPanel Canvas.Left="0" Canvas.Top="0" Margin="2" Background="Black">
                     <Path Name="Icon" Data="{x:Null}" Fill="White" Width="28" Height="28" Stretch="Uniform" RenderTransformOrigin="0.5,0.5">
                         <Path.Effect>
                             <DropShadowEffect Color="Black" Opacity="0.9" BlurRadius="5" Direction="315" ShadowDepth="0" />
                         </Path.Effect>
                     </Path>
                 </DockPanel>
+                <Label Name="ID" Content="120" MaxWidth="64" Padding="1,0" Margin="0" FontSize="10" Canvas.Right="0" Canvas.Bottom="0" Height="12" 
+                       HorizontalAlignment="Right" Background="White" Foreground="Black"/>
             </Canvas>
         </DataTemplate>
         <LinearGradientBrush x:Key="PlayIconBrush" EndPoint="0.5,1" StartPoint="0.5,0">
@@ -695,24 +697,12 @@
                                 </GroupBox>
                                 <GroupBox Padding="0,0,0,0" Style="{StaticResource FlatGroupBox}" Header="{StaticResource ComponentTreeStr}" Name="Explorer" VerticalContentAlignment="Stretch" HorizontalContentAlignment="Stretch" >
                                     <TreeView Name="ComponentTree" Padding="1,4,1,4" Margin="0,26,0,0" VerticalContentAlignment="Stretch" HorizontalContentAlignment="Stretch" 
-                                              AllowDrop="True" MouseMove="ComponentTree_MouseMove" MouseDoubleClick="ComponentTree_MouseDoubleClick"
+                                              AllowDrop="True" MouseMove="ComponentTree_MouseMove" SelectedItemChanged="ComponentTree_SelectedItemChanged" MouseDoubleClick="ComponentTree_MouseDoubleClick"
                                               DragEnter="ComponentTree_CheckDrop" DragOver="ComponentTree_CheckDrop" DragLeave="ComponentTree_CheckDrop" Drop="ComponentTree_Drop" 
                                               IsTextSearchEnabled="True" Background="{DynamicResource ListBrush}" BorderThickness="0,0,0,0">
                                         <TreeView.ItemTemplate >
                                             <HierarchicalDataTemplate ItemsSource="{Binding Children}">
                                                 <TextBlock Text="{Binding Name}" MouseLeftButtonDown="ComponentTree_MouseLeftButtonDown">
-                                                    <TextBlock.Style >
-                                                        <Style TargetType="TextBlock">
-                                                            <Style.Triggers>
-                                                                <DataTrigger Binding="{Binding HasOutStandingTask}" Value="true">
-                                                                    <Setter Property="Foreground" Value="DarkOrange" />
-                                                                </DataTrigger>
-                                                                <DataTrigger Binding="{Binding HasOutStandingTask}" Value="false">
-                                                                    <Setter Property="Foreground" Value="Aqua" />
-                                                                </DataTrigger>
-                                                            </Style.Triggers>
-                                                        </Style>
-                                                    </TextBlock.Style>
                                                 </TextBlock>
                                             </HierarchicalDataTemplate>
                                         </TreeView.ItemTemplate>

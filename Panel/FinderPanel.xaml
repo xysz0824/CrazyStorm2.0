@@ -41,18 +41,6 @@
                     <TreeView.ItemTemplate >
                         <DataTemplate>
                             <TextBlock Text="{Binding Name}" PreviewMouseLeftButtonDown="TextBlock_PreviewMouseLeftButtonDown" >
-                                <TextBlock.Style>
-                                    <Style TargetType="TextBlock">
-                                        <Style.Triggers>
-                                            <DataTrigger Binding="{Binding HasOutStandingTask}" Value="true">
-                                                <Setter Property="Foreground" Value="DarkOrange" />
-                                            </DataTrigger>
-                                            <DataTrigger Binding="{Binding HasOutStandingTask}" Value="false">
-                                                <Setter Property="Foreground" Value="Aqua" />
-                                            </DataTrigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </TextBlock.Style>
                             </TextBlock>
                         </DataTemplate>
                     </TreeView.ItemTemplate>

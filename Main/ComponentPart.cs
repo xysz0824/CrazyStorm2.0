@@ -260,6 +260,13 @@ namespace CrazyStorm
             new ComponentTreeCommand().Do(commandStacks[selectedSystem],
                 selectedSystem, sourceComponent, targetComponent, new Action(UpdateProperty));
         }
+        private void ComponentTree_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
+        {
+            if (ComponentTree.SelectedItem == null) return;
+            var set = new List<CrazyStorm.Core.Component>();
+            set.Add(ComponentTree.SelectedItem as Component);
+            SelectComponents(set, true);
+        }
         private void ComponentTree_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
             if (e.OriginalSource is TextBlock && ComponentTree.SelectedItem != null)

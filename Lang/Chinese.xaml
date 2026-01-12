@@ -180,6 +180,7 @@
     <sys:String x:Key="YellowStr">黄</sys:String>
     <sys:String x:Key="OrangeStr">橙</sys:String>
     <sys:String x:Key="GrayStr">灰</sys:String>
+    <sys:String x:Key="PinkStr">粉</sys:String>
     <sys:String x:Key="ConditionStr">条件</sys:String>
     <sys:String x:Key="TypeStr">类型</sys:String>
     <sys:String x:Key="ResultStr">结果</sys:String>

@@ -23,7 +23,7 @@ namespace CrazyStorm.Core
         Green,
         Yellow,
         Orange,
-        Gray
+        Pink,
     }
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public struct LayerData

@@ -72,6 +72,8 @@ namespace CrazyStorm
                             var frame = VisualHelper.VisualDownwardSearch(item, "Frame") as Label;
                             var icon = VisualHelper.VisualDownwardSearch(item, "Icon") as Path;
                             var box = VisualHelper.VisualDownwardSearch(item, "Box") as Border;
+                            var id = VisualHelper.VisualDownwardSearch(item, "ID") as Label;
+                            id.Content = component.Name;
                             frame.DataContext = layer;
                             box.Opacity = component.Selected ? 1 : 0;
                             //If component has a parent, caculate the absolute position.
@@ -101,14 +103,17 @@ namespace CrazyStorm
                                     DrawHelper.DrawLine(canvas, (int)x + config.ScreenWidthOver2, (int)y + config.ScreenHeightOver2,
                                         (int)tx + config.ScreenWidthOver2, (int)ty + config.ScreenHeightOver2, 2, false, Colors.White, 0.5f);
                             }
-                            if (component.Selected) selectedComponents.Add(component);
-                            //Draw component mark.
-                            var marker = assembly.CreateInstance("CrazyStorm.ComponentMarker") as IComponentMark;
-                            marker.Draw(canvas, component, (int)x + config.ScreenWidthOver2, (int)y + config.ScreenHeightOver2);
-                            //Draw specific mark.
-                            if (component is Emitter) marker = assembly.CreateInstance("CrazyStorm.EmitterMarker") as IComponentMark;
-                            else marker = assembly.CreateInstance("CrazyStorm." + component.GetType().Name + "Marker") as IComponentMark;
-                            marker?.Draw(canvas, component, (int)x + config.ScreenWidthOver2, (int)y + config.ScreenHeightOver2);
+                            if (component.Selected)
+                            {
+                                selectedComponents.Add(component);
+                                //Draw component mark.
+                                var marker = assembly.CreateInstance("CrazyStorm.ComponentMarker") as IComponentMark;
+                                marker.Draw(canvas, component, (int)x + config.ScreenWidthOver2, (int)y + config.ScreenHeightOver2);
+                                //Draw specific mark.
+                                if (component is Emitter) marker = assembly.CreateInstance("CrazyStorm.EmitterMarker") as IComponentMark;
+                                else marker = assembly.CreateInstance("CrazyStorm." + component.GetType().Name + "Marker") as IComponentMark;
+                                marker?.Draw(canvas, component, (int)x + config.ScreenWidthOver2, (int)y + config.ScreenHeightOver2);
+                            }
                             icon.Data = (Geometry)FindResource($"{component.GetType().Name}_Icon");
                             var scale = (double)FindResource($"{component.GetType().Name}_Scale");
                             var transform = new ScaleTransform(scale, scale, icon.ActualWidth / 2, icon.ActualHeight / 2);
@@ -165,28 +170,24 @@ namespace CrazyStorm
         void SelectComponents(List<Component> set, bool canDoubleClick, int clickCount)
         {
             foreach (var layer in selectedSystem.Layers)
-                if (layer.Visible)
-                    foreach (var component in layer.Components)
+            {
+                if (!layer.Visible) continue;
+                foreach (var component in layer.Components)
+                {
+                    if (Keyboard.Modifiers != ModifierKeys.Control) component.Selected = false;
+                    if (set != null)
                     {
-                        if (Keyboard.Modifiers != ModifierKeys.Control)
-                            component.Selected = false;
-                        
-                        if (set != null)
+                        foreach (var target in set)
                         {
-                            foreach (var target in set)
+                            if (component == target)
                             {
-                                if (component == target)
-                                {
-                                    component.Selected = 
-                                        Keyboard.Modifiers != ModifierKeys.Control ? 
-                                        true :
-                                        !component.Selected;
-                                    break;
-                                }
+                                component.Selected = Keyboard.Modifiers != ModifierKeys.Control ? true : !component.Selected;
+                                break;
                             }
                         }
                     }
-
+                }
+            }
             UpdateSelectedStatus();
             //If mouse double click
             if (!(canDoubleClick && set != null && set.Count > 0 && Keyboard.Modifiers != ModifierKeys.Control))
