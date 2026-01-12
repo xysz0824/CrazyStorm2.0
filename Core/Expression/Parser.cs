@@ -141,6 +141,8 @@ namespace CrazyStorm.Expression
                 IdentifierToken(",");
                 coordinateList.Add(Expression());
             }
+            if (dimension == 1)
+                return new Rand(coordinateList[0]);
             if (dimension == 2)
                 return new Rand(coordinateList[0], coordinateList[1]);
             else

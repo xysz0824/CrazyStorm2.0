@@ -57,7 +57,6 @@ namespace CrazyStorm
             string[] split = properyName.Split('.');
             string displayName = FindTranslation(split[0]);
             if (displayName != null && split.Length > 1) displayName += "." + split[1];
-            else if (displayName == null) displayName = split[0];
             return displayName;
         }
         public static string Translate(string expression)
@@ -69,11 +68,18 @@ namespace CrazyStorm
                 var token = lexer.Tokens[i] as IdentifierToken;
                 if (token != null && !token.IsOperator)
                 {
-                    var translated = FindTranslation((string)token.GetValue());
+                    var translated = TranslateProperty((string)token.GetValue());
                     if (translated != null) token.SetValue(translated);
                 }
             }
             return lexer.Output();
+        }
+        public static string ReverseTranslateProperty(string properyName)
+        {
+            string[] split = properyName.Split('.');
+            string displayName = FindReverseTranslation(split[0]);
+            if (displayName != null && split.Length > 1) displayName += "." + split[1];
+            return displayName;
         }
         public static string ReverseTranslate(string expression)
         {
@@ -84,7 +90,7 @@ namespace CrazyStorm
                 var token = lexer.Tokens[i] as IdentifierToken;
                 if (token != null && !token.IsOperator)
                 {
-                    var original = FindReverseTranslation(token.GetValue() as string);
+                    var original = ReverseTranslateProperty(token.GetValue() as string);
                     if (original != null) token.SetValue(original);
                 }
             }

@@ -14,7 +14,7 @@ namespace CrazyStorm.Core
 {
     public enum ForceType
     {
-        Direction,
+        OneDirection,
         Inner,
         Outer
     }
@@ -131,7 +131,7 @@ namespace CrazyStorm.Core
                 }
                 switch (ForceType)
                 {
-                    case ForceType.Direction:
+                    case ForceType.OneDirection:
                         Vector2 v = new Vector2();
                         MathHelper.SetVector2(ref v, Force / results[i].Mass, Direction);
                         results[i].PSpeedVector += v;

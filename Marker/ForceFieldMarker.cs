@@ -42,7 +42,7 @@ namespace CrazyStorm
             }
             switch (force.ForceType)
             {
-                case ForceType.Direction:
+                case ForceType.OneDirection:
                     DrawHelper.DrawArrow(canvas, x, y, 40, 2, force.Direction, Colors.Yellow, 1);
                     break;
                 case ForceType.Inner:

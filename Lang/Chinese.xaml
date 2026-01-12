@@ -22,6 +22,7 @@
     <sys:String x:Key="PasteStr">粘贴</sys:String>
     <sys:String x:Key="DelStr">删除</sys:String>
     <sys:String x:Key="FindStr">查找</sys:String>
+    <sys:String x:Key="AllStr">全部</sys:String>
     <sys:String x:Key="SelectAllStr">选中全部</sys:String>
     <sys:String x:Key="ResourceStr">资源</sys:String>
     <sys:String x:Key="AddImageStr">添加图案</sys:String>
@@ -129,6 +130,9 @@
     <sys:String x:Key="FieldShapeStr">场形状</sys:String>
     <sys:String x:Key="RebounderShapeStr">反弹板形状</sys:String>
     <sys:String x:Key="ReachStr">范围</sys:String>
+    <sys:String x:Key="RectangleStr">矩形</sys:String>
+    <sys:String x:Key="LineStr">线形</sys:String>
+    <sys:String x:Key="CircleStr">圆形</sys:String>
     <sys:String x:Key="TargetNameStr">目标名称</sys:String>
     <sys:String x:Key="SizeStr">尺寸</sys:String>
     <sys:String x:Key="RotationStr">旋转角</sys:String>
@@ -136,6 +140,9 @@
     <sys:String x:Key="ForceStr">力大小</sys:String>
     <sys:String x:Key="DirectionStr">方向角</sys:String>
     <sys:String x:Key="ForceTypeStr">力类型</sys:String>
+    <sys:String x:Key="OneDirectionStr">单向</sys:String>
+    <sys:String x:Key="InnerStr">朝向中心</sys:String>
+    <sys:String x:Key="OuterStr">排斥中心</sys:String>
     <sys:String x:Key="LinearStr">线性</sys:String>
     <sys:String x:Key="AcceleratedStr">加速</sys:String>
     <sys:String x:Key="DeceleratedStr">减速</sys:String>

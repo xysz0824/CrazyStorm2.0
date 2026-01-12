@@ -12,38 +12,64 @@ namespace CrazyStorm.Expression
 {
     public class Rand : SyntaxTree
     {
+        //{a,b}
         public Rand(SyntaxTree left, SyntaxTree right)
         {
             AddChild(left);
             AddChild(right);
         }
+        //{x} => {-x, x}
+        public Rand(SyntaxTree unique)
+        {
+            AddChild(unique);
+        }
 
         public SyntaxTree GetLeft() { return GetChildren()[0]; }
 
         public SyntaxTree GetRight() { return GetChildren()[1]; }
+        public bool HasRight() => GetChildren().Count > 1;
 
         public override object Eval(Environment e)
         {
             var left = GetLeft().Eval(e);
-            var right = GetRight().Eval(e);
-            if ((!(left is int) && !(left is float)) || (!(right is int) && !(right is float)))
+            if (HasRight())
             {
-                throw new ExpressionException("TypeError");
+                var right = GetRight().Eval(e);
+                if ((!(left is int) && !(left is float)) || (!(right is int) && !(right is float)))
+                {
+                    throw new ExpressionException("TypeError");
+                }
+                float ratio = (float)new Random().NextDouble();
+                return (float)left * (1 - ratio) + (float)right * ratio;
             }
-            float ratio = (float)new Random().NextDouble();
-            return (float)left * (1 - ratio) + (float)right * ratio;
+            else if (GetLeft() is Number)
+            {
+                float ratio = (float)new Random().NextDouble();
+                return (-(float)left) * (1 - ratio) + (float)left * ratio;
+            }
+            else throw new ExpressionException("IllegalInput");
         }
 
         public override void Compile(List<byte> codeStream)
         {
-            GetLeft().Compile(codeStream);
-            GetRight().Compile(codeStream);
-            byte[] code = VM.CreateInstruction(VMCode.RAND);
-            codeStream.AddRange(code);
+            if (HasRight())
+            {
+                GetLeft().Compile(codeStream);
+                GetRight().Compile(codeStream);
+                codeStream.AddRange(VM.CreateInstruction(VMCode.RAND));
+            }
+            else
+            {
+                //Left must be number
+                var v = (float)GetLeft().Eval(null);
+                codeStream.AddRange(VM.CreateInstruction(VMCode.VECTOR, new Vector3(-v)));
+                codeStream.AddRange(VM.CreateInstruction(VMCode.VECTOR, new Vector3(v)));
+                codeStream.AddRange(VM.CreateInstruction(VMCode.RAND));
+            }
         }
         public override string ToString()
         {
-            return $"{{{GetLeft()},{GetRight()}}}";
+            return HasRight() ? $"{{{GetLeft()},{GetRight()}}}" : $"{{{GetLeft()}}}";
         }
     }
 }

@@ -332,25 +332,31 @@ namespace CrazyStorm.Core
                             particleSystem.GetAndIncreaseComponentIndex(batch.GetType().ToString());
                             batch.ParentID = center.ID;
                             batch.Position = ConvertVector2(float.Parse(match.Groups["x"].Value), float.Parse(match.Groups["y"].Value),
-                                batch, "Position") - OldCenter;
+                                0, 0, batch, "Position") - OldCenter;
                             batch.BeginFrame = int.Parse(match.Groups["begin"].Value);
                             batch.TotalFrame = int.Parse(match.Groups["life"].Value);
                             batch.EmitPosition = ConvertVector2(float.Parse(match.Groups["fx"].Value), float.Parse(match.Groups["fy"].Value),
-                                batch, "EmitPosition") - OldCenter;
-                            batch.EmitRadius = float.Parse(match.Groups["r"].Value);
-                            batch.EmitRoundAngle = ConvertAngle(float.Parse(match.Groups["rdirection"].Value),
-                                match.Groups["rdirections"].Value, batch, "EmitRoundAngle");
-                            batch.EmitCount = int.Parse(match.Groups["tiao"].Value);
-                            batch.EmitCycle = int.Parse(match.Groups["t"].Value);
-                            batch.EmitAngle = ConvertAngle(float.Parse(match.Groups["fdirection"].Value),
-                                match.Groups["fdirections"].Value, batch, "EmitAngle");
-                            batch.EmitRange = int.Parse(match.Groups["range"].Value);
-                            batch.Speed = float.Parse(match.Groups["speed"].Value);
-                            batch.SpeedAngle = ConvertAngle(float.Parse(match.Groups["speedd"].Value),
-                                match.Groups["speedds"].Value, batch, "SpeedAngle");
-                            batch.Acspeed = float.Parse(match.Groups["aspeed"].Value);
-                            batch.AcspeedAngle = ConvertAngle(float.Parse(match.Groups["aspeedd"].Value),
-                                match.Groups["aspeedds"].Value, batch, "AcspeedAngle");
+                                float.Parse(match.Groups["randfx"].Value), float.Parse(match.Groups["randfy"].Value), batch, "EmitPosition") - OldCenter;
+                            batch.EmitRadius = ConvertFloat(float.Parse(match.Groups["r"].Value), float.Parse(match.Groups["randr"].Value),
+                                batch, "EmitRadius");
+                            batch.EmitRoundAngle = ConvertAngle(float.Parse(match.Groups["rdirection"].Value), float.Parse(match.Groups["randrdirection"].Value), 
+                                batch, "EmitRoundAngle");
+                            batch.EmitCount = ConvertInt(int.Parse(match.Groups["tiao"].Value), int.Parse(match.Groups["randtiao"].Value),
+                                batch, "EmitCount");
+                            batch.EmitCycle = ConvertInt(int.Parse(match.Groups["t"].Value), int.Parse(match.Groups["randt"].Value),
+                                batch, "EmitCycle");
+                            batch.EmitAngle = ConvertAngle(float.Parse(match.Groups["fdirection"].Value), float.Parse(match.Groups["randfdirection"].Value), 
+                                batch, "EmitAngle");
+                            batch.EmitRange = ConvertInt(int.Parse(match.Groups["range"].Value), int.Parse(match.Groups["randrange"].Value),
+                                batch, "EmitRange");
+                            batch.Speed = ConvertFloat(float.Parse(match.Groups["speed"].Value), float.Parse(match.Groups["randspeed"].Value),
+                                batch, "Speed");
+                            batch.SpeedAngle = ConvertAngle(float.Parse(match.Groups["speedd"].Value), float.Parse(match.Groups["randspeedd"].Value),
+                                batch, "SpeedAngle");
+                            batch.Acspeed = ConvertFloat(float.Parse(match.Groups["aspeed"].Value), float.Parse(match.Groups["randaspeed"].Value),
+                                batch, "Acspeed");
+                            batch.AcspeedAngle = ConvertAngle(float.Parse(match.Groups["aspeedd"].Value), float.Parse(match.Groups["randaspeedd"].Value),
+                                batch, "AcspeedAngle");
                             var particle = batch.Particle as Particle;
                             particle.MaxLife = int.Parse(match.Groups["sonlife"].Value);
                             var typeId = int.Parse(match.Groups["typeid"].Value);
@@ -367,15 +373,17 @@ namespace CrazyStorm.Core
                             particle.RGB = new RGB(float.Parse(match.Groups["colorR"].Value),
                                 float.Parse(match.Groups["colorG"].Value), float.Parse(match.Groups["colorB"].Value));
                             particle.Opacity = float.Parse(match.Groups["alpha"].Value);
-                            particle.PRotation = ConvertAngle(float.Parse(match.Groups["head"].Value),
-                                match.Groups["heads"].Value, batch, "PRotation");
+                            particle.PRotation = ConvertAngle(float.Parse(match.Groups["head"].Value), float.Parse(match.Groups["randhead"].Value),
+                                batch, "PRotation");
                             particle.StickToSpeedAngle = bool.Parse(match.Groups["withspeedd"].Value);
-                            particle.PSpeed = float.Parse(match.Groups["sonspeed"].Value);
-                            particle.PSpeedAngle = ConvertAngle(float.Parse(match.Groups["sonspeedd"].Value),
-                                match.Groups["sonspeedds"].Value, batch, "PSpeedAngle");
-                            particle.PAcspeed = float.Parse(match.Groups["sonaspeed"].Value);
-                            particle.PAcspeedAngle = ConvertAngle(float.Parse(match.Groups["sonaspeedd"].Value),
-                                match.Groups["sonaspeedds"].Value, batch, "PAcspeedAngle");
+                            particle.PSpeed = ConvertFloat(float.Parse(match.Groups["sonspeed"].Value), float.Parse(match.Groups["randsonspeed"].Value),
+                                batch, "PSpeed");
+                            particle.PSpeedAngle = ConvertAngle(float.Parse(match.Groups["sonspeedd"].Value), float.Parse(match.Groups["randsonspeedd"].Value),
+                                batch, "PSpeedAngle");
+                            particle.PAcspeed = ConvertFloat(float.Parse(match.Groups["sonaspeed"].Value), float.Parse(match.Groups["randsonaspeed"].Value),
+                                batch, "PAcspeed");
+                            particle.PAcspeedAngle = ConvertAngle(float.Parse(match.Groups["sonaspeedd"].Value), float.Parse(match.Groups["randsonaspeedd"].Value), 
+                                batch, "PAcspeedAngle");
                             particle.PSpeedHScale = float.Parse(match.Groups["xscale"].Value);
                             particle.PSpeedVScale = float.Parse(match.Groups["yscale"].Value);
                             particle.FadeEffect = bool.Parse(match.Groups["dispel"].Value);
@@ -390,6 +398,7 @@ namespace CrazyStorm.Core
                             //sonevents
                             eventGroups = GetEventGroups(typeof(Particle), match.Groups["sonevents"].Value, true);
                             foreach (var eventGroup in eventGroups) batch.ParticleEventGroups.Add(eventGroup);
+
                             layer.Components.Add(batch);
                         }
                         //binding
@@ -406,40 +415,85 @@ namespace CrazyStorm.Core
                 ParticleSystems.Add(particleSystem);
             }
         }
-        public static Vector2 ConvertVector2(float x, float y, PropertyContainer propertyContainer, string name)
+        public static int ConvertInt(int v, int rand, PropertyContainer propertyContainer, string name)
         {
-            if (x == -99998 && y == -99998)
+            if (rand != 0)
             {
                 propertyContainer.Properties[name] = new PropertyValue()
                 {
-                    Value = "Position",
+                    Value = $"{v}+{{{rand}}}",
+                    Expression = true,
+                };
+                return 0;
+            }
+            else return v;
+        }
+        public static float ConvertFloat(float v, float rand, PropertyContainer propertyContainer, string name)
+        {
+            if (rand != 0f)
+            {
+                propertyContainer.Properties[name] = new PropertyValue()
+                {
+                    Value = $"{v}+{{{rand}}}",
+                    Expression = true,
+                };
+                return 0f;
+            }
+            else return v;
+        }
+        public static Vector2 ConvertVector2(float x, float y, float randx, float randy, PropertyContainer propertyContainer, string name)
+        {
+            string randXStr = randx.ToString();
+            if (randx != 0f) randXStr = $"{{{randx}}}";
+            string randYStr = randy.ToString();
+            if (randy != 0f) randYStr = $"{{{randy}}}";
+            if (x == -99998 && y == -99998)
+            {
+                string randStr = (randx != 0f || randy != 0f) ? $"+[{randXStr},{randYStr}]" : "";
+                propertyContainer.Properties[name] = new PropertyValue()
+                {
+                    Value = $"Position{randStr}",
                     Expression = true,
                 };
                 return Vector2.Zero;
             }
             else if (x == -99999 && y == -99999)
             {
+                string randStr = (randx != 0f || randy != 0f) ? $"+[{randXStr},{randYStr}]" : "";
                 propertyContainer.Properties[name] = new PropertyValue()
                 {
-                    Value = "BodyPosition",
+                    Value = $"BodyPosition{randStr}",
                     Expression = true,
                 };
                 return Vector2.Zero;
             }
             else if (x <= -99998 || y <= -99998)
             {
+                randXStr = randx != 0f ? $"+{randXStr}" : "";
+                randYStr = randy != 0f ? $"+{randYStr}" : "";
                 propertyContainer.Properties[name] = new PropertyValue()
                 {
-                    Value = $"[{(x == -99998 ? "Position.x" : x == -99999 ? "BodyPosition.x" : x.ToString())}," +
-                    $"{(y == -99998 ? "Position.y" : y == -99999 ? "BodyPosition.x" : y.ToString())}]",
+                    Value = $"[{(x == -99998 ? "Position.x" : x == -99999 ? "BodyPosition.x" : x.ToString())}{randXStr}," +
+                    $"{(y == -99998 ? "Position.y" : y == -99999 ? "BodyPosition.y" : y.ToString())}{randYStr}]",
+                    Expression = true,
+                };
+                return Vector2.Zero;
+            }
+            else if (randx != 0f || randy != 0f)
+            {
+                string randStr = $"+[{randXStr},{randYStr}]";
+                propertyContainer.Properties[name] = new PropertyValue()
+                {
+                    Value = $"[{x},{y}]{randStr}",
                     Expression = true,
                 };
                 return Vector2.Zero;
             }
             else return new Vector2(x, y);
         }
-        public static float ConvertAngle(float deg, string vecStr, PropertyContainer propertyContainer, string name)
+        public static float ConvertAngle(float deg, float rand, PropertyContainer propertyContainer, string name)
         {
+            string randStr = rand != 0f ? $"+{{{rand}}}" : "";
             if (deg == -100000)
             {
                 //This expression is not implemented, just ignore it
@@ -449,7 +503,7 @@ namespace CrazyStorm.Core
             {
                 propertyContainer.Properties[name] = new PropertyValue
                 {
-                    Value = "BodyAngle",
+                    Value = $"BodyAngle{randStr}",
                     Expression = true,
                 };
                 return 0;
@@ -458,7 +512,16 @@ namespace CrazyStorm.Core
             {
                 propertyContainer.Properties[name] = new PropertyValue
                 {
-                    Value = "SelfAngle",
+                    Value = $"SelfAngle{randStr}",
+                    Expression = true,
+                };
+                return 0;
+            }
+            else if (rand != 0f)
+            {
+                propertyContainer.Properties[name] = new PropertyValue
+                {
+                    Value = $"{deg}{randStr}",
                     Expression = true,
                 };
                 return 0;
@@ -526,7 +589,7 @@ namespace CrazyStorm.Core
             if (value.Contains("+"))
             {
                 var split = value.Split('+');
-                return $"{split[0]}+{{-{split[1]},{split[1]}}}";
+                return $"{split[0]}+{{{split[1]}}}";
             }
             else return value;
         }
