@@ -42,17 +42,12 @@ namespace CrazyStorm.Core
             @"(?<x>[^,]+),(?<y>[^,]+)" +
             @"(?:,(?<speed>[^,]+))?(?:,(?<speedd>[^,]+))?(?:,(?<aspeed>[^,]+))?(?:,(?<aspeedd>[^,]+))?,(?<events>.*))$", RegexOptions.Compiled);
         static readonly Vector2 OldCenter = new Vector2(480, 360);
-        static readonly List<string> ConditionKeyWords = new List<string>
-        {
-            "且", "或", "=", ">", "<",
-        };
-        static readonly List<string> NormalEventKeyWords = new List<string>()
-        {
-            "变化到", "增加", "减少",
-        };
+        static readonly List<string> LogicOperatorKeywords = new List<string> { "且", "或" };
+        static readonly List<string> CompareOperatorKeywords = new List<string> { "=", ">", "<" };
+        static readonly List<string> ChangeTypeKeywords = new List<string>() { "变化到", "增加", "减少" };
         static readonly Dictionary<string, string> KeywordMap = new Dictionary<string, string>()
         {
-            { "当前帧", "CurrentFrame" }, { "且", "&" }, { "或", "|"},
+            { "子弹当前帧", "PCurrentFrame" }, { "当前帧", "CurrentFrame" }, { "且", "&" }, { "或", "|"},
             { "额外发射", "EmitParticle" }, { "恢复", "Recover"},
             { "变化到", "ChangeTo" }, { "增加", "Increase" }, { "减少", "Decrease" },
             { "正比", "Linear" }, { "固定", "Instant"}, { "正弦", "Sin"}, { "无缝正弦", "Sin"},
@@ -82,7 +77,7 @@ namespace CrazyStorm.Core
         };
         static readonly Dictionary<string, string> ParticleKeywordMap = new Dictionary<string, string>()
         {
-            { "X坐标", "子弹X坐标" }, { "Y坐标", "子弹Y坐标" },
+            { "当前帧", "子弹当前帧" }, { "X坐标", "子弹X坐标" }, { "Y坐标", "子弹Y坐标" },
         };
         static readonly Regex LayerMatch = new Regex(@"^Layer(?<num>[^:]+):" +
             @"(?<name>[^,]+),(?<begin>[^,]+),(?<end>[^,]+)," +
@@ -558,9 +553,13 @@ namespace CrazyStorm.Core
             }
             return str;
         }
-        public static string ConvertCondition(string str)
+        public static string ConvertCondition(string str, int t, int addtime, bool particleEvent)
         {
-            foreach (var keyword in ConditionKeyWords)
+            foreach (var keyword in LogicOperatorKeywords)
+            {
+                if (str.Contains(keyword)) str = str.Replace(keyword, $" {keyword} ");
+            }
+            foreach (var keyword in CompareOperatorKeywords)
             {
                 if (str.Contains(keyword)) str = str.Replace(keyword, $" {keyword} ");
             }
@@ -568,7 +567,12 @@ namespace CrazyStorm.Core
             str = "";
             for (int i = 0; i < split.Length; ++i)
             {
+                if (particleEvent) split[i] = ConvertParticleEventProperty(split[i]);
                 str += ConvertKeyword(split[i]);
+                if (t > 0 && addtime > 1 && i >= 1 && CompareOperatorKeywords.Exists((op) => op == split[i - 1]))
+                {
+                    str += particleEvent ? $"+PCurrentFrame/{t}*{addtime}" : $"+CurrentFrame/{t}*{addtime}";
+                }
             }
             return str;
         }
@@ -614,7 +618,7 @@ namespace CrazyStorm.Core
         }
         public static bool IsSpecialEvent(string str)
         {
-            foreach (var keyword in NormalEventKeyWords)
+            foreach (var keyword in ChangeTypeKeywords)
             {
                 if (str.Contains(keyword)) return false;
             }
@@ -622,7 +626,7 @@ namespace CrazyStorm.Core
         }
         public static string AdjustEventText(string str)
         {
-            foreach (var keyword in NormalEventKeyWords)
+            foreach (var keyword in ChangeTypeKeywords)
             {
                 if (str.Contains(keyword)) return str.Replace(keyword, $" {keyword} ");
             }
@@ -632,22 +636,22 @@ namespace CrazyStorm.Core
         {
             EventGroup group = new EventGroup();
             var split = str.Split('|');
+            int t = 1, addtime = 0;
             if (split.Length >= 4)
             {
                 group.Name = split[0];
-                var t = int.Parse(split[1]);
-                var addtime = int.Parse(split[2]);
+                t = int.Parse(split[1]);
+                addtime = int.Parse(split[2]);
             }
             var events = split.Length >= 4 ? split[3].Split(';') : str.Split(';');
             foreach (var e in events)
             {
                 if (string.IsNullOrEmpty(e)) continue;
                 split = e.Split('：');
-                //TODO : Process t and addtime
                 var condition = split[0];
                 var content = split[1];
                 var eventInfo = new EventInfo();
-                eventInfo.condition = ConvertCondition(condition);
+                eventInfo.condition = ConvertCondition(condition, t, addtime, particleEvents);
                 if (IsSpecialEvent(content))
                 {
                     eventInfo.isSpecialEvent = true;

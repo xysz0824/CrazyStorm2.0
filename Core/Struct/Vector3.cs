@@ -13,20 +13,32 @@ namespace CrazyStorm.Core
     public struct Vector3
     {
         public float x, y, z;
+        public bool Integer { get; private set; }
         public static readonly Vector3 Zero = new Vector3();
         public Vector3(float x, float y, float z)
         {
             this.x = x;
             this.y = y;
             this.z = z;
+            Integer = false;
+        }
+        public Vector3(int x, int y, int z)
+        {
+            this.x = x;
+            this.y = y;
+            this.z = z;
+            Integer = true;
         }
         public Vector3(float x, float y) : this(x, y, 0) { }
+        public Vector3(int x, int y) : this(x, y, 0) { }
         public Vector3(float x) : this(x, x, x) { }
+        public Vector3(int x) : this(x, x, x) { }
         public Vector3(Vector2 xy, float z)
         {
             this.x = xy.x;
             this.y = xy.y;
             this.z = z;
+            Integer = false;
         }
         public Vector3(Vector2 xy) : this(xy, 0) { }
         public override string ToString()

@@ -228,12 +228,24 @@ namespace CrazyStorm.Core
                     case VMCode.DIV:
                         var divisor = VM.PopVector();
                         var dividend = VM.PopVector();
-                        VM.PushVector(new Vector3(dividend.x / divisor.x, dividend.y / divisor.y, dividend.z / divisor.z));
+                        VM.PushVector(new Vector3(
+                            (dividend.Integer && divisor.x == Math.Floor(divisor.x)) ? (int)dividend.x / (int)divisor.x : 
+                            dividend.x / divisor.x,
+                            (dividend.Integer && divisor.y == Math.Floor(divisor.y)) ? (int)dividend.y / (int)divisor.y :
+                            dividend.y / divisor.y,
+                            (dividend.Integer && divisor.z == Math.Floor(divisor.z)) ? (int)dividend.z / (int)divisor.z :
+                            dividend.z / divisor.z));
                         break;
                     case VMCode.MOD:
                         divisor = VM.PopVector();
                         var number = VM.PopVector();
-                        VM.PushVector(new Vector3(number.x % divisor.x, number.y % divisor.y, number.z % divisor.z));
+                        VM.PushVector(new Vector3(
+                            (number.Integer && divisor.x == Math.Floor(divisor.x)) ? (int)number.x % (int)divisor.x :
+                            number.x % divisor.x,
+                            (number.Integer && divisor.y == Math.Floor(divisor.y)) ? (int)number.y % (int)divisor.y :
+                            number.y % divisor.y,
+                            (number.Integer && divisor.z == Math.Floor(divisor.z)) ? (int)number.z % (int)divisor.z :
+                            number.z % divisor.z));
                         break;
                     case VMCode.MORE:
                         var right = VM.PopFloat();
