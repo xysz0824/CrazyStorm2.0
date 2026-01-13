@@ -163,7 +163,7 @@ namespace CrazyStorm.Core
             get { return bindingTarget; }
             set { bindingTarget = value; }
         }
-        public int BindingTargetID { get; private set; }
+        public int BindingTargetID { get; set; }
         public IList<VariableResource> Locals { get; set; }
         public IList<VariableResource> Globals { get; set; }
         public Vector2 BodyPosition { get; set; }

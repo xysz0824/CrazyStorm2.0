@@ -284,7 +284,7 @@ namespace CrazyStorm.Core
                 //center
                 match = CenterMatch.Match(line);
                 var center = match.Success ? new Center() : null;
-                center.Name = "0";
+                center.Name = "Center";
                 center.ID = particleSystem.GetComponentIndex();
                 particleSystem.GetAndIncreaseComponentIndex(center.GetType().ToString());
                 if (center != null)
@@ -324,6 +324,7 @@ namespace CrazyStorm.Core
                         layer.BeginFrame = int.Parse(match.Groups["begin"].Value) - 1;
                         layer.TotalFrame = int.Parse(match.Groups["end"].Value) - layer.BeginFrame;
                         var batchCount = int.Parse(match.Groups["batchcount"].Value);
+                        var batchs = new List<MultiEmitter>();
                         for (int i = 0; i < batchCount; ++i)
                         {
                             //batchs
@@ -332,6 +333,8 @@ namespace CrazyStorm.Core
                             if (!match.Success) continue;
                             var batch = new MultiEmitter();
                             batch.Name = match.Groups["id"].Value;
+                            batch.BindingTargetID = bool.Parse(match.Groups["binding"].Value) ?
+                                int.Parse(match.Groups["bindid"].Value) : -1;
                             batch.ID = particleSystem.GetComponentIndex();
                             particleSystem.GetAndIncreaseComponentIndex(batch.GetType().ToString());
                             batch.ParentID = center.ID;
@@ -410,9 +413,15 @@ namespace CrazyStorm.Core
                             eventGroups = GetEventGroups(typeof(Particle), match.Groups["sonevents"].Value, true);
                             foreach (var eventGroup in eventGroups) batch.ParticleEventGroups.Add(eventGroup);
                             layer.Components.Add(batch);
+                            batchs.Add(batch);
                         }
                         //binding
-                        //TODO : Binding
+                        foreach (var component in layer.Components)
+                        {
+                            if (component.BindingTargetID == -1) continue;
+                            component.BindingTarget = batchs.Find((emitter) => emitter.Name == component.BindingTargetID.ToString());
+                            component.BindingTargetID = -1;
+                        }
                         if (particleSystem.Layers.Count == 0)
                         {
                             layer.Components.Add(center);
@@ -664,10 +673,24 @@ namespace CrazyStorm.Core
                     eventInfo.resultProperty = ConvertKeyword(split[0]);
                     if (eventInfo.resultProperty == TypeKeyword)
                     {
-                        //TODO : Increase/Decrease Type
+                        var rand = split[2].Split('+');
+                        if (rand.Length >= 2) split[2] = $"{rand[0]}+{{{rand[1]}}}";
                         eventInfo.isSpecialEvent = true;
-                        eventInfo.specialEvent = "ChangeType";
-                        eventInfo.arguments = "0,0";
+                        switch (ConvertKeyword(split[1]))
+                        {
+                            case "ChangeTo":
+                                eventInfo.specialEvent = "ChangeType";
+                                eventInfo.arguments = $"{split[2]},0";
+                                break;
+                            case "Increase":
+                                eventInfo.specialEvent = "IncreaseType";
+                                eventInfo.arguments = split[2];
+                                break;
+                            case "Decrease":
+                                eventInfo.specialEvent = "DecreaseType";
+                                eventInfo.arguments = split[2];
+                                break;
+                        }
                     }
                     else
                     {

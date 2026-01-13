@@ -77,7 +77,7 @@ namespace CrazyStorm.Core
         public int changeTime;
         public string specialEvent;
         public string[] arguments;
-        public VMInstruction[] argumentExpression;
+        public VMInstruction[][] argumentExpressions;
     }
     public class EventHelper
     {
@@ -115,10 +115,10 @@ namespace CrazyStorm.Core
             }
             var changeTypeNames = Enum.GetNames(typeof(EventChangeType));
             var changeModeNames = Enum.GetNames(typeof(EventChangeMode));
-            var changeType = changeTypeNames.FirstOrDefault((str) => eventText.Contains(str));
+            string[] split = eventText.Split(' ');
+            var changeType = changeTypeNames.FirstOrDefault((str) => Array.IndexOf(split, str) != -1);
             if (changeType != null)
             {
-                string[] split = eventText.Split(' ');
                 info.resultProperty = split[0];
                 info.changeType = split[1];
                 info.resultValue = string.Empty;
@@ -149,7 +149,7 @@ namespace CrazyStorm.Core
             else
             {
                 info.isSpecialEvent = true;
-                string[] split = eventText.Split('(');
+                split = eventText.Split('(');
                 info.specialEvent = split[0];
                 split = split[1].Split(')');
                 info.arguments = split[0];
@@ -205,16 +205,12 @@ namespace CrazyStorm.Core
                 bytes.AddRange(PlayDataHelper.GetStringBytes(eventInfo.specialEvent));
                 string[] split = eventInfo.arguments.Split(',');
                 bytes.AddRange(BitConverter.GetBytes(split.Length));
-                if (eventInfo.specialEvent == "Loop")
+                for (int i = 0; i < split.Length; ++i)
                 {
-                    byte[] compiledExpression = Compile(split[0]);
+                    bytes.AddRange(PlayDataHelper.GetStringBytes(split[i]));
+                    byte[] compiledExpression = Compile(split[i]);
                     bytes.AddRange(BitConverter.GetBytes(compiledExpression.Length));
                     bytes.AddRange(compiledExpression);
-                }
-                else
-                {
-                    for (int i = 0; i < split.Length; ++i)
-                        bytes.AddRange(PlayDataHelper.GetStringBytes(split[i]));
                 }
             }
             return bytes.ToArray();
@@ -251,19 +247,16 @@ namespace CrazyStorm.Core
                 {
                     eventInfo.specialEvent = PlayDataHelper.ReadString(reader);
                     int argumentCount = reader.ReadInt32();
-                    if (eventInfo.specialEvent == "Loop")
+                    var arguments = new List<string>();
+                    var argumentExpressions = new List<VMInstruction[]>();
+                    for (int i = 0; i < argumentCount; ++i)
                     {
+                        arguments.Add(PlayDataHelper.ReadString(reader));
                         int length = reader.ReadInt32();
-                        eventInfo.argumentExpression = VM.Decode(reader.ReadBytes(length));
+                        argumentExpressions.Add(VM.Decode(reader.ReadBytes(length)));
                     }
-                    else
-                    {
-                        var arguments = new List<string>();
-                        for (int i = 0; i < argumentCount; ++i)
-                            arguments.Add(PlayDataHelper.ReadString(reader));
-
-                        eventInfo.arguments = arguments.ToArray();
-                    }
+                    eventInfo.arguments = arguments.ToArray();
+                    eventInfo.argumentExpressions = argumentExpressions.ToArray();
                 }
             }
             return eventInfo;
@@ -334,7 +327,7 @@ namespace CrazyStorm.Core
             else
             {
                 return EventManager.ExecuteSpecialEvent(propertyContainer, eventInfo.specialEvent, eventInfo.arguments,
-                    eventInfo.argumentExpression);
+                    eventInfo.argumentExpressions);
             }
         }
         public static bool IsSpecialEvent(string str)

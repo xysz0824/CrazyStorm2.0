@@ -49,7 +49,7 @@ namespace CrazyStorm
                 if (selectedComponents.Count == 1)
                 {
                     var component = selectedComponents.First();
-                    SelectedGroupType.Text = component.GetType().Name;
+                    SelectedGroupType.Text = ExpressionHelper.FindTranslation(component.GetType().Name);
                     SelectedGroupName.DataContext = component;
                     SelectedGroupName.SetBinding(TextBlock.TextProperty, "Name");
                     SelectedGroupTip.Text = (string)FindResource("DoubleClickTipStr");

@@ -11,8 +11,8 @@ namespace CrazyStorm.Core
 {
     public static class EventManager
     {
-        public static readonly Dictionary<string, Func<PropertyContainer, string[], VMInstruction[], bool>> SpecialEvents =
-            new Dictionary<string, Func<PropertyContainer, string[], VMInstruction[], bool>>()
+        public static readonly Dictionary<string, Func<PropertyContainer, string[], VMInstruction[][], bool>> SpecialEvents =
+            new Dictionary<string, Func<PropertyContainer, string[], VMInstruction[][], bool>>()
             {
                 { "EmitParticle", (pc, args, expr) =>
                 {
@@ -31,22 +31,86 @@ namespace CrazyStorm.Core
                 } },
                 { "Loop", (pc, args, expr) =>
                 {
-                    VM.Execute(pc, expr);
+                    VM.Execute(pc, expr[0]);
                     if (!VM.PopBool()) return true;
                     return false;
                 } },
                 { "ChangeType", (pc, args, expr) =>
                 {
-                    int typeId = int.Parse(args[0]) + int.Parse(args[1]);
+                    VM.Execute(pc, expr[0]);
+                    int args0 = VM.PopInt();
+                    VM.Execute(pc, expr[1]);
+                    int args1 = VM.PopInt();
+                    int typeId = args0 + args1;
                     if (typeId >= ParticleType.DefaultTypeIndex)
                     {
                         if (pc is Emitter) (pc as Emitter).Template.Type = ParticleType.DefaultTypes[typeId - ParticleType.DefaultTypeIndex];
                         else if (pc is ParticleBase) (pc as ParticleBase).Type = ParticleType.DefaultTypes[typeId - ParticleType.DefaultTypeIndex];
                     }
-                    else
+                    else if (typeId < CustomTypes.Count)
                     {
                         if (pc is Emitter) (pc as Emitter).Template.Type = CustomTypes[typeId];
                         else if (pc is ParticleBase) (pc as ParticleBase).Type = CustomTypes[typeId];
+                    }
+                    return false;
+                } },
+                { "IncreaseType", (pc, args, expr) =>
+                {
+                    VM.Execute(pc, expr[0]);
+                    int args0 = VM.PopInt();
+                    if (pc is Emitter)
+                    {
+                        int typeId = (pc as Emitter).Template.Type.ID + args0;
+                        if (typeId >= ParticleType.DefaultTypeIndex)
+                        {
+                            (pc as Emitter).Template.Type = ParticleType.DefaultTypes[typeId - ParticleType.DefaultTypeIndex];
+                        }
+                        else if (typeId < CustomTypes.Count)
+                        {
+                            (pc as Emitter).Template.Type = CustomTypes[typeId];
+                        }
+                    }
+                    else if (pc is ParticleBase)
+                    {
+                        int typeId = (pc as ParticleBase).Type.ID + args0;
+                        if (typeId >= ParticleType.DefaultTypeIndex)
+                        {
+                            (pc as ParticleBase).Type = ParticleType.DefaultTypes[typeId - ParticleType.DefaultTypeIndex];
+                        }
+                        else if (typeId < CustomTypes.Count)
+                        {
+                            (pc as ParticleBase).Type = CustomTypes[typeId];
+                        }
+                    }
+                    return false;
+                } },
+                { "DecreaseType", (pc, args, expr) =>
+                {
+                    VM.Execute(pc, expr[0]);
+                    int args0 = VM.PopInt();
+                    if (pc is Emitter)
+                    {
+                        int typeId = (pc as Emitter).Template.Type.ID - args0;
+                        if (typeId >= 0 && typeId >= ParticleType.DefaultTypeIndex)
+                        {
+                            (pc as Emitter).Template.Type = ParticleType.DefaultTypes[typeId - ParticleType.DefaultTypeIndex];
+                        }
+                        else if (typeId >= 0 && typeId < CustomTypes.Count)
+                        {
+                            (pc as Emitter).Template.Type = CustomTypes[typeId];
+                        }
+                    }
+                    else if (pc is ParticleBase)
+                    {
+                        int typeId = (pc as ParticleBase).Type.ID - args0;
+                        if (typeId >= ParticleType.DefaultTypeIndex)
+                        {
+                            (pc as ParticleBase).Type = ParticleType.DefaultTypes[typeId - ParticleType.DefaultTypeIndex];
+                        }
+                        else if (typeId >= 0 && typeId < CustomTypes.Count)
+                        {
+                            (pc as ParticleBase).Type = CustomTypes[typeId];
+                        }
                     }
                     return false;
                 } },
@@ -116,7 +180,7 @@ namespace CrazyStorm.Core
                     return false;
                 } },
             };
-        public static Func<string, PropertyContainer, string[], VMInstruction[], bool> OnFunctionCall;
+        public static Func<string, PropertyContainer, string[], VMInstruction[][], bool> OnFunctionCall;
         public delegate void SoundPlayHandler(string path);
         public static event SoundPlayHandler OnSoundPlay;
         public static bool CanSoundPlay => OnSoundPlay != null;
@@ -260,14 +324,14 @@ namespace CrazyStorm.Core
             executorList.Add(executor);
         }
         public static bool ExecuteSpecialEvent(PropertyContainer propertyContainer, string eventName, string[] arguments,
-            VMInstruction[] argumentExpression)
+            VMInstruction[][] argumentExpressions)
         {
             if (!SpecialEvents.ContainsKey(eventName))
             {
-                if (OnFunctionCall!= null) return OnFunctionCall.Invoke(eventName, propertyContainer, arguments, argumentExpression);
+                if (OnFunctionCall!= null) return OnFunctionCall.Invoke(eventName, propertyContainer, arguments, argumentExpressions);
                 else return false;
             }
-            return SpecialEvents[eventName](propertyContainer, arguments, argumentExpression);
+            return SpecialEvents[eventName](propertyContainer, arguments, argumentExpressions);
         }
         public static void Update()
         {
