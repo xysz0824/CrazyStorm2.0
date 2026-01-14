@@ -480,6 +480,7 @@ namespace CrazyStorm.Core
                                 particle.Length = 792;
                                 particle.Properties.Remove("Length");
                             }
+                            particle.VSpeed = submatch.Groups["vspeed"].Success ? float.Parse(submatch.Groups["vspeed"].Value) : 0f;
                             //events
                             var eventGroups = GetEventGroups(typeof(CurveEmitter), submatch.Groups["events"].Value, false);
                             foreach (var eventGroup in eventGroups) lase.ComponentEventGroups.Add(eventGroup);

@@ -118,6 +118,7 @@
     <sys:String x:Key="FogEffectStr">雾化效果</sys:String>
     <sys:String x:Key="FadeEffectStr">消弹效果</sys:String>
     <sys:String x:Key="AfterimageEffectStr">拖影效果</sys:String>
+    <sys:String x:Key="VSpeedStr">图案流速</sys:String>
     <sys:String x:Key="BlendTypeStr">混合模式</sys:String>
     <sys:String x:Key="KillOutsideStr">出屏即消</sys:String>
     <sys:String x:Key="CollisionStr">包围盒判定</sys:String>

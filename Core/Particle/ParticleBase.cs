@@ -42,6 +42,7 @@ namespace CrazyStorm.Core
         public bool ignoreForce;
         public bool fogEffect;
         public bool fadeEffect;
+        public float vspeed;
     }
     public abstract class ParticleBase : PropertyContainer, IXmlData, IGeneratePlayData, ILoadPlayData, 
         IComparable<ParticleBase>, IPlayable
@@ -202,6 +203,12 @@ namespace CrazyStorm.Core
         {
             get { return particleBaseData.fadeEffect; }
             set { particleBaseData.fadeEffect = value; }
+        }
+        [FloatProperty(float.MinValue, float.MaxValue)]
+        public float VSpeed
+        {
+            get { return particleBaseData.vspeed; }
+            set { particleBaseData.vspeed = value; }
         }
         public IList<EventGroup> ParticleEventGroups { get; set; }
         #endregion
@@ -389,6 +396,9 @@ namespace CrazyStorm.Core
                 case "FadeEffect":
                     VM.PushBool(FadeEffect);
                     return true;
+                case "VSpeed":
+                    VM.PushFloat(VSpeed);
+                    return true;
             }
             for (int i = 0; i < Emitter.Locals.Count; ++i)
             {
@@ -500,6 +510,9 @@ namespace CrazyStorm.Core
                     return true;
                 case "FadeEffect":
                     FadeEffect = VM.PopBool();
+                    return true;
+                case "VSpeed":
+                    VSpeed = VM.PopFloat();
                     return true;
             }
             for (int i = 0; i < Emitter.Locals.Count; ++i)

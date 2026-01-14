@@ -206,7 +206,8 @@ namespace CrazyStorm_Player
             float alpha = particle.Opacity / 100f - (ParticleBase.FOG_TIME - particle.FogFrame) / ParticleBase.FOG_TIME;
             Color color = new Color(particle.RGB.r / 255f, particle.RGB.g / 255f, particle.RGB.b / 255f, alpha);
             int frame = particle.PCurrentFrame / (type.Delay + 1) % type.Frames;
-            Rectangle rect = new Rectangle((int)type.StartPoint.x + frame * type.Width, (int)type.StartPoint.y, type.Width, type.Height);
+            float vOffset = particle.PCurrentFrame * particle.VSpeed;
+            Rectangle rect = new Rectangle((int)type.StartPoint.x + frame * type.Width, (int)(type.StartPoint.y - vOffset), type.Width, type.Height);
             var tex = type.ID >= ParticleType.DefaultTypeIndex ? defaultTextures[0] : type.Image != null ? customTextures[type.Image.ID] : null;
             if (tex != null)
             {
@@ -261,7 +262,8 @@ namespace CrazyStorm_Player
             float alpha = particle.Opacity / 100f - (ParticleBase.FOG_TIME - particle.FogFrame) / ParticleBase.FOG_TIME;
             Color color = new Color(particle.RGB.r / 255f, particle.RGB.g / 255f, particle.RGB.b / 255f, alpha);
             int frame = particle.PCurrentFrame / (type.Delay + 1) % type.Frames;
-            Rectangle rect = new Rectangle((int)type.StartPoint.x + frame * type.Width, (int)type.StartPoint.y, type.Width, type.Height);
+            float vOffset = particle.PCurrentFrame * particle.VSpeed;
+            Rectangle rect = new Rectangle((int)type.StartPoint.x + frame * type.Width, (int)(type.StartPoint.y - vOffset), type.Width, type.Height);
             var tex = type.ID >= ParticleType.DefaultTypeIndex ? defaultTextures[0] : type.Image != null ? customTextures[type.Image.ID] : null;
             if (tex != null) curveBatch.Draw(particle.Curve, tex, rect, center, color);
         }
