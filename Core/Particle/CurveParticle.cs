@@ -79,8 +79,11 @@ namespace CrazyStorm.Core
         public override void LoadPlayData(BinaryReader reader, float version)
         {
             base.LoadPlayData(reader, version);
-            //curveParticleData
-            curveParticleData = PlayDataHelper.ReadStruct<CurveParticleData>(reader);
+            using (BinaryReader curveParticleReader = PlayDataHelper.GetBlockReader(reader))
+            {
+                //curveParticleData
+                curveParticleData = PlayDataHelper.ReadStruct<CurveParticleData>(curveParticleReader);
+            }
         }
         public override bool PushProperty(string propertyName)
         {

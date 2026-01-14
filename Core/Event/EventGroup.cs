@@ -113,9 +113,7 @@ namespace CrazyStorm.Core
             {
                 //compiledCondition
                 int length = eventGroupReader.ReadInt32();
-                if (length > 0)
-                    VMCondition = VM.Decode(eventGroupReader.ReadBytes(length));
-
+                if (length > 0) VMCondition = VM.Decode(eventGroupReader.ReadBytes(length));
                 //compiledEvents
                 while (!PlayDataHelper.EndOfReader(eventGroupReader))
                 {
