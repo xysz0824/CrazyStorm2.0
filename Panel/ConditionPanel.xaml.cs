@@ -337,7 +337,7 @@ namespace CrazyStorm
                 var op = (expression.Token as IdentifierToken).GetValue() as string;
                 foreach (var checkBox in checkBoxMap[op]) checkBox.IsChecked = true;
                 var leftValue = expression.GetRightChild();
-                LeftValue.Text = leftValue.ToString();
+                LeftValue.Text = ExpressionHelper.Translate(leftValue.ToString());
                 if (!internalMap) SwitchToConditionMenu_Click(null, null);
             }
             else
@@ -361,7 +361,7 @@ namespace CrazyStorm
                     var leftOp = (left.Token as IdentifierToken).GetValue() as string;
                     foreach (var checkBox in checkBoxMap[leftOp]) checkBox.IsChecked = true;
                     var leftValue = left.GetRightChild();
-                    LeftValue.Text = leftValue.ToString();
+                    LeftValue.Text = ExpressionHelper.Translate(leftValue.ToString());
 
                     var midOp = (expression.Token as IdentifierToken).GetValue() as string;
                     foreach (var button in buttonMap[midOp]) button.IsChecked = true;
@@ -387,7 +387,7 @@ namespace CrazyStorm
                     var rightOp = (right.Token as IdentifierToken).GetValue() as string;
                     foreach (var checkBox in checkBoxMap[rightOp]) checkBox.IsChecked = true;
                     var rightValue = right.GetRightChild();
-                    RightValue.Text = rightValue.ToString();
+                    RightValue.Text = ExpressionHelper.Translate(rightValue.ToString());
                     if (!internalMap) SwitchToConditionMenu_Click(null, null);
                 }
                 else
