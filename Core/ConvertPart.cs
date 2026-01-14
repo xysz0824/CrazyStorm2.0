@@ -307,7 +307,7 @@ namespace CrazyStorm.Core
                 if (center != null)
                 {
                     center.Visibility = match.Groups["x"].Success;
-                    center.ComponentEventGroups.Add(globalEvents);
+                    if (globalEvents != null) center.ComponentEventGroups.Add(globalEvents);
                     var eventgroup = GetEventGroup(typeof(Center), match.Groups["events"].Value, false);
                     if (eventgroup.Events.Count > 0)
                     {
@@ -384,8 +384,9 @@ namespace CrazyStorm.Core
                             batch.InstantMovement = submatch.Groups["instantmovement"].Success ? bool.Parse(submatch.Groups["instantmovement"].Value) : false;
                             var particle = batch.Particle as Particle;
                             particle.MaxLife = int.Parse(submatch.Groups["sonlife"].Value);
-                            var typeId = int.Parse(submatch.Groups["typeid"].Value);
-                            if (typeId < ParticleType.DefaultTypes.Count) particle.Type = ParticleType.DefaultTypes[typeId];
+                            var typeId = int.Parse(submatch.Groups["typeid"].Value) - 1;
+                            if (typeId < 0) particle.Type = ParticleType.DefaultTypes[ParticleType.DefaultTypes.Count - 1];
+                            else if (typeId < ParticleType.DefaultTypes.Count) particle.Type = ParticleType.DefaultTypes[typeId];
                             else if (typeId < particleSystem.CustomTypes.Count) particle.Type = particleSystem.CustomTypes[typeId];
                             particle.WidthScale = ConvertFloat(float.Parse(submatch.Groups["wscale"].Value), submatch.Groups["randwscale"].Success ?
                                 float.Parse(submatch.Groups["randwscale"].Value) : 0f, particle, "WidthScale");
@@ -466,8 +467,9 @@ namespace CrazyStorm.Core
                                 lase, "AcspeedAngle");
                             var particle = lase.Particle as CurveParticle;
                             particle.MaxLife = int.Parse(submatch.Groups["sonlife"].Value);
-                            var typeId = int.Parse(submatch.Groups["typeid"].Value);
-                            if (typeId < ParticleType.DefaultTypes.Count) particle.Type = ParticleType.DefaultTypes[typeId];
+                            var typeId = int.Parse(submatch.Groups["typeid"].Value) - 1;
+                            if (typeId < 0) particle.Type = ParticleType.DefaultTypes[ParticleType.DefaultTypes.Count - 1];
+                            else if (typeId < ParticleType.DefaultTypes.Count) particle.Type = ParticleType.DefaultTypes[typeId];
                             else if (typeId < particleSystem.CustomTypes.Count) particle.Type = particleSystem.CustomTypes[typeId];
                             particle.WidthScale = float.Parse(submatch.Groups["wscale"].Value);
                             particle.Length = int.Parse(submatch.Groups["longs"].Value);
