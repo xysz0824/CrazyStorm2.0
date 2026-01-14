@@ -16,34 +16,53 @@ namespace CrazyStorm.Core
         public Vector3 Pos;
         public Vector2 TexCoord;
     }
+    public enum CurveType
+    {
+        Line,
+        Ray,
+        Curve
+    }
     public struct CurveInitData
     {
         public Vector2 pos;
+        public Vector2 head;
+        public int length;
         public int segment;
+        public CurveType type;
     }
     public class Curve : PoolObject<Curve, CurveInitData>
     {
+        CurveType type;
         Vector2[] points;
         int current;
         float actualLength;
         short[] indices;
         CurveVertex[] vertices;
 
+        public CurveType Type => type;
         public Vector2[] Points => points;
         public short[] Indices => indices;
         public CurveVertex[] Vertices => vertices;
 
         public override void Initialize(CurveInitData init)
         {
+            type = init.type;
             points = new Vector2[init.segment + 1];
+            var head = Vector2.Normalize(init.head);
+            var curr = 0;
             for (int i = 0; i < points.Length; ++i)
             {
-                points[i] = init.pos;
+                if (type != CurveType.Ray) points[i] = init.pos;
+                else
+                {
+                    points[curr] = init.pos + head * ((1f - (float)i / (points.Length - 1)) * init.length);
+                    curr = curr - 1 < 0 ? points.Length - 1 : curr - 1;
+                }
             }
             indices = new short[init.segment * 6];
             vertices = new CurveVertex[init.segment * 2 + 2];
             current = 0;
-            actualLength = 0;
+            actualLength = (type != CurveType.Ray) ? 0 : init.length;
         }
         public Vector2 GetCurveEnd()
         {
@@ -84,15 +103,25 @@ namespace CrazyStorm.Core
             }
             return false;
         }
-        public void Update(Vector2 pos, float width, float length)
+        public void Update(Vector2 pos, Vector2 head, float width, float length)
         {
             points[current] = pos;
             var lastOne = points[(current - (points.Length - 1) < 0) ? current + 1 : (current - (points.Length - 1))];
             var lastTwo = points[(current - (points.Length - 2) < 0) ? current + 2 : (current - (points.Length - 2))];
-            actualLength -= (lastOne - lastTwo).Length();
-            actualLength += (points[current] - points[(current - 1 < 0) ? points.Length - 1 : current - 1]).Length();
+            if (type == CurveType.Curve) actualLength -= (lastOne - lastTwo).Length();
+            if (type != CurveType.Ray) actualLength += (points[current] - points[(current - 1 < 0) ? points.Length - 1 : current - 1]).Length();
+            if (type != CurveType.Curve)
+            {
+                var curr = current;
+                head.Normalize();
+                for (int i = 0; i < points.Length; ++i)
+                {
+                    if (type == CurveType.Line) points[curr] = pos - head * (float)i / (points.Length - 1) * actualLength;
+                    else points[curr] = pos + head * ((1f - (float)i / (points.Length - 1)) * actualLength);
+                    curr = curr - 1 < 0 ? points.Length - 1 : curr - 1;
+                }
+            }
             var scaleLength = Math.Min(actualLength, length);
-
             var halfWidth = width * 0.5f;
             var index = current;
             var vertexIndex = 0;

@@ -15,6 +15,7 @@ namespace CrazyStorm.Core
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public struct CurveParticleData
     {
+        public CurveType type;
         public int length;
         public int segment;
     }
@@ -25,13 +26,19 @@ namespace CrazyStorm.Core
         #endregion
 
         #region Public Members
+        [EnumProperty(typeof(CurveType))]
+        public CurveType CurveType
+        {
+            get { return  curveParticleData.type; }
+            set { curveParticleData.type = value; }
+        }
         [IntProperty(0, int.MaxValue)]
         public int Length
         {
             get { return curveParticleData.length; }
             set { curveParticleData.length = value; }
         }
-        [IntProperty(1, 256)]
+        [IntProperty(16, 256)]
         public int Segment
         {
             get { return curveParticleData.segment; }
@@ -44,6 +51,7 @@ namespace CrazyStorm.Core
         #region Constructor
         public CurveParticle()
         {
+            curveParticleData.type = CurveType.Curve;
             curveParticleData.length = 100;
             curveParticleData.segment = 64;
         }
@@ -92,6 +100,9 @@ namespace CrazyStorm.Core
 
             switch (propertyName)
             {
+                case "CurveType":
+                    VM.PushInt((int)CurveType);
+                    return true;
                 case "Length":
                     VM.PushInt(Length);
                     return true;
@@ -108,6 +119,26 @@ namespace CrazyStorm.Core
 
             switch (propertyName)
             {
+                case "CurveType":
+                    var newCurveType = (CurveType)VM.PopInt();
+                    if (CurveType != newCurveType)
+                    {
+                        if (Curve != null) Curve.Return(Curve);
+                        var head = PSpeedVector;
+                        if (head.Length() == 0) MathHelper.SetVector2(ref head, 1, PSpeedAngle, 
+                            new Vector2(PSpeedHScale, PSpeedVScale));
+                        var initData = new CurveInitData
+                        {
+                            pos = PPosition,
+                            segment = Segment,
+                            type = newCurveType,
+                            head = head,
+                            length = Length
+                        };
+                        Curve = Curve.Rent(initData);
+                    }
+                    CurveType = newCurveType;
+                    return true;
                 case "Length":
                     Length = VM.PopInt();
                     return true;
@@ -130,11 +161,21 @@ namespace CrazyStorm.Core
         }
         public override bool Update(int currentFrame = 0)
         {
-            var initData = new CurveInitData { pos = PPosition, segment = Segment };
-            if (Curve == null) Curve = Curve.Rent(initData);
             if (!base.Update()) return false;
+            var head = PSpeedVector;
+            if (head.Length() == 0) MathHelper.SetVector2(ref head, 1, PSpeedAngle, 
+                new Vector2(PSpeedHScale, PSpeedVScale));
+            if (Curve == null)
+            {
+                var initData = new CurveInitData { pos = PPosition, 
+                    segment = Segment, 
+                    type = CurveType, 
+                    head = head,
+                    length = Length };
+                Curve = Curve.Rent(initData);
+            }
             PRotation = PSpeedAngle + 90;
-            Curve.Update(PPosition, Type.Width * WidthScale, Length);
+            Curve.Update(PPosition, head, Type.Width * WidthScale, Length);
             return true;
         }
         public override void CopyTo(PropertyContainer target)

@@ -105,6 +105,28 @@ namespace CrazyStorm.Core
             @"(?:,(?<deepbind>[^,]+))?" +
             @"(?:,(?<randwscale>[^,]+))?(?:,(?<randhscale>[^,]+))?(?:,(?<syncScale>[^,]+))?" +
             @"(?:,(?<instantMovement>[^,]+))?$", RegexOptions.Compiled);
+        static readonly Regex LaseMatch = new Regex(@"^(?<id>[^,]+),(?<layerid>[^,]+)," +
+            @"(?<binding>[^,]+),(?<bindid>[^,]+),(?<bindwithspeedd>[^,]+),," +
+            @"(?<x>[^,]+),(?<y>[^,]+),(?<begin>[^,]+),(?<life>[^,]+)," +
+            @"(?<r>[^,]+),(?<rdirection>[^,]+),(?<rdirections>[^,]+)," +
+            @"(?<tiao>[^,]+),(?<t>[^,]+),(?<fdirection>[^,]+),(?<fdirections>[^,]+),(?<range>[^,]+)," +
+            @"(?<speed>[^,]+),(?<speedd>[^,]+),(?<speedds>[^,]+)," +
+            @"(?<aspeed>[^,]+),(?<aspeedd>[^,]+),(?<aspeedds>[^,]+)," +
+            @"(?<sonlife>[^,]+),(?<typeid>[^,]+),(?<wscale>[^,]+),(?<longs>[^,]+)," +
+            @"(?<alpha>[^,]+),(?<shape>[^,]+)," +
+            @"(?<sonspeed>[^,]+),(?<sonspeedd>[^,]+),(?<sondspeedds>[^,]+)," +
+            @"(?<sonaspeed>[^,]+),(?<sonaspeedd>[^,]+),(?<sondaspeedds>[^,]+)," +
+            @"(?<xscale>[^,]+),(?<yscale>[^,]+)," +
+            @"(?<blend>[^,]+),(?<outdispel>[^,]+),(?<invincible>[^,]+)," +
+            @"(?<segment>[^,]+)," +
+            @"(?:(?<events>[^,]+))?,(?:(?<sonevents>[^,]+))?," +
+            @"(?<randr>[^,]+),(?<randrdirection>[^,]+)," +
+            @"(?<randtiao>[^,]+),(?<randt>[^,]+),(?<randfdirection>[^,]+),(?<randrange>[^,]+)," +
+            @"(?<randspeed>[^,]+),(?<randspeedd>[^,]+),(?<randaspeed>[^,]+),(?<randaspeedd>[^,]+)," +
+            @"(?<randsonspeed>[^,]+),(?<randsonspeedd>[^,]+),(?<randsonaspeed>[^,]+),(?<randsonaspeedd>[^,]+)" +
+            @"(?:,(?<deepbind>[^,]+))?" +
+            @"(?:,(?<colorR>[^,]+))?(?:,(?<colorG>[^,]+))?(?:,(?<colorB>[^,]+))?" +
+            @"(?:,(?<vspeed>[^,]+))?$", RegexOptions.Compiled);
         public static bool IsCS1(string filePath)
         {
             using (var reader = new StreamReader(filePath, Encoding.UTF8))
@@ -324,91 +346,145 @@ namespace CrazyStorm.Core
                         {
                             //batchs
                             line = reader.ReadLine().Trim();
-                            match = BatchMatch.Match(line);
-                            if (!match.Success) continue;
+                            var submatch = BatchMatch.Match(line);
+                            if (!submatch.Success) continue;
                             var batch = new MultiEmitter();
-                            batch.Name = match.Groups["id"].Value;
-                            batch.BindingTargetID = bool.Parse(match.Groups["binding"].Value) ?
-                                int.Parse(match.Groups["bindid"].Value) : -1;
+                            batch.Name = submatch.Groups["id"].Value;
+                            batch.BindingTargetID = bool.Parse(submatch.Groups["binding"].Value) ?
+                                int.Parse(submatch.Groups["bindid"].Value) : -1;
                             batch.ID = particleSystem.GetComponentIndex();
                             particleSystem.GetAndIncreaseComponentIndex(batch.GetType().ToString());
                             batch.ParentID = center.ID;
-                            batch.Position = ConvertVector2(float.Parse(match.Groups["x"].Value), float.Parse(match.Groups["y"].Value),
+                            batch.Position = ConvertVector2(float.Parse(submatch.Groups["x"].Value), float.Parse(submatch.Groups["y"].Value),
                                 0, 0, batch, "Position") - OldCenter;
-                            batch.BeginFrame = int.Parse(match.Groups["begin"].Value);
-                            batch.TotalFrame = int.Parse(match.Groups["life"].Value);
-                            batch.EmitPosition = ConvertVector2(float.Parse(match.Groups["fx"].Value), float.Parse(match.Groups["fy"].Value),
-                                float.Parse(match.Groups["randfx"].Value), float.Parse(match.Groups["randfy"].Value), batch, "EmitPosition") - OldCenter;
-                            batch.EmitRadius = ConvertFloat(float.Parse(match.Groups["r"].Value), float.Parse(match.Groups["randr"].Value),
+                            batch.BeginFrame = int.Parse(submatch.Groups["begin"].Value) - 1;
+                            batch.TotalFrame = int.Parse(submatch.Groups["life"].Value);
+                            batch.EmitPosition = ConvertVector2(float.Parse(submatch.Groups["fx"].Value), float.Parse(submatch.Groups["fy"].Value),
+                                float.Parse(submatch.Groups["randfx"].Value), float.Parse(submatch.Groups["randfy"].Value), batch, "EmitPosition") - OldCenter;
+                            batch.EmitRadius = ConvertFloat(float.Parse(submatch.Groups["r"].Value), float.Parse(submatch.Groups["randr"].Value),
                                 batch, "EmitRadius");
-                            batch.EmitRoundAngle = ConvertAngle(float.Parse(match.Groups["rdirection"].Value), float.Parse(match.Groups["randrdirection"].Value), 
+                            batch.EmitRoundAngle = ConvertAngle(float.Parse(submatch.Groups["rdirection"].Value), float.Parse(submatch.Groups["randrdirection"].Value), 
                                 batch, "EmitRoundAngle");
-                            batch.EmitCount = ConvertInt(int.Parse(match.Groups["tiao"].Value), int.Parse(match.Groups["randtiao"].Value),
+                            batch.EmitCount = ConvertInt(int.Parse(submatch.Groups["tiao"].Value), int.Parse(submatch.Groups["randtiao"].Value),
                                 batch, "EmitCount");
-                            batch.EmitCycle = ConvertInt(int.Parse(match.Groups["t"].Value), int.Parse(match.Groups["randt"].Value),
+                            batch.EmitCycle = ConvertInt(int.Parse(submatch.Groups["t"].Value), int.Parse(submatch.Groups["randt"].Value),
                                 batch, "EmitCycle");
-                            batch.EmitAngle = ConvertAngle(float.Parse(match.Groups["fdirection"].Value), float.Parse(match.Groups["randfdirection"].Value), 
+                            batch.EmitAngle = ConvertAngle(float.Parse(submatch.Groups["fdirection"].Value), float.Parse(submatch.Groups["randfdirection"].Value), 
                                 batch, "EmitAngle");
-                            batch.EmitRange = ConvertInt(int.Parse(match.Groups["range"].Value), int.Parse(match.Groups["randrange"].Value),
+                            batch.EmitRange = ConvertInt(int.Parse(submatch.Groups["range"].Value), int.Parse(submatch.Groups["randrange"].Value),
                                 batch, "EmitRange");
-                            batch.Speed = ConvertFloat(float.Parse(match.Groups["speed"].Value), float.Parse(match.Groups["randspeed"].Value),
+                            batch.Speed = ConvertFloat(float.Parse(submatch.Groups["speed"].Value), float.Parse(submatch.Groups["randspeed"].Value),
                                 batch, "Speed");
-                            batch.SpeedAngle = ConvertAngle(float.Parse(match.Groups["speedd"].Value), float.Parse(match.Groups["randspeedd"].Value),
+                            batch.SpeedAngle = ConvertAngle(float.Parse(submatch.Groups["speedd"].Value), float.Parse(submatch.Groups["randspeedd"].Value),
                                 batch, "SpeedAngle");
-                            batch.Acspeed = ConvertFloat(float.Parse(match.Groups["aspeed"].Value), float.Parse(match.Groups["randaspeed"].Value),
+                            batch.Acspeed = ConvertFloat(float.Parse(submatch.Groups["aspeed"].Value), float.Parse(submatch.Groups["randaspeed"].Value),
                                 batch, "Acspeed");
-                            batch.AcspeedAngle = ConvertAngle(float.Parse(match.Groups["aspeedd"].Value), float.Parse(match.Groups["randaspeedd"].Value),
+                            batch.AcspeedAngle = ConvertAngle(float.Parse(submatch.Groups["aspeedd"].Value), float.Parse(submatch.Groups["randaspeedd"].Value),
                                 batch, "AcspeedAngle");
-                            batch.InstantMovement = match.Groups["instantmovement"].Success ? bool.Parse(match.Groups["instantmovement"].Value) : false;
+                            batch.InstantMovement = submatch.Groups["instantmovement"].Success ? bool.Parse(submatch.Groups["instantmovement"].Value) : false;
                             var particle = batch.Particle as Particle;
-                            particle.MaxLife = int.Parse(match.Groups["sonlife"].Value);
-                            var typeId = int.Parse(match.Groups["typeid"].Value);
-                            if (typeId < ParticleType.DefaultTypes.Count)
-                            {
-                                particle.Type = ParticleType.DefaultTypes[typeId];
-                            }
-                            else if (typeId < particleSystem.CustomTypes.Count)
-                            {
-                                particle.Type = particleSystem.CustomTypes[typeId];
-                            }
-                            particle.WidthScale = ConvertFloat(float.Parse(match.Groups["wscale"].Value), match.Groups["randwscale"].Success ?
-                                float.Parse(match.Groups["randwscale"].Value) : 0f, particle, "WidthScale");
-                            particle.HeightScale = ConvertFloat(float.Parse(match.Groups["hscale"].Value), match.Groups["randhscale"].Success ?
-                                float.Parse(match.Groups["randhscale"].Value) : 0f, particle, "HeightScale");
-                            particle.RetainScale = match.Groups["syncScale"].Success ? bool.Parse(match.Groups["syncScale"].Value) : true;
-                            particle.RGB = new RGB(float.Parse(match.Groups["colorR"].Value),
-                                float.Parse(match.Groups["colorG"].Value), float.Parse(match.Groups["colorB"].Value));
-                            particle.Opacity = float.Parse(match.Groups["alpha"].Value);
-                            particle.PRotation = ConvertAngle(float.Parse(match.Groups["head"].Value), float.Parse(match.Groups["randhead"].Value),
+                            particle.MaxLife = int.Parse(submatch.Groups["sonlife"].Value);
+                            var typeId = int.Parse(submatch.Groups["typeid"].Value);
+                            if (typeId < ParticleType.DefaultTypes.Count) particle.Type = ParticleType.DefaultTypes[typeId];
+                            else if (typeId < particleSystem.CustomTypes.Count) particle.Type = particleSystem.CustomTypes[typeId];
+                            particle.WidthScale = ConvertFloat(float.Parse(submatch.Groups["wscale"].Value), submatch.Groups["randwscale"].Success ?
+                                float.Parse(submatch.Groups["randwscale"].Value) : 0f, particle, "WidthScale");
+                            particle.HeightScale = ConvertFloat(float.Parse(submatch.Groups["hscale"].Value), submatch.Groups["randhscale"].Success ?
+                                float.Parse(submatch.Groups["randhscale"].Value) : 0f, particle, "HeightScale");
+                            particle.RetainScale = submatch.Groups["syncScale"].Success ? bool.Parse(submatch.Groups["syncScale"].Value) : true;
+                            particle.RGB = new RGB(float.Parse(submatch.Groups["colorR"].Value),
+                                float.Parse(submatch.Groups["colorG"].Value), float.Parse(submatch.Groups["colorB"].Value));
+                            particle.Opacity = float.Parse(submatch.Groups["alpha"].Value);
+                            particle.PRotation = ConvertAngle(float.Parse(submatch.Groups["head"].Value), float.Parse(submatch.Groups["randhead"].Value),
                                 particle, "PRotation");
-                            particle.StickToSpeedAngle = bool.Parse(match.Groups["withspeedd"].Value);
-                            particle.PSpeed = ConvertFloat(float.Parse(match.Groups["sonspeed"].Value), float.Parse(match.Groups["randsonspeed"].Value),
+                            particle.StickToSpeedAngle = bool.Parse(submatch.Groups["withspeedd"].Value);
+                            particle.PSpeed = ConvertFloat(float.Parse(submatch.Groups["sonspeed"].Value), float.Parse(submatch.Groups["randsonspeed"].Value),
                                 particle, "PSpeed");
-                            particle.PSpeedAngle = ConvertAngle(float.Parse(match.Groups["sonspeedd"].Value), float.Parse(match.Groups["randsonspeedd"].Value),
+                            particle.PSpeedAngle = ConvertAngle(float.Parse(submatch.Groups["sonspeedd"].Value), float.Parse(submatch.Groups["randsonspeedd"].Value),
                                 particle, "PSpeedAngle");
-                            particle.PAcspeed = ConvertFloat(float.Parse(match.Groups["sonaspeed"].Value), float.Parse(match.Groups["randsonaspeed"].Value),
+                            particle.PAcspeed = ConvertFloat(float.Parse(submatch.Groups["sonaspeed"].Value), float.Parse(submatch.Groups["randsonaspeed"].Value),
                                 particle, "PAcspeed");
-                            particle.PAcspeedAngle = ConvertAngle(float.Parse(match.Groups["sonaspeedd"].Value), float.Parse(match.Groups["randsonaspeedd"].Value),
+                            particle.PAcspeedAngle = ConvertAngle(float.Parse(submatch.Groups["sonaspeedd"].Value), float.Parse(submatch.Groups["randsonaspeedd"].Value),
                                 particle, "PAcspeedAngle");
-                            particle.PSpeedHScale = float.Parse(match.Groups["xscale"].Value);
-                            particle.PSpeedVScale = float.Parse(match.Groups["yscale"].Value);
-                            particle.FadeEffect = bool.Parse(match.Groups["dispel"].Value);
-                            particle.BlendType = bool.Parse(match.Groups["blend"].Value) ? 
+                            particle.PSpeedHScale = float.Parse(submatch.Groups["xscale"].Value);
+                            particle.PSpeedVScale = float.Parse(submatch.Groups["yscale"].Value);
+                            particle.FadeEffect = bool.Parse(submatch.Groups["dispel"].Value);
+                            particle.BlendType = bool.Parse(submatch.Groups["blend"].Value) ? 
                                 BlendType.Additive : BlendType.AlphaBlend;
-                            particle.AfterimageEffect = bool.Parse(match.Groups["afterimage"].Value);
-                            particle.KillOutside = bool.Parse(match.Groups["outdispel"].Value);
-                            particle.Collision = bool.Parse(match.Groups["invincible"].Value);
-                            particle.IgnoreMask = match.Groups["affectedByCover"].Success ? !bool.Parse(match.Groups["affectedByCover"].Value) : false;
-                            particle.IgnoreRebound = match.Groups["affectedByRebound"].Success ? !bool.Parse(match.Groups["affectedByRebound"].Value) : false;
-                            particle.IgnoreForce = match.Groups["affectedByForce"].Success ? !bool.Parse(match.Groups["affectedByForce"].Value) : false;
+                            particle.AfterimageEffect = bool.Parse(submatch.Groups["afterimage"].Value);
+                            particle.KillOutside = bool.Parse(submatch.Groups["outdispel"].Value);
+                            particle.Collision = bool.Parse(submatch.Groups["invincible"].Value);
+                            particle.IgnoreMask = submatch.Groups["affectedByCover"].Success ? !bool.Parse(submatch.Groups["affectedByCover"].Value) : false;
+                            particle.IgnoreRebound = submatch.Groups["affectedByRebound"].Success ? !bool.Parse(submatch.Groups["affectedByRebound"].Value) : false;
+                            particle.IgnoreForce = submatch.Groups["affectedByForce"].Success ? !bool.Parse(submatch.Groups["affectedByForce"].Value) : false;
                             //events
-                            var eventGroups = GetEventGroups(typeof(MultiEmitter), match.Groups["events"].Value, false);
+                            var eventGroups = GetEventGroups(typeof(MultiEmitter), submatch.Groups["events"].Value, false);
                             foreach (var eventGroup in eventGroups) batch.ComponentEventGroups.Add(eventGroup);
                             //sonevents
-                            eventGroups = GetEventGroups(typeof(Particle), match.Groups["sonevents"].Value, true);
+                            eventGroups = GetEventGroups(typeof(Particle), submatch.Groups["sonevents"].Value, true);
                             foreach (var eventGroup in eventGroups) batch.ParticleEventGroups.Add(eventGroup);
                             layer.Components.Add(batch);
                             batchs.Add(batch);
+                        }
+                        var laseCount = int.Parse(match.Groups["lasecount"].Value);
+                        for (int i = 0; i < laseCount; ++i)
+                        {
+                            //lases
+                            line = reader.ReadLine().Trim();
+                            var submatch = LaseMatch.Match(line);
+                            if (!match.Success) continue;
+                            var lase = new CurveEmitter();
+                            lase.Name = submatch.Groups["id"].Value;
+                            lase.BindingTargetID = bool.Parse(submatch.Groups["binding"].Value) ?
+                                int.Parse(submatch.Groups["bindid"].Value) : -1;
+                            lase.ID = particleSystem.GetComponentIndex();
+                            particleSystem.GetAndIncreaseComponentIndex(lase.GetType().ToString());
+                            lase.ParentID = center.ID;
+                            lase.Position = ConvertVector2(float.Parse(submatch.Groups["x"].Value), float.Parse(submatch.Groups["y"].Value),
+                                0, 0, lase, "Position") - OldCenter;
+                            lase.BeginFrame = int.Parse(submatch.Groups["begin"].Value) - 1;
+                            lase.TotalFrame = int.Parse(submatch.Groups["life"].Value);
+                            lase.EmitRadius = ConvertFloat(float.Parse(submatch.Groups["r"].Value), float.Parse(submatch.Groups["randr"].Value),
+                                lase, "EmitRadius");
+                            lase.EmitRoundAngle = ConvertAngle(float.Parse(submatch.Groups["rdirection"].Value), float.Parse(submatch.Groups["randrdirection"].Value),
+                                lase, "EmitRoundAngle");
+                            lase.EmitCount = ConvertInt(int.Parse(submatch.Groups["tiao"].Value), int.Parse(submatch.Groups["randtiao"].Value),
+                                lase, "EmitCount");
+                            lase.EmitCycle = ConvertInt(int.Parse(submatch.Groups["t"].Value), int.Parse(submatch.Groups["randt"].Value),
+                                lase, "EmitCycle");
+                            lase.EmitAngle = ConvertAngle(float.Parse(submatch.Groups["fdirection"].Value), float.Parse(submatch.Groups["randfdirection"].Value),
+                                lase, "EmitAngle");
+                            lase.EmitRange = ConvertInt(int.Parse(submatch.Groups["range"].Value), int.Parse(submatch.Groups["randrange"].Value),
+                                lase, "EmitRange");
+                            lase.Speed = ConvertFloat(float.Parse(submatch.Groups["speed"].Value), float.Parse(submatch.Groups["randspeed"].Value),
+                                lase, "Speed");
+                            lase.SpeedAngle = ConvertAngle(float.Parse(submatch.Groups["speedd"].Value), float.Parse(submatch.Groups["randspeedd"].Value),
+                                lase, "SpeedAngle");
+                            lase.Acspeed = ConvertFloat(float.Parse(submatch.Groups["aspeed"].Value), float.Parse(submatch.Groups["randaspeed"].Value),
+                                lase, "Acspeed");
+                            lase.AcspeedAngle = ConvertAngle(float.Parse(submatch.Groups["aspeedd"].Value), float.Parse(submatch.Groups["randaspeedd"].Value),
+                                lase, "AcspeedAngle");
+                            var particle = lase.Particle as CurveParticle;
+                            particle.MaxLife = int.Parse(submatch.Groups["sonlife"].Value);
+                            var typeId = int.Parse(submatch.Groups["typeid"].Value);
+                            if (typeId < ParticleType.DefaultTypes.Count) particle.Type = ParticleType.DefaultTypes[typeId];
+                            else if (typeId < particleSystem.CustomTypes.Count) particle.Type = particleSystem.CustomTypes[typeId];
+                            particle.WidthScale = float.Parse(submatch.Groups["wscale"].Value);
+                            particle.Length = int.Parse(submatch.Groups["longs"].Value);
+                            particle.Opacity = float.Parse(submatch.Groups["alpha"].Value);
+                            particle.CurveType = (CurveType)Enum.Parse(typeof(CurveType), submatch.Groups["shape"].Value);
+                            if (particle.CurveType == CurveType.Ray)
+                            {
+                                particle.Length = 792;
+                                particle.Properties.Remove("Length");
+                            }
+                            //events
+                            var eventGroups = GetEventGroups(typeof(CurveEmitter), submatch.Groups["events"].Value, false);
+                            foreach (var eventGroup in eventGroups) lase.ComponentEventGroups.Add(eventGroup);
+                            //sonevents
+                            eventGroups = GetEventGroups(typeof(CurveParticle), submatch.Groups["sonevents"].Value, true);
+                            foreach (var eventGroup in eventGroups) lase.ParticleEventGroups.Add(eventGroup);
+                            layer.Components.Add(lase);
                         }
                         //binding
                         foreach (var component in layer.Components)
@@ -423,7 +499,7 @@ namespace CrazyStorm.Core
                         }
                         particleSystem.Layers.Add(layer);
                     }
-                    line = reader.ReadLine().Trim();
+                    line = reader.ReadLine()?.Trim();
                 }
                 while (!reader.EndOfStream);
                 ParticleSystems.Add(particleSystem);

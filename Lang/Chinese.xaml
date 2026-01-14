@@ -124,6 +124,9 @@
     <sys:String x:Key="IgnoreMaskStr">忽略事件场</sys:String>
     <sys:String x:Key="IgnoreReboundStr">忽略反弹板</sys:String>
     <sys:String x:Key="IgnoreForceStr">忽略力场</sys:String>
+    <sys:String x:Key="CurveTypeStr">类型</sys:String>
+    <sys:String x:Key="RayStr">射线</sys:String>
+    <sys:String x:Key="CurveStr">曲线</sys:String>
     <sys:String x:Key="LengthStr">长度</sys:String>
     <sys:String x:Key="SegmentStr">段数</sys:String>
     <sys:String x:Key="HalfWidthStr">半长</sys:String>
@@ -132,7 +135,7 @@
     <sys:String x:Key="RebounderShapeStr">反弹板形状</sys:String>
     <sys:String x:Key="ReachStr">范围</sys:String>
     <sys:String x:Key="RectangleStr">矩形</sys:String>
-    <sys:String x:Key="LineStr">线形</sys:String>
+    <sys:String x:Key="LineStr">直线</sys:String>
     <sys:String x:Key="CircleStr">圆形</sys:String>
     <sys:String x:Key="TargetNameStr">目标名称</sys:String>
     <sys:String x:Key="SizeStr">尺寸</sys:String>
