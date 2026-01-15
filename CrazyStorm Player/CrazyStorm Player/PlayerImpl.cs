@@ -23,7 +23,7 @@ using Color = Microsoft.Xna.Framework.Color;
 using Rectangle = Microsoft.Xna.Framework.Rectangle;
 using SamplerState = Microsoft.Xna.Framework.Graphics.SamplerState;
 using Microsoft.Xna.Framework.Audio;
-using System.Media;
+using Effect = Microsoft.Xna.Framework.Graphics.Effect;
 
 namespace CrazyStorm_Player
 {
@@ -32,6 +32,16 @@ namespace CrazyStorm_Player
         const int PARTICLE_PRESERVED_DIST = 50;
         const int CURVE_PRESERVED_DIST = 100;
 
+        Effect shader;
+        EffectParameter shaderMaskSize;
+        Vector2[] MaskSizeArray;
+        EffectParameter shaderMaskPosition;
+        Vector2[] MaskPositionArray;
+        EffectParameter shaderMaskType;
+        EffectParameter shaderMaskShape;
+        EffectParameter shaderMaskRotate;
+        EffectParameter shaderMaskCount;
+        EffectParameter shaderRenderCenter;
         SpriteBatch spriteBatch;
         CurveBatch curveBatch;
         BlendState substration, multiply;
@@ -67,6 +77,19 @@ namespace CrazyStorm_Player
         }
         public void Initialize(GraphicsDevice gd)
         {
+            var shaderFile = Assembly.GetExecutingAssembly().GetManifestResourceStream("CrazyStorm_Player.shader.mgfxo");
+            using (var ms = new MemoryStream())
+            {
+                shaderFile.CopyTo(ms);
+                shader = new Effect(gd, ms.ToArray());
+                shaderMaskSize = shader.Parameters["MaskSize"];
+                shaderMaskPosition = shader.Parameters["MaskPosition"];
+                shaderMaskType = shader.Parameters["MaskType"];
+                shaderMaskShape = shader.Parameters["MaskShape"];
+                shaderMaskRotate = shader.Parameters["MaskRotate"];
+                shaderMaskCount = shader.Parameters["MaskCount"];
+                shaderRenderCenter = shader.Parameters["RenderCenter"];
+            }
             spriteBatch = new SpriteBatch(gd);
             curveBatch = new CurveBatch(gd);
             substration = new BlendState();
@@ -183,16 +206,16 @@ namespace CrazyStorm_Player
                 switch (blendType)
                 {
                     case BlendType.AlphaBlend:
-                        spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied, SamplerState.LinearWrap);
+                        spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied, SamplerState.LinearWrap, null, null, shader);
                         break;
                     case BlendType.Additive:
-                        spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Additive, SamplerState.LinearWrap);
+                        spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Additive, SamplerState.LinearWrap, null, null, shader);
                         break;
                     case BlendType.Substraction:
-                        spriteBatch.Begin(SpriteSortMode.Deferred, substration, SamplerState.LinearWrap);
+                        spriteBatch.Begin(SpriteSortMode.Deferred, substration, SamplerState.LinearWrap, null, null, shader);
                         break;
                     case BlendType.Multiply:
-                        spriteBatch.Begin(SpriteSortMode.Deferred, multiply, SamplerState.LinearWrap);
+                        spriteBatch.Begin(SpriteSortMode.Deferred, multiply, SamplerState.LinearWrap, null, null, shader);
                         break;
                 }
             }
@@ -239,19 +262,19 @@ namespace CrazyStorm_Player
                 switch (blendType)
                 {
                     case BlendType.AlphaBlend:
-                        spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied, SamplerState.LinearWrap);
+                        spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied, SamplerState.LinearWrap, null, null, shader);
                         curveBatch.Begin(BlendState.NonPremultiplied);
                         break;
                     case BlendType.Additive:
-                        spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Additive, SamplerState.LinearWrap);
+                        spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Additive, SamplerState.LinearWrap, null, null, shader);
                         curveBatch.Begin(BlendState.Additive);
                         break;
                     case BlendType.Substraction:
-                        spriteBatch.Begin(SpriteSortMode.Deferred, substration, SamplerState.LinearWrap);
+                        spriteBatch.Begin(SpriteSortMode.Deferred, substration, SamplerState.LinearWrap, null, null, shader);
                         curveBatch.Begin(substration);
                         break;
                     case BlendType.Multiply:
-                        spriteBatch.Begin(SpriteSortMode.Deferred, multiply, SamplerState.LinearWrap);
+                        spriteBatch.Begin(SpriteSortMode.Deferred, multiply, SamplerState.LinearWrap, null, null, shader);
                         curveBatch.Begin(multiply);
                         break;
                 }
@@ -277,6 +300,20 @@ namespace CrazyStorm_Player
             EventManager.TypeSoundMap = File.ParticleSystems[SelectedParticleSystemIndex].TypeSoundMap;
             EventManager.Update();
             File.ParticleSystems[SelectedParticleSystemIndex].Update(CurrentFrame);
+            ParticleManager.UpdateLayerMasks(File.ParticleSystems[SelectedParticleSystemIndex].Layers);
+            shaderMaskCount.SetValue(ParticleManager.MaskCount);
+            if (MaskSizeArray == null) MaskSizeArray = new Vector2[ParticleManager.MaskSizeArray.Length];
+            for (int i = 0; i < MaskSizeArray.Length; ++i) MaskSizeArray[i] = new Vector2(ParticleManager.MaskSizeArray[i].x,
+                ParticleManager.MaskSizeArray[i].y);
+            shaderMaskSize.SetValue(MaskSizeArray);
+            if (MaskPositionArray == null) MaskPositionArray = new Vector2[ParticleManager.MaskPositionArray.Length];
+            for (int i = 0; i < MaskPositionArray.Length; ++i) MaskPositionArray[i] = new Vector2(ParticleManager.MaskPositionArray[i].x,
+                ParticleManager.MaskPositionArray[i].y);
+            shaderMaskPosition.SetValue(MaskPositionArray);
+            shaderMaskShape.SetValue(ParticleManager.MaskShapeArray);
+            shaderMaskType.SetValue(ParticleManager.MaskTypeArray);
+            shaderMaskRotate.SetValue(ParticleManager.MaskRotateArray);
+            shaderRenderCenter.SetValue(new Vector2(Width / 2, Height / 2));
             var collidedCount = 0;
             Vector2 newPos = default;
             var particles = ParticleManager.CheckCollision(false, controllable.selfPosLast.X, controllable.selfPosLast.Y,
@@ -289,7 +326,7 @@ namespace CrazyStorm_Player
         public void Draw(GraphicsDevice gd, GameTime gameTime)
         {
             gd.Clear(Color.Black);
-            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied, SamplerState.LinearWrap);
+            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied, SamplerState.LinearWrap, null, null, shader);
             curveBatch.Begin(BlendState.NonPremultiplied);
             if (background != null)
             {

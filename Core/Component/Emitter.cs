@@ -329,7 +329,7 @@ namespace CrazyStorm.Core
         {
             if (!base.Update(currentFrame)) return false;
             if (BindingTarget == null || CheckCircularBinding()) EmitCyclically();
-            else BindingUpdate(EmitCyclically);
+            else BindingUpdate(EmitCyclically, true);
             return true;
         }
         public override void Reset()
@@ -352,7 +352,7 @@ namespace CrazyStorm.Core
             if (BindingTarget == null || CheckCircularBinding())
                 Emit();
             else
-                BindingUpdate(Emit);
+                BindingUpdate(Emit, true);
         }
         #endregion
     }

@@ -127,6 +127,16 @@ namespace CrazyStorm.Core
             @"(?:,(?<deepbind>[^,]+))?" +
             @"(?:,(?<colorR>[^,]+))?(?:,(?<colorG>[^,]+))?(?:,(?<colorB>[^,]+))?" +
             @"(?:,(?<vspeed>[^,]+))?$", RegexOptions.Compiled);
+        static readonly Regex CoverMatch = new Regex(@"^(?<id>[^,]+),(?<layerid>[^,]+)," +
+            @"(?<x>[^,]+),(?<y>[^,]+),(?<begin>[^,]+),(?<life>[^,]+)," +
+            @"(?<halfw>[^,]+),(?<halfh>[^,]+),(?<circle>[^,]+),(?<type>[^,]+),(?<controlid>[^,]+)," +
+            @"(?<speed>[^,]+),(?<speedd>[^,]+),(?<speedds>[^,]+)," +
+            @"(?<aspeed>[^,]+),(?<aspeedd>[^,]+),(?<aspeedds>[^,]+)," +
+            @"(?:(?<events>[^,]+))?,(?:(?<sonevents>[^,]+))?," +
+            @"(?<randspeed>[^,]+),(?<randspeedd>[^,]+),(?<randaspeed>[^,]+),(?<randaspeedd>[^,]+)" +
+            @"(?:,(?<bindid>[^,]+))?(?:,(?<deepbind>[^,]+))?" +
+            @"(?:,(?<maskon>[^,]+))?(?:,(?<masktype>[^,]+))?(?:,(?<maskmutex>[^,]+))?" +
+            @"(?:,(?<degree>[^,]+))?$", RegexOptions.Compiled);
         public static bool IsCS1(string filePath)
         {
             using (var reader = new StreamReader(filePath, Encoding.UTF8))
@@ -433,7 +443,7 @@ namespace CrazyStorm.Core
                             //lases
                             line = reader.ReadLine().Trim();
                             var submatch = LaseMatch.Match(line);
-                            if (!match.Success) continue;
+                            if (!submatch.Success) continue;
                             var lase = new CurveEmitter();
                             lase.Name = submatch.Groups["id"].Value;
                             lase.BindingTargetID = bool.Parse(submatch.Groups["binding"].Value) ?
@@ -488,6 +498,48 @@ namespace CrazyStorm.Core
                             eventGroups = GetEventGroups(typeof(CurveParticle), submatch.Groups["sonevents"].Value, true);
                             foreach (var eventGroup in eventGroups) lase.ParticleEventGroups.Add(eventGroup);
                             layer.Components.Add(lase);
+                        }
+                        var coverCount = int.Parse(match.Groups["covercount"].Value);
+                        for (int i = 0; i < coverCount; i++)
+                        {
+                            //cover
+                            line = reader.ReadLine().Trim();
+                            var submatch = CoverMatch.Match(line);
+                            if (!submatch.Success) continue;
+                            var cover = new EventField();
+                            cover.Name = submatch.Groups["id"].Value;
+                            cover.BindingTargetID = submatch.Groups["bindid"].Success ? int.Parse(submatch.Groups["bindid"].Value) : -1;
+                            cover.ID = particleSystem.GetComponentIndex();
+                            particleSystem.GetAndIncreaseComponentIndex(cover.GetType().ToString());
+                            cover.ParentID = center.ID;
+                            cover.Position = ConvertVector2(float.Parse(submatch.Groups["x"].Value), float.Parse(submatch.Groups["y"].Value),
+                                0, 0, cover, "Position") - OldCenter;
+                            cover.BeginFrame = int.Parse(submatch.Groups["begin"].Value) - 1;
+                            cover.TotalFrame = int.Parse(submatch.Groups["life"].Value);
+                            cover.HalfWidth = int.Parse(submatch.Groups["halfw"].Value);
+                            cover.HalfHeight = int.Parse(submatch.Groups["halfh"].Value);
+                            cover.FieldShape = bool.Parse(submatch.Groups["circle"].Value) ? FieldShape.Circle : FieldShape.Rectangle;
+                            cover.Reach = int.Parse(submatch.Groups["type"].Value) == 0 ? Reach.All : Reach.Name;
+                            cover.TargetName = cover.Reach == Reach.Name ? submatch.Groups["controlid"].Value : "";
+                            cover.Speed = ConvertFloat(float.Parse(submatch.Groups["speed"].Value), float.Parse(submatch.Groups["randspeed"].Value),
+                                cover, "Speed");
+                            cover.SpeedAngle = ConvertAngle(float.Parse(submatch.Groups["speedd"].Value), float.Parse(submatch.Groups["randspeedd"].Value),
+                                cover, "SpeedAngle");
+                            cover.Acspeed = ConvertFloat(float.Parse(submatch.Groups["aspeed"].Value), float.Parse(submatch.Groups["randaspeed"].Value),
+                                cover, "Acspeed");
+                            cover.AcspeedAngle = ConvertAngle(float.Parse(submatch.Groups["aspeedd"].Value), float.Parse(submatch.Groups["randaspeedd"].Value),
+                                cover, "AcspeedAngle");
+                            cover.LayerMask = submatch.Groups["maskon"].Success ? bool.Parse(submatch.Groups["maskon"].Value) : false;
+                            cover.LayerMaskType = submatch.Groups["masktype"].Success ? (LayerMaskType)int.Parse(submatch.Groups["masktype"].Value) : default;
+                            cover.LayerMaskMutex = submatch.Groups["maskmutex"].Success ? bool.Parse(submatch.Groups["maskmutex"].Value) : false;
+                            cover.Rotation = submatch.Groups["degree"].Success ? float.Parse(submatch.Groups["degree"].Value) : 0f;
+                            //events
+                            var eventGroups = GetEventGroups(typeof(EventField), submatch.Groups["events"].Value, false);
+                            foreach (var eventGroup in eventGroups) cover.ComponentEventGroups.Add(eventGroup);
+                            //sonevents
+                            eventGroups = GetEventGroups(typeof(ParticleBase), submatch.Groups["sonevents"].Value, true);
+                            foreach (var eventGroup in eventGroups) cover.EventFieldEventGroups.Add(eventGroup);
+                            layer.Components.Add(cover);
                         }
                         //binding
                         foreach (var component in layer.Components)
@@ -777,13 +829,10 @@ namespace CrazyStorm.Core
                     }
                     else
                     {
-                        if (eventInfo.resultProperty == BlendKeyword)
-                        {
-                            eventInfo.resultValue = BlendValueMap[eventInfo.resultValue];
-                        }
                         eventInfo.resultType = PropertyTypeRule.GetValueType(componentType, eventInfo.resultProperty);
                         eventInfo.changeType = ConvertKeyword(split[1]);
                         eventInfo.resultValue = ConvertSpecialValue(eventInfo.resultType, ConvertKeyword(split[2]), out eventInfo.isExpressionResult);
+                        if (eventInfo.resultProperty == BlendKeyword) eventInfo.resultValue = BlendValueMap[eventInfo.resultValue];
                     }
                 }
                 var eventText = EventHelper.BuildEvent(eventInfo, !eventInfo.isSpecialEvent);

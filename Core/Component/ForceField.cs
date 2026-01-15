@@ -28,6 +28,7 @@ namespace CrazyStorm.Core
         public float force;
         public float direction;
         public ForceType forceType;
+        public float rotation;
     }
     public class ForceField : Component
     {
@@ -39,13 +40,13 @@ namespace CrazyStorm.Core
         #endregion
 
         #region Public Members
-        [FloatProperty(0, float.MaxValue)]
+        [FloatProperty(1, float.MaxValue)]
         public float HalfWidth
         {
             get { return forceFieldData.halfWidth; }
             set { forceFieldData.halfWidth = value; }
         }
-        [FloatProperty(0, float.MaxValue)]
+        [FloatProperty(1, float.MaxValue)]
         public float HalfHeight
         {
             get { return forceFieldData.halfHeight; }
@@ -87,6 +88,12 @@ namespace CrazyStorm.Core
             get { return targetName; }
             set { targetName = value; }
         }
+        [FloatProperty(int.MinValue, int.MaxValue)]
+        public float Rotation
+        {
+            get { return forceFieldData.rotation; }
+            set { forceFieldData.rotation = value; }
+        }
         #endregion
 
         #region Constructor
@@ -103,8 +110,9 @@ namespace CrazyStorm.Core
         void Update()
         {
             int count = 0;
-            var results = ParticleManager.SearchByRect(Position.x - HalfWidth, Position.x + HalfWidth,
-                Position.y - HalfHeight, Position.y + HalfHeight, out count);
+            var results = FieldShape == FieldShape.Rectangle ?
+                ParticleManager.SearchByRect(Position, HalfWidth, HalfHeight, Rotation, out count) :
+                ParticleManager.SearchByEllipse(Position, HalfWidth, HalfHeight, Rotation, out count);
             for (int i = 0; i < count;++i)
             {
                 if (results[i].IgnoreForce)
@@ -113,21 +121,15 @@ namespace CrazyStorm.Core
                 switch (Reach)
                 {
                     case Reach.Layer:
-                        if (results[i].Emitter.LayerName != TargetName && results[i].Emitter.LayerName != LayerName)
+                        if (results[i].Emitter.LayerName != TargetName)
                             continue;
 
                         break;
                     case Reach.Name:
-                        if (results[i].Emitter.Name != TargetName)
+                        if (results[i].Emitter.Name != TargetName && results[i].Emitter.LayerName != LayerName)
                             continue;
 
                         break;
-                }
-                if (FieldShape == FieldShape.Circle)
-                {
-                    Vector2 v = Position - results[i].PPosition;
-                    if (Math.Sqrt(v.x * v.x + v.y * v.y) > HalfWidth)
-                        continue;
                 }
                 switch (ForceType)
                 {
@@ -224,6 +226,9 @@ namespace CrazyStorm.Core
                 case "ForceType":
                     VM.PushInt((int)ForceType);
                     return true;
+                case "Rotation":
+                    VM.PushFloat(Rotation);
+                    return true;
             }
             return false;
         }
@@ -258,6 +263,9 @@ namespace CrazyStorm.Core
                 case "ForceType":
                     ForceType = (ForceType)VM.PopInt();
                     return true;
+                case "Rotation":
+                    Rotation = VM.PopFloat();
+                    return true;
             }
             return false;
         }
@@ -269,7 +277,7 @@ namespace CrazyStorm.Core
             if (BindingTarget == null)
                 Update();
             else
-                BindingUpdate(Update);
+                BindingUpdate(Update, true);
 
             return true;
         }
@@ -285,6 +293,7 @@ namespace CrazyStorm.Core
             Force = initialState.Force;
             Direction = initialState.Direction;
             ForceType = initialState.ForceType;
+            Rotation = initialState.Rotation;
         }
         #endregion
     }

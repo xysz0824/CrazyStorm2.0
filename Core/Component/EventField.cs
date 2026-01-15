@@ -24,6 +24,11 @@ namespace CrazyStorm.Core
         Layer,
         Name
     }
+    public enum LayerMaskType
+    {
+        InsideMask,
+        OutsideMask,
+    }
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public struct EventFieldData
     {
@@ -31,6 +36,10 @@ namespace CrazyStorm.Core
         public float halfHeight;
         public FieldShape fieldShape;
         public Reach reach;
+        public bool layerMask;
+        public LayerMaskType layerMaskType;
+        public bool layerMaskMutex;
+        public float rotation;
     }
     public class EventField : Component
     {
@@ -43,13 +52,13 @@ namespace CrazyStorm.Core
         #endregion
 
         #region Public Members
-        [FloatProperty(0, float.MaxValue)]
+        [FloatProperty(1, float.MaxValue)]
         public float HalfWidth
         {
             get { return eventFieldData.halfWidth; }
             set { eventFieldData.halfWidth = value; }
         }
-        [FloatProperty(0, float.MaxValue)]
+        [FloatProperty(1, float.MaxValue)]
         public float HalfHeight
         {
             get { return eventFieldData.halfHeight; }
@@ -73,6 +82,30 @@ namespace CrazyStorm.Core
             get { return targetName; }
             set { targetName = value; }
         }
+        [BoolProperty]
+        public bool LayerMask
+        {
+            get { return eventFieldData.layerMask; }
+            set { eventFieldData.layerMask = value; }
+        }
+        [EnumProperty(typeof(LayerMaskType))]
+        public LayerMaskType LayerMaskType
+        {
+            get { return eventFieldData.layerMaskType; }
+            set { eventFieldData.layerMaskType = value; }
+        }
+        [BoolProperty]
+        public bool LayerMaskMutex
+        {
+            get { return eventFieldData.layerMaskMutex; }
+            set { eventFieldData.layerMaskMutex = value; }
+        }
+        [FloatProperty(int.MinValue, int.MaxValue)]
+        public float Rotation
+        {
+            get { return eventFieldData.rotation; }
+            set { eventFieldData.rotation = value; }
+        }
         public IList<EventGroup> EventFieldEventGroups { get { return eventFieldEventGroups; } }
         #endregion
 
@@ -90,8 +123,9 @@ namespace CrazyStorm.Core
         void Update()
         {
             int count = 0;
-            var results = ParticleManager.SearchByRect(Position.x - HalfWidth, Position.x + HalfWidth,
-                Position.y - HalfHeight, Position.y + HalfHeight, out count);
+            var results = FieldShape == FieldShape.Rectangle ? 
+                ParticleManager.SearchByRect(Position, HalfWidth, HalfHeight, Rotation, out count) :
+                ParticleManager.SearchByEllipse(Position, HalfWidth, HalfHeight, Rotation, out count);
             for (int i = 0;i < count; ++i)
             {
                 if (results[i].IgnoreMask)
@@ -100,21 +134,15 @@ namespace CrazyStorm.Core
                 switch (Reach)
                 {
                     case Reach.Layer:
-                        if (results[i].Emitter.LayerName != TargetName && results[i].Emitter.LayerName != LayerName)
+                        if (results[i].Emitter.LayerName != TargetName)
                             continue;
 
                         break;
                     case Reach.Name:
-                        if (results[i].Emitter.Name != TargetName)
+                        if (results[i].Emitter.Name != TargetName && results[i].Emitter.LayerName != LayerName)
                             continue;
 
                         break;
-                }
-                if (FieldShape == FieldShape.Circle)
-                {
-                    Vector2 v = Position - results[i].PPosition;
-                    if (Math.Sqrt(v.x * v.x + v.y * v.y) > HalfWidth)
-                        continue;
                 }
                 for (int k = 0; k < EventFieldEventGroups.Count; ++k)
                     EventFieldEventGroups[k].Execute(results[i], null);
@@ -203,6 +231,18 @@ namespace CrazyStorm.Core
                 case "TargetName":
                     VM.PushString(TargetName);
                     return true;
+                case "LayerMask":
+                    VM.PushBool(LayerMask);
+                    return true;
+                case "LayerMaskType":
+                    VM.PushInt((int)LayerMaskType);
+                    return true;
+                case "LayerMaskMutex":
+                    VM.PushBool(LayerMaskMutex);
+                    return true;
+                case "Rotation":
+                    VM.PushFloat(Rotation);
+                    return true;
             }
             return false;
         }
@@ -228,6 +268,18 @@ namespace CrazyStorm.Core
                 case "TargetName":
                     TargetName = VM.PopString();
                     return true;
+                case "LayerMask":
+                    LayerMask = VM.PopBool();
+                    return true;
+                case "LayerMaskType":
+                    LayerMaskType = (LayerMaskType)VM.PopInt();
+                    return true;
+                case "LayerMaskMutex":
+                    LayerMaskMutex = VM.PopBool();
+                    return true;
+                case "Rotation":
+                    Rotation = VM.PopFloat();
+                    return true;
             }
             return false;
         }
@@ -239,7 +291,7 @@ namespace CrazyStorm.Core
             if (BindingTarget == null)
                 Update();
             else
-                BindingUpdate(Update);
+                BindingUpdate(Update, true);
 
             return true;
         }
@@ -252,6 +304,10 @@ namespace CrazyStorm.Core
             FieldShape = initialState.FieldShape;
             Reach = initialState.Reach;
             TargetName = initialState.TargetName;
+            LayerMask = initialState.LayerMask;
+            LayerMaskType = initialState.LayerMaskType;
+            LayerMaskMutex = initialState.LayerMaskMutex;
+            Rotation = initialState.Rotation;
         }
         #endregion
     }

@@ -125,7 +125,7 @@
     <sys:String x:Key="IgnoreMaskStr">忽略事件场</sys:String>
     <sys:String x:Key="IgnoreReboundStr">忽略反弹板</sys:String>
     <sys:String x:Key="IgnoreForceStr">忽略力场</sys:String>
-    <sys:String x:Key="CurveTypeStr">类型</sys:String>
+    <sys:String x:Key="CurveTypeStr">线类型</sys:String>
     <sys:String x:Key="RayStr">射线</sys:String>
     <sys:String x:Key="CurveStr">曲线</sys:String>
     <sys:String x:Key="LengthStr">长度</sys:String>
@@ -133,6 +133,11 @@
     <sys:String x:Key="HalfWidthStr">半长</sys:String>
     <sys:String x:Key="HalfHeightStr">半宽</sys:String>
     <sys:String x:Key="FieldShapeStr">场形状</sys:String>
+    <sys:String x:Key="LayerMaskStr">图层遮罩</sys:String>
+    <sys:String x:Key="LayerMaskTypeStr">遮罩类型</sys:String>
+    <sys:String x:Key="LayerMaskMutexStr">遮罩与其他图层互斥</sys:String>
+    <sys:String x:Key="InsideMaskStr">范围内遮罩</sys:String>
+    <sys:String x:Key="OutsideMaskStr">范围外遮罩</sys:String>
     <sys:String x:Key="RebounderShapeStr">反弹板形状</sys:String>
     <sys:String x:Key="ReachStr">范围</sys:String>
     <sys:String x:Key="RectangleStr">矩形</sys:String>

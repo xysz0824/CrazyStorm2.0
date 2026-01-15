@@ -34,7 +34,7 @@ namespace CrazyStorm.Core
         #endregion
 
         #region Public Members
-        [IntProperty(0, int.MaxValue)]
+        [IntProperty(1, int.MaxValue)]
         public int Size
         {
             get { return rebounderData.size; }
@@ -67,8 +67,7 @@ namespace CrazyStorm.Core
         void Update()
         {
             int count = 0;
-            var results = ParticleManager.SearchByRect(Position.x - Size, Position.x + Size,
-                Position.y - Size, Position.y + Size, out count);
+            var results = ParticleManager.SearchByRect(Position, Size, Size, 0, out count);
             for (int i = 0; i < count; ++i)
             {
                 if (results[i].IgnoreRebound || results[i].Type == null || results[i].PSpeedVector == Vector2.Zero)
@@ -224,7 +223,7 @@ namespace CrazyStorm.Core
             if (BindingTarget == null)
                 Update();
             else
-                BindingUpdate(Update);
+                BindingUpdate(Update, true);
 
             return true;
         }

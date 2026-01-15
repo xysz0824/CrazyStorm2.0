@@ -187,8 +187,8 @@ namespace CrazyStorm.Core
         #endregion
 
         #region Protected Methods
-        protected delegate void Action();
-        protected void BindingUpdate(Action updateFunc)
+        public delegate void Action();
+        public void BindingUpdate(Action updateFunc, bool executeEvents)
         {
             int saveCurrentFrame = CurrentFrame;
             Vector2 savePosition = Position;
@@ -200,10 +200,8 @@ namespace CrazyStorm.Core
             foreach (var particle in BindingTarget.Particles)
             {
                 CurrentFrame = particle.PCurrentFrame - BeginFrame;
-                if (CurrentFrame < 0 || CurrentFrame >= TotalFrame || !Visibility)
-                    continue;
-
-                if (!EventManager.BindingRecover(this, particle) && eventImpacted)
+                if (CurrentFrame < 0 || CurrentFrame >= TotalFrame || !Visibility) continue;
+                if (executeEvents && !EventManager.BindingRecover(this, particle) && eventImpacted)
                 {
                     Reset();
                 }
@@ -213,15 +211,15 @@ namespace CrazyStorm.Core
                 Acspeed = particle.PAcspeed;
                 AcspeedAngle = particle.PAcspeedAngle;
                 ExecuteExpressions();
-                for (int i = 0; i < ComponentEventGroups.Count; ++i)
+                if (executeEvents)
                 {
-                    ComponentEventGroups[i].Execute(this, particle);
+                    for (int i = 0; i < ComponentEventGroups.Count; ++i)
+                    {
+                        ComponentEventGroups[i].Execute(this, particle);
+                    }
                 }
-                if (updateFunc != null)
-                {
-                    updateFunc();
-                }
-                if (EventManager.BindingUpdate(this, particle))
+                updateFunc?.Invoke();
+                if (executeEvents && EventManager.BindingUpdate(this, particle))
                 {
                     eventImpacted = true;
                 }

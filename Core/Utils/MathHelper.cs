@@ -10,6 +10,10 @@ namespace CrazyStorm.Core
     {
         public const float Pi = 3.14159274F;
         public const float PiOver2 = 1.57079637F;
+        public static float Lerp(float value1, float value2, float amount)
+        {
+            return value1 + (value2 - value1) * amount;
+        }
         public static double DegToRad(double degree)
         {
             return degree / 180.0 * Math.PI;

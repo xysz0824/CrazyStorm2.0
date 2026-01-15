@@ -188,8 +188,6 @@ namespace CrazyStorm.Core
                             //Back to start position of components block.
                             componentsReader.BaseStream.Position = startPosition;
                             component.LoadPlayData(componentsReader, version);
-                            component.LayerName = Name;
-                            
                             Components.Add(component);
                         }
                     }
@@ -201,6 +199,7 @@ namespace CrazyStorm.Core
             for (int i = 0; i < Components.Count; ++i)
             {
                 components[i].LayerID = id;
+                components[i].LayerName = name;
             }
         }
         public bool NeedUpdate(int currentFrame)

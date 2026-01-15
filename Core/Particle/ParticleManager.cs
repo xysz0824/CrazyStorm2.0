@@ -37,6 +37,8 @@ namespace CrazyStorm.Core
     }
     public static class ParticleManager
     {
+        public static readonly int MAX_MASK_COUNT = 8;
+
         public delegate void ParticleDrawHanlder(Particle particle);
         public static event ParticleDrawHanlder OnParticleDraw;
         public delegate void CurveParticleDrawHandler(CurveParticle curveParticle);
@@ -52,8 +54,19 @@ namespace CrazyStorm.Core
         static int instanceID;
         static List<ParticleBase> activeParticles;
         static ParticleBase[] searchResult;
-
+        static Vector2[] maskPositionArray = new Vector2[MAX_MASK_COUNT];
+        static Vector2[] maskSizeArray = new Vector2[MAX_MASK_COUNT];
+        static float[] maskShapeArray = new float[MAX_MASK_COUNT];
+        static float[] maskTypeArray = new float[MAX_MASK_COUNT];
+        static float[] maskRotateArray = new float[MAX_MASK_COUNT];
+        static int maskCount;
         public static int ActiveParticleCount => activeParticles != null ? activeParticles.Count : 0;
+        public static Vector2[] MaskPositionArray => maskPositionArray;
+        public static Vector2[] MaskSizeArray => maskSizeArray;
+        public static float[] MaskShapeArray => maskShapeArray;
+        public static float[] MaskTypeArray => maskTypeArray;
+        public static float[] MaskRotateArray => maskRotateArray;
+        public static int MaskCount => maskCount;
         public static void Initialize(int windowWidth, int windowHeight, int particlePreservedDist, int curvePreservedDist,
             int particleMaximum, int curveParticleMaximum)
         {
@@ -101,7 +114,7 @@ namespace CrazyStorm.Core
         //{
         //    particleQuadTree.Insert(particleBase);
         //}
-        public static ParticleBase[] SearchByRect(float left, float right, float top, float bottom, out int count)
+        public static ParticleBase[] SearchByRect(Vector2 center, float halfW, float halfH, float rotation, out int count)
         {
             int index = 0;
             for (int i = 0; i < activeParticles.Count; ++i)
@@ -109,9 +122,26 @@ namespace CrazyStorm.Core
                 var instance = activeParticles[i];
                 if (instance.Alive)
                 {
-                    float x = instance.PPosition.x;
-                    float y = instance.PPosition.y;
-                    if (x >= left && x <= right && y >= top && y <= bottom)
+                    var v = MathHelper.Rotate(instance.PPosition - center, -rotation);
+                    if (v.x >= -halfW && v.x <= halfW && v.y >= -halfH && v.y <= halfH)
+                    {
+                        searchResult[index++] = instance;
+                    }
+                }
+            }
+            count = index;
+            return searchResult;
+        }
+        public static ParticleBase[] SearchByEllipse(Vector2 center, float halfW, float halfH, float rotation, out int count)
+        {
+            int index = 0;
+            for (int i = 0; i < activeParticles.Count; ++i)
+            {
+                var instance = activeParticles[i];
+                if (instance.Alive)
+                {
+                    var v = MathHelper.Rotate(instance.PPosition - center, -rotation);
+                    if ((v.x * v.x) / (halfW * halfW) + (v.y * v.y) / (halfH * halfH) <= 1f)
                     {
                         searchResult[index++] = instance;
                     }
@@ -129,7 +159,7 @@ namespace CrazyStorm.Core
             for (int i = 0; i < activeParticles.Count; ++i)
             {
                 var instance = activeParticles[i];
-                if (!instance.Alive) continue;
+                if (!instance.Alive || Masked(instance.PPosition)) continue;
                 if (instance.CheckCollision(new Vector2(bx, by), new Vector2(x, y), r))
                 {
                     searchResult[index++] = instance;
@@ -161,6 +191,101 @@ namespace CrazyStorm.Core
             var outPoint = particle.GetOutPoint();
             return outPoint.x < left || outPoint.x > right ||
                 outPoint.y < top || outPoint.y > bottom;
+        }
+        private static bool Masked(Vector2 pos)
+        {
+            if (maskCount == 0) return false;
+            float result = MathHelper.Lerp(1, MathHelper.Lerp(0, 1, MaskTypeArray[0] - 1), MaskTypeArray[0]);
+            for (int i = 0; i < maskCount; ++i)
+            {
+                bool masked = false;
+                var d = pos - MaskPositionArray[i];
+                d = MathHelper.Rotate(d, -MaskRotateArray[i]);
+                if (MaskShapeArray[i] == 0) //Rect
+                {
+                    masked = d.x >= MaskSizeArray[i].x || -MaskSizeArray[i].x >= d.x || d.y >= MaskSizeArray[i].y || -MaskSizeArray[i].y >= d.y;
+                }
+                else if (MaskShapeArray[i] == 1) //Ellipse
+                {
+                    d.x *= d.x;
+                    d.y *= d.y;
+                    masked = d.x / (MaskSizeArray[i].x * MaskSizeArray[i].x) + d.y / (MaskSizeArray[i].y * MaskSizeArray[i].y) >= 1;
+                }
+                result = MathHelper.Lerp(result, MathHelper.Lerp(result + (masked ? 0 : 1), result * (masked ? 1 : 0), MaskTypeArray[i] - 1), Math.Min(1, MaskTypeArray[i]));
+            }
+            return result == 0;
+        }
+        public static void UpdateLayerMasks(IList<Layer> layers)
+        {
+            maskCount = 0;
+            Array.Clear(MaskPositionArray, 0, MAX_MASK_COUNT);
+            Array.Clear(MaskSizeArray, 0, MAX_MASK_COUNT);
+            Array.Clear(MaskShapeArray, 0, MAX_MASK_COUNT);
+            Array.Clear(MaskTypeArray, 0, MAX_MASK_COUNT);
+            Array.Clear(MaskRotateArray, 0, MAX_MASK_COUNT);
+            for (int i = 0; i < layers.Count; ++i)
+            {
+                for (int j = 0; j < layers.Count; ++j)
+                {
+                    if (j == i) continue;
+                    foreach (var component in layers[j].Components)
+                    {
+                        var eventField = component as EventField;
+                        if (eventField == null) continue;
+                        if (eventField.BindingTarget == null)
+                        {
+                            if (maskCount >= MAX_MASK_COUNT || !eventField.LayerMask || !eventField.Visibility || !eventField.LayerMaskMutex) continue;
+                            MaskPositionArray[maskCount] = eventField.Position;
+                            MaskSizeArray[maskCount] = new Vector2(eventField.HalfWidth, eventField.HalfHeight);
+                            MaskShapeArray[maskCount] = eventField.FieldShape == FieldShape.Circle ? 1 : 0;
+                            MaskTypeArray[maskCount] = eventField.LayerMaskType == LayerMaskType.OutsideMask ? 1 : 2;
+                            MaskRotateArray[maskCount] = (float)MathHelper.DegToRad(eventField.Rotation);
+                            maskCount++;
+                        }
+                        else
+                        {
+                            eventField.BindingUpdate(() =>
+                            {
+                                if (maskCount >= MAX_MASK_COUNT || !eventField.LayerMask || !eventField.Visibility || !eventField.LayerMaskMutex) return;
+                                MaskPositionArray[maskCount] = eventField.Position;
+                                MaskSizeArray[maskCount] = new Vector2(eventField.HalfWidth, eventField.HalfHeight);
+                                MaskShapeArray[maskCount] = eventField.FieldShape == FieldShape.Circle ? 1 : 0;
+                                MaskTypeArray[maskCount] = eventField.LayerMaskType == LayerMaskType.OutsideMask ? 1 : 2;
+                                MaskRotateArray[maskCount] = (float)MathHelper.DegToRad(eventField.Rotation);
+                                maskCount++;
+                            }, false);
+                        }
+                    }
+                }
+                foreach (var component in layers[i].Components)
+                {
+                    var eventField = component as EventField;
+                    if (eventField == null) continue;
+                    if (eventField.BindingTarget == null)
+                    {
+                        if (maskCount >= MAX_MASK_COUNT || !eventField.LayerMask || !eventField.Visibility) continue;
+                        MaskPositionArray[maskCount] = eventField.Position;
+                        MaskSizeArray[maskCount] = new Vector2(eventField.HalfWidth, eventField.HalfHeight);
+                        MaskShapeArray[maskCount] = eventField.FieldShape == FieldShape.Circle ? 1 : 0;
+                        MaskTypeArray[maskCount] = (int)eventField.LayerMaskType + 1;
+                        MaskRotateArray[maskCount] = (float)MathHelper.DegToRad(eventField.Rotation);
+                        maskCount++;
+                    }
+                    else
+                    {
+                        eventField.BindingUpdate(() =>
+                        {
+                            if (maskCount >= MAX_MASK_COUNT || !eventField.LayerMask || !eventField.Visibility) return;
+                            MaskPositionArray[maskCount] = eventField.Position;
+                            MaskSizeArray[maskCount] = new Vector2(eventField.HalfWidth, eventField.HalfHeight);
+                            MaskShapeArray[maskCount] = eventField.FieldShape == FieldShape.Circle ? 1 : 0;
+                            MaskTypeArray[maskCount] = (int)eventField.LayerMaskType + 1;
+                            MaskRotateArray[maskCount] = (float)MathHelper.DegToRad(eventField.Rotation);
+                            maskCount++;
+                        }, false);
+                    }
+                }
+            }
         }
         public static void Update()
         {
