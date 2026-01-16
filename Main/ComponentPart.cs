@@ -166,6 +166,7 @@ namespace CrazyStorm
         }
         void BindComponent()
         {
+            var center = new Point(config.ScreenWidthOver2, config.ScreenHeightOver2);
             bindingLines = new List<Line>();
             foreach (var component in selectedComponents)
             {
@@ -178,7 +179,7 @@ namespace CrazyStorm
                     x += parent.x;
                     y += parent.y;
                 }
-                var line = DrawHelper.GetLine((int)x + config.ScreenWidthOver2, (int)y + config.ScreenHeightOver2,
+                var line = DrawHelper.GetLine((int)(x + center.X), (int)(y + center.Y),
                     (int)screenMousePos.X, (int)screenMousePos.Y, 2, true, Colors.White, 0.5f);
                 line.DataContext = component;
                 bindingLines.Add(line);

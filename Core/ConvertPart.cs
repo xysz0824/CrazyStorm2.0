@@ -374,14 +374,14 @@ namespace CrazyStorm.Core
                             var submatch = BatchMatch.Match(line);
                             if (!submatch.Success) continue;
                             var batch = new MultiEmitter();
-                            batch.Name = submatch.Groups["id"].Value;
+                            batch.Name = (float.Parse(submatch.Groups["id"].Value) + 1).ToString();
                             batch.BindingTargetID = bool.Parse(submatch.Groups["binding"].Value) ?
                                 int.Parse(submatch.Groups["bindid"].Value) : -1;
                             batch.ID = particleSystem.GetComponentIndex();
                             particleSystem.GetAndIncreaseComponentIndex(batch.GetType().ToString());
                             batch.ParentID = center.ID;
                             batch.Position = ConvertVector2(float.Parse(submatch.Groups["x"].Value), float.Parse(submatch.Groups["y"].Value),
-                                0, 0, batch, "Position") - OldCenter;
+                                0, 0, batch, "Position") - OldCenter - center.Position;
                             batch.BeginFrame = int.Parse(submatch.Groups["begin"].Value) - 1;
                             batch.TotalFrame = int.Parse(submatch.Groups["life"].Value);
                             batch.EmitPosition = ConvertVector2(float.Parse(submatch.Groups["fx"].Value), float.Parse(submatch.Groups["fy"].Value),
@@ -460,14 +460,14 @@ namespace CrazyStorm.Core
                             var submatch = LaseMatch.Match(line);
                             if (!submatch.Success) continue;
                             var lase = new CurveEmitter();
-                            lase.Name = submatch.Groups["id"].Value;
+                            lase.Name = (float.Parse(submatch.Groups["id"].Value) + 1).ToString();
                             lase.BindingTargetID = bool.Parse(submatch.Groups["binding"].Value) ?
                                 int.Parse(submatch.Groups["bindid"].Value) : -1;
                             lase.ID = particleSystem.GetComponentIndex();
                             particleSystem.GetAndIncreaseComponentIndex(lase.GetType().ToString());
                             lase.ParentID = center.ID;
                             lase.Position = ConvertVector2(float.Parse(submatch.Groups["x"].Value), float.Parse(submatch.Groups["y"].Value),
-                                0, 0, lase, "Position") - OldCenter;
+                                0, 0, lase, "Position") - OldCenter - center.Position;
                             lase.BeginFrame = int.Parse(submatch.Groups["begin"].Value) - 1;
                             lase.TotalFrame = int.Parse(submatch.Groups["life"].Value);
                             lase.EmitRadius = ConvertFloat(float.Parse(submatch.Groups["r"].Value), float.Parse(submatch.Groups["randr"].Value),
@@ -522,13 +522,13 @@ namespace CrazyStorm.Core
                             var submatch = CoverMatch.Match(line);
                             if (!submatch.Success) continue;
                             var cover = new EventField();
-                            cover.Name = submatch.Groups["id"].Value;
+                            cover.Name = (float.Parse(submatch.Groups["id"].Value) + 1).ToString();
                             cover.BindingTargetID = submatch.Groups["bindid"].Success ? int.Parse(submatch.Groups["bindid"].Value) : -1;
                             cover.ID = particleSystem.GetComponentIndex();
                             particleSystem.GetAndIncreaseComponentIndex(cover.GetType().ToString());
                             cover.ParentID = center.ID;
                             cover.Position = ConvertVector2(float.Parse(submatch.Groups["x"].Value), float.Parse(submatch.Groups["y"].Value),
-                                0, 0, cover, "Position") - OldCenter;
+                                0, 0, cover, "Position") - OldCenter - center.Position;
                             cover.BeginFrame = int.Parse(submatch.Groups["begin"].Value) - 1;
                             cover.TotalFrame = int.Parse(submatch.Groups["life"].Value);
                             cover.HalfWidth = int.Parse(submatch.Groups["halfw"].Value);
@@ -564,12 +564,12 @@ namespace CrazyStorm.Core
                             var submatch = ReboundMatch.Match(line);
                             if (!submatch.Success) continue;
                             var rebound = new Rebounder();
-                            rebound.Name = submatch.Groups["id"].Value;
+                            rebound.Name = (float.Parse(submatch.Groups["id"].Value) + 1).ToString();
                             rebound.ID = particleSystem.GetComponentIndex();
                             particleSystem.GetAndIncreaseComponentIndex(rebound.GetType().ToString());
                             rebound.ParentID = center.ID;
                             rebound.Position = ConvertVector2(float.Parse(submatch.Groups["x"].Value), float.Parse(submatch.Groups["y"].Value),
-                                0, 0, rebound, "Position") - OldCenter;
+                                0, 0, rebound, "Position") - OldCenter - center.Position;
                             rebound.BeginFrame = int.Parse(submatch.Groups["begin"].Value) - 1;
                             rebound.TotalFrame = int.Parse(submatch.Groups["life"].Value);
                             rebound.Size = int.Parse(submatch.Groups["longs"].Value);
@@ -597,13 +597,13 @@ namespace CrazyStorm.Core
                             var submatch = ForceMatch.Match(line);
                             if (!submatch.Success) continue;
                             var force = new ForceField();
-                            force.Name = submatch.Groups["id"].Value;
+                            force.Name = (float.Parse(submatch.Groups["id"].Value) + 1).ToString();
                             force.BindingTargetID = submatch.Groups["bindid"].Success ? int.Parse(submatch.Groups["bindid"].Value) : -1;
                             force.ID = particleSystem.GetComponentIndex();
                             particleSystem.GetAndIncreaseComponentIndex(force.GetType().ToString());
                             force.ParentID = center.ID;
                             force.Position = ConvertVector2(float.Parse(submatch.Groups["x"].Value), float.Parse(submatch.Groups["y"].Value),
-                                0, 0, force, "Position") - OldCenter;
+                                0, 0, force, "Position") - OldCenter - center.Position;
                             force.BeginFrame = int.Parse(submatch.Groups["begin"].Value) - 1;
                             force.TotalFrame = int.Parse(submatch.Groups["life"].Value);
                             force.HalfWidth = int.Parse(submatch.Groups["halfw"].Value);

@@ -50,15 +50,12 @@ namespace CrazyStorm
             }
             if (canvas != null)
             {
+                var center = new Point(config.ScreenWidthOver2, config.ScreenHeightOver2);
                 if (selectedComponents == null) selectedComponents = new List<Component>();
                 else selectedComponents.Clear();
                 canvas.Children.Clear();
                 //Update binding lines
-                if (bindingLines != null)
-                {
-                    foreach (var line in bindingLines)
-                        canvas.Children.Add(line);
-                }
+                if (bindingLines != null) foreach (var line in bindingLines) canvas.Children.Add(line);
                 //Update components on current screen.
                 var assembly = Assembly.GetExecutingAssembly();
                 var itemTemplate = FindResource("ComponentItem") as DataTemplate;
@@ -96,30 +93,27 @@ namespace CrazyStorm
                                     tx += parent.x;
                                     ty += parent.y;
                                 }
-                                if (!component.Selected)
-                                    DrawHelper.DrawLine(canvas, (int)x + config.ScreenWidthOver2, (int)y + config.ScreenHeightOver2,
-                                        (int)tx + config.ScreenWidthOver2, (int)ty + config.ScreenHeightOver2, 2, true, Colors.White, 0.5f);
-                                else
-                                    DrawHelper.DrawLine(canvas, (int)x + config.ScreenWidthOver2, (int)y + config.ScreenHeightOver2,
-                                        (int)tx + config.ScreenWidthOver2, (int)ty + config.ScreenHeightOver2, 2, false, Colors.White, 0.5f);
+                                if (component.Selected)
+                                    DrawHelper.DrawLine(canvas, (int)(x + center.X), (int)(y + center.Y),
+                                        (int)(tx + center.X), (int)(ty + center.Y), 2, false, Colors.White, 0.5f);
                             }
                             if (component.Selected)
                             {
                                 selectedComponents.Add(component);
                                 //Draw component mark.
                                 var marker = assembly.CreateInstance("CrazyStorm.ComponentMarker") as IComponentMark;
-                                marker.Draw(canvas, component, (int)x + config.ScreenWidthOver2, (int)y + config.ScreenHeightOver2);
+                                marker.Draw(canvas, component, (int)(x + center.X), (int)(y + center.Y));
                                 //Draw specific mark.
                                 if (component is Emitter) marker = assembly.CreateInstance("CrazyStorm.EmitterMarker") as IComponentMark;
                                 else marker = assembly.CreateInstance("CrazyStorm." + component.GetType().Name + "Marker") as IComponentMark;
-                                marker?.Draw(canvas, component, (int)x + config.ScreenWidthOver2, (int)y + config.ScreenHeightOver2);
+                                marker?.Draw(canvas, component, (int)(x + center.X), (int)(y + center.Y));
                             }
                             icon.Data = (Geometry)FindResource($"{component.GetType().Name}_Icon");
                             var scale = (double)FindResource($"{component.GetType().Name}_Scale");
                             var transform = new ScaleTransform(scale, scale, icon.ActualWidth / 2, icon.ActualHeight / 2);
                             icon.RenderTransform = transform;
-                            item.SetValue(Canvas.LeftProperty, (double)x - box.Width / 2 + config.ScreenWidthOver2);
-                            item.SetValue(Canvas.TopProperty, (double)y - box.Height / 2 + config.ScreenHeightOver2);
+                            item.SetValue(Canvas.LeftProperty, (double)x - box.Width / 2 + center.X);
+                            item.SetValue(Canvas.TopProperty, (double)y - box.Height / 2 + center.Y);
                             canvas.Children.Add(item);
                         }
                     }
@@ -128,6 +122,7 @@ namespace CrazyStorm
         }
         void SelectComponents(int x, int y, int width, int height, int clickCount)
         {
+            var center = new Point(config.ScreenWidthOver2, config.ScreenHeightOver2);
             var set = new List<Component>();
             //Select those involved in selection rect. 
             int index = 0;
@@ -147,8 +142,8 @@ namespace CrazyStorm
                             absoluteY += parent.y;
                         }
                         var selectRect = new Rect(x, y, width, height);
-                        var componentRect = new Rect(absoluteX - config.GridWidth / 2 + config.ScreenWidthOver2,
-                            absoluteY - config.GridHeight / 2 + config.ScreenHeightOver2, config.GridWidth, config.GridHeight);
+                        var componentRect = new Rect(absoluteX - config.GridWidth / 2 + center.X,
+                            absoluteY - config.GridHeight / 2 + center.Y, config.GridWidth, config.GridHeight);
                         if (selectRect.IntersectsWith(componentRect))
                         {
                             //Prevent overlay shade from preceding components.
@@ -241,10 +236,11 @@ namespace CrazyStorm
         }
         private void Screen_MouseMove(object sender, MouseEventArgs e)
         {
+            var center = new Point(config.ScreenWidthOver2, config.ScreenHeightOver2);
             screenMousePos = e.GetPosition(sender as IInputElement);
             int x = (int)screenMousePos.X;
             int y = (int)screenMousePos.Y;
-            MousePosTip.Content = (x - config.ScreenWidthOver2) + "," + (y - config.ScreenHeightOver2);
+            MousePosTip.Content = (x - center.X) + "," + (y - center.Y);
             //Display a rect with red edge to mark the location that component will be put on.
             if (aimRect != null)
             {
@@ -320,14 +316,15 @@ namespace CrazyStorm
             //Add component to the place mouse down with left-button.
             if (aimRect != null)
             {
+                var center = new Point(config.ScreenWidthOver2, config.ScreenHeightOver2);
                 aimRect.SetValue(OpacityProperty, 0.0d);
                 var boxX = (double)aimRect.GetValue(Canvas.LeftProperty);
                 var boxY = (double)aimRect.GetValue(Canvas.TopProperty);
                 aimComponent.ID = selectedSystem.GetComponentIndex();
                 var index = selectedSystem.GetAndIncreaseComponentIndex(aimComponent.GetType().ToString());
                 aimComponent.Name = (string)FindResource($"{aimComponent.GetType().Name}Str") + (index + 1);
-                aimComponent.X = (int)(boxX + (double)aimRect.GetValue(Canvas.WidthProperty) / 2 - config.ScreenWidthOver2);
-                aimComponent.Y = (int)(boxY + (double)aimRect.GetValue(Canvas.HeightProperty) / 2 - config.ScreenHeightOver2);
+                aimComponent.X = (int)(boxX + (double)aimRect.GetValue(Canvas.WidthProperty) / 2 - center.X);
+                aimComponent.Y = (int)(boxY + (double)aimRect.GetValue(Canvas.HeightProperty) / 2 - center.Y);
                 new AddComponentCommand().Do(commandStacks[selectedSystem], selectedSystem, selectedLayer, aimComponent);
                 UpdateSelectedStatus();
                 aimComponent = null;
