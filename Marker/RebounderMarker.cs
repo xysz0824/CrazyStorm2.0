@@ -24,10 +24,10 @@ namespace CrazyStorm
                 line.Stroke = new SolidColorBrush(Colors.Red);
                 line.StrokeThickness = 6;
                 line.Opacity = 0.3f;
-                line.X1 = x + Rebounder.Size * Math.Cos(Rebounder.Rotation / 180 * Math.PI);
-                line.Y1 = y + Rebounder.Size * Math.Sin(Rebounder.Rotation / 180 * Math.PI);
-                line.X2 = x + Rebounder.Size * Math.Cos((Rebounder.Rotation + 180) / 180 * Math.PI);
-                line.Y2 = y + Rebounder.Size * Math.Sin((Rebounder.Rotation + 180) / 180 * Math.PI);
+                line.X1 = x;
+                line.Y1 = y;
+                line.X2 = x + Rebounder.Size * Math.Cos(MathHelper.DegToRad(Rebounder.Rotation));
+                line.Y2 = y + Rebounder.Size * Math.Sin(MathHelper.DegToRad(Rebounder.Rotation));
                 canvas.Children.Add(line);
             }
             else if (Rebounder.RebounderShape == RebounderShape.Circle)

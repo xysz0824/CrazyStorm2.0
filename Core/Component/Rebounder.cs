@@ -22,8 +22,10 @@ namespace CrazyStorm.Core
     public struct RebounderData
     {
         public int size;
-        public RebounderShape rebounderShape;
+        public RebounderShape shape;
         public float rotation;
+        public int limit;
+        public bool oneSide;
     }
     public class Rebounder : Component
     {
@@ -43,14 +45,26 @@ namespace CrazyStorm.Core
         [EnumProperty(typeof(RebounderShape))]
         public RebounderShape RebounderShape
         {
-            get { return rebounderData.rebounderShape; }
-            set { rebounderData.rebounderShape = value; }
+            get { return rebounderData.shape; }
+            set { rebounderData.shape = value; }
         }
         [FloatProperty(float.MinValue, float.MaxValue)]
         public float Rotation
         {
             get { return rebounderData.rotation; }
             set { rebounderData.rotation = value; }
+        }
+        [IntProperty(1, int.MaxValue)]
+        public int ReboundLimit
+        {
+            get { return rebounderData.limit; }
+            set { rebounderData.limit = value; }
+        }
+        [BoolProperty]
+        public bool ReboundOneSide
+        {
+            get { return rebounderData.oneSide; }
+            set { rebounderData.oneSide= value; }
         }
         public IList<EventGroup> RebounderEventGroups { get { return rebounderEventGroups; } }
         #endregion
@@ -59,6 +73,7 @@ namespace CrazyStorm.Core
         public Rebounder()
         {
             rebounderData.size = 50;
+            rebounderData.limit = 1;
             rebounderEventGroups = new GenericContainer<EventGroup>();
         }
         #endregion
@@ -70,54 +85,45 @@ namespace CrazyStorm.Core
             var results = ParticleManager.SearchByRect(Position, Size, Size, 0, out count);
             for (int i = 0; i < count; ++i)
             {
-                if (results[i].IgnoreRebound || results[i].Type == null || results[i].PSpeedVector == Vector2.Zero)
-                    continue;
-
-                float radius = Math.Max(results[i].Type.Width, results[i].Type.Height) / 2;
+                if (results[i].IgnoreRebound || results[i].Type == null || results[i].PSpeedVector == Vector2.Zero ||
+                    results[i].ReboundTime >= ReboundLimit) continue;
+                float width = results[i].Type.Width;
+                float widthScale = results[i].WidthScale;
+                float height = (results[i] is Particle) ? results[i].Type.Height : results[i].Type.Width;
+                float heightScale = (results[i] is Particle) ? (results[i] as Particle).HeightScale : results[i].WidthScale;
+                var center = MathHelper.GetActualCenter(results[i].PPosition, results[i].PRotation, results[i].Type.CenterPoint,
+                    new Vector2(width, height), new Vector2(widthScale, heightScale));
+                float radius = new Vector2(width * widthScale, height * heightScale).Length() * 0.5f;
                 float rotation = Rotation;
                 switch (RebounderShape)
                 {
                     case RebounderShape.Line:
-                        Vector2 p1 = Position + MathHelper.GetVector2(Size, Rotation);
-                        Vector2 p2 = Position + MathHelper.GetVector2(Size, Rotation + 180);
-                        if (!MathHelper.LineIntersectWithCircle(p1, p2, results[i].PPosition, radius))
-                            continue;
-
-                        if (SpeedVector != Vector2.Zero && Vector2.Dot(results[i].PSpeedVector, SpeedVector) >= 0)
-                            continue;
-
+                        var p1 = Position;
+                        var p2 = Position + MathHelper.GetVector2(Size, Rotation);
+                        if (!MathHelper.LineIntersectWithCircle(p1, p2, center, radius)) continue;
+                        if (SpeedVector != Vector2.Zero && Vector2.Dot(results[i].PSpeedVector, SpeedVector) >= 0) continue;
+                        var normal = Vector2.Normalize(MathHelper.Rotate(p2 - p1, -90));
+                        if (ReboundOneSide && Vector2.Dot(normal, results[i].PSpeedVector) >= 0) continue;
                         float dr = Rotation - lastRotation;
-                        if (dr > 0)
+                        if (dr != 0f)
                         {
-                            Vector2 rotationVector = MathHelper.GetVector2(1, Rotation + 90);
-                            if (Vector2.Dot(results[i].PSpeedVector, rotationVector) >= 0)
-                                continue;
-                        }
-                        else if (dr < 0)
-                        {
-                            Vector2 rotationVector = MathHelper.GetVector2(1, Rotation - 90);
-                            if (Vector2.Dot(results[i].PSpeedVector, rotationVector) >= 0)
-                                continue;
+                            Vector2 rotationVector = MathHelper.GetVector2(1, Rotation + dr > 0 ? 90 : -90);
+                            if (Vector2.Dot(results[i].PSpeedVector, rotationVector) >= 0) continue;
                         }
                         break;
                     case RebounderShape.Circle:
-                        if (!MathHelper.TwoCirclesIntersect(Position, Size, results[i].PPosition, radius))
-                            continue;
-
-                        if (MathHelper.PointInsideCircle(Position, Size, results[i].PPosition))
+                        if (!MathHelper.TwoCirclesIntersect(Position, Size, center, radius)) continue;
+                        if (MathHelper.PointInsideCircle(Position, Size, center))
                         {
-                            if (Vector2.Dot(results[i].PSpeedVector, Position - results[i].PPosition) >= 0)
-                                continue;
+                            if (Vector2.Dot(results[i].PSpeedVector, Position - center) >= 0) continue;
                         }
-                        else if (Vector2.Dot(results[i].PSpeedVector, results[i].PPosition - Position) >= 0)
-                            continue;
-
-                        rotation = MathHelper.GetDegree(results[i].PPosition - Position) + 90;
+                        else if (Vector2.Dot(results[i].PSpeedVector, center - Position) >= 0) continue;
+                        rotation = MathHelper.GetDegree(center - Position) + 90;
                         break;
                 }
                 results[i].PSpeedVector = MathHelper.GetVector2(results[i].PSpeed, 2 * rotation - results[i].PSpeedAngle);
-                for (int k = 0; k < RebounderEventGroups.Count; ++k)
-                    RebounderEventGroups[k].Execute(results[i], null);
+                for (int k = 0; k < RebounderEventGroups.Count; ++k) RebounderEventGroups[k].Execute(results[i], null);
+                results[i].ReboundTime++;
             }
             lastRotation = Rotation;
         }
@@ -128,9 +134,7 @@ namespace CrazyStorm.Core
         {
             var clone = base.Clone() as Rebounder;
             clone.rebounderEventGroups = new GenericContainer<EventGroup>();
-            foreach (var item in rebounderEventGroups)
-                clone.rebounderEventGroups.Add(item.Clone() as EventGroup);
-
+            foreach (var item in rebounderEventGroups) clone.rebounderEventGroups.Add(item.Clone() as EventGroup);
             return clone;
         }
         public override XmlElement BuildFromXml(XmlElement node)
@@ -193,6 +197,12 @@ namespace CrazyStorm.Core
                 case "Rotation":
                     VM.PushFloat(Rotation);
                     return true;
+                case "ReboundLimit":
+                    VM.PushInt(ReboundLimit);
+                    return true;
+                case "ReboundOneSide":
+                    VM.PushBool(ReboundOneSide);
+                    return true;
             }
             return false;
         }
@@ -211,6 +221,12 @@ namespace CrazyStorm.Core
                     return true;
                 case "Rotation":
                     Rotation = VM.PopFloat();
+                    return true;
+                case "ReboundLimit":
+                    ReboundLimit = VM.PopInt();
+                    return true;
+                case "ReboundOneSide":
+                    ReboundOneSide = VM.PopBool();
                     return true;
             }
             return false;
@@ -234,6 +250,8 @@ namespace CrazyStorm.Core
             Size = initialState.Size;
             RebounderShape = initialState.RebounderShape;
             Rotation = initialState.Rotation;
+            ReboundLimit = initialState.ReboundLimit;
+            ReboundOneSide = initialState.ReboundOneSide;
         }
         #endregion
     }

@@ -116,6 +116,10 @@ namespace CrazyStorm.Core
         {
             return lhs.x * rhs.x + lhs.y * rhs.y;
         }
+        public static Vector2 Scale(Vector2 lhs, Vector2 rhs)
+        {
+            return new Vector2(lhs.x * rhs.x, lhs.y * rhs.y);
+        }
         //
         public static Vector2 Divide(Vector2 lhs, float rhs)
         {

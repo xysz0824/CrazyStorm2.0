@@ -210,6 +210,7 @@ namespace CrazyStorm.Core
             get { return particleBaseData.vspeed; }
             set { particleBaseData.vspeed = value; }
         }
+        public int ReboundTime { get; set; }
         public IList<EventGroup> ParticleEventGroups { get; set; }
         #endregion
 
@@ -601,6 +602,7 @@ namespace CrazyStorm.Core
             particle.Emitter = Emitter;
             particle.FogFrame = 0;
             particle.ParticleEventGroups = ParticleEventGroups;
+            particle.ReboundTime = 0;
         }
         public virtual void Reset() { }
         public int CompareTo(ParticleBase other)

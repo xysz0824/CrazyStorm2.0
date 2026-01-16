@@ -146,7 +146,8 @@
     <sys:String x:Key="TargetNameStr">目标名称</sys:String>
     <sys:String x:Key="SizeStr">尺寸</sys:String>
     <sys:String x:Key="RotationStr">旋转角</sys:String>
-    <sys:String x:Key="CollisionTimeStr">反弹次数</sys:String>
+    <sys:String x:Key="ReboundLimitStr">反弹次数限制</sys:String>
+    <sys:String x:Key="ReboundOneSideStr">单面反弹</sys:String>
     <sys:String x:Key="ForceStr">力大小</sys:String>
     <sys:String x:Key="DirectionStr">方向角</sys:String>
     <sys:String x:Key="ForceTypeStr">力类型</sys:String>

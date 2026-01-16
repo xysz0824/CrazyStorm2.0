@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Runtime.ConstrainedExecution;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -137,6 +138,14 @@ namespace CrazyStorm.Core
             @"(?:,(?<bindid>[^,]+))?(?:,(?<deepbind>[^,]+))?" +
             @"(?:,(?<maskon>[^,]+))?(?:,(?<masktype>[^,]+))?(?:,(?<maskmutex>[^,]+))?" +
             @"(?:,(?<degree>[^,]+))?$", RegexOptions.Compiled);
+        static readonly Regex ReboundMatch = new Regex(@"^(?<id>[^,]+),(?<layerid>[^,]+)," +
+            @"(?<x>[^,]+),(?<y>[^,]+),(?<begin>[^,]+),(?<life>[^,]+)," +
+            @"(?<longs>[^,]+),(?<angle>[^,]+),(?<time>[^,]+)," +
+            @"(?<speed>[^,]+),(?<speedd>[^,]+)," +
+            @"(?<aspeed>[^,]+),(?<aspeedd>[^,]+)," +
+            @"(?:(?<events>[^,]+))?," +
+            @"(?<randspeed>[^,]+),(?<randspeedd>[^,]+),(?<randaspeed>[^,]+),(?<randaspeedd>[^,]+)" +
+            @"(?:,(?<oneside>[^,]+))?$", RegexOptions.Compiled);
         public static bool IsCS1(string filePath)
         {
             using (var reader = new StreamReader(filePath, Encoding.UTF8))
@@ -318,12 +327,8 @@ namespace CrazyStorm.Core
                 {
                     center.Visibility = match.Groups["x"].Success;
                     if (globalEvents != null) center.ComponentEventGroups.Add(globalEvents);
-                    var eventgroup = GetEventGroup(typeof(Center), match.Groups["events"].Value, false);
-                    if (eventgroup.Events.Count > 0)
-                    {
-                        eventgroup.Name = "CenterEvents";
-                        center.ComponentEventGroups.Add(eventgroup);
-                    }
+                    var eventgroup = GetEventGroup(typeof(Center), match.Groups["events"].Value, false, "CenterEvents");
+                    if (eventgroup.Events.Count > 0) center.ComponentEventGroups.Add(eventgroup);
                     line = reader.ReadLine().Trim();
                 }
                 if (center.Visibility)
@@ -429,10 +434,10 @@ namespace CrazyStorm.Core
                             particle.IgnoreRebound = submatch.Groups["affectedByRebound"].Success ? !bool.Parse(submatch.Groups["affectedByRebound"].Value) : false;
                             particle.IgnoreForce = submatch.Groups["affectedByForce"].Success ? !bool.Parse(submatch.Groups["affectedByForce"].Value) : false;
                             //events
-                            var eventGroups = GetEventGroups(typeof(MultiEmitter), submatch.Groups["events"].Value, false);
+                            var eventGroups = GetEventGroups(typeof(MultiEmitter), submatch.Groups["events"].Value, false, "");
                             foreach (var eventGroup in eventGroups) batch.ComponentEventGroups.Add(eventGroup);
                             //sonevents
-                            eventGroups = GetEventGroups(typeof(Particle), submatch.Groups["sonevents"].Value, true);
+                            eventGroups = GetEventGroups(typeof(Particle), submatch.Groups["sonevents"].Value, true, "");
                             foreach (var eventGroup in eventGroups) batch.ParticleEventGroups.Add(eventGroup);
                             layer.Components.Add(batch);
                             batchs.Add(batch);
@@ -492,15 +497,15 @@ namespace CrazyStorm.Core
                             }
                             particle.VSpeed = submatch.Groups["vspeed"].Success ? float.Parse(submatch.Groups["vspeed"].Value) : 0f;
                             //events
-                            var eventGroups = GetEventGroups(typeof(CurveEmitter), submatch.Groups["events"].Value, false);
+                            var eventGroups = GetEventGroups(typeof(CurveEmitter), submatch.Groups["events"].Value, false, "");
                             foreach (var eventGroup in eventGroups) lase.ComponentEventGroups.Add(eventGroup);
                             //sonevents
-                            eventGroups = GetEventGroups(typeof(CurveParticle), submatch.Groups["sonevents"].Value, true);
+                            eventGroups = GetEventGroups(typeof(CurveParticle), submatch.Groups["sonevents"].Value, true, "");
                             foreach (var eventGroup in eventGroups) lase.ParticleEventGroups.Add(eventGroup);
                             layer.Components.Add(lase);
                         }
                         var coverCount = int.Parse(match.Groups["covercount"].Value);
-                        for (int i = 0; i < coverCount; i++)
+                        for (int i = 0; i < coverCount; ++i)
                         {
                             //cover
                             line = reader.ReadLine().Trim();
@@ -534,12 +539,45 @@ namespace CrazyStorm.Core
                             cover.LayerMaskMutex = submatch.Groups["maskmutex"].Success ? bool.Parse(submatch.Groups["maskmutex"].Value) : false;
                             cover.Rotation = submatch.Groups["degree"].Success ? float.Parse(submatch.Groups["degree"].Value) : 0f;
                             //events
-                            var eventGroups = GetEventGroups(typeof(EventField), submatch.Groups["events"].Value, false);
+                            var eventGroups = GetEventGroups(typeof(EventField), submatch.Groups["events"].Value, false, "");
                             foreach (var eventGroup in eventGroups) cover.ComponentEventGroups.Add(eventGroup);
                             //sonevents
-                            eventGroups = GetEventGroups(typeof(ParticleBase), submatch.Groups["sonevents"].Value, true);
+                            eventGroups = GetEventGroups(typeof(ParticleBase), submatch.Groups["sonevents"].Value, true, "");
                             foreach (var eventGroup in eventGroups) cover.EventFieldEventGroups.Add(eventGroup);
                             layer.Components.Add(cover);
+                        }
+                        var reboundCount = int.Parse(match.Groups["reboundcount"].Value);
+                        for (int i = 0; i < reboundCount; ++i)
+                        {
+                            //rebound
+                            line = reader.ReadLine().Trim();
+                            var submatch = ReboundMatch.Match(line);
+                            if (!submatch.Success) continue;
+                            var rebound = new Rebounder();
+                            rebound.Name = submatch.Groups["id"].Value;
+                            rebound.ID = particleSystem.GetComponentIndex();
+                            particleSystem.GetAndIncreaseComponentIndex(rebound.GetType().ToString());
+                            rebound.ParentID = center.ID;
+                            rebound.Position = ConvertVector2(float.Parse(submatch.Groups["x"].Value), float.Parse(submatch.Groups["y"].Value),
+                                0, 0, rebound, "Position") - OldCenter;
+                            rebound.BeginFrame = int.Parse(submatch.Groups["begin"].Value) - 1;
+                            rebound.TotalFrame = int.Parse(submatch.Groups["life"].Value);
+                            rebound.Size = int.Parse(submatch.Groups["longs"].Value);
+                            rebound.Rotation = int.Parse(submatch.Groups["angle"].Value);
+                            rebound.ReboundLimit = int.Parse(submatch.Groups["time"].Value);
+                            rebound.Speed = ConvertFloat(float.Parse(submatch.Groups["speed"].Value), float.Parse(submatch.Groups["randspeed"].Value),
+                                rebound, "Speed");
+                            rebound.SpeedAngle = ConvertAngle(float.Parse(submatch.Groups["speedd"].Value), float.Parse(submatch.Groups["randspeedd"].Value),
+                                rebound, "SpeedAngle");
+                            rebound.Acspeed = ConvertFloat(float.Parse(submatch.Groups["aspeed"].Value), float.Parse(submatch.Groups["randaspeed"].Value),
+                                rebound, "Acspeed");
+                            rebound.AcspeedAngle = ConvertAngle(float.Parse(submatch.Groups["aspeedd"].Value), float.Parse(submatch.Groups["randaspeedd"].Value),
+                                rebound, "AcspeedAngle");
+                            rebound.ReboundOneSide = submatch.Groups["oneside"].Success ? bool.Parse(submatch.Groups["oneside"].Value) : false;
+                            //events
+                            var eventGroups = GetEventGroups(typeof(ParticleBase), submatch.Groups["events"].Value, true, "ReboundGroups");
+                            foreach (var eventGroup in eventGroups) rebound.RebounderEventGroups.Add(eventGroup);
+                            layer.Components.Add(rebound);
                         }
                         //binding
                         foreach (var component in layer.Components)
@@ -763,11 +801,12 @@ namespace CrazyStorm.Core
             }
             return str;
         }
-        public static EventGroup GetEventGroup(Type componentType, string str, bool particleEvents)
+        public static EventGroup GetEventGroup(Type componentType, string str, bool particleEvents, string defaultName)
         {
             EventGroup group = new EventGroup();
             var split = str.Split('|');
             int t = 1, addtime = 0;
+            group.Name = defaultName;
             if (split.Length >= 4)
             {
                 group.Name = split[0];
@@ -779,8 +818,8 @@ namespace CrazyStorm.Core
             {
                 if (string.IsNullOrEmpty(e)) continue;
                 split = e.Split('：');
-                var condition = split[0];
-                var content = split[1];
+                var condition = split.Length >= 2 ? split[0] : "";
+                var content = split.Length >= 2 ? split[1] : split[0];
                 var eventInfo = new EventInfo();
                 eventInfo.condition = ConvertCondition(condition, t, addtime, particleEvents);
                 if (IsSpecialEvent(content))
@@ -796,8 +835,8 @@ namespace CrazyStorm.Core
                 else
                 {
                     split = content.Split('，');
-                    eventInfo.changeMode = ConvertKeyword(split[1]);
-                    eventInfo.changeTime = split[2].Replace("帧", "");
+                    eventInfo.changeMode = split.Length >= 2 ? ConvertKeyword(split[1]) : "Instant";
+                    eventInfo.changeTime = split.Length >= 3 ? split[2].Replace("帧", "") : "1";
                     if (eventInfo.changeTime.Contains("(") && eventInfo.changeTime.EndsWith(")"))
                     {
                         //Event execution time is not supported
@@ -840,14 +879,14 @@ namespace CrazyStorm.Core
             }
             return group;
         }
-        public static List<EventGroup> GetEventGroups(Type componentType, string str, bool particleEvents)
+        public static List<EventGroup> GetEventGroups(Type componentType, string str, bool particleEvents, string defaultName)
         {
             var split = str.Split('&');
             var groups = new List<EventGroup>();
             foreach (var groupStr in split)
             {
                 if (string.IsNullOrEmpty(groupStr)) continue;
-                groups.Add(GetEventGroup(componentType, groupStr, particleEvents));
+                groups.Add(GetEventGroup(componentType, groupStr, particleEvents, defaultName));
             }
             return groups;
         }

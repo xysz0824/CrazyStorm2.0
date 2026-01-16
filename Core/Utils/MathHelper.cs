@@ -249,5 +249,11 @@ namespace CrazyStorm.Core
             }
             return false;
         }
+        public static Vector2 GetActualCenter(Vector2 pos, float rotation, Vector2 origin, Vector2 size, Vector2 scale)
+        {
+            var localOffset = (size * 0.5f - origin);
+            localOffset = Vector2.Scale(localOffset, scale);
+            return pos + Rotate(localOffset, rotation);
+        }
     }
 }
