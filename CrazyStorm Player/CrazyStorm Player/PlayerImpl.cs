@@ -34,9 +34,7 @@ namespace CrazyStorm_Player
 
         Effect shader;
         EffectParameter shaderMaskSize;
-        Vector2[] MaskSizeArray;
         EffectParameter shaderMaskPosition;
-        Vector2[] MaskPositionArray;
         EffectParameter shaderMaskType;
         EffectParameter shaderMaskShape;
         EffectParameter shaderMaskRotate;
@@ -164,7 +162,7 @@ namespace CrazyStorm_Player
                 }
             }
             FrameworkDispatcher.Update();
-            File.BodyPosition = new CrazyStorm.Core.Vector2(controllable.selfPos.X, controllable.selfPos.Y);
+            File.BodyPosition = controllable.selfPos.ToCore();
             File.ParticleSystems[SelectedParticleSystemIndex].Reset();
             sounds = new Dictionary<string, SoundEffect>();
             EventManager.OnSoundPlay += PlaySound;
@@ -184,6 +182,7 @@ namespace CrazyStorm_Player
             characterTexture?.Dispose();
             pointTexture?.Dispose();
             slowModeTexture?.Dispose();
+            shader?.Dispose();
         }
         void PlaySound(string path)
         {
@@ -220,17 +219,17 @@ namespace CrazyStorm_Player
                 }
             }
             lastBlendType = blendType;
-            ParticleType type = particle.Type;
-            Vector2 center = new Vector2(Width / 2, Height / 2);
-            Vector2 imageCenter = new Vector2(type.CenterPoint.x, type.CenterPoint.y);
+            var type = particle.Type;
+            var center = new Vector2(Width / 2, Height / 2);
+            var imageCenter = new Vector2(type.CenterPoint.x, type.CenterPoint.y);
             float fogScale = (ParticleBase.FOG_TIME - particle.FogFrame) / 15.0f;
-            Vector2 scale = new Vector2(particle.WidthScale + fogScale, particle.HeightScale + fogScale);
-            Vector2 position = new Vector2(particle.PPosition.x, particle.PPosition.y) + center;
+            var scale = new Vector2(particle.WidthScale + fogScale, particle.HeightScale + fogScale);
+            var position = new Vector2(particle.PPosition.x, particle.PPosition.y) + center;
             float alpha = particle.Opacity / 100f - (ParticleBase.FOG_TIME - particle.FogFrame) / ParticleBase.FOG_TIME;
-            Color color = new Color(particle.RGB.r / 255f, particle.RGB.g / 255f, particle.RGB.b / 255f, alpha);
+            var color = new Color(particle.RGB.r / 255f, particle.RGB.g / 255f, particle.RGB.b / 255f, alpha);
             int frame = particle.PCurrentFrame / (type.Delay + 1) % type.Frames;
             float vOffset = particle.PCurrentFrame * particle.VSpeed;
-            Rectangle rect = new Rectangle((int)type.StartPoint.x + frame * type.Width, (int)(type.StartPoint.y - vOffset), type.Width, type.Height);
+            var rect = new Rectangle((int)type.StartPoint.x + frame * type.Width, (int)(type.StartPoint.y - vOffset), type.Width, type.Height);
             var tex = type.ID >= ParticleType.DefaultTypeIndex ? defaultTextures[0] : type.Image != null ? customTextures[type.Image.ID] : null;
             if (tex != null)
             {
@@ -280,13 +279,13 @@ namespace CrazyStorm_Player
                 }
             }
             lastBlendType = blendType;
-            ParticleType type = particle.Type;
-            Vector2 center = new Vector2(Width / 2, Height / 2);
+            var type = particle.Type;
+            var center = new Vector2(Width / 2, Height / 2);
             float alpha = particle.Opacity / 100f - (ParticleBase.FOG_TIME - particle.FogFrame) / ParticleBase.FOG_TIME;
-            Color color = new Color(particle.RGB.r / 255f, particle.RGB.g / 255f, particle.RGB.b / 255f, alpha);
+            var color = new Color(particle.RGB.r / 255f, particle.RGB.g / 255f, particle.RGB.b / 255f, alpha);
             int frame = particle.PCurrentFrame / (type.Delay + 1) % type.Frames;
             float vOffset = particle.PCurrentFrame * particle.VSpeed;
-            Rectangle rect = new Rectangle((int)type.StartPoint.x + frame * type.Width, (int)(type.StartPoint.y - vOffset), type.Width, type.Height);
+            var rect = new Rectangle((int)type.StartPoint.x + frame * type.Width, (int)(type.StartPoint.y - vOffset), type.Width, type.Height);
             var tex = type.ID >= ParticleType.DefaultTypeIndex ? defaultTextures[0] : type.Image != null ? customTextures[type.Image.ID] : null;
             if (tex != null) curveBatch.Draw(particle.Curve, tex, rect, center, color);
         }
@@ -294,34 +293,29 @@ namespace CrazyStorm_Player
         {
             FrameworkDispatcher.Update();
             controllable.Update(keyboard);
-            File.BodyPosition = new CrazyStorm.Core.Vector2(controllable.selfPos.X, controllable.selfPos.Y);
-            EventManager.CustomTypes = File.ParticleSystems[SelectedParticleSystemIndex].CustomTypes;
+            File.BodyPosition = controllable.selfPos.ToCore();
+            var selectedParticle = File.ParticleSystems[SelectedParticleSystemIndex];
+            EventManager.CustomTypes = selectedParticle.CustomTypes;
             EventManager.Sounds = File.Sounds;
-            EventManager.TypeSoundMap = File.ParticleSystems[SelectedParticleSystemIndex].TypeSoundMap;
+            EventManager.TypeSoundMap = selectedParticle.TypeSoundMap;
             EventManager.Update();
-            File.ParticleSystems[SelectedParticleSystemIndex].Update(CurrentFrame);
-            ParticleManager.UpdateLayerMasks(File.ParticleSystems[SelectedParticleSystemIndex].Layers);
+            selectedParticle.Update(CurrentFrame);
+            ParticleManager.UpdateLayerMasks(selectedParticle.Layers);
             shaderMaskCount.SetValue(ParticleManager.MaskCount);
-            if (MaskSizeArray == null) MaskSizeArray = new Vector2[ParticleManager.MaskSizeArray.Length];
-            for (int i = 0; i < MaskSizeArray.Length; ++i) MaskSizeArray[i] = new Vector2(ParticleManager.MaskSizeArray[i].x,
-                ParticleManager.MaskSizeArray[i].y);
-            shaderMaskSize.SetValue(MaskSizeArray);
-            if (MaskPositionArray == null) MaskPositionArray = new Vector2[ParticleManager.MaskPositionArray.Length];
-            for (int i = 0; i < MaskPositionArray.Length; ++i) MaskPositionArray[i] = new Vector2(ParticleManager.MaskPositionArray[i].x,
-                ParticleManager.MaskPositionArray[i].y);
-            shaderMaskPosition.SetValue(MaskPositionArray);
+            shaderMaskSize.SetValue(ParticleManager.MaskSizeArray);
+            shaderMaskPosition.SetValue(ParticleManager.MaskPositionArray);
             shaderMaskShape.SetValue(ParticleManager.MaskShapeArray);
             shaderMaskType.SetValue(ParticleManager.MaskTypeArray);
             shaderMaskRotate.SetValue(ParticleManager.MaskRotateArray);
             shaderRenderCenter.SetValue(new Vector2(Width / 2, Height / 2));
             var collidedCount = 0;
-            Vector2 newPos = default;
-            var particles = ParticleManager.CheckCollision(false, controllable.selfPosLast.X, controllable.selfPosLast.Y,
-                controllable.selfPos.X, controllable.selfPos.Y, controllable.selfRadius, out collidedCount, out newPos.X, out newPos.Y);
+            CrazyStorm.Core.Vector2 newPos = default;
+            var particles = ParticleManager.CheckCollision(false, controllable.selfPosLast.ToCore(),
+                controllable.selfPos.ToCore(), controllable.selfRadius, out collidedCount, out newPos);
             for (int i = 0; i < collidedCount; ++i) particles[i].Die();
-            controllable.selfPos = newPos;
+            controllable.selfPos = newPos.ToXna();
             ParticleManager.Update();
-            CurrentFrame = File.ParticleSystems[SelectedParticleSystemIndex].CurrentFrame;
+            CurrentFrame = selectedParticle.CurrentFrame;
         }
         public void Draw(GraphicsDevice gd, GameTime gameTime)
         {

@@ -136,12 +136,10 @@ namespace CrazyStorm.Core
                 if (InstantMovement)
                 {
                     newParticle.MaxLife = 1;
-                    var pool = ArrayPool<Vector2>.Shared;
-                    if (lastSpawn == null) lastSpawn = pool.Rent(EmitCount);
+                    if (lastSpawn == null) lastSpawn = new Vector2[EmitCount];
                     else if (lastSpawn != null && lastSpawn.Length < EmitCount)
                     {
-                        pool.Return(lastSpawn, true);
-                        lastSpawn = pool.Rent(EmitCount);
+                        lastSpawn = new Vector2[EmitCount];
                     }
                     newParticle.PPositionLast = lastSpawn[i] == default ? newParticle.PPosition : lastSpawn[i];
                     lastSpawn[i] = newParticle.PPosition;
@@ -162,11 +160,10 @@ namespace CrazyStorm.Core
         public override object Clone()
         {
             var clone = base.Clone() as Emitter;
+            clone.lastSpawn = new Vector2[EmitCount];
             clone.particle = particle.Clone() as ParticleBase;
             clone.particleEventGroups = new GenericContainer<EventGroup>();
-            foreach (var item in particleEventGroups)
-                clone.particleEventGroups.Add(item.Clone() as EventGroup);
-
+            foreach (var item in particleEventGroups) clone.particleEventGroups.Add(item.Clone() as EventGroup);
             return clone;
         }
         public override XmlElement BuildFromXml(XmlElement node)
@@ -311,18 +308,10 @@ namespace CrazyStorm.Core
                     return true;
                 case "InstantMovement":
                     InstantMovement = VM.PopBool();
-                    if (!InstantMovement && lastSpawn != null)
-                    {
-                        var pool = ArrayPool<Vector2>.Shared;
-                        pool.Return(lastSpawn);
-                        lastSpawn = null;
-                    }
+                    if (!InstantMovement && lastSpawn != null) lastSpawn = null;
                     return true;
             }
-            if (Template == null)
-            {
-                return false;
-            }
+            if (Template == null) return false;
             return Template.SetProperty(propertyName);
         }
         public override bool Update(int currentFrame)

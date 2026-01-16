@@ -150,30 +150,19 @@ namespace CrazyStorm.Core
             count = index;
             return searchResult;
         }
-        public static ParticleBase[] CheckCollision(bool dead, float bx, float by, float x, float y, float r, out int count, out float nx, 
-            out float ny)
+        public static ParticleBase[] CheckCollision(bool dead, Vector2 playerLast, Vector2 player, float r, out int count, out Vector2 newPos)
         {
             var index = 0;
-            nx = x;
-            ny = y;
+            newPos = player;
             for (int i = 0; i < activeParticles.Count; ++i)
             {
                 var instance = activeParticles[i];
                 if (!instance.Alive || Masked(instance.PPosition)) continue;
-                if (instance.CheckCollision(new Vector2(bx, by), new Vector2(x, y), r))
-                {
-                    searchResult[index++] = instance;
-                }
+                if (instance.CheckCollision(playerLast, player, r)) searchResult[index++] = instance;
                 else
                 {
-                    Vector2 newPlayerPos;
-                    var judge = instance.CheckVolume(dead, new Vector2(bx, by), new Vector2(x, y), out newPlayerPos);
-                    if (judge)
-                    {
-                        searchResult[index++] = instance;
-                    }
-                    nx = newPlayerPos.x;
-                    ny = newPlayerPos.y;
+                    var judge = instance.CheckVolume(dead, playerLast, player, out newPos);
+                    if (judge)  searchResult[index++] = instance;
                 }
             }
             count = index;

@@ -114,6 +114,9 @@
       <HintPath>..\..\packages\SharpDX.XInput.4.0.1\lib\net45\SharpDX.XInput.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Buffers, Version=4.0.5.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\System.Buffers.4.6.1\lib\net462\System.Buffers.dll</HintPath>
+    </Reference>
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Management" />
@@ -133,6 +136,7 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="StandalonePlayer.cs" />
+    <Compile Include="StructExternsion.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
@@ -183,10 +187,8 @@
     </PropertyGroup>
     <Error Condition="!Exists('..\..\packages\MonoGame.Framework.WindowsDX.3.7.0.1708\build\MonoGame.Framework.WindowsDX.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\MonoGame.Framework.WindowsDX.3.7.0.1708\build\MonoGame.Framework.WindowsDX.targets'))" />
   </Target>
-  <Target Name="CompileShaders" BeforeTargets="BeforeBuild"
-          Inputs="%(FxShader.FullPath)"
-          Outputs="%(FxShader.Mgfxo)">
-    <Exec Command='2mgfx "%(FxShader.FullPath)" "%(FxShader.Mgfxo)" /Profile:DirectX_11' />
+  <Target Name="CompileShaders" BeforeTargets="BeforeBuild" Inputs="%(FxShader.FullPath)" Outputs="%(FxShader.Mgfxo)">
+    <Exec Command="2mgfx &quot;%(FxShader.FullPath)&quot; &quot;%(FxShader.Mgfxo)&quot; /Profile:DirectX_11" />
   </Target>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
