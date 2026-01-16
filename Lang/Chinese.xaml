@@ -152,8 +152,9 @@
     <sys:String x:Key="DirectionStr">方向角</sys:String>
     <sys:String x:Key="ForceTypeStr">力类型</sys:String>
     <sys:String x:Key="OneDirectionStr">单向</sys:String>
-    <sys:String x:Key="InnerStr">朝向中心</sys:String>
-    <sys:String x:Key="OuterStr">排斥中心</sys:String>
+    <sys:String x:Key="InnerForceStr">朝向中心</sys:String>
+    <sys:String x:Key="OuterForceStr">排斥中心</sys:String>
+    <sys:String x:Key="ForceImpactSpeedStr">影响速度</sys:String>
     <sys:String x:Key="LinearStr">线性</sys:String>
     <sys:String x:Key="AcceleratedStr">加速</sys:String>
     <sys:String x:Key="DeceleratedStr">减速</sys:String>

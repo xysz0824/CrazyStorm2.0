@@ -15,8 +15,8 @@ namespace CrazyStorm.Core
     public enum ForceType
     {
         OneDirection,
-        Inner,
-        Outer
+        InnerForce,
+        OuterForce
     }
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public struct ForceFieldData
@@ -29,9 +29,13 @@ namespace CrazyStorm.Core
         public float direction;
         public ForceType forceType;
         public float rotation;
+        public float impactSpeed;
     }
     public class ForceField : Component
     {
+        public delegate void ForceImpactHandler(Vector2 impactSpeed);
+        public static event ForceImpactHandler OnForceImpactBody;
+
         #region Private Members
         [StringData]
         [XmlAttribute]
@@ -94,6 +98,12 @@ namespace CrazyStorm.Core
             get { return forceFieldData.rotation; }
             set { forceFieldData.rotation = value; }
         }
+        [FloatProperty(float.MinValue, float.MaxValue)]
+        public float ForceImpactSpeed
+        {
+            get { return forceFieldData.impactSpeed; }
+            set { forceFieldData.impactSpeed = value; }
+        }
         #endregion
 
         #region Constructor
@@ -110,43 +120,62 @@ namespace CrazyStorm.Core
         void Update()
         {
             int count = 0;
+            Vector2 v = default;
             var results = FieldShape == FieldShape.Rectangle ?
                 ParticleManager.SearchByRect(Position, HalfWidth, HalfHeight, Rotation, out count) :
                 ParticleManager.SearchByEllipse(Position, HalfWidth, HalfHeight, Rotation, out count);
             for (int i = 0; i < count;++i)
             {
-                if (results[i].IgnoreForce)
-                    continue;
-
+                if (results[i].IgnoreForce) continue;
                 switch (Reach)
                 {
                     case Reach.Layer:
-                        if (results[i].Emitter.LayerName != TargetName)
-                            continue;
-
+                        if (results[i].Emitter.LayerName != TargetName) continue;
                         break;
                     case Reach.Name:
-                        if (results[i].Emitter.Name != TargetName && results[i].Emitter.LayerName != LayerName)
-                            continue;
-
+                        if (results[i].Emitter.Name != TargetName && results[i].Emitter.LayerName != LayerName) continue;
                         break;
                 }
                 switch (ForceType)
                 {
                     case ForceType.OneDirection:
-                        Vector2 v = new Vector2();
-                        MathHelper.SetVector2(ref v, Force / results[i].Mass, Direction);
+                        v = MathHelper.GetVector2(Force / results[i].Mass, Direction);
                         results[i].PSpeedVector += v;
                         break;
-                    case ForceType.Inner:
-                        v = Position - results[i].PPosition;
-                        float d = (float)Math.Sqrt(v.x * v.x + v.y * v.y);
-                        results[i].PSpeedVector += v / d * (Force / results[i].Mass);
+                    case ForceType.InnerForce:
+                        v = Position == results[i].PPosition ? new Vector2(0, 0) : Vector2.Normalize(Position - results[i].PPosition);
+                        results[i].PSpeedVector += v * (Force / results[i].Mass);
                         break;
-                    case ForceType.Outer:
-                        v = results[i].PPosition - Position;
-                        d = (float)Math.Sqrt(v.x * v.x + v.y * v.y);
-                        results[i].PSpeedVector += v / d * (Force / results[i].Mass);
+                    case ForceType.OuterForce:
+                        v = Position == results[i].PPosition ? new Vector2(0, 0) : Vector2.Normalize(results[i].PPosition - Position);
+                        results[i].PSpeedVector += v * (Force / results[i].Mass);
+                        break;
+                }
+            }
+            var bodyImpacted = false;
+            v = MathHelper.Rotate(BodyPosition - Position, -Rotation);
+            if (FieldShape == FieldShape.Rectangle)
+            {
+                bodyImpacted = v.x >= -HalfWidth && v.x <= HalfWidth && v.y >= -HalfHeight && v.y <= HalfHeight;
+            }
+            else if (FieldShape == FieldShape.Circle)
+            {
+                bodyImpacted = (v.x * v.x) / (HalfWidth * HalfWidth) + (v.y * v.y) / (HalfHeight * HalfHeight) <= 1f;
+            }
+            if (bodyImpacted)
+            {
+                switch (ForceType)
+                {
+                    case ForceType.OneDirection:
+                        OnForceImpactBody?.Invoke(MathHelper.GetVector2(ForceImpactSpeed, Direction));
+                        break;
+                    case ForceType.InnerForce:
+                        OnForceImpactBody?.Invoke((Position == BodyPosition ? new Vector2(0, 0) : Vector2.Normalize(Position - BodyPosition)) * 
+                            ForceImpactSpeed);
+                        break;
+                    case ForceType.OuterForce:
+                        OnForceImpactBody?.Invoke((Position == BodyPosition ? new Vector2(0, 0) : Vector2.Normalize(BodyPosition - Position)) * 
+                            ForceImpactSpeed);
                         break;
                 }
             }
@@ -229,6 +258,9 @@ namespace CrazyStorm.Core
                 case "Rotation":
                     VM.PushFloat(Rotation);
                     return true;
+                case "ForceImpactSpeed":
+                    VM.PushFloat(ForceImpactSpeed);
+                    return true;
             }
             return false;
         }
@@ -266,6 +298,9 @@ namespace CrazyStorm.Core
                 case "Rotation":
                     Rotation = VM.PopFloat();
                     return true;
+                case "ForceImpactSpeed":
+                    ForceImpactSpeed = VM.PopFloat();
+                    return true;
             }
             return false;
         }
@@ -294,6 +329,7 @@ namespace CrazyStorm.Core
             Direction = initialState.Direction;
             ForceType = initialState.ForceType;
             Rotation = initialState.Rotation;
+            ForceImpactSpeed = initialState.ForceImpactSpeed;
         }
         #endregion
     }

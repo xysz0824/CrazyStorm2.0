@@ -146,6 +146,16 @@ namespace CrazyStorm.Core
             @"(?:(?<events>[^,]+))?," +
             @"(?<randspeed>[^,]+),(?<randspeedd>[^,]+),(?<randaspeed>[^,]+),(?<randaspeedd>[^,]+)" +
             @"(?:,(?<oneside>[^,]+))?$", RegexOptions.Compiled);
+        static readonly Regex ForceMatch = new Regex(@"^(?<id>[^,]+),(?<layerid>[^,]+)," +
+            @"(?<x>[^,]+),(?<y>[^,]+),(?<begin>[^,]+),(?<life>[^,]+)," +
+            @"(?<halfw>[^,]+),(?<halfh>[^,]+),(?<circle>[^,]+),(?<type>[^,]+),(?<controlid>[^,]+)," +
+            @"(?<speed>[^,]+),(?<speedd>[^,]+)," +
+            @"(?<aspeed>[^,]+),(?<aspeedd>[^,]+)," +
+            @"(?<addaspeed>[^,]+),(?<addaspeedd>[^,]+)," +
+            @"(?<suction>[^,]+),(?<replusion>[^,]+),(?<addspeed>[^,]+)," +
+            @"(?<randspeed>[^,]+),(?<randspeedd>[^,]+),(?<randaspeed>[^,]+),(?<randaspeedd>[^,]+)" +
+            @"(?:,(?<bindid>[^,]+))?(?:,(?<deepbind>[^,]+))?$", RegexOptions.Compiled);
+        public static readonly string DefaultCenterName = "Center";
         public static bool IsCS1(string filePath)
         {
             using (var reader = new StreamReader(filePath, Encoding.UTF8))
@@ -320,7 +330,7 @@ namespace CrazyStorm.Core
                 //center
                 match = CenterMatch.Match(line);
                 var center = match.Success ? new Center() : null;
-                center.Name = "Center";
+                center.Name = DefaultCenterName;
                 center.ID = particleSystem.GetComponentIndex();
                 particleSystem.GetAndIncreaseComponentIndex(center.GetType().ToString());
                 if (center != null)
@@ -578,6 +588,43 @@ namespace CrazyStorm.Core
                             var eventGroups = GetEventGroups(typeof(ParticleBase), submatch.Groups["events"].Value, true, "ReboundGroups");
                             foreach (var eventGroup in eventGroups) rebound.RebounderEventGroups.Add(eventGroup);
                             layer.Components.Add(rebound);
+                        }
+                        var forcecount = int.Parse(match.Groups["forcecount"].Value);
+                        for (int i = 0; i < forcecount; ++i)
+                        {
+                            //force
+                            line = reader.ReadLine().Trim();
+                            var submatch = ForceMatch.Match(line);
+                            if (!submatch.Success) continue;
+                            var force = new ForceField();
+                            force.Name = submatch.Groups["id"].Value;
+                            force.BindingTargetID = submatch.Groups["bindid"].Success ? int.Parse(submatch.Groups["bindid"].Value) : -1;
+                            force.ID = particleSystem.GetComponentIndex();
+                            particleSystem.GetAndIncreaseComponentIndex(force.GetType().ToString());
+                            force.ParentID = center.ID;
+                            force.Position = ConvertVector2(float.Parse(submatch.Groups["x"].Value), float.Parse(submatch.Groups["y"].Value),
+                                0, 0, force, "Position") - OldCenter;
+                            force.BeginFrame = int.Parse(submatch.Groups["begin"].Value) - 1;
+                            force.TotalFrame = int.Parse(submatch.Groups["life"].Value);
+                            force.HalfWidth = int.Parse(submatch.Groups["halfw"].Value);
+                            force.HalfHeight = int.Parse(submatch.Groups["halfh"].Value);
+                            force.FieldShape = bool.Parse(submatch.Groups["circle"].Value) ? FieldShape.Circle : FieldShape.Rectangle;
+                            force.Reach = int.Parse(submatch.Groups["type"].Value) == 0 ? Reach.All : Reach.Name;
+                            force.TargetName = force.Reach == Reach.Name ? submatch.Groups["controlid"].Value : "";
+                            force.Speed = ConvertFloat(float.Parse(submatch.Groups["speed"].Value), float.Parse(submatch.Groups["randspeed"].Value),
+                                force, "Speed");
+                            force.SpeedAngle = ConvertAngle(float.Parse(submatch.Groups["speedd"].Value), float.Parse(submatch.Groups["randspeedd"].Value),
+                                force, "SpeedAngle");
+                            force.Acspeed = ConvertFloat(float.Parse(submatch.Groups["aspeed"].Value), float.Parse(submatch.Groups["randaspeed"].Value),
+                                force, "Acspeed");
+                            force.AcspeedAngle = ConvertAngle(float.Parse(submatch.Groups["aspeedd"].Value), float.Parse(submatch.Groups["randaspeedd"].Value),
+                                force, "AcspeedAngle");
+                            force.Force = float.Parse(submatch.Groups["addaspeed"].Value);
+                            force.Direction = float.Parse(submatch.Groups["addaspeedd"].Value);
+                            force.ForceType = bool.Parse(submatch.Groups["suction"].Value) ? ForceType.InnerForce :
+                                bool.Parse(submatch.Groups["replusion"].Value) ? ForceType.OuterForce : ForceType.OneDirection;
+                            force.ForceImpactSpeed = float.Parse(submatch.Groups["addspeed"].Value);
+                            layer.Components.Add(force);
                         }
                         //binding
                         foreach (var component in layer.Components)

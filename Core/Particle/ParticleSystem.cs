@@ -257,7 +257,10 @@ namespace CrazyStorm.Core
                 var layer = Layers[i];
                 for (int k = 0; k < layer.Components.Count; ++k)
                 {
-                    if (layer.Components[k] is Center) return layer.Components[k].Position;
+                    if (layer.Components[k] is Center && layer.Components[k].Name == File.DefaultCenterName)
+                    {
+                        return layer.Components[k].Position;
+                    }
                 }
             }
             return Vector2.Zero;

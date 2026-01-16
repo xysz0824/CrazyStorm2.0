@@ -50,7 +50,7 @@ namespace CrazyStorm
                 case ForceType.OneDirection:
                     DrawHelper.DrawArrow(canvas, x, y, 40, 2, field.Direction, Colors.Yellow, 1);
                     break;
-                case ForceType.Inner:
+                case ForceType.InnerForce:
                     for (float i = 0; i < 360; i += 20)
                     {
                         int ax = x + (int)(80 * Math.Cos(i / 180 * Math.PI));
@@ -58,7 +58,7 @@ namespace CrazyStorm
                         DrawHelper.DrawArrow(canvas, ax, ay, 40, 2, i + 180, Colors.Yellow, 1);
                     }
                     break;
-                case ForceType.Outer:
+                case ForceType.OuterForce:
                     for (float i = 0; i < 360; i += 20)
                     {
                         int ax = x + (int)(40 * Math.Cos(i / 180 * Math.PI));

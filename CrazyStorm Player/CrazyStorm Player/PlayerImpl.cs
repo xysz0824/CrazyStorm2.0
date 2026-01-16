@@ -165,6 +165,7 @@ namespace CrazyStorm_Player
             File.BodyPosition = controllable.selfPos.ToCore();
             File.ParticleSystems[SelectedParticleSystemIndex].Reset();
             sounds = new Dictionary<string, SoundEffect>();
+            ForceField.OnForceImpactBody += ForceImpactBody;
             EventManager.OnSoundPlay += PlaySound;
             ParticleManager.OnParticleDraw += (particle) => DrawParticle(spriteBatch, particle);
             ParticleManager.OnCurveParticleDraw += (particle) => DrawCurveParticle(spriteBatch, curveBatch, particle);
@@ -183,6 +184,10 @@ namespace CrazyStorm_Player
             pointTexture?.Dispose();
             slowModeTexture?.Dispose();
             shader?.Dispose();
+        }
+        void ForceImpactBody(CrazyStorm.Core.Vector2 speedVector)
+        {
+            controllable.selfPos += speedVector.ToXna();
         }
         void PlaySound(string path)
         {
