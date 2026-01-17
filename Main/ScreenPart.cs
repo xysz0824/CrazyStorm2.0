@@ -2,11 +2,13 @@
  * The MIT License (MIT)
  * Copyright (c) StarX 2026
  */
+using CrazyStorm.Core;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Reflection;
+using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
@@ -16,7 +18,6 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
-using CrazyStorm.Core;
 
 namespace CrazyStorm
 {
@@ -229,12 +230,25 @@ namespace CrazyStorm
         #region Window EventHandlers
         private void ScrollViewer_PreviewKeyDown(object sender, KeyEventArgs e)
         {
+            var moveStatusMap = new Dictionary<Key, MoveStatus> { 
+                { Key.Up, MoveStatus.Up }, 
+                { Key.Down, MoveStatus.Down }, 
+                { Key.Left, MoveStatus.Left }, 
+                { Key.Right, MoveStatus.Right }
+            };
             switch (e.Key)
             {
                 case Key.Up:
                 case Key.Down:
                 case Key.Left:
                 case Key.Right:
+                    if (selectedComponents.Count > 0)
+                    {
+                        var gridSize = config.GridSize;
+                        var stack = commandStacks[selectedSystem];
+                        new MoveComponentCommand(moveStatusMap[e.Key], gridSize, config.GridAlignment).Do(stack, 
+                            selectedComponents, new Action(UpdateProperty));
+                    }
                     e.Handled = true;
                     break;
             }
