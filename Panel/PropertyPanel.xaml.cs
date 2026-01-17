@@ -151,14 +151,18 @@ namespace CrazyStorm
             foreach (var item in infos)
             {
                 var attributes = item.GetCustomAttributes(false);
+                var runtimeProperty = attributes.FirstOrDefault((attr) => attr is RuntimePropertyAttribute);
+                var readonlyProperty = attributes.FirstOrDefault((attr) => attr is ReadOnlyPropertyAttribute);
                 var value = container.Properties[item.Name].Value;
-                if (!(attributes.Length > 0 && attributes[0] is RuntimePropertyAttribute))
+                if (!(attributes.Length > 0 && runtimeProperty != null))
                 {
                     var property = new PropertyGridItem()
                     {
                         Info = item,
                         DisplayName = (string)FindResource(item.Name + "Str"),
-                        DisplayValue = item.PropertyType != typeof(string) ? ExpressionHelper.Translate(value) : value,
+                        DisplayValue = item.PropertyType != typeof(string) && readonlyProperty == null ? 
+                            ExpressionHelper.Translate(value) : value,
+                        ReadOnly = readonlyProperty != null,
                     };
                     propertyItems.Add(property);
                 }
@@ -184,13 +188,14 @@ namespace CrazyStorm
         {
             foreach (var item in properties)
             {
-                if (!container.Properties[item.Info.Name].Expression)
+                if (!item.ReadOnly && !container.Properties[item.Info.Name].Expression)
                 {
                     var result = item.Info.GetGetMethod().Invoke(container, null).ToString();
                     container.Properties[item.Info.Name].Value = result;
                 }
                 var value = container.Properties[item.Info.Name].Value;
-                item.DisplayValue = item.Info.PropertyType != typeof(string) ? ExpressionHelper.Translate(value) : value ;
+                item.DisplayValue = item.Info.PropertyType != typeof(string) && !item.ReadOnly ? 
+                    ExpressionHelper.Translate(value) : value ;
             }
         }
         void InitializeColorCombo()
@@ -325,6 +330,12 @@ namespace CrazyStorm
         #region Window EventHandlers
         private void Grid_BeginningEdit(object sender, DataGridBeginningEditEventArgs e)
         {
+            var item = e.Row.Item as PropertyGridItem;
+            if (item.ReadOnly)
+            {
+                e.Cancel = true;
+                return;
+            }
             var textBlock = e.EditingEventArgs.OriginalSource as TextBlock;
             if (textBlock != null)
             {

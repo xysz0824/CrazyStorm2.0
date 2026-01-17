@@ -278,8 +278,8 @@ namespace CrazyStorm
             {
                 if (config.GridAlignment)
                 {
-                    aimRect.SetValue(Canvas.LeftProperty, (double)((x / ((int)config.GridWidth / 2)) * (config.GridWidth / 2)));
-                    aimRect.SetValue(Canvas.TopProperty, (double)((y / ((int)config.GridHeight / 2)) * (config.GridHeight / 2)));
+                    aimRect.SetValue(Canvas.LeftProperty, (double)((x / (config.GridWidth / 2)) * (config.GridWidth / 2)));
+                    aimRect.SetValue(Canvas.TopProperty, (double)((y / (config.GridHeight / 2)) * (config.GridHeight / 2)));
                 }
                 else if (x <= config.ScreenWidth - config.GridWidth && y <= config.ScreenHeight - config.GridHeight)
                 {

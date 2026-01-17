@@ -301,5 +301,7 @@
     <sys:String x:Key="SubstractionStr">减法混合</sys:String>
     <sys:String x:Key="MultiplyStr">乘法混合</sys:String>
     <sys:String x:Key="LocalStr">局部变量</sys:String>
-    <sys:String x:Key="ComponentLifeTimeStr">组件作用帧：[{0} -> {1}]</sys:String>
+    <sys:String x:Key="ComponentLifeTimeStr">作用帧：[{0} -> {1}]</sys:String>
+    <sys:String x:Key="BindingTargetStr">绑定至</sys:String>
+    <sys:String x:Key="BindingTargetTipStr">绑定至：{0}</sys:String>
 </ResourceDictionary>

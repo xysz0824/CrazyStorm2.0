@@ -18,6 +18,7 @@ namespace CrazyStorm
         private PropertyInfo info;
         private string displayName;
         private string displayValue;
+        private bool readOnly;
 
         public PropertyInfo Info
         {
@@ -37,6 +38,16 @@ namespace CrazyStorm
                 this.displayValue = value;
                 if (PropertyChanged != null)
                     PropertyChanged(this, new PropertyChangedEventArgs("DisplayValue"));
+            }
+        }
+        public bool ReadOnly
+        {
+            get { return readOnly; }
+            set
+            {
+                this.readOnly = value;
+                if (PropertyChanged != null)
+                    PropertyChanged(this, new PropertyChangedEventArgs("ReadOnly"));
             }
         }
     }

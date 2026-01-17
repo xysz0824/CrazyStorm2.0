@@ -38,6 +38,11 @@
                     <Style TargetType="DataGridCell" BasedOn="{StaticResource {x:Type DataGridCell}}">
                         <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
                         <Setter Property="Padding" Value="4,4"/>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding ReadOnly}" Value="True">
+                                <Setter Property="Foreground" Value="Gray"/>
+                            </DataTrigger>
+                        </Style.Triggers>
                     </Style>
                 </DataGrid.Resources>
             </DataGrid>
@@ -73,6 +78,11 @@
                     <Style TargetType="DataGridCell" BasedOn="{StaticResource {x:Type DataGridCell}}">
                         <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
                         <Setter Property="Padding" Value="4,4"/>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding ReadOnly}" Value="True">
+                                <Setter Property="Foreground" Value="Gray"/>
+                            </DataTrigger>
+                        </Style.Triggers>
                     </Style>
                 </DataGrid.Resources>
             </DataGrid>
@@ -161,6 +171,11 @@
                         <Style TargetType="DataGridCell" BasedOn="{StaticResource {x:Type DataGridCell}}">
                             <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
                             <Setter Property="Padding" Value="4,4"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding ReadOnly}" Value="True">
+                                    <Setter Property="Foreground" Value="Gray"/>
+                                </DataTrigger>
+                            </Style.Triggers>
                         </Style>
                     </DataGrid.Resources>
                 </DataGrid>

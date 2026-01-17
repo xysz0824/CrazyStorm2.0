@@ -37,7 +37,8 @@ namespace CrazyStorm.Core
                     propertiesInfo.Add(property);
                     if (!properties.ContainsKey(property.Name))
                     {
-                        var value = new PropertyValue { Value = property.GetGetMethod().Invoke(this, null).ToString() };
+                        var obj = property.GetGetMethod().Invoke(this, null);
+                        var value = new PropertyValue { Value = obj == null ? "" : obj.ToString() };
                         properties[property.Name] = value;
                     }
                 }

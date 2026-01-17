@@ -148,6 +148,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Converter\EventConverter.cs" />
+    <Compile Include="Converter\TypeIconConverter.cs" />
     <Compile Include="Edit\Command\Component\BindComponentCommand.cs" />
     <Compile Include="Edit\Command\Component\ComponentTreeCommand.cs" />
     <Compile Include="Edit\Command\EventGroup\AddEventGroupCommand.cs" />

@@ -58,11 +58,18 @@ namespace CrazyStorm
                     var scale = (double)FindResource($"{component.GetType().Name}_Scale");
                     var transform = new ScaleTransform(scale, scale);
                     SelectedGroupIconPath.RenderTransform = transform;
-
-                    var layerBeginFrame = selectedSystem.Layers.First((l) => l.Components.Contains(selectedComponents[0])).BeginFrame;
-                    StatusText.Content = string.Format((string)FindResource("ComponentLifeTimeStr"),
-                    selectedComponents[0].BeginFrame + layerBeginFrame - 1,
-                    selectedComponents[0].BeginFrame + layerBeginFrame - 1 + selectedComponents[0].TotalFrame - 1);
+                    if (selectedComponents[0].BindingTarget == null)
+                    {
+                        var layerBeginFrame = selectedSystem.Layers.First((l) => l.Components.Contains(selectedComponents[0])).BeginFrame;
+                        StatusText.Content = string.Format((string)FindResource("ComponentLifeTimeStr"),
+                        selectedComponents[0].BeginFrame + layerBeginFrame - 1,
+                        selectedComponents[0].BeginFrame + layerBeginFrame - 1 + selectedComponents[0].TotalFrame - 1);
+                    }
+                    else
+                    {
+                        StatusText.Content = string.Format((string)FindResource("BindingTargetTipStr"),
+                            selectedComponents[0].BindingTarget.Name);
+                    }
                 }
                 else
                 {
@@ -202,6 +209,7 @@ namespace CrazyStorm
                     {
                         new UnbindComponentCommand().Do(commandStacks[selectedSystem], selectedComponents);
                         UpdateScreen();
+                        UpdateSelectedGroup();
                         break;
                     }
                 }
@@ -222,6 +230,10 @@ namespace CrazyStorm
             {
                 emitter.Particle.Type = ParticleType.DefaultTypes.First();
             }
+        }
+        private void ComponentTree_GotFocus(object sender, RoutedEventArgs e)
+        {
+            ComponentTree_SelectedItemChanged(null, null);
         }
         private void ComponentTree_MouseLeftButtonDown(object sender, MouseEventArgs e)
         {

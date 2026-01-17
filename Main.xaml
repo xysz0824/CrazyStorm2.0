@@ -13,6 +13,7 @@
         <local:LayerStartConverter x:Key="LayerStartConverter" />
         <local:LayerLengthConverter x:Key="LayerLengthConverter" />
         <local:ResourceValidConverter x:Key="ResourceValidConverter" />
+        <local:TypeIconConverter x:Key="TypeIconConverter" />
         <LinearGradientBrush x:Key="ComponentIconBrush" EndPoint="0.5,1" StartPoint="0.5,0">
             <GradientStop Color="#DCDCDC" Offset="0" />
             <GradientStop Color="#8F8F8F" Offset="1" />
@@ -182,7 +183,7 @@
         </Style>
         <DataTemplate x:Key="ComponentItem" >
             <Canvas Width="32" Height="32">
-                <Label Name="Frame" Width="32" Height="32">
+                <Label Canvas.Left="1" Canvas.Top="1" Name="Frame" Width="32" Height="32">
                     <Label.Background>
                         <ImageBrush ImageSource="Images/layercolor.png" TileMode="FlipY">
                             <ImageBrush.Viewbox>
@@ -191,12 +192,12 @@
                         </ImageBrush>
                     </Label.Background>
                 </Label>
-                <Border Name="Box" Canvas.Left="0" Canvas.Top="0" Width="32" Height="32" Opacity="0" BorderThickness="2" BorderBrush="Red">
+                <Border Name="Box" Canvas.Left="0" Canvas.Top="-1" Width="35" Height="36" Opacity="0" BorderThickness="4" BorderBrush="Red">
                     <Border.Effect>
                         <DropShadowEffect ShadowDepth="0" BlurRadius="8" />
                     </Border.Effect>
                 </Border>
-                <DockPanel Canvas.Left="0" Canvas.Top="0" Margin="2" Background="Black">
+                <DockPanel Canvas.Left="1" Canvas.Top="1" Margin="2" Background="Black">
                     <Path Name="Icon" Data="{x:Null}" Fill="White" Width="28" Height="28" Stretch="Uniform" RenderTransformOrigin="0.5,0.5">
                         <Path.Effect>
                             <DropShadowEffect Color="Black" Opacity="0.9" BlurRadius="5" Direction="315" ShadowDepth="0" />
@@ -582,7 +583,7 @@
         <Grid Height="Auto" Width="Auto" Background="{DynamicResource TitleBarBrush}">
             <Grid.RowDefinitions>
                 <RowDefinition MinHeight="300"/>
-                <RowDefinition Height="126" MinHeight="126"/>
+                <RowDefinition Height="100" MinHeight="100"/>
             </Grid.RowDefinitions>
             <Grid Grid.Row="0">
                 <Grid.ColumnDefinitions>
@@ -693,13 +694,16 @@
                                 </GroupBox>
                                 <GroupBox Padding="0,0,0,0" Style="{StaticResource FlatGroupBox}" Header="{StaticResource ComponentTreeStr}" Name="Explorer" VerticalContentAlignment="Stretch" HorizontalContentAlignment="Stretch" >
                                     <TreeView Name="ComponentTree" Padding="1,4,1,4" Margin="0,26,0,0" VerticalContentAlignment="Stretch" HorizontalContentAlignment="Stretch" 
-                                              AllowDrop="True" MouseMove="ComponentTree_MouseMove" SelectedItemChanged="ComponentTree_SelectedItemChanged" MouseDoubleClick="ComponentTree_MouseDoubleClick"
+                                              AllowDrop="True" MouseMove="ComponentTree_MouseMove" SelectedItemChanged="ComponentTree_SelectedItemChanged" GotFocus="ComponentTree_GotFocus" MouseDoubleClick="ComponentTree_MouseDoubleClick"
                                               DragEnter="ComponentTree_CheckDrop" DragOver="ComponentTree_CheckDrop" DragLeave="ComponentTree_CheckDrop" Drop="ComponentTree_Drop" 
                                               IsTextSearchEnabled="True" Background="{DynamicResource ListBrush}" BorderThickness="0,0,0,0">
                                         <TreeView.ItemTemplate >
                                             <HierarchicalDataTemplate ItemsSource="{Binding Children}">
-                                                <TextBlock Text="{Binding Name}" MouseLeftButtonDown="ComponentTree_MouseLeftButtonDown">
-                                                </TextBlock>
+                                                <StackPanel Orientation="Horizontal">
+                                                    <Path Data="{Binding Converter={StaticResource TypeIconConverter}}" 
+                                                          Fill="{DynamicResource TextBrush}" Width="12" Height="12" Margin="0,0,4,0" Stretch="Uniform" />
+                                                    <TextBlock Text="{Binding Name}" MouseLeftButtonDown="ComponentTree_MouseLeftButtonDown" />
+                                                </StackPanel>
                                             </HierarchicalDataTemplate>
                                         </TreeView.ItemTemplate>
                                         <TreeView.ItemContainerStyle>

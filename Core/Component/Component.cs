@@ -68,6 +68,12 @@ namespace CrazyStorm.Core
                     PropertyChanged(this, new PropertyChangedEventArgs("Name"));
             }
         }
+        [ReadOnlyProperty]
+        public Emitter BindingTarget
+        {
+            get { return bindingTarget; }
+            set { bindingTarget = value; }
+        }
         public string LayerName { get; set; }
         public int LayerID { get; set; }
         [RuntimeProperty]
@@ -158,11 +164,6 @@ namespace CrazyStorm.Core
             set { parent = value; }
         }
         public int ParentID { get; set; }
-        public Emitter BindingTarget
-        {
-            get { return bindingTarget; }
-            set { bindingTarget = value; }
-        }
         public int BindingTargetID { get; set; }
         public IList<VariableResource> Locals { get; set; }
         public IList<VariableResource> Globals { get; set; }
@@ -243,6 +244,7 @@ namespace CrazyStorm.Core
         #endregion
 
         #region Public Methods
+        public override string ToString() => Name;
         public void TransPositiontoRelative()
         {
             if (parent != null)
