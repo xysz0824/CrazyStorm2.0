@@ -43,6 +43,7 @@ namespace CrazyStorm
                     i--;
                 }
             //Update selected group.
+            StatusText.Content = "";
             if (selectedComponents.Count > 0)
             {
                 SelectedGroup.Opacity = 1;
@@ -57,6 +58,11 @@ namespace CrazyStorm
                     var scale = (double)FindResource($"{component.GetType().Name}_Scale");
                     var transform = new ScaleTransform(scale, scale);
                     SelectedGroupIconPath.RenderTransform = transform;
+
+                    var layerBeginFrame = selectedSystem.Layers.First((l) => l.Components.Contains(selectedComponents[0])).BeginFrame;
+                    StatusText.Content = string.Format((string)FindResource("ComponentLifeTimeStr"),
+                    selectedComponents[0].BeginFrame + layerBeginFrame - 1,
+                    selectedComponents[0].BeginFrame + layerBeginFrame - 1 + selectedComponents[0].TotalFrame - 1);
                 }
                 else
                 {

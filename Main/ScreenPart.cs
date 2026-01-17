@@ -31,6 +31,7 @@ namespace CrazyStorm
         double selectionRectX, selectionRectY;
         bool selectingComponent;
         List<Line> bindingLines;
+        bool binded;
         List<Component> selectedComponents;
         #endregion
 
@@ -55,7 +56,8 @@ namespace CrazyStorm
                 else selectedComponents.Clear();
                 canvas.Children.Clear();
                 //Update binding lines
-                if (bindingLines != null) foreach (var line in bindingLines) canvas.Children.Add(line);
+                if (bindingLines != null && !binded) foreach (var line in bindingLines) canvas.Children.Add(line);
+                else if (bindingLines != null && binded) foreach (var line in bindingLines) canvas.Children.Remove(line);
                 //Update components on current screen.
                 var assembly = Assembly.GetExecutingAssembly();
                 var itemTemplate = FindResource("ComponentItem") as DataTemplate;
@@ -94,8 +96,11 @@ namespace CrazyStorm
                                     ty += parent.y;
                                 }
                                 if (component.Selected)
-                                    DrawHelper.DrawLine(canvas, (int)(x + center.X), (int)(y + center.Y),
-                                        (int)(tx + center.X), (int)(ty + center.Y), 2, false, Colors.White, 0.5f);
+                                {
+                                    var v = new Vector2(tx - x, ty - y);
+                                    DrawHelper.DrawArrow(canvas, (int)(x + center.X), (int)(y + center.Y), 
+                                        Math.Max(1, (int)v.Length() - 16), 3, MathHelper.GetDegree(v), Colors.White, 0.5f);
+                                }
                             }
                             if (component.Selected)
                             {
@@ -222,6 +227,18 @@ namespace CrazyStorm
         #endregion
 
         #region Window EventHandlers
+        private void ScrollViewer_PreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            switch (e.Key)
+            {
+                case Key.Up:
+                case Key.Down:
+                case Key.Left:
+                case Key.Right:
+                    e.Handled = true;
+                    break;
+            }
+        }
         private void Screen_LostFocus(object sender, RoutedEventArgs e)
         {
             CancelAllSelection();
@@ -240,7 +257,8 @@ namespace CrazyStorm
             screenMousePos = e.GetPosition(sender as IInputElement);
             int x = (int)screenMousePos.X;
             int y = (int)screenMousePos.Y;
-            MousePosTip.Content = (x - center.X) + "," + (y - center.Y);
+            if (selectedComponents.Count == 1) MousePosTip.Content = $"{selectedComponents[0].X},{selectedComponents[0].Y}";
+            else MousePosTip.Content = $"{x - center.X},{y - center.Y}";
             //Display a rect with red edge to mark the location that component will be put on.
             if (aimRect != null)
             {
@@ -333,10 +351,19 @@ namespace CrazyStorm
             //Binding to selected emitter
             if (bindingLines != null)
             {
+                binded = true;
                 SelectComponents((int)screenMousePos.X, (int)screenMousePos.Y, 1, 1, e.ClickCount);
                 if (selectedComponents.Count == 1 && selectedComponents[0] is Emitter)
+                {
                     new BindComponentCommand().Do(commandStacks[selectedSystem], bindingLines, selectedComponents.First());
-
+                    var components = new List<Component>();
+                    foreach (var line in bindingLines)
+                    {
+                        var component = line.DataContext as Component;
+                        components.Add(component);
+                    }
+                    SelectComponents(components, false);
+                }
                 bindingLines = null;
             }
             if (e.ClickCount == 2)
@@ -352,8 +379,16 @@ namespace CrazyStorm
         }
         private void ParticleTabControl_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
-            //Determine selected components.
             selectingComponent = false;
+            if (binded)
+            {
+                binded = false;
+                selectionRect.SetValue(WidthProperty, 0.0d);
+                selectionRect.SetValue(HeightProperty, 0.0d);
+                selectionRect = null;
+                return;
+            }
+            //Determine selected components.
             if (selectionRect != null)
             {
                 var x = (double)selectionRect.GetValue(LeftProperty);

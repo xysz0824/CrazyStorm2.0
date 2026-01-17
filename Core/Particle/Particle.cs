@@ -169,7 +169,7 @@ namespace CrazyStorm.Core
                 new Vector2(WidthScale, HeightScale), Type.VolumeStart, new Vector2(Type.VolumeWidth, Type.VolumeHeight), 
                 Type.VolumeJudgeArea, out newPlayerPos);
         }
-        public override bool Update(int currentFrame = 0)
+        public override bool Update(int currentFrame = 1)
         {
             if (!base.Update()) return false;
             if (StickToSpeedAngle) PRotation = PSpeedAngle + 90;

@@ -265,7 +265,7 @@ namespace CrazyStorm.Core
             }
             return Vector2.Zero;
         }
-        public bool Update(int currentFrame = 0)
+        public bool Update(int currentFrame = 1)
         {
             if (currentFrame != CurrentFrame)
             {
@@ -279,7 +279,7 @@ namespace CrazyStorm.Core
                 ComponentTree[i].CenterPosition = centerPosition;
                 UpdateComponent(ComponentTree[i], CurrentFrame);
             }
-            if (++CurrentFrame == TotalFrame)
+            if (++CurrentFrame > TotalFrame)
             {
                 Reset();
             }
@@ -296,7 +296,7 @@ namespace CrazyStorm.Core
         }
         public void Reset()
         {
-            CurrentFrame = 0;
+            CurrentFrame = 1;
             for (int i = 0; i < Layers.Count; ++i)
                 Layers[i].Reset();
         }

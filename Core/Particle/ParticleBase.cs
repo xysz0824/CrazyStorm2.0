@@ -63,7 +63,7 @@ namespace CrazyStorm.Core
         public int FogFrame { get; private set; }
         public Emitter Emitter { get; set; }
         //public ParticleQuadTree QuadTree { get; set; }
-        [IntProperty(0, int.MaxValue)]
+        [IntProperty(1, int.MaxValue)]
         public int MaxLife
         {
             get { return particleBaseData.maxLife; }
@@ -218,6 +218,7 @@ namespace CrazyStorm.Core
         public ParticleBase()
         {
             RenderOrder = int.MaxValue;
+            PCurrentFrame = 1;
             particleBaseData.maxLife = 200;
             particleBaseData.widthScale = 1;
             particleBaseData.rgb = new RGB(255, 255, 255);
@@ -541,16 +542,16 @@ namespace CrazyStorm.Core
             newPlayerPos = player;
             return false;
         }
-        public virtual bool Update(int currentFrame = 0)
+        public virtual bool Update(int currentFrame = 1)
         {
             ExecuteExpressions();
-            if (PCurrentFrame >= MaxLife || (KillOutside && ParticleManager.OutOfWindow(this)))
+            if (PCurrentFrame > MaxLife || (KillOutside && ParticleManager.OutOfWindow(this)))
             {
                 Alive = false;
                 Emitter.Particles.Remove(this);
                 return false;
             }
-            if (PCurrentFrame == 0)
+            if (PCurrentFrame == 1)
             {
                 MathHelper.SetVector2(ref pspeedVector, PSpeed, PSpeedAngle,
                     new Vector2(PSpeedHScale, PSpeedVScale));
@@ -570,7 +571,7 @@ namespace CrazyStorm.Core
             {
                 FogFrame = (int)FOG_TIME;
             }
-            else if (PCurrentFrame < MaxLife - FOG_TIME)
+            else if (PCurrentFrame <= MaxLife - FOG_TIME)
             {
                 ++FogFrame;
                 if (!FogEffect || FogFrame >= FOG_TIME) FogFrame = (int)FOG_TIME;
@@ -586,7 +587,7 @@ namespace CrazyStorm.Core
         public virtual void Die()
         {
             if (!Alive) return;
-            PCurrentFrame = Math.Max(MaxLife - (int)FOG_TIME, 0);
+            PCurrentFrame = Math.Max(MaxLife - (int)FOG_TIME + 1, 1);
         }
         public override void CopyTo(PropertyContainer target)
         {

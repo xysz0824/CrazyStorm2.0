@@ -363,8 +363,8 @@ namespace CrazyStorm.Core
                     {
                         var layer = new Layer(match.Groups["name"].Value);
                         layer.Color = LayerColorMap[int.Parse(match.Groups["num"].Value) - 1];
-                        layer.BeginFrame = int.Parse(match.Groups["begin"].Value) - 1;
-                        layer.TotalFrame = int.Parse(match.Groups["end"].Value) - layer.BeginFrame;
+                        layer.BeginFrame = int.Parse(match.Groups["begin"].Value);
+                        layer.TotalFrame = int.Parse(match.Groups["end"].Value) - layer.BeginFrame + 1;
                         var batchCount = int.Parse(match.Groups["batchcount"].Value);
                         var batchs = new List<MultiEmitter>();
                         for (int i = 0; i < batchCount; ++i)
@@ -382,7 +382,7 @@ namespace CrazyStorm.Core
                             batch.ParentID = center.ID;
                             batch.Position = ConvertVector2(float.Parse(submatch.Groups["x"].Value), float.Parse(submatch.Groups["y"].Value),
                                 0, 0, batch, "Position") - OldCenter - center.Position;
-                            batch.BeginFrame = int.Parse(submatch.Groups["begin"].Value) - 1;
+                            batch.BeginFrame = int.Parse(submatch.Groups["begin"].Value);
                             batch.TotalFrame = int.Parse(submatch.Groups["life"].Value);
                             batch.EmitPosition = ConvertVector2(float.Parse(submatch.Groups["fx"].Value), float.Parse(submatch.Groups["fy"].Value),
                                 float.Parse(submatch.Groups["randfx"].Value), float.Parse(submatch.Groups["randfy"].Value), batch, "EmitPosition") - OldCenter;
@@ -468,7 +468,7 @@ namespace CrazyStorm.Core
                             lase.ParentID = center.ID;
                             lase.Position = ConvertVector2(float.Parse(submatch.Groups["x"].Value), float.Parse(submatch.Groups["y"].Value),
                                 0, 0, lase, "Position") - OldCenter - center.Position;
-                            lase.BeginFrame = int.Parse(submatch.Groups["begin"].Value) - 1;
+                            lase.BeginFrame = int.Parse(submatch.Groups["begin"].Value);
                             lase.TotalFrame = int.Parse(submatch.Groups["life"].Value);
                             lase.EmitRadius = ConvertFloat(float.Parse(submatch.Groups["r"].Value), float.Parse(submatch.Groups["randr"].Value),
                                 lase, "EmitRadius");
@@ -529,7 +529,7 @@ namespace CrazyStorm.Core
                             cover.ParentID = center.ID;
                             cover.Position = ConvertVector2(float.Parse(submatch.Groups["x"].Value), float.Parse(submatch.Groups["y"].Value),
                                 0, 0, cover, "Position") - OldCenter - center.Position;
-                            cover.BeginFrame = int.Parse(submatch.Groups["begin"].Value) - 1;
+                            cover.BeginFrame = int.Parse(submatch.Groups["begin"].Value);
                             cover.TotalFrame = int.Parse(submatch.Groups["life"].Value);
                             cover.HalfWidth = int.Parse(submatch.Groups["halfw"].Value);
                             cover.HalfHeight = int.Parse(submatch.Groups["halfh"].Value);
@@ -570,7 +570,7 @@ namespace CrazyStorm.Core
                             rebound.ParentID = center.ID;
                             rebound.Position = ConvertVector2(float.Parse(submatch.Groups["x"].Value), float.Parse(submatch.Groups["y"].Value),
                                 0, 0, rebound, "Position") - OldCenter - center.Position;
-                            rebound.BeginFrame = int.Parse(submatch.Groups["begin"].Value) - 1;
+                            rebound.BeginFrame = int.Parse(submatch.Groups["begin"].Value);
                             rebound.TotalFrame = int.Parse(submatch.Groups["life"].Value);
                             rebound.Size = int.Parse(submatch.Groups["longs"].Value);
                             rebound.Rotation = int.Parse(submatch.Groups["angle"].Value);
@@ -604,7 +604,7 @@ namespace CrazyStorm.Core
                             force.ParentID = center.ID;
                             force.Position = ConvertVector2(float.Parse(submatch.Groups["x"].Value), float.Parse(submatch.Groups["y"].Value),
                                 0, 0, force, "Position") - OldCenter - center.Position;
-                            force.BeginFrame = int.Parse(submatch.Groups["begin"].Value) - 1;
+                            force.BeginFrame = int.Parse(submatch.Groups["begin"].Value);
                             force.TotalFrame = int.Parse(submatch.Groups["life"].Value);
                             force.HalfWidth = int.Parse(submatch.Groups["halfw"].Value);
                             force.HalfHeight = int.Parse(submatch.Groups["halfh"].Value);

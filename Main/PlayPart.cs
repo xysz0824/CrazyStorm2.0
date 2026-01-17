@@ -81,7 +81,7 @@ namespace CrazyStorm
                 player.PlayerImpl.SelectedParticleSystemIndex = particleSystemIndex;
                 player.PlayerImpl.ControllableImagePath = config.SelfImagePath;
                 player.PlayerImpl.ControllableSetting = config.SelfSetting;
-                player.PlayerImpl.CurrentFrame = selectedFrame - 1;
+                player.PlayerImpl.CurrentFrame = selectedFrame;
                 screenContent.Children.Add(player);
                 Panel.SetZIndex(player, 1);
             }
@@ -172,7 +172,7 @@ namespace CrazyStorm
                     path.Data = (Geometry)FindResource("Play_Icon");
                     path.Fill = (Brush)FindResource("PlayIconBrush");
                     path.ToolTip = (string)FindResource("PlayStr");
-                    selectedFrame = player.PlayerImpl.CurrentFrame + 1;
+                    selectedFrame = player.PlayerImpl.CurrentFrame;
                     TimeAxis.IsHitTestVisible = true;
                     ScrollViewer.SetHorizontalScrollBarVisibility(LayerAxis, ScrollBarVisibility.Auto);
                     ScrollViewer.SetVerticalScrollBarVisibility(LayerAxis, ScrollBarVisibility.Auto);
@@ -184,7 +184,7 @@ namespace CrazyStorm
                     path.Data = (Geometry)FindResource("Pause_Icon");
                     path.Fill = (Brush)FindResource("PauseIconBrush");
                     path.ToolTip = (string)FindResource("PauseStr");
-                    player.PlayerImpl.CurrentFrame = selectedFrame - 1;
+                    player.PlayerImpl.CurrentFrame = selectedFrame;
                     TimeAxis.IsHitTestVisible = false;
                     ScrollViewer.SetHorizontalScrollBarVisibility(LayerAxis, ScrollBarVisibility.Hidden);
                     ScrollViewer.SetVerticalScrollBarVisibility(LayerAxis, ScrollBarVisibility.Hidden);

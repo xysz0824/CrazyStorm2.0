@@ -424,7 +424,7 @@
         <!-- Status Bar -->
         <StatusBar Height="24" Width="Auto" DockPanel.Dock="Bottom" Padding="1,0,6,0"
                    Background="{DynamicResource TitleBarBrush}" Foreground="{DynamicResource TextBrush}">
-            <StatusBarItem Name="StatusText" Content="{Binding Path=Status}" />
+            <StatusBarItem Name="StatusText" />
             <StatusBarItem Name="MousePosTip" HorizontalAlignment="Right" />
         </StatusBar>
         <!-- Tool Bar -->
@@ -875,7 +875,8 @@
                     </TabControl>
                 </DockPanel>
                 <!-- ParticleScreen -->
-                <ScrollViewer  Grid.Column="1" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" Focusable="True" LostFocus="Screen_LostFocus" Background="{DynamicResource TitleBarBrush}">
+                <ScrollViewer  Grid.Column="1" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" PreviewKeyDown="ScrollViewer_PreviewKeyDown"
+                               Focusable="True" LostFocus="Screen_LostFocus" Background="{DynamicResource TitleBarBrush}">
                     <TabControl Name="ParticleTabControl" SelectionChanged="ParticleTabControl_SelectionChanged" 
                                 MouseLeave="ParticleTabControl_MouseLeave" MouseLeftButtonUp="ParticleTabControl_MouseLeftButtonUp"
                                 Background="{DynamicResource ScreenBackgroundBrush}" BorderThickness="0,0,0,0">

@@ -74,13 +74,13 @@ namespace CrazyStorm.Core
         public int LayerFrame { get; set; }
         [RuntimeProperty]
         public int CurrentFrame { get; set; }
-        [IntProperty(0, int.MaxValue)]
+        [IntProperty(1, int.MaxValue)]
         public int BeginFrame
         {
             get { return componentData.beginFrame; }
             set { componentData.beginFrame = value; }
         }
-        [IntProperty(0, int.MaxValue)]
+        [IntProperty(1, int.MaxValue)]
         public int TotalFrame
         {
             get { return componentData.totalFrame; }
@@ -178,6 +178,7 @@ namespace CrazyStorm.Core
             ParentID = -1;
             BindingTargetID = -1;
             name = string.Empty;
+            componentData.beginFrame = 1;
             componentData.totalFrame = 200;
             componentData.visibility = true;
             Locals = new GenericContainer<VariableResource>();
@@ -199,8 +200,8 @@ namespace CrazyStorm.Core
             bool eventImpacted = false;
             foreach (var particle in BindingTarget.Particles)
             {
-                CurrentFrame = particle.PCurrentFrame - BeginFrame;
-                if (CurrentFrame < 0 || CurrentFrame >= TotalFrame || !Visibility) continue;
+                CurrentFrame = particle.PCurrentFrame - BeginFrame + 1;
+                if (CurrentFrame < 1 || CurrentFrame > TotalFrame || !Visibility) continue;
                 if (executeEvents && !EventManager.BindingRecover(this, particle) && eventImpacted)
                 {
                     Reset();
@@ -643,8 +644,8 @@ namespace CrazyStorm.Core
             LayerFrame = currentFrame;
             if (BindingTarget == null || CheckCircularBinding())
             {
-                CurrentFrame = currentFrame - BeginFrame;
-                if (CurrentFrame < 0 || CurrentFrame >= TotalFrame || !Visibility)
+                CurrentFrame = currentFrame - BeginFrame + 1;
+                if (CurrentFrame < 1 || CurrentFrame > TotalFrame || !Visibility)
                     return false;
             }
             Position = GetRelativePositionRuntime();

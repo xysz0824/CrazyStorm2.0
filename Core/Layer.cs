@@ -81,7 +81,7 @@ namespace CrazyStorm.Core
             get { return layerData.beginFrame; }
             set 
             { 
-                layerData.beginFrame = value >= 0 ? value : 0;
+                layerData.beginFrame = value > 0 ? value : 1;
                 if (PropertyChanged != null)
                     PropertyChanged(this, new PropertyChangedEventArgs("BeginFrame"));
             }
@@ -108,6 +108,7 @@ namespace CrazyStorm.Core
         {
             this.name = name;
             layerData.visible = true;
+            layerData.beginFrame = 1;
             layerData.totalFrame = 200;
             components = new GenericContainer<Component>();
         }

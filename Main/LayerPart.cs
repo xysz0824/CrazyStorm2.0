@@ -133,7 +133,7 @@ namespace CrazyStorm
         private void LayerTimer_Tick(object sender, EventArgs e)
         {
             if (player == null) return;
-            FitAxisScroll(player.PlayerImpl.CurrentFrame + 1);
+            FitAxisScroll(player.PlayerImpl.CurrentFrame);
         }
         private void TimeAxis_MouseMove(object sender, MouseEventArgs e)
         {
@@ -159,7 +159,7 @@ namespace CrazyStorm
                 selectedFrame = frame;
                 TimeScalePointerFrame.Content = selectedFrame.ToString();
                 TimeScalePointerTransform.X = (selectedFrame - 1) * 3 - axisScroll.HorizontalOffset;
-                if (player != null) player.PlayerImpl.CurrentFrame = selectedFrame - 1;
+                if (player != null) player.PlayerImpl.CurrentFrame = selectedFrame;
             }
         }
         private void TimeAxis_MouseDown(object sender, MouseButtonEventArgs e)
