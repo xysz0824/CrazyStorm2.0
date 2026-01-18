@@ -176,20 +176,23 @@ namespace CrazyStorm
                                     }
                                 }
                             }
-                            if (value == null) value = Environment.GetLocal(item.Name);
-                            if (value == null) value = Environment.GetGlobal(item.Name);
-                            if (value != null)
+                            else
                             {
-                                //Fields of support struct must be float type.
-                                var lexer = new Lexer();
-                                lexer.Load(input);
-                                var syntaxTree = new Parser(lexer).Expression();
-                                var eval = syntaxTree.Eval(Environment);
-                                if (!(eval is float))
+                                value = Environment.GetLocal(item.Name);
+                                if (value == null) value = Environment.GetGlobal(item.Name);
+                                if (value != null)
                                 {
-                                    UIHelper.SetErrorToolTip(LeftValue, new ExpressionException("TypeError"));
+                                    //Fields of support struct must be float type.
+                                    var lexer = new Lexer();
+                                    lexer.Load(input);
+                                    var syntaxTree = new Parser(lexer).Expression();
+                                    var eval = syntaxTree.Eval(Environment);
+                                    if (!(eval is float))
+                                    {
+                                        UIHelper.SetErrorToolTip(LeftValue, new ExpressionException("TypeError"));
+                                    }
+                                    else finalText = LeftValue.Text;
                                 }
-                                else finalText = LeftValue.Text;
                             }
                         }
                     }

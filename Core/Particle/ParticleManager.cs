@@ -157,7 +157,12 @@ namespace CrazyStorm.Core
             for (int i = 0; i < activeParticles.Count; ++i)
             {
                 var instance = activeParticles[i];
-                if (!instance.Alive || Masked(instance.PPosition)) continue;
+                if (!instance.Alive) continue;
+                if (Masked(instance.PPosition))
+                {
+                    instance.PMasked = true;
+                    continue;
+                }
                 if (instance.CheckCollision(playerLast, player, r)) searchResult[index++] = instance;
                 else
                 {

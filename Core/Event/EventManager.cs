@@ -409,6 +409,7 @@ namespace CrazyStorm.Core
                         break;
                 }
                 propertyContainer.SetProperty(item.Key);
+                VM.Clear();
             }
             return true;
         }

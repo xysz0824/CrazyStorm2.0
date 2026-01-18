@@ -72,6 +72,8 @@ namespace CrazyStorm.Core
         [RuntimeProperty]
         public int PCurrentFrame { get; set; }
         [RuntimeProperty]
+        public bool PMasked { get; set; }
+        [RuntimeProperty]
         public Vector2 PPosition { get; set; }
         public Vector2 PPositionLast { get; set; }
         public ParticleType Type
@@ -357,6 +359,10 @@ namespace CrazyStorm.Core
                     return true;
                 case "PCurrentFrame":
                     VM.PushInt(PCurrentFrame);
+                    return true;
+                case "PMasked":
+                    VM.PushBool(PMasked);
+                    PMasked = false;
                     return true;
                 case "PPosition":
                     VM.PushVector2(PPosition);

@@ -72,6 +72,7 @@ namespace CrazyStorm.Core
                     break;
             }
             PropertyContainer.SetProperty(PropertyName);
+            VM.Clear();
             currentTime++;
         }
     }

@@ -52,6 +52,12 @@ namespace CrazyStorm.Core
         static Stack<Vector3> vectorStack = new Stack<Vector3>();
         static Stack<bool> boolStack = new Stack<bool>();
         static Stack<string> stringStack = new Stack<string>();
+        public static void Clear()
+        {
+            vectorStack.Clear();
+            boolStack.Clear();
+            stringStack.Clear();
+        }
         public static byte[] CreateInstruction(VMCode code, object operand)
         {
             var bytes = new List<byte>();

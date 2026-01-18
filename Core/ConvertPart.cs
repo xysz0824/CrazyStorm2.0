@@ -48,6 +48,7 @@ namespace CrazyStorm.Core
         static readonly List<string> ChangeTypeKeywords = new List<string>() { "变化到", "增加", "减少" };
         static readonly Dictionary<string, string> KeywordMap = new Dictionary<string, string>()
         {
+            { "进入遮罩瞬间", "PMasked" },
             { "子弹当前帧", "PCurrentFrame" }, { "当前帧", "CurrentFrame" }, { "且", "&" }, { "或", "|"},
             { "额外发射", "EmitParticle" }, { "恢复", "Recover"},
             { "变化到", "ChangeTo" }, { "增加", "Increase" }, { "减少", "Decrease" },

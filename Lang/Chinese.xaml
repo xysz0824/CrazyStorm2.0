@@ -99,6 +99,7 @@
     <sys:String x:Key="EmitRoundAngleStr">发射圆方位角</sys:String>
     <sys:String x:Key="InstantMovementStr">瞬时生命运动</sys:String>
     <sys:String x:Key="PCurrentFrameStr">粒子当前帧</sys:String>
+    <sys:String x:Key="PMaskedStr">进入遮罩瞬间</sys:String>
     <sys:String x:Key="PPositionStr">粒子坐标</sys:String>
     <sys:String x:Key="MaxLifeStr">生命</sys:String>
     <sys:String x:Key="WidthScaleStr">宽比</sys:String>

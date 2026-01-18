@@ -148,6 +148,7 @@ namespace CrazyStorm.Core
             {
                 VM.Execute(this, expression.Value);
                 SetProperty(expression.Key);
+                VM.Clear();
             }
         }
         public abstract bool PushProperty(string propertyName);
