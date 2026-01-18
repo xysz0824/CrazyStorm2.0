@@ -101,7 +101,7 @@ namespace CrazyStorm.Core
                 template.CopyTo(poolObject.Instance);
                 particle = poolObject.Instance;
             }
-            int order = layerID * 1000000000 + 9 - (int)template.BlendType;
+            int order = layerID * searchResult.Length * 10 + 9 - (int)template.BlendType;
             particle.RenderOrder = order + instanceID * 10;
             particle.ID = instanceID++;
             particle.Reset();
