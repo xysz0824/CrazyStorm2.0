@@ -45,7 +45,13 @@ namespace CrazyStorm
         #region Private Methods
         private void InitializeTypes()
         {
-            Type[] type = { typeof(MultiEmitter), typeof(CurveEmitter), typeof(EventField), typeof(Rebounder), typeof(ForceField) };
+            Type[] type = { 
+                typeof(MultiEmitter), 
+                typeof(CurveEmitter), 
+                typeof(EventField), 
+                typeof(Rebounder), 
+                typeof(ForceField),
+                typeof(Center)};
             for (int i = 0;i < type.Length;++i)
             {
                 var item = new ComboBoxItem();
@@ -106,10 +112,9 @@ namespace CrazyStorm
                         if (TypeCheckBox.IsChecked.Value)
                         {
                             var type = (TypeComboBox.SelectedItem as ComboBoxItem).DataContext as Type;
-                            if (component.GetType() != type)
-                                continue;
+                            if (component.GetType() == type) results.Add(component);
                         }
-                        results.Add(component);
+                        else results.Add(component);
                     }
                     results.AddRange(SearchTree(component.Children));
                 }
