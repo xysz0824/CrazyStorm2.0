@@ -11,12 +11,22 @@ namespace CrazyStorm.Core
 {
     public class PropertyTypeRule
     {
-        public static PropertyType GetValueType(Type type, string name)
+        public static PropertyType GetValueType(Type type, Type subType, string name)
         {
+            var split = name.Split('.');
+            var nameWithoutDot = split[0];
+            var memberName = split.Length >= 2 ? split[1] : null;
             var properties = type.GetProperties();
+            if (subType != null)
+            {
+                var subProperties = subType.GetProperties();
+                var originalLength = properties.Length;
+                Array.Resize(ref properties, originalLength + subProperties.Length);
+                Array.Copy(subProperties, 0, properties, originalLength, subProperties.Length);
+            }
             foreach (var property in properties)
             {
-                if (property.Name != name) continue;
+                if (property.Name != nameWithoutDot) continue;
                 var attributes = property.GetCustomAttributes(false);
                 foreach (var attribute in attributes)
                 {
@@ -24,8 +34,8 @@ namespace CrazyStorm.Core
                     if (attribute is BoolPropertyAttribute) return PropertyType.Boolean;
                     if (attribute is IntPropertyAttribute) return PropertyType.Int32;
                     if (attribute is FloatPropertyAttribute) return PropertyType.Single;
-                    if (attribute is Vector2PropertyAttribute) return PropertyType.Vector2;
-                    if (attribute is RGBPropertyAttribute) return PropertyType.RGB;
+                    if (attribute is Vector2PropertyAttribute) return memberName != null ? PropertyType.Single : PropertyType.Vector2;
+                    if (attribute is RGBPropertyAttribute) return memberName != null ? PropertyType.Single : PropertyType.RGB;
                     if (attribute is EnumPropertyAttribute) return PropertyType.Enum;
                     if (attribute is RuntimePropertyAttribute)
                     {

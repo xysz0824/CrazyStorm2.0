@@ -313,8 +313,43 @@ namespace CrazyStorm.Core
                 particleBaseData = PlayDataHelper.ReadStruct<ParticleBaseData>(particleBaseReader);
             }
         }
+        protected virtual bool PushSystemProperty(string propertyName)
+        {
+            switch (propertyName)
+            {
+                case "SelfAngle":
+                    VM.PushFloat(0);
+                    return true;
+                case "BodyPosition":
+                    VM.PushVector2(Emitter.BodyPosition);
+                    return true;
+                case "BodyPosition.x":
+                    VM.PushFloat(Emitter.BodyPosition.x);
+                    return true;
+                case "BodyPosition.y":
+                    VM.PushFloat(Emitter.BodyPosition.y);
+                    return true;
+                case "BodyAngle":
+                    VM.PushFloat(MathHelper.GetDegree(Emitter.BodyPosition - PPosition));
+                    return true;
+                case "CenterPosition":
+                    VM.PushVector2(Emitter.CenterPosition);
+                    return true;
+                case "CenterPosition.x":
+                    VM.PushFloat(Emitter.CenterPosition.x);
+                    return true;
+                case "CenterPosition.y":
+                    VM.PushFloat(Emitter.CenterPosition.y);
+                    return true;
+                case "CenterAngle":
+                    VM.PushFloat(MathHelper.GetDegree(Emitter.CenterPosition - PPosition));
+                    return true;
+            }
+            return false;
+        }
         public override bool PushProperty(string propertyName)
         {
+            if (PushSystemProperty(propertyName)) return true;
             switch (propertyName)
             {
                 case "MaxLife":

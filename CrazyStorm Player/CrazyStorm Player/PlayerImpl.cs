@@ -156,9 +156,21 @@ namespace CrazyStorm_Player
             customTextures = new Dictionary<int, Texture2D>();
             foreach (var image in File.Images)
             {
+                if (!System.IO.File.Exists(image.RelatviePath))
+                {
+                    customTextures[image.ID] = null;
+                    continue;
+                }
                 using (var file = new FileStream(image.RelatviePath, FileMode.Open))
                 {
-                    customTextures[image.ID] = Texture2D.FromStream(gd, file);
+                    try
+                    {
+                        customTextures[image.ID] = Texture2D.FromStream(gd, file);
+                    }
+                    catch
+                    {
+                        customTextures[image.ID] = null;
+                    }
                 }
             }
             FrameworkDispatcher.Update();

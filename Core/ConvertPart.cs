@@ -337,7 +337,7 @@ namespace CrazyStorm.Core
                 {
                     center.Visibility = match.Groups["x"].Success;
                     if (globalEvents != null) center.ComponentEventGroups.Add(globalEvents);
-                    var eventgroup = GetEventGroup(typeof(Center), match.Groups["events"].Value, false, "CenterEvents");
+                    var eventgroup = GetEventGroup(typeof(Center), null, match.Groups["events"].Value, false, "CenterEvents");
                     if (eventgroup.Events.Count > 0) center.ComponentEventGroups.Add(eventgroup);
                     line = reader.ReadLine().Trim();
                 }
@@ -444,10 +444,10 @@ namespace CrazyStorm.Core
                             particle.IgnoreRebound = submatch.Groups["affectedByRebound"].Success ? !bool.Parse(submatch.Groups["affectedByRebound"].Value) : false;
                             particle.IgnoreForce = submatch.Groups["affectedByForce"].Success ? !bool.Parse(submatch.Groups["affectedByForce"].Value) : false;
                             //events
-                            var eventGroups = GetEventGroups(typeof(MultiEmitter), submatch.Groups["events"].Value, false, "");
+                            var eventGroups = GetEventGroups(typeof(MultiEmitter), typeof(Particle), submatch.Groups["events"].Value, false, "");
                             foreach (var eventGroup in eventGroups) batch.ComponentEventGroups.Add(eventGroup);
                             //sonevents
-                            eventGroups = GetEventGroups(typeof(Particle), submatch.Groups["sonevents"].Value, true, "");
+                            eventGroups = GetEventGroups(typeof(Particle), null, submatch.Groups["sonevents"].Value, true, "");
                             foreach (var eventGroup in eventGroups) batch.ParticleEventGroups.Add(eventGroup);
                             layer.Components.Add(batch);
                             batchs.Add(batch);
@@ -507,10 +507,10 @@ namespace CrazyStorm.Core
                             }
                             particle.VSpeed = submatch.Groups["vspeed"].Success ? float.Parse(submatch.Groups["vspeed"].Value) : 0f;
                             //events
-                            var eventGroups = GetEventGroups(typeof(CurveEmitter), submatch.Groups["events"].Value, false, "");
+                            var eventGroups = GetEventGroups(typeof(CurveEmitter), typeof(CurveParticle), submatch.Groups["events"].Value, false, "");
                             foreach (var eventGroup in eventGroups) lase.ComponentEventGroups.Add(eventGroup);
                             //sonevents
-                            eventGroups = GetEventGroups(typeof(CurveParticle), submatch.Groups["sonevents"].Value, true, "");
+                            eventGroups = GetEventGroups(typeof(CurveParticle), null,submatch.Groups["sonevents"].Value, true, "");
                             foreach (var eventGroup in eventGroups) lase.ParticleEventGroups.Add(eventGroup);
                             layer.Components.Add(lase);
                         }
@@ -549,10 +549,10 @@ namespace CrazyStorm.Core
                             cover.LayerMaskMutex = submatch.Groups["maskmutex"].Success ? bool.Parse(submatch.Groups["maskmutex"].Value) : false;
                             cover.Rotation = submatch.Groups["degree"].Success ? float.Parse(submatch.Groups["degree"].Value) : 0f;
                             //events
-                            var eventGroups = GetEventGroups(typeof(EventField), submatch.Groups["events"].Value, false, "");
+                            var eventGroups = GetEventGroups(typeof(EventField), typeof(ParticleBase), submatch.Groups["events"].Value, false, "");
                             foreach (var eventGroup in eventGroups) cover.ComponentEventGroups.Add(eventGroup);
                             //sonevents
-                            eventGroups = GetEventGroups(typeof(ParticleBase), submatch.Groups["sonevents"].Value, true, "");
+                            eventGroups = GetEventGroups(typeof(ParticleBase), null,submatch.Groups["sonevents"].Value, true, "");
                             foreach (var eventGroup in eventGroups) cover.EventFieldEventGroups.Add(eventGroup);
                             layer.Components.Add(cover);
                         }
@@ -585,7 +585,7 @@ namespace CrazyStorm.Core
                                 rebound, "AcspeedAngle");
                             rebound.ReboundOneSide = submatch.Groups["oneside"].Success ? bool.Parse(submatch.Groups["oneside"].Value) : false;
                             //events
-                            var eventGroups = GetEventGroups(typeof(ParticleBase), submatch.Groups["events"].Value, true, "ReboundGroups");
+                            var eventGroups = GetEventGroups(typeof(ParticleBase), null, submatch.Groups["events"].Value, true, "ReboundGroups");
                             foreach (var eventGroup in eventGroups) rebound.RebounderEventGroups.Add(eventGroup);
                             layer.Components.Add(rebound);
                         }
@@ -849,7 +849,7 @@ namespace CrazyStorm.Core
             }
             return str;
         }
-        public static EventGroup GetEventGroup(Type componentType, string str, bool particleEvents, string defaultName)
+        public static EventGroup GetEventGroup(Type type, Type subType, string str, bool particleEvents, string defaultName)
         {
             EventGroup group = new EventGroup();
             var split = str.Split('|');
@@ -916,13 +916,17 @@ namespace CrazyStorm.Core
                     }
                     else
                     {
-                        eventInfo.resultType = PropertyTypeRule.GetValueType(componentType, eventInfo.resultProperty);
                         eventInfo.changeType = ConvertKeyword(split[1]);
-                        eventInfo.resultValue = ConvertSpecialValue(eventInfo.resultType, ConvertKeyword(split[2]), out eventInfo.isExpressionResult);
                         if (eventInfo.resultProperty == BlendKeyMap.Key)
                         {
                             eventInfo.resultProperty = BlendKeyMap.Value;
-                            eventInfo.resultValue = BlendValueMap[eventInfo.resultValue];
+                            eventInfo.resultType = PropertyType.Enum;
+                            eventInfo.resultValue = BlendValueMap[split[2]];
+                        }
+                        else
+                        {
+                            eventInfo.resultType = PropertyTypeRule.GetValueType(type, subType, eventInfo.resultProperty);
+                            eventInfo.resultValue = ConvertSpecialValue(eventInfo.resultType, ConvertKeyword(split[2]), out eventInfo.isExpressionResult);
                         }
                     }
                 }
@@ -931,14 +935,14 @@ namespace CrazyStorm.Core
             }
             return group;
         }
-        public static List<EventGroup> GetEventGroups(Type componentType, string str, bool particleEvents, string defaultName)
+        public static List<EventGroup> GetEventGroups(Type type, Type subType, string str, bool particleEvents, string defaultName)
         {
             var split = str.Split('&');
             var groups = new List<EventGroup>();
             foreach (var groupStr in split)
             {
                 if (string.IsNullOrEmpty(groupStr)) continue;
-                groups.Add(GetEventGroup(componentType, groupStr, particleEvents, defaultName));
+                groups.Add(GetEventGroup(type, subType, groupStr, particleEvents, defaultName));
             }
             return groups;
         }
