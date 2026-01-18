@@ -131,7 +131,7 @@
                             </ListView.ItemTemplate>
                     </ListView>
                     <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
-                        <Canvas Name="Preview" Height="{Binding ElementName=Image, Path=ActualHeight}" Width="{Binding ElementName=Image, Path=ActualWidth}">
+                        <Canvas Name="Preview" HorizontalAlignment="Left" VerticalAlignment="Top" Height="{Binding ElementName=Image, Path=ActualHeight}" Width="{Binding ElementName=Image, Path=ActualWidth}">
                             <Image Name="Image" Canvas.Left="0" Canvas.Top="0"/>
                             <Rectangle 
                                 Fill="ForestGreen" 

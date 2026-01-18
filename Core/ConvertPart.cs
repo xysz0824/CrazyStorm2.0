@@ -71,7 +71,7 @@ namespace CrazyStorm.Core
             { "1", "True" }, { "0", "False" },
         };
         static readonly string TypeKeyword = "类型";
-        static readonly string BlendKeyword = "高光效果";
+        static readonly KeyValuePair<string, string> BlendKeyMap = new KeyValuePair<string, string>("高光效果", "BlendType");
         static readonly Dictionary<string, string> BlendValueMap = new Dictionary<string, string>()
         {
             { "1", "Additive" }, { "0", "AlphaBlend" },
@@ -175,7 +175,7 @@ namespace CrazyStorm.Core
                 reader.ReadLine();
                 match = RenderingOrderMatch.Match(reader.ReadLine());
                 //particleSystem
-                var particleSystem = new ParticleSystem(Path.GetFileName(filePath));
+                var particleSystem = new ParticleSystem(Path.GetFileNameWithoutExtension(filePath));
                 if (match.Success)
                 {
                     particleSystem.OrderType = (OrderType)int.Parse(match.Groups[1].Value);
@@ -827,6 +827,7 @@ namespace CrazyStorm.Core
             if (type == PropertyType.Boolean && BoolValueMap.ContainsKey(value)) return BoolValueMap[value];
             if (value.Contains("+"))
             {
+                expressionResult = true;
                 var split = value.Split('+');
                 return $"{split[0]}+{{{split[1]}}}";
             }
@@ -918,7 +919,11 @@ namespace CrazyStorm.Core
                         eventInfo.resultType = PropertyTypeRule.GetValueType(componentType, eventInfo.resultProperty);
                         eventInfo.changeType = ConvertKeyword(split[1]);
                         eventInfo.resultValue = ConvertSpecialValue(eventInfo.resultType, ConvertKeyword(split[2]), out eventInfo.isExpressionResult);
-                        if (eventInfo.resultProperty == BlendKeyword) eventInfo.resultValue = BlendValueMap[eventInfo.resultValue];
+                        if (eventInfo.resultProperty == BlendKeyMap.Key)
+                        {
+                            eventInfo.resultProperty = BlendKeyMap.Value;
+                            eventInfo.resultValue = BlendValueMap[eventInfo.resultValue];
+                        }
                     }
                 }
                 var eventText = EventHelper.BuildEvent(eventInfo, !eventInfo.isSpecialEvent);

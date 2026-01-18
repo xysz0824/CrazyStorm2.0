@@ -91,7 +91,7 @@ namespace CrazyStorm.Core
             }
             if (!eventInfo.isSpecialEvent)
             {
-                if (eventInfo.isExpressionResult) eventInfo.resultValue = "(" + eventInfo.resultValue + ")";
+                if (eventInfo.isExpressionResult) eventInfo.resultValue = $"({eventInfo.resultValue})";
                 eventString.Append(string.Format("{0} {1} {2}, {3}, {4}", eventInfo.resultProperty, eventInfo.changeType,
                     eventInfo.resultValue, eventInfo.changeMode, eventInfo.changeTime));
             }
@@ -160,9 +160,12 @@ namespace CrazyStorm.Core
         {
             var lexer = new Expression.Lexer();
             lexer.Load(str);
-            var syntaxTree = new Expression.Parser(lexer).Expression();
             var compiledBytes = new List<byte>();
-            syntaxTree.Compile(compiledBytes);
+            if (lexer.Tokens.Count > 0)
+            {
+                var syntaxTree = new Expression.Parser(lexer).Expression();
+                syntaxTree.Compile(compiledBytes);
+            }
             return compiledBytes.ToArray();
         }
         public static byte[] GenerateEventData(string text)

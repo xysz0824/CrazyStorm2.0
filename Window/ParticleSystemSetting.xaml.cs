@@ -186,10 +186,17 @@ namespace CrazyStorm
             }
             else
             {
-                var bitmap = new BitmapImage(new Uri((ImageCombo.SelectedItem as FileResource).AbsolutePath));
-                Image.Source = bitmap;
-                Image.Width = bitmap.PixelWidth;
-                Image.Height = bitmap.PixelHeight;
+                try
+                {
+                    var bitmap = new BitmapImage(new Uri((ImageCombo.SelectedItem as FileResource).AbsolutePath));
+                    Image.Source = bitmap;
+                    Image.Width = bitmap.PixelWidth;
+                    Image.Height = bitmap.PixelHeight;
+                }
+                catch
+                {
+                    Image.Source = null;
+                }
                 //Check if width or height is 2 to the power of n
                 if (((int)Image.Width & ((int)Image.Width - 1)) != 0 ||
                     ((int)Image.Height & ((int)Image.Height - 1)) != 0)

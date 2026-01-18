@@ -97,7 +97,7 @@ namespace CrazyStorm
         }
         void Save()
         {
-            if (string.IsNullOrWhiteSpace(filePath))
+            if (string.IsNullOrWhiteSpace(filePath) || File.IsCS1(filePath))
                 SaveTo();
             else
                 Save(filePath);
@@ -118,6 +118,7 @@ namespace CrazyStorm
             {
                 save.InitialDirectory = File.CurrentDirectory;
                 save.Filter = (string)FindResource("ProjectFileExtensionStr");
+                save.FileName = fileName;
                 if (save.ShowDialog() == System.Windows.Forms.DialogResult.OK)
                     Save(save.FileName);
             }
