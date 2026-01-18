@@ -114,7 +114,8 @@ namespace CrazyStorm
                     SaveTo();
                     break;
                 case "PlayCurrent":
-                    PlayCurrent();
+                    if (player == null) PlayItem_Click(null, null);
+                    else StopItem_Click(null, null);
                     break;
                 case "JumpToFrame":
                     OpenJumpToFrame();

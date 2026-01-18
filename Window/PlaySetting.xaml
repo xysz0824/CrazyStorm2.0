@@ -15,8 +15,7 @@
         </GroupBox>
         <GroupBox Header="{StaticResource DisplayStr}">
             <StackPanel Orientation="Horizontal">
-                <RadioButton Name="Windowed" Content="{StaticResource WindowStr}" Margin="5"/>
-                <RadioButton Name="FullScreen" Content="{StaticResource FullScreenStr}" Margin="5"/>
+                <CheckBox Name="CollapseLayerAxis" Content="{StaticResource CollapseLayerAxisStr}" Margin="5"/>
             </StackPanel>
         </GroupBox>
         <GroupBox Header="{StaticResource CharacterStr}">

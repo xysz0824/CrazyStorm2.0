@@ -328,7 +328,7 @@
                                     CanExecute="CommandBinding_CanExecute"
                                     Executed="CommandBinding_Executed" />
     </Window.CommandBindings>
-    <DockPanel Height="Auto" Name="dockPanel1" Width="Auto">
+    <DockPanel Height="Auto" Width="Auto">
         <!-- Top Menu -->
         <Menu Height="23" Name="menu1" Width="Auto" DockPanel.Dock="Top" Padding="2,2,0,0" IsEnabled="True" Margin="0" Background="{DynamicResource TitleBarBrush}">
             <MenuItem Padding="10,0">
@@ -583,7 +583,8 @@
         <Grid Height="Auto" Width="Auto" Background="{DynamicResource TitleBarBrush}">
             <Grid.RowDefinitions>
                 <RowDefinition MinHeight="300"/>
-                <RowDefinition Height="100" MinHeight="100"/>
+                <RowDefinition Name="LayerAxisDefinition" Height="94" MinHeight="30">
+                </RowDefinition>
             </Grid.RowDefinitions>
             <Grid Grid.Row="0">
                 <Grid.ColumnDefinitions>

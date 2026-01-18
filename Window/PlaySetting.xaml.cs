@@ -39,8 +39,7 @@ namespace CrazyStorm
             Setting.DataContext = config;
             selfSettingBoxes = new TextBox[] { SelfStartX, SelfStartY, SelfWidth, SelfHeight, SelfCenterX, SelfCenterY,
                 SelfFrames, SelfDelay, SelfRadius};
-            if (config.Windowed) Windowed.IsChecked = true;
-            else FullScreen.IsChecked = true;
+            CollapseLayerAxis.IsChecked = config.CollapseLayerAxis;
             if (!string.IsNullOrWhiteSpace(config.SelfSetting))
             {
                 string[] split = config.SelfSetting.Split(',');
@@ -76,7 +75,7 @@ namespace CrazyStorm
             {
                 config.ParticleMaximum = particleMaximum;
                 config.CurveParticleMaximum = curveParticleMaximum;
-                config.Windowed = Windowed.IsChecked == true;
+                config.CollapseLayerAxis = CollapseLayerAxis.IsChecked.Value;
                 config.SelfImagePath = SelfImagePath.Text;
             }
             else

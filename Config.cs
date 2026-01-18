@@ -25,7 +25,7 @@ namespace CrazyStorm
         bool centerDisplay;
         int particleMaximum;
         int curveParticleMaximum;
-        bool windowed;
+        bool collapseLayerAxis;
         string selfImagePath;
         string selfSetting;
         string theme;
@@ -117,14 +117,14 @@ namespace CrazyStorm
                 }
             }
         }
-        public bool Windowed
+        public bool CollapseLayerAxis
         {
-            get { return windowed; }
+            get { return collapseLayerAxis; }
             set
             {
-                windowed = value;
+                collapseLayerAxis = value;
                 if (PropertyChanged != null)
-                    PropertyChanged(this, new PropertyChangedEventArgs("Windowed"));
+                    PropertyChanged(this, new PropertyChangedEventArgs("CollapseLayerAxis"));
             }
         }
         public string SelfImagePath
@@ -182,7 +182,7 @@ namespace CrazyStorm
             centerDisplay = iniHelper.ReadValue("Screen", "CenterDisplay", true);
             particleMaximum = iniHelper.ReadValue("Play", "ParticleMaximum", 3000);
             curveParticleMaximum = iniHelper.ReadValue("Play", "CurveParticleMaximum", 200);
-            windowed = iniHelper.ReadValue("Play", "Windowed", true);
+            collapseLayerAxis = iniHelper.ReadValue("Play", "CollapseLayerAxis", true);
             selfImagePath = iniHelper.ReadValue("Play", "SelfImagePath", string.Empty);
             selfSetting = iniHelper.ReadValue("Play", "SelfSetting", string.Empty);
             theme = iniHelper.ReadValue("General", "Theme", "StyleDefault");
@@ -196,7 +196,7 @@ namespace CrazyStorm
             iniHelper.WriteValue("Screen", "CenterDisplay", centerDisplay);
             iniHelper.WriteValue("Play", "ParticleMaximum", particleMaximum);
             iniHelper.WriteValue("Play", "CurveParticleMaximum", curveParticleMaximum);
-            iniHelper.WriteValue("Play", "Windowed", windowed);
+            iniHelper.WriteValue("Play", "CollapseLayerAxis", collapseLayerAxis);
             iniHelper.WriteValue("Play", "SelfImagePath", selfImagePath);
             iniHelper.WriteValue("Play", "SelfSetting", selfSetting);
             iniHelper.WriteValue("General", "Theme", theme);

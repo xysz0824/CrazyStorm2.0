@@ -245,6 +245,7 @@
     <sys:String x:Key="MaxParticleStr">普通粒子上限</sys:String>
     <sys:String x:Key="MaxCurveParticleStr">曲线粒子上限</sys:String>
     <sys:String x:Key="DisplayStr">显示</sys:String>
+    <sys:String x:Key="CollapseLayerAxisStr">播放时折叠图层列表</sys:String>
     <sys:String x:Key="WindowStr">窗口</sys:String>
     <sys:String x:Key="FullScreenStr">全屏</sys:String>
     <sys:String x:Key="XOffsetStr">X偏移</sys:String>
