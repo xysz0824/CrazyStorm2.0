@@ -293,7 +293,7 @@ namespace CrazyStorm
                 CreatePropertyPanel(ComponentTree.SelectedItem as Component);
             }
         }
-        private void TabClose_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        private void TabClose_Click(object sender, RoutedEventArgs e)
         {
             var tabItem = VisualHelper.VisualUpwardSearch<TabItem>(sender as DependencyObject) as TabItem;
             LeftTabControl.Items.Remove(tabItem);
