@@ -134,51 +134,6 @@ namespace CrazyStorm.Core
                     (pc as Component)?.Reset();
                     return false;
                 } },
-                { "FollowBody", (pc, args, expr) =>
-                {
-                    //TODO : FollowBody
-                    return false;
-                } },
-                { "FollowBodySlow", (pc, args, expr) =>
-                {
-                    //TODO : FollowBodySlow
-                    return false;
-                } },
-                { "FollowBodyX", (pc, args, expr) =>
-                {
-                    //TODO : FollowBodyX
-                    return false;
-                } },
-                { "FollowBodyXSlow", (pc, args, expr) =>
-                {
-                    //TODO : FollowBodyXSlow
-                    return false;
-                } },
-                { "FollowBodyY", (pc, args, expr) =>
-                {
-                    //TODO : FollowBodyY
-                    return false;
-                } },
-                { "FollowBodyYSlow", (pc, args, expr) =>
-                {
-                    //TODO : FollowBodyYSlow
-                    return false;
-                } },
-                { "RandomMove", (pc, args, expr) =>
-                {
-                    //TODO : RandomMove
-                    return false;
-                } },
-                { "RandomMoveSlow", (pc, args, expr) =>
-                {
-                    //TODO : RandomMoveSlow
-                    return false;
-                } },
-                { "RandomWalk", (pc, args, expr) =>
-                {
-                    //TODO : RandomWalk
-                    return false;
-                } },
             };
         public static Func<string, PropertyContainer, string[], VMInstruction[][], bool> OnFunctionCall;
         public delegate void SoundPlayHandler(string path);

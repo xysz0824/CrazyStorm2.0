@@ -165,8 +165,9 @@ namespace CrazyStorm.Core
         }
         public int ParentID { get; set; }
         public int BindingTargetID { get; set; }
-        public IList<VariableResource> Locals { get; set; }
+        public ParticleSystem System { get; set; }
         public IList<VariableResource> Globals { get; set; }
+        public IList<VariableResource> Locals { get; private set; }
         public Vector2 BodyPosition { get; set; }
         public Vector2 CenterPosition { get; set; }
         public int Status { get; set; }

@@ -330,7 +330,10 @@ namespace CrazyStorm.Core
                 foreach (var layer in particleSystem.Layers)
                 {
                     foreach (var component in layer.Components)
+                    {
+                        component.System = particleSystem;
                         component.Globals = globals;
+                    }
                 }
             }
         }
