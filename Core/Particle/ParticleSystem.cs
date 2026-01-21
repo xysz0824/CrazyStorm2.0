@@ -67,6 +67,9 @@ namespace CrazyStorm.Core
         public int CustomTypeIndex { get { return customTypeIndex++; } }
         public int LayerIndex { get { return layerIndex++; } }
         public IDictionary<int, int> TypeSoundMap { get { return typeSoundMap; } }
+        public int Status { get; private set; }
+        public int StatusFrame { get; private set; }
+        public Vector2 CenterPosition { get; private set; }
         #endregion
 
         #region Constructor
@@ -270,13 +273,16 @@ namespace CrazyStorm.Core
             if (currentFrame != CurrentFrame)
             {
                 Reset();
-                for (int i = 0; i < currentFrame; ++i) Update(i);
+                for (int i = 1; i < currentFrame; ++i) Update(i);
                 CurrentFrame = currentFrame;
             }
-            var centerPosition = GetCenterPositionOrDefault();
+            StatusFrame++;
+            CenterPosition = GetCenterPositionOrDefault();
             for (int i = 0; i < ComponentTree.Count; ++i)
             {
-                ComponentTree[i].CenterPosition = centerPosition;
+                ComponentTree[i].Status = Status;
+                ComponentTree[i].StatusFrame = StatusFrame;
+                ComponentTree[i].CenterPosition = CenterPosition;
                 UpdateComponent(ComponentTree[i], CurrentFrame);
             }
             if (++CurrentFrame > TotalFrame)
@@ -291,6 +297,9 @@ namespace CrazyStorm.Core
             if (layer.NeedUpdate(currentFrame)) component.Update(currentFrame);
             for (int i = 0; i < component.Children.Count; ++i)
             {
+                component.Children[i].Status = Status;
+                component.Children[i].StatusFrame = StatusFrame;
+                component.Children[i].CenterPosition = CenterPosition;
                 UpdateComponent(component.Children[i], currentFrame);
             }
         }
@@ -299,6 +308,11 @@ namespace CrazyStorm.Core
             CurrentFrame = 1;
             for (int i = 0; i < Layers.Count; ++i)
                 Layers[i].Reset();
+        }
+        public void SetStatus(int i)
+        {
+            Status = i;
+            StatusFrame = 0;
         }
         #endregion
     }

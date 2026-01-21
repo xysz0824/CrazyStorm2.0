@@ -319,6 +319,12 @@ namespace CrazyStorm.Core
         {
             switch (propertyName)
             {
+                case "Status":
+                    VM.PushInt(Emitter.Status);
+                    return true;
+                case "StatusFrame":
+                    VM.PushInt(Emitter.StatusFrame);
+                    return true;
                 case "SelfAngle":
                     VM.PushFloat(0);
                     return true;

@@ -22,6 +22,30 @@
             <GradientStop Color="#FF193CC2" Offset="0" />
             <GradientStop Color="#FF03CBF6" Offset="1" />
         </LinearGradientBrush>
+        <Style x:Key="StatusButton" TargetType="Button">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderBrush" Value="White"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Margin" Value="0,0,1,0"/>
+            <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border
+                        Background="{TemplateBinding Background}"
+                        Margin="{TemplateBinding Margin}" Padding="0"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}"
+                        SnapsToDevicePixels="True">
+                            <ContentPresenter
+                            Margin="0"
+                            HorizontalAlignment="Center" VerticalAlignment="Center"
+                            RecognizesAccessKey="True"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
         <Style x:Key="FlatComponentButton" TargetType="Button">
             <Setter Property="Background" Value="{StaticResource ComponentIconBrush}" />
             <Setter Property="Margin" Value="1,1,2,1" />
@@ -921,6 +945,19 @@
                                         </Image>
                                         <Canvas Name="ComponentLayer" Canvas.Top="0" Canvas.Left="0" Width="{Binding Path=ScreenWidth}" Height="{Binding Path=ScreenHeight}"/>
                                         <Label Name="ActiveParticleCount" Content="0" Canvas.Top="5" Canvas.Left="5" Foreground="White" Panel.ZIndex="1000" Visibility="Hidden"/>
+                                        <Label Name="StatusTip" Content="{StaticResource StatusTipStr}" Canvas.Left="5" Canvas.Bottom="30" Foreground="White" Panel.ZIndex="1000" Visibility="Hidden"/>
+                                        <StackPanel Name="StatusPanel" Orientation="Horizontal" Canvas.Left="10" Canvas.Bottom="14" Panel.ZIndex="1000" Visibility="Hidden">
+                                            <Button Style="{StaticResource StatusButton}" Foreground="Black" Background="White" Width="18" Height="18" Content="0" Click="StatusButton_Click"/>
+                                            <Button Style="{StaticResource StatusButton}" Foreground="White" Width="18" Height="18" Content="1" Click="StatusButton_Click"/>
+                                            <Button Style="{StaticResource StatusButton}" Foreground="White" Width="18" Height="18" Content="2" Click="StatusButton_Click"/>
+                                            <Button Style="{StaticResource StatusButton}" Foreground="White" Width="18" Height="18" Content="3" Click="StatusButton_Click"/>
+                                            <Button Style="{StaticResource StatusButton}" Foreground="White" Width="18" Height="18" Content="4" Click="StatusButton_Click"/>
+                                            <Button Style="{StaticResource StatusButton}" Foreground="White" Width="18" Height="18" Content="5" Click="StatusButton_Click"/>
+                                            <Button Style="{StaticResource StatusButton}" Foreground="White" Width="18" Height="18" Content="6" Click="StatusButton_Click"/>
+                                            <Button Style="{StaticResource StatusButton}" Foreground="White" Width="18" Height="18" Content="7" Click="StatusButton_Click"/>
+                                            <Button Style="{StaticResource StatusButton}" Foreground="White" Width="18" Height="18" Content="8" Click="StatusButton_Click"/>
+                                            <Button Style="{StaticResource StatusButton}" Foreground="White" Width="18" Height="18" Content="9" Click="StatusButton_Click"/>
+                                        </StackPanel>
                                         <!--<local:Player Name="RuntimeScreen" Width="{Binding Path=ScreenWidth}" Height="{Binding Path=ScreenHeight}" Visibility="Visible"></local:Player>-->
                                     </Canvas>
                                     <Border Name="AimBox" Opacity="0" BorderThickness="2" BorderBrush="Red" Width="32" Height="32" />

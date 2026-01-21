@@ -46,9 +46,10 @@ namespace CrazyStorm.Core
         static readonly List<string> LogicOperatorKeywords = new List<string> { "且", "或" };
         static readonly List<string> CompareOperatorKeywords = new List<string> { "=", ">", "<" };
         static readonly List<string> ChangeTypeKeywords = new List<string>() { "变化到", "增加", "减少" };
+        static readonly Regex StatusMatch = new Regex(@"^状态(?<status>[0-9]+)$", RegexOptions.Compiled);
         static readonly Dictionary<string, string> KeywordMap = new Dictionary<string, string>()
         {
-            { "进入遮罩瞬间", "PMasked" },
+            { "进入遮罩瞬间", "PMasked" }, { "状态帧", "StatusFrame" }, { "状态", "Status"}, 
             { "子弹当前帧", "PCurrentFrame" }, { "当前帧", "CurrentFrame" }, { "且", "&" }, { "或", "|"},
             { "额外发射", "EmitParticle" }, { "恢复", "Recover"},
             { "变化到", "ChangeTo" }, { "增加", "Increase" }, { "减少", "Decrease" },
@@ -782,13 +783,22 @@ namespace CrazyStorm.Core
             }
             var split = str.Split(' ');
             str = "";
-            for (int i = 0; i < split.Length; ++i)
+            var match = StatusMatch.Match(split[0]);
+            if (match.Success)
             {
-                if (particleEvent) split[i] = ConvertParticleEventProperty(split[i]);
-                str += ConvertKeyword(split[i]);
-                if (t > 0 && addtime > 1 && i >= 1 && CompareOperatorKeywords.Exists((op) => op == split[i - 1]))
+                var status = match.Groups["status"].Value;
+                str = $"Status={status}&StatusFrame{split[1]}{split[2]}";
+            }
+            else
+            {
+                for (int i = 0; i < split.Length; ++i)
                 {
-                    str += particleEvent ? $"+PCurrentFrame/{t}*{addtime}" : $"+CurrentFrame/{t}*{addtime}";
+                    if (particleEvent) split[i] = ConvertParticleEventProperty(split[i]);
+                    str += ConvertKeyword(split[i]);
+                    if (t > 0 && addtime > 1 && i >= 1 && CompareOperatorKeywords.Exists((op) => op == split[i - 1]))
+                    {
+                        str += particleEvent ? $"+PCurrentFrame/{t}*{addtime}" : $"+CurrentFrame/{t}*{addtime}";
+                    }
                 }
             }
             return str;

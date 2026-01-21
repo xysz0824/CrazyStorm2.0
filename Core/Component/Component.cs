@@ -169,6 +169,8 @@ namespace CrazyStorm.Core
         public IList<VariableResource> Globals { get; set; }
         public Vector2 BodyPosition { get; set; }
         public Vector2 CenterPosition { get; set; }
+        public int Status { get; set; }
+        public int StatusFrame { get; set; }
         public IList<EventGroup> ComponentEventGroups { get { return componentEventGroups; } }
         public IList<Component> Children { get { return children; } }
         #endregion
@@ -481,6 +483,12 @@ namespace CrazyStorm.Core
         {
             switch (propertyName)
             {
+                case "Status":
+                    VM.PushInt(Status);
+                    return true;
+                case "StatusFrame":
+                    VM.PushInt(StatusFrame);
+                    return true;
                 case "SelfAngle":
                     VM.PushFloat(0);
                     return true;

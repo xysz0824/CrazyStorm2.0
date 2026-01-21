@@ -63,7 +63,7 @@ namespace CrazyStorm
         {
             if (layerTimer == null)
             {
-                layerTimer = new DispatcherTimer(DispatcherPriority.Render, Dispatcher);
+                layerTimer = new DispatcherTimer(DispatcherPriority.Send, Dispatcher);
                 layerTimer.Interval = new TimeSpan(0, 0, 0, 0, 16);
                 layerTimer.Tick += LayerTimer_Tick;
             }

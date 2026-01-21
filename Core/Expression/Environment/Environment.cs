@@ -62,6 +62,8 @@ namespace CrazyStorm.Expression
         #region Private Methods
         void InitializeSystemProperty()
         {
+            PutProperty("Status", default(int));
+            PutProperty("StatusFrame", default(int));
             PutProperty("SelfAngle", default(float));
             PutProperty("BodyPosition", Core.Vector2.Zero);
             PutProperty("BodyPosition.x", default(float));

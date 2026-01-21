@@ -25,6 +25,8 @@ namespace CrazyStorm
         #region Private Members
         EmbeddedPlayer player;
         Label activeParticleCountLabel;
+        Label statusTipLabel;
+        StackPanel statusPanel;
         DispatcherTimer playTimer;
         #endregion
 
@@ -60,8 +62,25 @@ namespace CrazyStorm
                 if (activeParticleCountLabel == null)
                 {
                     activeParticleCountLabel = VisualHelper.VisualDownwardSearch(content, "ActiveParticleCount") as Label;
+                    statusTipLabel = VisualHelper.VisualDownwardSearch(content, "StatusTip") as Label;
+                    statusPanel = VisualHelper.VisualDownwardSearch(content, "StatusPanel") as StackPanel;
+                    foreach (Button button in statusPanel.Children)
+                    {
+                        if ((string)button.Content == "0")
+                        {
+                            button.Background = new SolidColorBrush(Colors.White);
+                            button.Foreground = new SolidColorBrush(Colors.Black);
+                        }
+                        else
+                        {
+                            button.Background = new SolidColorBrush(Colors.Transparent);
+                            button.Foreground = new SolidColorBrush(Colors.White);
+                        }
+                    }
                 }
                 activeParticleCountLabel.Visibility = Visibility.Visible;
+                statusTipLabel.Visibility = Visibility.Visible;
+                statusPanel.Visibility = Visibility.Visible;
                 player = new EmbeddedPlayer();
                 var config = screen.DataContext as Config;
                 player.Width = config.ScreenWidth;
@@ -113,7 +132,7 @@ namespace CrazyStorm
             StartLayerTimer();
             if (playTimer == null)
             {
-                playTimer = new DispatcherTimer(DispatcherPriority.Render, Dispatcher);
+                playTimer = new DispatcherTimer(DispatcherPriority.Send, Dispatcher);
                 playTimer.Interval = new TimeSpan(0, 0, 0, 0, 16);
                 playTimer.Tick += PlayTimer_Tick;
             }
@@ -202,7 +221,12 @@ namespace CrazyStorm
             if (player == null) return;
             player.Dispose();
             player = null;
-            if (activeParticleCountLabel != null) activeParticleCountLabel.Visibility = Visibility.Hidden;
+            if (activeParticleCountLabel != null)
+            {
+                activeParticleCountLabel.Visibility = Visibility.Hidden;
+                statusTipLabel.Visibility = Visibility.Hidden;
+                statusPanel.Visibility = Visibility.Hidden;
+            }
             StopButton.Visibility = Visibility.Collapsed;
             var path = VisualHelper.VisualDownwardSearch<Path>(PlayButton) as Path;
             path.Data = (Geometry)FindResource("Play_Icon");
@@ -222,6 +246,27 @@ namespace CrazyStorm
         private void JumpToFrame_Click(object sender, RoutedEventArgs e)
         {
             OpenJumpToFrame();
+        }
+        private void StatusButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (player != null)
+            {
+                var status = int.Parse((string)(sender as Button).Content);
+                player.PlayerImpl.File.ParticleSystems[player.PlayerImpl.SelectedParticleSystemIndex].SetStatus(status);
+                foreach (Button button in statusPanel.Children)
+                {
+                    if ((string)button.Content == status.ToString())
+                    {
+                        button.Background = new SolidColorBrush(Colors.White);
+                        button.Foreground = new SolidColorBrush(Colors.Black);
+                    }
+                    else
+                    {
+                        button.Background = new SolidColorBrush(Colors.Transparent);
+                        button.Foreground = new SolidColorBrush(Colors.White);
+                    }
+                }
+            }
         }
         #endregion
     }

@@ -306,4 +306,7 @@
     <sys:String x:Key="ComponentLifeTimeStr">作用帧：[{0} -> {1}]</sys:String>
     <sys:String x:Key="BindingTargetStr">绑定至</sys:String>
     <sys:String x:Key="BindingTargetTipStr">绑定至：{0}</sys:String>
+    <sys:String x:Key="StatusStr">状态</sys:String>
+    <sys:String x:Key="StatusFrameStr">状态帧</sys:String>
+    <sys:String x:Key="StatusTipStr">状态：</sys:String>
 </ResourceDictionary>
