@@ -46,6 +46,7 @@ namespace CrazyStorm_Player
             graphics.PreferredBackBufferWidth = width;
             graphics.PreferredBackBufferHeight = height;
             graphics.IsFullScreen = !windowed;
+            IsFixedTimeStep = true;
             graphics.SynchronizeWithVerticalRetrace = false;
             TargetElapsedTime = TimeSpan.FromSeconds(1.0f / frameRate);
         }

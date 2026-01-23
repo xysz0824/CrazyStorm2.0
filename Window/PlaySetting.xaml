@@ -7,7 +7,7 @@
             <StackPanel>
                 <StackPanel Orientation="Horizontal">
                     <Label Content="{StaticResource FrameRateStr}" Margin="0,1"/>
-                    <TextBox Name="FrameRate" Text="{Binding Path=FrameRate, Mode=OneTime}" Height="25" Width="50" Margin="0,1" VerticalAlignment="Center" VerticalContentAlignment="Center" MaxLines="1" MaxLength="9"/>
+                    <TextBox Name="FrameRate" Text="{Binding Path=FrameRate, Mode=OneTime}" Height="25" Width="50" Margin="0,1" VerticalAlignment="Center" VerticalContentAlignment="Center" MaxLines="1" MaxLength="9" IsEnabled="False"/>
                     <Label Content="{StaticResource MaxParticleStr}" Margin="0,1"/>
                     <TextBox Name="ParticleMaximum" Text="{Binding Path=ParticleMaximum, Mode=OneTime}" Height="25" Width="50" Margin="0,1" VerticalAlignment="Center" VerticalContentAlignment="Center" MaxLines="1" MaxLength="9"/>
                     <Label Content="{StaticResource MaxCurveParticleStr}" Margin="0,1"/>
