@@ -11,35 +11,36 @@ namespace CrazyStorm.Core
 {
     public static class EventManager
     {
-        public static readonly Dictionary<string, Func<PropertyContainer, string[], VMInstruction[][], bool>> SpecialEvents =
-            new Dictionary<string, Func<PropertyContainer, string[], VMInstruction[][], bool>>()
+        public static readonly Dictionary<string, Func<PropertyContainer, VMInstruction[][], float, bool>> SpecialEvents =
+            new Dictionary<string, Func<PropertyContainer, VMInstruction[][], float, bool>>()
             {
-                { "EmitParticle", (pc, args, expr) =>
+                { "EmitParticle", (pc, expr, frameRate) =>
                 {
-                    (pc as Emitter)?.EmitParticle();
+                    (pc as Emitter)?.EmitParticle(frameRate);
                     return false;
                 } },
-                { "PlaySound", (pc, args, expr) =>
+                { "PlaySound", (pc, expr, frameRate) =>
                 {
                     if (OnSoundPlay != null)
                     {
-                        var label = args[0];
+                        VM.Execute(pc, expr[0], frameRate);
+                        var label = VM.PopString();
                         var sound = Sounds.FirstOrDefault((item) => string.Equals(item.Label, label));
                         if (sound != null) OnSoundPlay(sound.AbsolutePath);
                     }
                     return false;
                 } },
-                { "Loop", (pc, args, expr) =>
+                { "Loop", (pc, expr, frameRate) =>
                 {
-                    VM.Execute(pc, expr[0]);
+                    VM.Execute(pc, expr[0], frameRate);
                     if (!VM.PopBool()) return true;
                     return false;
                 } },
-                { "ChangeType", (pc, args, expr) =>
+                { "ChangeType", (pc, expr, frameRate) =>
                 {
-                    VM.Execute(pc, expr[0]);
+                    VM.Execute(pc, expr[0], frameRate);
                     int args0 = VM.PopInt();
-                    VM.Execute(pc, expr[1]);
+                    VM.Execute(pc, expr[1], frameRate);
                     int args1 = VM.PopInt();
                     int typeId = args0 + args1;
                     if (typeId >= ParticleType.DefaultTypeIndex)
@@ -54,9 +55,9 @@ namespace CrazyStorm.Core
                     }
                     return false;
                 } },
-                { "IncreaseType", (pc, args, expr) =>
+                { "IncreaseType", (pc, expr, frameRate) =>
                 {
-                    VM.Execute(pc, expr[0]);
+                    VM.Execute(pc, expr[0], frameRate);
                     int args0 = VM.PopInt();
                     if (pc is Emitter)
                     {
@@ -84,9 +85,9 @@ namespace CrazyStorm.Core
                     }
                     return false;
                 } },
-                { "DecreaseType", (pc, args, expr) =>
+                { "DecreaseType", (pc, expr, frameRate) =>
                 {
-                    VM.Execute(pc, expr[0]);
+                    VM.Execute(pc, expr[0], frameRate);
                     int args0 = VM.PopInt();
                     if (pc is Emitter)
                     {
@@ -114,28 +115,40 @@ namespace CrazyStorm.Core
                     }
                     return false;
                 } },
-                { "GotoFrame", (pc, args, expr) =>
+                { "GotoFrame", (pc, expr, frameRate) =>
                 {
-                    //TODO : GotoFrame
+                    VM.Execute(pc, expr[0], frameRate);
+                    int args0 = VM.PopInt();
+                    VM.Execute(pc, expr[1], frameRate);
+                    int args1 = VM.PopInt();
+                    if (pc is Component)
+                    {
+                        var component = pc as Component;
+                        if (args1 == 0 || args1 >= component.System.FrameSkipCount)
+                        {
+                            component.System.CurrentFrame = args0;
+                            component.System.FrameSkipCount++;
+                        }
+                    }
                     return false;
                 } },
-                { "QuakeScreen", (pc, args, expr) =>
+                { "QuakeScreen", (pc, expr, frameRate) =>
                 {
                     //TODO : QuakeScreen
                     return false;
                 } },
-                { "StopScreen", (pc, args, expr) =>
+                { "StopScreen", (pc, expr, frameRate) =>
                 {
                     //TODO : StopScreen
                     return false;
                 } },
-                { "Recover", (pc, args, expr) =>
+                { "Recover", (pc, expr, frameRate) =>
                 {
-                    (pc as Component)?.Reset();
+                    (pc as Component)?.Reset(frameRate);
                     return false;
                 } },
             };
-        public static Func<string, PropertyContainer, string[], VMInstruction[][], bool> OnFunctionCall;
+        public static Func<string, PropertyContainer, VMInstruction[][], float, bool> OnFunctionCall;
         public delegate void SoundPlayHandler(string path);
         public static event SoundPlayHandler OnSoundPlay;
         public static bool CanSoundPlay => OnSoundPlay != null;
@@ -151,7 +164,8 @@ namespace CrazyStorm.Core
             executorList = new List<EventExecutor>();
             cache = new Dictionary<string, Dictionary<string, TypeSet>>();
         }
-        public static void AddEvent(PropertyContainer propertyContainer, PropertyContainer bindingContainer, VMEventInfo eventInfo)
+        public static void AddEvent(PropertyContainer propertyContainer, PropertyContainer bindingContainer, VMEventInfo eventInfo, 
+            float frameRate)
         {
             var executor = new EventExecutor();
             executor.PropertyContainer = propertyContainer;
@@ -165,7 +179,7 @@ namespace CrazyStorm.Core
             var targetValue = eventInfo.resultValue;
             if (eventInfo.isExpressionResult)
             {
-                VM.Execute(propertyContainer, eventInfo.resultExpression);
+                VM.Execute(propertyContainer, eventInfo.resultExpression, frameRate);
                 switch (eventInfo.resultType)
                 {
                     case PropertyType.Boolean:
@@ -275,20 +289,20 @@ namespace CrazyStorm.Core
             }
             executor.InitialValue = initialValue;
             executor.TargetValue = targetValue;
-            executor.Update();
+            executor.Update(frameRate);
             executorList.Add(executor);
         }
-        public static bool ExecuteSpecialEvent(PropertyContainer propertyContainer, string eventName, string[] arguments,
-            VMInstruction[][] argumentExpressions)
+        public static bool ExecuteSpecialEvent(PropertyContainer propertyContainer, string eventName, 
+            VMInstruction[][] argumentExpressions, float frameRate)
         {
             if (!SpecialEvents.ContainsKey(eventName))
             {
-                if (OnFunctionCall!= null) return OnFunctionCall.Invoke(eventName, propertyContainer, arguments, argumentExpressions);
+                if (OnFunctionCall!= null) return OnFunctionCall.Invoke(eventName, propertyContainer, argumentExpressions, frameRate);
                 else return false;
             }
-            return SpecialEvents[eventName](propertyContainer, arguments, argumentExpressions);
+            return SpecialEvents[eventName](propertyContainer, argumentExpressions, frameRate);
         }
-        public static void Update()
+        public static void Update(float frameRate)
         {
             for (int i = 0; i < executorList.Count; ++i)
             {
@@ -300,11 +314,11 @@ namespace CrazyStorm.Core
                         --i;
                     }
                     else
-                        executorList[i].Update();
+                        executorList[i].Update(frameRate);
                 }
             }
         }
-        public static bool BindingUpdate(PropertyContainer propertyContainer, PropertyContainer bindingContainer)
+        public static bool BindingUpdate(PropertyContainer propertyContainer, PropertyContainer bindingContainer, float frameRate)
         {
             bool updated = false;
             string id = GetUniqueKey(propertyContainer, bindingContainer);
@@ -318,7 +332,7 @@ namespace CrazyStorm.Core
                     }
                     if (!executorList[i].Finished)
                     {
-                        executorList[i].Update();
+                        executorList[i].Update(frameRate);
                     }
                     cache[id][executorList[i].PropertyName] = executorList[i].CurrentValue;
                     if (executorList[i].Finished)

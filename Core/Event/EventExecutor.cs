@@ -25,9 +25,10 @@ namespace CrazyStorm.Core
         {
             currentValue = new TypeSet();
         }
-        public void Update()
+        public void Update(float frameRate)
         {
-             float ratio = currentTime / ChangeTime;
+            float frameScale = ParticleSystem.FRAME_RATE_BASE / frameRate;
+            float ratio = currentTime / ChangeTime;
             if (ChangeMode == EventChangeMode.Accelerated) ratio *= ratio;
             else if (ChangeMode == EventChangeMode.Decelerated) ratio *= (2 - ratio);
             else if (ChangeMode == EventChangeMode.Sin) ratio = (float)Math.Sin(ratio * Math.PI * 2);
@@ -73,7 +74,7 @@ namespace CrazyStorm.Core
             }
             PropertyContainer.SetProperty(PropertyName);
             VM.Clear();
-            currentTime++;
+            currentTime += frameScale;
         }
     }
 }

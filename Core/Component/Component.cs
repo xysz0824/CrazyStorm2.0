@@ -77,9 +77,9 @@ namespace CrazyStorm.Core
         public string LayerName { get; set; }
         public int LayerID { get; set; }
         [RuntimeProperty]
-        public int LayerFrame { get; set; }
+        public float LayerFrame { get; set; }
         [RuntimeProperty]
-        public int CurrentFrame { get; set; }
+        public float CurrentFrame { get; set; }
         [IntProperty(1, int.MaxValue)]
         public int BeginFrame
         {
@@ -171,7 +171,7 @@ namespace CrazyStorm.Core
         public Vector2 BodyPosition { get; set; }
         public Vector2 CenterPosition { get; set; }
         public int Status { get; set; }
-        public int StatusFrame { get; set; }
+        public float StatusFrame { get; set; }
         public IList<EventGroup> ComponentEventGroups { get { return componentEventGroups; } }
         public IList<Component> Children { get { return children; } }
         #endregion
@@ -192,10 +192,10 @@ namespace CrazyStorm.Core
         #endregion
 
         #region Protected Methods
-        public delegate void Action();
-        public void BindingUpdate(Action updateFunc, bool executeEvents)
+        public delegate void Action(float frameRate);
+        public void BindingUpdate(Action updateFunc, bool executeEvents, float frameRate)
         {
-            int saveCurrentFrame = CurrentFrame;
+            float saveCurrentFrame = CurrentFrame;
             Vector2 savePosition = Position;
             float saveSpeed = Speed;
             float saveSpeedAngle = SpeedAngle;
@@ -208,23 +208,23 @@ namespace CrazyStorm.Core
                 if (CurrentFrame < 1 || CurrentFrame > TotalFrame || !Visibility) continue;
                 if (executeEvents && !EventManager.BindingRecover(this, particle) && eventImpacted)
                 {
-                    Reset();
+                    Reset(frameRate);
                 }
                 Position = particle.PPosition;
                 Speed = particle.PSpeed;
                 SpeedAngle = particle.PSpeedAngle;
                 Acspeed = particle.PAcspeed;
                 AcspeedAngle = particle.PAcspeedAngle;
-                ExecuteExpressions();
+                ExecuteExpressions(frameRate);
                 if (executeEvents)
                 {
                     for (int i = 0; i < ComponentEventGroups.Count; ++i)
                     {
-                        ComponentEventGroups[i].Execute(this, particle);
+                        ComponentEventGroups[i].Execute(this, particle, frameRate);
                     }
                 }
-                updateFunc?.Invoke();
-                if (executeEvents && EventManager.BindingUpdate(this, particle))
+                updateFunc?.Invoke(frameRate);
+                if (executeEvents && EventManager.BindingUpdate(this, particle, frameRate))
                 {
                     eventImpacted = true;
                 }
@@ -488,7 +488,7 @@ namespace CrazyStorm.Core
                     VM.PushInt(Status);
                     return true;
                 case "StatusFrame":
-                    VM.PushInt(StatusFrame);
+                    VM.PushFloat(StatusFrame, true);
                     return true;
                 case "SelfAngle":
                     VM.PushFloat(0);
@@ -529,10 +529,10 @@ namespace CrazyStorm.Core
                     VM.PushString(Name);
                     return true;
                 case "LayerFrame":
-                    VM.PushInt(LayerFrame);
+                    VM.PushFloat(LayerFrame, true);
                     return true;
                 case "CurrentFrame":
-                    VM.PushInt(CurrentFrame);
+                    VM.PushFloat(CurrentFrame, true);
                     return true;
                 case "BeginFrame":
                     VM.PushInt(BeginFrame);
@@ -590,12 +590,6 @@ namespace CrazyStorm.Core
                 case "Name":
                     Name = VM.PopString();
                     return true;
-                case "LayerFrame":
-                    LayerFrame = VM.PopInt();
-                    return true;
-                case "CurrentFrame":
-                    CurrentFrame = VM.PopInt();
-                    return true;
                 case "BeginFrame":
                     BeginFrame = VM.PopInt();
                     return true;
@@ -649,9 +643,10 @@ namespace CrazyStorm.Core
             }
             return false;
         }
-        public virtual bool Update(int currentFrame)
+        public virtual bool Update(float frameRate, float currentFrame)
         {
-            ExecuteExpressions();
+            float frameScale = ParticleSystem.FRAME_RATE_BASE / frameRate;
+            ExecuteExpressions(frameRate);
             LayerFrame = currentFrame;
             if (BindingTarget == null || CheckCircularBinding())
             {
@@ -662,15 +657,15 @@ namespace CrazyStorm.Core
             Position = GetRelativePositionRuntime();
             if (BindingTarget == null || CheckCircularBinding())
             {
-                speedVector += acspeedVector;
-                Position += speedVector;
+                speedVector += acspeedVector * frameScale;
+                Position += speedVector * frameScale;
                 for (int i = 0; i < ComponentEventGroups.Count; ++i)
-                    ComponentEventGroups[i].Execute(this, null);
+                    ComponentEventGroups[i].Execute(this, null, frameRate);
             }
             Position = GetAbsolutePositionRuntime();
             return true;
         }
-        public virtual void Reset()
+        public virtual void Reset(float frameRate)
         {
             if (initialState == null)
             {
@@ -681,11 +676,11 @@ namespace CrazyStorm.Core
                     var variable = new VariableResource { Label = item.Label, Value = item.Value };
                     initialState.Locals.Add(variable);
                 }
-                initialState.ExecuteExpressions();
+                initialState.ExecuteExpressions(frameRate);
             }
             else
             {
-                initialState.ExecuteExpressions();
+                initialState.ExecuteExpressions(frameRate);
                 BeginFrame = initialState.BeginFrame;
                 TotalFrame = initialState.TotalFrame;
                 Position = initialState.Position;

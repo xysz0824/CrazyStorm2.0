@@ -86,7 +86,7 @@ namespace CrazyStorm.Core
             OnParticleDraw = null;
             OnCurveParticleDraw = null;
         }
-        public static ParticleBase GetParticle(int layerID, ParticleBase template)
+        public static ParticleBase GetParticle(int layerID, ParticleBase template, float frameRate)
         {
             ParticleBase particle = null;
             if (template is Particle)
@@ -104,7 +104,7 @@ namespace CrazyStorm.Core
             int order = layerID * searchResult.Length * 10 + 9 - (int)template.BlendType;
             particle.RenderOrder = order + instanceID * 10;
             particle.ID = instanceID++;
-            particle.Reset();
+            particle.Reset(frameRate);
             particle.Alive = true;
             activeParticles.Add(particle);
             //particleQuadTree.Insert(particle);
@@ -238,7 +238,7 @@ namespace CrazyStorm.Core
                         }
                         else
                         {
-                            eventField.BindingUpdate(() =>
+                            eventField.BindingUpdate((frameRate) =>
                             {
                                 if (maskCount >= MAX_MASK_COUNT || !eventField.LayerMask || !eventField.Visibility || !eventField.LayerMaskMutex) return;
                                 MaskPositionArray[maskCount] = eventField.Position;
@@ -247,7 +247,7 @@ namespace CrazyStorm.Core
                                 MaskTypeArray[maskCount] = eventField.LayerMaskType == LayerMaskType.OutsideMask ? 1 : 2;
                                 MaskRotateArray[maskCount] = (float)MathHelper.DegToRad(eventField.Rotation);
                                 maskCount++;
-                            }, false);
+                            }, false, 0);
                         }
                     }
                 }
@@ -267,7 +267,7 @@ namespace CrazyStorm.Core
                     }
                     else
                     {
-                        eventField.BindingUpdate(() =>
+                        eventField.BindingUpdate((frameRate) =>
                         {
                             if (maskCount >= MAX_MASK_COUNT || !eventField.LayerMask || !eventField.Visibility) return;
                             MaskPositionArray[maskCount] = eventField.Position;
@@ -276,17 +276,17 @@ namespace CrazyStorm.Core
                             MaskTypeArray[maskCount] = (int)eventField.LayerMaskType + 1;
                             MaskRotateArray[maskCount] = (float)MathHelper.DegToRad(eventField.Rotation);
                             maskCount++;
-                        }, false);
+                        }, false, 0);
                     }
                 }
             }
         }
-        public static void Update()
+        public static void Update(float frameRate)
         {
             for (int i = 0; i < activeParticles.Count; ++i)
             {
                 var instance = activeParticles[i];
-                if (instance.Alive && !OutOfRange(instance)) instance.Update();
+                if (instance.Alive && !OutOfRange(instance)) instance.Update(frameRate);
                 else if (instance.Alive) instance.Alive = false;
                 if (!instance.Alive)
                 {

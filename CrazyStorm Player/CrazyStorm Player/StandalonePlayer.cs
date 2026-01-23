@@ -24,13 +24,14 @@ namespace CrazyStorm_Player
             var selectedParticleSystemIndex = Int32.Parse(Environment.GetCommandLineArgs()[3]);
             var width = Int32.Parse(Environment.GetCommandLineArgs()[4]);
             var height = Int32.Parse(Environment.GetCommandLineArgs()[5]);
-            var particleMaximum = Int32.Parse(Environment.GetCommandLineArgs()[6]);
-            var curveParticleMaximum = Int32.Parse(Environment.GetCommandLineArgs()[7]);
-            var windowed = bool.Parse(Environment.GetCommandLineArgs()[8]);
-            var controllableImagePath = Environment.GetCommandLineArgs()[9];
-            var controllableSetting = Environment.GetCommandLineArgs()[10];
+            var frameRate = Int32.Parse(Environment.GetCommandLineArgs()[6]);
+            var particleMaximum = Int32.Parse(Environment.GetCommandLineArgs()[7]);
+            var curveParticleMaximum = Int32.Parse(Environment.GetCommandLineArgs()[8]);
+            var windowed = bool.Parse(Environment.GetCommandLineArgs()[9]);
+            var controllableImagePath = Environment.GetCommandLineArgs()[10];
+            var controllableSetting = Environment.GetCommandLineArgs()[11];
 
-            playerImpl = new PlayerImpl(width, height, particleMaximum, curveParticleMaximum);
+            playerImpl = new PlayerImpl(width, height, frameRate, particleMaximum, curveParticleMaximum);
             playerImpl.ResourceDirectory = Environment.CurrentDirectory;
             playerImpl.File = new File();
             playerImpl.File.LoadPlayFile(path, VersionInfo.BaseVersion);
@@ -45,6 +46,8 @@ namespace CrazyStorm_Player
             graphics.PreferredBackBufferWidth = width;
             graphics.PreferredBackBufferHeight = height;
             graphics.IsFullScreen = !windowed;
+            graphics.SynchronizeWithVerticalRetrace = false;
+            TargetElapsedTime = TimeSpan.FromSeconds(1.0f / frameRate);
         }
         protected override void LoadContent()
         {

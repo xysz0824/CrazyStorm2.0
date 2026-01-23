@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Numerics;
 using System.Text;
@@ -10,6 +11,16 @@ namespace CrazyStorm.Core
     {
         public const float Pi = 3.14159274F;
         public const float PiOver2 = 1.57079637F;
+        public static bool FrameMod(float frame, float frameRate, int testValue)
+        {
+            return (frame % testValue == 0f) ||
+                ((frame % testValue > (frame + ParticleSystem.FRAME_RATE_BASE / frameRate) % testValue) &&
+                (frame + ParticleSystem.FRAME_RATE_BASE / frameRate) % testValue != 0f);
+        }
+        public static bool FrameEqual(float frame, float frameRate, int testFrame)
+        {
+            return frame <= testFrame && frame + ParticleSystem.FRAME_RATE_BASE / frameRate > testFrame;
+        }
         public static float Lerp(float value1, float value2, float amount)
         {
             return value1 + (value2 - value1) * amount;

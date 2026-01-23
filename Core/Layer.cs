@@ -203,18 +203,18 @@ namespace CrazyStorm.Core
                 components[i].LayerName = name;
             }
         }
-        public bool NeedUpdate(int currentFrame)
+        public bool NeedUpdate(float currentFrame)
         {
             if (!Visible) return false;
             if (currentFrame < BeginFrame || currentFrame >= BeginFrame + TotalFrame) return false;
             return true;
         }
-        public void Reset()
+        public void Reset(float frameRate)
         {
             if (Visible)
             {
                 for (int i = 0; i < Components.Count; ++i)
-                    Components[i].Reset();
+                    Components[i].Reset(frameRate);
             }
         }
         #endregion

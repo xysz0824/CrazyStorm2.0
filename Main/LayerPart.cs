@@ -133,7 +133,7 @@ namespace CrazyStorm
         private void LayerTimer_Tick(object sender, EventArgs e)
         {
             if (player == null) return;
-            FitAxisScroll(player.PlayerImpl.CurrentFrame);
+            FitAxisScroll((int)player.PlayerImpl.CurrentFrame);
         }
         private void TimeAxis_MouseMove(object sender, MouseEventArgs e)
         {

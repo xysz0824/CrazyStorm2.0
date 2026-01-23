@@ -76,7 +76,6 @@ namespace CrazyStorm.Core
         public EventChangeMode changeMode;
         public int changeTime;
         public string specialEvent;
-        public string[] arguments;
         public VMInstruction[][] argumentExpressions;
     }
     public class EventHelper
@@ -210,7 +209,6 @@ namespace CrazyStorm.Core
                 bytes.AddRange(BitConverter.GetBytes(split.Length));
                 for (int i = 0; i < split.Length; ++i)
                 {
-                    bytes.AddRange(PlayDataHelper.GetStringBytes(split[i]));
                     byte[] compiledExpression = Compile(split[i]);
                     bytes.AddRange(BitConverter.GetBytes(compiledExpression.Length));
                     bytes.AddRange(compiledExpression);
@@ -250,15 +248,12 @@ namespace CrazyStorm.Core
                 {
                     eventInfo.specialEvent = PlayDataHelper.ReadString(reader);
                     int argumentCount = reader.ReadInt32();
-                    var arguments = new List<string>();
                     var argumentExpressions = new List<VMInstruction[]>();
                     for (int i = 0; i < argumentCount; ++i)
                     {
-                        arguments.Add(PlayDataHelper.ReadString(reader));
                         int length = reader.ReadInt32();
                         argumentExpressions.Add(VM.Decode(reader.ReadBytes(length)));
                     }
-                    eventInfo.arguments = arguments.ToArray();
                     eventInfo.argumentExpressions = argumentExpressions.ToArray();
                 }
             }
@@ -314,23 +309,24 @@ namespace CrazyStorm.Core
             }
             return set;
         }
-        public static bool Execute(PropertyContainer propertyContainer, PropertyContainer bindingContainer, VMEventInfo eventInfo)
+        public static bool Execute(PropertyContainer propertyContainer, PropertyContainer bindingContainer, VMEventInfo eventInfo,
+            float frameRate)
         {
             if (eventInfo.conditionExpression != null)
             {
-                VM.Execute(propertyContainer, eventInfo.conditionExpression);
+                VM.Execute(propertyContainer, eventInfo.conditionExpression, frameRate);
                 bool result = VM.PopBool();
                 if (!result) return false;
             }
             if (!eventInfo.isSpecialEvent)
             {
-                EventManager.AddEvent(propertyContainer, bindingContainer, eventInfo);
+                EventManager.AddEvent(propertyContainer, bindingContainer, eventInfo, frameRate);
                 return false;
             }
             else
             {
-                return EventManager.ExecuteSpecialEvent(propertyContainer, eventInfo.specialEvent, eventInfo.arguments,
-                    eventInfo.argumentExpressions);
+                return EventManager.ExecuteSpecialEvent(propertyContainer, eventInfo.specialEvent, 
+                    eventInfo.argumentExpressions, frameRate);
             }
         }
         public static bool IsSpecialEvent(string str)

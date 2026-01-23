@@ -120,7 +120,7 @@ namespace CrazyStorm.Core
         #endregion
 
         #region Private Methods
-        void Update()
+        void Update(float frameRate)
         {
             int count = 0;
             var results = FieldShape == FieldShape.Rectangle ? 
@@ -145,7 +145,7 @@ namespace CrazyStorm.Core
                         break;
                 }
                 for (int k = 0; k < EventFieldEventGroups.Count; ++k)
-                    EventFieldEventGroups[k].Execute(results[i], null);
+                    EventFieldEventGroups[k].Execute(results[i], null, frameRate);
             }
         }
         #endregion
@@ -283,21 +283,21 @@ namespace CrazyStorm.Core
             }
             return false;
         }
-        public override bool Update(int currentFrame)
+        public override bool Update(float frameRate, float currentFrame)
         {
-            if (!base.Update(currentFrame))
+            if (!base.Update(frameRate, currentFrame))
                 return false;
 
             if (BindingTarget == null)
-                Update();
+                Update(frameRate);
             else
-                BindingUpdate(Update, true);
+                BindingUpdate(Update, true, frameRate);
 
             return true;
         }
-        public override void Reset()
+        public override void Reset(float frameRate)
         {
-            base.Reset();
+            base.Reset(frameRate);
             var initialState = base.initialState as EventField;
             HalfWidth = initialState.HalfWidth;
             HalfHeight = initialState.HalfHeight;

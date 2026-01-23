@@ -142,11 +142,11 @@ namespace CrazyStorm.Core
                 }
             }
         }
-        public void ExecuteExpressions()
+        public void ExecuteExpressions(float frameRate)
         {
             foreach (var expression in PropertyExpressions)
             {
-                VM.Execute(this, expression.Value);
+                VM.Execute(this, expression.Value, frameRate);
                 SetProperty(expression.Key);
                 VM.Clear();
             }

@@ -69,10 +69,12 @@ namespace CrazyStorm
         }
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            int particleMaximum, curveParticleMaximum;
-            if (Int32.TryParse(ParticleMaximum.Text, out particleMaximum) && 
+            int frameRate, particleMaximum, curveParticleMaximum;
+            if (Int32.TryParse(FrameRate.Text, out frameRate) &&
+                Int32.TryParse(ParticleMaximum.Text, out particleMaximum) && 
                 Int32.TryParse(CurveParticleMaximum.Text, out curveParticleMaximum))
             {
+                config.FrameRate = frameRate;
                 config.ParticleMaximum = particleMaximum;
                 config.CurveParticleMaximum = curveParticleMaximum;
                 config.CollapseLayerAxis = CollapseLayerAxis.IsChecked.Value;

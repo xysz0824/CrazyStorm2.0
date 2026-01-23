@@ -85,7 +85,7 @@ namespace CrazyStorm
                 var config = screen.DataContext as Config;
                 player.Width = config.ScreenWidth;
                 player.Height = config.ScreenHeight;
-                player.PlayerImpl = new PlayerImpl(config.ScreenWidth, config.ScreenHeight,
+                player.PlayerImpl = new PlayerImpl(config.ScreenWidth, config.ScreenHeight, config.FrameRate,
                     config.ParticleMaximum, config.CurveParticleMaximum);
                 if (string.IsNullOrWhiteSpace(File.CurrentDirectory))
                 {
@@ -193,7 +193,7 @@ namespace CrazyStorm
                     path.Data = (Geometry)FindResource("Play_Icon");
                     path.Fill = (Brush)FindResource("PlayIconBrush");
                     path.ToolTip = (string)FindResource("PlayStr");
-                    selectedFrame = player.PlayerImpl.CurrentFrame;
+                    selectedFrame = (int)player.PlayerImpl.CurrentFrame;
                     TimeAxis.IsHitTestVisible = true;
                     if (config.CollapseLayerAxis) LayerAxisDefinition.Height = new GridLength(94);
                     ScrollViewer.SetHorizontalScrollBarVisibility(LayerAxis, ScrollBarVisibility.Auto);

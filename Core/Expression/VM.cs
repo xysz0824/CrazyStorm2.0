@@ -124,7 +124,7 @@ namespace CrazyStorm.Core
             }
             return list.ToArray();
         }
-        public static void Execute(PropertyContainer propertyContainer, VMInstruction[] instructions)
+        public static void Execute(PropertyContainer propertyContainer, VMInstruction[] instructions, float frameRate)
         {
             for (int i = 0; i < instructions.Length; ++i)
             {
@@ -216,7 +216,10 @@ namespace CrazyStorm.Core
                         VM.PushBool(VM.PopBool() | VM.PopBool());
                         break;
                     case VMCode.EQUAL:
-                        VM.PushBool(VM.PopVector() == VM.PopVector());
+                        var vR = VM.PopVector();
+                        var vL = VM.PopVector();
+                        VM.PushBool(vL.UseFrameEqual ? MathHelper.FrameEqual(vL.x, frameRate, (int)vR.x) : 
+                            vL == vR);
                         break;
                     case VMCode.ADD:
                         VM.PushVector(VM.PopVector() + VM.PopVector());
@@ -330,13 +333,15 @@ namespace CrazyStorm.Core
             var v = vectorStack.Pop();
             return new Vector2(v.x, v.y);
         }
-        public static void PushFloat(float value)
+        public static void PushFloat(float value, bool useFrameEqual = false)
         {
             if (float.IsNaN(value))
             {
                 throw new NotFiniteNumberException();
             }
-            vectorStack.Push(new Vector3(value));
+            var v = new Vector3(value);
+            v.UseFrameEqual = useFrameEqual;
+            vectorStack.Push(v);
         }
         public static float PopFloat()
         {

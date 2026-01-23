@@ -29,7 +29,7 @@ namespace CrazyStorm_Player
             this.movableWidth = movableWidth;
             this.movableHeight = movableHeight;
         }
-        public void Update(KeyboardState state)
+        public void Update(KeyboardState state, float frameRate)
         {
             selfPosLast = selfPos;
             Vector2 direction = Vector2.Zero;
@@ -50,15 +50,16 @@ namespace CrazyStorm_Player
                 direction.Y = 1;
             }
             if (direction.LengthSquared() != 0) direction.Normalize();
+            var frameScale = CrazyStorm.Core.ParticleSystem.FRAME_RATE_BASE / frameRate;
             if (state.IsKeyDown(Keys.LeftShift) || state.IsKeyDown(Keys.RightShift))
             {
                 slow = true;
-                selfPos += direction * 2.0f;
+                selfPos += direction * 2.0f * frameScale;
             }
             else
             {
                 slow = false;
-                selfPos += direction * 4.0f;
+                selfPos += direction * 4.0f * frameScale;
             }
             selfPos.X = MathHelper.Clamp(selfPos.X, -movableWidth / 2, movableWidth / 2);
             selfPos.Y = MathHelper.Clamp(selfPos.Y, -movableHeight / 2, movableHeight / 2);

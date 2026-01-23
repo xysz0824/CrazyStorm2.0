@@ -117,8 +117,9 @@ namespace CrazyStorm.Core
         #endregion
 
         #region Private Methods
-        void Update()
+        void Update(float frameRate)
         {
+            float frameScale = ParticleSystem.FRAME_RATE_BASE / frameRate;
             int count = 0;
             Vector2 v = default;
             var results = FieldShape == FieldShape.Rectangle ?
@@ -140,15 +141,15 @@ namespace CrazyStorm.Core
                 {
                     case ForceType.OneDirection:
                         v = MathHelper.GetVector2(Force / results[i].Mass, Direction);
-                        results[i].PSpeedVector += v;
+                        results[i].PSpeedVector += v * frameScale;
                         break;
                     case ForceType.InnerForce:
                         v = Position == results[i].PPosition ? new Vector2(0, 0) : Vector2.Normalize(Position - results[i].PPosition);
-                        results[i].PSpeedVector += v * (Force / results[i].Mass);
+                        results[i].PSpeedVector += v * (Force / results[i].Mass) * frameScale;
                         break;
                     case ForceType.OuterForce:
                         v = Position == results[i].PPosition ? new Vector2(0, 0) : Vector2.Normalize(results[i].PPosition - Position);
-                        results[i].PSpeedVector += v * (Force / results[i].Mass);
+                        results[i].PSpeedVector += v * (Force / results[i].Mass) * frameScale;
                         break;
                 }
             }
@@ -304,21 +305,21 @@ namespace CrazyStorm.Core
             }
             return false;
         }
-        public override bool Update(int currentFrame)
+        public override bool Update(float frameRate, float currentFrame)
         {
-            if (!base.Update(currentFrame))
+            if (!base.Update(frameRate, currentFrame))
                 return false;
 
             if (BindingTarget == null)
-                Update();
+                Update(frameRate);
             else
-                BindingUpdate(Update, true);
+                BindingUpdate(Update, true, frameRate);
 
             return true;
         }
-        public override void Reset()
+        public override void Reset(float frameRate)
         {
-            base.Reset();
+            base.Reset(frameRate);
             var initialState = base.initialState as ForceField;
             HalfWidth = initialState.HalfWidth;
             HalfHeight = initialState.HalfHeight;

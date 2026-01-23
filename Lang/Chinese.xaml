@@ -309,4 +309,5 @@
     <sys:String x:Key="StatusStr">状态</sys:String>
     <sys:String x:Key="StatusFrameStr">状态帧</sys:String>
     <sys:String x:Key="StatusTipStr">状态：</sys:String>
+    <sys:String x:Key="FrameRateStr">帧率</sys:String>
 </ResourceDictionary>

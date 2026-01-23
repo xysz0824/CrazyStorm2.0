@@ -60,7 +60,7 @@ namespace CrazyStorm.Core
         public int ID { get; set; }
         public int RenderOrder;
         public bool Alive;
-        public int FogFrame { get; private set; }
+        public float FogFrame { get; private set; }
         public Emitter Emitter { get; set; }
         //public ParticleQuadTree QuadTree { get; set; }
         [IntProperty(1, int.MaxValue)]
@@ -70,7 +70,7 @@ namespace CrazyStorm.Core
             set { particleBaseData.maxLife = value; }
         }
         [RuntimeProperty]
-        public int PCurrentFrame { get; set; }
+        public float PCurrentFrame { get; private set; }
         [RuntimeProperty]
         public bool PMasked { get; set; }
         [RuntimeProperty]
@@ -323,7 +323,7 @@ namespace CrazyStorm.Core
                     VM.PushInt(Emitter.Status);
                     return true;
                 case "StatusFrame":
-                    VM.PushInt(Emitter.StatusFrame);
+                    VM.PushFloat(Emitter.StatusFrame, true);
                     return true;
                 case "SelfAngle":
                     VM.PushFloat(0);
@@ -364,7 +364,7 @@ namespace CrazyStorm.Core
                     VM.PushInt(MaxLife);
                     return true;
                 case "PCurrentFrame":
-                    VM.PushInt(PCurrentFrame);
+                    VM.PushFloat(PCurrentFrame, true);
                     return true;
                 case "PMasked":
                     VM.PushBool(PMasked);
@@ -473,9 +473,6 @@ namespace CrazyStorm.Core
             {
                 case "MaxLife":
                     MaxLife = VM.PopInt();
-                    return true;
-                case "PCurrentFrame":
-                    PCurrentFrame = VM.PopInt();
                     return true;
                 case "PPosition":
                     PPosition = VM.PopVector2();
@@ -589,16 +586,17 @@ namespace CrazyStorm.Core
             newPlayerPos = player;
             return false;
         }
-        public virtual bool Update(int currentFrame = 1)
+        public virtual bool Update(float frameRate, float currentFrame = 1)
         {
-            ExecuteExpressions();
+            var frameScale = ParticleSystem.FRAME_RATE_BASE / frameRate;
+            ExecuteExpressions(frameRate);
             if (PCurrentFrame > MaxLife || (KillOutside && ParticleManager.OutOfWindow(this)))
             {
                 Alive = false;
                 Emitter.Particles.Remove(this);
                 return false;
             }
-            if (PCurrentFrame == 1)
+            if (MathHelper.FrameEqual(PCurrentFrame, frameRate, 1))
             {
                 MathHelper.SetVector2(ref pspeedVector, PSpeed, PSpeedAngle,
                     new Vector2(PSpeedHScale, PSpeedVScale));
@@ -607,27 +605,26 @@ namespace CrazyStorm.Core
             }
             //QuadTree.Update(this);
             PPositionLast = PPosition;
-            PSpeedVector += PAcspeedVector;
-            PPosition += PSpeedVector;
+            PSpeedVector += PAcspeedVector * frameScale;
+            PPosition += PSpeedVector * frameScale;
             for (int i = 0; i < ParticleEventGroups.Count; ++i)
             {
-                ParticleEventGroups[i].Execute(this, null);
+                ParticleEventGroups[i].Execute(this, null, frameRate);
             }
-            ++PCurrentFrame;
+            PCurrentFrame += frameScale;
             if (MaxLife <= FOG_TIME)
             {
                 FogFrame = (int)FOG_TIME;
             }
             else if (PCurrentFrame <= MaxLife - FOG_TIME)
             {
-                ++FogFrame;
+                FogFrame += frameScale;
                 if (!FogEffect || FogFrame >= FOG_TIME) FogFrame = (int)FOG_TIME;
             }
             else if (FadeEffect)
             {
-                --FogFrame;
-                if (FogFrame <= 0)
-                    FogFrame = 0;
+                FogFrame -= frameScale;
+                if (FogFrame <= 0) FogFrame = 0;
             }
             return true;
         }
@@ -652,7 +649,7 @@ namespace CrazyStorm.Core
             particle.ParticleEventGroups = ParticleEventGroups;
             particle.ReboundTime = 0;
         }
-        public virtual void Reset() { }
+        public virtual void Reset(float frameRate) { }
         public int CompareTo(ParticleBase other)
         {
             return RenderOrder - other.RenderOrder;

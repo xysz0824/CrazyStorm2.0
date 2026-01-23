@@ -23,6 +23,7 @@ namespace CrazyStorm
         string backgroundPath;
         bool gridAlignment;
         bool centerDisplay;
+        int frameRate;
         int particleMaximum;
         int curveParticleMaximum;
         bool collapseLayerAxis;
@@ -91,6 +92,18 @@ namespace CrazyStorm
                 centerDisplay = value;
                 if (PropertyChanged != null)
                     PropertyChanged(this, new PropertyChangedEventArgs("CenterDisplay"));
+            }
+        }
+        public int FrameRate
+        {
+            get { return frameRate; }
+            set
+            {
+                frameRate = value > 1 ? value : 1;
+                if (PropertyChanged != null)
+                {
+                    PropertyChanged(this, new PropertyChangedEventArgs("FrameRate"));
+                }
             }
         }
         public int ParticleMaximum
@@ -180,6 +193,7 @@ namespace CrazyStorm
             backgroundPath = iniHelper.ReadValue("Screen", "BackgroundPath", string.Empty);
             gridAlignment = iniHelper.ReadValue("Screen", "GridAlignment", true);
             centerDisplay = iniHelper.ReadValue("Screen", "CenterDisplay", true);
+            frameRate = iniHelper.ReadValue("Play", "FrameRate", 60);
             particleMaximum = iniHelper.ReadValue("Play", "ParticleMaximum", 3000);
             curveParticleMaximum = iniHelper.ReadValue("Play", "CurveParticleMaximum", 200);
             collapseLayerAxis = iniHelper.ReadValue("Play", "CollapseLayerAxis", true);
@@ -194,6 +208,7 @@ namespace CrazyStorm
             iniHelper.WriteValue("Screen", "BackgroundPath", backgroundPath);
             iniHelper.WriteValue("Screen", "GridAlignment", gridAlignment);
             iniHelper.WriteValue("Screen", "CenterDisplay", centerDisplay);
+            iniHelper.WriteValue("Play", "FrameRate", frameRate);
             iniHelper.WriteValue("Play", "ParticleMaximum", particleMaximum);
             iniHelper.WriteValue("Play", "CurveParticleMaximum", curveParticleMaximum);
             iniHelper.WriteValue("Play", "CollapseLayerAxis", collapseLayerAxis);

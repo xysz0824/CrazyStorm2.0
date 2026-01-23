@@ -59,16 +59,17 @@ namespace CrazyStorm_Player
         public File File { get; set; }
         public int Width { get; set; }
         public int Height { get; set; }
+        public float FrameRate { get; set; }
         public string BackgroundPath { get; set; }
         public int SelectedParticleSystemIndex { get; set; }
         public string ControllableImagePath { get; set; }
         public string ControllableSetting { get; set; }
-        public int CurrentFrame { get; set; }
-        public PlayerImpl(int width, int height, int particleMaximum, int curveParticleMaximum)
+        public float CurrentFrame { get; set; }
+        public PlayerImpl(int width, int height, float frameRate, int particleMaximum, int curveParticleMaximum)
         {
             Width = width;
             Height = height;
-
+            FrameRate = frameRate;
             EventManager.Initialize();
             ParticleManager.Initialize(width, height, PARTICLE_PRESERVED_DIST, CURVE_PRESERVED_DIST, 
                 particleMaximum, curveParticleMaximum);
@@ -175,7 +176,7 @@ namespace CrazyStorm_Player
             }
             FrameworkDispatcher.Update();
             File.BodyPosition = controllable.selfPos.ToCore();
-            File.ParticleSystems[SelectedParticleSystemIndex].Reset();
+            File.ParticleSystems[SelectedParticleSystemIndex].Reset(FrameRate);
             sounds = new Dictionary<string, SoundEffect>();
             ForceField.OnForceImpactBody += ForceImpactBody;
             EventManager.OnSoundPlay += PlaySound;
@@ -244,8 +245,8 @@ namespace CrazyStorm_Player
             var position = new Vector2(particle.PPosition.x, particle.PPosition.y) + center;
             float alpha = particle.Opacity / 100f - (ParticleBase.FOG_TIME - particle.FogFrame) / ParticleBase.FOG_TIME;
             var color = new Color(particle.RGB.r / 255f, particle.RGB.g / 255f, particle.RGB.b / 255f, alpha);
-            int frame = particle.PCurrentFrame / (type.Delay + 1) % type.Frames;
-            float vOffset = particle.PCurrentFrame * particle.VSpeed;
+            int frame = (int)particle.PCurrentFrame / (type.Delay + 1) % type.Frames;
+            float vOffset = (int)particle.PCurrentFrame * particle.VSpeed;
             var rect = new Rectangle((int)type.StartPoint.x + frame * type.Width, (int)(type.StartPoint.y - vOffset), type.Width, type.Height);
             var tex = type.ID >= ParticleType.DefaultTypeIndex ? defaultTextures[0] : type.Image != null ? customTextures[type.Image.ID] : null;
             if (tex != null)
@@ -300,8 +301,8 @@ namespace CrazyStorm_Player
             var center = new Vector2(Width / 2, Height / 2);
             float alpha = particle.Opacity / 100f - (ParticleBase.FOG_TIME - particle.FogFrame) / ParticleBase.FOG_TIME;
             var color = new Color(particle.RGB.r / 255f, particle.RGB.g / 255f, particle.RGB.b / 255f, alpha);
-            int frame = particle.PCurrentFrame / (type.Delay + 1) % type.Frames;
-            float vOffset = particle.PCurrentFrame * particle.VSpeed;
+            int frame = (int)particle.PCurrentFrame / (type.Delay + 1) % type.Frames;
+            float vOffset = (int)particle.PCurrentFrame * particle.VSpeed;
             var rect = new Rectangle((int)type.StartPoint.x + frame * type.Width, (int)(type.StartPoint.y - vOffset), type.Width, type.Height);
             var tex = type.ID >= ParticleType.DefaultTypeIndex ? defaultTextures[0] : type.Image != null ? customTextures[type.Image.ID] : null;
             if (tex != null) curveBatch.Draw(particle.Curve, tex, rect, center, color);
@@ -309,14 +310,14 @@ namespace CrazyStorm_Player
         public void Update(KeyboardState keyboard, GameTime gameTime)
         {
             FrameworkDispatcher.Update();
-            controllable.Update(keyboard);
+            controllable.Update(keyboard, FrameRate);
             File.BodyPosition = controllable.selfPos.ToCore();
             var selectedParticle = File.ParticleSystems[SelectedParticleSystemIndex];
             EventManager.CustomTypes = selectedParticle.CustomTypes;
             EventManager.Sounds = File.Sounds;
             EventManager.TypeSoundMap = selectedParticle.TypeSoundMap;
-            EventManager.Update();
-            selectedParticle.Update(CurrentFrame);
+            EventManager.Update(FrameRate);
+            selectedParticle.Update(FrameRate, CurrentFrame);
             ParticleManager.UpdateLayerMasks(selectedParticle.Layers);
             shaderMaskCount.SetValue(ParticleManager.MaskCount);
             shaderMaskSize.SetValue(ParticleManager.MaskSizeArray);
@@ -331,7 +332,7 @@ namespace CrazyStorm_Player
                 controllable.selfPos.ToCore(), controllable.selfRadius, out collidedCount, out newPos);
             for (int i = 0; i < collidedCount; ++i) particles[i].Die();
             controllable.selfPos = newPos.ToXna();
-            ParticleManager.Update();
+            ParticleManager.Update(FrameRate);
             CurrentFrame = selectedParticle.CurrentFrame;
         }
         public void Draw(GraphicsDevice gd, GameTime gameTime)

@@ -122,16 +122,14 @@ namespace CrazyStorm.Core
                 }
             }
         }
-        public void Execute(PropertyContainer propertyContainer, PropertyContainer bindingContainer)
+        public void Execute(PropertyContainer propertyContainer, PropertyContainer bindingContainer, float frameRate)
         {
-            if (VMCondition != null)
-                VM.Execute(propertyContainer, VMCondition);
-
+            if (VMCondition != null) VM.Execute(propertyContainer, VMCondition, frameRate);
             if (VMCondition == null || VM.PopBool())
             {
                 for (int i = 0; i < VMEvents.Count; ++i)
                 {
-                    if (EventHelper.Execute(propertyContainer, bindingContainer, VMEvents[i]))
+                    if (EventHelper.Execute(propertyContainer, bindingContainer, VMEvents[i], frameRate))
                         i = -1;
                 }
             }

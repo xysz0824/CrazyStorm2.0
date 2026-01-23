@@ -19,6 +19,8 @@ namespace CrazyStorm.Core
     }
     public class ParticleSystem : IXmlData, IGeneratePlayData, ILoadPlayData, IPlayable
     {
+        public const float FRAME_RATE_BASE = 60;
+
         #region Private Members
         [StringData]
         [XmlAttribute]
@@ -47,7 +49,8 @@ namespace CrazyStorm.Core
             get { return orderType; }
             set { orderType = value; }
         }
-        public int CurrentFrame { get; set; }
+        public float CurrentFrame { get; set; }
+        public int FrameSkipCount { get; set; }
         public int TotalFrame
         {
             get
@@ -68,7 +71,7 @@ namespace CrazyStorm.Core
         public int LayerIndex { get { return layerIndex++; } }
         public IDictionary<int, int> TypeSoundMap { get { return typeSoundMap; } }
         public int Status { get; private set; }
-        public int StatusFrame { get; private set; }
+        public float StatusFrame { get; private set; }
         public Vector2 CenterPosition { get; private set; }
         #endregion
 
@@ -268,46 +271,45 @@ namespace CrazyStorm.Core
             }
             return Vector2.Zero;
         }
-        public bool Update(int currentFrame = 1)
+        public bool Update(float frameRate, float currentFrame = 1)
         {
+            var frameScale = FRAME_RATE_BASE / frameRate;
             if (currentFrame != CurrentFrame)
             {
-                Reset();
-                for (int i = 1; i < currentFrame; ++i) Update(i);
+                Reset(frameRate);
+                for (float i = 1; i < currentFrame; i += frameScale) Update(frameRate, i);
                 CurrentFrame = currentFrame;
             }
-            StatusFrame++;
+            StatusFrame += frameScale;
             CenterPosition = GetCenterPositionOrDefault();
             for (int i = 0; i < ComponentTree.Count; ++i)
             {
                 ComponentTree[i].Status = Status;
                 ComponentTree[i].StatusFrame = StatusFrame;
                 ComponentTree[i].CenterPosition = CenterPosition;
-                UpdateComponent(ComponentTree[i], CurrentFrame);
+                UpdateComponent(ComponentTree[i], frameRate, CurrentFrame);
             }
-            if (++CurrentFrame > TotalFrame)
-            {
-                Reset();
-            }
+            CurrentFrame += frameScale;
+            if (CurrentFrame > TotalFrame) Reset(frameRate);
             return true;
         }
-        public void UpdateComponent(Component component, int currentFrame)
+        public void UpdateComponent(Component component, float frameRate, float currentFrame)
         {
             var layer = Layers[component.LayerID];
-            if (layer.NeedUpdate(currentFrame)) component.Update(currentFrame);
+            if (layer.NeedUpdate(currentFrame)) component.Update(frameRate, currentFrame);
             for (int i = 0; i < component.Children.Count; ++i)
             {
                 component.Children[i].Status = Status;
                 component.Children[i].StatusFrame = StatusFrame;
                 component.Children[i].CenterPosition = CenterPosition;
-                UpdateComponent(component.Children[i], currentFrame);
+                UpdateComponent(component.Children[i], frameRate, currentFrame);
             }
         }
-        public void Reset()
+        public void Reset(float frameRate)
         {
             CurrentFrame = 1;
             for (int i = 0; i < Layers.Count; ++i)
-                Layers[i].Reset();
+                Layers[i].Reset(frameRate);
         }
         public void SetStatus(int i)
         {
