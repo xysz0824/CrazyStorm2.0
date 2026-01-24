@@ -134,7 +134,11 @@ namespace CrazyStorm.Core
                 } },
                 { "QuakeScreen", (pc, expr, frameScale) =>
                 {
-                    //TODO : QuakeScreen
+                    VM.Execute(pc, expr[0], frameScale);
+                    int args0 = VM.PopInt();
+                    VM.Execute(pc, expr[1], frameScale);
+                    int args1 = VM.PopInt();
+                    pc.System.ShakeScreen(args1, args0);
                     return false;
                 } },
                 { "StopScreen", (pc, expr, frameScale) =>
@@ -143,7 +147,7 @@ namespace CrazyStorm.Core
                     int args0 = VM.PopInt();
                     VM.Execute(pc, expr[1], frameScale);
                     int args1 = VM.PopInt();
-                    pc.System.FrameScale(args1, args0);
+                    pc.System.ScaleFrame(args1, args0);
                     return false;
                 } },
                 { "Recover", (pc, expr, frameScale) =>

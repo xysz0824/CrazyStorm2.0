@@ -63,9 +63,9 @@ namespace CrazyStorm_Player
             selfPos.X = MathHelper.Clamp(selfPos.X, -movableWidth / 2, movableWidth / 2);
             selfPos.Y = MathHelper.Clamp(selfPos.Y, -movableHeight / 2, movableHeight / 2);
         }
-        public void Draw(SpriteBatch spriteBatch, Texture2D character, Texture2D point, Texture2D slowMode)
+        public void Draw(SpriteBatch spriteBatch, Texture2D character, Texture2D point, Texture2D slowMode, Vector2 offset)
         {
-            Vector2 center = new Vector2(movableWidth / 2, movableHeight / 2);
+            Vector2 center = new Vector2(movableWidth / 2, movableHeight / 2) + offset;
             Vector2 position = selfPos + center;
             Color color = new Color(1f, 1f, 1f, 1f);
             Rectangle rect;

@@ -3,16 +3,23 @@
  * Copyright (c) StarX 2026
  */
 using System;
+using System.Collections;
 using System.Collections.Generic;
-using System.Text;
 using System.Collections.ObjectModel;
+using System.IO;
+using System.Text;
 using System.Xml;
 using System.Xml.Serialization;
-using System.IO;
 
 namespace CrazyStorm.Core
 {
-    public struct FrameScaleEvent
+    public struct ShakeScreenEvent
+    {
+        public float duration;
+        public float level;
+        public float frame;
+    }
+    public struct ScaleFrameEvent
     {
         public float duration;
         public float level;
@@ -42,8 +49,10 @@ namespace CrazyStorm.Core
         int layerIndex;
         IDictionary<int, int> componentIndex;
         IDictionary<int, int> typeSoundMap;
+        Vector2 screenOffset;
+        ShakeScreenEvent shakeScreenEvent;
         float frameFactor = 1;
-        FrameScaleEvent frameScaleEvent;
+        ScaleFrameEvent scaleFrameEvent;
         #endregion
 
         #region Public Members
@@ -57,6 +66,7 @@ namespace CrazyStorm.Core
             get { return orderType; }
             set { orderType = value; }
         }
+        public Vector2 ScreenOffset => screenOffset;
         public float FrameFactor => frameFactor;
         public float CurrentFrame { get; set; }
         public int FrameSkipCount { get; set; }
@@ -277,22 +287,39 @@ namespace CrazyStorm.Core
             }
             return Vector2.Zero;
         }
-        public bool Update(float frameRate, float currentFrame = 1)
+        void UpdateGlobalEvents(float frameScale)
         {
-            var frameScale = FRAME_RATE_BASE / frameRate;
-            if (frameScaleEvent.frame < frameScaleEvent.duration)
+            if (shakeScreenEvent.frame < shakeScreenEvent.duration)
             {
-                frameScaleEvent.frame = Math.Min(frameScaleEvent.frame + frameScale, frameScaleEvent.duration);
-                if (frameScaleEvent.frame == frameScaleEvent.duration) frameFactor = 1;
-                else if (frameScaleEvent.level >= 1) frameFactor = 0;
+                shakeScreenEvent.frame = Math.Min(shakeScreenEvent.frame + frameScale, shakeScreenEvent.duration);
+                if (shakeScreenEvent.frame == shakeScreenEvent.duration) screenOffset = new Vector2(0, 0);
                 else
                 {
-                    float t = frameScaleEvent.frame / frameScaleEvent.duration;
-                    double percent = MathHelper.Lerp(0.5f, 1f, Math.Max(0, frameScaleEvent.level));
+                    float t = shakeScreenEvent.frame / shakeScreenEvent.duration;
+                    if (MathHelper.FrameMod(shakeScreenEvent.frame, frameScale, 2))
+                    {
+                        screenOffset = new Vector2(0, ((1f - t) * shakeScreenEvent.level * (float)Math.Sin(shakeScreenEvent.frame)));
+                    }
+                }
+            }
+            if (scaleFrameEvent.frame < scaleFrameEvent.duration)
+            {
+                scaleFrameEvent.frame = Math.Min(scaleFrameEvent.frame + frameScale, scaleFrameEvent.duration);
+                if (scaleFrameEvent.frame == scaleFrameEvent.duration) frameFactor = 1;
+                else if (scaleFrameEvent.level >= 1) frameFactor = 0;
+                else
+                {
+                    float t = scaleFrameEvent.frame / scaleFrameEvent.duration;
+                    double percent = MathHelper.Lerp(0.5f, 1f, Math.Max(0, scaleFrameEvent.level));
                     double fadeTime = 0.8d;
                     frameFactor = 1.0f - (float)(percent * (1.0d - Math.Pow(Math.Max(0, 1d / (1d - fadeTime) * (t - fadeTime)), 3)));
                 }
             }
+        }
+        public bool Update(float frameRate, float currentFrame = 1)
+        {
+            var frameScale = FRAME_RATE_BASE / frameRate;
+            UpdateGlobalEvents(frameScale);
             if (currentFrame != CurrentFrame)
             {
                 Reset();
@@ -335,9 +362,13 @@ namespace CrazyStorm.Core
             Status = i;
             StatusFrame = 0;
         }
-        public void FrameScale(float duration, float level)
+        public void ShakeScreen(float duration, float level)
         {
-            frameScaleEvent = new FrameScaleEvent { duration = duration, level = level, frame = 0 };
+            shakeScreenEvent = new ShakeScreenEvent { duration = duration, level = level, frame = 0 };
+        }
+        public void ScaleFrame(float duration, float level)
+        {
+            scaleFrameEvent = new ScaleFrameEvent { duration = duration, level = level, frame = 0 };
         }
         #endregion
     }

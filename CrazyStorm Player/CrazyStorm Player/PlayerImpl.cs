@@ -238,7 +238,7 @@ namespace CrazyStorm_Player
             }
             lastBlendType = blendType;
             var type = particle.Type;
-            var center = new Vector2(Width / 2, Height / 2);
+            var center = new Vector2(Width / 2, Height / 2) + particle.System.ScreenOffset.ToXna();
             var imageCenter = new Vector2(type.CenterPoint.x, type.CenterPoint.y);
             float fogScale = (ParticleBase.FOG_TIME - particle.FogFrame) / 15.0f;
             var scale = new Vector2(particle.WidthScale + fogScale, particle.HeightScale + fogScale);
@@ -298,7 +298,7 @@ namespace CrazyStorm_Player
             }
             lastBlendType = blendType;
             var type = particle.Type;
-            var center = new Vector2(Width / 2, Height / 2);
+            var center = new Vector2(Width / 2, Height / 2) + particle.System.ScreenOffset.ToXna();
             float alpha = particle.Opacity / 100f - (ParticleBase.FOG_TIME - particle.FogFrame) / ParticleBase.FOG_TIME;
             var color = new Color(particle.RGB.r / 255f, particle.RGB.g / 255f, particle.RGB.b / 255f, alpha);
             int frame = (int)particle.PCurrentFrame / (type.Delay + 1) % type.Frames;
@@ -344,8 +344,9 @@ namespace CrazyStorm_Player
             {
                 spriteBatch.Draw(background, Vector2.Zero, null, Color.White, 0, Vector2.Zero, backgroundScale, SpriteEffects.None, 0);
             }
-            controllable.Draw(spriteBatch, characterTexture, pointTexture, slowModeTexture);
-            ParticleManager.Draw(File.ParticleSystems[SelectedParticleSystemIndex].OrderType);
+            var particle = File.ParticleSystems[SelectedParticleSystemIndex];
+            controllable.Draw(spriteBatch, characterTexture, pointTexture, slowModeTexture, particle.ScreenOffset.ToXna());
+            ParticleManager.Draw(particle.OrderType);
             lastBlendType = BlendType.None;
             curveBatch.End();
             spriteBatch.End();
