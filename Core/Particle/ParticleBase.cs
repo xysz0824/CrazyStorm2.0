@@ -586,17 +586,16 @@ namespace CrazyStorm.Core
             newPlayerPos = player;
             return false;
         }
-        public virtual bool Update(float frameRate, float currentFrame = 1)
+        public virtual bool Update(float frameScale, float currentFrame = 1)
         {
-            var frameScale = ParticleSystem.FRAME_RATE_BASE / frameRate;
-            ExecuteExpressions(frameRate);
+            ExecuteExpressions(frameScale);
             if (PCurrentFrame > MaxLife || (KillOutside && ParticleManager.OutOfWindow(this)))
             {
                 Alive = false;
                 Emitter.Particles.Remove(this);
                 return false;
             }
-            if (MathHelper.FrameEqual(PCurrentFrame, frameRate, 1))
+            if (MathHelper.FrameEqual(PCurrentFrame, frameScale, 1))
             {
                 MathHelper.SetVector2(ref pspeedVector, PSpeed, PSpeedAngle,
                     new Vector2(PSpeedHScale, PSpeedVScale));
@@ -609,7 +608,7 @@ namespace CrazyStorm.Core
             PPosition += PSpeedVector * frameScale;
             for (int i = 0; i < ParticleEventGroups.Count; ++i)
             {
-                ParticleEventGroups[i].Execute(this, null, frameRate);
+                ParticleEventGroups[i].Execute(this, null, frameScale);
             }
             PCurrentFrame += frameScale;
             if (MaxLife <= FOG_TIME)
@@ -649,7 +648,7 @@ namespace CrazyStorm.Core
             particle.ParticleEventGroups = ParticleEventGroups;
             particle.ReboundTime = 0;
         }
-        public virtual void Reset(float frameRate) { }
+        public virtual void Reset() { }
         public int CompareTo(ParticleBase other)
         {
             return RenderOrder - other.RenderOrder;

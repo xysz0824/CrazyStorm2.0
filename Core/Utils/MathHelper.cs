@@ -11,15 +11,14 @@ namespace CrazyStorm.Core
     {
         public const float Pi = 3.14159274F;
         public const float PiOver2 = 1.57079637F;
-        public static bool FrameMod(float frame, float frameRate, int testValue)
+        public static bool FrameMod(float frame, float frameScale, int testValue)
         {
             return (frame % testValue == 0f) ||
-                ((frame % testValue > (frame + ParticleSystem.FRAME_RATE_BASE / frameRate) % testValue) &&
-                (frame + ParticleSystem.FRAME_RATE_BASE / frameRate) % testValue != 0f);
+                ((frame % testValue > (frame + frameScale) % testValue) && (frame + frameScale) % testValue != 0f);
         }
-        public static bool FrameEqual(float frame, float frameRate, int testFrame)
+        public static bool FrameEqual(float frame, float frameScale, int testFrame)
         {
-            return frame <= testFrame && frame + ParticleSystem.FRAME_RATE_BASE / frameRate > testFrame;
+            return frame <= testFrame && frame + frameScale > testFrame;
         }
         public static float Lerp(float value1, float value2, float amount)
         {

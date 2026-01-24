@@ -25,9 +25,8 @@ namespace CrazyStorm.Core
         {
             currentValue = new TypeSet();
         }
-        public void Update(float frameRate)
+        public void Update(float frameScale)
         {
-            float frameScale = ParticleSystem.FRAME_RATE_BASE / frameRate;
             float ratio = currentTime / ChangeTime;
             if (ChangeMode == EventChangeMode.Accelerated) ratio *= ratio;
             else if (ChangeMode == EventChangeMode.Decelerated) ratio *= (2 - ratio);

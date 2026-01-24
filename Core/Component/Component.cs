@@ -165,7 +165,6 @@ namespace CrazyStorm.Core
         }
         public int ParentID { get; set; }
         public int BindingTargetID { get; set; }
-        public ParticleSystem System { get; set; }
         public IList<VariableResource> Globals { get; set; }
         public IList<VariableResource> Locals { get; private set; }
         public Vector2 BodyPosition { get; set; }
@@ -192,8 +191,8 @@ namespace CrazyStorm.Core
         #endregion
 
         #region Protected Methods
-        public delegate void Action(float frameRate);
-        public void BindingUpdate(Action updateFunc, bool executeEvents, float frameRate)
+        public delegate void Action(float frameScale);
+        public void BindingUpdate(Action updateFunc, bool executeEvents, float frameScale)
         {
             float saveCurrentFrame = CurrentFrame;
             Vector2 savePosition = Position;
@@ -208,23 +207,23 @@ namespace CrazyStorm.Core
                 if (CurrentFrame < 1 || CurrentFrame > TotalFrame || !Visibility) continue;
                 if (executeEvents && !EventManager.BindingRecover(this, particle) && eventImpacted)
                 {
-                    Reset(frameRate);
+                    Reset();
                 }
                 Position = particle.PPosition;
                 Speed = particle.PSpeed;
                 SpeedAngle = particle.PSpeedAngle;
                 Acspeed = particle.PAcspeed;
                 AcspeedAngle = particle.PAcspeedAngle;
-                ExecuteExpressions(frameRate);
+                ExecuteExpressions(frameScale);
                 if (executeEvents)
                 {
                     for (int i = 0; i < ComponentEventGroups.Count; ++i)
                     {
-                        ComponentEventGroups[i].Execute(this, particle, frameRate);
+                        ComponentEventGroups[i].Execute(this, particle, frameScale);
                     }
                 }
-                updateFunc?.Invoke(frameRate);
-                if (executeEvents && EventManager.BindingUpdate(this, particle, frameRate))
+                updateFunc?.Invoke(frameScale);
+                if (executeEvents && EventManager.BindingUpdate(this, particle, frameScale))
                 {
                     eventImpacted = true;
                 }
@@ -643,10 +642,9 @@ namespace CrazyStorm.Core
             }
             return false;
         }
-        public virtual bool Update(float frameRate, float currentFrame)
+        public virtual bool Update(float frameScale, float currentFrame)
         {
-            float frameScale = ParticleSystem.FRAME_RATE_BASE / frameRate;
-            ExecuteExpressions(frameRate);
+            ExecuteExpressions(frameScale);
             LayerFrame = currentFrame;
             if (BindingTarget == null || CheckCircularBinding())
             {
@@ -660,12 +658,12 @@ namespace CrazyStorm.Core
                 speedVector += acspeedVector * frameScale;
                 Position += speedVector * frameScale;
                 for (int i = 0; i < ComponentEventGroups.Count; ++i)
-                    ComponentEventGroups[i].Execute(this, null, frameRate);
+                    ComponentEventGroups[i].Execute(this, null, frameScale);
             }
             Position = GetAbsolutePositionRuntime();
             return true;
         }
-        public virtual void Reset(float frameRate)
+        public virtual void Reset()
         {
             if (initialState == null)
             {
@@ -676,11 +674,11 @@ namespace CrazyStorm.Core
                     var variable = new VariableResource { Label = item.Label, Value = item.Value };
                     initialState.Locals.Add(variable);
                 }
-                initialState.ExecuteExpressions(frameRate);
+                initialState.ExecuteExpressions(1);
             }
             else
             {
-                initialState.ExecuteExpressions(frameRate);
+                initialState.ExecuteExpressions(1);
                 BeginFrame = initialState.BeginFrame;
                 TotalFrame = initialState.TotalFrame;
                 Position = initialState.Position;

@@ -29,7 +29,7 @@ namespace CrazyStorm_Player
             this.movableWidth = movableWidth;
             this.movableHeight = movableHeight;
         }
-        public void Update(KeyboardState state, float frameRate)
+        public void Update(KeyboardState state, float frameScale)
         {
             selfPosLast = selfPos;
             Vector2 direction = Vector2.Zero;
@@ -50,7 +50,6 @@ namespace CrazyStorm_Player
                 direction.Y = 1;
             }
             if (direction.LengthSquared() != 0) direction.Normalize();
-            var frameScale = CrazyStorm.Core.ParticleSystem.FRAME_RATE_BASE / frameRate;
             if (state.IsKeyDown(Keys.LeftShift) || state.IsKeyDown(Keys.RightShift))
             {
                 slow = true;

@@ -86,7 +86,7 @@ namespace CrazyStorm.Core
             OnParticleDraw = null;
             OnCurveParticleDraw = null;
         }
-        public static ParticleBase GetParticle(int layerID, ParticleBase template, float frameRate)
+        public static ParticleBase GetParticle(ParticleSystem system, int layerID, ParticleBase template)
         {
             ParticleBase particle = null;
             if (template is Particle)
@@ -101,10 +101,11 @@ namespace CrazyStorm.Core
                 template.CopyTo(poolObject.Instance);
                 particle = poolObject.Instance;
             }
+            particle.System = system;
             int order = layerID * searchResult.Length * 10 + 9 - (int)template.BlendType;
             particle.RenderOrder = order + instanceID * 10;
             particle.ID = instanceID++;
-            particle.Reset(frameRate);
+            particle.Reset();
             particle.Alive = true;
             activeParticles.Add(particle);
             //particleQuadTree.Insert(particle);
@@ -286,7 +287,8 @@ namespace CrazyStorm.Core
             for (int i = 0; i < activeParticles.Count; ++i)
             {
                 var instance = activeParticles[i];
-                if (instance.Alive && !OutOfRange(instance)) instance.Update(frameRate);
+                var frameScale = instance.System.FrameFactor * ParticleSystem.FRAME_RATE_BASE / frameRate;
+                if (instance.Alive && !OutOfRange(instance)) instance.Update(frameScale);
                 else if (instance.Alive) instance.Alive = false;
                 if (!instance.Alive)
                 {

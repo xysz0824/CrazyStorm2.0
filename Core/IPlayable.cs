@@ -10,7 +10,7 @@ namespace CrazyStorm.Core
 {
     public interface IPlayable
     {
-        bool Update(float frameRate, float currentFrame);
-        void Reset(float frameRate);
+        bool Update(float frameScale, float currentFrame);
+        void Reset();
     }
 }

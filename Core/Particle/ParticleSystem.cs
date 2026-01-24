@@ -12,6 +12,12 @@ using System.IO;
 
 namespace CrazyStorm.Core
 {
+    public struct FrameScaleEvent
+    {
+        public float duration;
+        public float level;
+        public float frame;
+    }
     public enum OrderType
     {
         FirstAsTop,
@@ -36,6 +42,8 @@ namespace CrazyStorm.Core
         int layerIndex;
         IDictionary<int, int> componentIndex;
         IDictionary<int, int> typeSoundMap;
+        float frameFactor = 1;
+        FrameScaleEvent frameScaleEvent;
         #endregion
 
         #region Public Members
@@ -49,6 +57,7 @@ namespace CrazyStorm.Core
             get { return orderType; }
             set { orderType = value; }
         }
+        public float FrameFactor => frameFactor;
         public float CurrentFrame { get; set; }
         public int FrameSkipCount { get; set; }
         public int TotalFrame
@@ -82,12 +91,9 @@ namespace CrazyStorm.Core
             layers = new GenericContainer<Layer>();
             componentTree = new GenericContainer<Component>();
         }
-        public ParticleSystem(string name)
+        public ParticleSystem(string name) : this()
         {
             this.name = name;
-            customTypes = new GenericContainer<ParticleType>();
-            layers = new GenericContainer<Layer>();
-            componentTree = new GenericContainer<Component>();
             componentIndex = new Dictionary<int, int>();
             typeSoundMap = new Dictionary<int, int>();
         }
@@ -274,10 +280,23 @@ namespace CrazyStorm.Core
         public bool Update(float frameRate, float currentFrame = 1)
         {
             var frameScale = FRAME_RATE_BASE / frameRate;
+            if (frameScaleEvent.frame < frameScaleEvent.duration)
+            {
+                frameScaleEvent.frame = Math.Min(frameScaleEvent.frame + frameScale, frameScaleEvent.duration);
+                if (frameScaleEvent.frame == frameScaleEvent.duration) frameFactor = 1;
+                else if (frameScaleEvent.level >= 1) frameFactor = 0;
+                else
+                {
+                    float t = frameScaleEvent.frame / frameScaleEvent.duration;
+                    double percent = MathHelper.Lerp(0.5f, 1f, Math.Max(0, frameScaleEvent.level));
+                    double fadeTime = 0.8d;
+                    frameFactor = 1.0f - (float)(percent * (1.0d - Math.Pow(Math.Max(0, 1d / (1d - fadeTime) * (t - fadeTime)), 3)));
+                }
+            }
             if (currentFrame != CurrentFrame)
             {
-                Reset(frameRate);
-                for (float i = 1; i < currentFrame; i += frameScale) Update(frameRate, i);
+                Reset();
+                for (float i = 1; i < currentFrame; i += frameScale) Update(frameScale, i);
                 CurrentFrame = currentFrame;
             }
             StatusFrame += frameScale;
@@ -287,34 +306,38 @@ namespace CrazyStorm.Core
                 ComponentTree[i].Status = Status;
                 ComponentTree[i].StatusFrame = StatusFrame;
                 ComponentTree[i].CenterPosition = CenterPosition;
-                UpdateComponent(ComponentTree[i], frameRate, CurrentFrame);
+                UpdateComponent(ComponentTree[i], FrameFactor * frameScale, CurrentFrame);
             }
             CurrentFrame += frameScale;
-            if (CurrentFrame > TotalFrame) Reset(frameRate);
+            if (CurrentFrame > TotalFrame) Reset();
             return true;
         }
-        public void UpdateComponent(Component component, float frameRate, float currentFrame)
+        public void UpdateComponent(Component component, float frameScale, float currentFrame)
         {
             var layer = Layers[component.LayerID];
-            if (layer.NeedUpdate(currentFrame)) component.Update(frameRate, currentFrame);
+            if (layer.NeedUpdate(currentFrame)) component.Update(frameScale, currentFrame);
             for (int i = 0; i < component.Children.Count; ++i)
             {
                 component.Children[i].Status = Status;
                 component.Children[i].StatusFrame = StatusFrame;
                 component.Children[i].CenterPosition = CenterPosition;
-                UpdateComponent(component.Children[i], frameRate, currentFrame);
+                UpdateComponent(component.Children[i], frameScale, currentFrame);
             }
         }
-        public void Reset(float frameRate)
+        public void Reset()
         {
             CurrentFrame = 1;
             for (int i = 0; i < Layers.Count; ++i)
-                Layers[i].Reset(frameRate);
+                Layers[i].Reset();
         }
         public void SetStatus(int i)
         {
             Status = i;
             StatusFrame = 0;
+        }
+        public void FrameScale(float duration, float level)
+        {
+            frameScaleEvent = new FrameScaleEvent { duration = duration, level = level, frame = 0 };
         }
         #endregion
     }

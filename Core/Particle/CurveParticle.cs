@@ -159,9 +159,9 @@ namespace CrazyStorm.Core
             return FogFrame >= FOG_TIME && Curve != null &&
                 Curve.IterateSegment(CurveJudge, playerLast, player, new Vector2(WidthScale, WidthScale), 2, PRotation, Length);
         }
-        public override bool Update(float frameRate, float currentFrame = 1)
+        public override bool Update(float frameScale, float currentFrame = 1)
         {
-            if (!base.Update(frameRate, currentFrame)) return false;
+            if (!base.Update(frameScale, currentFrame)) return false;
             var head = PSpeedVector;
             if (head.Length() == 0) MathHelper.SetVector2(ref head, 1, PSpeedAngle, 
                 new Vector2(PSpeedHScale, PSpeedVScale));

@@ -124,7 +124,7 @@ namespace CrazyStorm.Core
             }
             return list.ToArray();
         }
-        public static void Execute(PropertyContainer propertyContainer, VMInstruction[] instructions, float frameRate)
+        public static void Execute(PropertyContainer propertyContainer, VMInstruction[] instructions, float frameScale)
         {
             for (int i = 0; i < instructions.Length; ++i)
             {
@@ -218,7 +218,7 @@ namespace CrazyStorm.Core
                     case VMCode.EQUAL:
                         var vR = VM.PopVector();
                         var vL = VM.PopVector();
-                        VM.PushBool(vL.UseFrameEqual ? MathHelper.FrameEqual(vL.x, frameRate, (int)vR.x) : 
+                        VM.PushBool(vL.UseFrameEqual ? MathHelper.FrameEqual(vL.x, frameScale, (int)vR.x) : 
                             vL == vR);
                         break;
                     case VMCode.ADD:

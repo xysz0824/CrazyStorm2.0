@@ -209,12 +209,12 @@ namespace CrazyStorm.Core
             if (currentFrame < BeginFrame || currentFrame >= BeginFrame + TotalFrame) return false;
             return true;
         }
-        public void Reset(float frameRate)
+        public void Reset()
         {
             if (Visible)
             {
                 for (int i = 0; i < Components.Count; ++i)
-                    Components[i].Reset(frameRate);
+                    Components[i].Reset();
             }
         }
         #endregion

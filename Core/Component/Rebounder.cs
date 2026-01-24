@@ -79,7 +79,7 @@ namespace CrazyStorm.Core
         #endregion
 
         #region Private Methods
-        void Update(float frameRate)
+        void Update(float frameScale)
         {
             int count = 0;
             var results = ParticleManager.SearchByRect(Position, Size, Size, 0, out count);
@@ -122,7 +122,7 @@ namespace CrazyStorm.Core
                         break;
                 }
                 results[i].PSpeedVector = MathHelper.GetVector2(results[i].PSpeed, 2 * rotation - results[i].PSpeedAngle);
-                for (int k = 0; k < RebounderEventGroups.Count; ++k) RebounderEventGroups[k].Execute(results[i], null, frameRate);
+                for (int k = 0; k < RebounderEventGroups.Count; ++k) RebounderEventGroups[k].Execute(results[i], null, frameScale);
                 results[i].ReboundTime++;
             }
             lastRotation = Rotation;
@@ -231,21 +231,21 @@ namespace CrazyStorm.Core
             }
             return false;
         }
-        public override bool Update(float frameRate, float currentFrame)
+        public override bool Update(float frameScale, float currentFrame)
         {
-            if (!base.Update(frameRate, currentFrame))
+            if (!base.Update(frameScale, currentFrame))
                 return false;
 
             if (BindingTarget == null)
-                Update(frameRate);
+                Update(frameScale);
             else
-                BindingUpdate(Update, true, frameRate);
+                BindingUpdate(Update, true, frameScale);
 
             return true;
         }
-        public override void Reset(float frameRate)
+        public override void Reset()
         {
-            base.Reset(frameRate);
+            base.Reset();
             var initialState = base.initialState as Rebounder;
             Size = initialState.Size;
             RebounderShape = initialState.RebounderShape;

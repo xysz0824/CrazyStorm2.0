@@ -169,9 +169,9 @@ namespace CrazyStorm.Core
                 new Vector2(WidthScale, HeightScale), Type.VolumeStart, new Vector2(Type.VolumeWidth, Type.VolumeHeight), 
                 Type.VolumeJudgeArea, out newPlayerPos);
         }
-        public override bool Update(float frameRate, float currentFrame = 1)
+        public override bool Update(float frameScale, float currentFrame = 1)
         {
-            if (!base.Update(frameRate, currentFrame)) return false;
+            if (!base.Update(frameScale, currentFrame)) return false;
             if (StickToSpeedAngle) PRotation = PSpeedAngle + 90;
             if (RetainScale && WidthScale != HeightScale) HeightScale = WidthScale;
             if (AfterimageEffect)
@@ -200,9 +200,9 @@ namespace CrazyStorm.Core
                 particle.AfterImageData[i] = default;
             }
         }
-        public override void Reset(float frameRate)
+        public override void Reset()
         {
-            base.Reset(frameRate);
+            base.Reset();
             afterimageData = new AfterImage[AFTERIMAGE_COUNT];
         }
         #endregion

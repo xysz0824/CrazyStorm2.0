@@ -310,23 +310,23 @@ namespace CrazyStorm.Core
             return set;
         }
         public static bool Execute(PropertyContainer propertyContainer, PropertyContainer bindingContainer, VMEventInfo eventInfo,
-            float frameRate)
+            float frameScale)
         {
             if (eventInfo.conditionExpression != null)
             {
-                VM.Execute(propertyContainer, eventInfo.conditionExpression, frameRate);
+                VM.Execute(propertyContainer, eventInfo.conditionExpression, frameScale);
                 bool result = VM.PopBool();
                 if (!result) return false;
             }
             if (!eventInfo.isSpecialEvent)
             {
-                EventManager.AddEvent(propertyContainer, bindingContainer, eventInfo, frameRate);
+                EventManager.AddEvent(propertyContainer, bindingContainer, eventInfo, frameScale);
                 return false;
             }
             else
             {
                 return EventManager.ExecuteSpecialEvent(propertyContainer, eventInfo.specialEvent, 
-                    eventInfo.argumentExpressions, frameRate);
+                    eventInfo.argumentExpressions, frameScale);
             }
         }
         public static bool IsSpecialEvent(string str)

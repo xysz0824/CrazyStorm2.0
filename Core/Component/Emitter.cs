@@ -115,13 +115,13 @@ namespace CrazyStorm.Core
         #endregion
 
         #region Private Methods
-        void EmitCyclically(float frameRate)
+        void EmitCyclically(float frameScale)
         {
-            if (MathHelper.FrameMod(CurrentFrame, frameRate, EmitCycle)) Emit(frameRate);
+            if (MathHelper.FrameMod(CurrentFrame, frameScale, EmitCycle)) Emit(frameScale);
         }
-        void Emit(float frameRate)
+        void Emit(float frameScale)
         {
-            Template.ExecuteExpressions(frameRate);
+            Template.ExecuteExpressions(frameScale);
             float increment = EmitRange / EmitCount;
             float angle = EmitAngle - (EmitRange + increment) / 2;
             for (int i = 0; i < EmitCount; ++i)
@@ -131,7 +131,7 @@ namespace CrazyStorm.Core
                     EmitPosition.x + EmitRadius * (float)Math.Cos(MathHelper.DegToRad(EmitRoundAngle)),
                     EmitPosition.y + EmitRadius * (float)Math.Sin(MathHelper.DegToRad(EmitRoundAngle)));
                 Template.PSpeedAngle = angle;
-                ParticleBase newParticle = ParticleManager.GetParticle(LayerID, Template, frameRate);
+                ParticleBase newParticle = ParticleManager.GetParticle(System, LayerID, Template);
                 if (InstantMovement)
                 {
                     newParticle.MaxLife = 1;
@@ -313,18 +313,18 @@ namespace CrazyStorm.Core
             if (Template == null) return false;
             return Template.SetProperty(propertyName);
         }
-        public override bool Update(float frameRate, float currentFrame)
+        public override bool Update(float frameScale, float currentFrame)
         {
-            if (!base.Update(frameRate, currentFrame)) return false;
-            if (BindingTarget == null || CheckCircularBinding()) EmitCyclically(frameRate);
-            else BindingUpdate(EmitCyclically, true, frameRate);
+            if (!base.Update(frameScale, currentFrame)) return false;
+            if (BindingTarget == null || CheckCircularBinding()) EmitCyclically(frameScale);
+            else BindingUpdate(EmitCyclically, true, frameScale);
             return true;
         }
-        public override void Reset(float frameRate)
+        public override void Reset()
         {
             Template = InitialTemplate.Clone() as ParticleBase;
-            Template.Reset(frameRate);
-            base.Reset(frameRate);
+            Template.Reset();
+            base.Reset();
             var initialState = base.initialState as Emitter;
             EmitPosition = initialState.EmitPosition;
             EmitCount = initialState.EmitCount;
@@ -335,12 +335,12 @@ namespace CrazyStorm.Core
             EmitRoundAngle = initialState.EmitRoundAngle;
             InstantMovement = initialState.InstantMovement;
         }
-        public void EmitParticle(float frameRate)
+        public void EmitParticle(float frameScale)
         {
             if (BindingTarget == null || CheckCircularBinding())
-                Emit(frameRate);
+                Emit(frameScale);
             else
-                BindingUpdate(Emit, true, frameRate);
+                BindingUpdate(Emit, true, frameScale);
         }
         #endregion
     }

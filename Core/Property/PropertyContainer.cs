@@ -18,6 +18,8 @@ namespace CrazyStorm.Core
         public IDictionary<string, PropertyValue> Properties { get { return properties; } }
         IDictionary<string, VMInstruction[]> propertyExpressions;
         public IDictionary<string, VMInstruction[]> PropertyExpressions { get { return propertyExpressions; } }
+        public ParticleSystem System { get; set; }
+
         public PropertyContainer()
         {
             properties = new Dictionary<string, PropertyValue>();
@@ -142,11 +144,11 @@ namespace CrazyStorm.Core
                 }
             }
         }
-        public void ExecuteExpressions(float frameRate)
+        public void ExecuteExpressions(float frameScale)
         {
             foreach (var expression in PropertyExpressions)
             {
-                VM.Execute(this, expression.Value, frameRate);
+                VM.Execute(this, expression.Value, frameScale);
                 SetProperty(expression.Key);
                 VM.Clear();
             }

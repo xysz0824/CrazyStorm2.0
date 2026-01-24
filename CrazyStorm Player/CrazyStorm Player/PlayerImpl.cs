@@ -176,7 +176,7 @@ namespace CrazyStorm_Player
             }
             FrameworkDispatcher.Update();
             File.BodyPosition = controllable.selfPos.ToCore();
-            File.ParticleSystems[SelectedParticleSystemIndex].Reset(FrameRate);
+            File.ParticleSystems[SelectedParticleSystemIndex].Reset();
             sounds = new Dictionary<string, SoundEffect>();
             ForceField.OnForceImpactBody += ForceImpactBody;
             EventManager.OnSoundPlay += PlaySound;
@@ -310,9 +310,9 @@ namespace CrazyStorm_Player
         public void Update(KeyboardState keyboard, GameTime gameTime)
         {
             FrameworkDispatcher.Update();
-            controllable.Update(keyboard, FrameRate);
-            File.BodyPosition = controllable.selfPos.ToCore();
             var selectedParticle = File.ParticleSystems[SelectedParticleSystemIndex];
+            controllable.Update(keyboard, selectedParticle.FrameFactor * ParticleSystem.FRAME_RATE_BASE / FrameRate);
+            File.BodyPosition = controllable.selfPos.ToCore();
             EventManager.CustomTypes = selectedParticle.CustomTypes;
             EventManager.Sounds = File.Sounds;
             EventManager.TypeSoundMap = selectedParticle.TypeSoundMap;
