@@ -96,6 +96,8 @@ namespace CrazyStorm
             PasteButton.IsEnabled = false;
             UndoButton.IsEnabled = false;
             RedoButton.IsEnabled = false;
+            BindButton.IsEnabled = false;
+            UnbindButton.IsEnabled = false;
         }
         void InitializeLayerAndComponent()
         {
@@ -105,6 +107,8 @@ namespace CrazyStorm
             ComponentTree.ItemsSource = selectedSystem.ComponentTree;
             BindComponentItem.IsEnabled = false;
             UnbindComponentItem.IsEnabled = false;
+            BindButton.IsEnabled = false;
+            UnbindButton.IsEnabled = false;
             LeftTabControl.SelectedIndex = 0;
         }
         void InitializeScreen()

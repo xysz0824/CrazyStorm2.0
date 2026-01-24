@@ -536,7 +536,7 @@
                         </Style>
                     </Button.Style>
                 </Button>
-            <Button Name="FindButton" IsDefault="False" IsCancel="False" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" 
+                <Button Name="FindButton" IsDefault="False" IsCancel="False" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" 
                     ToolTip="{StaticResource FindStr}" Click="FindItem_Click" >
                     <Path Data="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z" Stroke="{DynamicResource IconBrush}" StrokeThickness="3" StrokeLineJoin="Round" StrokeStartLineCap="Round" StrokeEndLineCap="Round"
                           Fill="{x:Null}" Width="24" Height="21" Stretch="Uniform">
@@ -545,8 +545,45 @@
                         </Path.Effect>
                     </Path>
                 </Button>
-            <Separator/>
-            <Button Name="UndoButton" IsDefault="False" IsCancel="False" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" 
+                <Separator/>
+                <Button Name="BindButton" IsDefault="False" IsCancel="False" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" 
+                        ToolTip="{DynamicResource BindComponentStr}" Click="BindComponentItem_Click">
+                    <Path Data="{StaticResource Bind_Icon}" Fill="{DynamicResource IconBrush}" Width="24" Height="24" Stretch="Uniform">
+                        <Path.Effect>
+                            <DropShadowEffect Color="Black" Opacity="1" BlurRadius="3" Direction="315" ShadowDepth="0" />
+                        </Path.Effect>
+                    </Path>
+                    <Button.Style>
+                        <Style TargetType="Button">
+                            <Setter Property="Opacity" Value="1" />
+                            <Style.Triggers>
+                                <Trigger Property="IsEnabled" Value="False">
+                                    <Setter Property="Opacity" Value="0.4" />
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Button.Style>
+                </Button>
+                <Button Name="UnbindButton" IsDefault="False" IsCancel="False" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" 
+                        ToolTip="{DynamicResource UnbindComponentStr}" Click="UnbindComponentItem_Click">
+                    <Path Data="{StaticResource Unbind_Icon}" Fill="{DynamicResource IconBrush}" Width="24" Height="24" Stretch="Uniform">
+                        <Path.Effect>
+                            <DropShadowEffect Color="Black" Opacity="1" BlurRadius="3" Direction="315" ShadowDepth="0" />
+                        </Path.Effect>
+                    </Path>
+                    <Button.Style>
+                        <Style TargetType="Button">
+                            <Setter Property="Opacity" Value="1" />
+                            <Style.Triggers>
+                                <Trigger Property="IsEnabled" Value="False">
+                                    <Setter Property="Opacity" Value="0.4" />
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Button.Style>
+                </Button>
+                <Separator/>
+                <Button Name="UndoButton" IsDefault="False" IsCancel="False" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" 
                     ToolTip="{StaticResource UndoStr}" Click="UndoItem_Click">
                     <Path Data="M240,424V328c116.4,0,159.39,33.76,208,96,0-119.23-39.57-240-208-240V88L64,256Z" Stroke="{DynamicResource IconBrush}" StrokeThickness="3" StrokeLineJoin="Round" StrokeStartLineCap="Round" StrokeEndLineCap="Round"
                           Fill="{x:Null}" Width="24" Height="21" Stretch="Uniform">
@@ -565,7 +602,7 @@
                         </Style>
                     </Button.Style>
                 </Button>
-            <Button Name="RedoButton" IsDefault="False" IsCancel="False" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" 
+                <Button Name="RedoButton" IsDefault="False" IsCancel="False" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" 
                     ToolTip="{StaticResource RedoStr}" Click="RedoItem_Click">
                     <Path Data="M448,256,272,88v96C103.57,184,64,304.77,64,424c48.61-62.24,91.6-96,208-96v96Z" Stroke="{DynamicResource IconBrush}" StrokeThickness="3" StrokeLineJoin="Round" StrokeStartLineCap="Round" StrokeEndLineCap="Round"
                           Fill="{x:Null}" Width="24" Height="21" Stretch="Uniform">
@@ -584,7 +621,7 @@
                         </Style>
                     </Button.Style>
                 </Button>
-            <Separator/>
+                <Separator/>
                 <Button Name="PlayButton" IsDefault="False" IsCancel="False" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" 
                     ToolTip="{StaticResource PlayStr}" Click="PlayItem_Click">
                     <Path Data="{StaticResource Play_Icon}" Fill="{StaticResource PlayIconBrush}" Width="24" Height="20" Stretch="Uniform">

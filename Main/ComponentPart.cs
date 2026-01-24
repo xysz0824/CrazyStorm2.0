@@ -140,6 +140,8 @@ namespace CrazyStorm
             //Enable binding if selected one or more.
             BindComponentItem.IsEnabled = selectedComponents != null && selectedComponents.Count > 0;
             UnbindComponentItem.IsEnabled = BindComponentItem.IsEnabled;
+            BindButton.IsEnabled = BindComponentItem.IsEnabled;
+            UnbindButton.IsEnabled = UnbindComponentItem.IsEnabled;
         }
         void UpdateComponentPanels()
         {

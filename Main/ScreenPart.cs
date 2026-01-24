@@ -334,6 +334,7 @@ namespace CrazyStorm
         }
         private void Screen_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
+            if (player != null && !player.Pause) return;
             //Show selection rect.
             Point point = e.GetPosition(sender as IInputElement);
             double x = point.X;
@@ -388,8 +389,7 @@ namespace CrazyStorm
         private void ParticleTabControl_MouseLeave(object sender, MouseEventArgs e)
         {
             //Cancel selection when mouse leaves.
-            if (selectingComponent)
-                ParticleTabControl_MouseLeftButtonUp(sender, null);
+            if (selectingComponent) ParticleTabControl_MouseLeftButtonUp(sender, null);
         }
         private void ParticleTabControl_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
