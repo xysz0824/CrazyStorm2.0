@@ -161,7 +161,7 @@
                     </ScrollViewer>
                 </DockPanel>
             </TabItem>
-            <TabItem Header="{StaticResource SoundStr}">
+            <TabItem Header="{StaticResource TypeSoundStr}">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="*"/>

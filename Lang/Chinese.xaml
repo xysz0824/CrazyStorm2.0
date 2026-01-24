@@ -207,6 +207,7 @@
     <sys:String x:Key="SpecificEventGroupStr">特性事件组</sys:String>
     <sys:String x:Key="ParticleSystemNameStr">粒子系统名称</sys:String>
     <sys:String x:Key="CustomTypeStr">自定义类型</sys:String>
+    <sys:String x:Key="TypeSoundStr">类型音效</sys:String>
     <sys:String x:Key="StartPointXStr">起点X</sys:String>
     <sys:String x:Key="StartPointYStr">起点Y</sys:String>
     <sys:String x:Key="CenterPointXStr">中心X</sys:String>

@@ -61,18 +61,15 @@ namespace CrazyStorm
         {
             //A frame approximately equals to 16ms(60 frames equal to one second)
             frame++;
-            if (Opacity >= 1f)
+            if (frame >= 20)
             {
                 string[] args = Environment.GetCommandLineArgs();
                 LogHelper.Clear("Log.txt", VersionInfo.AppTitle);
                 Environment.CurrentDirectory = System.AppDomain.CurrentDomain.SetupInformation.ApplicationBase;
                 mainWindow = new Main();
                 mainWindow.Initailize();
-                if (args.Length >= 2)
-                    mainWindow.OpenFile(args[1]);
-                else
-                    mainWindow.StartNewFile();
-
+                if (args.Length >= 2) mainWindow.OpenFile(args[1]);
+                else mainWindow.StartNewFile();
                 mainWindow.Show();
                 this.Close();
                 dTimer.Stop();
