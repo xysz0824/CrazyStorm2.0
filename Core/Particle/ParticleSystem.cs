@@ -30,7 +30,7 @@ namespace CrazyStorm.Core
         FirstAsTop,
         LastAsTop
     }
-    public class ParticleSystem : IXmlData, IGeneratePlayData, ILoadPlayData, IPlayable
+    public class ParticleSystem : IXmlData, IGeneratePlayData, ILoadPlayData
     {
         public const float FRAME_RATE_BASE = 60;
 
@@ -322,7 +322,7 @@ namespace CrazyStorm.Core
             UpdateGlobalEvents(frameScale);
             if (currentFrame != CurrentFrame)
             {
-                Reset();
+                Reset(true);
                 for (float i = 1; i < currentFrame; i += frameScale) Update(frameScale, i);
                 CurrentFrame = currentFrame;
             }
@@ -336,7 +336,7 @@ namespace CrazyStorm.Core
                 UpdateComponent(ComponentTree[i], FrameFactor * frameScale, CurrentFrame);
             }
             CurrentFrame += frameScale;
-            if (CurrentFrame > TotalFrame) Reset();
+            if (CurrentFrame > TotalFrame) Reset(false);
             return true;
         }
         public void UpdateComponent(Component component, float frameScale, float currentFrame)
@@ -351,11 +351,18 @@ namespace CrazyStorm.Core
                 UpdateComponent(component.Children[i], frameScale, currentFrame);
             }
         }
-        public void Reset()
+        public void Reset(bool includeGlobalEvents)
         {
             CurrentFrame = 1;
-            for (int i = 0; i < Layers.Count; ++i)
-                Layers[i].Reset();
+            if (includeGlobalEvents)
+            {
+                FrameSkipCount = 0;
+                screenOffset = new Vector2(0, 0);
+                shakeScreenEvent = default;
+                frameFactor = 1;
+                scaleFrameEvent = default;
+            }
+            for (int i = 0; i < Layers.Count; ++i) Layers[i].Reset();
         }
         public void SetStatus(int i)
         {

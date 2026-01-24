@@ -176,7 +176,7 @@ namespace CrazyStorm_Player
             }
             FrameworkDispatcher.Update();
             File.BodyPosition = controllable.selfPos.ToCore();
-            File.ParticleSystems[SelectedParticleSystemIndex].Reset();
+            File.ParticleSystems[SelectedParticleSystemIndex].Reset(true);
             sounds = new Dictionary<string, SoundEffect>();
             ForceField.OnForceImpactBody += ForceImpactBody;
             EventManager.OnSoundPlay += PlaySound;
