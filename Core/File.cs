@@ -186,6 +186,7 @@ namespace CrazyStorm.Core
             }
             RebuildObjectReference();
             RebuildComponentTree();
+            UpdateResource();
         }
         public void Save(string filePath)
         {

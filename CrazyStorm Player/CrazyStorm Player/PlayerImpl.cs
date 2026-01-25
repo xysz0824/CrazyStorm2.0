@@ -118,7 +118,7 @@ namespace CrazyStorm_Player
             //Load background texture
             if (!string.IsNullOrWhiteSpace(BackgroundPath))
             {
-                using (var file = new System.IO.FileStream(BackgroundPath, System.IO.FileMode.Open))
+                using (var file = new System.IO.FileStream(BackgroundPath, FileMode.Open, FileAccess.Read))
                 {
                     background = Texture2D.FromStream(gd, file);
                     float scale1 = Width / (float)background.Width;
@@ -153,7 +153,7 @@ namespace CrazyStorm_Player
             //Load main character texture
             if (!StringUtil.IsNullOrWhiteSpace(controllable.imagePath))
             {
-                using (var file = new FileStream(controllable.imagePath, FileMode.Open))
+                using (var file = new FileStream(controllable.imagePath, FileMode.Open, FileAccess.Read))
                 {
                     characterTexture = Texture2D.FromStream(gd, file);
                 }
@@ -172,7 +172,7 @@ namespace CrazyStorm_Player
                     customTextures[image.ID] = null;
                     continue;
                 }
-                using (var file = new FileStream(image.RelatviePath, FileMode.Open))
+                using (var file = new FileStream(image.RelatviePath, FileMode.Open, FileAccess.Read))
                 {
                     try
                     {
@@ -215,7 +215,7 @@ namespace CrazyStorm_Player
         {
             if (!sounds.ContainsKey(path))
             {
-                using (var stream = new FileStream(path, FileMode.Open))
+                using (var stream = new FileStream(path, FileMode.Open, FileAccess.Read))
                 {
                     sounds[path] = SoundEffect.FromStream(stream);
                 }

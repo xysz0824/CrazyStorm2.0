@@ -311,7 +311,8 @@ namespace CrazyStorm.Core
                         match = SoundMatch.Match(line);
                         if (match.Success)
                         {
-                            var typeid = int.Parse(match.Groups["typeid"].Value) - 1;
+                            var typeid = int.Parse(match.Groups["typeid"].Value);
+                            if (typeid < ParticleType.DefaultTypes.Count) typeid += ParticleType.DefaultTypeIndex;
                             var relativePath = match.Groups["path"].Value;
                             var sound = new FileResource
                             {
@@ -408,10 +409,12 @@ namespace CrazyStorm.Core
                             batch.InstantMovement = submatch.Groups["instantmovement"].Success ? bool.Parse(submatch.Groups["instantmovement"].Value) : false;
                             var particle = batch.Particle as Particle;
                             particle.MaxLife = int.Parse(submatch.Groups["sonlife"].Value);
-                            var typeId = int.Parse(submatch.Groups["typeid"].Value) - 1;
-                            if (typeId < 0) particle.Type = ParticleType.DefaultTypes[ParticleType.DefaultTypes.Count - 1];
-                            else if (typeId < ParticleType.DefaultTypes.Count) particle.Type = ParticleType.DefaultTypes[typeId];
-                            else if (typeId < particleSystem.CustomTypes.Count) particle.Type = particleSystem.CustomTypes[typeId];
+                            var typeId = int.Parse(submatch.Groups["typeid"].Value);
+                            if (typeId < ParticleType.DefaultTypes.Count) particle.Type = ParticleType.DefaultTypes[typeId];
+                            else if (typeId - ParticleType.DefaultTypes.Count < particleSystem.CustomTypes.Count)
+                            {
+                                particle.Type = particleSystem.CustomTypes[typeId - ParticleType.DefaultTypes.Count];
+                            }
                             particle.WidthScale = ConvertFloat(float.Parse(submatch.Groups["wscale"].Value), submatch.Groups["randwscale"].Success ?
                                 float.Parse(submatch.Groups["randwscale"].Value) : 0f, particle, "WidthScale");
                             particle.HeightScale = ConvertFloat(float.Parse(submatch.Groups["hscale"].Value), submatch.Groups["randhscale"].Success ?
@@ -491,10 +494,12 @@ namespace CrazyStorm.Core
                                 lase, "AcspeedAngle");
                             var particle = lase.Particle as CurveParticle;
                             particle.MaxLife = int.Parse(submatch.Groups["sonlife"].Value);
-                            var typeId = int.Parse(submatch.Groups["typeid"].Value) - 1;
-                            if (typeId < 0) particle.Type = ParticleType.DefaultTypes[ParticleType.DefaultTypes.Count - 1];
-                            else if (typeId < ParticleType.DefaultTypes.Count) particle.Type = ParticleType.DefaultTypes[typeId];
-                            else if (typeId < particleSystem.CustomTypes.Count) particle.Type = particleSystem.CustomTypes[typeId];
+                            var typeId = int.Parse(submatch.Groups["typeid"].Value);
+                            if (typeId < ParticleType.DefaultTypes.Count) particle.Type = ParticleType.DefaultTypes[typeId];
+                            else if (typeId - ParticleType.DefaultTypes.Count < particleSystem.CustomTypes.Count)
+                            {
+                                particle.Type = particleSystem.CustomTypes[typeId - ParticleType.DefaultTypes.Count];
+                            }
                             particle.WidthScale = float.Parse(submatch.Groups["wscale"].Value);
                             particle.Length = int.Parse(submatch.Groups["longs"].Value);
                             particle.Opacity = float.Parse(submatch.Groups["alpha"].Value);
