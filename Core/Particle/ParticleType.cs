@@ -345,12 +345,20 @@ namespace CrazyStorm.Core
         #endregion
 
         #region Public Methods
-        public static void LoadDefaultTypes()
+        public static void LoadDefaultTypes(string libraryPath)
         {
             if (DefaultTypes.Count > 0) return;
-            var assembly = Assembly.GetExecutingAssembly();
-            Stream defaultParticleTypesStream = assembly.GetManifestResourceStream("CrazyStorm.Core.set.txt");
-            using (StreamReader reader = new StreamReader(defaultParticleTypesStream, Encoding.UTF8))
+            Stream libraryStream = null;
+            if (string.IsNullOrEmpty(libraryPath))
+            {
+                var assembly = Assembly.GetExecutingAssembly();
+                libraryStream = assembly.GetManifestResourceStream("CrazyStorm.Core.set.txt");
+            }
+            else
+            {
+                libraryStream = new FileStream($"typelibrary\\{libraryPath}", FileMode.Open, FileAccess.Read);
+            }
+            using (StreamReader reader = new StreamReader(libraryStream, Encoding.UTF8))
             {
                 int i = 0;
                 while (!reader.EndOfStream)
@@ -367,10 +375,13 @@ namespace CrazyStorm.Core
                     {
                         particleType.Color = (ParticleColor)(int.Parse(splits[8]) + 1);
                     }
+                    if (splits.Length > 9) particleType.Frames = int.Parse(splits[9]);
+                    if (splits.Length > 10) particleType.Delay = int.Parse(splits[10]);
                     DefaultTypes.Add(particleType);
                     i++;
                 }
             }
+            libraryStream.Close();
         }
         public override string ToString()
         {

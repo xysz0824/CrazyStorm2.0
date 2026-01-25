@@ -23,6 +23,7 @@ namespace CrazyStorm
     public partial class ParticleSystemSetting : Window
     {
         #region Private Members
+        Config config;
         File file;
         ParticleSystem selectedParticle;
         ParticleType selectedType;
@@ -32,8 +33,9 @@ namespace CrazyStorm
         #endregion
 
         #region Constructor
-        public ParticleSystemSetting(File file, ParticleSystem particleSystem, TabItem selectedTab)
+        public ParticleSystemSetting(Config config, File file, ParticleSystem particleSystem, TabItem selectedTab)
         {
+            this.config = config;
             this.file = file;
             this.selectedParticle = particleSystem;
             this.selectedTab = selectedTab;
@@ -66,7 +68,7 @@ namespace CrazyStorm
             {
                 var type = types.FirstOrDefault((item) => item.ID == typeSound.Key);
                 var sound = sounds.FirstOrDefault((item) => item.ID == typeSound.Value);
-                var typeSoundPanel = new TypeSoundPanel(types, sounds, selectedParticle, type, type.Color, sound);
+                var typeSoundPanel = new TypeSoundPanel(config, types, sounds, selectedParticle, type, type.Color, sound);
                 TypeSoundList.Items.Add(typeSoundPanel);
                 typeSoundPanel.CanChangeMap = true;
             }
@@ -197,14 +199,6 @@ namespace CrazyStorm
                 {
                     Image.Source = null;
                 }
-                //Check if width or height is 2 to the power of n
-                if (((int)Image.Width & ((int)Image.Width - 1)) != 0 ||
-                    ((int)Image.Height & ((int)Image.Height - 1)) != 0)
-                {
-                    MessageBox.Show((string)FindResource("ImageSizeWaringStr"), (string)FindResource("TipTitleStr"),
-                        MessageBoxButton.OK, MessageBoxImage.Warning);
-                    return;
-                }
             }
         }
         private void FirstAsTop_Checked(object sender, RoutedEventArgs e)
@@ -221,7 +215,7 @@ namespace CrazyStorm
         }
         private void AddTypeSound_Click(object sender, RoutedEventArgs e)
         {
-            var newTypeSoundPanel = new TypeSoundPanel(types, sounds, selectedParticle, null, default, null);
+            var newTypeSoundPanel = new TypeSoundPanel(config, types, sounds, selectedParticle, null, default, null);
             TypeSoundList.Items.Add(newTypeSoundPanel);
             newTypeSoundPanel.CanChangeMap = true;
             DelTypeSound.IsEnabled = true;

@@ -910,7 +910,7 @@ namespace CrazyStorm.Core
                         {
                             case "ChangeTo":
                                 eventInfo.specialEvent = "ChangeType";
-                                eventInfo.arguments = $"{split[2]},0";
+                                eventInfo.arguments = $"{split[2]}";
                                 break;
                             case "Increase":
                                 eventInfo.specialEvent = "IncreaseType";

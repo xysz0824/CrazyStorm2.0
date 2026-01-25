@@ -25,6 +25,7 @@ namespace CrazyStorm
     public partial class TypeSoundPanel : UserControl
     {
         #region Private Members
+        Config config;
         List<ParticleType> types;
         List<FileResource> sounds;
         ParticleSystem selectedParticle;
@@ -36,9 +37,10 @@ namespace CrazyStorm
         #endregion
 
         #region Constructor
-        public TypeSoundPanel(List<ParticleType> types, List<FileResource> sounds, ParticleSystem selectedParticle, ParticleType selectedType, 
+        public TypeSoundPanel(Config config, List<ParticleType> types, List<FileResource> sounds, ParticleSystem selectedParticle, ParticleType selectedType, 
             ParticleColor selectedColor, FileResource selectedSound)
         {
+            this.config = config;
             this.types = types;
             this.sounds = sounds;
             this.selectedParticle = selectedParticle;
@@ -115,7 +117,15 @@ namespace CrazyStorm
             var oldType = e.RemovedItems.Count > 0 ? e.RemovedItems[0] as ParticleType : null;
             if (oldType != null && ColorCombo.SelectedIndex >= 0)
             {
-                selectedParticle.TypeSoundMap.Remove(oldType.ID + ColorCombo.SelectedIndex);
+                foreach (var type in types)
+                {
+                    if (type.Name == oldType.Name && ExpressionHelper.Translate(type.Color.ToString()) ==
+                        (string)(ColorCombo.SelectedItem as ComboBoxItem).Content)
+                    {
+                        selectedParticle.TypeSoundMap.Remove(type.ID);
+                        break;
+                    }
+                }
             }
             //Refresh color combobox.
             InitializeColorCombo();
@@ -127,8 +137,16 @@ namespace CrazyStorm
             var imageBrush = TypeImageRect.Fill as ImageBrush;
             if (selectedType.ID >= ParticleType.DefaultTypeIndex)
             {
-                var path = "pack://application:,,,/Images/barrages.png";
-                imageBrush.ImageSource = new BitmapImage(new Uri(path, UriKind.Absolute));
+                if (string.IsNullOrEmpty(config.TypeLibraryPath))
+                {
+                    var path = "pack://application:,,,/Images/barrages.png";
+                    imageBrush.ImageSource = new BitmapImage(new Uri(path, UriKind.Absolute));
+                }
+                else
+                {
+                    var path = $"typelibrary\\{config.TypeLibraryPath}";
+                    imageBrush.ImageSource = new BitmapImage(new Uri(path, UriKind.Relative));
+                }
             }
             else
             {
@@ -149,13 +167,28 @@ namespace CrazyStorm
             var oldColor = e.RemovedItems.Count > 0 ? e.RemovedItems[0] as ComboBoxItem : null;
             if (oldColor != null)
             {
-                var oldColorIndex = ColorCombo.Items.IndexOf(oldColor);
-                selectedParticle.TypeSoundMap.Remove(selectedType.ID + oldColorIndex);
+                foreach (var type in types)
+                {
+                    if (type.Name == selectedType.Name && ExpressionHelper.Translate(type.Color.ToString()) ==
+                        (string)oldColor.Content)
+                    {
+                        selectedParticle.TypeSoundMap.Remove(type.ID);
+                        break;
+                    }
+                }
             }
             if (SoundCombo.SelectedItem != null)
             {
                 var sound = SoundCombo.SelectedItem as FileResource;
-                selectedParticle.TypeSoundMap[selectedType.ID + ColorCombo.SelectedIndex] = sound.ID;
+                foreach (var type in types)
+                {
+                    if (type.Name == selectedType.Name && ExpressionHelper.Translate(type.Color.ToString()) ==
+                        (string)(ColorCombo.SelectedItem as ComboBoxItem).Content)
+                    {
+                        selectedParticle.TypeSoundMap[type.ID] = sound.ID;
+                        break;
+                    }
+                }
             }
         }
         private void SoundCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)

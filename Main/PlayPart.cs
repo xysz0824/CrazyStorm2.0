@@ -95,6 +95,7 @@ namespace CrazyStorm
                 {
                     player.PlayerImpl.ResourceDirectory = File.CurrentDirectory;
                 }
+                player.PlayerImpl.TypeLibraryPath = config.TypeLibraryPath;
                 player.PlayerImpl.File = new File();
                 player.PlayerImpl.File.LoadPlayFile(file.GeneratePlayFile(), CrazyStorm_Player.VersionInfo.BaseVersion);
                 player.PlayerImpl.BackgroundPath = config.BackgroundPath;

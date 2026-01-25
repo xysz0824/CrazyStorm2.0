@@ -24,6 +24,7 @@ namespace CrazyStorm
     public partial class PropertyPanel : UserControl
     {
         #region Private Members
+        Config config;
         Expression.Environment environment;
         File file;
         CommandStack commandStack;
@@ -43,10 +44,11 @@ namespace CrazyStorm
         #endregion
 
         #region Constructor
-        public PropertyPanel(CommandStack commandStack, File file,
+        public PropertyPanel(CommandStack commandStack, Config config, File file,
             List<ParticleType> types, Component component, Action updateFunc)
         {
             this.commandStack = commandStack;
+            this.config = config;
             this.file = file;
             this.types = types;
             this.component = component;
@@ -461,8 +463,16 @@ namespace CrazyStorm
                 var imageBrush = TypeImageRect.Fill as ImageBrush;
                 if (selectedType.ID >= ParticleType.DefaultTypeIndex)
                 {
-                    var path = "pack://application:,,,/Images/barrages.png";
-                    imageBrush.ImageSource = new BitmapImage(new Uri(path, UriKind.Absolute));
+                    if (string.IsNullOrEmpty(config.TypeLibraryPath))
+                    {
+                        var path = "pack://application:,,,/Images/barrages.png";
+                        imageBrush.ImageSource = new BitmapImage(new Uri(path, UriKind.Absolute));
+                    }
+                    else
+                    {
+                        var path = $"typelibrary\\{System.IO.Path.GetFileNameWithoutExtension(config.TypeLibraryPath)}.png";
+                        imageBrush.ImageSource = new BitmapImage(new Uri(path, UriKind.Relative));
+                    }
                 }
                 else
                 {

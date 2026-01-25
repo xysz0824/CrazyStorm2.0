@@ -364,7 +364,7 @@
                 <MenuItem Name="SaveItem" Header="{StaticResource SaveStr}" InputGestureText="Ctrl+S" Click="SaveItem_Click" />
                 <MenuItem Name="SaveToItem" Header="{StaticResource SaveToStr}" InputGestureText="Ctrl+Shift+S" Click="SaveToItem_Click" />
                 <Separator/>
-                <MenuItem Header="{StaticResource SetScreenStr}" Click="ScreenSettingItem_Click" />
+                <MenuItem Header="{StaticResource GlobalSettingStr}" Click="GlobalSettingItem_Click" />
                 <MenuItem Header="{StaticResource StyleStr}">
                     <MenuItem Name="StyleDefault" Header="{StaticResource StyleDefaultStr}" IsCheckable="True" IsChecked="True" Click="StyleItem_Click" Loaded="StyleItem_Loaded"/>
                     <MenuItem Name="StyleBlack" Header="{StaticResource StyleBlackStr}" IsCheckable="True" Click="StyleItem_Click" Loaded="StyleItem_Loaded"/>

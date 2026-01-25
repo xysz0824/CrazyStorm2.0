@@ -30,9 +30,11 @@ namespace CrazyStorm_Player
             var windowed = bool.Parse(Environment.GetCommandLineArgs()[9]);
             var controllableImagePath = Environment.GetCommandLineArgs()[10];
             var controllableSetting = Environment.GetCommandLineArgs()[11];
+            var typeLibraryPath = Environment.GetCommandLineArgs()[12];
 
             playerImpl = new PlayerImpl(width, height, frameRate, particleMaximum, curveParticleMaximum);
             playerImpl.ResourceDirectory = Environment.CurrentDirectory;
+            playerImpl.TypeLibraryPath = typeLibraryPath;
             playerImpl.File = new File();
             playerImpl.File.LoadPlayFile(path, VersionInfo.BaseVersion);
             playerImpl.BackgroundPath = backgroundPath;

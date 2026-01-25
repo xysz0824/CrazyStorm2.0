@@ -6,6 +6,7 @@ using CrazyStorm.Expression;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Configuration;
 using System.IO;
 using System.Linq.Expressions;
 using System.Runtime.InteropServices.ComTypes;
@@ -348,7 +349,6 @@ namespace CrazyStorm.Core
                 }
                 //Collect all particle types
                 var particleTypes = new List<ParticleType>();
-                ParticleType.LoadDefaultTypes();
                 particleTypes.AddRange(ParticleType.DefaultTypes);
                 particleTypes.AddRange(particleSystem.CustomTypes);
                 //Collect all components

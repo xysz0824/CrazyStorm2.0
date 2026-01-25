@@ -25,7 +25,7 @@
         <TabControl>
             <TabItem Header="{StaticResource CustomTypeStr}">
                 <DockPanel>
-                    <GroupBox DockPanel.Dock="Bottom" Name="Setting"  IsEnabled="False" Header="{StaticResource SettingStr}" Canvas.Left="10" Canvas.Top="193" Width="550" Height="135">
+                    <GroupBox DockPanel.Dock="Bottom" Name="Setting"  IsEnabled="False" Header="{StaticResource SettingStr}" Canvas.Left="10" Canvas.Top="193" MinWidth="550" Height="135" HorizontalAlignment="Stretch">
                         <StackPanel>
                             <WrapPanel Margin="0">
                                 <Label Content="{StaticResource NameStr}" Margin="0,1,7,1"/>

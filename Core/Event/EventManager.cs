@@ -39,10 +39,7 @@ namespace CrazyStorm.Core
                 { "ChangeType", (pc, expr, frameScale) =>
                 {
                     VM.Execute(pc, expr[0], frameScale);
-                    int args0 = VM.PopInt();
-                    VM.Execute(pc, expr[1], frameScale);
-                    int args1 = VM.PopInt();
-                    int typeId = args0 + args1;
+                    int typeId = VM.PopInt();
                     if (typeId >= ParticleType.DefaultTypeIndex)
                     {
                         if (pc is Emitter) (pc as Emitter).Template.Type = ParticleType.DefaultTypes[typeId - ParticleType.DefaultTypeIndex];

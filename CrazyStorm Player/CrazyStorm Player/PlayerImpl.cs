@@ -46,7 +46,7 @@ namespace CrazyStorm_Player
         Texture2D background;
         Vector2 backgroundScale;
         Vector2 backgroundPos;
-        List<Texture2D> defaultTextures;
+        Texture2D defaultTexture;
         Dictionary<int, Texture2D> customTextures;
         Dictionary<string, SoundEffect> sounds;
         Texture2D characterTexture;
@@ -56,6 +56,7 @@ namespace CrazyStorm_Player
         BlendType lastBlendType = BlendType.None;
 
         public string ResourceDirectory { get; set; } 
+        public string TypeLibraryPath { get; set; }
         public File File { get; set; }
         public int Width { get; set; }
         public int Height { get; set; }
@@ -135,11 +136,20 @@ namespace CrazyStorm_Player
                 }
             }
             //Load default textures and types
+            ParticleType.LoadDefaultTypes(TypeLibraryPath);
             var assembly = Assembly.GetExecutingAssembly();
-            defaultTextures = new List<Texture2D>();
             Environment.CurrentDirectory = System.AppDomain.CurrentDomain.SetupInformation.ApplicationBase;
-            Stream defaultTexturesStream = assembly.GetManifestResourceStream("CrazyStorm_Player.barrages.png");
-            defaultTextures.Add(Texture2D.FromStream(gd, defaultTexturesStream));
+            Stream defaultTextureStream = null;
+            if (string.IsNullOrEmpty(TypeLibraryPath))
+            {
+                defaultTextureStream = assembly.GetManifestResourceStream("CrazyStorm_Player.barrages.png");
+            }
+            else
+            {
+                defaultTextureStream = new FileStream($"typelibrary\\{Path.GetFileNameWithoutExtension(TypeLibraryPath)}.png", 
+                    FileMode.Open, FileAccess.Read);
+            }
+            defaultTexture = Texture2D.FromStream(gd, defaultTextureStream);
             //Load main character texture
             if (!StringUtil.IsNullOrWhiteSpace(controllable.imagePath))
             {
@@ -187,8 +197,7 @@ namespace CrazyStorm_Player
         {
             spriteBatch?.Dispose();
             background?.Dispose();
-            foreach (var tex in defaultTextures) tex?.Dispose();
-            defaultTextures.Clear();
+            defaultTexture?.Dispose();
             foreach (var tex in customTextures.Values) tex?.Dispose();
             customTextures.Clear();
             foreach (var sound in sounds.Values) sound?.Dispose();
@@ -248,7 +257,7 @@ namespace CrazyStorm_Player
             int frame = (int)particle.PCurrentFrame / (type.Delay + 1) % type.Frames;
             float vOffset = (int)particle.PCurrentFrame * particle.VSpeed;
             var rect = new Rectangle((int)type.StartPoint.x + frame * type.Width, (int)(type.StartPoint.y - vOffset), type.Width, type.Height);
-            var tex = type.ID >= ParticleType.DefaultTypeIndex ? defaultTextures[0] : type.Image != null ? customTextures[type.Image.ID] : null;
+            var tex = type.ID >= ParticleType.DefaultTypeIndex ? defaultTexture : type.Image != null ? customTextures[type.Image.ID] : null;
             if (tex != null)
             {
                 var rad = MathHelper.ToRadians(particle.PRotation);
@@ -304,7 +313,7 @@ namespace CrazyStorm_Player
             int frame = (int)particle.PCurrentFrame / (type.Delay + 1) % type.Frames;
             float vOffset = (int)particle.PCurrentFrame * particle.VSpeed;
             var rect = new Rectangle((int)type.StartPoint.x + frame * type.Width, (int)(type.StartPoint.y - vOffset), type.Width, type.Height);
-            var tex = type.ID >= ParticleType.DefaultTypeIndex ? defaultTextures[0] : type.Image != null ? customTextures[type.Image.ID] : null;
+            var tex = type.ID >= ParticleType.DefaultTypeIndex ? defaultTexture : type.Image != null ? customTextures[type.Image.ID] : null;
             if (tex != null) curveBatch.Draw(particle.Curve, tex, rect, center, color);
         }
         public void Update(KeyboardState keyboard, GameTime gameTime)

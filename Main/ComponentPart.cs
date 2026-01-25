@@ -111,7 +111,7 @@ namespace CrazyStorm
             var particleTypes = new List<ParticleType>();
             particleTypes.AddRange(ParticleType.DefaultTypes);
             particleTypes.AddRange(selectedSystem.CustomTypes);
-            var panel = new PropertyPanel(commandStacks[selectedSystem], file, 
+            var panel = new PropertyPanel(commandStacks[selectedSystem], config, file, 
                 particleTypes, component, UpdateProperty);
             scroll.Content = panel;
             panel.OnBeginEditing += () => editingProperties = true;

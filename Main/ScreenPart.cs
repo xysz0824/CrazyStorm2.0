@@ -444,10 +444,10 @@ namespace CrazyStorm
             var clickedItem = sender as MenuItem;
             clickedItem.IsChecked = clickedItem.Name == config.Theme;
         }
-        private void ScreenSettingItem_Click(object sender, RoutedEventArgs e)
+        private void GlobalSettingItem_Click(object sender, RoutedEventArgs e)
         {
-            //Open screen setting window.
-            ScreenSetting window = new ScreenSetting(config);
+            //Open global setting window.
+            GlobalSetting window = new GlobalSetting(config);
             window.OnButtonClick += () => UpdateScreen();
             window.ShowDialog();
             window.Close();

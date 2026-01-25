@@ -131,8 +131,8 @@ namespace CrazyStorm
         #region Public Methods
         public void Initailize()
         {
-            ParticleType.LoadDefaultTypes();
             InitializeConfig();
+            ParticleType.LoadDefaultTypes(config.TypeLibraryPath);
             ChangeTheme(config.Theme);
         }
         public void StartNewFile()

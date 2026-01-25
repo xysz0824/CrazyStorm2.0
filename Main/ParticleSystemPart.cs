@@ -107,7 +107,8 @@ namespace CrazyStorm
         }
         void OpenSelectedParticleSystemSetting()
         {
-            ParticleSystemSetting window = new ParticleSystemSetting(file, selectedSystem, ParticleTabControl.SelectedItem as TabItem);
+            ParticleSystemSetting window = new ParticleSystemSetting(config, file, selectedSystem, 
+                ParticleTabControl.SelectedItem as TabItem);
             window.ShowDialog();
             window.Close();
             ReloadTypes();

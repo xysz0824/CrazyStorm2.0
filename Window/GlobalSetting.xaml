@@ -1,0 +1,44 @@
+﻿<Window x:Class="CrazyStorm.GlobalSetting"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="{StaticResource GlobalSettingStr}" Height="325" Width="300" WindowStyle="ToolWindow" WindowStartupLocation="CenterScreen" ResizeMode="NoResize" Background="#FFF0F0F0">
+    <StackPanel Name="Setting" Orientation="Vertical" Margin="5,5">
+        <GroupBox Header="{StaticResource DefaultTypeStr}" Margin="0,0,0,5">
+            <StackPanel Orientation="Vertical">
+                <TextBlock Text="{StaticResource TypeLibraryTipStr}" Background="LemonChiffon" Margin="5,5,5,0" Padding="5,5" TextWrapping="Wrap" ></TextBlock>
+                <StackPanel Orientation="Horizontal" Margin="5,5,5,0">
+                    <Label Content="{StaticResource SelectTypeLibraryStr}" />
+                    <ComboBox Name="TypeLibraryList" Width="140" SelectedIndex="0" VerticalContentAlignment="Center">
+                        <ComboBoxItem Content="{StaticResource EmbeddedLibraryStr}"/>
+                    </ComboBox>
+                </StackPanel>
+            </StackPanel>
+        </GroupBox>
+        <GroupBox Header="{StaticResource ScreenSettingStr}" Margin="0,0,0,5">
+            <StackPanel Orientation="Vertical">
+                <StackPanel Orientation="Horizontal" Margin="5,5,5,0">
+                    <Label Content="{StaticResource ScreenWidthStr}" />
+                    <TextBox Name="ScreenWidth" Text="{Binding Path=ScreenWidth, Mode=OneTime}" Height="23" Width="42" VerticalContentAlignment="Center" MaxLines="1" MaxLength="4"/>
+                    <Label Content="{StaticResource ScreenHeightStr}" />
+                    <TextBox Name="ScreenHeight" Text="{Binding Path=ScreenHeight, Mode=OneTime}" Height="23" Width="42" VerticalContentAlignment="Center" MaxLength="4" MaxLines="1"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="5,5,5,0">
+                    <Label Content="{StaticResource BackgroundPathStr}" />
+                    <TextBox Name="BackgroundPath" Text="{Binding Path=BackgroundPath, Mode=OneTime}" Height="23" Width="140" VerticalContentAlignment="Center"/>
+                    <Button Name="Browse" Content="{StaticResource BrowseStr}" Width="42" Margin="5,0,0,0" Click="Browse_Click"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="5,5,5,0">
+                    <Label Content="{StaticResource GridSnapStr}" />
+                    <RadioButton Name="GridOpen" Content="{StaticResource ActiveStr}" VerticalAlignment="Center" Margin="0,0,5,0"/>
+                    <RadioButton Name="GridClose" Content="{StaticResource InactiveStr}" VerticalAlignment="Center"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="5,5,5,0">
+                    <Label Content="{StaticResource CenterDisplayStr}"/>
+                    <RadioButton Name="CenterOpen" Content="{StaticResource ActiveStr}" VerticalAlignment="Center" Margin="0,0,5,0"/>
+                    <RadioButton Name="CenterClose" Content="{StaticResource InactiveStr}" VerticalAlignment="Center"/>
+                </StackPanel>
+            </StackPanel>
+        </GroupBox>
+        <Button Content="{StaticResource ConfirmStr}" Width="75" Click="Button_Click"/>
+    </StackPanel>
+</Window>

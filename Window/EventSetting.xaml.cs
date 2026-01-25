@@ -200,7 +200,15 @@ namespace CrazyStorm
             {
                 if (TypeCombo.SelectedItem == null || ColorCombo.SelectedItem == null) return false;
                 eventInfo.specialEvent = "ChangeType";
-                eventInfo.arguments = (TypeCombo.SelectedItem as ParticleType).ID + "," + ColorCombo.SelectedIndex;
+                var selectedType = TypeCombo.SelectedItem as ParticleType;
+                foreach (var type in types)
+                {
+                    if (type.Name == selectedType.Name && ExpressionHelper.Translate(type.Color.ToString()) == 
+                        (string)(ColorCombo.SelectedItem as ComboBoxItem).Content)
+                    {
+                        eventInfo.arguments = type.ID.ToString();
+                    }
+                }
             }
             else if (GlobalEvent.IsChecked == true)
             {
@@ -357,15 +365,30 @@ namespace CrazyStorm
                 }
                 else if (eventInfo.specialEvent == "ChangeType")
                 {
-                    for (int i = 0; i < TypeCombo.Items.Count; ++i)
+                    var id = int.Parse(split[0]);
+                    foreach (var type in types)
                     {
-                        if ((TypeCombo.Items[i] as ParticleType).ID == int.Parse(split[0]))
+                        if (type.ID == id)
                         {
-                            TypeCombo.SelectedIndex = i;
+                            for (int i = 0; i < TypeCombo.Items.Count; ++i)
+                            {
+                                if ((TypeCombo.Items[i] as ParticleType).Name == type.Name)
+                                {
+                                    TypeCombo.SelectedIndex = i;
+                                    break;
+                                }
+                            }
+                            for (int i = 0; i < ColorCombo.Items.Count; ++i)
+                            {
+                                if ((string)(ColorCombo.Items[i] as ComboBoxItem).Content == 
+                                    ExpressionHelper.Translate(type.Color.ToString()))
+                                {
+                                    ColorCombo.SelectedIndex = i;
+                                }
+                            }
                             break;
                         }
                     }
-                    if (TypeCombo.SelectedItem != null) ColorCombo.SelectedIndex = int.Parse(split[1].Trim());
                     return;
                 }
                 else

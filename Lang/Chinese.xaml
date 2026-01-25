@@ -9,7 +9,7 @@
     <sys:String x:Key="OpenStr">打开</sys:String>
     <sys:String x:Key="SaveStr">保存</sys:String>
     <sys:String x:Key="SaveToStr">另存为</sys:String>
-    <sys:String x:Key="SetScreenStr">屏幕设置</sys:String>
+    <sys:String x:Key="GlobalSettingStr">全局设置</sys:String>
     <sys:String x:Key="StyleStr">界面主题</sys:String>
     <sys:String x:Key="StyleDefaultStr">默认</sys:String>
     <sys:String x:Key="StyleBlackStr">黑色</sys:String>
@@ -207,6 +207,9 @@
     <sys:String x:Key="SpecificEventGroupStr">特性事件组</sys:String>
     <sys:String x:Key="ParticleSystemNameStr">粒子系统名称</sys:String>
     <sys:String x:Key="CustomTypeStr">自定义类型</sys:String>
+    <sys:String x:Key="DefaultTypeStr">默认类型库</sys:String>
+    <sys:String x:Key="SelectTypeLibraryStr">选择配置</sys:String>
+    <sys:String x:Key="EmbeddedLibraryStr">内置库</sys:String>
     <sys:String x:Key="TypeSoundStr">类型音效</sys:String>
     <sys:String x:Key="StartPointXStr">起点X</sys:String>
     <sys:String x:Key="StartPointYStr">起点Y</sys:String>
@@ -282,7 +285,6 @@
     <sys:String x:Key="NeedSaveFirstStr">你需要先保存工程文件，然后才能执行该操作</sys:String>
     <sys:String x:Key="PlayFileSavedStr">播放文件已保存到工程文件目录下</sys:String>
     <sys:String x:Key="SaveTipStr">要保存当前文件吗？</sys:String>
-    <sys:String x:Key="ImageSizeWaringStr">该图案的尺寸大小非2次幂，请考虑更改图案尺寸，否则将会变形</sys:String>
     <sys:String x:Key="ImageTypeStr">PNG图像(*.png)|*.png</sys:String>
     <sys:String x:Key="SoundTypeStr">WAV音效(*.wav)|*.wav</sys:String>
     <sys:String x:Key="BackGroundImageTypeStr">JPEG图像(*.jpg)|*.jpg|PNG图像(*.png)|*.png</sys:String>
@@ -311,4 +313,5 @@
     <sys:String x:Key="StatusFrameStr">状态帧</sys:String>
     <sys:String x:Key="StatusTipStr">状态：</sys:String>
     <sys:String x:Key="FrameRateStr">帧率</sys:String>
+    <sys:String x:Key="TypeLibraryTipStr">⚠︎ 配置文件(*.txt)需放置在.\typelibrary\下</sys:String>
 </ResourceDictionary>

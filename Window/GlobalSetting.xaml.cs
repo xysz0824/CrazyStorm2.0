@@ -14,10 +14,12 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using System.IO;
+using CrazyStorm.Core;
 
 namespace CrazyStorm
 {
-    public partial class ScreenSetting : Window
+    public partial class GlobalSetting : Window
     {
         #region Private Members
         Config config;
@@ -28,7 +30,7 @@ namespace CrazyStorm
         #endregion
 
         #region Constructor
-        public ScreenSetting(Config config)
+        public GlobalSetting(Config config)
         {
             this.config = config;
             InitializeComponent();
@@ -40,15 +42,29 @@ namespace CrazyStorm
         void InitializeSetting()
         {
             Setting.DataContext = config;
-            if (config.GridAlignment)
-                GridOpen.IsChecked = true;
-            else
-                GridClose.IsChecked = true;
-
-            if (config.CenterDisplay)
-                CenterOpen.IsChecked = true;
-            else
-                CenterClose.IsChecked = true;
+            if (config.GridAlignment) GridOpen.IsChecked = true;
+            else GridClose.IsChecked = true;
+            if (config.CenterDisplay) CenterOpen.IsChecked = true;
+            else CenterClose.IsChecked = true;
+            InitializeTypeLibraryList();
+        }
+        void InitializeTypeLibraryList()
+        {
+            var files = Directory.GetFiles("typelibrary", "*.txt");
+            foreach (var file in files)
+            {
+                if (System.IO.File.Exists($"typelibrary\\{System.IO.Path.GetFileNameWithoutExtension(file)}.png"))
+                {
+                    var fileName = System.IO.Path.GetFileName(file);
+                    var item = new ComboBoxItem();
+                    item.Content = fileName;
+                    TypeLibraryList.Items.Add(item);
+                    if (config.TypeLibraryPath == fileName)
+                    {
+                        TypeLibraryList.SelectedItem = item;
+                    }
+                }
+            }
         }
         #endregion
 
@@ -60,7 +76,9 @@ namespace CrazyStorm
                 open.InitialDirectory = AppDomain.CurrentDomain.BaseDirectory;
                 open.Filter = (string)FindResource("BackGroundImageTypeStr");
                 if (open.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                {
                     BackgroundPath.Text = open.FileName;
+                }
             }
         }
         private void Button_Click(object sender, RoutedEventArgs e)
@@ -72,18 +90,32 @@ namespace CrazyStorm
                 config.ScreenHeight = height;
                 config.BackgroundPath = BackgroundPath.Text;
                 if (GridOpen.IsChecked.HasValue && GridOpen.IsChecked.Value == true)
+                {
                     config.GridAlignment = true;
+                }
                 else
+                {
                     config.GridAlignment = false;
-
+                }
                 if (CenterOpen.IsChecked.HasValue && CenterOpen.IsChecked.Value == true)
+                {
                     config.CenterDisplay = true;
+                }
                 else
+                {
                     config.CenterDisplay = false;
-
-                if (OnButtonClick != null)
-                    OnButtonClick();
-
+                }
+                if (TypeLibraryList.SelectedIndex > 0)
+                {
+                    config.TypeLibraryPath = (TypeLibraryList.SelectedItem as ComboBoxItem).Content as string;
+                }
+                else
+                {
+                    config.TypeLibraryPath = string.Empty;
+                }
+                ParticleType.DefaultTypes.Clear();
+                ParticleType.LoadDefaultTypes(config.TypeLibraryPath);
+                if (OnButtonClick != null) OnButtonClick();
                 config.Save();
                 this.Close();
             }
