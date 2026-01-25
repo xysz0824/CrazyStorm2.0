@@ -380,12 +380,12 @@ namespace CrazyStorm.Core
                             batch.ID = particleSystem.GetComponentIndex();
                             particleSystem.GetAndIncreaseComponentIndex(batch.GetType().ToString());
                             batch.ParentID = center.ID;
-                            batch.Position = ConvertVector2(float.Parse(submatch.Groups["x"].Value), float.Parse(submatch.Groups["y"].Value),
-                                0, 0, batch, "Position") - OldCenter - center.Position;
+                            batch.Position = ConvertVector2(float.Parse(submatch.Groups["x"].Value), float.Parse(submatch.Groups["y"].Value), 
+                                0, 0, batch, "Position", OldCenter + center.Position);
                             batch.BeginFrame = int.Parse(submatch.Groups["begin"].Value);
                             batch.TotalFrame = int.Parse(submatch.Groups["life"].Value);
                             batch.EmitPosition = ConvertVector2(float.Parse(submatch.Groups["fx"].Value), float.Parse(submatch.Groups["fy"].Value),
-                                float.Parse(submatch.Groups["randfx"].Value), float.Parse(submatch.Groups["randfy"].Value), batch, "EmitPosition") - OldCenter;
+                                float.Parse(submatch.Groups["randfx"].Value), float.Parse(submatch.Groups["randfy"].Value), batch, "EmitPosition", OldCenter);
                             batch.EmitRadius = ConvertFloat(float.Parse(submatch.Groups["r"].Value), float.Parse(submatch.Groups["randr"].Value),
                                 batch, "EmitRadius");
                             batch.EmitRoundAngle = ConvertAngle(float.Parse(submatch.Groups["rdirection"].Value), float.Parse(submatch.Groups["randrdirection"].Value), 
@@ -419,7 +419,7 @@ namespace CrazyStorm.Core
                                 float.Parse(submatch.Groups["randwscale"].Value) : 0f, particle, "WidthScale");
                             particle.HeightScale = ConvertFloat(float.Parse(submatch.Groups["hscale"].Value), submatch.Groups["randhscale"].Success ?
                                 float.Parse(submatch.Groups["randhscale"].Value) : 0f, particle, "HeightScale");
-                            particle.RetainScale = submatch.Groups["syncScale"].Success ? bool.Parse(submatch.Groups["syncScale"].Value) : true;
+                            particle.RetainScale = submatch.Groups["syncScale"].Success ? bool.Parse(submatch.Groups["syncScale"].Value) : false;
                             particle.RGB = new RGB(float.Parse(submatch.Groups["colorR"].Value),
                                 float.Parse(submatch.Groups["colorG"].Value), float.Parse(submatch.Groups["colorB"].Value));
                             particle.Opacity = float.Parse(submatch.Groups["alpha"].Value);
@@ -436,12 +436,13 @@ namespace CrazyStorm.Core
                                 particle, "PAcspeedAngle");
                             particle.PSpeedHScale = float.Parse(submatch.Groups["xscale"].Value);
                             particle.PSpeedVScale = float.Parse(submatch.Groups["yscale"].Value);
+                            particle.FogEffect = bool.Parse(submatch.Groups["mist"].Value);
                             particle.FadeEffect = bool.Parse(submatch.Groups["dispel"].Value);
                             particle.BlendType = bool.Parse(submatch.Groups["blend"].Value) ? 
                                 BlendType.Additive : BlendType.AlphaBlend;
                             particle.AfterimageEffect = bool.Parse(submatch.Groups["afterimage"].Value);
                             particle.KillOutside = bool.Parse(submatch.Groups["outdispel"].Value);
-                            particle.Collision = bool.Parse(submatch.Groups["invincible"].Value);
+                            particle.Collision = !bool.Parse(submatch.Groups["invincible"].Value);
                             particle.IgnoreMask = submatch.Groups["affectedByCover"].Success ? !bool.Parse(submatch.Groups["affectedByCover"].Value) : false;
                             particle.IgnoreRebound = submatch.Groups["affectedByRebound"].Success ? !bool.Parse(submatch.Groups["affectedByRebound"].Value) : false;
                             particle.IgnoreForce = submatch.Groups["affectedByForce"].Success ? !bool.Parse(submatch.Groups["affectedByForce"].Value) : false;
@@ -468,8 +469,8 @@ namespace CrazyStorm.Core
                             lase.ID = particleSystem.GetComponentIndex();
                             particleSystem.GetAndIncreaseComponentIndex(lase.GetType().ToString());
                             lase.ParentID = center.ID;
-                            lase.Position = ConvertVector2(float.Parse(submatch.Groups["x"].Value), float.Parse(submatch.Groups["y"].Value),
-                                0, 0, lase, "Position") - OldCenter - center.Position;
+                            lase.Position = ConvertVector2(float.Parse(submatch.Groups["x"].Value), float.Parse(submatch.Groups["y"].Value), 
+                                0, 0, lase, "Position", OldCenter + center.Position);
                             lase.BeginFrame = int.Parse(submatch.Groups["begin"].Value);
                             lase.TotalFrame = int.Parse(submatch.Groups["life"].Value);
                             lase.EmitRadius = ConvertFloat(float.Parse(submatch.Groups["r"].Value), float.Parse(submatch.Groups["randr"].Value),
@@ -532,7 +533,7 @@ namespace CrazyStorm.Core
                             particleSystem.GetAndIncreaseComponentIndex(cover.GetType().ToString());
                             cover.ParentID = center.ID;
                             cover.Position = ConvertVector2(float.Parse(submatch.Groups["x"].Value), float.Parse(submatch.Groups["y"].Value),
-                                0, 0, cover, "Position") - OldCenter - center.Position;
+                                0, 0, cover, "Position", OldCenter + center.Position);
                             cover.BeginFrame = int.Parse(submatch.Groups["begin"].Value);
                             cover.TotalFrame = int.Parse(submatch.Groups["life"].Value);
                             cover.HalfWidth = int.Parse(submatch.Groups["halfw"].Value);
@@ -572,8 +573,8 @@ namespace CrazyStorm.Core
                             rebound.ID = particleSystem.GetComponentIndex();
                             particleSystem.GetAndIncreaseComponentIndex(rebound.GetType().ToString());
                             rebound.ParentID = center.ID;
-                            rebound.Position = ConvertVector2(float.Parse(submatch.Groups["x"].Value), float.Parse(submatch.Groups["y"].Value),
-                                0, 0, rebound, "Position") - OldCenter - center.Position;
+                            rebound.Position = ConvertVector2(float.Parse(submatch.Groups["x"].Value), float.Parse(submatch.Groups["y"].Value), 
+                                0, 0, rebound, "Position", OldCenter + center.Position);
                             rebound.BeginFrame = int.Parse(submatch.Groups["begin"].Value);
                             rebound.TotalFrame = int.Parse(submatch.Groups["life"].Value);
                             rebound.Size = int.Parse(submatch.Groups["longs"].Value);
@@ -606,8 +607,8 @@ namespace CrazyStorm.Core
                             force.ID = particleSystem.GetComponentIndex();
                             particleSystem.GetAndIncreaseComponentIndex(force.GetType().ToString());
                             force.ParentID = center.ID;
-                            force.Position = ConvertVector2(float.Parse(submatch.Groups["x"].Value), float.Parse(submatch.Groups["y"].Value),
-                                0, 0, force, "Position") - OldCenter - center.Position;
+                            force.Position = ConvertVector2(float.Parse(submatch.Groups["x"].Value), float.Parse(submatch.Groups["y"].Value), 
+                                0, 0, force, "Position", OldCenter + center.Position);
                             force.BeginFrame = int.Parse(submatch.Groups["begin"].Value);
                             force.TotalFrame = int.Parse(submatch.Groups["life"].Value);
                             force.HalfWidth = int.Parse(submatch.Groups["halfw"].Value);
@@ -675,7 +676,8 @@ namespace CrazyStorm.Core
             }
             else return v;
         }
-        public static Vector2 ConvertVector2(float x, float y, float randx, float randy, PropertyContainer propertyContainer, string name)
+        public static Vector2 ConvertVector2(float x, float y, float randx, float randy, PropertyContainer propertyContainer, string name,
+            Vector2 offset)
         {
             string randXStr = randx.ToString();
             if (randx != 0f) randXStr = $"{{{randx}}}";
@@ -707,8 +709,8 @@ namespace CrazyStorm.Core
                 randYStr = randy != 0f ? $"+{randYStr}" : "";
                 propertyContainer.Properties[name] = new PropertyValue()
                 {
-                    Value = $"[{(x == -99998 ? "Position.x" : x == -99999 ? "BodyPosition.x" : x.ToString())}{randXStr}," +
-                    $"{(y == -99998 ? "Position.y" : y == -99999 ? "BodyPosition.y" : y.ToString())}{randYStr}]",
+                    Value = $"[{(x == -99998 ? "Position.x" : x == -99999 ? "BodyPosition.x" : (x - offset.x).ToString())}{randXStr}," +
+                    $"{(y == -99998 ? "Position.y" : y == -99999 ? "BodyPosition.y" : (y - offset.y).ToString())}{randYStr}]",
                     Expression = true,
                 };
                 return Vector2.Zero;
@@ -718,12 +720,12 @@ namespace CrazyStorm.Core
                 string randStr = $"+[{randXStr},{randYStr}]";
                 propertyContainer.Properties[name] = new PropertyValue()
                 {
-                    Value = $"[{x},{y}]{randStr}",
+                    Value = $"[{x - offset.x},{y - offset.y}]{randStr}",
                     Expression = true,
                 };
                 return Vector2.Zero;
             }
-            else return new Vector2(x, y);
+            else return new Vector2(x, y) - offset;
         }
         public static float ConvertAngle(float deg, float rand, PropertyContainer propertyContainer, string name)
         {
