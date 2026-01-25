@@ -184,6 +184,7 @@ namespace CrazyStorm_Player
                     }
                 }
             }
+            Environment.CurrentDirectory = System.AppDomain.CurrentDomain.SetupInformation.ApplicationBase;
             FrameworkDispatcher.Update();
             File.BodyPosition = controllable.selfPos.ToCore();
             File.ParticleSystems[SelectedParticleSystemIndex].Reset(true);

@@ -27,12 +27,13 @@ namespace CrazyStorm.Core
         }
         public void Update(float frameScale)
         {
-            float ratio = currentTime / ChangeTime;
+            float ratio = Math.Min(1, (currentTime + frameScale) / ChangeTime);
             if (ChangeMode == EventChangeMode.Accelerated) ratio *= ratio;
             else if (ChangeMode == EventChangeMode.Decelerated) ratio *= (2 - ratio);
             else if (ChangeMode == EventChangeMode.Sin) ratio = (float)Math.Sin(ratio * Math.PI * 2);
             else if (ChangeMode == EventChangeMode.Cos) ratio = (float)Math.Cos(ratio * Math.PI * 2);
-            currentValue.type = InitialValue.type;
+            else if (ChangeMode == EventChangeMode.Instant) ratio = 1;
+                currentValue.type = InitialValue.type;
             switch (InitialValue.type)
             {
                 case PropertyType.Boolean:

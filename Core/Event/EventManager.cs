@@ -118,7 +118,7 @@ namespace CrazyStorm.Core
                     int args0 = VM.PopInt();
                     VM.Execute(pc, expr[1], frameScale);
                     int args1 = VM.PopInt();
-                    if (pc is Component)
+                    if (args0 > 0 && pc is Component)
                     {
                         var component = pc as Component;
                         if (args1 == 0 || args1 >= component.System.FrameSkipCount)
