@@ -93,7 +93,7 @@ namespace CrazyStorm.Core
             set { componentData.totalFrame = value; }
         }
         [Vector2Property]
-        public Vector2 Position
+        public Vector2 Position //When in Edit mode, this represents relative position, in Play mode, absolute position
         {
             get { return componentData.position; }
             set { componentData.position = value; }
@@ -249,20 +249,16 @@ namespace CrazyStorm.Core
         public override string ToString() => Name;
         public void TransPositiontoRelative()
         {
-            if (parent != null)
-                componentData.position -= parent.GetAbsolutePosition();
+            if (parent != null) Position -= parent.GetAbsolutePosition();
         }
         public void TransPositiontoAbsolute()
         {
-            if (parent != null)
-                componentData.position += parent.GetAbsolutePosition();
+            if (parent != null) Position += parent.GetAbsolutePosition();
         }
         public Vector2 GetAbsolutePosition()
         {
-            if (parent != null)
-                return componentData.position + parent.GetAbsolutePosition();
-
-            return componentData.position;
+            if (parent != null) return Position + parent.GetAbsolutePosition();
+            return Position;
         }
         public IList<Component> GetPosterity()
         {

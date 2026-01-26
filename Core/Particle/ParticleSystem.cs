@@ -272,7 +272,7 @@ namespace CrazyStorm.Core
                 }
             }
         }
-        public Vector2 GetCenterPositionOrDefault()
+        Vector2 GetCenterPositionRuntime()
         {
             for (int i = 0; i < Layers.Count; ++i)
             {
@@ -327,7 +327,7 @@ namespace CrazyStorm.Core
                 CurrentFrame = currentFrame;
             }
             StatusFrame += frameScale;
-            CenterPosition = GetCenterPositionOrDefault();
+            CenterPosition = GetCenterPositionRuntime();
             for (int i = 0; i < ComponentTree.Count; ++i)
             {
                 ComponentTree[i].Status = Status;

@@ -56,6 +56,7 @@ namespace CrazyStorm
             InitializeComponent();
             InitializeEnvironment();
             LoadContent();
+            UpdateProperty();
         }
         #endregion
 
