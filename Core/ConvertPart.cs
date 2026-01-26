@@ -375,8 +375,7 @@ namespace CrazyStorm.Core
                             if (!submatch.Success) continue;
                             var batch = new MultiEmitter();
                             batch.Name = (float.Parse(submatch.Groups["id"].Value) + 1).ToString();
-                            batch.BindingTargetID = bool.Parse(submatch.Groups["binding"].Value) ?
-                                int.Parse(submatch.Groups["bindid"].Value) : -1;
+                            batch.BindingTargetID = int.Parse(submatch.Groups["bindid"].Value);
                             batch.ID = particleSystem.GetComponentIndex();
                             particleSystem.GetAndIncreaseComponentIndex(batch.GetType().ToString());
                             batch.ParentID = center.ID;
@@ -464,8 +463,7 @@ namespace CrazyStorm.Core
                             if (!submatch.Success) continue;
                             var lase = new CurveEmitter();
                             lase.Name = (float.Parse(submatch.Groups["id"].Value) + 1).ToString();
-                            lase.BindingTargetID = bool.Parse(submatch.Groups["binding"].Value) ?
-                                int.Parse(submatch.Groups["bindid"].Value) : -1;
+                            lase.BindingTargetID = int.Parse(submatch.Groups["bindid"].Value);
                             lase.ID = particleSystem.GetComponentIndex();
                             particleSystem.GetAndIncreaseComponentIndex(lase.GetType().ToString());
                             lase.ParentID = center.ID;
@@ -528,7 +526,7 @@ namespace CrazyStorm.Core
                             if (!submatch.Success) continue;
                             var cover = new EventField();
                             cover.Name = (float.Parse(submatch.Groups["id"].Value) + 1).ToString();
-                            cover.BindingTargetID = submatch.Groups["bindid"].Success ? int.Parse(submatch.Groups["bindid"].Value) : -1;
+                            cover.BindingTargetID = int.Parse(submatch.Groups["bindid"].Value);
                             cover.ID = particleSystem.GetComponentIndex();
                             particleSystem.GetAndIncreaseComponentIndex(cover.GetType().ToString());
                             cover.ParentID = center.ID;
@@ -603,7 +601,7 @@ namespace CrazyStorm.Core
                             if (!submatch.Success) continue;
                             var force = new ForceField();
                             force.Name = (float.Parse(submatch.Groups["id"].Value) + 1).ToString();
-                            force.BindingTargetID = submatch.Groups["bindid"].Success ? int.Parse(submatch.Groups["bindid"].Value) : -1;
+                            force.BindingTargetID = int.Parse(submatch.Groups["bindid"].Value);
                             force.ID = particleSystem.GetComponentIndex();
                             particleSystem.GetAndIncreaseComponentIndex(force.GetType().ToString());
                             force.ParentID = center.ID;
@@ -635,7 +633,7 @@ namespace CrazyStorm.Core
                         foreach (var component in layer.Components)
                         {
                             if (component.BindingTargetID == -1) continue;
-                            component.BindingTarget = batchs.Find((emitter) => emitter.Name == component.BindingTargetID.ToString());
+                            component.BindingTarget = batchs.Find((emitter) => emitter.Name == (component.BindingTargetID + 1).ToString());
                             component.BindingTargetID = -1;
                         }
                         if (particleSystem.Layers.Count == 0)
