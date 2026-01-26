@@ -210,6 +210,9 @@
     <sys:String x:Key="DefaultTypeStr">默认类型库</sys:String>
     <sys:String x:Key="SelectTypeLibraryStr">选择配置</sys:String>
     <sys:String x:Key="EmbeddedLibraryStr">内置库</sys:String>
+    <sys:String x:Key="FrameOrientationStr">动画裁取方向</sys:String>
+    <sys:String x:Key="HorizontalStr">水平</sys:String>
+    <sys:String x:Key="VerticalStr">垂直</sys:String>
     <sys:String x:Key="TypeSoundStr">类型音效</sys:String>
     <sys:String x:Key="StartPointXStr">起点X</sys:String>
     <sys:String x:Key="StartPointYStr">起点Y</sys:String>

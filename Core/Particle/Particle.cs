@@ -37,7 +37,7 @@ namespace CrazyStorm.Core
         #endregion
 
         #region Public Members
-        [FloatProperty(0, float.MaxValue)]
+        [FloatProperty(float.MinValue, float.MaxValue)]
         public float HeightScale
         {
             get { return particleData.heightScale; }

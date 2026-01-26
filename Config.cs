@@ -9,6 +9,7 @@ using System.Linq;
 using System.Text;
 using System.ComponentModel;
 using CrazyStorm.Core;
+using CrazyStorm_Player;
 
 namespace CrazyStorm
 {
@@ -31,6 +32,7 @@ namespace CrazyStorm
         string selfSetting;
         string theme;
         string typeLibraryPath;
+        int frameOrientation;
         #endregion
 
         #region Public Members
@@ -181,6 +183,16 @@ namespace CrazyStorm
                     PropertyChanged(this, new PropertyChangedEventArgs("TypeLibraryPath"));
             }
         }
+        public FrameOrientation FrameOrientation
+        {
+            get { return (FrameOrientation)frameOrientation; }
+            set
+            {
+                frameOrientation = (int)value;
+                if (PropertyChanged != null)
+                    PropertyChanged(this, new PropertyChangedEventArgs("FrameOrientation"));
+            }
+        }
         #endregion
 
         #region Constructor
@@ -191,7 +203,6 @@ namespace CrazyStorm
             {
                 System.IO.File.CreateText(filePath);
             }
-
             Load();
         }
         #endregion
@@ -212,6 +223,7 @@ namespace CrazyStorm
             selfSetting = iniHelper.ReadValue("Play", "SelfSetting", string.Empty);
             theme = iniHelper.ReadValue("General", "Theme", "StyleDefault");
             typeLibraryPath = iniHelper.ReadValue("General", "TypeLibrary", string.Empty);
+            frameOrientation = iniHelper.ReadValue("General", "FrameOrientation", (int)FrameOrientation.Horizontal);
         }
         public void Save()
         {
@@ -228,6 +240,7 @@ namespace CrazyStorm
             iniHelper.WriteValue("Play", "SelfSetting", selfSetting);
             iniHelper.WriteValue("General", "Theme", theme);
             iniHelper.WriteValue("General", "TypeLibrary", typeLibraryPath);
+            iniHelper.WriteValue("General", "FrameOrientation", frameOrientation);
         }
         #endregion
     }

@@ -27,6 +27,11 @@ using Effect = Microsoft.Xna.Framework.Graphics.Effect;
 
 namespace CrazyStorm_Player
 {
+    public enum FrameOrientation
+    {
+        Horizontal,
+        Vertical
+    }
     public class PlayerImpl
     {
         const int PARTICLE_PRESERVED_DIST = 50;
@@ -57,6 +62,7 @@ namespace CrazyStorm_Player
 
         public string ResourceDirectory { get; set; } 
         public string TypeLibraryPath { get; set; }
+        public FrameOrientation FrameOrientation { get; set; }
         public File File { get; set; }
         public int Width { get; set; }
         public int Height { get; set; }
@@ -71,6 +77,7 @@ namespace CrazyStorm_Player
             Width = width;
             Height = height;
             FrameRate = frameRate;
+            CurrentFrame = 1;
             EventManager.Initialize();
             ParticleManager.Initialize(width, height, PARTICLE_PRESERVED_DIST, CURVE_PRESERVED_DIST, 
                 particleMaximum, curveParticleMaximum);
@@ -248,34 +255,46 @@ namespace CrazyStorm_Player
             }
             lastBlendType = blendType;
             var type = particle.Type;
+            var tex = type.ID >= ParticleType.DefaultTypeIndex ? defaultTexture : type.Image != null ? customTextures[type.Image.ID] : null;
+            if (tex == null) return;
             var center = new Vector2(Width / 2, Height / 2) + particle.System.ScreenOffset.ToXna();
-            var imageCenter = new Vector2(type.CenterPoint.x, type.CenterPoint.y);
+            var origin = type.CenterPoint.ToXna();
+            if (particle.WidthScale < 0) origin.X = type.Width - origin.X;
+            if (particle.HeightScale < 0) origin.Y = type.Height - origin.Y;
+            SpriteEffects spriteEffects = particle.WidthScale < 0 ? SpriteEffects.FlipHorizontally : SpriteEffects.None;
+            spriteEffects |= particle.HeightScale < 0 ? SpriteEffects.FlipVertically : SpriteEffects.None;
             float fogScale = (ParticleBase.FOG_TIME - particle.FogFrame) / 15.0f;
-            var scale = new Vector2(particle.WidthScale + fogScale, particle.HeightScale + fogScale);
+            var scale = new Vector2(Math.Abs(particle.WidthScale) + fogScale, Math.Abs(particle.HeightScale) + fogScale);
             var position = new Vector2(particle.PPosition.x, particle.PPosition.y) + center;
             float alpha = particle.Opacity / 100f - (ParticleBase.FOG_TIME - particle.FogFrame) / ParticleBase.FOG_TIME;
             var color = new Color(particle.RGB.r / 255f, particle.RGB.g / 255f, particle.RGB.b / 255f, alpha);
-            int frame = (int)particle.PCurrentFrame / (type.Delay + 1) % type.Frames;
-            float vOffset = (int)particle.PCurrentFrame * particle.VSpeed;
-            var rect = new Rectangle((int)type.StartPoint.x + frame * type.Width, (int)(type.StartPoint.y - vOffset), type.Width, type.Height);
-            var tex = type.ID >= ParticleType.DefaultTypeIndex ? defaultTexture : type.Image != null ? customTextures[type.Image.ID] : null;
-            if (tex != null)
+            int frame = (int)particle.PAnimateFrame / (type.Delay + 1) % type.Frames;
+            float vOffset = (int)particle.PAnimateFrame * particle.VSpeed;
+            var rect = new Rectangle((int)type.StartPoint.x, (int)(type.StartPoint.y - vOffset), type.Width, type.Height);
+            if (FrameOrientation == FrameOrientation.Vertical)
             {
-                var rad = MathHelper.ToRadians(particle.PRotation);
-                spriteBatch.Draw(tex, position, rect, color, rad, imageCenter, scale, SpriteEffects.None, 0);
-                if (!particle.AfterimageEffect) return;
-                for (int i = 0; i < Particle.AFTERIMAGE_COUNT; ++i)
+                var row = (int)Math.Max(1, (tex.Height - type.StartPoint.y) / rect.Height);
+                rect.Offset(frame / row * rect.Width, frame % row * rect.Height);
+            }
+            else
+            {
+                var col = (int)Math.Max(1, (tex.Width - type.StartPoint.x) / rect.Width);
+                rect.Offset(frame % col * rect.Width, frame / col * rect.Height);
+            }
+            var rad = MathHelper.ToRadians(particle.PRotation);
+            spriteBatch.Draw(tex, position, rect, color, rad, origin, scale, spriteEffects, 0);
+            if (!particle.AfterimageEffect) return;
+            for (int i = 0; i < Particle.AFTERIMAGE_COUNT; ++i)
+            {
+                var afterImage = particle.AfterImageData[i];
+                if (afterImage.alpha > 0)
                 {
-                    var afterImage = particle.AfterImageData[i];
-                    if (afterImage.alpha > 0)
-                    {
-                        position = new Vector2(afterImage.x, afterImage.y) + center;
-                        rad = MathHelper.ToRadians(afterImage.rot);
-                        color.A = (byte)(afterImage.alpha * alpha * 255f);
-                        spriteBatch.Draw(tex, position, rect, color, rad, imageCenter, scale, SpriteEffects.None, 0);
-                    }
-                    particle.AfterImageData[i] = afterImage;
+                    position = new Vector2(afterImage.x, afterImage.y) + center;
+                    rad = MathHelper.ToRadians(afterImage.rot);
+                    color.A = (byte)(afterImage.alpha * alpha * 255f);
+                    spriteBatch.Draw(tex, position, rect, color, rad, origin, scale, spriteEffects, 0);
                 }
+                particle.AfterImageData[i] = afterImage;
             }
         }
         void DrawCurveParticle(SpriteBatch spriteBatch, CurveBatch curveBatch, CurveParticle particle)
@@ -308,13 +327,24 @@ namespace CrazyStorm_Player
             }
             lastBlendType = blendType;
             var type = particle.Type;
+            var tex = type.ID >= ParticleType.DefaultTypeIndex ? defaultTexture : type.Image != null ? customTextures[type.Image.ID] : null;
+            if (tex == null) return;
             var center = new Vector2(Width / 2, Height / 2) + particle.System.ScreenOffset.ToXna();
             float alpha = particle.Opacity / 100f - (ParticleBase.FOG_TIME - particle.FogFrame) / ParticleBase.FOG_TIME;
             var color = new Color(particle.RGB.r / 255f, particle.RGB.g / 255f, particle.RGB.b / 255f, alpha);
-            int frame = (int)particle.PCurrentFrame / (type.Delay + 1) % type.Frames;
-            float vOffset = (int)particle.PCurrentFrame * particle.VSpeed;
-            var rect = new Rectangle((int)type.StartPoint.x + frame * type.Width, (int)(type.StartPoint.y - vOffset), type.Width, type.Height);
-            var tex = type.ID >= ParticleType.DefaultTypeIndex ? defaultTexture : type.Image != null ? customTextures[type.Image.ID] : null;
+            int frame = (int)particle.PAnimateFrame / (type.Delay + 1) % type.Frames;
+            float vOffset = (int)particle.PAnimateFrame * particle.VSpeed;
+            var rect = new Rectangle((int)type.StartPoint.x, (int)(type.StartPoint.y - vOffset), type.Width, type.Height);
+            if (FrameOrientation == FrameOrientation.Vertical)
+            {
+                var row = (int)Math.Max(1, (tex.Height - type.StartPoint.y) / rect.Height);
+                rect.Offset(frame / row * rect.Width, frame % row * rect.Height);
+            }
+            else
+            {
+                var col = (int)Math.Max(1, (tex.Width - type.StartPoint.x) / rect.Width);
+                rect.Offset(frame % col * rect.Width, frame / col * rect.Height);
+            }
             if (tex != null) curveBatch.Draw(particle.Curve, tex, rect, center, color);
         }
         public void Update(KeyboardState keyboard, GameTime gameTime)

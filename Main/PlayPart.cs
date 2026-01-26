@@ -81,27 +81,28 @@ namespace CrazyStorm
                 activeParticleCountLabel.Visibility = Visibility.Visible;
                 statusTipLabel.Visibility = Visibility.Visible;
                 statusPanel.Visibility = Visibility.Visible;
-                player = new EmbeddedPlayer();
                 var config = screen.DataContext as Config;
+                player = new EmbeddedPlayer();
                 player.Width = config.ScreenWidth;
                 player.Height = config.ScreenHeight;
                 player.PlayerImpl = new PlayerImpl(config.ScreenWidth, config.ScreenHeight, config.FrameRate,
                     config.ParticleMaximum, config.CurveParticleMaximum);
                 if (string.IsNullOrWhiteSpace(File.CurrentDirectory))
                 {
-                    player.PlayerImpl.ResourceDirectory = System.AppDomain.CurrentDomain.SetupInformation.ApplicationBase;
+                    player.PlayerImpl.ResourceDirectory = AppDomain.CurrentDomain.SetupInformation.ApplicationBase;
                 }
                 else
                 {
                     player.PlayerImpl.ResourceDirectory = File.CurrentDirectory;
                 }
                 player.PlayerImpl.TypeLibraryPath = config.TypeLibraryPath;
-                player.PlayerImpl.File = new File();
-                player.PlayerImpl.File.LoadPlayFile(file.GeneratePlayFile(), CrazyStorm_Player.VersionInfo.BaseVersion);
+                player.PlayerImpl.FrameOrientation = config.FrameOrientation;
                 player.PlayerImpl.BackgroundPath = config.BackgroundPath;
                 player.PlayerImpl.SelectedParticleSystemIndex = particleSystemIndex;
                 player.PlayerImpl.ControllableImagePath = config.SelfImagePath;
                 player.PlayerImpl.ControllableSetting = config.SelfSetting;
+                player.PlayerImpl.File = new File();
+                player.PlayerImpl.File.LoadPlayFile(file.GeneratePlayFile(), CrazyStorm_Player.VersionInfo.BaseVersion);
                 player.PlayerImpl.CurrentFrame = selectedFrame;
                 screenContent.Children.Add(player);
                 Panel.SetZIndex(player, 1);

@@ -16,6 +16,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using System.IO;
 using CrazyStorm.Core;
+using CrazyStorm_Player;
 
 namespace CrazyStorm
 {
@@ -42,6 +43,8 @@ namespace CrazyStorm
         void InitializeSetting()
         {
             Setting.DataContext = config;
+            if (config.FrameOrientation == FrameOrientation.Horizontal) Horizontal.IsChecked = true;
+            else Vertical.IsChecked = true; 
             if (config.GridAlignment) GridOpen.IsChecked = true;
             else GridClose.IsChecked = true;
             if (config.CenterDisplay) CenterOpen.IsChecked = true;
@@ -89,22 +92,10 @@ namespace CrazyStorm
                 config.ScreenWidth = width;
                 config.ScreenHeight = height;
                 config.BackgroundPath = BackgroundPath.Text;
-                if (GridOpen.IsChecked.HasValue && GridOpen.IsChecked.Value == true)
-                {
-                    config.GridAlignment = true;
-                }
-                else
-                {
-                    config.GridAlignment = false;
-                }
-                if (CenterOpen.IsChecked.HasValue && CenterOpen.IsChecked.Value == true)
-                {
-                    config.CenterDisplay = true;
-                }
-                else
-                {
-                    config.CenterDisplay = false;
-                }
+                config.FrameOrientation = Vertical.IsChecked.HasValue &&Vertical.IsChecked.Value == true ?
+                    FrameOrientation.Vertical : FrameOrientation.Horizontal;
+                config.GridAlignment = GridOpen.IsChecked.HasValue && GridOpen.IsChecked.Value == true;
+                config.CenterDisplay = CenterOpen.IsChecked.HasValue && CenterOpen.IsChecked.Value == true;
                 if (TypeLibraryList.SelectedIndex > 0)
                 {
                     config.TypeLibraryPath = (TypeLibraryList.SelectedItem as ComboBoxItem).Content as string;

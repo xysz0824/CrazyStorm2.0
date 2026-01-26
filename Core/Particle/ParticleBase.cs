@@ -71,6 +71,7 @@ namespace CrazyStorm.Core
         }
         [RuntimeProperty]
         public float PCurrentFrame { get; private set; }
+        public float PAnimateFrame { get; private set; }
         [RuntimeProperty]
         public bool PMasked { get; set; }
         [RuntimeProperty]
@@ -79,7 +80,11 @@ namespace CrazyStorm.Core
         public ParticleType Type
         {
             get { return type; }
-            set { type = value; }
+            set 
+            {
+                if (type != value) PAnimateFrame = 1;
+                type = value; 
+            }
         }
         [RGBProperty]
         public RGB RGB
@@ -188,7 +193,7 @@ namespace CrazyStorm.Core
             get { return particleBaseData.ignoreForce; }
             set { particleBaseData.ignoreForce = value; }
         }
-        [FloatProperty(0, float.MaxValue)]
+        [FloatProperty(float.MinValue, float.MaxValue)]
         public float WidthScale
         {
             get { return particleBaseData.widthScale; }
@@ -221,6 +226,7 @@ namespace CrazyStorm.Core
         {
             RenderOrder = int.MaxValue;
             PCurrentFrame = 1;
+            PAnimateFrame = 1;
             particleBaseData.maxLife = 200;
             particleBaseData.widthScale = 1;
             particleBaseData.rgb = new RGB(255, 255, 255);
@@ -611,6 +617,7 @@ namespace CrazyStorm.Core
                 ParticleEventGroups[i].Execute(this, null, frameScale);
             }
             PCurrentFrame += frameScale;
+            PAnimateFrame += frameScale;
             if (MaxLife <= FOG_TIME)
             {
                 FogFrame = (int)FOG_TIME;
@@ -640,7 +647,9 @@ namespace CrazyStorm.Core
             particle.type = type;
             particle.typeID = typeID;
             particle.particleBaseData = particleBaseData;
-            particle.PCurrentFrame = PCurrentFrame;
+            particle.PCurrentFrame = 1;
+            particle.PAnimateFrame = 1;
+            particle.PMasked = false;
             particle.PPosition = PPosition;
             particle.PSpeedAngle = PSpeedAngle;
             particle.Emitter = Emitter;

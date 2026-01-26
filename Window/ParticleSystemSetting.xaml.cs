@@ -17,6 +17,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using CrazyStorm_Player;
 
 namespace CrazyStorm
 {
@@ -107,8 +108,18 @@ namespace CrazyStorm
                 rect.Height = height;
                 rect.Stroke = new SolidColorBrush(Colors.Red);
                 Preview.Children.Add(rect);
-                Canvas.SetLeft(rect, startPointX + i * width);
-                Canvas.SetTop(rect, startPointY);
+                if (config.FrameOrientation == FrameOrientation.Vertical)
+                {
+                    var rows = (int)Math.Max(1, (Image.Height - startPointY) / height);
+                    Canvas.SetLeft(rect, startPointX + (i / rows) * width);
+                    Canvas.SetTop(rect, startPointY + (i % rows) * height);
+                }
+                else
+                {
+                    var cols = (int)Math.Max(1, (Image.Width - startPointX) / width);
+                    Canvas.SetLeft(rect, startPointX + (i % cols) * width);
+                    Canvas.SetTop(rect, startPointY + (i / cols) * height);
+                }
                 rect.Opacity = 0.8f;
             }
         }

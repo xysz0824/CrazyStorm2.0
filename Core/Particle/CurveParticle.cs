@@ -152,7 +152,7 @@ namespace CrazyStorm.Core
         bool CurveJudge(Vector2 head, Vector2 tail, float scale, Vector2 bp, Vector2 p, Vector2 s, float r, float deg)
         {
             if (scale < 0.3f || scale > 0.7f) return false;
-            return MathHelper.Judge(head, tail, bp, p, s, r, deg) & WidthScale >= 0.5f;
+            return MathHelper.Judge(head, tail, bp, p, s, r, deg) & Math.Abs(WidthScale) >= 0.5f;
         }
         public override bool CheckCollision(Vector2 playerLast, Vector2 player, float r)
         {
