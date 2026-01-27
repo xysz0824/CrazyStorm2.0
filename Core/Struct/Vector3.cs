@@ -13,7 +13,7 @@ namespace CrazyStorm.Core
     public struct Vector3
     {
         public float x, y, z;
-        public bool Integer { get; private set; }
+        public bool AsInteger { get; set; }
         public bool UseFrameEqual { get; set; }
         public static readonly Vector3 Zero = new Vector3();
         public Vector3(float x, float y, float z)
@@ -21,7 +21,7 @@ namespace CrazyStorm.Core
             this.x = x;
             this.y = y;
             this.z = z;
-            Integer = false;
+            AsInteger = false;
             UseFrameEqual = false;
         }
         public Vector3(int x, int y, int z)
@@ -29,7 +29,7 @@ namespace CrazyStorm.Core
             this.x = x;
             this.y = y;
             this.z = z;
-            Integer = true;
+            AsInteger = true;
             UseFrameEqual = false;
         }
         public Vector3(float x, float y) : this(x, y, 0) { }
@@ -41,7 +41,7 @@ namespace CrazyStorm.Core
             this.x = xy.x;
             this.y = xy.y;
             this.z = z;
-            Integer = false;
+            AsInteger = false;
             UseFrameEqual = false;
         }
         public Vector3(Vector2 xy) : this(xy, 0) { }

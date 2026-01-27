@@ -483,7 +483,7 @@ namespace CrazyStorm.Core
                     VM.PushInt(Status);
                     return true;
                 case "StatusFrame":
-                    VM.PushFloat(StatusFrame, true);
+                    VM.PushFloat(StatusFrame, true, true);
                     return true;
                 case "SelfAngle":
                     VM.PushFloat(0);
@@ -524,10 +524,10 @@ namespace CrazyStorm.Core
                     VM.PushString(Name);
                     return true;
                 case "LayerFrame":
-                    VM.PushFloat(LayerFrame, true);
+                    VM.PushFloat(LayerFrame, true, true);
                     return true;
                 case "CurrentFrame":
-                    VM.PushFloat(CurrentFrame, true);
+                    VM.PushFloat(CurrentFrame, true, true);
                     return true;
                 case "BeginFrame":
                     VM.PushInt(BeginFrame);

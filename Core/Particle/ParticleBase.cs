@@ -331,7 +331,7 @@ namespace CrazyStorm.Core
                     VM.PushInt(Emitter.Status);
                     return true;
                 case "StatusFrame":
-                    VM.PushFloat(Emitter.StatusFrame, true);
+                    VM.PushFloat(Emitter.StatusFrame, true, true);
                     return true;
                 case "SelfAngle":
                     VM.PushFloat(0);
@@ -372,10 +372,10 @@ namespace CrazyStorm.Core
                     VM.PushInt(MaxLife);
                     return true;
                 case "PLayerFrame":
-                    VM.PushFloat(PLayerFrame, true);
+                    VM.PushFloat(PLayerFrame, true, true);
                     return true;
                 case "PCurrentFrame":
-                    VM.PushFloat(PCurrentFrame, true);
+                    VM.PushFloat(PCurrentFrame, true, true);
                     return true;
                 case "PMasked":
                     VM.PushBool(PMasked);

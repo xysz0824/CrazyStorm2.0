@@ -238,22 +238,22 @@ namespace CrazyStorm.Core
                         var divisor = VM.PopVector();
                         var dividend = VM.PopVector();
                         VM.PushVector(new Vector3(
-                            (dividend.Integer && divisor.x == Math.Floor(divisor.x)) ? (int)dividend.x / (int)divisor.x : 
+                            (dividend.AsInteger && divisor.x == Math.Floor(divisor.x)) ? (int)dividend.x / (int)divisor.x : 
                             dividend.x / divisor.x,
-                            (dividend.Integer && divisor.y == Math.Floor(divisor.y)) ? (int)dividend.y / (int)divisor.y :
+                            (dividend.AsInteger && divisor.y == Math.Floor(divisor.y)) ? (int)dividend.y / (int)divisor.y :
                             dividend.y / divisor.y,
-                            (dividend.Integer && divisor.z == Math.Floor(divisor.z)) ? (int)dividend.z / (int)divisor.z :
+                            (dividend.AsInteger && divisor.z == Math.Floor(divisor.z)) ? (int)dividend.z / (int)divisor.z :
                             dividend.z / divisor.z));
                         break;
                     case VMCode.MOD:
                         divisor = VM.PopVector();
                         var number = VM.PopVector();
                         VM.PushVector(new Vector3(
-                            (number.Integer && divisor.x == Math.Floor(divisor.x)) ? (int)number.x % (int)divisor.x :
+                            (number.AsInteger && divisor.x == Math.Floor(divisor.x)) ? (int)number.x % (int)divisor.x :
                             number.x % divisor.x,
-                            (number.Integer && divisor.y == Math.Floor(divisor.y)) ? (int)number.y % (int)divisor.y :
+                            (number.AsInteger && divisor.y == Math.Floor(divisor.y)) ? (int)number.y % (int)divisor.y :
                             number.y % divisor.y,
-                            (number.Integer && divisor.z == Math.Floor(divisor.z)) ? (int)number.z % (int)divisor.z :
+                            (number.AsInteger && divisor.z == Math.Floor(divisor.z)) ? (int)number.z % (int)divisor.z :
                             number.z % divisor.z));
                         break;
                     case VMCode.MORE:
@@ -333,13 +333,14 @@ namespace CrazyStorm.Core
             var v = vectorStack.Pop();
             return new Vector2(v.x, v.y);
         }
-        public static void PushFloat(float value, bool useFrameEqual = false)
+        public static void PushFloat(float value, bool asInteger = false, bool useFrameEqual = false)
         {
             if (float.IsNaN(value))
             {
                 throw new NotFiniteNumberException();
             }
             var v = new Vector3(value);
+            v.AsInteger = asInteger;
             v.UseFrameEqual = useFrameEqual;
             vectorStack.Push(v);
         }
