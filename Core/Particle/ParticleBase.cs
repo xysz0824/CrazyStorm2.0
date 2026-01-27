@@ -599,7 +599,6 @@ namespace CrazyStorm.Core
         }
         public virtual bool Update(float frameScale, float currentFrame = 1)
         {
-            ExecuteExpressions(frameScale);
             if (PCurrentFrame > MaxLife || (KillOutside && ParticleManager.OutOfWindow(this)))
             {
                 Alive = false;

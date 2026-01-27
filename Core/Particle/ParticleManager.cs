@@ -301,8 +301,8 @@ namespace CrazyStorm.Core
         }
         public static void Draw(OrderType orderType)
         {
-            if (orderType == OrderType.FirstAsTop) activeParticles.Sort();
-            else activeParticles.Sort((a, b) => b.CompareTo(a));
+            if (orderType == OrderType.FirstAsTop) activeParticles.Sort((a, b) => b.CompareTo(a));
+            else activeParticles.Sort();
             for (int i = 0; i < activeParticles.Count; ++i)
             {
                 var instance = activeParticles[i];
