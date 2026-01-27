@@ -70,7 +70,9 @@ namespace CrazyStorm.Core
             set { particleBaseData.maxLife = value; }
         }
         [RuntimeProperty]
-        public float PCurrentFrame { get; private set; }
+        public float PLayerFrame => Emitter != null ? Emitter.LayerFrame : 1;
+        [RuntimeProperty]
+        public float PCurrentFrame { get; set; }
         public float PAnimateFrame { get; private set; }
         [RuntimeProperty]
         public bool PMasked { get; set; }
@@ -368,6 +370,9 @@ namespace CrazyStorm.Core
             {
                 case "MaxLife":
                     VM.PushInt(MaxLife);
+                    return true;
+                case "PLayerFrame":
+                    VM.PushFloat(PLayerFrame, true);
                     return true;
                 case "PCurrentFrame":
                     VM.PushFloat(PCurrentFrame, true);

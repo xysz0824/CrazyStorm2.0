@@ -128,24 +128,20 @@ namespace CrazyStorm.Core
                 ParticleManager.SearchByEllipse(Position, HalfWidth, HalfHeight, Rotation, out count);
             for (int i = 0;i < count; ++i)
             {
-                if (results[i].IgnoreMask)
-                    continue;
-
+                if (results[i].IgnoreMask) continue;
                 switch (Reach)
                 {
                     case Reach.Layer:
-                        if (results[i].Emitter.LayerName != TargetName)
-                            continue;
-
+                        if (results[i].Emitter.LayerName != TargetName) continue;
                         break;
                     case Reach.Name:
-                        if (results[i].Emitter.Name != TargetName && results[i].Emitter.LayerName != LayerName)
-                            continue;
-
+                        if (results[i].Emitter.Name != TargetName || results[i].Emitter.LayerName != LayerName) continue;
                         break;
                 }
                 for (int k = 0; k < EventFieldEventGroups.Count; ++k)
+                {
                     EventFieldEventGroups[k].Execute(results[i], null, frameScale);
+                }
             }
         }
         #endregion

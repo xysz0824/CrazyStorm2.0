@@ -28,7 +28,6 @@ namespace CrazyStorm.Expression
             get
             {
                 var left = GetLeftChild();
-                var right = GetRightChild();
                 return (!(left is BinaryExpression)) && (!(left is NegativeExpression)) &&
                     (!(left is Call));
             }

@@ -2,11 +2,11 @@
  * The MIT License (MIT)
  * Copyright (c) StarX 2026
  */
+using CrazyStorm.Expression;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Runtime.ConstrainedExecution;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -15,6 +15,12 @@ using System.Web;
 
 namespace CrazyStorm.Core
 {
+    public enum ConvertEventType
+    {
+        Component,
+        Particle,
+        CoverParticle,
+    }
     public partial class File
     {
         static readonly LayerColor[] LayerColorMap = new LayerColor[]
@@ -49,8 +55,8 @@ namespace CrazyStorm.Core
         static readonly Regex StatusMatch = new Regex(@"^状态(?<status>[0-9]+)$", RegexOptions.Compiled);
         static readonly Dictionary<string, string> KeywordMap = new Dictionary<string, string>()
         {
-            { "进入遮罩瞬间", "PMasked" }, { "状态帧", "StatusFrame" }, { "状态", "Status"}, 
-            { "子弹当前帧", "PCurrentFrame" }, { "当前帧", "CurrentFrame" }, { "且", "&" }, { "或", "|"},
+            { "进入遮罩瞬间", "PMasked" }, { "状态帧", "StatusFrame" }, { "状态", "Status"},
+            { "子弹图层帧", "PLayerFrame" }, { "子弹当前帧", "PCurrentFrame" }, { "当前帧", "CurrentFrame" }, { "且", "&" }, { "或", "|"},
             { "额外发射", "EmitParticle" }, { "恢复", "Recover"},
             { "变化到", "ChangeTo" }, { "增加", "Increase" }, { "减少", "Decrease" },
             { "正比", "Linear" }, { "固定", "Instant"}, { "正弦", "Sin"}, { "无缝正弦", "Sin"},
@@ -78,6 +84,10 @@ namespace CrazyStorm.Core
         static readonly Dictionary<string, string> ParticleKeywordMap = new Dictionary<string, string>()
         {
             { "当前帧", "子弹当前帧" }, { "X坐标", "子弹X坐标" }, { "Y坐标", "子弹Y坐标" },
+        };
+        static readonly Dictionary<string, string> CoverParticleKeywordMap = new Dictionary<string, string>()
+        {
+            { "当前帧", "子弹图层帧" }, { "X坐标", "子弹X坐标" }, { "Y坐标", "子弹Y坐标" },
         };
         static readonly Regex LayerMatch = new Regex(@"^Layer(?<num>[^:]+):" +
             @"(?<name>[^,]+),(?<begin>[^,]+),(?<end>[^,]+)," +
@@ -337,7 +347,7 @@ namespace CrazyStorm.Core
                 {
                     center.Visibility = match.Groups["x"].Success;
                     if (globalEvents != null) center.ComponentEventGroups.Add(globalEvents);
-                    var eventgroup = GetEventGroup(typeof(Center), null, match.Groups["events"].Value, false, "CenterEvents");
+                    var eventgroup = GetEventGroup(typeof(Center), null, match.Groups["events"].Value, ConvertEventType.Component, "CenterEvents");
                     if (eventgroup.Events.Count > 0) center.ComponentEventGroups.Add(eventgroup);
                     line = reader.ReadLine().Trim();
                 }
@@ -446,10 +456,10 @@ namespace CrazyStorm.Core
                             particle.IgnoreRebound = submatch.Groups["affectedByRebound"].Success ? !bool.Parse(submatch.Groups["affectedByRebound"].Value) : false;
                             particle.IgnoreForce = submatch.Groups["affectedByForce"].Success ? !bool.Parse(submatch.Groups["affectedByForce"].Value) : false;
                             //events
-                            var eventGroups = GetEventGroups(typeof(MultiEmitter), typeof(Particle), submatch.Groups["events"].Value, false, "");
+                            var eventGroups = GetEventGroups(typeof(MultiEmitter), typeof(Particle), submatch.Groups["events"].Value, ConvertEventType.Component, "");
                             foreach (var eventGroup in eventGroups) batch.ComponentEventGroups.Add(eventGroup);
                             //sonevents
-                            eventGroups = GetEventGroups(typeof(Particle), null, submatch.Groups["sonevents"].Value, true, "");
+                            eventGroups = GetEventGroups(typeof(Particle), null, submatch.Groups["sonevents"].Value, ConvertEventType.Particle, "");
                             foreach (var eventGroup in eventGroups) batch.ParticleEventGroups.Add(eventGroup);
                             layer.Components.Add(batch);
                             batchs.Add(batch);
@@ -510,10 +520,10 @@ namespace CrazyStorm.Core
                             }
                             particle.VSpeed = submatch.Groups["vspeed"].Success ? float.Parse(submatch.Groups["vspeed"].Value) : 0f;
                             //events
-                            var eventGroups = GetEventGroups(typeof(CurveEmitter), typeof(CurveParticle), submatch.Groups["events"].Value, false, "");
+                            var eventGroups = GetEventGroups(typeof(CurveEmitter), typeof(CurveParticle), submatch.Groups["events"].Value, ConvertEventType.Component, "");
                             foreach (var eventGroup in eventGroups) lase.ComponentEventGroups.Add(eventGroup);
                             //sonevents
-                            eventGroups = GetEventGroups(typeof(CurveParticle), null,submatch.Groups["sonevents"].Value, true, "");
+                            eventGroups = GetEventGroups(typeof(CurveParticle), null,submatch.Groups["sonevents"].Value, ConvertEventType.Particle, "");
                             foreach (var eventGroup in eventGroups) lase.ParticleEventGroups.Add(eventGroup);
                             layer.Components.Add(lase);
                         }
@@ -552,11 +562,16 @@ namespace CrazyStorm.Core
                             cover.LayerMaskMutex = submatch.Groups["maskmutex"].Success ? bool.Parse(submatch.Groups["maskmutex"].Value) : false;
                             cover.Rotation = submatch.Groups["degree"].Success ? float.Parse(submatch.Groups["degree"].Value) : 0f;
                             //events
-                            var eventGroups = GetEventGroups(typeof(EventField), typeof(ParticleBase), submatch.Groups["events"].Value, false, "");
+                            var eventGroups = GetEventGroups(typeof(EventField), typeof(ParticleBase), submatch.Groups["events"].Value, ConvertEventType.Component, "");
                             foreach (var eventGroup in eventGroups) cover.ComponentEventGroups.Add(eventGroup);
                             //sonevents
-                            eventGroups = GetEventGroups(typeof(ParticleBase), null,submatch.Groups["sonevents"].Value, true, "");
+                            eventGroups = GetEventGroups(typeof(ParticleBase), null,submatch.Groups["sonevents"].Value, ConvertEventType.CoverParticle, "");
                             foreach (var eventGroup in eventGroups) cover.EventFieldEventGroups.Add(eventGroup);
+                            GetFrameConditionRange(eventGroups, out int minFrame, out int maxFrame);
+                            cover.BeginFrame = Math.Min(cover.BeginFrame, minFrame);
+                            cover.TotalFrame = Math.Max(cover.TotalFrame, maxFrame - cover.BeginFrame + 1);
+                            layer.BeginFrame = Math.Min(layer.BeginFrame, cover.BeginFrame);
+                            layer.TotalFrame = Math.Max(layer.TotalFrame, cover.BeginFrame + cover.TotalFrame - layer.BeginFrame);
                             layer.Components.Add(cover);
                         }
                         var reboundCount = int.Parse(match.Groups["reboundcount"].Value);
@@ -588,7 +603,7 @@ namespace CrazyStorm.Core
                                 rebound, "AcspeedAngle");
                             rebound.ReboundOneSide = submatch.Groups["oneside"].Success ? bool.Parse(submatch.Groups["oneside"].Value) : false;
                             //events
-                            var eventGroups = GetEventGroups(typeof(ParticleBase), null, submatch.Groups["events"].Value, true, "ReboundGroups");
+                            var eventGroups = GetEventGroups(typeof(ParticleBase), null, submatch.Groups["events"].Value, ConvertEventType.Particle, "ReboundGroups");
                             foreach (var eventGroup in eventGroups) rebound.RebounderEventGroups.Add(eventGroup);
                             layer.Components.Add(rebound);
                         }
@@ -773,7 +788,7 @@ namespace CrazyStorm.Core
             }
             return str;
         }
-        public static string ConvertCondition(string str, int t, int addtime, bool particleEvent)
+        public static string ConvertCondition(string str, int t, int addtime, ConvertEventType eventType)
         {
             foreach (var keyword in LogicOperatorKeywords)
             {
@@ -795,19 +810,22 @@ namespace CrazyStorm.Core
             {
                 for (int i = 0; i < split.Length; ++i)
                 {
-                    if (particleEvent) split[i] = ConvertParticleEventProperty(split[i]);
+                    if (eventType == ConvertEventType.Particle) split[i] = ConvertEventProperty(ParticleKeywordMap, split[i]);
+                    else if (eventType == ConvertEventType.CoverParticle) split[i] = ConvertEventProperty(CoverParticleKeywordMap, split[i]);
                     str += ConvertKeyword(split[i]);
                     if (t > 0 && addtime > 1 && i >= 1 && CompareOperatorKeywords.Exists((op) => op == split[i - 1]))
                     {
-                        str += particleEvent ? $"+PCurrentFrame/{t}*{addtime}" : $"+CurrentFrame/{t}*{addtime}";
+                        if (eventType == ConvertEventType.Particle) str += $"+PCurrentFrame/{t}*{addtime}";
+                        else if (eventType == ConvertEventType.CoverParticle) str += $"+PLayerFrame/{t}*{addtime}";
+                        else str += $"+CurrentFrame/{t}*{addtime}";
                     }
                 }
             }
             return str;
         }
-        public static string ConvertParticleEventProperty(string str)
+        public static string ConvertEventProperty(Dictionary<string, string> map, string str)
         {
-            foreach (var word in ParticleKeywordMap)
+            foreach (var word in map)
             {
                 if (str == word.Key)
                 {
@@ -862,7 +880,55 @@ namespace CrazyStorm.Core
             }
             return str;
         }
-        public static EventGroup GetEventGroup(Type type, Type subType, string str, bool particleEvents, string defaultName)
+        public static void GetFrameConditionRange(List<EventGroup> groups, out int min, out int max)
+        {
+            min = int.MaxValue;
+            max = int.MinValue;
+            foreach (var group in groups)
+            {
+                foreach (var e in group.Events)
+                {
+                    var info = EventHelper.SplitEvent(e);
+                    var lexer = new Lexer();
+                    lexer.Load(info.condition);
+                    var syntaxTree = new Parser(lexer).Expression() as BinaryExpression;
+                    if (syntaxTree == null) continue;
+                    if (syntaxTree.GetLeftChild() is BinaryExpression && syntaxTree.GetRightChild() is BinaryExpression)
+                    {
+                        var left = syntaxTree.GetLeftChild() as BinaryExpression;
+                        var right = syntaxTree.GetRightChild() as BinaryExpression;
+                        if (left.GetLeftChild() is Name && right.GetLeftChild() is Name)
+                        {
+                            var leftName = left.GetLeftChild() as Name;
+                            if (leftName.ToString().EndsWith("LayerFrame"))
+                            {
+                               var value = (float)left.GetRightChild().Eval(null);
+                                if (value < min) min = (int)value;
+                                if (value > max) max = (int)value;
+                            }
+                            var rightName = right.GetLeftChild() as Name;
+                            if (rightName.ToString().EndsWith("LayerFrame"))
+                            {
+                                var value = (float)right.GetRightChild().Eval(null);
+                                if (value < min) min = (int)value;
+                                if (value > max) max = (int)value;
+                            }
+                        }
+                    }
+                    else if (syntaxTree.GetLeftChild() is Name)
+                    {
+                        var name = syntaxTree.GetLeftChild() as Name;
+                        if (name.ToString().EndsWith("LayerFrame"))
+                        {
+                            var value = (float)syntaxTree.GetRightChild().Eval(null);
+                            if (value < min) min = (int)value;
+                            if (value > max) max = (int)value;
+                        }
+                    }
+                }
+            }
+        }
+        public static EventGroup GetEventGroup(Type type, Type subType, string str, ConvertEventType eventType, string defaultName)
         {
             EventGroup group = new EventGroup();
             var split = str.Split('|');
@@ -882,13 +948,14 @@ namespace CrazyStorm.Core
                 var condition = split.Length >= 2 ? split[0] : "";
                 var content = split.Length >= 2 ? split[1] : split[0];
                 var eventInfo = new EventInfo();
-                eventInfo.condition = ConvertCondition(condition, t, addtime, particleEvents);
+                eventInfo.condition = ConvertCondition(condition, t, addtime, eventType);
                 if (IsSpecialEvent(content))
                 {
                     eventInfo.isSpecialEvent = true;
                     if (!content.Contains('(')) split = content.Split('，');
                     else split = content.Split('(');
-                    if (particleEvents) split[0] = ConvertParticleEventProperty(split[0]);
+                    if (eventType == ConvertEventType.Particle) split[0] = ConvertEventProperty(ParticleKeywordMap, split[0]);
+                    else if (eventType == ConvertEventType.CoverParticle) split[0] = ConvertEventProperty(CoverParticleKeywordMap, split[0]);
                     eventInfo.specialEvent = ConvertKeyword(split[0]);
                     eventInfo.arguments = ConvertKeyword(content.Replace($"{split[0]}(", "").Replace(")", "")
                         .Replace($"{split[0]}，", "").Replace(split[0], "").Replace("，", ","));
@@ -904,7 +971,8 @@ namespace CrazyStorm.Core
                         eventInfo.changeTime = eventInfo.changeTime.Split('(')[0];
                     }
                     split = AdjustEventText(split[0]).Split(' ');
-                    if (particleEvents) split[0] = ConvertParticleEventProperty(split[0]);
+                    if (eventType == ConvertEventType.Particle) split[0] = ConvertEventProperty(ParticleKeywordMap, split[0]);
+                    else if (eventType == ConvertEventType.CoverParticle) split[0] = ConvertEventProperty(CoverParticleKeywordMap, split[0]);
                     eventInfo.resultProperty = ConvertKeyword(split[0]);
                     if (eventInfo.resultProperty == TypeKeyword)
                     {
@@ -948,14 +1016,14 @@ namespace CrazyStorm.Core
             }
             return group;
         }
-        public static List<EventGroup> GetEventGroups(Type type, Type subType, string str, bool particleEvents, string defaultName)
+        public static List<EventGroup> GetEventGroups(Type type, Type subType, string str, ConvertEventType eventType, string defaultName)
         {
             var split = str.Split('&');
             var groups = new List<EventGroup>();
             foreach (var groupStr in split)
             {
                 if (string.IsNullOrEmpty(groupStr)) continue;
-                groups.Add(GetEventGroup(type, subType, groupStr, particleEvents, defaultName));
+                groups.Add(GetEventGroup(type, subType, groupStr, eventType, defaultName));
             }
             return groups;
         }
