@@ -985,6 +985,10 @@ namespace CrazyStorm.Core
                         {
                             case "ChangeTo":
                                 eventInfo.specialEvent = "ChangeType";
+                                var typeID = int.Parse(rand[0]);
+                                if (typeID < ParticleType.DefaultTypes.Count) typeID += ParticleType.DefaultTypeIndex;
+                                if (rand.Length >= 2) split[2] = $"{typeID}+{{{rand[1]}}}";
+                                else split[2] = typeID.ToString();
                                 eventInfo.arguments = $"{split[2]}";
                                 break;
                             case "Increase":

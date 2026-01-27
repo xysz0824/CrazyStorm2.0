@@ -546,6 +546,7 @@ namespace CrazyStorm.Core
                     return true;
                 case "BlendType":
                     BlendType = (BlendType)VM.PopInt();
+                    RenderOrder = (RenderOrder - RenderOrder % 10) + 9 - (int)BlendType;
                     return true;
                 case "KillOutside":
                     KillOutside = VM.PopBool();
