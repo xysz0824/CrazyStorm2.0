@@ -22,6 +22,7 @@ namespace CrazyStorm.Core
         public int emitCount;
         public int emitCycle;
         public float emitAngle;
+        public bool bindToSpeedAngle;
         public float emitRange;
         public float emitRadius;
         public float emitRoundAngle;
@@ -67,6 +68,12 @@ namespace CrazyStorm.Core
         {
             get { return emitterData.emitAngle; }
             set { emitterData.emitAngle = value; }
+        }
+        [BoolProperty]
+        public bool BindToSpeedAngle
+        {
+            get { return emitterData.bindToSpeedAngle; }
+            set { emitterData.bindToSpeedAngle = value; }
         }
         [FloatProperty(float.MinValue, float.MaxValue)]
         public float EmitRange
@@ -124,6 +131,7 @@ namespace CrazyStorm.Core
             Template.ExecuteExpressions(frameScale);
             float increment = EmitRange / EmitCount;
             float angle = EmitAngle - (EmitRange + increment) / 2;
+            if (BindToSpeedAngle) angle = SpeedAngle + angle;
             for (int i = 0; i < EmitCount; ++i)
             {
                 angle += increment;
@@ -252,6 +260,9 @@ namespace CrazyStorm.Core
                 case "EmitAngle":
                     VM.PushFloat(EmitAngle);
                     return true;
+                case "BindToSpeedAngle":
+                    VM.PushBool(BindToSpeedAngle);
+                    return true;
                 case "EmitRange":
                     VM.PushFloat(EmitRange);
                     return true;
@@ -296,6 +307,9 @@ namespace CrazyStorm.Core
                 case "EmitAngle":
                     EmitAngle = VM.PopFloat();
                     return true;
+                case "BindToSpeedAngle":
+                    BindToSpeedAngle = VM.PopBool();
+                    return true;
                 case "EmitRange":
                     EmitRange = VM.PopFloat();
                     return true;
@@ -330,6 +344,7 @@ namespace CrazyStorm.Core
             EmitCount = initialState.EmitCount;
             EmitCycle = initialState.EmitCycle;
             EmitAngle = initialState.EmitAngle;
+            BindToSpeedAngle = initialState.BindToSpeedAngle;
             EmitRange = initialState.EmitRange;
             EmitRadius = initialState.EmitRadius;
             EmitRoundAngle = initialState.EmitRoundAngle;

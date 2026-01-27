@@ -94,6 +94,7 @@
     <sys:String x:Key="EmitCountStr">发射条数</sys:String>
     <sys:String x:Key="EmitCycleStr">发射周期</sys:String>
     <sys:String x:Key="EmitAngleStr">发射角</sys:String>
+    <sys:String x:Key="BindToSpeedAngleStr">相对速度角</sys:String>
     <sys:String x:Key="EmitRangeStr">发射范围</sys:String>
     <sys:String x:Key="EmitRadiusStr">发射半径</sys:String>
     <sys:String x:Key="EmitRoundAngleStr">发射圆方位角</sys:String>

@@ -405,6 +405,7 @@ namespace CrazyStorm.Core
                                 batch, "EmitCycle");
                             batch.EmitAngle = ConvertAngle(float.Parse(submatch.Groups["fdirection"].Value), float.Parse(submatch.Groups["randfdirection"].Value), 
                                 batch, "EmitAngle");
+                            batch.BindToSpeedAngle = bool.Parse(submatch.Groups["bindwithspeedd"].Value);
                             batch.EmitRange = ConvertInt(int.Parse(submatch.Groups["range"].Value), int.Parse(submatch.Groups["randrange"].Value),
                                 batch, "EmitRange");
                             batch.Speed = ConvertFloat(float.Parse(submatch.Groups["speed"].Value), float.Parse(submatch.Groups["randspeed"].Value),
@@ -491,6 +492,7 @@ namespace CrazyStorm.Core
                                 lase, "EmitCycle");
                             lase.EmitAngle = ConvertAngle(float.Parse(submatch.Groups["fdirection"].Value), float.Parse(submatch.Groups["randfdirection"].Value),
                                 lase, "EmitAngle");
+                            lase.BindToSpeedAngle = bool.Parse(submatch.Groups["bindwithspeedd"].Value);
                             lase.EmitRange = ConvertInt(int.Parse(submatch.Groups["range"].Value), int.Parse(submatch.Groups["randrange"].Value),
                                 lase, "EmitRange");
                             lase.Speed = ConvertFloat(float.Parse(submatch.Groups["speed"].Value), float.Parse(submatch.Groups["randspeed"].Value),
