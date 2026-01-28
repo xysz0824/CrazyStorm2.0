@@ -209,9 +209,9 @@ namespace CrazyStorm.Core
             {
                 if (property.Value.Expression)
                 {
-                    var lexer = new Expression.Lexer();
+                    var lexer = new Lexer();
                     lexer.Load(property.Value.Value);
-                    var syntaxTree = new Expression.Parser(lexer).Expression();
+                    var syntaxTree = new Parser(lexer).Expression();
                     if (!SyntaxTree.CanEval(syntaxTree))
                     {
                         var compiledBytes = new List<byte>();

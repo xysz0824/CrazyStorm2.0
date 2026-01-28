@@ -124,9 +124,61 @@ namespace CrazyStorm.Core
             }
             return list.ToArray();
         }
+        public static int GetOperandConsumption(VMInstruction instruction)
+        {
+            switch (instruction.code)
+            {
+                case VMCode.VECTOR: return -1;
+                case VMCode.BOOL: return -1;
+                case VMCode.NAME: return -1;
+                case VMCode.CALL:
+                    int consumption = 1;
+                    switch (instruction.stringOperand)
+                    {
+                        case "abs": consumption += 1; break;
+                        case "dist": consumption += 2; break;
+                        case "angle": consumption += 2; break;
+                        case "rand": consumption += 2; break;
+                        case "randi": consumption += 2; break;
+                        case "sin": consumption += 1; break;
+                        case "cos": consumption += 1; break;
+                        case "tan": consumption += 1; break;
+                        case "asin": consumption += 1; break;
+                        case "acos": consumption += 1; break;
+                        case "atan": consumption += 1; break;
+                        case "exp": consumption += 1; break;
+                        case "log": consumption += 2; break;
+                        case "pow": consumption += 2; break;
+                        case "sqrt": consumption += 1; break;
+                    }
+                    return consumption;
+                case VMCode.AND:
+                case VMCode.OR:
+                case VMCode.EQUAL:
+                case VMCode.ADD:
+                case VMCode.SUB:
+                case VMCode.MUL:
+                case VMCode.DIV:
+                case VMCode.MOD:
+                case VMCode.MORE:
+                case VMCode.LESS:
+                case VMCode.MOREOREQUAL:
+                case VMCode.LESSOREQUAL:
+                case VMCode.NOTEQUAL:
+                case VMCode.VECTOR2:
+                    return 2;
+                case VMCode.RGB: return 3;
+                case VMCode.RAND: return 2;
+            }
+            return 0;
+        }
         public static void Execute(PropertyContainer propertyContainer, VMInstruction[] instructions, float frameScale)
         {
-            for (int i = 0; i < instructions.Length; ++i)
+            Execute(propertyContainer, instructions, 0, instructions.Length - 1, frameScale);
+        }
+        public static void Execute(PropertyContainer propertyContainer, VMInstruction[] instructions, int startIndex, int endIndex, float frameScale)
+        {
+            for (int i = startIndex; i <= endIndex; ++i)
             {
                 switch (instructions[i].code)
                 {

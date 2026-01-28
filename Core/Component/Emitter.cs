@@ -128,25 +128,39 @@ namespace CrazyStorm.Core
         }
         void Emit(float frameScale)
         {
-            Template.ExecuteExpressions(frameScale);
-            float increment = EmitRange / EmitCount;
-            float angle = EmitAngle - (EmitRange + increment) / 2;
+            var emitPosition = EmitPosition;
+            if (ExecuteRandomExpression("EmitPosition", frameScale)) emitPosition += VM.PopVector2();
+            var emitCount = EmitCount;
+            if (ExecuteRandomExpression("EmitCount", frameScale)) emitCount += VM.PopInt();
+            var emitCycle = EmitCycle;
+            if (ExecuteRandomExpression("EmitCycle", frameScale)) emitCycle += VM.PopInt();
+            var emitAngle = EmitAngle;
+            if (ExecuteRandomExpression("EmitAngle", frameScale)) emitAngle += VM.PopFloat();
+            var emitRange = EmitRange;
+            if (ExecuteRandomExpression("EmitRange", frameScale)) emitRange += VM.PopFloat();
+            var emitRadius = EmitRadius;
+            if (ExecuteRandomExpression("EmitRadius", frameScale)) emitRadius += VM.PopFloat();
+            var emitRoundAngle = EmitRoundAngle;
+            if (ExecuteRandomExpression("EmitRoundAngle", frameScale)) emitRoundAngle += VM.PopFloat();
+            Template.ExecuteExpressionsAndSet(frameScale);
+            float increment = emitRange / emitCount;
+            float angle = emitAngle - (emitRange + increment) / 2;
             if (BindToSpeedAngle) angle = SpeedAngle + angle;
-            for (int i = 0; i < EmitCount; ++i)
+            for (int i = 0; i < emitCount; ++i)
             {
                 angle += increment;
                 Template.PPosition = new Vector2(
-                    EmitPosition.x + EmitRadius * (float)Math.Cos(MathHelper.DegToRad(EmitRoundAngle)),
-                    EmitPosition.y + EmitRadius * (float)Math.Sin(MathHelper.DegToRad(EmitRoundAngle)));
+                    emitPosition.x + emitRadius * (float)Math.Cos(MathHelper.DegToRad(emitRoundAngle)),
+                    emitPosition.y + emitRadius * (float)Math.Sin(MathHelper.DegToRad(emitRoundAngle)));
                 Template.PSpeedAngle = angle;
                 ParticleBase newParticle = ParticleManager.GetParticle(System, LayerID, Template);
                 if (InstantMovement)
                 {
                     newParticle.MaxLife = 1;
-                    if (lastSpawn == null) lastSpawn = new Vector2[EmitCount];
-                    else if (lastSpawn != null && lastSpawn.Length < EmitCount)
+                    if (lastSpawn == null) lastSpawn = new Vector2[emitCount];
+                    else if (lastSpawn != null && lastSpawn.Length < emitCount)
                     {
-                        lastSpawn = new Vector2[EmitCount];
+                        lastSpawn = new Vector2[emitCount];
                     }
                     newParticle.PPositionLast = lastSpawn[i] == default ? newParticle.PPosition : lastSpawn[i];
                     lastSpawn[i] = newParticle.PPosition;

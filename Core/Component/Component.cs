@@ -214,7 +214,7 @@ namespace CrazyStorm.Core
                 SpeedAngle = particle.PSpeedAngle;
                 Acspeed = particle.PAcspeed;
                 AcspeedAngle = particle.PAcspeedAngle;
-                ExecuteExpressions(frameScale);
+                ExecuteDynamicExpressions(frameScale);
                 if (executeEvents)
                 {
                     for (int i = 0; i < ComponentEventGroups.Count; ++i)
@@ -640,7 +640,7 @@ namespace CrazyStorm.Core
         }
         public virtual bool Update(float frameScale, float currentFrame)
         {
-            ExecuteExpressions(frameScale);
+            ExecuteDynamicExpressions(frameScale);
             LayerFrame = currentFrame;
             if (BindingTarget == null || CheckCircularBinding())
             {
@@ -670,11 +670,11 @@ namespace CrazyStorm.Core
                     var variable = new VariableResource { Label = item.Label, Value = item.Value };
                     initialState.Locals.Add(variable);
                 }
-                initialState.ExecuteExpressions(1);
+                initialState.ExecuteExpressionsAndSet(1);
             }
             else
             {
-                initialState.ExecuteExpressions(1);
+                initialState.ExecuteExpressionsAndSet(1);
                 BeginFrame = initialState.BeginFrame;
                 TotalFrame = initialState.TotalFrame;
                 Position = initialState.Position;

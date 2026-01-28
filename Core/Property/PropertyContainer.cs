@@ -144,7 +144,133 @@ namespace CrazyStorm.Core
                 }
             }
         }
-        public void ExecuteExpressions(float frameScale)
+        public int ExtractBlock(VMInstruction[] original, int end, out int start)
+        {
+            start = end;
+            var needOperand = VM.GetOperandConsumption(original[start]);
+            if (needOperand <= 0) return needOperand;
+            start--;
+            while (start >= 0)
+            {
+                var instruction = original[start];
+                var consumption = VM.GetOperandConsumption(instruction);
+                if (consumption > 0) needOperand--;
+                needOperand += consumption;
+                if (needOperand <= 0) break;
+                start--;
+            }
+            return needOperand;
+        }
+        public bool ExecuteRandomExpression(string name, float frameScale)
+        {
+            if (!PropertyExpressions.ContainsKey(name)) return false;
+            var expression = PropertyExpressions[name];
+            if (expression[expression.Length - 1].code == VMCode.RAND)
+            {
+                //Entire expression is random
+                VM.Execute(this, expression, frameScale);
+                return true;
+            }
+            else
+            {
+                //Partial random expression
+                for (int i = expression.Length - 1; i >= 0; --i)
+                {
+                    var instruction = expression[i];
+                    if (instruction.code == VMCode.RAND)
+                    {
+                        var rand = 0f;
+                        ExtractBlock(expression, i, out int startIndex);
+                        VM.Execute(this, expression, startIndex, i, frameScale);
+                        rand = VM.PopFloat();
+                        for (int k = i + 1; k < expression.Length; ++k)
+                        {
+                            var needOperand = ExtractBlock(expression, k, out int sIndex);
+                            if (needOperand != 0 || sIndex > startIndex) continue;
+                            if (expression[k].code == VMCode.SUB && k == i + 1) rand = -rand;
+                            break;
+                        }
+                        VM.PushFloat(rand);
+                        return true;
+                    }
+                    else if (instruction.code == VMCode.VECTOR2)
+                    {
+                        //Entire expression is Vector2
+                        ExtractBlock(expression, i - 1, out int rightStartIndex);
+                        var randV = new Vector2();
+                        //Right Part
+                        for (int j = i - 1; j >= rightStartIndex; --j)
+                        {
+                            instruction = expression[j];
+                            if (instruction.code != VMCode.RAND) continue;
+                            ExtractBlock(expression, j, out int startIndex);
+                            VM.Execute(this, expression, startIndex, j, frameScale);
+                            randV.x = VM.PopFloat();
+                            for (int k = j + 1; k < expression.Length; ++k)
+                            {
+                                var needOperand = ExtractBlock(expression, k, out int sIndex);
+                                if (needOperand != 0 || sIndex > startIndex) continue;
+                                if (expression[k].code == VMCode.SUB && k == j + 1) randV.x = -randV.x;
+                                break;
+                            }
+                            break;
+                        }
+                        ExtractBlock(expression, rightStartIndex - 1, out int leftStartIndex);
+                        //Left Part
+                        for (int j = rightStartIndex - 1; j >= leftStartIndex; --j)
+                        {
+                            instruction = expression[j];
+                            if (instruction.code != VMCode.RAND) continue;
+                            ExtractBlock(expression, j, out int startIndex);
+                            VM.Execute(this, expression, startIndex, j, frameScale);
+                            randV.y = VM.PopFloat();
+                            for (int k = j + 1; k < expression.Length; ++k)
+                            {
+                                var needOperand = ExtractBlock(expression, k, out int sIndex);
+                                if (needOperand != 0 || sIndex > startIndex) continue;
+                                if (expression[k].code == VMCode.SUB && k == j + 1) randV.y = -randV.y;
+                                break;
+                            }
+                            break;
+                        }
+                        VM.PushVector2(randV);
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+        public void ExecuteDynamicExpression(string name, float frameScale)
+        {
+            if (!PropertyExpressions.ContainsKey(name)) return;
+            foreach (var instruction in PropertyExpressions[name])
+            {
+                if (instruction.code == VMCode.NAME)
+                {
+                    VM.Execute(this, PropertyExpressions[name], frameScale);
+                    SetProperty(name);
+                    VM.Clear();
+                    break;
+                }
+            }
+        }
+        public void ExecuteDynamicExpressions(float frameScale)
+        {
+            foreach (var expression in PropertyExpressions)
+            {
+                foreach (var instruction in expression.Value)
+                {
+                    if (instruction.code == VMCode.NAME)
+                    {
+                        VM.Execute(this, expression.Value, frameScale);
+                        SetProperty(expression.Key);
+                        VM.Clear();
+                        break;
+                    }
+                }
+            }
+        }
+        public void ExecuteExpressionsAndSet(float frameScale)
         {
             foreach (var expression in PropertyExpressions)
             {
