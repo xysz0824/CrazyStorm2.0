@@ -180,10 +180,10 @@
                 <Setter.Value>
                     <ControlTemplate TargetType="TabItem">
                         <Border x:Name="Bd" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}"
-                        BorderThickness="0,0,0,0" Padding="{TemplateBinding Padding}">
+                        BorderThickness="0" Padding="{TemplateBinding Padding}">
                             <DockPanel>
                                 <TextBlock Text="{Binding Name}" Margin="4,3,0,0" DockPanel.Dock="Left"/>
-                                <Button Style="{StaticResource StatusButton}" Width="16" VerticalAlignment="Stretch" Click="TabClose_Click">
+                                <Button Style="{StaticResource StatusButton}" Width="16" BorderThickness="0" VerticalAlignment="Stretch" Click="TabClose_Click">
                                     <Path Width="9" Height="9" Stroke="Black" Margin="4,4,0,0" StrokeThickness="2" Data="{StaticResource Cross_Icon}" 
                                       VerticalAlignment="Center" DockPanel.Dock="Right" HorizontalAlignment="Right" Stretch="Uniform"/>
                                 </Button>

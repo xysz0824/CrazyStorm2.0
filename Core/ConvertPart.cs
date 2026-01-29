@@ -541,9 +541,8 @@ namespace CrazyStorm.Core
                             cover.BindingTargetID = int.Parse(submatch.Groups["bindid"].Value);
                             cover.ID = particleSystem.GetComponentIndex();
                             particleSystem.GetAndIncreaseComponentIndex(cover.GetType().ToString());
-                            cover.ParentID = center.ID;
                             cover.Position = ConvertVector2(float.Parse(submatch.Groups["x"].Value), float.Parse(submatch.Groups["y"].Value),
-                                0, 0, cover, "Position", OldCenter + center.Position);
+                                0, 0, cover, "Position", OldCenter);
                             cover.BeginFrame = int.Parse(submatch.Groups["begin"].Value);
                             cover.TotalFrame = int.Parse(submatch.Groups["life"].Value);
                             cover.HalfWidth = int.Parse(submatch.Groups["halfw"].Value);
@@ -587,9 +586,8 @@ namespace CrazyStorm.Core
                             rebound.Name = (float.Parse(submatch.Groups["id"].Value) + 1).ToString();
                             rebound.ID = particleSystem.GetComponentIndex();
                             particleSystem.GetAndIncreaseComponentIndex(rebound.GetType().ToString());
-                            rebound.ParentID = center.ID;
                             rebound.Position = ConvertVector2(float.Parse(submatch.Groups["x"].Value), float.Parse(submatch.Groups["y"].Value), 
-                                0, 0, rebound, "Position", OldCenter + center.Position);
+                                0, 0, rebound, "Position", OldCenter);
                             rebound.BeginFrame = int.Parse(submatch.Groups["begin"].Value);
                             rebound.TotalFrame = int.Parse(submatch.Groups["life"].Value);
                             rebound.Size = int.Parse(submatch.Groups["longs"].Value);
@@ -621,9 +619,8 @@ namespace CrazyStorm.Core
                             force.BindingTargetID = int.Parse(submatch.Groups["bindid"].Value);
                             force.ID = particleSystem.GetComponentIndex();
                             particleSystem.GetAndIncreaseComponentIndex(force.GetType().ToString());
-                            force.ParentID = center.ID;
                             force.Position = ConvertVector2(float.Parse(submatch.Groups["x"].Value), float.Parse(submatch.Groups["y"].Value), 
-                                0, 0, force, "Position", OldCenter + center.Position);
+                                0, 0, force, "Position", OldCenter);
                             force.BeginFrame = int.Parse(submatch.Groups["begin"].Value);
                             force.TotalFrame = int.Parse(submatch.Groups["life"].Value);
                             force.HalfWidth = int.Parse(submatch.Groups["halfw"].Value);

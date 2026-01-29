@@ -51,7 +51,7 @@ namespace CrazyStorm.Core
         static int bottom;
         static int particlePreserved;
         static int curvePreserved;
-        static int instanceID;
+        static long instanceID;
         static List<ParticleBase> activeParticles;
         static ParticleBase[] searchResult;
         static Vector2[] maskPositionArray = new Vector2[MAX_MASK_COUNT];
@@ -102,7 +102,7 @@ namespace CrazyStorm.Core
                 particle = poolObject.Instance;
             }
             particle.System = system;
-            int order = layerID * searchResult.Length * 10 + 9 - (int)template.BlendType;
+            long order = layerID * searchResult.Length * 10 + 9 - (int)template.BlendType;
             particle.RenderOrder = order + instanceID * 10;
             particle.ID = instanceID++;
             particle.Reset();
@@ -301,8 +301,8 @@ namespace CrazyStorm.Core
         }
         public static void Draw(OrderType orderType)
         {
-            if (orderType == OrderType.FirstAsTop) activeParticles.Sort((a, b) => b.CompareTo(a));
-            else activeParticles.Sort();
+            if (orderType == OrderType.FirstAsTop) activeParticles.Sort();
+            else activeParticles.Sort((a, b) => b.CompareTo(a));
             for (int i = 0; i < activeParticles.Count; ++i)
             {
                 var instance = activeParticles[i];

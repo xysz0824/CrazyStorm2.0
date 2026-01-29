@@ -242,13 +242,22 @@ namespace CrazyStorm.Core
         }
         protected override bool PushSystemProperty(string propertyName)
         {
-            if (base.PushSystemProperty(propertyName)) return true;
             switch (propertyName)
             {
                 case "SelfAngle":
-                    VM.PushFloat(MathHelper.GetDegree(Position - EmitPosition));
+                    var degree = MathHelper.GetDegree(Position - EmitPosition);
+                    VM.PushFloat(degree);
+                    return true;
+                case "BodyAngle":
+                    degree = MathHelper.GetDegree(BodyPosition - EmitPosition);
+                    VM.PushFloat(degree);
+                    return true;
+                case "CenterAngle":
+                    degree = MathHelper.GetDegree(CenterPosition - EmitPosition);
+                    VM.PushFloat(degree);
                     return true;
             }
+            if (base.PushSystemProperty(propertyName)) return true;
             return false;
         }
         public override bool PushProperty(string propertyName)

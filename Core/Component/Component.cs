@@ -203,8 +203,8 @@ namespace CrazyStorm.Core
             bool eventImpacted = false;
             foreach (var particle in BindingTarget.Particles)
             {
-                CurrentFrame = particle.PCurrentFrame - BeginFrame + 1;
-                if (CurrentFrame < 1 || CurrentFrame > TotalFrame || !Visibility) continue;
+                CurrentFrame = particle.PCurrentFrame - BeginFrame;
+                if (CurrentFrame < 1 || CurrentFrame > Math.Min(particle.MaxLife, TotalFrame) || !Visibility) continue;
                 if (executeEvents && !EventManager.BindingRecover(this, particle) && eventImpacted)
                 {
                     Reset();
@@ -498,7 +498,8 @@ namespace CrazyStorm.Core
                     VM.PushFloat(BodyPosition.y);
                     return true;
                 case "BodyAngle":
-                    VM.PushFloat(MathHelper.GetDegree(BodyPosition - Position));
+                    var degree = MathHelper.GetDegree(BodyPosition - Position);
+                    VM.PushFloat(degree);
                     return true;
                 case "CenterPosition":
                     VM.PushVector2(CenterPosition);
@@ -510,7 +511,8 @@ namespace CrazyStorm.Core
                     VM.PushFloat(CenterPosition.y);
                     return true;
                 case "CenterAngle":
-                    VM.PushFloat(MathHelper.GetDegree(CenterPosition - Position));
+                    degree = MathHelper.GetDegree(CenterPosition - Position);
+                    VM.PushFloat(degree);
                     return true;
             }
             return false;

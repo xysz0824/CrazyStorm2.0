@@ -57,9 +57,9 @@ namespace CrazyStorm.Core
         #endregion
 
         #region Public Members
-        public int ID { get; set; }
-        public int RenderOrder;
-        public bool Alive;
+        public long ID { get; set; }
+        public long RenderOrder { get; set; }
+        public bool Alive { get; set; }
         public float FogFrame { get; private set; }
         public Emitter Emitter { get; set; }
         //public ParticleQuadTree QuadTree { get; set; }
@@ -665,7 +665,7 @@ namespace CrazyStorm.Core
         public virtual void Reset() { }
         public int CompareTo(ParticleBase other)
         {
-            return RenderOrder - other.RenderOrder;
+            return (int)(RenderOrder - other.RenderOrder);
         }
         #endregion
     }
