@@ -603,7 +603,6 @@ namespace CrazyStorm.Core
             if (PCurrentFrame > MaxLife || (KillOutside && ParticleManager.OutOfWindow(this)))
             {
                 Alive = false;
-                Emitter.Particles.Remove(this);
                 return false;
             }
             if (MathHelper.FrameEqual(PCurrentFrame, frameScale, 1))

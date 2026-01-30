@@ -290,6 +290,7 @@ namespace CrazyStorm.Core
                 {
                     if (instance is Particle) ParticlePool.Return((instance as Particle).PoolObject);
                     else if (instance is CurveParticle) CurveParticlePool.Return((instance as CurveParticle).PoolObject);
+                    instance.Emitter.Particles.Remove(instance);
                     activeParticles.RemoveAt(i);
                     i--;
                 }
