@@ -204,7 +204,7 @@ namespace CrazyStorm.Core
             foreach (var particle in BindingTarget.Particles)
             {
                 CurrentFrame = particle.PCurrentFrame - BeginFrame;
-                if (CurrentFrame < 1 || CurrentFrame > Math.Min(particle.MaxLife, TotalFrame) || !Visibility) continue;
+                if (CurrentFrame < 1 || CurrentFrame > TotalFrame || !particle.Alive || !Visibility) continue;
                 if (executeEvents && !EventManager.BindingRecover(this, particle) && eventImpacted)
                 {
                     Reset();

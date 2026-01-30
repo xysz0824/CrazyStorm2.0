@@ -121,13 +121,11 @@ namespace CrazyStorm.Core
             for (int i = 0; i < activeParticles.Count; ++i)
             {
                 var instance = activeParticles[i];
-                if (instance.Alive)
+                if (!instance.Alive) continue;
+                var v = MathHelper.Rotate(instance.PPosition - center, -rotation);
+                if (v.x >= -halfW && v.x <= halfW && v.y >= -halfH && v.y <= halfH)
                 {
-                    var v = MathHelper.Rotate(instance.PPosition - center, -rotation);
-                    if (v.x >= -halfW && v.x <= halfW && v.y >= -halfH && v.y <= halfH)
-                    {
-                        searchResult[index++] = instance;
-                    }
+                    searchResult[index++] = instance;
                 }
             }
             count = index;
@@ -139,13 +137,11 @@ namespace CrazyStorm.Core
             for (int i = 0; i < activeParticles.Count; ++i)
             {
                 var instance = activeParticles[i];
-                if (instance.Alive)
+                if (!instance.Alive) continue;
+                var v = MathHelper.Rotate(instance.PPosition - center, -rotation);
+                if ((v.x * v.x) / (halfW * halfW) + (v.y * v.y) / (halfH * halfH) <= 1f)
                 {
-                    var v = MathHelper.Rotate(instance.PPosition - center, -rotation);
-                    if ((v.x * v.x) / (halfW * halfW) + (v.y * v.y) / (halfH * halfH) <= 1f)
-                    {
-                        searchResult[index++] = instance;
-                    }
+                    searchResult[index++] = instance;
                 }
             }
             count = index;

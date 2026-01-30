@@ -342,7 +342,10 @@ namespace CrazyStorm.Core
         public void UpdateComponent(Component component, float frameScale, float currentFrame)
         {
             var layer = Layers[component.LayerID];
-            if (layer.NeedUpdate(currentFrame)) component.Update(frameScale, currentFrame);
+            if (layer.NeedUpdate(currentFrame) || component.BindingTarget != null)
+            {
+                component.Update(frameScale, currentFrame);
+            }
             for (int i = 0; i < component.Children.Count; ++i)
             {
                 component.Children[i].Status = Status;
