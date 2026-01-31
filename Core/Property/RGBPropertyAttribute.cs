@@ -11,6 +11,7 @@ namespace CrazyStorm.Core
     [AttributeUsage(AttributeTargets.Property, AllowMultiple = false, Inherited = false)]
     public sealed class RGBPropertyAttribute : PropertyAttribute
     {
+        public RGBPropertyAttribute(int id) : base(id) { }
         public override bool IsLegal(string newValue, out object value)
         {
             value = null;

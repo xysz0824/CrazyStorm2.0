@@ -22,6 +22,10 @@ namespace CrazyStorm
             var environment = Parameter[2] as Expression.Environment;
             var button = Parameter[3] as Button;
             component.Locals.Remove(local);
+            for (int i = 0; i < component.Locals.Count; ++i)
+            {
+                component.Locals[i].ID = 1000 + i;
+            }
             if (button != null) button.IsEnabled = component.Locals.Count > 0;
             environment.RemoveLocal(local.Label);
         }
@@ -33,6 +37,10 @@ namespace CrazyStorm
             var environment = Parameter[2] as Expression.Environment;
             var button = Parameter[3] as Button;
             component.Locals.Add(local);
+            for (int i = 0; i < component.Locals.Count; ++i)
+            {
+                component.Locals[i].ID = 1000 + i;
+            }
             if (button != null) button.IsEnabled = true;
             environment.PutLocal(local.Label, local.Value);
         }

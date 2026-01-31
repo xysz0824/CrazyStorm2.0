@@ -154,7 +154,7 @@ namespace CrazyStorm.Expression
             return new ExpressionException("TypeError");
         }
 
-        public override void Compile(List<byte> codeStream)
+        public override void Compile(Type type, Type subType, IList<VariableResource> variables, List<byte> codeStream)
         {
             SyntaxTree left = GetLeftChild();
             SyntaxTree right = GetRightChild();
@@ -190,7 +190,7 @@ namespace CrazyStorm.Expression
                 codeStream.AddRange(scode);
             }
             else
-                left.Compile(codeStream);
+                left.Compile(type, subType, variables, codeStream);
 
             if (rightCanEval)
             {
@@ -207,7 +207,7 @@ namespace CrazyStorm.Expression
                 codeStream.AddRange(scode);
             }
             else
-                right.Compile(codeStream);
+                right.Compile(type, subType, variables, codeStream);
 
             var op = (string)Token.GetValue();
             byte[] code = null;

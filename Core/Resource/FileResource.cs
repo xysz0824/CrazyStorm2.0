@@ -73,9 +73,9 @@ namespace CrazyStorm.Core
             node.AppendChild(fileResourceNode);
             return fileResourceNode;
         }
-        public override List<byte> GeneratePlayData()
+        public override List<byte> GeneratePlayData(File file)
         {
-            var bytes = base.GeneratePlayData();
+            var bytes = base.GeneratePlayData(file);
             var fileResourceBytes = new List<byte>();
             fileResourceBytes.AddRange(BitConverter.GetBytes(id));
             PlayDataHelper.GenerateStringDataFields(this, fileResourceBytes);

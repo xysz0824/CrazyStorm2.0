@@ -2,6 +2,7 @@
  * The MIT License (MIT)
  * Copyright (c) StarX 2026
  */
+using CrazyStorm.Core;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -59,6 +60,6 @@ namespace CrazyStorm.Expression
 
         public abstract object Eval(Environment e);
 
-        public abstract void Compile(List<byte> codeStream);
+        public abstract void Compile(Type type, Type subType, IList<VariableResource> variables, List<byte> codeStream);
     }
 }

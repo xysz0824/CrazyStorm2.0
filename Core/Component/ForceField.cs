@@ -44,61 +44,61 @@ namespace CrazyStorm.Core
         #endregion
 
         #region Public Members
-        [FloatProperty(1, float.MaxValue)]
+        [FloatProperty(14, 1, float.MaxValue)]
         public float HalfWidth
         {
             get { return forceFieldData.halfWidth; }
             set { forceFieldData.halfWidth = value; }
         }
-        [FloatProperty(1, float.MaxValue)]
+        [FloatProperty(15, 1, float.MaxValue)]
         public float HalfHeight
         {
             get { return forceFieldData.halfHeight; }
             set { forceFieldData.halfHeight = value; }
         }
-        [FloatProperty(float.MinValue, float.MaxValue)]
+        [FloatProperty(16, float.MinValue, float.MaxValue)]
         public float Force
         {
             get { return forceFieldData.force; }
             set { forceFieldData.force = value; }
         }
-        [FloatProperty(float.MinValue, float.MaxValue)]
+        [FloatProperty(17, float.MinValue, float.MaxValue)]
         public float Direction
         {
             get { return forceFieldData.direction; }
             set { forceFieldData.direction = value; }
         }
-        [EnumProperty(typeof(ForceType))]
+        [EnumProperty(18, typeof(ForceType))]
         public ForceType ForceType
         {
             get { return forceFieldData.forceType; }
             set { forceFieldData.forceType = value; }
         }
-        [EnumProperty(typeof(FieldShape))]
+        [EnumProperty(19, typeof(FieldShape))]
         public FieldShape FieldShape
         {
             get { return forceFieldData.fieldShape; }
             set { forceFieldData.fieldShape = value; }
         }
-        [EnumProperty(typeof(Reach))]
+        [EnumProperty(20, typeof(Reach))]
         public Reach Reach
         {
             get { return forceFieldData.reach; }
             set { forceFieldData.reach = value; }
         }
-        [StringProperty(1, 15, true, true, false, false)]
+        [StringProperty(21, 1, 15, true, true, false, false)]
         public string TargetName
         {
             get { return targetName; }
             set { targetName = value; }
         }
-        [FloatProperty(int.MinValue, int.MaxValue)]
+        [FloatProperty(22, int.MinValue, int.MaxValue)]
         public float Rotation
         {
             get { return forceFieldData.rotation; }
             set { forceFieldData.rotation = value; }
         }
-        [FloatProperty(float.MinValue, float.MaxValue)]
+        [FloatProperty(23, float.MinValue, float.MaxValue)]
         public float ForceImpactSpeed
         {
             get { return forceFieldData.impactSpeed; }
@@ -202,9 +202,9 @@ namespace CrazyStorm.Core
             node.AppendChild(forceFieldNode);
             return forceFieldNode;
         }
-        public override List<byte> GeneratePlayData()
+        public override List<byte> GeneratePlayData(File file)
         {
-            var bytes = base.GeneratePlayData();
+            var bytes = base.GeneratePlayData(file);
             var forceFieldBytes = new List<byte>();
             //stringDataFields
             PlayDataHelper.GenerateStringDataFields(this, forceFieldBytes);
@@ -224,81 +224,77 @@ namespace CrazyStorm.Core
                 forceFieldData = PlayDataHelper.ReadStruct<ForceFieldData>(forceFieldReader);
             }
         }
-        public override bool PushProperty(string propertyName)
+        public override bool PushProperty(int propertyID)
         {
-            if (base.PushProperty(propertyName))
-                return true;
-
-            switch (propertyName)
+            if (base.PushProperty(propertyID)) return true;
+            switch (propertyID)
             {
-                case "HalfWidth":
+                case 14:
                     VM.PushFloat(HalfWidth);
                     return true;
-                case "HalfHeight":
+                case 15:
                     VM.PushFloat(HalfHeight);
                     return true;
-                case "FieldShape":
+                case 16:
                     VM.PushInt((int)FieldShape);
                     return true;
-                case "Reach":
+                case 17:
                     VM.PushInt((int)Reach);
                     return true;
-                case "TargetName":
+                case 18:
                     VM.PushString(TargetName);
                     return true;
-                case "Force":
+                case 19:
                     VM.PushFloat(Force);
                     return true;
-                case "Direction":
+                case 20:
                     VM.PushFloat(Direction);
                     return true;
-                case "ForceType":
+                case 21:
                     VM.PushInt((int)ForceType);
                     return true;
-                case "Rotation":
+                case 22:
                     VM.PushFloat(Rotation);
                     return true;
-                case "ForceImpactSpeed":
+                case 23:
                     VM.PushFloat(ForceImpactSpeed);
                     return true;
             }
             return false;
         }
-        public override bool SetProperty(string propertyName)
+        public override bool SetProperty(int propertyID)
         {
-            if (base.SetProperty(propertyName))
-                return true;
-
-            switch (propertyName)
+            if (base.SetProperty(propertyID)) return true;
+            switch (propertyID)
             {
-                case "HalfWidth":
+                case 14:
                     HalfWidth = VM.PopFloat();
                     return true;
-                case "HalfHeight":
+                case 15:
                     HalfHeight = VM.PopFloat();
                     return true;
-                case "FieldShape":
+                case 16:
                     FieldShape = (FieldShape)VM.PopInt();
                     return true;
-                case "Reach":
+                case 17:
                     Reach = (Reach)VM.PopInt();
                     return true;
-                case "TargetName":
+                case 18:
                     TargetName = VM.PopString();
                     return true;
-                case "Force":
+                case 19:
                     Force = VM.PopFloat();
                     return true;
-                case "Direction":
+                case 20:
                     Direction = VM.PopFloat();
                     return true;
-                case "ForceType":
+                case 21:
                     ForceType = (ForceType)VM.PopInt();
                     return true;
-                case "Rotation":
+                case 22:
                     Rotation = VM.PopFloat();
                     return true;
-                case "ForceImpactSpeed":
+                case 23:
                     ForceImpactSpeed = VM.PopFloat();
                     return true;
             }

@@ -4,11 +4,12 @@
  */
 using System;
 using System.Collections.Generic;
-using System.Text;
+using System.IO;
 using System.Reflection;
+using System.Runtime.InteropServices;
+using System.Text;
 using System.Xml;
 using System.Xml.Serialization;
-using System.IO;
 
 namespace CrazyStorm.Core
 {
@@ -16,32 +17,34 @@ namespace CrazyStorm.Core
     {
         IDictionary<string, PropertyValue> properties;
         public IDictionary<string, PropertyValue> Properties { get { return properties; } }
-        IDictionary<string, VMInstruction[]> propertyExpressions;
-        public IDictionary<string, VMInstruction[]> PropertyExpressions { get { return propertyExpressions; } }
+        IDictionary<int, VMInstruction[]> propertyExpressions;
+        public IDictionary<int, VMInstruction[]> PropertyExpressions { get { return propertyExpressions; } }
         public ParticleSystem System { get; set; }
 
         public PropertyContainer()
         {
             properties = new Dictionary<string, PropertyValue>();
-            propertyExpressions = new Dictionary<string, VMInstruction[]>();
+            propertyExpressions = new Dictionary<int, VMInstruction[]>();
         }
         public List<PropertyInfo> InitializeAndGetProperties(Type type)
         {
             var propertiesInfo = new List<PropertyInfo>();
             foreach (PropertyInfo property in type.GetProperties())
             {
-                if (property.DeclaringType.Name != type.Name)
-                    continue;
-
+                if (property.DeclaringType.Name != type.Name) continue;
                 object[] attributes = property.GetCustomAttributes(false);
-                if (attributes.Length > 0 && attributes[0] is PropertyAttribute)
+                foreach (var attribute in attributes)
                 {
-                    propertiesInfo.Add(property);
-                    if (!properties.ContainsKey(property.Name))
+                    if (attribute is PropertyAttribute)
                     {
-                        var obj = property.GetGetMethod().Invoke(this, null);
-                        var value = new PropertyValue { Value = obj == null ? "" : obj.ToString() };
-                        properties[property.Name] = value;
+                        propertiesInfo.Add(property);
+                        if (!properties.ContainsKey(property.Name))
+                        {
+                            var obj = property.GetGetMethod().Invoke(this, null);
+                            var value = new PropertyValue { Value = obj == null ? "" : obj.ToString() };
+                            properties[property.Name] = value;
+                        }
+                        break;
                     }
                 }
             }
@@ -53,8 +56,14 @@ namespace CrazyStorm.Core
             foreach (PropertyInfo property in GetType().GetProperties())
             {
                 object[] attributes = property.GetCustomAttributes(false);
-                if (attributes.Length > 0 && attributes[0] is PropertyAttribute)
-                    propertiesInfo.Add(property);
+                foreach (var attribute in attributes)
+                {
+                    if (attribute is PropertyAttribute)
+                    {
+                        propertiesInfo.Add(property);
+                        break;
+                    }
+                }
             }
             return propertiesInfo;
         }
@@ -62,8 +71,7 @@ namespace CrazyStorm.Core
         {
             var clone = MemberwiseClone() as PropertyContainer;
             clone.properties = new Dictionary<string, PropertyValue>();
-            foreach (var pair in properties)
-                clone.properties[pair.Key] = pair.Value.Clone() as PropertyValue;
+            foreach (var pair in properties) clone.properties[pair.Key] = pair.Value.Clone() as PropertyValue;
             return clone;
         }
         public virtual void CopyTo(PropertyContainer target)
@@ -74,23 +82,15 @@ namespace CrazyStorm.Core
         public void BuildFromXmlElement(XmlElement node)
         {
             var propertiesNode = node.SelectSingleNode("Properties");
-            if (propertiesNode == null)
-                throw new System.IO.FileLoadException("FileDataError");
-
+            if (propertiesNode == null) throw new System.IO.FileLoadException("FileDataError");
             foreach (XmlElement childNode in propertiesNode.ChildNodes)
             {
-                if (!childNode.HasAttribute("Key"))
-                    throw new System.IO.FileLoadException("FileDataError");
-
+                if (!childNode.HasAttribute("Key")) throw new System.IO.FileLoadException("FileDataError");
                 string key = childNode.GetAttribute("Key");
-                if (!childNode.HasAttribute("Value"))
-                    throw new System.IO.FileLoadException("FileDataError");
-
+                if (!childNode.HasAttribute("Value")) throw new System.IO.FileLoadException("FileDataError");
                 string expression = childNode.GetAttribute("Value");
                 PropertyInfo property = GetType().GetProperty(key);
-                if (property == null)
-                    throw new System.IO.FileLoadException("FileDataError");
-
+                if (property == null) throw new System.IO.FileLoadException("FileDataError");
                 var value = new PropertyValue { Expression = true, Value = expression };
                 properties[property.Name] = value;
             }
@@ -114,7 +114,7 @@ namespace CrazyStorm.Core
             }
             return propertiesNode;
         }
-        public void GeneratePropertyExpressions(List<byte> data)
+        public void GeneratePropertyExpressions(IList<VariableResource> variables, List<byte> data)
         {
             List<byte> newData = new List<byte>();
             foreach (var pair in properties)
@@ -122,7 +122,8 @@ namespace CrazyStorm.Core
                 if (pair.Value.Expression)
                 {
                     List<byte> pairData = new List<byte>();
-                    pairData.AddRange(PlayDataHelper.GetStringBytes(pair.Key));
+                    int propertyID = Expression.Environment.GetPropertyID(pair.Key, GetType(), null, variables);
+                    pairData.AddRange(BitConverter.GetBytes(propertyID));
                     pairData.AddRange(pair.Value.CompiledExpression);
                     newData.AddRange(PlayDataHelper.CreateBlock(pairData));
                 }
@@ -137,9 +138,9 @@ namespace CrazyStorm.Core
                 {
                     using (BinaryReader expressionReader = PlayDataHelper.GetBlockReader(listReader))
                     {
-                        string propertyName = PlayDataHelper.ReadString(expressionReader);
-                        int bytesLength = (int)expressionReader.BaseStream.Length - propertyName.Length - 1;
-                        propertyExpressions[propertyName] = VM.Decode(expressionReader.ReadBytes(bytesLength));
+                        int propertyID = expressionReader.ReadInt32();
+                        int bytesLength = (int)expressionReader.BaseStream.Length - sizeof(int);
+                        propertyExpressions[propertyID] = VM.Decode(expressionReader.ReadBytes(bytesLength));
                     }
                 }
             }
@@ -161,10 +162,10 @@ namespace CrazyStorm.Core
             }
             return needOperand;
         }
-        public bool ExecuteRandomExpression(string name, float frameScale)
+        public bool ExecuteRandomExpression(int id, float frameScale)
         {
-            if (!PropertyExpressions.ContainsKey(name)) return false;
-            var expression = PropertyExpressions[name];
+            if (!PropertyExpressions.ContainsKey(id)) return false;
+            var expression = PropertyExpressions[id];
             if (expression[expression.Length - 1].code == VMCode.RAND)
             {
                 //Entire expression is random
@@ -240,15 +241,15 @@ namespace CrazyStorm.Core
             }
             return false;
         }
-        public void ExecuteDynamicExpression(string name, float frameScale)
+        public void ExecuteDynamicExpression(int id, float frameScale)
         {
-            if (!PropertyExpressions.ContainsKey(name)) return;
-            foreach (var instruction in PropertyExpressions[name])
+            if (!PropertyExpressions.ContainsKey(id)) return;
+            foreach (var instruction in PropertyExpressions[id])
             {
                 if (instruction.code == VMCode.NAME)
                 {
-                    VM.Execute(this, PropertyExpressions[name], frameScale);
-                    SetProperty(name);
+                    VM.Execute(this, PropertyExpressions[id], frameScale);
+                    SetProperty(id);
                     VM.Clear();
                     break;
                 }
@@ -279,7 +280,7 @@ namespace CrazyStorm.Core
                 VM.Clear();
             }
         }
-        public abstract bool PushProperty(string propertyName);
-        public abstract bool SetProperty(string propertyName);
+        public abstract bool PushProperty(int propertyID);
+        public abstract bool SetProperty(int propertyID);
     }
 }

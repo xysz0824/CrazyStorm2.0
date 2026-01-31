@@ -157,7 +157,7 @@ namespace CrazyStorm.Core
             node.AppendChild(layerNode);
             return layerNode;
         }
-        public List<byte> GeneratePlayData()
+        public List<byte> GeneratePlayData(File file)
         {
             var layerBytes = new List<byte>();
             //stringDataFields
@@ -165,7 +165,7 @@ namespace CrazyStorm.Core
             //layerData
             PlayDataHelper.GenerateStruct(layerData, layerBytes);
             //components
-            PlayDataHelper.GenerateObjectList(components, layerBytes);
+            PlayDataHelper.GenerateObjectList(file, components, layerBytes);
             return PlayDataHelper.CreateBlock(layerBytes);
         }
         public void LoadPlayData(BinaryReader reader, float version)

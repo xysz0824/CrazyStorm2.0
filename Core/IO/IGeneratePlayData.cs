@@ -11,6 +11,6 @@ namespace CrazyStorm.Core
 {
     public interface IGeneratePlayData
     {
-        List<byte> GeneratePlayData();
+        List<byte> GeneratePlayData(File file);
     }
 }

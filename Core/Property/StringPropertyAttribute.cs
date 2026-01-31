@@ -13,8 +13,8 @@ namespace CrazyStorm.Core
     {
         int minLength, maxLength;
         bool supportNumber, supportAlpha, supportPunctuation, supportSymbol;
-        public StringPropertyAttribute(int minLength, int maxLength, 
-            bool supportNumber, bool supportAlpha, bool supportPunctuation, bool supportSymbol)
+        public StringPropertyAttribute(int id, int minLength, int maxLength, 
+            bool supportNumber, bool supportAlpha, bool supportPunctuation, bool supportSymbol) : base(id)
         {
             this.minLength = minLength;
             this.maxLength = maxLength;

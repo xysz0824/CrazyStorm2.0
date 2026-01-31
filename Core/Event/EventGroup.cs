@@ -88,7 +88,7 @@ namespace CrazyStorm.Core
             node.AppendChild(eventGroupNode);
             return eventGroupNode;
         }
-        public List<byte> GeneratePlayData()
+        public List<byte> GeneratePlayData(File file)
         {
             var eventGroupBytes = new List<byte>();
             //compiledCondition

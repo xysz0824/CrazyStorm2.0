@@ -224,7 +224,7 @@ namespace CrazyStorm.Core
             node.AppendChild(particleSystemNode);
             return particleSystemNode;
         }
-        public List<byte> GeneratePlayData()
+        public List<byte> GeneratePlayData(File file)
         {
             var particleSystemBytes = new List<byte>();
             //orderType
@@ -232,9 +232,9 @@ namespace CrazyStorm.Core
             //stringDataField
             PlayDataHelper.GenerateStringDataFields(this, particleSystemBytes);
             //customTypes
-            PlayDataHelper.GenerateObjectList(customTypes, particleSystemBytes);
+            PlayDataHelper.GenerateObjectList(file, customTypes, particleSystemBytes);
             //layers
-            PlayDataHelper.GenerateObjectList(layers, particleSystemBytes);
+            PlayDataHelper.GenerateObjectList(file, layers, particleSystemBytes);
             //typeSoundMap
             particleSystemBytes.AddRange(BitConverter.GetBytes(typeSoundMap.Count));
             foreach (var typeSound in typeSoundMap)

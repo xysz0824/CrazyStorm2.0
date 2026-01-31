@@ -159,7 +159,7 @@ namespace CrazyStorm.Core
         public static bool CanSoundPlay => OnSoundPlay != null;
 
         static List<EventExecutor> executorList;
-        static Dictionary<string, Dictionary<string, TypeSet>> cache;
+        static Dictionary<string, Dictionary<int, TypeSet>> cache;
         public static IList<ParticleType> CustomTypes { get; set; }
         public static IList<FileResource> Sounds { get; set; }
         public static IDictionary<int, int> TypeSoundMap { get; set; }
@@ -167,7 +167,7 @@ namespace CrazyStorm.Core
         {
             OnSoundPlay = null;
             executorList = new List<EventExecutor>();
-            cache = new Dictionary<string, Dictionary<string, TypeSet>>();
+            cache = new Dictionary<string, Dictionary<int, TypeSet>>();
         }
         public static void AddEvent(PropertyContainer propertyContainer, PropertyContainer bindingContainer, VMEventInfo eventInfo, 
             float frameScale)
@@ -175,10 +175,10 @@ namespace CrazyStorm.Core
             var executor = new EventExecutor();
             executor.PropertyContainer = propertyContainer;
             executor.BindingContainer = bindingContainer;
-            executor.PropertyName = eventInfo.resultProperty;
+            executor.PropertyID = eventInfo.resultPropertyID;
             executor.ChangeMode = eventInfo.changeMode;
             executor.ChangeTime = eventInfo.changeTime;
-            propertyContainer.PushProperty(executor.PropertyName);
+            propertyContainer.PushProperty(executor.PropertyID);
             var initialValue = new TypeSet();
             initialValue.type = eventInfo.resultType;
             var targetValue = eventInfo.resultValue;
@@ -337,13 +337,13 @@ namespace CrazyStorm.Core
                 {
                     if (!cache.ContainsKey(id))
                     {
-                        cache.Add(id, new Dictionary<string, TypeSet>());
+                        cache.Add(id, new Dictionary<int, TypeSet>());
                     }
                     if (!executorList[i].Finished)
                     {
                         executorList[i].Update(frameScale);
                     }
-                    cache[id][executorList[i].PropertyName] = executorList[i].CurrentValue;
+                    cache[id][executorList[i].PropertyID] = executorList[i].CurrentValue;
                     if (executorList[i].Finished)
                     {
                         executorList.RemoveAt(i);

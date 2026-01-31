@@ -227,6 +227,7 @@ namespace CrazyStorm
             aimRect = VisualHelper.VisualDownwardSearch((DependencyObject)ParticleTabControl.SelectedContent, "AimBox");
             aimRect.SetValue(OpacityProperty, 1.0d);
             aimComponent = ComponentFactory.Create(button.Name);
+            aimComponent.Globals = file.Globals;
             var emitter = aimComponent as Emitter;
             if (emitter != null)
             {

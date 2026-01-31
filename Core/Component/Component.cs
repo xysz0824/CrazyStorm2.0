@@ -57,7 +57,7 @@ namespace CrazyStorm.Core
             get { return componentData.id; }
             set { componentData.id = value; }
         }
-        [StringProperty(1, 15, true, true, false, false)]
+        [StringProperty(0, 1, 15, true, true, false, false)]
         public string Name
         {
             get { return name; }
@@ -68,7 +68,7 @@ namespace CrazyStorm.Core
                     PropertyChanged(this, new PropertyChangedEventArgs("Name"));
             }
         }
-        [ReadOnlyProperty]
+        [ReadOnlyProperty(1)]
         public Emitter BindingTarget
         {
             get { return bindingTarget; }
@@ -76,23 +76,23 @@ namespace CrazyStorm.Core
         }
         public string LayerName { get; set; }
         public int LayerID { get; set; }
-        [RuntimeProperty]
+        [RuntimeProperty(2)]
         public float LayerFrame { get; set; }
-        [RuntimeProperty]
+        [RuntimeProperty(3)]
         public float CurrentFrame { get; set; }
-        [IntProperty(1, int.MaxValue)]
+        [IntProperty(4, 1, int.MaxValue)]
         public int BeginFrame
         {
             get { return componentData.beginFrame; }
             set { componentData.beginFrame = value; }
         }
-        [IntProperty(1, int.MaxValue)]
+        [IntProperty(5, 1, int.MaxValue)]
         public int TotalFrame
         {
             get { return componentData.totalFrame; }
             set { componentData.totalFrame = value; }
         }
-        [Vector2Property]
+        [Vector2Property(6)]
         public Vector2 Position //When in Edit mode, this represents relative position, in Play mode, absolute position
         {
             get { return componentData.position; }
@@ -123,31 +123,31 @@ namespace CrazyStorm.Core
             get { return acspeedVector; }
             set { acspeedVector = value; }
         }
-        [FloatProperty(float.MinValue, float.MaxValue)]
+        [FloatProperty(9, float.MinValue, float.MaxValue)]
         public float Speed
         {
             get { return componentData.speed; }
             set { componentData.speed = value; }
         }
-        [FloatProperty(float.MinValue, float.MaxValue)]
+        [FloatProperty(10, float.MinValue, float.MaxValue)]
         public float SpeedAngle
         {
             get { return componentData.speedAngle; }
             set { componentData.speedAngle = value; }
         }
-        [FloatProperty(float.MinValue, float.MaxValue)]
+        [FloatProperty(11, float.MinValue, float.MaxValue)]
         public float Acspeed
         {
             get { return componentData.acspeed; }
             set { componentData.acspeed = value; }
         }
-        [FloatProperty(float.MinValue, float.MaxValue)]
+        [FloatProperty(12, float.MinValue, float.MaxValue)]
         public float AcspeedAngle
         {
             get { return componentData.acspeedAngle; }
             set { componentData.acspeedAngle = value; }
         }
-        [BoolProperty]
+        [BoolProperty(13)]
         public bool Visibility
         {
             get { return componentData.visibility; }
@@ -299,12 +299,14 @@ namespace CrazyStorm.Core
 
             clone.Locals = new GenericContainer<VariableResource>();
             foreach (var variable in Locals)
+            {
                 clone.Locals.Add(variable.Clone() as VariableResource);
-
+            }
             clone.componentEventGroups = new GenericContainer<EventGroup>();
             foreach (var componentEventGroup in componentEventGroups)
+            {
                 clone.componentEventGroups.Add(componentEventGroup.Clone() as EventGroup);
-
+            }
             clone.children = new GenericContainer<Component>();
             if (children.Count > 0)
             {
@@ -346,7 +348,7 @@ namespace CrazyStorm.Core
                     throw new System.IO.FileLoadException("FileDataError");
             }
             //variables
-            XmlHelper.BuildFromObjectList(Locals, new VariableResource(""), componentNode, "Variables");
+            XmlHelper.BuildFromObjectList(Locals, new VariableResource(int.MinValue, ""), componentNode, "Variables");
             //componentEventGroups
             XmlHelper.BuildFromObjectList(componentEventGroups, new EventGroup(), componentNode, "ComponentEventGroups");
             return componentNode;
@@ -413,15 +415,13 @@ namespace CrazyStorm.Core
                 BindingTargetID = -1;
             }
         }
-        public virtual List<byte> GeneratePlayData()
+        public virtual List<byte> GeneratePlayData(File file)
         {
             var componentBytes = new List<byte>();
             //type for factory
             componentBytes.AddRange(PlayDataHelper.GetStringBytes(GetType().Name));
             //stringDataFields
             PlayDataHelper.GenerateStringDataFields(this, componentBytes);
-            //properties
-            base.GeneratePropertyExpressions(componentBytes);
             //componentData
             PlayDataHelper.GenerateStruct(componentData, componentBytes);
             //parent
@@ -429,9 +429,14 @@ namespace CrazyStorm.Core
             //bindingTarget
             componentBytes.AddRange(BitConverter.GetBytes(bindingTarget != null ? bindingTarget.ID : -1));
             //variables
-            PlayDataHelper.GenerateObjectList(Locals, componentBytes);
+            PlayDataHelper.GenerateObjectList(file, Locals, componentBytes);
+            //properties
+            var variables = new List<VariableResource>();
+            variables.AddRange(Locals);
+            variables.AddRange(file.Globals);
+            base.GeneratePropertyExpressions(variables, componentBytes);
             //componentEventGroups
-            PlayDataHelper.GenerateObjectList(componentEventGroups, componentBytes);
+            PlayDataHelper.GenerateObjectList(file, componentEventGroups, componentBytes);
             return PlayDataHelper.CreateBlock(componentBytes);
         }
         public virtual void LoadPlayData(BinaryReader reader, float version)
@@ -442,8 +447,6 @@ namespace CrazyStorm.Core
                 PlayDataHelper.ReadString(componentReader);
                 //stringDataFields
                 PlayDataHelper.ReadStringDataFields(this, componentReader);
-                //properties
-                base.LoadPropertyExpressions(componentReader);
                 //componentData
                 componentData = PlayDataHelper.ReadStruct<ComponentData>(componentReader);
                 //parent
@@ -452,6 +455,8 @@ namespace CrazyStorm.Core
                 BindingTargetID = componentReader.ReadInt32();
                 //variables
                 PlayDataHelper.ReadObjectList(Locals, componentReader, version);
+                //properties
+                base.LoadPropertyExpressions(componentReader);
                 //componentEventGroups
                 PlayDataHelper.ReadObjectList(ComponentEventGroups, componentReader, version);
             }
@@ -475,96 +480,96 @@ namespace CrazyStorm.Core
             }
             return Position;
         }
-        protected virtual bool PushSystemProperty(string propertyName)
+        protected virtual bool PushSystemProperty(int propertyID)
         {
-            switch (propertyName)
+            switch (propertyID)
             {
-                case "Status":
+                case -1:
                     VM.PushInt(Status);
                     return true;
-                case "StatusFrame":
+                case -2:
                     VM.PushFloat(StatusFrame, true, true);
                     return true;
-                case "SelfAngle":
+                case -3:
                     VM.PushFloat(0);
                     return true;
-                case "BodyPosition":
+                case -4:
                     VM.PushVector2(BodyPosition);
                     return true;
-                case "BodyPosition.x":
+                case -5:
                     VM.PushFloat(BodyPosition.x);
                     return true;
-                case "BodyPosition.y":
+                case -6:
                     VM.PushFloat(BodyPosition.y);
                     return true;
-                case "BodyAngle":
+                case -7:
                     var degree = MathHelper.GetDegree(BodyPosition - Position);
                     VM.PushFloat(degree);
                     return true;
-                case "CenterPosition":
+                case -8:
                     VM.PushVector2(CenterPosition);
                     return true;
-                case "CenterPosition.x":
+                case -9:
                     VM.PushFloat(CenterPosition.x);
                     return true;
-                case "CenterPosition.y":
+                case -10:
                     VM.PushFloat(CenterPosition.y);
                     return true;
-                case "CenterAngle":
+                case -11:
                     degree = MathHelper.GetDegree(CenterPosition - Position);
                     VM.PushFloat(degree);
                     return true;
             }
             return false;
         }
-        public override bool PushProperty(string propertyName)
+        public override bool PushProperty(int propertyID)
         {
-            if (PushSystemProperty(propertyName)) return true;
-            switch (propertyName)
+            if (PushSystemProperty(propertyID)) return true;
+            switch (propertyID)
             {
-                case "Name":
+                case 0:
                     VM.PushString(Name);
                     return true;
-                case "LayerFrame":
+                case 2:
                     VM.PushFloat(LayerFrame, true, true);
                     return true;
-                case "CurrentFrame":
+                case 3:
                     VM.PushFloat(CurrentFrame, true, true);
                     return true;
-                case "BeginFrame":
+                case 4:
                     VM.PushInt(BeginFrame);
                     return true;
-                case "TotalFrame":
+                case 5:
                     VM.PushInt(TotalFrame);
                     return true;
-                case "Position":
+                case 6:
                     VM.PushVector2(Position);
                     return true;
-                case "Position.x":
+                case 7:
                     VM.PushFloat(Position.x);
                     return true;
-                case "Position.y":
+                case 8:
                     VM.PushFloat(Position.y);
                     return true;
-                case "Speed":
+                case 9:
                     VM.PushFloat(Speed);
                     return true;
-                case "SpeedAngle":
+                case 10:
                     VM.PushFloat(SpeedAngle);
                     return true;
-                case "Acspeed":
+                case 11:
                     VM.PushFloat(Acspeed);
                     return true;
-                case "AcspeedAngle":
+                case 12:
                     VM.PushFloat(AcspeedAngle);
                     return true;
-                case "Visibility":
+                case 13:
                     VM.PushBool(Visibility);
                     return true;
             }
             for (int i = 0; i < Locals.Count; ++i)
             {
-                if (Locals[i].Label == propertyName)
+                if (Locals[i].ID == propertyID)
                 {
                     VM.PushFloat(Locals[i].Value);
                     return true;
@@ -572,7 +577,7 @@ namespace CrazyStorm.Core
             }
             for (int i = 0; i < Globals.Count; ++i)
             {
-                if (Globals[i].Label == propertyName)
+                if (Globals[i].ID == propertyID)
                 {
                     VM.PushFloat(Globals[i].Value);
                     return true;
@@ -580,51 +585,51 @@ namespace CrazyStorm.Core
             }
             return false;
         }
-        public override bool SetProperty(string propertyName)
+        public override bool SetProperty(int propertyID)
         {
-            switch (propertyName)
+            switch (propertyID)
             {
-                case "Name":
+                case 0:
                     Name = VM.PopString();
                     return true;
-                case "BeginFrame":
+                case 4:
                     BeginFrame = VM.PopInt();
                     return true;
-                case "TotalFrame":
+                case 5:
                     TotalFrame = VM.PopInt();
                     return true;
-                case "Position":
+                case 6:
                     Position = VM.PopVector2();
                     return true;
-                case "Position.x":
+                case 7:
                     Position = new Vector2(VM.PopFloat(), Position.y);
                     return true;
-                case "Position.y":
+                case 8:
                     Position = new Vector2(Position.x, VM.PopFloat());
                     return true;
-                case "Speed":
+                case 9:
                     Speed = VM.PopFloat();
                     MathHelper.SetVector2(ref speedVector, Speed, SpeedAngle);
                     return true;
-                case "SpeedAngle":
+                case 10:
                     SpeedAngle = VM.PopFloat();
                     MathHelper.SetVector2(ref speedVector, Speed, SpeedAngle);
                     return true;
-                case "Acspeed":
+                case 11:
                     Acspeed = VM.PopFloat();
                     MathHelper.SetVector2(ref acspeedVector, Acspeed, AcspeedAngle);
                     return true;
-                case "AcspeedAngle":
+                case 12:
                     AcspeedAngle = VM.PopFloat();
                     MathHelper.SetVector2(ref acspeedVector, Acspeed, AcspeedAngle);
                     return true;
-                case "Visibility":
+                case 13:
                     Visibility = VM.PopBool();
                     return true;
             }
             for (int i = 0; i < Locals.Count; ++i)
             {
-                if (Locals[i].Label == propertyName)
+                if (Locals[i].ID == propertyID)
                 {
                     Locals[i].Value = VM.PopFloat();
                     return true;
@@ -632,7 +637,7 @@ namespace CrazyStorm.Core
             }
             for (int i = 0; i < Globals.Count; ++i)
             {
-                if (Globals[i].Label == propertyName)
+                if (Globals[i].ID == propertyID)
                 {
                     Globals[i].Value = VM.PopFloat();
                     return true;
@@ -669,7 +674,7 @@ namespace CrazyStorm.Core
                 initialState.Locals = new List<VariableResource>();
                 foreach (VariableResource item in Locals)
                 {
-                    var variable = new VariableResource { Label = item.Label, Value = item.Value };
+                    var variable = new VariableResource { ID = item.ID, Label = item.Label, Value = item.Value };
                     initialState.Locals.Add(variable);
                 }
                 initialState.ExecuteExpressionsAndSet(1);
@@ -685,8 +690,10 @@ namespace CrazyStorm.Core
                 Acspeed = initialState.Acspeed;
                 AcspeedAngle = initialState.AcspeedAngle;
                 Visibility = initialState.Visibility;
-                for (int i = 0;i < Locals.Count;++i)
+                for (int i = 0; i < Locals.Count; ++i)
+                {
                     Locals[i].Value = initialState.Locals[i].Value;
+                }
             }
             MathHelper.SetVector2(ref speedVector, Speed, SpeedAngle);
             MathHelper.SetVector2(ref acspeedVector, Acspeed, AcspeedAngle);

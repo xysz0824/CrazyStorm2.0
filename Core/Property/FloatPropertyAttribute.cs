@@ -12,7 +12,7 @@ namespace CrazyStorm.Core
     public sealed class FloatPropertyAttribute : PropertyAttribute
     {
         float minValue, maxValue;
-        public FloatPropertyAttribute(float minValue, float maxValue)
+        public FloatPropertyAttribute(int id, float minValue, float maxValue) : base(id)
         {
             this.minValue = minValue;
             this.maxValue = maxValue;

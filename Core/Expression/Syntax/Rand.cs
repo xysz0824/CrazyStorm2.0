@@ -50,12 +50,12 @@ namespace CrazyStorm.Expression
             else throw new ExpressionException("IllegalInput");
         }
 
-        public override void Compile(List<byte> codeStream)
+        public override void Compile(Type type, Type subType, IList<VariableResource> variables, List<byte> codeStream)
         {
             if (HasRight())
             {
-                GetLeft().Compile(codeStream);
-                GetRight().Compile(codeStream);
+                GetLeft().Compile(type, subType, variables, codeStream);
+                GetRight().Compile(type, subType, variables, codeStream);
                 codeStream.AddRange(VM.CreateInstruction(VMCode.RAND));
             }
             else

@@ -104,16 +104,21 @@ namespace CrazyStorm
                 var name = label + i;
                 bool ok = true;
                 for (int k = 0; k < file.Globals.Count; ++k)
+                {
                     if (file.Globals[k].Label == name)
                     {
                         ok = false;
                         break;
                     }
-
+                }
                 if (ok)
                 {
-                    var newVar = new VariableResource(name);
+                    var newVar = new VariableResource(int.MinValue, name);
                     file.Globals.Add(newVar);
+                    for (int k = 0; k < file.Globals.Count; ++k)
+                    {
+                        file.Globals[k].ID = 10000 + k;
+                    }
                     UpdateGlobals(UpdateType.Add, newVar);
                     DeleteVariable.IsEnabled = true;
                     return;
@@ -126,6 +131,10 @@ namespace CrazyStorm
             {
                 var item = VariableGrid.SelectedItem as VariableResource;
                 file.Globals.Remove(item);
+                for (int k = 0; k < file.Globals.Count; ++k)
+                {
+                    file.Globals[k].ID = 10000 + k;
+                }
                 UpdateGlobals(UpdateType.Delete, item);
                 DeleteVariable.IsEnabled = file.Globals.Count > 0;
             }
@@ -141,6 +150,7 @@ namespace CrazyStorm
                     //Check the commit to avoid repeating name.
                     newValue = newValue.Trim();
                     foreach (var item in file.Globals)
+                    {
                         if (item != editItem && item.Label == newValue)
                         {
                             MessageBox.Show((string)FindResource("NameRepeatingStr"), (string)FindResource("TipTitleStr"),
@@ -149,6 +159,7 @@ namespace CrazyStorm
                             (e.EditingElement as TextBox).Text = editItem.Label;
                             return;
                         }
+                    }
                     UpdateGlobals(UpdateType.Modify, editItem, newValue, editItem.Value);
                 }
                 else if (e.Column.SortMemberPath == "Value")

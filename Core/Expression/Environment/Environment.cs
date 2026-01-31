@@ -12,6 +12,20 @@ namespace CrazyStorm.Expression
 {
     public class Environment
     {
+        public static readonly Dictionary<string, int> SystemPropertyIDMap = new Dictionary<string, int>
+        {
+            { "Status", -1 },
+            { "StatusFrame", -2 },
+            { "SelfAngle", -3 },
+            { "BodyPosition", -4 },
+            { "BodyPosition.x", -5 },
+            { "BodyPosition.y", -6 },
+            { "BodyAngle", -7 },
+            { "CenterPosition", -8 },
+            { "CenterPosition.x", -9 },
+            { "CenterPosition.y", -10 },
+            { "CenterAngle", -11 },
+        };
         #region Private Members
         IDictionary<string, float> globals;
         IDictionary<string, float> locals;
@@ -101,6 +115,67 @@ namespace CrazyStorm.Expression
         #endregion
 
         #region Public Methods
+        public static int GetPropertyID(string name, Type type, Type subType, IList<VariableResource> variables)
+        {
+            var propertyID = int.MinValue;
+            var split = name.Split('.');
+            var property = type.GetProperty(split[0]);
+            if (property != null)
+            {
+                foreach (var attribute in property.GetCustomAttributes(false))
+                {
+                    if (attribute is PropertyAttribute)
+                    {
+                        propertyID = (attribute as PropertyAttribute).ID;
+                        if (split.Length <= 1) break;
+                        if (split[1] == "x" || split[1] == "r") propertyID += 1;
+                        else if (split[1] == "y" || split[1] == "g") propertyID += 2;
+                        else if (split[1] == "z" || split[1] == "b") propertyID += 3;
+                        break;
+                    }
+                }
+            }
+            if (propertyID != int.MinValue) return propertyID;
+            if (subType != null)
+            {
+                property = subType.GetProperty(split[0]);
+                if (property != null)
+                {
+                    foreach (var attribute in property.GetCustomAttributes(false))
+                    {
+                        if (attribute is PropertyAttribute)
+                        {
+                            propertyID = (attribute as PropertyAttribute).ID;
+                            if (split.Length <= 1) break;
+                            if (split[1] == "x" || split[1] == "r") propertyID += 1;
+                            else if (split[1] == "y" || split[1] == "g") propertyID += 2;
+                            else if (split[1] == "z" || split[1] == "b") propertyID += 3;
+                            break;
+                        }
+                    }
+                }
+            }
+            if (propertyID != int.MinValue) return propertyID;
+            foreach (var variable in variables)
+            {
+                if (variable.Label == split[0])
+                {
+                    propertyID = variable.ID;
+                    break;
+                }
+            }
+            if (propertyID != int.MinValue) return propertyID;
+            foreach (var kv in SystemPropertyIDMap)
+            {
+                if (kv.Key == split[0])
+                {
+                    propertyID = kv.Value;
+                    break;
+                }
+            }
+            if (propertyID == int.MinValue) throw new Exception($"Can't find {name}");
+            return propertyID;
+        }
         public void PutGlobal(string name, float value) 
         {
             globals[name] = value; 

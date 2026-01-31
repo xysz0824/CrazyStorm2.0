@@ -15,6 +15,7 @@ namespace CrazyStorm.Core
         public CurveEmitter()
         {
             particle = new CurveParticle();
+            particle.Emitter = this;
             InitialTemplate = new CurveParticle();
         }
         public override XmlElement BuildFromXml(XmlElement node)

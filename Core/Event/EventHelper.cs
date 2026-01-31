@@ -67,7 +67,7 @@ namespace CrazyStorm.Core
     {
         public VMInstruction[] conditionExpression;
         public bool isSpecialEvent;
-        public string resultProperty;
+        public int resultPropertyID;
         public EventChangeType changeType;
         public bool isExpressionResult;
         public PropertyType resultType;
@@ -155,7 +155,7 @@ namespace CrazyStorm.Core
             }
             return info;
         }
-        public static byte[] Compile(string str)
+        public static byte[] Compile(Type type, Type subType, IList<VariableResource> variables, string str)
         {
             var lexer = new Expression.Lexer();
             lexer.Load(str);
@@ -163,17 +163,17 @@ namespace CrazyStorm.Core
             if (lexer.Tokens.Count > 0)
             {
                 var syntaxTree = new Expression.Parser(lexer).Expression();
-                syntaxTree.Compile(compiledBytes);
+                syntaxTree.Compile(type, subType, variables, compiledBytes);
             }
             return compiledBytes.ToArray();
         }
-        public static byte[] GenerateEventData(string text)
+        public static byte[] GenerateEventData(Type type, Type subType, IList<VariableResource> variables, string text)
         {
             EventInfo eventInfo = SplitEvent(text);
             List<byte> bytes = new List<byte>();
             if (eventInfo.condition != null)
             {
-                byte[] compiledExpression = Compile(eventInfo.condition);
+                byte[] compiledExpression = Compile(type, subType, variables, eventInfo.condition);
                 bytes.AddRange(BitConverter.GetBytes(compiledExpression.Length));
                 bytes.AddRange(compiledExpression);
             }
@@ -184,13 +184,14 @@ namespace CrazyStorm.Core
             bytes.AddRange(BitConverter.GetBytes(eventInfo.isSpecialEvent));
             if (!eventInfo.isSpecialEvent)
             {
-                bytes.AddRange(PlayDataHelper.GetStringBytes(eventInfo.resultProperty));
+                var propertyID = Expression.Environment.GetPropertyID(eventInfo.resultProperty, type, subType, variables);
+                bytes.AddRange(BitConverter.GetBytes(propertyID));
                 bytes.Add((byte)Enum.Parse(typeof(EventChangeType), eventInfo.changeType));
                 bytes.AddRange(BitConverter.GetBytes(eventInfo.isExpressionResult));
                 bytes.Add((byte)eventInfo.resultType);
                 if (eventInfo.isExpressionResult)
                 {
-                    byte[] compiledExpression = Compile(eventInfo.resultValue);
+                    byte[] compiledExpression = Compile(type, subType, variables, eventInfo.resultValue);
                     bytes.AddRange(BitConverter.GetBytes(compiledExpression.Length));
                     bytes.AddRange(compiledExpression);
                 }
@@ -209,7 +210,7 @@ namespace CrazyStorm.Core
                 bytes.AddRange(BitConverter.GetBytes(split.Length));
                 for (int i = 0; i < split.Length; ++i)
                 {
-                    byte[] compiledExpression = Compile(split[i]);
+                    byte[] compiledExpression = Compile(type, subType, variables, split[i]);
                     bytes.AddRange(BitConverter.GetBytes(compiledExpression.Length));
                     bytes.AddRange(compiledExpression);
                 }
@@ -229,7 +230,7 @@ namespace CrazyStorm.Core
                 eventInfo.isSpecialEvent = reader.ReadBoolean();
                 if (!eventInfo.isSpecialEvent)
                 {
-                    eventInfo.resultProperty = PlayDataHelper.ReadString(reader);
+                    eventInfo.resultPropertyID = reader.ReadInt32();
                     eventInfo.changeType = (EventChangeType)reader.ReadByte();
                     eventInfo.isExpressionResult = reader.ReadBoolean();
                     eventInfo.resultType = (PropertyType)reader.ReadByte();

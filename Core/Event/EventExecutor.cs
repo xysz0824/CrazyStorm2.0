@@ -14,7 +14,7 @@ namespace CrazyStorm.Core
         float currentTime;
         public PropertyContainer PropertyContainer { get; set; }
         public PropertyContainer BindingContainer { get; set; }
-        public string PropertyName { get; set; }
+        public int PropertyID { get; set; }
         public EventChangeMode ChangeMode { get; set; }
         public TypeSet InitialValue { get; set; }
         public TypeSet CurrentValue { get { return currentValue; } }
@@ -72,7 +72,7 @@ namespace CrazyStorm.Core
                     VM.PushString(currentValue.stringValue);
                     break;
             }
-            PropertyContainer.SetProperty(PropertyName);
+            PropertyContainer.SetProperty(PropertyID);
             VM.Clear();
             currentTime += frameScale;
         }

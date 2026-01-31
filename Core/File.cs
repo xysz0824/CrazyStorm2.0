@@ -94,7 +94,18 @@ namespace CrazyStorm.Core
             //sounds
             XmlHelper.BuildFromObjectList(sounds, new FileResource(0, "", ""), node, "Sounds");
             //globals
-            XmlHelper.BuildFromObjectList(globals, new VariableResource(""), node, "Globals");
+            XmlHelper.BuildFromObjectList(globals, new VariableResource(int.MinValue, ""), node, "Globals");
+            foreach (var particleSystem in particleSystems)
+            {
+                foreach (var layer in particleSystem.Layers)
+                {
+                    foreach (var component in layer.Components)
+                    {
+                        component.System = particleSystem;
+                        component.Globals = globals;
+                    }
+                }
+            }
             return node;
         }
         public XmlElement StoreAsXml(XmlDocument doc, XmlElement node)
@@ -205,6 +216,9 @@ namespace CrazyStorm.Core
         {
             if (container is Emitter) CompilePropertyExpressions((container as Emitter).Particle);
             Type containerType = container.GetType();
+            var variables = new List<VariableResource>();
+            if (container is Component) variables.AddRange((container as Component).Locals);
+            variables.AddRange(Globals);
             foreach (var property in container.Properties)
             {
                 if (property.Value.Expression)
@@ -215,7 +229,7 @@ namespace CrazyStorm.Core
                     if (!SyntaxTree.CanEval(syntaxTree))
                     {
                         var compiledBytes = new List<byte>();
-                        syntaxTree.Compile(compiledBytes);
+                        syntaxTree.Compile(containerType, null, variables, compiledBytes);
                         property.Value.CompiledExpression = compiledBytes.ToArray();
                     }
                     else
@@ -235,16 +249,30 @@ namespace CrazyStorm.Core
         }
         void CompileEventGroups(Component component)
         {
-            CompileEvents(component.ComponentEventGroups);
             if (component is Emitter)
-                CompileEvents((component as Emitter).ParticleEventGroups);
+            {
+                var subType = (component as Emitter).Particle.GetType();
+                CompileEvents(component, subType, component.ComponentEventGroups);
+                CompileEvents(component, subType, (component as Emitter).ParticleEventGroups);
+            }
             else if (component is EventField)
-                CompileEvents((component as EventField).EventFieldEventGroups);
+            {
+                CompileEvents(component, null, component.ComponentEventGroups);
+                CompileEvents(component, typeof(ParticleBase), (component as EventField).EventFieldEventGroups);
+            }
             else if (component is Rebounder)
-                CompileEvents((component as Rebounder).RebounderEventGroups);
+            {
+                CompileEvents(component, null, component.ComponentEventGroups);
+                CompileEvents(component, typeof(ParticleBase), (component as Rebounder).RebounderEventGroups);
+            }
+            else CompileEvents(component, null, component.ComponentEventGroups);
         }
-        void CompileEvents(IList<EventGroup> eventGroups)
+        void CompileEvents(Component component, Type subType, IList<EventGroup> eventGroups)
         {
+            var type = component.GetType();
+            var variables = new List<VariableResource>();
+            variables.AddRange(component.Locals);
+            variables.AddRange(Globals);
             foreach (EventGroup eventGroup in eventGroups)
             {
                 eventGroup.CompiledCondition = null;
@@ -254,13 +282,13 @@ namespace CrazyStorm.Core
                     lexer.Load(eventGroup.Condition);
                     var syntaxTree = new Expression.Parser(lexer).Expression();
                     var compiledBytes = new List<byte>();
-                    syntaxTree.Compile(compiledBytes);
+                    syntaxTree.Compile(type, subType, variables, compiledBytes);
                     eventGroup.CompiledCondition = compiledBytes.ToArray();
                 }
                 eventGroup.CompiledEvents.Clear();
                 foreach (string originalEvent in eventGroup.Events)
                 {
-                    eventGroup.CompiledEvents.Add(EventHelper.GenerateEventData(originalEvent));
+                    eventGroup.CompiledEvents.Add(EventHelper.GenerateEventData(type, subType, variables, originalEvent));
                 }
             }
         }
@@ -278,17 +306,17 @@ namespace CrazyStorm.Core
                 }
             }
         }
-        public List<byte> GeneratePlayData()
+        public List<byte> GeneratePlayData(File file)
         {
             var fileBytes = new List<byte>();
-            //particleSystems
-            PlayDataHelper.GenerateObjectList(particleSystems, fileBytes);
             //images
-            PlayDataHelper.GenerateObjectList(images, fileBytes);
+            PlayDataHelper.GenerateObjectList(file, images, fileBytes);
             //sounds
-            PlayDataHelper.GenerateObjectList(sounds, fileBytes);
+            PlayDataHelper.GenerateObjectList(file, sounds, fileBytes);
             //globals
-            PlayDataHelper.GenerateObjectList(globals, fileBytes);
+            PlayDataHelper.GenerateObjectList(file, globals, fileBytes);
+            //particleSystems
+            PlayDataHelper.GenerateObjectList(file, particleSystems, fileBytes);
             return fileBytes;
         }
         public byte[] GeneratePlayFile()
@@ -302,7 +330,7 @@ namespace CrazyStorm.Core
             writer.Write(PlayDataHelper.GetStringBytes(VersionInfo.PlayVersion));
             //Write play file data
             Compile();
-            writer.Write(GeneratePlayData().ToArray());
+            writer.Write(GeneratePlayData(this).ToArray());
             var bytes = stream.ToArray();
             stream.Close();
             return bytes;
@@ -318,8 +346,6 @@ namespace CrazyStorm.Core
         }
         public void LoadPlayData(BinaryReader reader, float version)
         {
-            //ParticleSystems
-            PlayDataHelper.ReadObjectList(ParticleSystems, reader, version);
             //Images
             PlayDataHelper.ReadObjectList(Images, reader, version);
             //Sounds
@@ -327,6 +353,8 @@ namespace CrazyStorm.Core
             //Globals
             globals = new List<VariableResource>();
             PlayDataHelper.ReadObjectList(globals, reader, version);
+            //ParticleSystems
+            PlayDataHelper.ReadObjectList(ParticleSystems, reader, version);
             foreach (var particleSystem in ParticleSystems)
             {
                 foreach (var layer in particleSystem.Layers)

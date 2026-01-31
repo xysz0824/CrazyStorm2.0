@@ -65,11 +65,9 @@ namespace CrazyStorm
         {
             environment = new Expression.Environment();
             //Put globals.
-            foreach (VariableResource item in file.Globals)
-                environment.PutGlobal(item.Label, item.Value);
+            foreach (VariableResource item in file.Globals) environment.PutGlobal(item.Label, item.Value);
             //Put locals.
-            foreach (VariableResource item in component.Locals)
-                environment.PutLocal(item.Label, item.Value);
+            foreach (VariableResource item in component.Locals) environment.PutLocal(item.Label, item.Value);
         }
         void LoadContent()
         {
@@ -388,13 +386,14 @@ namespace CrazyStorm
                 //To avoid repeating name, use number.
                 var name = label + i;
                 bool ok = true;
-                for (int k = 0;k < component.Locals.Count;++k)
+                for (int k = 0; k < component.Locals.Count; ++k)
+                {
                     if (component.Locals[k].Label == name)
                     {
                         ok = false;
                         break;
                     }
-
+                }
                 if (ok)
                 {
                     new AddLocalCommand().Do(commandStack, name, component, environment, DeleteVariable);
@@ -422,6 +421,7 @@ namespace CrazyStorm
                     //Check the commit to avoid repeating name.
                     newValue = newValue.Trim();
                     foreach (var item in component.Locals)
+                    {
                         if (item != editItem && item.Label == newValue)
                         {
                             MessageBox.Show((string)FindResource("NameRepeatingStr"), (string)FindResource("TipTitleStr"),
@@ -430,6 +430,7 @@ namespace CrazyStorm
                             (e.EditingElement as TextBox).Text = editItem.Label;
                             return;
                         }
+                    }
                     new ModifyLocalCommand().Do(commandStack, editItem, newValue, editItem.Value.ToString(), environment);
                 }
                 else if (e.Column.SortMemberPath == "Value")

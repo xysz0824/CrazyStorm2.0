@@ -438,7 +438,7 @@ namespace CrazyStorm.Core
                 imageID = -1;
             }
         }
-        public List<byte> GeneratePlayData()
+        public List<byte> GeneratePlayData(File file)
         {
             var particleTypeBytes = new List<byte>();
             particleTypeBytes.AddRange(BitConverter.GetBytes(image != null ? image.ID : -1));

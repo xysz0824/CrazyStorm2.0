@@ -45,55 +45,55 @@ namespace CrazyStorm.Core
         public ParticleBase Template { get; protected set; }
         public LinkedList<ParticleBase> Particles { get; private set; }
         public IList<EventGroup> EmitterEventGroups { get; private set; }
-        [Vector2Property]
+        [Vector2Property(14)]
         public Vector2 EmitPosition
         {
             get { return emitterData.emitPosition; }
             set { emitterData.emitPosition = value; }
         }
-        [IntProperty(1, int.MaxValue)]
+        [IntProperty(17, 1, int.MaxValue)]
         public int EmitCount
         {
             get { return emitterData.emitCount; }
             set { emitterData.emitCount = value; }
         }
-        [IntProperty(1, int.MaxValue)]
+        [IntProperty(18, 1, int.MaxValue)]
         public int EmitCycle
         {
             get { return emitterData.emitCycle; }
             set { emitterData.emitCycle = value; }
         }
-        [FloatProperty(float.MinValue, float.MaxValue)]
+        [FloatProperty(19, float.MinValue, float.MaxValue)]
         public float EmitAngle
         {
             get { return emitterData.emitAngle; }
             set { emitterData.emitAngle = value; }
         }
-        [BoolProperty]
+        [BoolProperty(20)]
         public bool BindToSpeedAngle
         {
             get { return emitterData.bindToSpeedAngle; }
             set { emitterData.bindToSpeedAngle = value; }
         }
-        [FloatProperty(float.MinValue, float.MaxValue)]
+        [FloatProperty(21, float.MinValue, float.MaxValue)]
         public float EmitRange
         {
             get { return emitterData.emitRange; }
             set { emitterData.emitRange = value; }
         }
-        [FloatProperty(float.MinValue, float.MaxValue)]
+        [FloatProperty(22, float.MinValue, float.MaxValue)]
         public float EmitRadius
         {
             get { return emitterData.emitRadius; }
             set { emitterData.emitRadius = value; }
         }
-        [FloatProperty(float.MinValue, float.MaxValue)]
+        [FloatProperty(23, float.MinValue, float.MaxValue)]
         public float EmitRoundAngle
         {
             get { return emitterData.emitRoundAngle; }
             set { emitterData.emitRoundAngle = value; }
         }
-        [BoolProperty]
+        [BoolProperty(24)]
         public bool InstantMovement
         {
             get { return emitterData.instantMovement; }
@@ -129,19 +129,19 @@ namespace CrazyStorm.Core
         void Emit(float frameScale)
         {
             var emitPosition = EmitPosition;
-            if (ExecuteRandomExpression("EmitPosition", frameScale)) emitPosition += VM.PopVector2();
+            if (ExecuteRandomExpression(14, frameScale)) emitPosition += VM.PopVector2();
             var emitCount = EmitCount;
-            if (ExecuteRandomExpression("EmitCount", frameScale)) emitCount += VM.PopInt();
+            if (ExecuteRandomExpression(17, frameScale)) emitCount += VM.PopInt();
             var emitCycle = EmitCycle;
-            if (ExecuteRandomExpression("EmitCycle", frameScale)) emitCycle += VM.PopInt();
+            if (ExecuteRandomExpression(18, frameScale)) emitCycle += VM.PopInt();
             var emitAngle = EmitAngle;
-            if (ExecuteRandomExpression("EmitAngle", frameScale)) emitAngle += VM.PopFloat();
+            if (ExecuteRandomExpression(19, frameScale)) emitAngle += VM.PopFloat();
             var emitRange = EmitRange;
-            if (ExecuteRandomExpression("EmitRange", frameScale)) emitRange += VM.PopFloat();
+            if (ExecuteRandomExpression(21, frameScale)) emitRange += VM.PopFloat();
             var emitRadius = EmitRadius;
-            if (ExecuteRandomExpression("EmitRadius", frameScale)) emitRadius += VM.PopFloat();
+            if (ExecuteRandomExpression(22, frameScale)) emitRadius += VM.PopFloat();
             var emitRoundAngle = EmitRoundAngle;
-            if (ExecuteRandomExpression("EmitRoundAngle", frameScale)) emitRoundAngle += VM.PopFloat();
+            if (ExecuteRandomExpression(23, frameScale)) emitRoundAngle += VM.PopFloat();
             Template.ExecuteExpressionsAndSet(frameScale);
             float increment = emitRange / emitCount;
             float angle = emitAngle - (emitRange + increment) / 2;
@@ -212,16 +212,16 @@ namespace CrazyStorm.Core
             node.AppendChild(emitterNode);
             return emitterNode;
         }
-        public override List<byte> GeneratePlayData()
+        public override List<byte> GeneratePlayData(File file)
         {
-            var bytes = base.GeneratePlayData();
+            var bytes = base.GeneratePlayData(file);
             var emitterBytes = new List<byte>();
             //emitterData
             PlayDataHelper.GenerateStruct(emitterData, emitterBytes);
             //particle
-            emitterBytes.AddRange(particle.GeneratePlayData());
+            emitterBytes.AddRange(particle.GeneratePlayData(file, this));
             //particleEventGroups
-            PlayDataHelper.GenerateObjectList(particleEventGroups, emitterBytes);
+            PlayDataHelper.GenerateObjectList(file, particleEventGroups, emitterBytes);
             bytes.AddRange(PlayDataHelper.CreateBlock(emitterBytes));
             return bytes;
         }
@@ -240,115 +240,110 @@ namespace CrazyStorm.Core
                 InitialTemplate.ParticleEventGroups = EmitterEventGroups;
             }
         }
-        protected override bool PushSystemProperty(string propertyName)
+        protected override bool PushSystemProperty(int propertyID)
         {
-            switch (propertyName)
+            switch (propertyID)
             {
-                case "SelfAngle":
+                case -3:
                     var degree = MathHelper.GetDegree(Position - EmitPosition);
                     VM.PushFloat(degree);
                     return true;
-                case "BodyAngle":
+                case -7:
                     degree = MathHelper.GetDegree(BodyPosition - EmitPosition);
                     VM.PushFloat(degree);
                     return true;
-                case "CenterAngle":
+                case -11:
                     degree = MathHelper.GetDegree(CenterPosition - EmitPosition);
                     VM.PushFloat(degree);
                     return true;
             }
-            if (base.PushSystemProperty(propertyName)) return true;
+            if (base.PushSystemProperty(propertyID)) return true;
             return false;
         }
-        public override bool PushProperty(string propertyName)
+        public override bool PushProperty(int propertyID)
         {
-            if (base.PushProperty(propertyName)) return true;
-            switch (propertyName)
+            if (base.PushProperty(propertyID)) return true;
+            switch (propertyID)
             {
-                case "EmitPosition":
+                case 14:
                     VM.PushVector2(EmitPosition);
                     return true;
-                case "EmitPosition.x":
+                case 15:
                     VM.PushFloat(EmitPosition.x);
                     return true;
-                case "EmitPosition.y":
+                case 16:
                     VM.PushFloat(EmitPosition.y);
                     return true;
-                case "EmitCount":
+                case 17:
                     VM.PushInt(EmitCount);
                     return true;
-                case "EmitCycle":
+                case 18:
                     VM.PushInt(EmitCycle);
                     return true;
-                case "EmitAngle":
+                case 19:
                     VM.PushFloat(EmitAngle);
                     return true;
-                case "BindToSpeedAngle":
+                case 20:
                     VM.PushBool(BindToSpeedAngle);
                     return true;
-                case "EmitRange":
+                case 21:
                     VM.PushFloat(EmitRange);
                     return true;
-                case "EmitRadius":
+                case 22:
                     VM.PushFloat(EmitRadius);
                     return true;
-                case "EmitRoundAngle":
+                case 23:
                     VM.PushFloat(EmitRoundAngle);
                     return true;
-                case "InstanceMovement":
+                case 24:
                     VM.PushBool(InstantMovement);
                     return true;
             }
-            if (Template == null)
-            {
-                return false;
-            }
-            return Template.PushProperty(propertyName);
+            if (Template == null) return false;
+            return Template.PushProperty(propertyID);
         }
-        public override bool SetProperty(string propertyName)
+        public override bool SetProperty(int propertyID)
         {
-            if (base.SetProperty(propertyName))
-                return true;
-
-            switch (propertyName)
+            if (base.SetProperty(propertyID)) return true;
+            switch (propertyID)
             {
-                case "EmitPosition":
+                case 14:
                     EmitPosition = VM.PopVector2();
                     return true;
-                case "EmitPosition.x":
+                case 15:
                     EmitPosition = new Vector2(VM.PopFloat(), EmitPosition.y);
                     return true;
-                case "EmitPosition.y":
+                case 16:
                     EmitPosition = new Vector2(EmitPosition.x, VM.PopFloat());
                     return true;
-                case "EmitCount":
+                case 17:
                     EmitCount = VM.PopInt();
                     return true;
-                case "EmitCycle":
+                case 18:
                     EmitCycle = VM.PopInt();
                     return true;
-                case "EmitAngle":
+                case 19:
                     EmitAngle = VM.PopFloat();
                     return true;
-                case "BindToSpeedAngle":
+                case 20:
                     BindToSpeedAngle = VM.PopBool();
                     return true;
-                case "EmitRange":
+                case 21:
                     EmitRange = VM.PopFloat();
                     return true;
-                case "EmitRadius":
+                case 22:
                     EmitRadius = VM.PopFloat();
                     return true;
-                case "EmitRoundAngle":
+                case 23:
                     EmitRoundAngle = VM.PopFloat();
                     return true;
-                case "InstantMovement":
+                case 24:
                     InstantMovement = VM.PopBool();
                     if (!InstantMovement && lastSpawn != null) lastSpawn = null;
                     return true;
             }
             if (Template == null) return false;
-            return Template.SetProperty(propertyName);
+            return Template.SetProperty(propertyID);
         }
         public override bool Update(float frameScale, float currentFrame)
         {

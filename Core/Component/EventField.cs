@@ -52,55 +52,55 @@ namespace CrazyStorm.Core
         #endregion
 
         #region Public Members
-        [FloatProperty(1, float.MaxValue)]
+        [FloatProperty(14, 1, float.MaxValue)]
         public float HalfWidth
         {
             get { return eventFieldData.halfWidth; }
             set { eventFieldData.halfWidth = value; }
         }
-        [FloatProperty(1, float.MaxValue)]
+        [FloatProperty(15, 1, float.MaxValue)]
         public float HalfHeight
         {
             get { return eventFieldData.halfHeight; }
             set { eventFieldData.halfHeight = value; }
         }
-        [EnumProperty(typeof(FieldShape))]
+        [EnumProperty(16, typeof(FieldShape))]
         public FieldShape FieldShape
         {
             get { return eventFieldData.fieldShape; }
             set { eventFieldData.fieldShape = value; }
         }
-        [EnumProperty(typeof(Reach))]
+        [EnumProperty(17, typeof(Reach))]
         public Reach Reach
         {
             get { return eventFieldData.reach; }
             set { eventFieldData.reach = value; }
         }
-        [StringProperty(1, 15, true, true, false, false)]
+        [StringProperty(18, 1, 15, true, true, false, false)]
         public string TargetName
         {
             get { return targetName; }
             set { targetName = value; }
         }
-        [BoolProperty]
+        [BoolProperty(19)]
         public bool LayerMask
         {
             get { return eventFieldData.layerMask; }
             set { eventFieldData.layerMask = value; }
         }
-        [EnumProperty(typeof(LayerMaskType))]
+        [EnumProperty(20, typeof(LayerMaskType))]
         public LayerMaskType LayerMaskType
         {
             get { return eventFieldData.layerMaskType; }
             set { eventFieldData.layerMaskType = value; }
         }
-        [BoolProperty]
+        [BoolProperty(21)]
         public bool LayerMaskMutex
         {
             get { return eventFieldData.layerMaskMutex; }
             set { eventFieldData.layerMaskMutex = value; }
         }
-        [FloatProperty(int.MinValue, int.MaxValue)]
+        [FloatProperty(22, int.MinValue, int.MaxValue)]
         public float Rotation
         {
             get { return eventFieldData.rotation; }
@@ -179,16 +179,16 @@ namespace CrazyStorm.Core
             node.AppendChild(eventFieldNode);
             return eventFieldNode;
         }
-        public override List<byte> GeneratePlayData()
+        public override List<byte> GeneratePlayData(File file)
         {
-            var bytes = base.GeneratePlayData();
+            var bytes = base.GeneratePlayData(file);
             var eventFieldBytes = new List<byte>();
             //stringDataFields
             PlayDataHelper.GenerateStringDataFields(this, eventFieldBytes);
             //eventFieldData
             PlayDataHelper.GenerateStruct(eventFieldData, eventFieldBytes);
             //eventFieldEventGroups
-            PlayDataHelper.GenerateObjectList(eventFieldEventGroups, eventFieldBytes);
+            PlayDataHelper.GenerateObjectList(file, eventFieldEventGroups, eventFieldBytes);
             bytes.AddRange(PlayDataHelper.CreateBlock(eventFieldBytes));
             return bytes;
         }
@@ -205,75 +205,71 @@ namespace CrazyStorm.Core
                 PlayDataHelper.ReadObjectList(EventFieldEventGroups, eventFieldReader, version);
             }
         }
-        public override bool PushProperty(string propertyName)
+        public override bool PushProperty(int propertyID)
         {
-            if (base.PushProperty(propertyName))
-                return true;
-
-            switch (propertyName)
+            if (base.PushProperty(propertyID)) return true;
+            switch (propertyID)
             {
-                case "HalfWidth":
+                case 14:
                     VM.PushFloat(HalfWidth);
                     return true;
-                case "HalfHeight":
+                case 15:
                     VM.PushFloat(HalfHeight);
                     return true;
-                case "FieldShape":
+                case 16:
                     VM.PushInt((int)FieldShape);
                     return true;
-                case "Reach":
+                case 17:
                     VM.PushInt((int)Reach);
                     return true;
-                case "TargetName":
+                case 18:
                     VM.PushString(TargetName);
                     return true;
-                case "LayerMask":
+                case 19:
                     VM.PushBool(LayerMask);
                     return true;
-                case "LayerMaskType":
+                case 20:
                     VM.PushInt((int)LayerMaskType);
                     return true;
-                case "LayerMaskMutex":
+                case 21:
                     VM.PushBool(LayerMaskMutex);
                     return true;
-                case "Rotation":
+                case 22:
                     VM.PushFloat(Rotation);
                     return true;
             }
             return false;
         }
-        public override bool SetProperty(string propertyName)
+        public override bool SetProperty(int propertyID)
         {
-            if (base.SetProperty(propertyName))
-                return true;
-
-            switch (propertyName)
+            if (base.SetProperty(propertyID)) return true;
+            switch (propertyID)
             {
-                case "HalfWidth":
+                case 14:
                     HalfWidth = VM.PopFloat();
                     return true;
-                case "HalfHeight":
+                case 15:
                     HalfHeight = VM.PopFloat();
                     return true;
-                case "FieldShape":
+                case 16:
                     FieldShape = (FieldShape)VM.PopInt();
                     return true;
-                case "Reach":
+                case 17:
                     Reach = (Reach)VM.PopInt();
                     return true;
-                case "TargetName":
+                case 18:
                     TargetName = VM.PopString();
                     return true;
-                case "LayerMask":
+                case 19:
                     LayerMask = VM.PopBool();
                     return true;
-                case "LayerMaskType":
+                case 20:
                     LayerMaskType = (LayerMaskType)VM.PopInt();
                     return true;
-                case "LayerMaskMutex":
+                case 21:
                     LayerMaskMutex = VM.PopBool();
                     return true;
-                case "Rotation":
+                case 22:
                     Rotation = VM.PopFloat();
                     return true;
             }

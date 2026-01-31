@@ -36,31 +36,31 @@ namespace CrazyStorm.Core
         #endregion
 
         #region Public Members
-        [IntProperty(1, int.MaxValue)]
+        [IntProperty(14, 1, int.MaxValue)]
         public int Size
         {
             get { return rebounderData.size; }
             set { rebounderData.size = value; }
         }
-        [EnumProperty(typeof(RebounderShape))]
+        [EnumProperty(15, typeof(RebounderShape))]
         public RebounderShape RebounderShape
         {
             get { return rebounderData.shape; }
             set { rebounderData.shape = value; }
         }
-        [FloatProperty(float.MinValue, float.MaxValue)]
+        [FloatProperty(16, float.MinValue, float.MaxValue)]
         public float Rotation
         {
             get { return rebounderData.rotation; }
             set { rebounderData.rotation = value; }
         }
-        [IntProperty(1, int.MaxValue)]
+        [IntProperty(17, 1, int.MaxValue)]
         public int ReboundLimit
         {
             get { return rebounderData.limit; }
             set { rebounderData.limit = value; }
         }
-        [BoolProperty]
+        [BoolProperty(18)]
         public bool ReboundOneSide
         {
             get { return rebounderData.oneSide; }
@@ -158,14 +158,14 @@ namespace CrazyStorm.Core
             node.AppendChild(rebounderNode);
             return rebounderNode;
         }
-        public override List<byte> GeneratePlayData()
+        public override List<byte> GeneratePlayData(File file)
         {
-            var bytes = base.GeneratePlayData();
+            var bytes = base.GeneratePlayData(file);
             var rebounderBytes = new List<byte>();
             //rebounderData
             PlayDataHelper.GenerateStruct(rebounderData, rebounderBytes);
             //rebounderEventGroups
-            PlayDataHelper.GenerateObjectList(rebounderEventGroups, rebounderBytes);
+            PlayDataHelper.GenerateObjectList(file, rebounderEventGroups, rebounderBytes);
             bytes.AddRange(PlayDataHelper.CreateBlock(rebounderBytes));
             return bytes;
         }
@@ -181,51 +181,47 @@ namespace CrazyStorm.Core
                 PlayDataHelper.ReadObjectList(RebounderEventGroups, rebounderReader, version);
             }
         }
-        public override bool PushProperty(string propertyName)
+        public override bool PushProperty(int propertyID)
         {
-            if (base.PushProperty(propertyName))
-                return true;
-
-            switch (propertyName)
+            if (base.PushProperty(propertyID)) return true;
+            switch (propertyID)
             {
-                case "Size":
+                case 14:
                     VM.PushInt(Size);
                     return true;
-                case "RebounderShape":
+                case 15:
                     VM.PushInt((int)RebounderShape);
                     return true;
-                case "Rotation":
+                case 16:
                     VM.PushFloat(Rotation);
                     return true;
-                case "ReboundLimit":
+                case 17:
                     VM.PushInt(ReboundLimit);
                     return true;
-                case "ReboundOneSide":
+                case 18:
                     VM.PushBool(ReboundOneSide);
                     return true;
             }
             return false;
         }
-        public override bool SetProperty(string propertyName)
+        public override bool SetProperty(int propertyID)
         {
-            if (base.SetProperty(propertyName))
-                return true;
-
-            switch (propertyName)
+            if (base.SetProperty(propertyID)) return true;
+            switch (propertyID)
             {
-                case "Size":
+                case 14:
                     Size = VM.PopInt();
                     return true;
-                case "RebounderShape":
+                case 15:
                     RebounderShape = (RebounderShape)VM.PopInt();
                     return true;
-                case "Rotation":
+                case 16:
                     Rotation = VM.PopFloat();
                     return true;
-                case "ReboundLimit":
+                case 17:
                     ReboundLimit = VM.PopInt();
                     return true;
-                case "ReboundOneSide":
+                case 18:
                     ReboundOneSide = VM.PopBool();
                     return true;
             }

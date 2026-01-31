@@ -28,7 +28,7 @@ namespace CrazyStorm.Expression
             throw new ExpressionException("TypeError");
         }
 
-        public override void Compile(List<byte> codeStream)
+        public override void Compile(Type type, Type subType, IList<VariableResource> variables, List<byte> codeStream)
         {
             SyntaxTree expression = GetExpression();
             if (expression is Expression.Number)
@@ -45,7 +45,7 @@ namespace CrazyStorm.Expression
             {
                 byte[] code1 = VM.CreateInstruction(VMCode.VECTOR, new Vector3(0));
                 codeStream.AddRange(code1);
-                expression.Compile(codeStream);
+                expression.Compile(type, subType, variables, codeStream);
                 byte[] code2 = VM.CreateInstruction(VMCode.SUB);
                 codeStream.AddRange(code2);
             }

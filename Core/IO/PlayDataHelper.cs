@@ -68,12 +68,12 @@ namespace CrazyStorm.Core
         {
             data.AddRange(CreateBlock(GetStructBytes(source)));
         }
-        public static void GenerateObjectList<T>(IList<T> source, List<byte> data)
+        public static void GenerateObjectList<T>(File file, IList<T> source, List<byte> data)
             where T : IGeneratePlayData
         {
             var objectListBytes = new List<byte>();
             foreach (var obj in source)
-                objectListBytes.AddRange((obj as IGeneratePlayData).GeneratePlayData());
+                objectListBytes.AddRange((obj as IGeneratePlayData).GeneratePlayData(file));
 
             data.AddRange(CreateBlock(objectListBytes));
         }

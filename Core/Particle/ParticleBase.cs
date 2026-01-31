@@ -44,7 +44,7 @@ namespace CrazyStorm.Core
         public bool fadeEffect;
         public float vspeed;
     }
-    public abstract class ParticleBase : PropertyContainer, IXmlData, IGeneratePlayData, ILoadPlayData, 
+    public abstract class ParticleBase : PropertyContainer, IXmlData, ILoadPlayData, 
         IComparable<ParticleBase>, IPlayable
     {
         public const float FOG_TIME = 10;
@@ -63,20 +63,20 @@ namespace CrazyStorm.Core
         public float FogFrame { get; private set; }
         public Emitter Emitter { get; set; }
         //public ParticleQuadTree QuadTree { get; set; }
-        [IntProperty(1, int.MaxValue)]
+        [IntProperty(100, 1, int.MaxValue)]
         public int MaxLife
         {
             get { return particleBaseData.maxLife; }
             set { particleBaseData.maxLife = value; }
         }
-        [RuntimeProperty]
+        [RuntimeProperty(101)]
         public float PLayerFrame => Emitter != null ? Emitter.LayerFrame : 1;
-        [RuntimeProperty]
+        [RuntimeProperty(102)]
         public float PCurrentFrame { get; set; }
         public float PAnimateFrame { get; private set; }
-        [RuntimeProperty]
+        [RuntimeProperty(103)]
         public bool PMasked { get; set; }
-        [RuntimeProperty]
+        [RuntimeProperty(104)]
         public Vector2 PPosition { get; set; }
         public Vector2 PPositionLast { get; set; }
         public ParticleType Type
@@ -88,19 +88,19 @@ namespace CrazyStorm.Core
                 type = value; 
             }
         }
-        [RGBProperty]
+        [RGBProperty(107)]
         public RGB RGB
         {
             get { return particleBaseData.rgb; }
             set { particleBaseData.rgb = value; }
         }
-        [FloatProperty(0, float.MaxValue)]
+        [FloatProperty(111, 0, float.MaxValue)]
         public float Mass
         {
             get { return particleBaseData.mass; }
             set { particleBaseData.mass = value; }
         }
-        [FloatProperty(0, float.MaxValue)]
+        [FloatProperty(112, 0, float.MaxValue)]
         public float Opacity
         {
             get { return particleBaseData.opacity; }
@@ -121,99 +121,99 @@ namespace CrazyStorm.Core
             get { return pacspeedVector; }
             set { pacspeedVector = value; }
         }
-        [FloatProperty(float.MinValue, float.MaxValue)]
+        [FloatProperty(113, float.MinValue, float.MaxValue)]
         public float PSpeed
         {
             get { return particleBaseData.pspeed; }
             set { particleBaseData.pspeed = value; }
         }
-        [RuntimeProperty]
+        [RuntimeProperty(114)]
         public float PSpeedAngle { get; set; }
-        [FloatProperty(float.MinValue, float.MaxValue)]
+        [FloatProperty(115, float.MinValue, float.MaxValue)]
         public float PAcspeed
         {
             get { return particleBaseData.pacspeed; }
             set { particleBaseData.pacspeed = value; }
         }
-        [FloatProperty(float.MinValue, float.MaxValue)]
+        [FloatProperty(116, float.MinValue, float.MaxValue)]
         public float PAcspeedAngle
         {
             get { return particleBaseData.pacspeedAngle; }
             set { particleBaseData.pacspeedAngle = value; }
         }
-        [FloatProperty(float.MinValue, float.MaxValue)]
+        [FloatProperty(117, float.MinValue, float.MaxValue)]
         public float PSpeedHScale
         {
             get { return particleBaseData.pspeedHScale; }
             set { particleBaseData.pspeedHScale = value; }
         }
-        [FloatProperty(float.MinValue, float.MaxValue)]
+        [FloatProperty(118, float.MinValue, float.MaxValue)]
         public float PSpeedVScale
         {
             get { return particleBaseData.pspeedVScale; }
             set { particleBaseData.pspeedVScale = value; }
         }
-        [FloatProperty(float.MinValue, float.MaxValue)]
+        [FloatProperty(119, float.MinValue, float.MaxValue)]
         public float PRotation
         {
             get { return particleBaseData.protation; }
             set { particleBaseData.protation = value; }
         }
-        [EnumProperty(typeof(BlendType))]
+        [EnumProperty(120, typeof(BlendType))]
         public BlendType BlendType
         {
             get { return particleBaseData.blendType; }
             set { particleBaseData.blendType = value; }
         }
-        [BoolProperty]
+        [BoolProperty(121)]
         public bool KillOutside
         {
             get { return particleBaseData.killOutside; }
             set { particleBaseData.killOutside = value; }
         }
-        [BoolProperty]
+        [BoolProperty(122)]
         public bool Collision
         {
             get { return particleBaseData.collision; }
             set { particleBaseData.collision = value; }
         }
-        [BoolProperty]
+        [BoolProperty(123)]
         public bool IgnoreMask
         {
             get { return particleBaseData.ignoreMask; }
             set { particleBaseData.ignoreMask = value; }
         }
-        [BoolProperty]
+        [BoolProperty(124)]
         public bool IgnoreRebound
         {
             get { return particleBaseData.ignoreRebound; }
             set { particleBaseData.ignoreRebound = value; }
         }
-        [BoolProperty]
+        [BoolProperty(125)]
         public bool IgnoreForce
         {
             get { return particleBaseData.ignoreForce; }
             set { particleBaseData.ignoreForce = value; }
         }
-        [FloatProperty(float.MinValue, float.MaxValue)]
+        [FloatProperty(126, float.MinValue, float.MaxValue)]
         public float WidthScale
         {
             get { return particleBaseData.widthScale; }
             set { particleBaseData.widthScale = value; }
         }
-        [BoolProperty]
+        [BoolProperty(127)]
         public bool FogEffect
         {
             get { return particleBaseData.fogEffect; }
             set { particleBaseData.fogEffect = value; }
         }
-        [BoolProperty]
+        [BoolProperty(128)]
         public bool FadeEffect
         {
             get { return particleBaseData.fadeEffect; }
             set { particleBaseData.fadeEffect = value; }
         }
-        [FloatProperty(float.MinValue, float.MaxValue)]
+        [FloatProperty(129, float.MinValue, float.MaxValue)]
         public float VSpeed
         {
             get { return particleBaseData.vspeed; }
@@ -301,11 +301,14 @@ namespace CrazyStorm.Core
                 typeID = -1;
             }
         }
-        public virtual List<byte> GeneratePlayData()
+        public virtual List<byte> GeneratePlayData(File file, Emitter emitter)
         {
             var particleBaseBytes = new List<byte>();
             //properties
-            base.GeneratePropertyExpressions(particleBaseBytes);
+            var variables = new List<VariableResource>();
+            variables.AddRange(emitter.Locals);
+            variables.AddRange(file.Globals);
+            base.GeneratePropertyExpressions(variables, particleBaseBytes);
             //type
             particleBaseBytes.AddRange(BitConverter.GetBytes(type != null ? type.ID : -1));
             //particleBaseData
@@ -323,146 +326,146 @@ namespace CrazyStorm.Core
                 particleBaseData = PlayDataHelper.ReadStruct<ParticleBaseData>(particleBaseReader);
             }
         }
-        protected virtual bool PushSystemProperty(string propertyName)
+        protected virtual bool PushSystemProperty(int propertyID)
         {
-            switch (propertyName)
+            switch (propertyID)
             {
-                case "Status":
+                case -1:
                     VM.PushInt(Emitter.Status);
                     return true;
-                case "StatusFrame":
+                case -2:
                     VM.PushFloat(Emitter.StatusFrame, true, true);
                     return true;
-                case "SelfAngle":
+                case -3:
                     VM.PushFloat(0);
                     return true;
-                case "BodyPosition":
+                case -4:
                     VM.PushVector2(Emitter.BodyPosition);
                     return true;
-                case "BodyPosition.x":
+                case -5:
                     VM.PushFloat(Emitter.BodyPosition.x);
                     return true;
-                case "BodyPosition.y":
+                case -6:
                     VM.PushFloat(Emitter.BodyPosition.y);
                     return true;
-                case "BodyAngle":
+                case -7:
                     VM.PushFloat(MathHelper.GetDegree(Emitter.BodyPosition - PPosition));
                     return true;
-                case "CenterPosition":
+                case -8:
                     VM.PushVector2(Emitter.CenterPosition);
                     return true;
-                case "CenterPosition.x":
+                case -9:
                     VM.PushFloat(Emitter.CenterPosition.x);
                     return true;
-                case "CenterPosition.y":
+                case -10:
                     VM.PushFloat(Emitter.CenterPosition.y);
                     return true;
-                case "CenterAngle":
+                case -11:
                     VM.PushFloat(MathHelper.GetDegree(Emitter.CenterPosition - PPosition));
                     return true;
             }
             return false;
         }
-        public override bool PushProperty(string propertyName)
+        public override bool PushProperty(int propertyID)
         {
-            if (PushSystemProperty(propertyName)) return true;
-            switch (propertyName)
+            if (PushSystemProperty(propertyID)) return true;
+            switch (propertyID)
             {
-                case "MaxLife":
+                case 100:
                     VM.PushInt(MaxLife);
                     return true;
-                case "PLayerFrame":
+                case 101:
                     VM.PushFloat(PLayerFrame, true, true);
                     return true;
-                case "PCurrentFrame":
+                case 102:
                     VM.PushFloat(PCurrentFrame, true, true);
                     return true;
-                case "PMasked":
+                case 103:
                     VM.PushBool(PMasked);
                     PMasked = false;
                     return true;
-                case "PPosition":
+                case 104:
                     VM.PushVector2(PPosition);
                     return true;
-                case "PPosition.x":
+                case 105:
                     VM.PushFloat(PPosition.x);
                     return true;
-                case "PPosition.y":
+                case 106:
                     VM.PushFloat(PPosition.y);
                     return true;
-                case "WidthScale":
-                    VM.PushFloat(WidthScale);
-                    return true;
-                case "RGB":
+                case 107:
                     VM.PushRGB(RGB);
                     return true;
-                case "RGB.r":
+                case 108:
                     VM.PushFloat(RGB.r);
                     return true;
-                case "RGB.g":
+                case 109:
                     VM.PushFloat(RGB.g);
                     return true;
-                case "RGB.b":
+                case 110:
                     VM.PushFloat(RGB.b);
                     return true;
-                case "Mass":
+                case 111:
                     VM.PushFloat(Mass);
                     return true;
-                case "Opacity":
+                case 112:
                     VM.PushFloat(Opacity);
                     return true;
-                case "PSpeed":
+                case 113:
                     VM.PushFloat(PSpeed);
                     return true;
-                case "PSpeedAngle":
+                case 114:
                     VM.PushFloat(PSpeedAngle);
                     return true;
-                case "PAcspeed":
+                case 115:
                     VM.PushFloat(PAcspeed);
                     return true;
-                case "PAcspeedAngle":
+                case 116:
                     VM.PushFloat(PAcspeedAngle);
                     return true;
-                case "PSpeedHScale":
+                case 117:
                     VM.PushFloat(PSpeedHScale);
                     return true;
-                case "PSpeedVScale":
+                case 118:
                     VM.PushFloat(PSpeedVScale);
                     return true;
-                case "PRotation":
+                case 119:
                     VM.PushFloat(PRotation);
                     return true;
-                case "BlendType":
+                case 120:
                     VM.PushInt((int)BlendType);
                     return true;
-                case "KillOutside":
+                case 121:
                     VM.PushBool(KillOutside);
                     return true;
-                case "Collision":
+                case 122:
                     VM.PushBool(Collision);
                     return true;
-                case "IgnoreMask":
+                case 123:
                     VM.PushBool(IgnoreMask);
                     return true;
-                case "IgnoreRebound":
+                case 124:
                     VM.PushBool(IgnoreRebound);
                     return true;
-                case "IgnoreForce":
+                case 125:
                     VM.PushBool(IgnoreForce);
                     return true;
-                case "FogEffect":
+                case 126:
+                    VM.PushFloat(WidthScale);
+                    return true;
+                case 127:
                     VM.PushBool(FogEffect);
                     return true;
-                case "FadeEffect":
+                case 128:
                     VM.PushBool(FadeEffect);
                     return true;
-                case "VSpeed":
+                case 129:
                     VM.PushFloat(VSpeed);
                     return true;
             }
             for (int i = 0; i < Emitter.Locals.Count; ++i)
             {
-                if (Emitter.Locals[i].Label == propertyName)
+                if (Emitter.Locals[i].ID == propertyID)
                 {
                     VM.PushFloat(Emitter.Locals[i].Value);
                     return true;
@@ -470,7 +473,7 @@ namespace CrazyStorm.Core
             }
             for (int i = 0; i < Emitter.Globals.Count; ++i)
             {
-                if (Emitter.Globals[i].Label == propertyName)
+                if (Emitter.Globals[i].ID == propertyID)
                 {
                     VM.PushFloat(Emitter.Globals[i].Value);
                     return true;
@@ -478,104 +481,104 @@ namespace CrazyStorm.Core
             }
             return false;
         }
-        public override bool SetProperty(string propertyName)
+        public override bool SetProperty(int propertyID)
         {
-            switch (propertyName)
+            switch (propertyID)
             {
-                case "MaxLife":
+                case 100:
                     MaxLife = VM.PopInt();
                     return true;
-                case "PPosition":
+                case 104:
                     PPosition = VM.PopVector2();
                     return true;
-                case "PPosition.x":
+                case 105:
                     PPosition = new Vector2(VM.PopFloat(), PPosition.y);
                     return true;
-                case "PPosition.y":
+                case 106:
                     PPosition = new Vector2(PPosition.x, VM.PopFloat());
                     return true;
-                case "WidthScale":
-                    WidthScale = VM.PopFloat();
-                    return true;
-                case "RGB":
+                case 107:
                     RGB = VM.PopRGB();
                     return true;
-                case "RGB.r":
+                case 108:
                     RGB = new RGB(VM.PopFloat(), RGB.g, RGB.b);
                     return true;
-                case "RGB.g":
+                case 109:
                     RGB = new RGB(RGB.r, VM.PopFloat(), RGB.b);
                     return true;
-                case "RGB.b":
+                case 110:
                     RGB = new RGB(RGB.r, RGB.g, VM.PopFloat());
                     return true;
-                case "Mass":
+                case 111:
                     Mass = VM.PopFloat();
                     return true;
-                case "Opacity":
+                case 112:
                     Opacity = VM.PopFloat();
                     return true;
-                case "PSpeed":
+                case 113:
                     PSpeed = VM.PopFloat();
                     MathHelper.SetVector2(ref pspeedVector, PSpeed, PSpeedAngle, 
                         new Vector2(PSpeedHScale, PSpeedVScale));
                     return true;
-                case "PSpeedAngle":
+                case 114:
                     PSpeedAngle = VM.PopFloat();
                     MathHelper.SetVector2(ref pspeedVector, PSpeed, PSpeedAngle, 
                         new Vector2(PSpeedHScale, PSpeedVScale));
                     return true;
-                case "PAcspeed":
+                case 115:
                     PAcspeed = VM.PopFloat();
                     MathHelper.SetVector2(ref pacspeedVector, PAcspeed, PAcspeedAngle, 
                         new Vector2(PSpeedHScale, PSpeedVScale));
                     return true;
-                case "PAcspeedAngle":
+                case 116:
                     PAcspeedAngle = VM.PopFloat();
                     MathHelper.SetVector2(ref pacspeedVector, PAcspeed, PAcspeedAngle, 
                         new Vector2(PSpeedHScale, PSpeedVScale));
                     return true;
-                case "PSpeedHScale":
+                case 117:
                     PSpeedHScale = VM.PopFloat();
                     return true;
-                case "PSpeedVScale":
+                case 118:
                     PSpeedVScale = VM.PopFloat();
                     return true;
-                case "PRotation":
+                case 119:
                     PRotation = VM.PopFloat();
                     return true;
-                case "BlendType":
+                case 120:
                     BlendType = (BlendType)VM.PopInt();
                     RenderOrder = (RenderOrder - RenderOrder % 10) + 9 - (int)BlendType;
                     return true;
-                case "KillOutside":
+                case 121:
                     KillOutside = VM.PopBool();
                     return true;
-                case "Collision":
+                case 122:
                     Collision = VM.PopBool();
                     return true;
-                case "IgnoreMask":
+                case 123:
                     IgnoreMask = VM.PopBool();
                     return true;
-                case "IgnoreRebound":
+                case 124:
                     IgnoreRebound = VM.PopBool();
                     return true;
-                case "IgnoreForce":
+                case 125:
                     IgnoreForce = VM.PopBool();
                     return true;
-                case "FogEffect":
+                case 126:
+                    WidthScale = VM.PopFloat();
+                    return true;
+                case 127:
                     FogEffect = VM.PopBool();
                     return true;
-                case "FadeEffect":
+                case 128:
                     FadeEffect = VM.PopBool();
                     return true;
-                case "VSpeed":
+                case 129:
                     VSpeed = VM.PopFloat();
                     return true;
             }
             for (int i = 0; i < Emitter.Locals.Count; ++i)
             {
-                if (Emitter.Locals[i].Label == propertyName)
+                if (Emitter.Locals[i].ID == propertyID)
                 {
                     Emitter.Locals[i].Value = VM.PopFloat();
                     return true;
@@ -583,7 +586,7 @@ namespace CrazyStorm.Core
             }
             for (int i = 0; i < Emitter.Globals.Count; ++i)
             {
-                if (Emitter.Globals[i].Label == propertyName)
+                if (Emitter.Globals[i].ID == propertyID)
                 {
                     Emitter.Globals[i].Value = VM.PopFloat();
                     return true;

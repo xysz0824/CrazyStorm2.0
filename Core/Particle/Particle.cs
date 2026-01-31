@@ -37,25 +37,25 @@ namespace CrazyStorm.Core
         #endregion
 
         #region Public Members
-        [FloatProperty(float.MinValue, float.MaxValue)]
+        [FloatProperty(130, float.MinValue, float.MaxValue)]
         public float HeightScale
         {
             get { return particleData.heightScale; }
             set { particleData.heightScale = value; }
         }
-        [BoolProperty]
+        [BoolProperty(131)]
         public bool RetainScale
         {
             get { return particleData.retainScale; }
             set { particleData.retainScale = value; }
         }
-        [BoolProperty]
+        [BoolProperty(132)]
         public bool StickToSpeedAngle
         {
             get { return particleData.stickToSpeedAngle; }
             set { particleData.stickToSpeedAngle = value; }
         }
-        [BoolProperty]
+        [BoolProperty(133)]
         public bool AfterimageEffect
         {
             get { return particleData.afterimageEffect; }
@@ -92,9 +92,9 @@ namespace CrazyStorm.Core
             node.AppendChild(particleNode);
             return particleNode;
         }
-        public override List<byte> GeneratePlayData()
+        public override List<byte> GeneratePlayData(File file, Emitter e)
         {
-            var bytes = base.GeneratePlayData();
+            var bytes = base.GeneratePlayData(file, e);
             var particleBytes = new List<byte>();
             //particleData
             PlayDataHelper.GenerateStruct(particleData, particleBytes);
@@ -110,45 +110,41 @@ namespace CrazyStorm.Core
                 particleData = PlayDataHelper.ReadStruct<ParticleData>(particleReader);
             }
         }
-        public override bool PushProperty(string propertyName)
+        public override bool PushProperty(int propertyID)
         {
-            if (base.PushProperty(propertyName))
-                return true;
-
-            switch (propertyName)
+            if (base.PushProperty(propertyID)) return true;
+            switch (propertyID)
             {
-                case "StickToSpeedAngle":
-                    VM.PushBool(StickToSpeedAngle);
-                    return true;
-                case "HeightScale":
+                case 130:
                     VM.PushFloat(HeightScale);
                     return true;
-                case "RetainScale":
+                case 131:
                     VM.PushBool(RetainScale);
                     return true;
-                case "AfterimageEffect":
+                case 132:
+                    VM.PushBool(StickToSpeedAngle);
+                    return true;
+                case 133:
                     VM.PushBool(AfterimageEffect);
                     return true;
             }
             return false;
         }
-        public override bool SetProperty(string propertyName)
+        public override bool SetProperty(int propertyID)
         {
-            if (base.SetProperty(propertyName))
-                return true;
-
-            switch (propertyName)
+            if (base.SetProperty(propertyID)) return true;
+            switch (propertyID)
             {
-                case "StickToSpeedAngle":
-                    StickToSpeedAngle = VM.PopBool();
-                    return true;
-                case "HeightScale":
+                case 130:
                     HeightScale = VM.PopFloat();
                     return true;
-                case "RetainScale":
+                case 131:
                     RetainScale = VM.PopBool();
                     return true;
-                case "AfterimageEffect":
+                case 132:
+                    StickToSpeedAngle = VM.PopBool();
+                    return true;
+                case 133:
                     AfterimageEffect = VM.PopBool();
                     if (!AfterimageEffect) afterimageTime = 0;
                     return true;

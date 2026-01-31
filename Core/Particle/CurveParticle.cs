@@ -26,19 +26,19 @@ namespace CrazyStorm.Core
         #endregion
 
         #region Public Members
-        [EnumProperty(typeof(CurveType))]
+        [EnumProperty(130,typeof(CurveType))]
         public CurveType CurveType
         {
             get { return  curveParticleData.type; }
             set { curveParticleData.type = value; }
         }
-        [IntProperty(0, int.MaxValue)]
+        [IntProperty(131, 0, int.MaxValue)]
         public int Length
         {
             get { return curveParticleData.length; }
             set { curveParticleData.length = value; }
         }
-        [IntProperty(16, 256)]
+        [IntProperty(132, 16, 256)]
         public int Segment
         {
             get { return curveParticleData.segment; }
@@ -75,9 +75,9 @@ namespace CrazyStorm.Core
             node.AppendChild(curveParticleNode);
             return curveParticleNode;
         }
-        public override List<byte> GeneratePlayData()
+        public override List<byte> GeneratePlayData(File file, Emitter e)
         {
-            var bytes = base.GeneratePlayData();
+            var bytes = base.GeneratePlayData(file, e);
             var curveParticleBytes = new List<byte>();
             //curveParticleData
             PlayDataHelper.GenerateStruct(curveParticleData, curveParticleBytes);
@@ -93,33 +93,29 @@ namespace CrazyStorm.Core
                 curveParticleData = PlayDataHelper.ReadStruct<CurveParticleData>(curveParticleReader);
             }
         }
-        public override bool PushProperty(string propertyName)
+        public override bool PushProperty(int propertyID)
         {
-            if (base.PushProperty(propertyName))
-                return true;
-
-            switch (propertyName)
+            if (base.PushProperty(propertyID)) return true;
+            switch (propertyID)
             {
-                case "CurveType":
+                case 130:
                     VM.PushInt((int)CurveType);
                     return true;
-                case "Length":
+                case 131:
                     VM.PushInt(Length);
                     return true;
-                case "Segment":
+                case 132:
                     VM.PushInt(Segment);
                     return true;
             }
             return false;
         }
-        public override bool SetProperty(string propertyName)
+        public override bool SetProperty(int propertyID)
         {
-            if (base.SetProperty(propertyName))
-                return true;
-
-            switch (propertyName)
+            if (base.SetProperty(propertyID)) return true;
+            switch (propertyID)
             {
-                case "CurveType":
+                case 130:
                     var newCurveType = (CurveType)VM.PopInt();
                     if (CurveType != newCurveType)
                     {
@@ -139,10 +135,10 @@ namespace CrazyStorm.Core
                     }
                     CurveType = newCurveType;
                     return true;
-                case "Length":
+                case 131:
                     Length = VM.PopInt();
                     return true;
-                case "Segment":
+                case 132:
                     Segment = VM.PopInt();
                     return true;
             }

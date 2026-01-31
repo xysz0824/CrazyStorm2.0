@@ -15,6 +15,7 @@ namespace CrazyStorm.Core
         public MultiEmitter()
         {
             particle = new Particle();
+            particle.Emitter = this;
             InitialTemplate = new Particle();
         }
         public override XmlElement BuildFromXml(XmlElement node)

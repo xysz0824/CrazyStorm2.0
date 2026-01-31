@@ -49,9 +49,9 @@ namespace CrazyStorm.Core
     public class VM
     {
         static Random random = new Random();
-        static Stack<Vector3> vectorStack = new Stack<Vector3>();
-        static Stack<bool> boolStack = new Stack<bool>();
-        static Stack<string> stringStack = new Stack<string>();
+        static Stack<Vector3> vectorStack = new Stack<Vector3>(16);
+        static Stack<bool> boolStack = new Stack<bool>(16);
+        static Stack<string> stringStack = new Stack<string>(16);
         public static void Clear()
         {
             vectorStack.Clear();
@@ -69,10 +69,12 @@ namespace CrazyStorm.Core
                     case VMCode.VECTOR:
                         bytes.AddRange(PlayDataHelper.GetStructBytes((Vector3)operand));
                         break;
+                    case VMCode.NAME:
+                        bytes.AddRange(BitConverter.GetBytes((int)operand));
+                        break;
                     case VMCode.BOOL:
                         bytes.AddRange(BitConverter.GetBytes((bool)operand));
                         break;
-                    case VMCode.NAME:
                     case VMCode.CALL:
                         bytes.AddRange(PlayDataHelper.GetStringBytes((string)operand));
                         break;
@@ -102,15 +104,15 @@ namespace CrazyStorm.Core
                         position += sizeof(Vector3);
                         list.Add(new VMInstruction { code = code, vectorOperand = v });
                         break;
+                    case VMCode.NAME:
+                        int i = BitConverter.ToInt32(bytes, position);
+                        position += sizeof(int);
+                        list.Add(new VMInstruction { code = code, vectorOperand = new Vector3(i) });
+                        break;
                     case VMCode.BOOL:
                         bool b = BitConverter.ToBoolean(bytes, position);
                         position += sizeof(bool);
                         list.Add(new VMInstruction { code = code, boolOperand = b });
-                        break;
-                    case VMCode.NAME:
-                        string name = PlayDataHelper.ReadString(bytes, position);
-                        position += name.Length + 1;
-                        list.Add(new VMInstruction { code = code, stringOperand = name });
                         break;
                     case VMCode.CALL:
                         string func = PlayDataHelper.ReadString(bytes, position);
@@ -186,7 +188,7 @@ namespace CrazyStorm.Core
                         VM.PushVector(instructions[i].vectorOperand);
                         break;
                     case VMCode.NAME:
-                        propertyContainer.PushProperty(instructions[i].stringOperand);
+                        propertyContainer.PushProperty((int)instructions[i].vectorOperand.x);
                         break;
                     case VMCode.CALL:
                         float count = VM.PopInt();

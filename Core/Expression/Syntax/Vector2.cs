@@ -32,10 +32,10 @@ namespace CrazyStorm.Expression
             return new Core.Vector2(Convert.ToSingle(x), Convert.ToSingle(y));
         }
 
-        public override void Compile(List<byte> codeStream)
+        public override void Compile(Type type, Type subType, IList<VariableResource> variables, List<byte> codeStream)
         {
-            GetX().Compile(codeStream);
-            GetY().Compile(codeStream);
+            GetX().Compile(type, subType, variables, codeStream);
+            GetY().Compile(type, subType, variables, codeStream);
             byte[] code = VM.CreateInstruction(VMCode.VECTOR2);
             codeStream.AddRange(code);
         }

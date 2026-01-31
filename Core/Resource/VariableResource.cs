@@ -15,6 +15,7 @@ namespace CrazyStorm.Core
 {
     public struct VariableResourceData
     {
+        public int id;
         public float value;
     }
     public class VariableResource : Resource
@@ -24,6 +25,15 @@ namespace CrazyStorm.Core
         #endregion
 
         #region Public Members
+        public int ID
+        {
+            get { return data.id; }
+            set
+            {
+                data.id = value;
+                OnPropertyChanged("ID");
+            }
+        }
         public float Value 
         { 
             get { return data.value; }
@@ -37,7 +47,7 @@ namespace CrazyStorm.Core
 
         #region Constructor
         public VariableResource() { }
-        public VariableResource(string label) : base(label) { }
+        public VariableResource(int id, string label) : base(label) { }
         #endregion
 
         #region Public Methods
@@ -68,9 +78,9 @@ namespace CrazyStorm.Core
             node.AppendChild(variableResourceNode);
             return variableResourceNode;
         }
-        public override List<byte> GeneratePlayData()
+        public override List<byte> GeneratePlayData(File file)
         {
-            var bytes = base.GeneratePlayData();
+            var bytes = base.GeneratePlayData(file);
             var variableResourceBytes = new List<byte>();
             //variableResourceData
             PlayDataHelper.GenerateStruct(data, variableResourceBytes);

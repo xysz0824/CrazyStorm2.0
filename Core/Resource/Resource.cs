@@ -62,7 +62,7 @@ namespace CrazyStorm.Core
             return resourceNode;
         }
 
-        public virtual List<byte> GeneratePlayData()
+        public virtual List<byte> GeneratePlayData(File file)
         {
             var resourceBytes = new List<byte>();
             PlayDataHelper.GenerateStringDataFields(this, resourceBytes);

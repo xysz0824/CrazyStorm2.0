@@ -31,11 +31,12 @@ namespace CrazyStorm.Expression
             return resultList;
         }
 
-        public override void Compile(List<byte> codeStream)
+        public override void Compile(Type type, Type subType, IList<VariableResource> variables, List<byte> codeStream)
         {
             foreach (var item in GetArguments())
-                item.Compile(codeStream);
-
+            {
+                item.Compile(type, subType, variables, codeStream);
+            }
             byte[] code = VM.CreateInstruction(VMCode.VECTOR, new Vector3(Count));
             codeStream.AddRange(code);
         }

@@ -12,7 +12,7 @@ namespace CrazyStorm.Core
     public sealed class IntPropertyAttribute : PropertyAttribute
     {
         int minValue, maxValue;
-        public IntPropertyAttribute(int minValue, int maxValue)
+        public IntPropertyAttribute(int id, int minValue, int maxValue) : base(id)
         {
             this.minValue = minValue;
             this.maxValue = maxValue;

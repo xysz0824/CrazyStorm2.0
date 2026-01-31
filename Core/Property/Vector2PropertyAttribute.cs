@@ -11,6 +11,7 @@ namespace CrazyStorm.Core
     [AttributeUsage(AttributeTargets.Property, AllowMultiple = false, Inherited = false)]
     public sealed class Vector2PropertyAttribute : PropertyAttribute
     {
+        public Vector2PropertyAttribute(int id) : base(id) { }
         public override bool IsLegal(string newValue, out object value)
         {
             value = null;

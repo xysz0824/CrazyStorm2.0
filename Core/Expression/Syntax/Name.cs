@@ -38,9 +38,11 @@ namespace CrazyStorm.Expression
             return result;
         }
 
-        public override void Compile(List<byte> codeStream)
+        public override void Compile(Type type, Type subType, IList<VariableResource> variables, List<byte> codeStream)
         {
-            byte[] code = VM.CreateInstruction(VMCode.NAME, (string)Token.GetValue());
+            var propertyName = (string)Token.GetValue();
+            var propertyID = Environment.GetPropertyID(propertyName, type, subType, variables);
+            byte[] code = VM.CreateInstruction(VMCode.NAME, propertyID);
             codeStream.AddRange(code);
         }
         public override string ToString()

@@ -12,7 +12,7 @@ namespace CrazyStorm.Core
     sealed class EnumPropertyAttribute : PropertyAttribute
     {
         Type type;
-        public EnumPropertyAttribute(Type enumType)
+        public EnumPropertyAttribute(int id, Type enumType) : base(id)
         {
             type = enumType;
         }

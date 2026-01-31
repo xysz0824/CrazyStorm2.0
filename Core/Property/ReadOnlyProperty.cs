@@ -11,6 +11,7 @@ namespace CrazyStorm.Core
     [AttributeUsage(AttributeTargets.Property, AllowMultiple = false, Inherited = false)]
     public sealed class ReadOnlyPropertyAttribute : PropertyAttribute
     {
+        public ReadOnlyPropertyAttribute(int id) : base(id) { }
         public override bool IsLegal(string newValue, out object value)
         {
             throw new NotImplementedException();
