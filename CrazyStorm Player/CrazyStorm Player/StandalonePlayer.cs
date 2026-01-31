@@ -34,13 +34,15 @@ namespace CrazyStorm_Player
             var frameOrientation = int.Parse(Environment.GetCommandLineArgs()[13]);
 
             playerImpl = new PlayerImpl(width, height, frameRate, particleMaximum, curveParticleMaximum);
-            playerImpl.ResourceDirectory = Environment.CurrentDirectory;
+            playerImpl.ResourceDirectory = System.IO.Path.GetDirectoryName(path) + '\\';
             playerImpl.TypeLibraryPath = typeLibraryPath;
             playerImpl.FrameOrientation = (FrameOrientation)frameOrientation;
             playerImpl.BackgroundPath = backgroundPath;
             playerImpl.SelectedParticleSystemIndex = selectedParticleSystemIndex;
             playerImpl.ControllableImagePath = controllableImagePath;
             playerImpl.ControllableSetting = controllableSetting;
+
+            ParticleType.LoadDefaultTypes(typeLibraryPath);
 
             playerImpl.File = new File();
             playerImpl.File.LoadPlayFile(path, VersionInfo.BaseVersion);
