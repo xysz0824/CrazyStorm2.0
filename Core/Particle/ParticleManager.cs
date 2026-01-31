@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Management.Instrumentation;
 using System.Runtime.CompilerServices;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace CrazyStorm.Core
 {
@@ -60,7 +61,6 @@ namespace CrazyStorm.Core
         static float[] maskRotateArray = new float[MAX_MASK_COUNT];
         static int maskCount;
         public static IList<ParticleBase> ActiveParticles => activeParticles;
-        public static int ActiveParticleCount => activeParticles != null ? activeParticles.Count : 0;
         public static Vector2[] MaskPositionArray => maskPositionArray;
         public static Vector2[] MaskSizeArray => maskSizeArray;
         public static float[] MaskShapeArray => maskShapeArray;
@@ -117,48 +117,61 @@ namespace CrazyStorm.Core
         //}
         public static void SearchByRect(Vector2 center, float halfW, float halfH, float rotation)
         {
-            for (int i = 0; i < activeParticles.Count; ++i)
+            Parallel.For(0, activeParticles.Count, i =>
             {
                 var instance = activeParticles[i];
-                if (!instance.Alive) continue;
+                if (!instance.Alive) return;
+
                 var v = MathHelper.Rotate(instance.PPosition - center, -rotation);
                 if (v.x >= -halfW && v.x <= halfW && v.y >= -halfH && v.y <= halfH)
                 {
                     instance.SearchFlag = true;
                 }
-            }
+            });
         }
         public static void SearchByEllipse(Vector2 center, float halfW, float halfH, float rotation)
         {
-            for (int i = 0; i < activeParticles.Count; ++i)
+            Parallel.For(0, activeParticles.Count, i =>
             {
                 var instance = activeParticles[i];
-                if (!instance.Alive) continue;
+                if (!instance.Alive) return;
                 var v = MathHelper.Rotate(instance.PPosition - center, -rotation);
                 if ((v.x * v.x) / (halfW * halfW) + (v.y * v.y) / (halfH * halfH) <= 1f)
                 {
                     instance.SearchFlag = true;
                 }
-            }
+            });
         }
         public static void CheckCollision(bool dead, Vector2 playerLast, Vector2 player, float r, out Vector2 newPos)
         {
             newPos = player;
-            for (int i = 0; i < activeParticles.Count; ++i)
+            Parallel.For(0, activeParticles.Count, i =>
             {
                 var instance = activeParticles[i];
-                if (!instance.Alive || !instance.Collision) continue;
+                if (!instance.Alive || !instance.Collision) return;
                 if (Masked(instance.PPosition))
                 {
                     instance.PMasked = true;
-                    continue;
+                    return;
                 }
                 if (instance.CheckCollision(playerLast, player, r)) instance.SearchFlag = true;
                 else
                 {
-                    var judge = instance.CheckVolume(dead, playerLast, player, out newPos);
+                    var judge = instance.CheckVolume(dead, playerLast, player, out Vector2 resultPos);
+                    instance.CollidedBodyPos = resultPos;
                     if (judge) instance.SearchFlag = true;
                 }
+            });
+            for (int i = activeParticles.Count - 1; i >=0; --i)
+            {
+                if (!activeParticles[i].Alive || !activeParticles[i].Collision) return;
+                if (activeParticles[i].CollidedBodyPos != default)
+                {
+                    newPos = activeParticles[i].CollidedBodyPos;
+                    activeParticles[i].CollidedBodyPos = default;
+                    break;
+                }
+                else activeParticles[i].CollidedBodyPos = default;
             }
         }
         public static bool OutOfWindow(ParticleBase particle)
