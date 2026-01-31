@@ -13,24 +13,24 @@ namespace CrazyStorm.Core
     public struct Vector3
     {
         public float x, y, z;
-        public bool AsInteger { get; set; }
-        public bool UseFrameEqual { get; set; }
+        public bool asInteger;
+        public bool useFrameEqual;
         public static readonly Vector3 Zero = new Vector3();
         public Vector3(float x, float y, float z)
         {
             this.x = x;
             this.y = y;
             this.z = z;
-            AsInteger = false;
-            UseFrameEqual = false;
+            asInteger = false;
+            useFrameEqual = false;
         }
         public Vector3(int x, int y, int z)
         {
             this.x = x;
             this.y = y;
             this.z = z;
-            AsInteger = true;
-            UseFrameEqual = false;
+            asInteger = true;
+            useFrameEqual = false;
         }
         public Vector3(float x, float y) : this(x, y, 0) { }
         public Vector3(int x, int y) : this(x, y, 0) { }
@@ -41,8 +41,8 @@ namespace CrazyStorm.Core
             this.x = xy.x;
             this.y = xy.y;
             this.z = z;
-            AsInteger = false;
-            UseFrameEqual = false;
+            asInteger = false;
+            useFrameEqual = false;
         }
         public Vector3(Vector2 xy) : this(xy, 0) { }
         public override string ToString()

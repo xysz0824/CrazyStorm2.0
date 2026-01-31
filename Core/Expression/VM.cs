@@ -185,180 +185,176 @@ namespace CrazyStorm.Core
                 switch (instructions[i].code)
                 {
                     case VMCode.VECTOR:
-                        VM.PushVector(instructions[i].vectorOperand);
+                        PushVector(instructions[i].vectorOperand);
                         break;
                     case VMCode.NAME:
                         propertyContainer.PushProperty((int)instructions[i].vectorOperand.x);
                         break;
                     case VMCode.CALL:
-                        float count = VM.PopInt();
+                        float count = PopInt();
                         switch (instructions[i].stringOperand)
                         {
                             case "abs":
-                                var v = VM.PopVector();
-                                VM.PushVector(new Vector3(Math.Abs(v.x), Math.Abs(v.y), Math.Abs(v.z)));
+                                var v = PopVector();
+                                PushVector(new Vector3(Math.Abs(v.x), Math.Abs(v.y), Math.Abs(v.z)));
                                 break;
                             case "dist":
-                                var v2 = VM.PopVector2() - VM.PopVector2();
-                                VM.PushFloat((float)Math.Sqrt(v2.x * v2.x + v2.y * v2.y));
+                                var v2 = PopVector2() - PopVector2();
+                                PushFloat((float)Math.Sqrt(v2.x * v2.x + v2.y * v2.y));
                                 break;
                             case "angle":
-                                v2 = VM.PopVector2() - VM.PopVector2();
-                                VM.PushFloat(MathHelper.GetDegree(new Vector2(v2.x, v2.y)));
+                                v2 = PopVector2() - PopVector2();
+                                PushFloat(MathHelper.GetDegree(new Vector2(v2.x, v2.y)));
                                 break;
                             case "rand":
                                 float ratio = (float)random.NextDouble();
-                                VM.PushVector(VM.PopVector() * (1 - ratio) + VM.PopVector() * ratio);
+                                PushVector(PopVector() * (1 - ratio) + PopVector() * ratio);
                                 break;
                             case "randi":
-                                int i2 = (int)VM.PopInt();
-                                int i1 = (int)VM.PopInt();
+                                int i2 = (int)PopInt();
+                                int i1 = (int)PopInt();
                                 if (i1 > i2)
                                 {
                                     int temp = i1;
                                     i1 = i2;
                                     i2 = temp;
                                 }
-                                VM.PushInt(random.Next(i1, i2));
+                                PushInt(random.Next(i1, i2));
                                 break;
                             case "sin":
-                                VM.PushFloat((float)Math.Sin(MathHelper.DegToRad(VM.PopFloat())));
+                                PushFloat((float)Math.Sin(MathHelper.DegToRad(PopFloat())));
                                 break;
                             case "cos":
-                                VM.PushFloat((float)Math.Cos(MathHelper.DegToRad(VM.PopFloat())));
+                                PushFloat((float)Math.Cos(MathHelper.DegToRad(PopFloat())));
                                 break;
                             case "tan":
-                                VM.PushFloat((float)Math.Tan(MathHelper.DegToRad(VM.PopFloat())));
+                                PushFloat((float)Math.Tan(MathHelper.DegToRad(PopFloat())));
                                 break;
                             case "pi":
-                                VM.PushFloat((float)Math.PI);
+                                PushFloat((float)Math.PI);
                                 break;
                             case "e":
-                                VM.PushFloat((float)Math.E);
+                                PushFloat((float)Math.E);
                                 break;
                             case "asin":
-                                VM.PushFloat((float)MathHelper.RadToDeg(Math.Asin(VM.PopFloat())));
+                                PushFloat((float)MathHelper.RadToDeg(Math.Asin(PopFloat())));
                                 break;
                             case "acos":
-                                VM.PushFloat((float)MathHelper.RadToDeg(Math.Acos(VM.PopFloat())));
+                                PushFloat((float)MathHelper.RadToDeg(Math.Acos(PopFloat())));
                                 break;
                             case "atan":
-                                VM.PushFloat((float)MathHelper.RadToDeg(Math.Atan(VM.PopFloat())));
+                                PushFloat((float)MathHelper.RadToDeg(Math.Atan(PopFloat())));
                                 break;
                             case "exp":
-                                VM.PushFloat((float)Math.Exp(VM.PopFloat()));
+                                PushFloat((float)Math.Exp(PopFloat()));
                                 break;
                             case "log":
-                                var newBase = VM.PopFloat();
-                                var a = VM.PopFloat();
-                                VM.PushFloat((float)Math.Log(a, newBase));
+                                var newBase = PopFloat();
+                                var a = PopFloat();
+                                PushFloat((float)Math.Log(a, newBase));
                                 break;
                             case "pow":
-                                float power = VM.PopFloat();
-                                float value = VM.PopFloat();
-                                VM.PushFloat((float)Math.Pow(value, power));
+                                float power = PopFloat();
+                                float value = PopFloat();
+                                PushFloat((float)Math.Pow(value, power));
                                 break;
                             case "sqrt":
-                                VM.PushFloat((float)Math.Sqrt(VM.PopFloat()));
+                                PushFloat((float)Math.Sqrt(PopFloat()));
                                 break;
                         }
                         break;
                     case VMCode.AND:
-                        VM.PushBool(VM.PopBool() & VM.PopBool());
+                        PushBool(PopBool() & PopBool());
                         break;
                     case VMCode.OR:
-                        VM.PushBool(VM.PopBool() | VM.PopBool());
+                        PushBool(PopBool() | PopBool());
                         break;
                     case VMCode.EQUAL:
-                        var vR = VM.PopVector();
-                        var vL = VM.PopVector();
-                        VM.PushBool(vL.UseFrameEqual ? MathHelper.FrameEqual(vL.x, frameScale, (int)vR.x) : 
+                        var vR = PopVector();
+                        var vL = PopVector();
+                        PushBool(vL.useFrameEqual ? MathHelper.FrameEqual(vL.x, frameScale, (int)vR.x) : 
                             vL == vR);
                         break;
                     case VMCode.ADD:
-                        VM.PushVector(VM.PopVector() + VM.PopVector());
+                        PushVector(PopVector() + PopVector());
                         break;
                     case VMCode.SUB:
-                        var subtrahend = VM.PopVector();
-                        var minuend = VM.PopVector();
-                        VM.PushVector(minuend - subtrahend);
+                        var subtrahend = PopVector();
+                        var minuend = PopVector();
+                        PushVector(minuend - subtrahend);
                         break;
                     case VMCode.MUL:
-                        var vA = VM.PopVector();
-                        var vB = VM.PopVector();
-                        VM.PushVector(new Vector3(vA.x * vB.x, vA.y * vB.y, vA.z * vB.z));
+                        var vA = PopVector();
+                        var vB = PopVector();
+                        PushVector(new Vector3(vA.x * vB.x, vA.y * vB.y, vA.z * vB.z));
                         break;
                     case VMCode.DIV:
-                        var divisor = VM.PopVector();
-                        var dividend = VM.PopVector();
-                        VM.PushVector(new Vector3(
-                            (dividend.AsInteger && divisor.x == Math.Floor(divisor.x)) ? (int)dividend.x / (int)divisor.x : 
+                        var divisor = PopVector();
+                        var dividend = PopVector();
+                        PushVector(new Vector3(
+                            (dividend.asInteger && divisor.x == Math.Floor(divisor.x)) ? (int)dividend.x / (int)divisor.x : 
                             dividend.x / divisor.x,
-                            (dividend.AsInteger && divisor.y == Math.Floor(divisor.y)) ? (int)dividend.y / (int)divisor.y :
+                            (dividend.asInteger && divisor.y == Math.Floor(divisor.y)) ? (int)dividend.y / (int)divisor.y :
                             dividend.y / divisor.y,
-                            (dividend.AsInteger && divisor.z == Math.Floor(divisor.z)) ? (int)dividend.z / (int)divisor.z :
+                            (dividend.asInteger && divisor.z == Math.Floor(divisor.z)) ? (int)dividend.z / (int)divisor.z :
                             dividend.z / divisor.z));
                         break;
                     case VMCode.MOD:
-                        divisor = VM.PopVector();
-                        var number = VM.PopVector();
-                        VM.PushVector(new Vector3(
-                            (number.AsInteger && divisor.x == Math.Floor(divisor.x)) ? (int)number.x % (int)divisor.x :
+                        divisor = PopVector();
+                        var number = PopVector();
+                        PushVector(new Vector3(
+                            (number.asInteger && divisor.x == Math.Floor(divisor.x)) ? (int)number.x % (int)divisor.x :
                             number.x % divisor.x,
-                            (number.AsInteger && divisor.y == Math.Floor(divisor.y)) ? (int)number.y % (int)divisor.y :
+                            (number.asInteger && divisor.y == Math.Floor(divisor.y)) ? (int)number.y % (int)divisor.y :
                             number.y % divisor.y,
-                            (number.AsInteger && divisor.z == Math.Floor(divisor.z)) ? (int)number.z % (int)divisor.z :
+                            (number.asInteger && divisor.z == Math.Floor(divisor.z)) ? (int)number.z % (int)divisor.z :
                             number.z % divisor.z));
                         break;
                     case VMCode.MORE:
-                        var right = VM.PopFloat();
-                        var left = VM.PopFloat();
-                        VM.PushBool(left > right);
+                        var right = PopFloat();
+                        var left = PopFloat();
+                        PushBool(left > right);
                         break;
                     case VMCode.LESS:
-                        right = VM.PopFloat();
-                        left = VM.PopFloat();
-                        VM.PushBool(left < right);
+                        right = PopFloat();
+                        left = PopFloat();
+                        PushBool(left < right);
                         break;
                     case VMCode.MOREOREQUAL:
-                        right = VM.PopFloat();
-                        left = VM.PopFloat();
-                        VM.PushBool(left >= right);
+                        right = PopFloat();
+                        left = PopFloat();
+                        PushBool(left >= right);
                         break;
                     case VMCode.LESSOREQUAL:
-                        right = VM.PopFloat();
-                        left = VM.PopFloat();
-                        VM.PushBool(left <= right);
+                        right = PopFloat();
+                        left = PopFloat();
+                        PushBool(left <= right);
                         break;
                     case VMCode.NOTEQUAL:
-                        VM.PushBool(VM.PopVector() != VM.PopVector());
+                        PushBool(PopVector() != PopVector());
                         break;
                     case VMCode.VECTOR2:
-                        float y = VM.PopFloat();
-                        float x = VM.PopFloat();
-                        VM.PushVector2(new Vector2(x, y));
+                        float y = PopFloat();
+                        float x = PopFloat();
+                        PushVector2(new Vector2(x, y));
                         break;
                     case VMCode.RGB:
-                        float b = VM.PopFloat();
-                        float g = VM.PopFloat();
-                        float r = VM.PopFloat();
-                        VM.PushRGB(new RGB(r, g, b));
+                        float b = PopFloat();
+                        float g = PopFloat();
+                        float r = PopFloat();
+                        PushRGB(new RGB(r, g, b));
                         break;
                     case VMCode.RAND:
-                        right = VM.PopFloat();
-                        left = VM.PopFloat();
+                        right = PopFloat();
+                        left = PopFloat();
                         float t = (float)random.NextDouble();
-                        VM.PushFloat(left * (1 - t) + right * t);
+                        PushFloat(left * (1 - t) + right * t);
                         break;
                 }
             }
         }
         public static void PushVector(Vector3 value)
         {
-            if (float.IsNaN(value.x) || float.IsNaN(value.y) || float.IsNaN(value.z))
-            {
-                throw new NotFiniteNumberException();
-            }
             vectorStack.Push(value);
         }
         public static Vector3 PopVector()
@@ -376,10 +372,6 @@ namespace CrazyStorm.Core
         }
         public static void PushVector2(Vector2 value)
         {
-            if (float.IsNaN(value.x) || float.IsNaN(value.y))
-            {
-                throw new NotFiniteNumberException();
-            }
             vectorStack.Push(new Vector3(value));
         }
         public static Vector2 PopVector2()
@@ -389,13 +381,9 @@ namespace CrazyStorm.Core
         }
         public static void PushFloat(float value, bool asInteger = false, bool useFrameEqual = false)
         {
-            if (float.IsNaN(value))
-            {
-                throw new NotFiniteNumberException();
-            }
             var v = new Vector3(value);
-            v.AsInteger = asInteger;
-            v.UseFrameEqual = useFrameEqual;
+            v.asInteger = asInteger;
+            v.useFrameEqual = useFrameEqual;
             vectorStack.Push(v);
         }
         public static float PopFloat()
