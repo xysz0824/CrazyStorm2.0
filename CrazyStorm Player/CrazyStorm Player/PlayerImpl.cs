@@ -365,11 +365,14 @@ namespace CrazyStorm_Player
             shaderMaskType.SetValue(ParticleManager.MaskTypeArray);
             shaderMaskRotate.SetValue(ParticleManager.MaskRotateArray);
             shaderRenderCenter.SetValue(new Vector2(Width / 2, Height / 2));
-            var collidedCount = 0;
-            CrazyStorm.Core.Vector2 newPos = default;
-            var particles = ParticleManager.CheckCollision(false, controllable.selfPosLast.ToCore(),
-                controllable.selfPos.ToCore(), controllable.selfRadius, out collidedCount, out newPos);
-            for (int i = 0; i < collidedCount; ++i) particles[i].Die();
+            ParticleManager.CheckCollision(false, controllable.selfPosLast.ToCore(),
+                controllable.selfPos.ToCore(), controllable.selfRadius, out CrazyStorm.Core.Vector2 newPos);
+            foreach (var particle in ParticleManager.ActiveParticles)
+            {
+                if (!particle.SearchFlag) continue;
+                particle.SearchFlag = false;
+                particle.Die();
+            }
             controllable.selfPos = newPos.ToXna();
             ParticleManager.Update(FrameRate);
             CurrentFrame = selectedParticle.CurrentFrame;

@@ -122,25 +122,25 @@ namespace CrazyStorm.Core
         #region Private Methods
         void Update(float frameScale)
         {
-            int count = 0;
-            var results = FieldShape == FieldShape.Rectangle ? 
-                ParticleManager.SearchByRect(Position, HalfWidth, HalfHeight, Rotation, out count) :
-                ParticleManager.SearchByEllipse(Position, HalfWidth, HalfHeight, Rotation, out count);
-            for (int i = 0;i < count; ++i)
+            if (FieldShape == FieldShape.Rectangle) ParticleManager.SearchByRect(Position, HalfWidth, HalfHeight, Rotation);
+            else ParticleManager.SearchByEllipse(Position, HalfWidth, HalfHeight, Rotation);
+            foreach (var particle in ParticleManager.ActiveParticles)
             {
-                if (results[i].IgnoreMask) continue;
+                if (!particle.SearchFlag) continue;
+                particle.SearchFlag = false;
+                if (particle.IgnoreMask) continue;
                 switch (Reach)
                 {
                     case Reach.Layer:
-                        if (results[i].Emitter.LayerName != TargetName) continue;
+                        if (particle.Emitter.LayerName != TargetName) continue;
                         break;
                     case Reach.Name:
-                        if (results[i].Emitter.Name != TargetName || results[i].Emitter.LayerName != LayerName) continue;
+                        if (particle.Emitter.LayerName != LayerName || particle.Emitter.Name != TargetName) continue;
                         break;
                 }
-                for (int k = 0; k < EventFieldEventGroups.Count; ++k)
+                for (int i = 0; i < EventFieldEventGroups.Count; ++i)
                 {
-                    EventFieldEventGroups[k].Execute(results[i], null, frameScale);
+                    EventFieldEventGroups[i].Execute(particle, null, frameScale);
                 }
             }
         }

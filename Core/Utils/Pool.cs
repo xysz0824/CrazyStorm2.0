@@ -19,7 +19,7 @@ namespace CrazyStorm.Core
     {
         static T[] pool;
         static int instanceID = 0;
-
+        public static int Capacity => pool != null ? pool.Length : 0;
         public bool PoolState { get; private set; }
 
         public static void Reset(int capacity)

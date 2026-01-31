@@ -53,13 +53,13 @@ namespace CrazyStorm.Core
         static int curvePreserved;
         static long instanceID;
         static List<ParticleBase> activeParticles;
-        static ParticleBase[] searchResult;
         static Vector2[] maskPositionArray = new Vector2[MAX_MASK_COUNT];
         static Vector2[] maskSizeArray = new Vector2[MAX_MASK_COUNT];
         static float[] maskShapeArray = new float[MAX_MASK_COUNT];
         static float[] maskTypeArray = new float[MAX_MASK_COUNT];
         static float[] maskRotateArray = new float[MAX_MASK_COUNT];
         static int maskCount;
+        public static IList<ParticleBase> ActiveParticles => activeParticles;
         public static int ActiveParticleCount => activeParticles != null ? activeParticles.Count : 0;
         public static Vector2[] MaskPositionArray => maskPositionArray;
         public static Vector2[] MaskSizeArray => maskSizeArray;
@@ -82,7 +82,6 @@ namespace CrazyStorm.Core
             CurveParticlePool.Reset(curveParticleMaximum);
             Curve.Reset(curveParticleMaximum);
             activeParticles = new List<ParticleBase>();
-            searchResult = new ParticleBase[particleMaximum + curveParticleMaximum];
             OnParticleDraw = null;
             OnCurveParticleDraw = null;
         }
@@ -102,7 +101,8 @@ namespace CrazyStorm.Core
                 particle = poolObject.Instance;
             }
             particle.System = system;
-            long order = layerID * searchResult.Length * 10 + 9 - (int)template.BlendType;
+            long order = layerID * (ParticlePool.Capacity + CurveParticlePool.Capacity) * 10 + 
+                9 - (int)template.BlendType;
             particle.RenderOrder = order + instanceID * 10;
             particle.ID = instanceID++;
             particle.Reset();
@@ -115,9 +115,8 @@ namespace CrazyStorm.Core
         //{
         //    particleQuadTree.Insert(particleBase);
         //}
-        public static ParticleBase[] SearchByRect(Vector2 center, float halfW, float halfH, float rotation, out int count)
+        public static void SearchByRect(Vector2 center, float halfW, float halfH, float rotation)
         {
-            int index = 0;
             for (int i = 0; i < activeParticles.Count; ++i)
             {
                 var instance = activeParticles[i];
@@ -125,15 +124,12 @@ namespace CrazyStorm.Core
                 var v = MathHelper.Rotate(instance.PPosition - center, -rotation);
                 if (v.x >= -halfW && v.x <= halfW && v.y >= -halfH && v.y <= halfH)
                 {
-                    searchResult[index++] = instance;
+                    instance.SearchFlag = true;
                 }
             }
-            count = index;
-            return searchResult;
         }
-        public static ParticleBase[] SearchByEllipse(Vector2 center, float halfW, float halfH, float rotation, out int count)
+        public static void SearchByEllipse(Vector2 center, float halfW, float halfH, float rotation)
         {
-            int index = 0;
             for (int i = 0; i < activeParticles.Count; ++i)
             {
                 var instance = activeParticles[i];
@@ -141,34 +137,29 @@ namespace CrazyStorm.Core
                 var v = MathHelper.Rotate(instance.PPosition - center, -rotation);
                 if ((v.x * v.x) / (halfW * halfW) + (v.y * v.y) / (halfH * halfH) <= 1f)
                 {
-                    searchResult[index++] = instance;
+                    instance.SearchFlag = true;
                 }
             }
-            count = index;
-            return searchResult;
         }
-        public static ParticleBase[] CheckCollision(bool dead, Vector2 playerLast, Vector2 player, float r, out int count, out Vector2 newPos)
+        public static void CheckCollision(bool dead, Vector2 playerLast, Vector2 player, float r, out Vector2 newPos)
         {
-            var index = 0;
             newPos = player;
             for (int i = 0; i < activeParticles.Count; ++i)
             {
                 var instance = activeParticles[i];
-                if (!instance.Alive) continue;
+                if (!instance.Alive || !instance.Collision) continue;
                 if (Masked(instance.PPosition))
                 {
                     instance.PMasked = true;
                     continue;
                 }
-                if (instance.CheckCollision(playerLast, player, r)) searchResult[index++] = instance;
+                if (instance.CheckCollision(playerLast, player, r)) instance.SearchFlag = true;
                 else
                 {
                     var judge = instance.CheckVolume(dead, playerLast, player, out newPos);
-                    if (judge)  searchResult[index++] = instance;
+                    if (judge) instance.SearchFlag = true;
                 }
             }
-            count = index;
-            return searchResult;
         }
         public static bool OutOfWindow(ParticleBase particle)
         {
