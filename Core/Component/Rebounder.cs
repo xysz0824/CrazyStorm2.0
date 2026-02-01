@@ -32,7 +32,6 @@ namespace CrazyStorm.Core
         #region Private Members
         float lastRotation;
         RebounderData rebounderData;
-        IList<EventGroup> rebounderEventGroups;
         #endregion
 
         #region Public Members
@@ -66,7 +65,7 @@ namespace CrazyStorm.Core
             get { return rebounderData.oneSide; }
             set { rebounderData.oneSide= value; }
         }
-        public IList<EventGroup> RebounderEventGroups { get { return rebounderEventGroups; } }
+        public GenericContainer<EventGroup> RebounderEventGroups { get; private set; }
         #endregion
 
         #region Constructor
@@ -74,7 +73,7 @@ namespace CrazyStorm.Core
         {
             rebounderData.size = 50;
             rebounderData.limit = 1;
-            rebounderEventGroups = new GenericContainer<EventGroup>();
+            RebounderEventGroups = new GenericContainer<EventGroup>();
         }
         #endregion
 
@@ -133,8 +132,8 @@ namespace CrazyStorm.Core
         public override object Clone()
         {
             var clone = base.Clone() as Rebounder;
-            clone.rebounderEventGroups = new GenericContainer<EventGroup>();
-            foreach (var item in rebounderEventGroups) clone.rebounderEventGroups.Add(item.Clone() as EventGroup);
+            clone.RebounderEventGroups = new GenericContainer<EventGroup>();
+            foreach (var item in RebounderEventGroups) clone.RebounderEventGroups.Add(item.Clone() as EventGroup);
             return clone;
         }
         public override XmlElement BuildFromXml(XmlElement node)
@@ -144,7 +143,7 @@ namespace CrazyStorm.Core
             //rebounderData
             XmlHelper.BuildFromStruct(ref rebounderData, rebounderNode);
             //rebounderEventGroups
-            XmlHelper.BuildFromObjectList(rebounderEventGroups, new EventGroup(), rebounderNode, "RebounderEventGroups");
+            XmlHelper.BuildFromObjectList(RebounderEventGroups, new EventGroup(), rebounderNode, "RebounderEventGroups");
             return rebounderNode;
         }
         public override XmlElement StoreAsXml(XmlDocument doc, XmlElement node)
@@ -154,7 +153,7 @@ namespace CrazyStorm.Core
             //rebounderData
             XmlHelper.StoreStruct(rebounderData, doc, rebounderNode);
             //rebounderEventGroups
-            XmlHelper.StoreObjectList(rebounderEventGroups, doc, rebounderNode, "RebounderEventGroups");
+            XmlHelper.StoreObjectList(RebounderEventGroups, doc, rebounderNode, "RebounderEventGroups");
             node.AppendChild(rebounderNode);
             return rebounderNode;
         }
@@ -165,7 +164,7 @@ namespace CrazyStorm.Core
             //rebounderData
             PlayDataHelper.GenerateStruct(rebounderData, rebounderBytes);
             //rebounderEventGroups
-            PlayDataHelper.GenerateObjectList(file, rebounderEventGroups, rebounderBytes);
+            PlayDataHelper.GenerateObjectList(file, RebounderEventGroups, rebounderBytes);
             bytes.AddRange(PlayDataHelper.CreateBlock(rebounderBytes));
             return bytes;
         }

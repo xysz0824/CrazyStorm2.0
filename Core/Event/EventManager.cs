@@ -159,15 +159,15 @@ namespace CrazyStorm.Core
         public static bool CanSoundPlay => OnSoundPlay != null;
 
         static List<EventExecutor> executorList;
-        static Dictionary<string, Dictionary<int, TypeSet>> cache;
-        public static IList<ParticleType> CustomTypes { get; set; }
-        public static IList<FileResource> Sounds { get; set; }
-        public static IDictionary<int, int> TypeSoundMap { get; set; }
+        static Dictionary<long, Dictionary<int, TypeSet>> cache;
+        public static GenericContainer<ParticleType> CustomTypes { get; set; }
+        public static GenericContainer<FileResource> Sounds { get; set; }
+        public static Dictionary<int, int> TypeSoundMap { get; set; }
         public static void Initialize()
         {
             OnSoundPlay = null;
             executorList = new List<EventExecutor>();
-            cache = new Dictionary<string, Dictionary<int, TypeSet>>();
+            cache = new Dictionary<long, Dictionary<int, TypeSet>>();
         }
         public static void AddEvent(PropertyContainer propertyContainer, PropertyContainer bindingContainer, VMEventInfo eventInfo, 
             float frameScale)
@@ -330,7 +330,7 @@ namespace CrazyStorm.Core
         public static bool BindingUpdate(PropertyContainer propertyContainer, PropertyContainer bindingContainer, float frameScale)
         {
             bool updated = false;
-            string id = GetUniqueKey(propertyContainer, bindingContainer);
+            long id = GetUniqueKey(propertyContainer, bindingContainer);
             for (int i = 0; i < executorList.Count; ++i)
             {
                 if (executorList[i].PropertyContainer == propertyContainer && executorList[i].BindingContainer == bindingContainer)
@@ -356,7 +356,7 @@ namespace CrazyStorm.Core
         }
         public static bool BindingRecover(PropertyContainer propertyContainer, PropertyContainer bindingContainer)
         {
-            string id = GetUniqueKey(propertyContainer, bindingContainer);
+            long id = GetUniqueKey(propertyContainer, bindingContainer);
             if (!cache.ContainsKey(id))
                 return false;
 
@@ -391,9 +391,9 @@ namespace CrazyStorm.Core
             }
             return true;
         }
-        private static string GetUniqueKey(PropertyContainer propertyContainer, PropertyContainer bindingContainer)
+        private static long GetUniqueKey(PropertyContainer propertyContainer, PropertyContainer bindingContainer)
         {
-            return (propertyContainer as Component).ID + "_" + (bindingContainer as ParticleBase).ID;
+            return (propertyContainer as Component).ID * ParticleManager.MaximumParticleCount + (bindingContainer as ParticleBase).ID;
         }
         public static void PlaySound(string path)
         {

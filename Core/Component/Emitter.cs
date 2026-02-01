@@ -32,7 +32,6 @@ namespace CrazyStorm.Core
     {
         #region Private Members
         EmitterData emitterData;
-        IList<EventGroup> particleEventGroups;
         Vector2[] lastSpawn;
         #endregion
 
@@ -43,8 +42,8 @@ namespace CrazyStorm.Core
         #region Public Members
         public ParticleBase InitialTemplate { get; protected set; }
         public ParticleBase Template { get; protected set; }
-        public LinkedList<ParticleBase> Particles { get; private set; }
-        public IList<EventGroup> EmitterEventGroups { get; private set; }
+        public List<ParticleBase> Particles { get; private set; }
+        public List<EventGroup> EmitterEventGroups { get; private set; }
         [Vector2Property(14)]
         public Vector2 EmitPosition
         {
@@ -100,7 +99,7 @@ namespace CrazyStorm.Core
             set { emitterData.instantMovement = value; }
         }
         public ParticleBase Particle { get { return particle; } }
-        public IList<EventGroup> ParticleEventGroups { get { return particleEventGroups; } }
+        public GenericContainer<EventGroup> ParticleEventGroups { get; private set; }
         #endregion
 
         #region Constructor
@@ -114,9 +113,9 @@ namespace CrazyStorm.Core
             emitterData.emitCount = 1;
             emitterData.emitCycle = 10;
             emitterData.emitRange = 360;
-            Particles = new LinkedList<ParticleBase>();
+            Particles = new List<ParticleBase>();
             EmitterEventGroups = new List<EventGroup>();
-            particleEventGroups = new GenericContainer<EventGroup>();
+            ParticleEventGroups = new GenericContainer<EventGroup>();
             lastSpawn = null;
         }
         #endregion
@@ -166,7 +165,7 @@ namespace CrazyStorm.Core
                     lastSpawn[i] = newParticle.PPosition;
                 }
                 newParticle.ParticleEventGroups = EmitterEventGroups;
-                Particles.AddLast(newParticle);
+                Particles.Add(newParticle);
             }
             if (EventManager.Sounds != null && EventManager.TypeSoundMap != null && 
                 EventManager.TypeSoundMap.ContainsKey(Template.Type.ID))
@@ -183,8 +182,8 @@ namespace CrazyStorm.Core
             var clone = base.Clone() as Emitter;
             clone.lastSpawn = new Vector2[EmitCount];
             clone.particle = particle.Clone() as ParticleBase;
-            clone.particleEventGroups = new GenericContainer<EventGroup>();
-            foreach (var item in particleEventGroups) clone.particleEventGroups.Add(item.Clone() as EventGroup);
+            clone.ParticleEventGroups = new GenericContainer<EventGroup>();
+            foreach (var item in ParticleEventGroups) clone.ParticleEventGroups.Add(item.Clone() as EventGroup);
             return clone;
         }
         public override XmlElement BuildFromXml(XmlElement node)
@@ -196,7 +195,7 @@ namespace CrazyStorm.Core
             //particle
             particle.BuildFromXml(emitterNode);
             //particleEventGroups
-            XmlHelper.BuildFromObjectList(particleEventGroups, new EventGroup(), emitterNode, "ParticleEventGroups");
+            XmlHelper.BuildFromObjectList(ParticleEventGroups, new EventGroup(), emitterNode, "ParticleEventGroups");
             return emitterNode;
         }
         public override XmlElement StoreAsXml(XmlDocument doc, XmlElement node)
@@ -208,7 +207,7 @@ namespace CrazyStorm.Core
             //particle
             particle.StoreAsXml(doc, emitterNode);
             //particleEventGroups
-            XmlHelper.StoreObjectList(particleEventGroups, doc, emitterNode, "ParticleEventGroups");
+            XmlHelper.StoreObjectList(ParticleEventGroups, doc, emitterNode, "ParticleEventGroups");
             node.AppendChild(emitterNode);
             return emitterNode;
         }
@@ -221,7 +220,7 @@ namespace CrazyStorm.Core
             //particle
             emitterBytes.AddRange(particle.GeneratePlayData(file, this));
             //particleEventGroups
-            PlayDataHelper.GenerateObjectList(file, particleEventGroups, emitterBytes);
+            PlayDataHelper.GenerateObjectList(file, ParticleEventGroups, emitterBytes);
             bytes.AddRange(PlayDataHelper.CreateBlock(emitterBytes));
             return bytes;
         }

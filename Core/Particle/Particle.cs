@@ -199,7 +199,7 @@ namespace CrazyStorm.Core
         public override void Reset()
         {
             base.Reset();
-            afterimageData = new AfterImage[AFTERIMAGE_COUNT];
+            Array.Clear(afterimageData, 0, AFTERIMAGE_COUNT);
         }
         #endregion
     }

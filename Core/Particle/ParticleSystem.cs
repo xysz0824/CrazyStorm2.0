@@ -40,15 +40,15 @@ namespace CrazyStorm.Core
         string name;
         [XmlAttribute]
         OrderType orderType;
-        IList<ParticleType> customTypes;
-        IList<Layer> layers;
-        IList<Component> componentTree;
+        GenericContainer<ParticleType> customTypes;
+        GenericContainer<Layer> layers;
+        GenericContainer<Component> componentTree;
         [XmlAttribute]
         int customTypeIndex;
         [XmlAttribute]
         int layerIndex;
-        IDictionary<int, int> componentIndex;
-        IDictionary<int, int> typeSoundMap;
+        Dictionary<int, int> componentIndex;
+        Dictionary<int, int> typeSoundMap;
         Vector2 screenOffset;
         ShakeScreenEvent shakeScreenEvent;
         float frameFactor = 1;
@@ -83,12 +83,12 @@ namespace CrazyStorm.Core
                 return totalFrame;
             }
         }
-        public IList<ParticleType> CustomTypes { get { return customTypes; } }
-        public IList<Layer> Layers { get { return layers; } }
-        public IList<Component> ComponentTree { get { return componentTree; } }
+        public GenericContainer<ParticleType> CustomTypes { get { return customTypes; } }
+        public GenericContainer<Layer> Layers { get { return layers; } }
+        public GenericContainer<Component> ComponentTree { get { return componentTree; } }
         public int CustomTypeIndex { get { return customTypeIndex++; } }
         public int LayerIndex { get { return layerIndex++; } }
-        public IDictionary<int, int> TypeSoundMap { get { return typeSoundMap; } }
+        public Dictionary<int, int> TypeSoundMap { get { return typeSoundMap; } }
         public int Status { get; private set; }
         public float StatusFrame { get; private set; }
         public Vector2 CenterPosition { get; private set; }

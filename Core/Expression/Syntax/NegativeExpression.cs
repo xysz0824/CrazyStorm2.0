@@ -28,7 +28,7 @@ namespace CrazyStorm.Expression
             throw new ExpressionException("TypeError");
         }
 
-        public override void Compile(Type type, Type subType, IList<VariableResource> variables, List<byte> codeStream)
+        public override void Compile(Type type, Type subType, List<VariableResource> variables, List<byte> codeStream)
         {
             SyntaxTree expression = GetExpression();
             if (expression is Expression.Number)

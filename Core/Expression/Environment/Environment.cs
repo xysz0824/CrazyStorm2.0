@@ -27,16 +27,16 @@ namespace CrazyStorm.Expression
             { "CenterAngle", -11 },
         };
         #region Private Members
-        IDictionary<string, float> globals;
-        IDictionary<string, float> locals;
-        IDictionary<string, object> properties;
-        IDictionary<string, Function> functions;
+        Dictionary<string, float> globals;
+        Dictionary<string, float> locals;
+        Dictionary<string, object> properties;
+        Dictionary<string, Function> functions;
         #endregion
 
         #region Public Members
-        public IDictionary<string, float> Globals { get { return globals; } }
-        public IDictionary<string, float> Locals { get { return locals; } }
-        public IDictionary<string, object> Properties { get { return properties; } }
+        public Dictionary<string, float> Globals { get { return globals; } }
+        public Dictionary<string, float> Locals { get { return locals; } }
+        public Dictionary<string, object> Properties { get { return properties; } }
         #endregion
 
         #region Constructor
@@ -115,7 +115,7 @@ namespace CrazyStorm.Expression
         #endregion
 
         #region Public Methods
-        public static int GetPropertyID(string name, Type type, Type subType, IList<VariableResource> variables)
+        public static int GetPropertyID(string name, Type type, Type subType, List<VariableResource> variables)
         {
             var propertyID = int.MinValue;
             var split = name.Split('.');

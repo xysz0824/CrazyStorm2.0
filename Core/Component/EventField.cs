@@ -48,7 +48,6 @@ namespace CrazyStorm.Core
         [XmlAttribute]
         string targetName;
         EventFieldData eventFieldData;
-        IList<EventGroup> eventFieldEventGroups;
         #endregion
 
         #region Public Members
@@ -106,7 +105,7 @@ namespace CrazyStorm.Core
             get { return eventFieldData.rotation; }
             set { eventFieldData.rotation = value; }
         }
-        public IList<EventGroup> EventFieldEventGroups { get { return eventFieldEventGroups; } }
+        public GenericContainer<EventGroup> EventFieldEventGroups { get; private set; }
         #endregion
 
         #region Constructor
@@ -115,7 +114,7 @@ namespace CrazyStorm.Core
             targetName = string.Empty;
             eventFieldData.halfWidth = 50;
             eventFieldData.halfHeight = 50;
-            eventFieldEventGroups = new GenericContainer<EventGroup>();
+            EventFieldEventGroups = new GenericContainer<EventGroup>();
         }
         #endregion
 
@@ -150,10 +149,8 @@ namespace CrazyStorm.Core
         public override object Clone()
         {
             var clone = base.Clone() as EventField;
-            clone.eventFieldEventGroups = new GenericContainer<EventGroup>();
-            foreach (var item in eventFieldEventGroups)
-                clone.eventFieldEventGroups.Add(item.Clone() as EventGroup);
-
+            clone.EventFieldEventGroups = new GenericContainer<EventGroup>();
+            foreach (var item in EventFieldEventGroups) clone.EventFieldEventGroups.Add(item.Clone() as EventGroup);
             return clone;
         }
         public override XmlElement BuildFromXml(XmlElement node)
@@ -164,7 +161,7 @@ namespace CrazyStorm.Core
             //eventFieldData
             XmlHelper.BuildFromStruct(ref eventFieldData, eventFieldNode);
             //eventFieldEventGroups
-            XmlHelper.BuildFromObjectList(eventFieldEventGroups, new EventGroup(), eventFieldNode, "EventFieldEventGroups");
+            XmlHelper.BuildFromObjectList(EventFieldEventGroups, new EventGroup(), eventFieldNode, "EventFieldEventGroups");
             return eventFieldNode;
         }
         public override XmlElement StoreAsXml(XmlDocument doc, XmlElement node)
@@ -175,7 +172,7 @@ namespace CrazyStorm.Core
             //eventFieldData
             XmlHelper.StoreStruct(eventFieldData, doc, eventFieldNode);
             //eventFieldEventGroups
-            XmlHelper.StoreObjectList(eventFieldEventGroups, doc, eventFieldNode, "EventFieldEventGroups");
+            XmlHelper.StoreObjectList(EventFieldEventGroups, doc, eventFieldNode, "EventFieldEventGroups");
             node.AppendChild(eventFieldNode);
             return eventFieldNode;
         }
@@ -188,7 +185,7 @@ namespace CrazyStorm.Core
             //eventFieldData
             PlayDataHelper.GenerateStruct(eventFieldData, eventFieldBytes);
             //eventFieldEventGroups
-            PlayDataHelper.GenerateObjectList(file, eventFieldEventGroups, eventFieldBytes);
+            PlayDataHelper.GenerateObjectList(file, EventFieldEventGroups, eventFieldBytes);
             bytes.AddRange(PlayDataHelper.CreateBlock(eventFieldBytes));
             return bytes;
         }

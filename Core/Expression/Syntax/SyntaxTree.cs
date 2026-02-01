@@ -31,11 +31,11 @@ namespace CrazyStorm.Expression
 
         public void AddChild(SyntaxTree tree) { children.Add(tree); }
 
-        public IList<SyntaxTree> GetChildren() { return children; }
+        public List<SyntaxTree> GetChildren() { return children; }
 
         public bool IsLeaf() { return token != null; }
 
-        public bool ContainType<T>() { return SyntaxTree.ContainType<T>(this); }
+        public bool ContainType<T>() { return ContainType<T>(this); }
 
         public static bool ContainType<T>(SyntaxTree syntaxTree)
         {
@@ -60,6 +60,6 @@ namespace CrazyStorm.Expression
 
         public abstract object Eval(Environment e);
 
-        public abstract void Compile(Type type, Type subType, IList<VariableResource> variables, List<byte> codeStream);
+        public abstract void Compile(Type type, Type subType, List<VariableResource> variables, List<byte> codeStream);
     }
 }

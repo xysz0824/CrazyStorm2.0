@@ -23,7 +23,7 @@ namespace CrazyStorm.Expression
             return Token.GetValue();
         }
 
-        public override void Compile(Type type, Type subType, IList<VariableResource> variables, List<byte> codeStream)
+        public override void Compile(Type type, Type subType, List<VariableResource> variables, List<byte> codeStream)
         {
             byte[] code = VM.CreateInstruction(VMCode.VECTOR, new Vector3((float)Eval(null)));
             codeStream.AddRange(code);

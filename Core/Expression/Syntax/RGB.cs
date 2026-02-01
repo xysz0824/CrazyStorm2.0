@@ -36,7 +36,7 @@ namespace CrazyStorm.Expression
             return new Core.RGB(Convert.ToSingle(r), Convert.ToSingle(g), Convert.ToSingle(b));
         }
 
-        public override void Compile(Type type, Type subType, IList<VariableResource> variables, List<byte> codeStream)
+        public override void Compile(Type type, Type subType, List<VariableResource> variables, List<byte> codeStream)
         {
             GetR().Compile(type, subType, variables, codeStream);
             GetG().Compile(type, subType, variables, codeStream);

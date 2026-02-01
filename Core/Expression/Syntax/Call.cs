@@ -41,7 +41,7 @@ namespace CrazyStorm.Expression
             return 0.0f;
         }
 
-        public override void Compile(Type type, Type subType, IList<VariableResource> variables, List<byte> codeStream)
+        public override void Compile(Type type, Type subType, List<VariableResource> variables, List<byte> codeStream)
         {
             GetArguments().Compile(type, subType, variables, codeStream);
             byte[] code = VM.CreateInstruction(VMCode.CALL, (string)Token.GetValue());

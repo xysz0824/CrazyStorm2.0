@@ -20,10 +20,10 @@ namespace CrazyStorm.Core
     public partial class File : IXmlData, IGeneratePlayData, ILoadPlayData
     {
         #region Private Members
-        IList<ParticleSystem> particleSystems;
-        IList<FileResource> images;
-        IList<FileResource> sounds;
-        IList<VariableResource> globals;
+        List<ParticleSystem> particleSystems;
+        GenericContainer<FileResource> images;
+        GenericContainer<FileResource> sounds;
+        GenericContainer<VariableResource> globals;
         [XmlAttribute]
         int fileResourceIndex;
         [XmlAttribute]
@@ -32,20 +32,25 @@ namespace CrazyStorm.Core
 
         #region Public Members
         public static string CurrentDirectory = string.Empty;
-        public IList<ParticleSystem> ParticleSystems { get { return particleSystems; } }
-        public IList<FileResource> Images { get { return images; } }
-        public IList<FileResource> Sounds { get { return sounds; } }
-        public IList<VariableResource> Globals { get { return globals; } }
+        public List<ParticleSystem> ParticleSystems { get { return particleSystems; } }
+        public GenericContainer<FileResource> Images { get { return images; } }
+        public GenericContainer<FileResource> Sounds { get { return sounds; } }
+        public GenericContainer<VariableResource> Globals { get { return globals; } }
         public Vector2 BodyPosition
         {
             set
             {
-                foreach (var particleSystem in ParticleSystems)
+                for (int i = 0;i < particleSystems.Count; ++i)
                 {
-                    foreach (var layer in particleSystem.Layers)
+                    var particleSystem = particleSystems[i];
+                    for (int j = 0;j < particleSystem.Layers.Count; ++j)
                     {
-                        foreach (var component in layer.Components)
+                        var layer = particleSystem.Layers[j];
+                        for (int k = 0;k < layer.Components.Count; ++k)
+                        {
+                            var component = layer.Components[k];
                             component.BodyPosition = value;
+                        }
                     }
                 }
             }
@@ -71,14 +76,9 @@ namespace CrazyStorm.Core
         #region Public Methods
         public void UpdateResource()
         {
-            foreach (var item in images)
-                item.CheckValid();
-
-            foreach (var item in sounds)
-                item.CheckValid();
-
-            foreach (var item in globals)
-                item.CheckValid();
+            foreach (var item in images) item.CheckValid();
+            foreach (var item in sounds) item.CheckValid();
+            foreach (var item in globals) item.CheckValid();
         }
         public object Clone()
         {
@@ -267,7 +267,7 @@ namespace CrazyStorm.Core
             }
             else CompileEvents(component, null, component.ComponentEventGroups);
         }
-        void CompileEvents(Component component, Type subType, IList<EventGroup> eventGroups)
+        void CompileEvents(Component component, Type subType, GenericContainer<EventGroup> eventGroups)
         {
             var type = component.GetType();
             var variables = new List<VariableResource>();
@@ -351,7 +351,7 @@ namespace CrazyStorm.Core
             //Sounds
             PlayDataHelper.ReadObjectList(Sounds, reader, version);
             //Globals
-            globals = new List<VariableResource>();
+            globals = new GenericContainer<VariableResource>();
             PlayDataHelper.ReadObjectList(globals, reader, version);
             //ParticleSystems
             PlayDataHelper.ReadObjectList(ParticleSystems, reader, version);

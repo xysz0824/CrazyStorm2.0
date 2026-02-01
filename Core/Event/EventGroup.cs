@@ -20,8 +20,6 @@ namespace CrazyStorm.Core
         [XmlAttribute]
         string condition;
         byte[] compiledCondition;
-        IList<string> events;
-        IList<byte[]> compiledEvents;
         #endregion
 
         #region Public Members
@@ -41,9 +39,9 @@ namespace CrazyStorm.Core
             set { compiledCondition = value; }
         }
         public VMInstruction[] VMCondition { get; set; }
-        public IList<VMEventInfo> VMEvents { get; set; }
-        public IList<string> Events { get { return events; } }
-        public IList<byte[]> CompiledEvents { get { return compiledEvents; } }
+        public List<VMEventInfo> VMEvents { get; set; }
+        public GenericContainer<string> Events { get; private set; }
+        public List<byte[]> CompiledEvents { get; private set; }
         #endregion
 
         #region Constructor
@@ -51,8 +49,8 @@ namespace CrazyStorm.Core
         {
             name = string.Empty;
             condition = string.Empty;
-            events = new GenericContainer<string>();
-            compiledEvents = new List<byte[]>();
+            Events = new GenericContainer<string>();
+            CompiledEvents = new List<byte[]>();
             VMEvents = new List<VMEventInfo>();
         }
         #endregion
@@ -61,10 +59,10 @@ namespace CrazyStorm.Core
         public object Clone()
         {
             var clone = MemberwiseClone() as EventGroup;
-            clone.events = new GenericContainer<string>();
-            foreach (var item in events) clone.events.Add(item);
+            clone.Events = new GenericContainer<string>();
+            foreach (var item in Events) clone.Events.Add(item);
             clone.compiledCondition = null;
-            clone.compiledEvents = new List<byte[]>();
+            clone.CompiledEvents = new List<byte[]>();
             return clone;
         }
         public XmlElement BuildFromXml(XmlElement node)
@@ -76,7 +74,7 @@ namespace CrazyStorm.Core
 
             XmlHelper.BuildFromFields(this, eventGroupNode);
             //events
-            XmlHelper.BuildFromList(events, eventGroupNode, "Events");
+            XmlHelper.BuildFromList(Events, eventGroupNode, "Events");
             return eventGroupNode;
         }
         public XmlElement StoreAsXml(XmlDocument doc, XmlElement node)
@@ -84,7 +82,7 @@ namespace CrazyStorm.Core
             var eventGroupNode = doc.CreateElement("EventGroup");
             XmlHelper.StoreFields(this, doc, eventGroupNode);
             //events
-            XmlHelper.StoreList(events, doc, eventGroupNode, "Events");
+            XmlHelper.StoreList(Events, doc, eventGroupNode, "Events");
             node.AppendChild(eventGroupNode);
             return eventGroupNode;
         }
@@ -100,10 +98,10 @@ namespace CrazyStorm.Core
             else
                 eventGroupBytes.AddRange(BitConverter.GetBytes(0));
             //compiledEvents
-            for (int i = 0; i < compiledEvents.Count; ++i)
+            for (int i = 0; i < CompiledEvents.Count; ++i)
             {
                 eventGroupBytes.AddRange(BitConverter.GetBytes(CompiledEvents[i].Length));
-                eventGroupBytes.AddRange(compiledEvents[i]);
+                eventGroupBytes.AddRange(CompiledEvents[i]);
             }
             return PlayDataHelper.CreateBlock(eventGroupBytes);
         }

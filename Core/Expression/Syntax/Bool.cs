@@ -23,7 +23,7 @@ namespace CrazyStorm.Expression
             return bool.Parse((string)Token.GetValue());
         }
 
-        public override void Compile(Type type, Type subType, IList<VariableResource> variables, List<byte> codeStream)
+        public override void Compile(Type type, Type subType, List<VariableResource> variables, List<byte> codeStream)
         {
             byte[] code = VM.CreateInstruction(VMCode.BOOL, Eval(null));
             codeStream.AddRange(code);

@@ -155,7 +155,7 @@ namespace CrazyStorm.Core
             }
             return info;
         }
-        public static byte[] Compile(Type type, Type subType, IList<VariableResource> variables, string str)
+        public static byte[] Compile(Type type, Type subType, List<VariableResource> variables, string str)
         {
             var lexer = new Expression.Lexer();
             lexer.Load(str);
@@ -167,7 +167,7 @@ namespace CrazyStorm.Core
             }
             return compiledBytes.ToArray();
         }
-        public static byte[] GenerateEventData(Type type, Type subType, IList<VariableResource> variables, string text)
+        public static byte[] GenerateEventData(Type type, Type subType, List<VariableResource> variables, string text)
         {
             EventInfo eventInfo = SplitEvent(text);
             List<byte> bytes = new List<byte>();

@@ -138,7 +138,7 @@ namespace CrazyStorm.Core
 
             node.AppendChild(objectListNode);
         }
-        public static void BuildFromDictionary<T, K>(IDictionary<T, K> source, XmlElement node, string name)
+        public static void BuildFromDictionary<T, K>(Dictionary<T, K> source, XmlElement node, string name)
         {
             source.Clear();
             var dictionaryNode = (XmlElement)node.SelectSingleNode(name);
@@ -158,7 +158,7 @@ namespace CrazyStorm.Core
                 else throw new System.IO.FileLoadException("FileDataError");
             }
         }
-        public static void StoreDictionary<T, K>(IDictionary<T, K> source, XmlDocument doc, XmlElement node, string name)
+        public static void StoreDictionary<T, K>(Dictionary<T, K> source, XmlDocument doc, XmlElement node, string name)
         {
             var dictionaryNode = doc.CreateElement(name);
             foreach (var pair in source)

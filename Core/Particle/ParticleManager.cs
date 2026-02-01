@@ -59,6 +59,7 @@ namespace CrazyStorm.Core
         static float[] maskShapeArray = new float[MAX_MASK_COUNT];
         static float[] maskTypeArray = new float[MAX_MASK_COUNT];
         static float[] maskRotateArray = new float[MAX_MASK_COUNT];
+        public static int MaximumParticleCount => searchResult.Length;
         public static int ActiveParticleCount => activeParticles != null ? activeParticles.Count : 0;
         public static Vector2[] MaskPositionArray => maskPositionArray;
         public static Vector2[] MaskSizeArray => maskSizeArray;
@@ -205,7 +206,7 @@ namespace CrazyStorm.Core
             }
             return result == 0;
         }
-        public static void UpdateLayerMasks(IList<Layer> layers)
+        public static void UpdateLayerMasks(GenericContainer<Layer> layers)
         {
             MaskCount = 0;
             Array.Clear(MaskPositionArray, 0, MAX_MASK_COUNT);
@@ -218,9 +219,9 @@ namespace CrazyStorm.Core
                 for (int j = 0; j < layers.Count; ++j)
                 {
                     if (j == i) continue;
-                    foreach (var component in layers[j].Components)
+                    for (int k = 0; k < layers[j].Components.Count; ++k)
                     {
-                        var eventField = component as EventField;
+                        var eventField = layers[j].Components[k] as EventField;
                         if (eventField == null) continue;
                         if (eventField.BindingTarget == null)
                         {
@@ -232,9 +233,9 @@ namespace CrazyStorm.Core
                         }
                     }
                 }
-                foreach (var component in layers[i].Components)
+                for (int j = 0; j < layers[i].Components.Count; ++j)
                 {
-                    var eventField = component as EventField;
+                    var eventField = layers[i].Components[j] as EventField;
                     if (eventField == null) continue;
                     if (eventField.BindingTarget == null)
                     {

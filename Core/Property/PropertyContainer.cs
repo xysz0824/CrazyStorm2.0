@@ -15,10 +15,10 @@ namespace CrazyStorm.Core
 {
     public abstract class PropertyContainer : ICloneable, ICopyable<PropertyContainer>
     {
-        IDictionary<string, PropertyValue> properties;
-        public IDictionary<string, PropertyValue> Properties { get { return properties; } }
-        IDictionary<int, VMInstruction[]> propertyExpressions;
-        public IDictionary<int, VMInstruction[]> PropertyExpressions { get { return propertyExpressions; } }
+        Dictionary<string, PropertyValue> properties;
+        public Dictionary<string, PropertyValue> Properties { get { return properties; } }
+        Dictionary<int, VMInstruction[]> propertyExpressions;
+        public Dictionary<int, VMInstruction[]> PropertyExpressions { get { return propertyExpressions; } }
         public ParticleSystem System { get; set; }
 
         public PropertyContainer()
@@ -114,7 +114,7 @@ namespace CrazyStorm.Core
             }
             return propertiesNode;
         }
-        public void GeneratePropertyExpressions(IList<VariableResource> variables, List<byte> data)
+        public void GeneratePropertyExpressions(List<VariableResource> variables, List<byte> data)
         {
             List<byte> newData = new List<byte>();
             foreach (var pair in properties)
@@ -164,8 +164,8 @@ namespace CrazyStorm.Core
         }
         public bool ExecuteRandomExpression(int id, float frameScale)
         {
-            if (!PropertyExpressions.ContainsKey(id)) return false;
-            var expression = PropertyExpressions[id];
+            if (!propertyExpressions.ContainsKey(id)) return false;
+            var expression = propertyExpressions[id];
             if (expression[expression.Length - 1].code == VMCode.RAND)
             {
                 //Entire expression is random
@@ -243,12 +243,13 @@ namespace CrazyStorm.Core
         }
         public void ExecuteDynamicExpression(int id, float frameScale)
         {
-            if (!PropertyExpressions.ContainsKey(id)) return;
-            foreach (var instruction in PropertyExpressions[id])
+            if (!propertyExpressions.ContainsKey(id)) return;
+            for (int i = 0;i < propertyExpressions[id].Length; ++i)
             {
+                var instruction = propertyExpressions[id][i];
                 if (instruction.code == VMCode.NAME)
                 {
-                    VM.Execute(this, PropertyExpressions[id], frameScale);
+                    VM.Execute(this, propertyExpressions[id], frameScale);
                     SetProperty(id);
                     VM.Clear();
                     break;
@@ -257,10 +258,11 @@ namespace CrazyStorm.Core
         }
         public void ExecuteDynamicExpressions(float frameScale)
         {
-            foreach (var expression in PropertyExpressions)
+            foreach (var expression in propertyExpressions)
             {
-                foreach (var instruction in expression.Value)
+                for (int i = 0;i < expression.Value.Length; ++i)
                 {
+                    var instruction = expression.Value[i];
                     if (instruction.code == VMCode.NAME)
                     {
                         VM.Execute(this, expression.Value, frameScale);
@@ -273,7 +275,7 @@ namespace CrazyStorm.Core
         }
         public void ExecuteExpressionsAndSet(float frameScale)
         {
-            foreach (var expression in PropertyExpressions)
+            foreach (var expression in propertyExpressions)
             {
                 VM.Execute(this, expression.Value, frameScale);
                 SetProperty(expression.Key);

@@ -42,7 +42,6 @@ namespace CrazyStorm.Core
         [XmlAttribute]
         string name;
         LayerData layerData;
-        IList<Component> components;
         #endregion
 
         #region Public Members
@@ -96,13 +95,13 @@ namespace CrazyStorm.Core
                     PropertyChanged(this, new PropertyChangedEventArgs("TotalFrame"));
             }
         }
-        public IList<Component> Components { get { return components; } }
+        public GenericContainer<Component> Components { get; private set; }
         #endregion
 
         #region Constructor
         public Layer() 
         {
-            components = new GenericContainer<Component>();
+            Components = new GenericContainer<Component>();
         }
         public Layer(string name)
         {
@@ -110,7 +109,7 @@ namespace CrazyStorm.Core
             layerData.visible = true;
             layerData.beginFrame = 1;
             layerData.totalFrame = 200;
-            components = new GenericContainer<Component>();
+            Components = new GenericContainer<Component>();
         }
         #endregion
 
@@ -118,8 +117,8 @@ namespace CrazyStorm.Core
         public object Clone()
         {
             var clone = MemberwiseClone() as Layer;
-            clone.components = new GenericContainer<Component>();
-            foreach (var component in components) clone.components.Add(component.Clone() as Component);
+            clone.Components = new GenericContainer<Component>();
+            foreach (var component in Components) clone.Components.Add(component.Clone() as Component);
             return clone;
         }
         public XmlElement BuildFromXml(XmlElement node)
@@ -140,7 +139,7 @@ namespace CrazyStorm.Core
                 {
                     Component component = ComponentFactory.Create(specificType);
                     component.BuildFromXml(componentNode);
-                    components.Add(component);
+                    Components.Add(component);
                 }
                 else throw new System.IO.FileLoadException("FileDataError");
             }
@@ -153,7 +152,7 @@ namespace CrazyStorm.Core
             //layerData
             XmlHelper.StoreStruct(layerData, doc, layerNode);
             //components
-            XmlHelper.StoreObjectList(components, doc, layerNode, "Components");
+            XmlHelper.StoreObjectList(Components, doc, layerNode, "Components");
             node.AppendChild(layerNode);
             return layerNode;
         }
@@ -165,7 +164,7 @@ namespace CrazyStorm.Core
             //layerData
             PlayDataHelper.GenerateStruct(layerData, layerBytes);
             //components
-            PlayDataHelper.GenerateObjectList(file, components, layerBytes);
+            PlayDataHelper.GenerateObjectList(file, Components, layerBytes);
             return PlayDataHelper.CreateBlock(layerBytes);
         }
         public void LoadPlayData(BinaryReader reader, float version)
@@ -199,8 +198,8 @@ namespace CrazyStorm.Core
         {
             for (int i = 0; i < Components.Count; ++i)
             {
-                components[i].LayerID = id;
-                components[i].LayerName = name;
+                Components[i].LayerID = id;
+                Components[i].LayerName = name;
             }
         }
         public bool NeedUpdate(float currentFrame)

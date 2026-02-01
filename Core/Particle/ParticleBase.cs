@@ -220,7 +220,7 @@ namespace CrazyStorm.Core
             set { particleBaseData.vspeed = value; }
         }
         public int ReboundTime { get; set; }
-        public IList<EventGroup> ParticleEventGroups { get; set; }
+        public List<EventGroup> ParticleEventGroups { get; set; }
         #endregion
 
         #region Constructor
@@ -285,7 +285,7 @@ namespace CrazyStorm.Core
             node.AppendChild(particleBaseNode);
             return particleBaseNode;
         }
-        public void RebuildReferenceFromCollection(IList<ParticleType> collection)
+        public void RebuildReferenceFromCollection(List<ParticleType> collection)
         {
             //type
             if (typeID != -1)

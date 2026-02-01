@@ -21,7 +21,7 @@ namespace CrazyStorm.Expression
 
         public int Count { get { return GetChildren().Count; } }
 
-        public IList<SyntaxTree> GetArguments() { return GetChildren(); }
+        public List<SyntaxTree> GetArguments() { return GetChildren(); }
 
         public override object Eval(Environment e)
         {
@@ -31,7 +31,7 @@ namespace CrazyStorm.Expression
             return resultList;
         }
 
-        public override void Compile(Type type, Type subType, IList<VariableResource> variables, List<byte> codeStream)
+        public override void Compile(Type type, Type subType, List<VariableResource> variables, List<byte> codeStream)
         {
             foreach (var item in GetArguments())
             {

@@ -423,7 +423,7 @@ namespace CrazyStorm.Core
             node.AppendChild(particleTypeNode);
             return particleTypeNode;
         }
-        public void RebuildImageReferenceFromCollection(IList<FileResource> collection)
+        public void RebuildImageReferenceFromCollection(GenericContainer<FileResource> collection)
         {
             if (imageID != -1)
             {

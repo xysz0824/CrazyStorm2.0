@@ -43,8 +43,8 @@ namespace CrazyStorm.Core
         bool selected;
         Component parent;
         Emitter bindingTarget;
-        IList<EventGroup> componentEventGroups;
-        IList<Component> children;
+        GenericContainer<EventGroup> componentEventGroups;
+        GenericContainer<Component> children;
         #endregion
 
         #region Protected Members
@@ -165,14 +165,14 @@ namespace CrazyStorm.Core
         }
         public int ParentID { get; set; }
         public int BindingTargetID { get; set; }
-        public IList<VariableResource> Globals { get; set; }
-        public IList<VariableResource> Locals { get; private set; }
+        public GenericContainer<VariableResource> Globals { get; set; }
+        public GenericContainer<VariableResource> Locals { get; private set; }
         public Vector2 BodyPosition { get; set; }
         public Vector2 CenterPosition { get; set; }
         public int Status { get; set; }
         public float StatusFrame { get; set; }
-        public IList<EventGroup> ComponentEventGroups { get { return componentEventGroups; } }
-        public IList<Component> Children { get { return children; } }
+        public GenericContainer<EventGroup> ComponentEventGroups { get { return componentEventGroups; } }
+        public GenericContainer<Component> Children { get { return children; } }
         #endregion
 
         #region Constructor
@@ -260,9 +260,9 @@ namespace CrazyStorm.Core
             if (parent != null) return Position + parent.GetAbsolutePosition();
             return Position;
         }
-        public IList<Component> GetPosterity()
+        public List<Component> GetPosterity()
         {
-            List<Component> posterity = new List<Component>();
+            var posterity = new List<Component>();
             foreach (var item in children)
             {
                 posterity.Add(item);
@@ -671,7 +671,7 @@ namespace CrazyStorm.Core
             if (initialState == null)
             {
                 initialState = this.MemberwiseClone() as Component;
-                initialState.Locals = new List<VariableResource>();
+                initialState.Locals = new GenericContainer<VariableResource>();
                 foreach (VariableResource item in Locals)
                 {
                     var variable = new VariableResource { ID = item.ID, Label = item.Label, Value = item.Value };
