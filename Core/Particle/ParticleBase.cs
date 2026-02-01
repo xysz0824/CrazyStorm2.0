@@ -220,8 +220,6 @@ namespace CrazyStorm.Core
             set { particleBaseData.vspeed = value; }
         }
         public int ReboundTime { get; set; }
-        public bool SearchFlag { get; set; }
-        public Vector2 CollidedBodyPos { get; set; }
         public IList<EventGroup> ParticleEventGroups { get; set; }
         #endregion
 
@@ -665,8 +663,6 @@ namespace CrazyStorm.Core
             particle.FogFrame = 0;
             particle.ParticleEventGroups = ParticleEventGroups;
             particle.ReboundTime = 0;
-            particle.SearchFlag = false;
-            particle.CollidedBodyPos = new Vector2();
         }
         public virtual void Reset() { }
         public int CompareTo(ParticleBase other)

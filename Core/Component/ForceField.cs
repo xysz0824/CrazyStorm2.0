@@ -119,36 +119,36 @@ namespace CrazyStorm.Core
         #region Private Methods
         void Update(float frameScale)
         {
+            int count = 0;
             Vector2 v = default;
-            if (FieldShape == FieldShape.Rectangle) ParticleManager.SearchByRect(Position, HalfWidth, HalfHeight, Rotation);
-            else ParticleManager.SearchByEllipse(Position, HalfWidth, HalfHeight, Rotation);
-            foreach (var particle in ParticleManager.ActiveParticles)
+            var results = FieldShape == FieldShape.Rectangle ?
+                ParticleManager.SearchByRect(Position, HalfWidth, HalfHeight, Rotation, out count) :
+                ParticleManager.SearchByEllipse(Position, HalfWidth, HalfHeight, Rotation, out count);
+            for (int i = 0; i < count;++i)
             {
-                if (!particle.SearchFlag) continue;
-                particle.SearchFlag = false;
-                if (particle.IgnoreForce) continue;
+                if (results[i].IgnoreForce) continue;
                 switch (Reach)
                 {
                     case Reach.Layer:
-                        if (particle.Emitter.LayerName != TargetName) continue;
+                        if (results[i].Emitter.LayerName != TargetName) continue;
                         break;
                     case Reach.Name:
-                        if (particle.Emitter.LayerName != LayerName || particle.Emitter.Name != TargetName) continue;
+                        if (results[i].Emitter.Name != TargetName && results[i].Emitter.LayerName != LayerName) continue;
                         break;
                 }
                 switch (ForceType)
                 {
                     case ForceType.OneDirection:
-                        v = MathHelper.GetVector2(Force / particle.Mass, Direction);
-                        particle.PSpeedVector += v * frameScale;
+                        v = MathHelper.GetVector2(Force / results[i].Mass, Direction);
+                        results[i].PSpeedVector += v * frameScale;
                         break;
                     case ForceType.InnerForce:
-                        v = Position == particle.PPosition ? new Vector2(0, 0) : Vector2.Normalize(Position - particle.PPosition);
-                        particle.PSpeedVector += v * (Force / particle.Mass) * frameScale;
+                        v = Position == results[i].PPosition ? new Vector2(0, 0) : Vector2.Normalize(Position - results[i].PPosition);
+                        results[i].PSpeedVector += v * (Force / results[i].Mass) * frameScale;
                         break;
                     case ForceType.OuterForce:
-                        v = Position == particle.PPosition ? new Vector2(0, 0) : Vector2.Normalize(particle.PPosition - Position);
-                        particle.PSpeedVector += v * (Force / particle.Mass) * frameScale;
+                        v = Position == results[i].PPosition ? new Vector2(0, 0) : Vector2.Normalize(results[i].PPosition - Position);
+                        results[i].PSpeedVector += v * (Force / results[i].Mass) * frameScale;
                         break;
                 }
             }

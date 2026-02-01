@@ -162,7 +162,7 @@ namespace CrazyStorm
         #region Window EventHandlers
         private void PlayTimer_Tick(object sender, EventArgs e)
         {
-            if (activeParticleCountLabel != null) activeParticleCountLabel.Content = ParticleManager.ActiveParticles.Count;
+            if (activeParticleCountLabel != null) activeParticleCountLabel.Content = ParticleManager.ActiveParticleCount;
         }
         private void GeneratePlayFile_Click(object sender, RoutedEventArgs e)
         {
