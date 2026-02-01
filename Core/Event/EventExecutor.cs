@@ -21,9 +21,15 @@ namespace CrazyStorm.Core
         public TypeSet TargetValue { get; set; }
         public int ChangeTime { get; set; }
         public bool Finished { get { return currentTime >= ChangeTime; } }
+        public EventExecutorPool PoolObject { get; set; }
         public EventExecutor()
         {
+            Reset();
+        }
+        public void Reset()
+        {
             currentValue = new TypeSet();
+            currentTime = 0;
         }
         public void Update(float frameScale)
         {

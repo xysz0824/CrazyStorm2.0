@@ -9,6 +9,15 @@ using System.Linq;
 
 namespace CrazyStorm.Core
 {
+    public class EventExecutorPool : PoolObject<EventExecutorPool, NullData>
+    {
+        public EventExecutor Instance { get; private set; }
+        public EventExecutorPool()
+        {
+            Instance = new EventExecutor();
+            Instance.PoolObject = this;
+        }
+    }
     public static class EventManager
     {
         public static readonly Dictionary<string, Func<PropertyContainer, VMInstruction[][], float, bool>> SpecialEvents =
@@ -172,7 +181,8 @@ namespace CrazyStorm.Core
         public static void AddEvent(PropertyContainer propertyContainer, PropertyContainer bindingContainer, VMEventInfo eventInfo, 
             float frameScale)
         {
-            var executor = new EventExecutor();
+            var executor = EventExecutorPool.Rent(NullData.Empty).Instance;
+            executor.Reset();
             executor.PropertyContainer = propertyContainer;
             executor.BindingContainer = bindingContainer;
             executor.PropertyID = eventInfo.resultPropertyID;
@@ -315,6 +325,7 @@ namespace CrazyStorm.Core
                 {
                     if (executorList[i].Finished)
                     {
+                        EventExecutorPool.Return(executorList[i].PoolObject);
                         executorList.RemoveAt(i);
                         --i;
                     }
@@ -346,6 +357,7 @@ namespace CrazyStorm.Core
                     cache[id][executorList[i].PropertyID] = executorList[i].CurrentValue;
                     if (executorList[i].Finished)
                     {
+                        EventExecutorPool.Return(executorList[i].PoolObject);
                         executorList.RemoveAt(i);
                         --i;
                     }
