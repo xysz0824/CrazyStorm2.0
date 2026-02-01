@@ -301,6 +301,28 @@ namespace CrazyStorm.Core
             LayerMaskMutex = initialState.LayerMaskMutex;
             Rotation = initialState.Rotation;
         }
+        public void UpdateMutexMask(float frameScale)
+        {
+            var maskCount = ParticleManager.MaskCount;
+            if (maskCount >= ParticleManager.MAX_MASK_COUNT || !LayerMask || !Visibility || !LayerMaskMutex) return;
+            ParticleManager.MaskPositionArray[maskCount] = Position;
+            ParticleManager.MaskSizeArray[maskCount] = new Vector2(HalfWidth, HalfHeight);
+            ParticleManager.MaskShapeArray[maskCount] = FieldShape == FieldShape.Circle ? 1 : 0;
+            ParticleManager.MaskTypeArray[maskCount] = LayerMaskType == LayerMaskType.OutsideMask ? 1 : 2;
+            ParticleManager.MaskRotateArray[maskCount] = (float)MathHelper.DegToRad(Rotation);
+            maskCount++;
+        }
+        public void UpdateLayerMask(float frameScale)
+        {
+            var maskCount = ParticleManager.MaskCount;
+            if (maskCount >= ParticleManager.MAX_MASK_COUNT || !LayerMask || !Visibility) return;
+            ParticleManager.MaskPositionArray[maskCount] = Position;
+            ParticleManager.MaskSizeArray[maskCount] = new Vector2(HalfWidth, HalfHeight);
+            ParticleManager.MaskShapeArray[maskCount] = FieldShape == FieldShape.Circle ? 1 : 0;
+            ParticleManager.MaskTypeArray[maskCount] = (int)LayerMaskType + 1;
+            ParticleManager.MaskRotateArray[maskCount] = (float)MathHelper.DegToRad(Rotation);
+            maskCount++;
+        }
         #endregion
     }
 }

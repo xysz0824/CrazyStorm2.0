@@ -10,7 +10,7 @@ using System.Text;
 namespace CrazyStorm.Core
 {
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
-    public struct Vector2
+    public struct Vector2 : IEquatable<Vector2>
     {
         public float x, y;
         public static readonly Vector2 Zero = new Vector2();
@@ -42,9 +42,13 @@ namespace CrazyStorm.Core
         {
             if (obj is Vector2)
             {
-                var comparer = (Vector2)obj;
-                return x == comparer.x && y == comparer.y;
+                return Equals((Vector2)obj);
             }
+            return false;
+        }
+        public bool Equals(Vector2 other)
+        {
+            if (x == other.x) return y == other.y;
             return false;
         }
         public override int GetHashCode()

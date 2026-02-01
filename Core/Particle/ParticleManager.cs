@@ -59,14 +59,13 @@ namespace CrazyStorm.Core
         static float[] maskShapeArray = new float[MAX_MASK_COUNT];
         static float[] maskTypeArray = new float[MAX_MASK_COUNT];
         static float[] maskRotateArray = new float[MAX_MASK_COUNT];
-        static int maskCount;
         public static int ActiveParticleCount => activeParticles != null ? activeParticles.Count : 0;
         public static Vector2[] MaskPositionArray => maskPositionArray;
         public static Vector2[] MaskSizeArray => maskSizeArray;
         public static float[] MaskShapeArray => maskShapeArray;
         public static float[] MaskTypeArray => maskTypeArray;
         public static float[] MaskRotateArray => maskRotateArray;
-        public static int MaskCount => maskCount;
+        public static int MaskCount { get; set; }
         public static void Initialize(int windowWidth, int windowHeight, int particlePreservedDist, int curvePreservedDist,
             int particleMaximum, int curveParticleMaximum)
         {
@@ -185,9 +184,9 @@ namespace CrazyStorm.Core
         }
         private static bool Masked(Vector2 pos)
         {
-            if (maskCount == 0) return false;
+            if (MaskCount == 0) return false;
             float result = MathHelper.Lerp(1, MathHelper.Lerp(0, 1, MaskTypeArray[0] - 1), MaskTypeArray[0]);
-            for (int i = 0; i < maskCount; ++i)
+            for (int i = 0; i < MaskCount; ++i)
             {
                 bool masked = false;
                 var d = pos - MaskPositionArray[i];
@@ -208,7 +207,7 @@ namespace CrazyStorm.Core
         }
         public static void UpdateLayerMasks(IList<Layer> layers)
         {
-            maskCount = 0;
+            MaskCount = 0;
             Array.Clear(MaskPositionArray, 0, MAX_MASK_COUNT);
             Array.Clear(MaskSizeArray, 0, MAX_MASK_COUNT);
             Array.Clear(MaskShapeArray, 0, MAX_MASK_COUNT);
@@ -225,26 +224,11 @@ namespace CrazyStorm.Core
                         if (eventField == null) continue;
                         if (eventField.BindingTarget == null)
                         {
-                            if (maskCount >= MAX_MASK_COUNT || !eventField.LayerMask || !eventField.Visibility || !eventField.LayerMaskMutex) continue;
-                            MaskPositionArray[maskCount] = eventField.Position;
-                            MaskSizeArray[maskCount] = new Vector2(eventField.HalfWidth, eventField.HalfHeight);
-                            MaskShapeArray[maskCount] = eventField.FieldShape == FieldShape.Circle ? 1 : 0;
-                            MaskTypeArray[maskCount] = eventField.LayerMaskType == LayerMaskType.OutsideMask ? 1 : 2;
-                            MaskRotateArray[maskCount] = (float)MathHelper.DegToRad(eventField.Rotation);
-                            maskCount++;
+                            eventField.UpdateMutexMask(1);
                         }
                         else
                         {
-                            eventField.BindingUpdate((frameRate) =>
-                            {
-                                if (maskCount >= MAX_MASK_COUNT || !eventField.LayerMask || !eventField.Visibility || !eventField.LayerMaskMutex) return;
-                                MaskPositionArray[maskCount] = eventField.Position;
-                                MaskSizeArray[maskCount] = new Vector2(eventField.HalfWidth, eventField.HalfHeight);
-                                MaskShapeArray[maskCount] = eventField.FieldShape == FieldShape.Circle ? 1 : 0;
-                                MaskTypeArray[maskCount] = eventField.LayerMaskType == LayerMaskType.OutsideMask ? 1 : 2;
-                                MaskRotateArray[maskCount] = (float)MathHelper.DegToRad(eventField.Rotation);
-                                maskCount++;
-                            }, false, 0);
+                            eventField.BindingUpdate(eventField.UpdateMutexMask, false, 0);
                         }
                     }
                 }
@@ -254,26 +238,11 @@ namespace CrazyStorm.Core
                     if (eventField == null) continue;
                     if (eventField.BindingTarget == null)
                     {
-                        if (maskCount >= MAX_MASK_COUNT || !eventField.LayerMask || !eventField.Visibility) continue;
-                        MaskPositionArray[maskCount] = eventField.Position;
-                        MaskSizeArray[maskCount] = new Vector2(eventField.HalfWidth, eventField.HalfHeight);
-                        MaskShapeArray[maskCount] = eventField.FieldShape == FieldShape.Circle ? 1 : 0;
-                        MaskTypeArray[maskCount] = (int)eventField.LayerMaskType + 1;
-                        MaskRotateArray[maskCount] = (float)MathHelper.DegToRad(eventField.Rotation);
-                        maskCount++;
+                        eventField.UpdateLayerMask(1);
                     }
                     else
                     {
-                        eventField.BindingUpdate((frameRate) =>
-                        {
-                            if (maskCount >= MAX_MASK_COUNT || !eventField.LayerMask || !eventField.Visibility) return;
-                            MaskPositionArray[maskCount] = eventField.Position;
-                            MaskSizeArray[maskCount] = new Vector2(eventField.HalfWidth, eventField.HalfHeight);
-                            MaskShapeArray[maskCount] = eventField.FieldShape == FieldShape.Circle ? 1 : 0;
-                            MaskTypeArray[maskCount] = (int)eventField.LayerMaskType + 1;
-                            MaskRotateArray[maskCount] = (float)MathHelper.DegToRad(eventField.Rotation);
-                            maskCount++;
-                        }, false, 0);
+                        eventField.BindingUpdate(eventField.UpdateLayerMask, false, 0);
                     }
                 }
             }

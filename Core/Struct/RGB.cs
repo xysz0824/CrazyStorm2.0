@@ -10,7 +10,7 @@ using System.Text;
 namespace CrazyStorm.Core
 {
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
-    public struct RGB
+    public struct RGB : IEquatable<RGB>
     {
         public float r, g, b;
         public static readonly RGB Zero = new RGB();
@@ -28,9 +28,13 @@ namespace CrazyStorm.Core
         {
             if (obj is RGB)
             {
-                var comparer = (RGB)obj;
-                return r == comparer.r && g == comparer.g && b == comparer.b;
+                return Equals((RGB)obj);
             }
+            return false;
+        }
+        public bool Equals(RGB other)
+        {
+            if (r == other.r && g == other.g) return b == other.b;
             return false;
         }
         public override int GetHashCode()
