@@ -300,6 +300,10 @@ namespace CrazyStorm.Core
             }
             return false;
         }
+        public override void BindingUpdate(int id, float frameScale)
+        {
+            Update(frameScale);
+        }
         public override bool Update(float frameScale, float currentFrame)
         {
             if (!base.Update(frameScale, currentFrame))
@@ -308,7 +312,7 @@ namespace CrazyStorm.Core
             if (BindingTarget == null)
                 Update(frameScale);
             else
-                BindingUpdate(Update, true, frameScale);
+                BindingUpdate(0, true, frameScale);
 
             return true;
         }

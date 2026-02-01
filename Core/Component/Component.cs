@@ -191,8 +191,7 @@ namespace CrazyStorm.Core
         #endregion
 
         #region Protected Methods
-        public delegate void Action(float frameScale);
-        public void BindingUpdate(Action updateFunc, bool executeEvents, float frameScale)
+        public void BindingUpdate(int id, bool executeEvents, float frameScale)
         {
             float saveCurrentFrame = CurrentFrame;
             Vector2 savePosition = Position;
@@ -222,7 +221,7 @@ namespace CrazyStorm.Core
                         ComponentEventGroups[i].Execute(this, particle, frameScale);
                     }
                 }
-                updateFunc?.Invoke(frameScale);
+                BindingUpdate(id, frameScale);
                 if (executeEvents && EventManager.BindingUpdate(this, particle, frameScale))
                 {
                     eventImpacted = true;
@@ -645,6 +644,7 @@ namespace CrazyStorm.Core
             }
             return false;
         }
+        public virtual void BindingUpdate(int id, float frameScale) { }
         public virtual bool Update(float frameScale, float currentFrame)
         {
             ExecuteDynamicExpressions(frameScale);

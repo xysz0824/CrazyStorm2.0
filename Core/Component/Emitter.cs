@@ -344,11 +344,16 @@ namespace CrazyStorm.Core
             if (Template == null) return false;
             return Template.SetProperty(propertyID);
         }
+        public override void BindingUpdate(int id, float frameScale)
+        {
+            if (id == 0) EmitCyclically(frameScale);
+            else if (id == 1) Emit(frameScale);
+        }
         public override bool Update(float frameScale, float currentFrame)
         {
             if (!base.Update(frameScale, currentFrame)) return false;
             if (BindingTarget == null || CheckCircularBinding()) EmitCyclically(frameScale);
-            else BindingUpdate(EmitCyclically, true, frameScale);
+            else BindingUpdate(0, true, frameScale);
             return true;
         }
         public override void Reset()
@@ -372,7 +377,7 @@ namespace CrazyStorm.Core
             if (BindingTarget == null || CheckCircularBinding())
                 Emit(frameScale);
             else
-                BindingUpdate(Emit, true, frameScale);
+                BindingUpdate(1, true, frameScale);
         }
         #endregion
     }

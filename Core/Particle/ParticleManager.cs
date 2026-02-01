@@ -225,11 +225,11 @@ namespace CrazyStorm.Core
                         if (eventField == null) continue;
                         if (eventField.BindingTarget == null)
                         {
-                            eventField.UpdateMutexMask(1);
+                            eventField.UpdateMutexMask();
                         }
                         else
                         {
-                            eventField.BindingUpdate(eventField.UpdateMutexMask, false, 0);
+                            eventField.BindingUpdate(1, false, 0);
                         }
                     }
                 }
@@ -239,11 +239,11 @@ namespace CrazyStorm.Core
                     if (eventField == null) continue;
                     if (eventField.BindingTarget == null)
                     {
-                        eventField.UpdateLayerMask(1);
+                        eventField.UpdateLayerMask();
                     }
                     else
                     {
-                        eventField.BindingUpdate(eventField.UpdateLayerMask, false, 0);
+                        eventField.BindingUpdate(2, false, 0);
                     }
                 }
             }

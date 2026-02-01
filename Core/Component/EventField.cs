@@ -272,6 +272,12 @@ namespace CrazyStorm.Core
             }
             return false;
         }
+        public override void BindingUpdate(int id, float frameScale)
+        {
+            if (id == 0) Update(frameScale);
+            else if (id == 1) UpdateMutexMask();
+            else if (id == 2) UpdateLayerMask();
+        }
         public override bool Update(float frameScale, float currentFrame)
         {
             if (!base.Update(frameScale, currentFrame))
@@ -280,7 +286,7 @@ namespace CrazyStorm.Core
             if (BindingTarget == null)
                 Update(frameScale);
             else
-                BindingUpdate(Update, true, frameScale);
+                BindingUpdate(0, true, frameScale);
 
             return true;
         }
@@ -298,7 +304,7 @@ namespace CrazyStorm.Core
             LayerMaskMutex = initialState.LayerMaskMutex;
             Rotation = initialState.Rotation;
         }
-        public void UpdateMutexMask(float frameScale)
+        public void UpdateMutexMask()
         {
             var maskCount = ParticleManager.MaskCount;
             if (maskCount >= ParticleManager.MAX_MASK_COUNT || !LayerMask || !Visibility || !LayerMaskMutex) return;
@@ -309,7 +315,7 @@ namespace CrazyStorm.Core
             ParticleManager.MaskRotateArray[maskCount] = (float)MathHelper.DegToRad(Rotation);
             maskCount++;
         }
-        public void UpdateLayerMask(float frameScale)
+        public void UpdateLayerMask()
         {
             var maskCount = ParticleManager.MaskCount;
             if (maskCount >= ParticleManager.MAX_MASK_COUNT || !LayerMask || !Visibility) return;
