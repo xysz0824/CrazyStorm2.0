@@ -104,8 +104,9 @@ namespace CrazyStorm
                 player.PlayerImpl.File = new File();
                 player.PlayerImpl.File.LoadPlayFile(file.GeneratePlayFile(), CrazyStorm_Player.VersionInfo.BaseVersion);
                 player.PlayerImpl.CurrentFrame = selectedFrame;
+                screenContent.Background.Opacity = 0;
                 (VisualHelper.VisualDownwardSearch(screenContent, "Grid") as Canvas).Visibility = Visibility.Hidden;
-                (VisualHelper.VisualDownwardSearch(screenContent, "Background") as Image).Visibility = Visibility.Hidden;
+                (VisualHelper.VisualDownwardSearch(screenContent, "Center") as Image).Visibility = Visibility.Hidden;
                 (VisualHelper.VisualDownwardSearch(screenContent, "ComponentLayer") as Canvas).Visibility = Visibility.Hidden;
                 screenContent.Children.Add(player);
                 Panel.SetZIndex(player, 1);
@@ -246,8 +247,9 @@ namespace CrazyStorm
                 var content = screen.Content as Canvas;
                 var screenContent = VisualHelper.VisualDownwardSearch(content, "ScreenContent") as Canvas;
                 screenContent.Children.Remove(player);
+                screenContent.Background.Opacity = 1;
                 (VisualHelper.VisualDownwardSearch(screenContent, "Grid") as Canvas).Visibility = Visibility.Visible;
-                (VisualHelper.VisualDownwardSearch(screenContent, "Background") as Image).Visibility = Visibility.Visible;
+                (VisualHelper.VisualDownwardSearch(screenContent, "Center") as Image).Visibility = Visibility.Visible;
                 (VisualHelper.VisualDownwardSearch(screenContent, "ComponentLayer") as Canvas).Visibility = Visibility.Visible;
             }
             player.Dispose();

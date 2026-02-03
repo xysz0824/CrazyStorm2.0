@@ -115,17 +115,17 @@ namespace CrazyStorm_Player
             string[] setting = ControllableSetting.Split(',');
             if (setting.Length == 9)
             {
-                controllable.selfStart = new Vector2(Int32.Parse(setting[0]), Int32.Parse(setting[1]));
-                controllable.selfSize = new Vector2(Int32.Parse(setting[2]), Int32.Parse(setting[3]));
-                controllable.selfCenter = new Vector2(Int32.Parse(setting[4]), Int32.Parse(setting[5]));
-                controllable.selfFrames = Int32.Parse(setting[6]);
-                controllable.selfDelay = Int32.Parse(setting[7]);
-                controllable.selfRadius = Int32.Parse(setting[8]);
+                controllable.selfStart = new Vector2(int.Parse(setting[0]), int.Parse(setting[1]));
+                controllable.selfSize = new Vector2(int.Parse(setting[2]), int.Parse(setting[3]));
+                controllable.selfCenter = new Vector2(int.Parse(setting[4]), int.Parse(setting[5]));
+                controllable.selfFrames = int.Parse(setting[6]);
+                controllable.selfDelay = int.Parse(setting[7]);
+                controllable.selfRadius = int.Parse(setting[8]);
             }
             //Load background texture
             if (!string.IsNullOrWhiteSpace(BackgroundPath))
             {
-                using (var file = new System.IO.FileStream(BackgroundPath, FileMode.Open, FileAccess.Read))
+                using (var file = new FileStream(BackgroundPath, FileMode.Open, FileAccess.Read))
                 {
                     background = Texture2D.FromStream(gd, file);
                     float scale1 = Width / (float)background.Width;
@@ -133,18 +133,18 @@ namespace CrazyStorm_Player
                     if (scale1 < scale2)
                     {
                         backgroundScale = new Vector2(scale1, scale1);
-                        backgroundPos.Y = (Height - scale1 * background.Height) / 2;
+                        backgroundPos.Y = (int)(Height - scale1 * background.Height) / 2;
                     }
                     else
                     {
                         backgroundScale = new Vector2(scale2, scale2);
-                        backgroundPos.X = (Width - scale2 * background.Width) / 2;
+                        backgroundPos.X = (int)(Width - scale2 * background.Width) / 2;
                     }
                 }
             }
             //Load default textures
             var assembly = Assembly.GetExecutingAssembly();
-            Environment.CurrentDirectory = System.AppDomain.CurrentDomain.SetupInformation.ApplicationBase;
+            Environment.CurrentDirectory = AppDomain.CurrentDomain.SetupInformation.ApplicationBase;
             Stream defaultTextureStream = null;
             if (string.IsNullOrEmpty(TypeLibraryPath))
             {
@@ -190,7 +190,7 @@ namespace CrazyStorm_Player
                     }
                 }
             }
-            Environment.CurrentDirectory = System.AppDomain.CurrentDomain.SetupInformation.ApplicationBase;
+            Environment.CurrentDirectory = AppDomain.CurrentDomain.SetupInformation.ApplicationBase;
             FrameworkDispatcher.Update();
             File.BodyPosition = controllable.selfPos.ToCore();
             File.ParticleSystems[SelectedParticleSystemIndex].Reset(true);
@@ -381,7 +381,7 @@ namespace CrazyStorm_Player
             curveBatch.Begin(BlendState.NonPremultiplied);
             if (background != null)
             {
-                spriteBatch.Draw(background, Vector2.Zero, null, Color.White, 0, Vector2.Zero, backgroundScale, SpriteEffects.None, 0);
+                spriteBatch.Draw(background, backgroundPos, null, Color.White, 0, Vector2.Zero, backgroundScale, SpriteEffects.None, 0);
             }
             var particle = File.ParticleSystems[SelectedParticleSystemIndex];
             controllable.Draw(spriteBatch, characterTexture, pointTexture, slowModeTexture, particle.ScreenOffset.ToXna());

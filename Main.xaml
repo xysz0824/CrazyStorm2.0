@@ -961,7 +961,7 @@
                                                 <Binding Path="GridAlignment" />
                                             </Canvas.Opacity>
                                         </Canvas>
-                                        <Image Name="Background" Source="Images/center.png" Width="65" Height="65" Stretch="Fill" RenderTransformOrigin="0.5,0.5" >
+                                        <Image Name="Center" Source="Images/center.png" Width="65" Height="65" Stretch="Fill" RenderTransformOrigin="0.5,0.5" >
                                             <Image.RenderTransform>
                                                 <TransformGroup>
                                                     <ScaleTransform/>
