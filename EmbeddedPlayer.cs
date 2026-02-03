@@ -18,7 +18,7 @@ namespace CrazyStorm
 {
     public class EmbeddedPlayer : WpfGame
     {
-        IGraphicsDeviceService graphics;
+        WpfGraphicsDeviceService graphics;
         WpfKeyboard keyboard;
         
         public PlayerImpl PlayerImpl { get; set; }

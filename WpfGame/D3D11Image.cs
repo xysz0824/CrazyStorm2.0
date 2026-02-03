@@ -1,0 +1,152 @@
+﻿using Microsoft.Xna.Framework.Graphics;
+using SharpDX.Direct3D9;
+using System;
+using System.Windows;
+using System.Windows.Interop;
+
+namespace MonoGame.Framework.WpfInterop.Internals
+{
+    /// <summary>
+    /// Wraps the <see cref="T:System.Windows.Interop.D3DImage" /> to make it compatible with Direct3D 11.
+    /// </summary>
+    /// <remarks>
+    /// The <see cref="T:MonoGame.Framework.WpfInterop.Internals.D3D11Image" /> should be disposed if no longer needed!
+    /// </remarks>
+    internal class D3D11Image : D3DImage, IDisposable
+    {
+        private static readonly object _d3d9Lock = new object();
+        private static D3D9 _d3D9;
+        private static int _referenceCount;
+        private SharpDX.Direct3D9.Texture _backBuffer;
+        private bool _disposed;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="T:MonoGame.Framework.WpfInterop.Internals.D3D11Image" /> class.
+        /// </summary>
+        public D3D11Image()
+        {
+            InitializeD3D9();
+        }
+
+        /// <summary>
+        /// Releases unmanaged resources before an instance of the <see cref="T:MonoGame.Framework.WpfInterop.Internals.D3D11Image" /> class is
+        /// reclaimed by garbage collection.
+        /// </summary>
+        /// <remarks>
+        /// This method releases unmanaged resources by calling the virtual <see cref="M:MonoGame.Framework.WpfInterop.Internals.D3D11Image.Dispose(System.Boolean)" />
+        /// method, passing in <see langword="false" />.
+        /// </remarks>
+        ~D3D11Image()
+        {
+            Dispose(false);
+        }
+
+        /// <summary>
+        /// Releases all resources used by an instance of the <see cref="T:MonoGame.Framework.WpfInterop.Internals.D3D11Image" /> class.
+        /// </summary>
+        /// <remarks>
+        /// This method calls the virtual <see cref="M:MonoGame.Framework.WpfInterop.Internals.D3D11Image.Dispose(System.Boolean)" /> method, passing in
+        /// <see langword="true" />, and then suppresses finalization of the instance.
+        /// </remarks>
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize((object)this);
+        }
+
+        /// <summary>
+        /// Invalidates the front buffer. (Needs to be called when the back buffer has changed.)
+        /// </summary>
+        public void Invalidate()
+        {
+            ThrowIfDisposed();
+            if (_backBuffer == null) return;
+            Lock();
+            AddDirtyRect(new Int32Rect(0, 0, PixelWidth, PixelHeight));
+            Unlock();
+        }
+
+        /// <summary>
+        /// Sets the back buffer of the <see cref="T:MonoGame.Framework.WpfInterop.Internals.D3D11Image" />.
+        /// </summary>
+        /// <param name="texture">The Direct3D 11 texture to be used as the back buffer.</param>
+        public void SetBackBuffer(Texture2D texture)
+        {
+            ThrowIfDisposed();
+            SharpDX.Direct3D9.Texture backBuffer = _backBuffer;
+            _backBuffer = _d3D9.GetSharedTexture(texture);
+            if (_backBuffer != null)
+            {
+                using (Surface surfaceLevel = _backBuffer.GetSurfaceLevel(0))
+                {
+                    Lock();
+                    SetBackBuffer(D3DResourceType.IDirect3DSurface9, surfaceLevel.NativePointer);
+                    Unlock();
+                }
+            }
+            else
+            {
+                Lock();
+                SetBackBuffer(D3DResourceType.IDirect3DSurface9, IntPtr.Zero);
+                Unlock();
+            }
+            if (backBuffer == null) return;
+            backBuffer.Dispose();
+        }
+
+        /// <summary>
+        /// Releases the unmanaged resources used by an instance of the <see cref="T:MonoGame.Framework.WpfInterop.Internals.D3D11Image" /> class
+        /// and optionally releases the managed resources.
+        /// </summary>
+        /// <param name="disposing">
+        /// <see langword="true" /> to release both managed and unmanaged resources;
+        /// <see langword="false" /> to release only unmanaged resources.
+        /// </param>
+        protected virtual void Dispose(bool disposing)
+        {
+            if (_disposed) return;
+            if (disposing)
+            {
+                SetBackBuffer(null);
+                if (_backBuffer != null)
+                {
+                    _backBuffer.Dispose();
+                    _backBuffer = null;
+                }
+            }
+            UninitializeD3D9();
+            _disposed = true;
+        }
+
+        /// <summary>Initializes the Direct3D 9 device.</summary>
+        private static void InitializeD3D9()
+        {
+            lock (_d3d9Lock)
+            {
+                ++_referenceCount;
+                if (_referenceCount != 1) return;
+               _d3D9 = new D3D9();
+            }
+        }
+
+        /// <summary>
+        /// Un-initializes the Direct3D 9 device, if no longer needed.
+        /// </summary>
+        private static void UninitializeD3D9()
+        {
+            lock (_d3d9Lock)
+            {
+                --_referenceCount;
+                if (_referenceCount != 0)
+                    return;
+                _d3D9.Dispose();
+                _d3D9 = null;
+            }
+        }
+
+        private void ThrowIfDisposed()
+        {
+            if (_disposed) throw new ObjectDisposedException(GetType().FullName);
+        }
+    }
+}

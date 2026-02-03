@@ -104,6 +104,9 @@ namespace CrazyStorm
                 player.PlayerImpl.File = new File();
                 player.PlayerImpl.File.LoadPlayFile(file.GeneratePlayFile(), CrazyStorm_Player.VersionInfo.BaseVersion);
                 player.PlayerImpl.CurrentFrame = selectedFrame;
+                (VisualHelper.VisualDownwardSearch(screenContent, "Grid") as Canvas).Visibility = Visibility.Hidden;
+                (VisualHelper.VisualDownwardSearch(screenContent, "Background") as Image).Visibility = Visibility.Hidden;
+                (VisualHelper.VisualDownwardSearch(screenContent, "ComponentLayer") as Canvas).Visibility = Visibility.Hidden;
                 screenContent.Children.Add(player);
                 Panel.SetZIndex(player, 1);
             }
@@ -200,6 +203,14 @@ namespace CrazyStorm
                     if (config.CollapseLayerAxis) LayerAxisDefinition.Height = new GridLength(94);
                     ScrollViewer.SetHorizontalScrollBarVisibility(LayerAxis, ScrollBarVisibility.Auto);
                     ScrollViewer.SetVerticalScrollBarVisibility(LayerAxis, ScrollBarVisibility.Auto);
+                    var screen = ParticleTabControl.SelectedItem as TabItem;
+                    if (screen != null)
+                    {
+                        var content = screen.Content as Canvas;
+                        var screenContent = VisualHelper.VisualDownwardSearch(content, "ScreenContent") as Canvas;
+                        (VisualHelper.VisualDownwardSearch(screenContent, "Grid") as Canvas).Visibility = Visibility.Visible;
+                        (VisualHelper.VisualDownwardSearch(screenContent, "ComponentLayer") as Canvas).Visibility = Visibility.Visible;
+                    }
                     Panel.SetZIndex(player, -1);
                     PausePlayTimer();
                 }
@@ -213,6 +224,14 @@ namespace CrazyStorm
                     if (config.CollapseLayerAxis) LayerAxisDefinition.Height = new GridLength(94);
                     ScrollViewer.SetHorizontalScrollBarVisibility(LayerAxis, ScrollBarVisibility.Hidden);
                     ScrollViewer.SetVerticalScrollBarVisibility(LayerAxis, ScrollBarVisibility.Hidden);
+                    var screen = ParticleTabControl.SelectedItem as TabItem;
+                    if (screen != null)
+                    {
+                        var content = screen.Content as Canvas;
+                        var screenContent = VisualHelper.VisualDownwardSearch(content, "ScreenContent") as Canvas;
+                        (VisualHelper.VisualDownwardSearch(screenContent, "Grid") as Canvas).Visibility = Visibility.Hidden;
+                        (VisualHelper.VisualDownwardSearch(screenContent, "ComponentLayer") as Canvas).Visibility = Visibility.Hidden;
+                    }
                     Panel.SetZIndex(player, 1);
                     StartPlayTimer();
                 }
@@ -221,6 +240,16 @@ namespace CrazyStorm
         private void StopItem_Click(object sender, RoutedEventArgs e)
         {
             if (player == null) return;
+            var screen = ParticleTabControl.SelectedItem as TabItem;
+            if (screen != null)
+            {
+                var content = screen.Content as Canvas;
+                var screenContent = VisualHelper.VisualDownwardSearch(content, "ScreenContent") as Canvas;
+                screenContent.Children.Remove(player);
+                (VisualHelper.VisualDownwardSearch(screenContent, "Grid") as Canvas).Visibility = Visibility.Visible;
+                (VisualHelper.VisualDownwardSearch(screenContent, "Background") as Image).Visibility = Visibility.Visible;
+                (VisualHelper.VisualDownwardSearch(screenContent, "ComponentLayer") as Canvas).Visibility = Visibility.Visible;
+            }
             player.Dispose();
             player = null;
             if (activeParticleCountLabel != null)

@@ -37,7 +37,7 @@ namespace CrazyStorm
                     return child;
                 else
                 {
-                    child = VisualHelper.VisualDownwardSearch(child, name);
+                    child = VisualDownwardSearch(child, name);
                     if (child != null)
                         return child;
                 }
@@ -89,12 +89,33 @@ namespace CrazyStorm
         public static void FocusItem<T>(MouseButtonEventArgs e)
         {
             //Focus pointed item when mouse right-button down.
-            var item = VisualHelper.VisualUpwardSearch<T>(e.OriginalSource as DependencyObject) as UIElement;
+            var item = VisualUpwardSearch<T>(e.OriginalSource as DependencyObject) as UIElement;
             if (item != null)
             {
                 item.Focus();
                 e.Handled = true;
             }
+        }
+        public static T FindParent<T>(DependencyObject child) where T : DependencyObject
+        {
+            T obj1;
+            while (true)
+            {
+                DependencyObject parent1 = LogicalTreeHelper.GetParent(child);
+                DependencyObject parent2 = VisualTreeHelper.GetParent(child);
+                if (parent1 != null || parent2 != null)
+                {
+                    T obj2 = parent1 as T;
+                    if (obj2 == null) obj2 = parent2 as T;
+                    obj1 = obj2;
+                    if (obj1 == null) child = parent1 ?? parent2;
+                    else goto final;
+                }
+                else break;
+            }
+            return default(T);
+        final:
+            return obj1;
         }
     }
 }
