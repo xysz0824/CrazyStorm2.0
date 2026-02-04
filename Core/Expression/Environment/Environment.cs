@@ -158,7 +158,7 @@ namespace CrazyStorm.Expression
             if (propertyID != int.MinValue) return propertyID;
             foreach (var variable in variables)
             {
-                if (variable.Label == split[0])
+                if (variable.Label == name)
                 {
                     propertyID = variable.ID;
                     break;
@@ -167,7 +167,7 @@ namespace CrazyStorm.Expression
             if (propertyID != int.MinValue) return propertyID;
             foreach (var kv in SystemPropertyIDMap)
             {
-                if (kv.Key == split[0])
+                if (kv.Key == name)
                 {
                     propertyID = kv.Value;
                     break;

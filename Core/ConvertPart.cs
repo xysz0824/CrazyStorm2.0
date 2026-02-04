@@ -833,32 +833,34 @@ namespace CrazyStorm.Core
             }
             return str;
         }
-        public static string ConvertSpecialValue(PropertyType type, string value, out bool expressionResult)
+        public static string ConvertSpecialValue(string property, PropertyType type, string value, out bool expressionResult)
         {
             expressionResult = false;
+            var split = property.Split('.');
+            var memberName = split.Length > 1 ? $".{split[1]}" : "";
             switch (value)
             {
                 case "自身":
                     expressionResult = true;
                     if (type == PropertyType.Single) return "SelfAngle";
-                    else if (type == PropertyType.Vector2) return "Position";
+                    else if (type == PropertyType.Vector2) return $"Position{memberName}";
                     break;
                 case "自机":
                     expressionResult = true;
                     if (type == PropertyType.Single) return "BodyAngle";
-                    else if (type == PropertyType.Vector2) return "BodyPosition";
+                    else if (type == PropertyType.Vector2) return $"BodyPosition{memberName}";
                     break;
                 case "中心":
                     expressionResult = true;
                     if (type == PropertyType.Single) return "CenterAngle";
-                    else if (type == PropertyType.Vector2) return "CenterPosition";
+                    else if (type == PropertyType.Vector2) return $"CenterPosition{memberName}";
                     break;
             }
             if (type == PropertyType.Boolean && BoolValueMap.ContainsKey(value)) return BoolValueMap[value];
             if (value.Contains("+"))
             {
                 expressionResult = true;
-                var split = value.Split('+');
+                split = value.Split('+');
                 return $"{split[0]}+{{{split[1]}}}";
             }
             else return value;
@@ -1010,7 +1012,9 @@ namespace CrazyStorm.Core
                         else
                         {
                             eventInfo.resultType = PropertyTypeRule.GetValueType(type, subType, eventInfo.resultProperty);
-                            eventInfo.resultValue = ConvertSpecialValue(eventInfo.resultType, ConvertKeyword(split[2]), out eventInfo.isExpressionResult);
+                            if (eventInfo.resultProperty.Contains(".")) eventInfo.resultType = PropertyType.Single;
+                            eventInfo.resultValue = ConvertSpecialValue(eventInfo.resultProperty, eventInfo.resultType, ConvertKeyword(split[2]), 
+                                out eventInfo.isExpressionResult);
                         }
                     }
                 }
