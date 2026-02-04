@@ -9,18 +9,24 @@ using System.Text;
 
 namespace CrazyStorm.Expression
 {
+    public enum OperatorTokenType
+    {
+        None,
+        Logic,
+        Arithmetic,
+    }
     public class IdentifierToken : Token
     {
         string value;
-        bool isOperator;
-        public IdentifierToken(int lineNumber, int index, string value, bool isOperator)
+        OperatorTokenType operatorType;
+        public IdentifierToken(int lineNumber, int index, string value, OperatorTokenType operatorType)
             : base(lineNumber, index)
         {
             this.value = value;
-            this.isOperator = isOperator;
+            this.operatorType = operatorType;
         }
 
-        public bool IsOperator { get { return isOperator; } }
+        public OperatorTokenType OperatorType => operatorType;
 
         public override object GetValue()
         {

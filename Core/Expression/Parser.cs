@@ -183,9 +183,8 @@ namespace CrazyStorm.Expression
             else
             {
                 Token token = lexer.Read();
-                if (token is NumberToken)
-                    return new Number(token);
-                else if (token is IdentifierToken && !(token as IdentifierToken).IsOperator)
+                if (token is NumberToken) return new Number(token);
+                else if (token is IdentifierToken && (token as IdentifierToken).OperatorType == OperatorTokenType.None)
                 {
                     if (IsIdentifierToken("("))
                         return new Call(token, Call());

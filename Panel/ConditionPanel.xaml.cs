@@ -203,7 +203,7 @@ namespace CrazyStorm
                     if (!string.IsNullOrEmpty(finalText))
                     {
                         leftProperty = item.Name;
-                        leftValue = LeftValue.Text;
+                        leftValue = ExpressionHelper.ReverseTranslate(LeftValue.Text);
                     }
                 }
                 else leftOperator = default;
@@ -281,7 +281,7 @@ namespace CrazyStorm
                     if (!string.IsNullOrEmpty(finalText))
                     {
                         rightProperty = item.Name;
-                        rightValue = RightValue.Text;
+                        rightValue = ExpressionHelper.ReverseTranslate(RightValue.Text);
                     }
                 }
                 else rightOperator = default;
@@ -292,6 +292,7 @@ namespace CrazyStorm
                 {
                     if (And.IsChecked == true) midOperator = " & ";
                     else if (Or.IsChecked == true) midOperator = " | ";
+                    else return null;
                 }
                 var result = string.Format("{0}{1}{2}{3}{4}{5}{6}", leftProperty, leftOperator, leftValue, midOperator,
                     rightProperty, rightOperator, rightValue).Trim();

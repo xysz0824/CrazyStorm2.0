@@ -56,7 +56,7 @@ namespace CrazyStorm.Core
         static readonly Dictionary<string, string> KeywordMap = new Dictionary<string, string>()
         {
             { "进入遮罩瞬间", "PMasked" }, { "状态帧", "StatusFrame" }, { "状态", "Status"},
-            { "子弹图层帧", "PLayerFrame" }, { "子弹当前帧", "PCurrentFrame" }, { "当前帧", "CurrentFrame" }, { "且", "&" }, { "或", "|"},
+            { "子弹图层帧", "PLayerFrame" }, { "子弹当前帧", "PCurrentFrame" }, { "当前帧", "CurrentFrame" }, { "且", " & " }, { "或", " | "},
             { "额外发射", "EmitParticle" }, { "恢复", "Recover"},
             { "变化到", "ChangeTo" }, { "增加", "Increase" }, { "减少", "Decrease" },
             { "正比", "Linear" }, { "固定", "Instant"}, { "正弦", "Sin"}, { "无缝正弦", "Sin"},
@@ -803,7 +803,7 @@ namespace CrazyStorm.Core
             if (match.Success)
             {
                 var status = match.Groups["status"].Value;
-                str = $"Status={status}&StatusFrame{split[1]}{split[2]}";
+                str = $"Status={status} & StatusFrame{split[1]}{split[2]}";
             }
             else
             {

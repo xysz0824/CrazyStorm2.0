@@ -11,11 +11,21 @@ namespace CrazyStorm
 {
     class ExpressionHelper
     {
+        static Dictionary<string, string> logicOperatorMap = new Dictionary<string, string>()
+        { {"&", "And"}, {"|", "Or"} };
         public static string FindTranslation(string original)
         {
             var str = $"{original}Str";
             var merged = App.Current.Resources.MergedDictionaries;
             var lang = merged.Where(d => d.Source != null && d.Source.OriginalString.StartsWith("Lang\\"));
+            foreach (var logicKV in logicOperatorMap)
+            {
+                if (original == logicKV.Key)
+                {
+                    str = $"{logicKV.Value}Str";
+                    break;
+                }
+            }
             foreach (var langE in lang)
             {
                 foreach (DictionaryEntry e in langE)
@@ -46,8 +56,16 @@ namespace CrazyStorm
                     if (resourceValue == null) continue;
                     if (resourceValue == translated)
                     {
-                        return resourceKey.Replace("Str", "");
+                        translated = resourceKey.Replace("Str", "");
+                        break;
                     }
+                }
+            }
+            foreach (var logicKV in logicOperatorMap)
+            {
+                if (translated == logicKV.Value)
+                {
+                    return logicKV.Key;
                 }
             }
             return translated;
@@ -66,7 +84,7 @@ namespace CrazyStorm
             for (int i = 0; i < lexer.Tokens.Count; ++i)
             {
                 var token = lexer.Tokens[i] as IdentifierToken;
-                if (token != null && !token.IsOperator)
+                if (token != null)
                 {
                     var translated = TranslateProperty((string)token.GetValue());
                     if (translated != null) token.SetValue(translated);
@@ -88,7 +106,7 @@ namespace CrazyStorm
             for (int i = 0; i < lexer.Tokens.Count; ++i)
             {
                 var token = lexer.Tokens[i] as IdentifierToken;
-                if (token != null && !token.IsOperator)
+                if (token != null)
                 {
                     var original = ReverseTranslateProperty(token.GetValue() as string);
                     if (original != null) token.SetValue(original);

@@ -16,6 +16,7 @@ namespace CrazyStorm.Expression
         static Regex NumberTokenRegex = new Regex(@"(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?");
         static Regex IdentifierTokenRegex = new Regex(@"(?:[_\p{L}])(?:[_\p{L}\p{Nd}])*(?:\.(?:[_\p{L}])(?:[_\p{L}\p{Nd}])*)*");
         static Regex OperatorTokenRegex = new Regex(@"[><!]=|[+\-*/%>=<&|(,)\[\]{}]");
+        static List<string> LogicOperators = new List<string> { "&", "|" };
         List<Token> tokens;
         public List<Token> Tokens => tokens;
 
@@ -36,7 +37,7 @@ namespace CrazyStorm.Expression
                     var identifierTokens = IdentifierTokenRegex.Matches(lineString);
                     foreach (Capture token in identifierTokens)
                     {
-                        lineTokens.Add(new IdentifierToken(lineNumber, token.Index, token.Value, false));
+                        lineTokens.Add(new IdentifierToken(lineNumber, token.Index, token.Value, OperatorTokenType.None));
                         lineString = ReplaceBySpace(lineString, token.Index, token.Length);
                     }
                     var numberTokens = NumberTokenRegex.Matches(lineString);
@@ -48,7 +49,8 @@ namespace CrazyStorm.Expression
                     var operatorTokens = OperatorTokenRegex.Matches(lineString);
                     foreach (Capture token in operatorTokens)
                     {
-                        lineTokens.Add(new IdentifierToken(lineNumber, token.Index, token.Value, true));
+                        lineTokens.Add(new IdentifierToken(lineNumber, token.Index, token.Value, 
+                            LogicOperators.Contains(token.Value) ? OperatorTokenType.Logic : OperatorTokenType.Arithmetic));
                         lineString = ReplaceBySpace(lineString, token.Index, token.Length);
                     }
                     lineTokens.Sort();
@@ -94,7 +96,12 @@ namespace CrazyStorm.Expression
                 var lineTokens = tokens.Where((token) => token.LineNumber == lineNumber);
                 foreach (var token in lineTokens)
                 {
-                    builder.Append(token.GetValue());
+                    var operatorToken = token as IdentifierToken;
+                    if (operatorToken != null && operatorToken.OperatorType == OperatorTokenType.Logic)
+                    {
+                        builder.Append($" {token.GetValue()} ");
+                    }
+                    else builder.Append(token.GetValue());
                 }
                 builder.Append("\n");
                 lineNumber++;
