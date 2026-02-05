@@ -59,12 +59,9 @@ namespace CrazyStorm
             {
                 var content = screen.Content as Canvas;
                 var screenContent = VisualHelper.VisualDownwardSearch(content, "ScreenContent") as Canvas;
-                if (activeParticleCountLabel == null)
-                {
-                    activeParticleCountLabel = VisualHelper.VisualDownwardSearch(content, "ActiveParticleCount") as Label;
-                    statusTipLabel = VisualHelper.VisualDownwardSearch(content, "StatusTip") as Label;
-                    statusPanel = VisualHelper.VisualDownwardSearch(content, "StatusPanel") as StackPanel;
-                }
+                activeParticleCountLabel = VisualHelper.VisualDownwardSearch(content, "ActiveParticleCount") as Label;
+                statusTipLabel = VisualHelper.VisualDownwardSearch(content, "StatusTip") as Label;
+                statusPanel = VisualHelper.VisualDownwardSearch(content, "StatusPanel") as StackPanel;
                 foreach (Button button in statusPanel.Children)
                 {
                     if ((string)button.Content == "0")
