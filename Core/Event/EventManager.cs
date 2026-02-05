@@ -187,13 +187,14 @@ namespace CrazyStorm.Core
             executor.BindingContainer = bindingContainer;
             executor.PropertyID = eventInfo.resultPropertyID;
             executor.ChangeMode = eventInfo.changeMode;
+            executor.ChangeType = eventInfo.changeType;
             executor.ChangeTime = eventInfo.changeTime;
-            propertyContainer.PushProperty(executor.PropertyID);
             var initialValue = new TypeSet();
             initialValue.type = eventInfo.resultType;
             var targetValue = eventInfo.resultValue;
             if (eventInfo.isExpressionResult)
             {
+                propertyContainer.PushProperty(executor.PropertyID);
                 VM.Execute(propertyContainer, eventInfo.resultExpression, frameScale);
                 switch (eventInfo.resultType)
                 {
@@ -202,52 +203,24 @@ namespace CrazyStorm.Core
                         initialValue.boolValue = VM.PopBool();
                         break;
                     case PropertyType.Int32:
-                        int resultInt = (int)VM.PopFloat();
+                        targetValue.intValue = (int)VM.PopFloat();
                         initialValue.intValue = (int)VM.PopFloat();
-                        if (eventInfo.changeType == EventChangeType.ChangeTo)
-                            targetValue.intValue = resultInt;
-                        else if (eventInfo.changeType == EventChangeType.Increase)
-                            targetValue.intValue = initialValue.intValue + resultInt;
-                        else
-                            targetValue.intValue = initialValue.intValue - resultInt;
-
                         break;
                     case PropertyType.Single:
-                        float resultFloat = VM.PopFloat();
+                        targetValue.floatValue = VM.PopFloat();
                         initialValue.floatValue = VM.PopFloat();
-                        if (eventInfo.changeType == EventChangeType.ChangeTo)
-                            targetValue.floatValue = resultFloat;
-                        else if (eventInfo.changeType == EventChangeType.Increase)
-                            targetValue.floatValue = initialValue.floatValue + resultFloat;
-                        else
-                            targetValue.floatValue = initialValue.floatValue - resultFloat;
-
                         break;
                     case PropertyType.Enum:
                         targetValue.enumValue = VM.PopInt();
                         initialValue.enumValue = VM.PopInt();
                         break;
                     case PropertyType.Vector2:
-                        Vector2 resultVector2 = VM.PopVector2();
+                        targetValue.vector2Value = VM.PopVector2();
                         initialValue.vector2Value = VM.PopVector2();
-                        if (eventInfo.changeType == EventChangeType.ChangeTo)
-                            targetValue.vector2Value = resultVector2;
-                        else if (eventInfo.changeType == EventChangeType.Increase)
-                            targetValue.vector2Value = initialValue.vector2Value + resultVector2;
-                        else
-                            targetValue.vector2Value = initialValue.vector2Value - resultVector2;
-
                         break;
                     case PropertyType.RGB:
-                        RGB resultRGB = VM.PopRGB();
+                        targetValue.rgbValue = VM.PopRGB();
                         initialValue.rgbValue = VM.PopRGB();
-                        if (eventInfo.changeType == EventChangeType.ChangeTo)
-                            targetValue.rgbValue = resultRGB;
-                        else if (eventInfo.changeType == EventChangeType.Increase)
-                            targetValue.rgbValue = initialValue.rgbValue + resultRGB;
-                        else
-                            targetValue.rgbValue = initialValue.rgbValue - resultRGB;
-
                         break;
                     case PropertyType.String:
                         targetValue.stringValue = VM.PopString();
@@ -255,8 +228,9 @@ namespace CrazyStorm.Core
                         break;
                 }
             }
-            else
+            else if (executor.ChangeType == EventChangeType.ChangeTo)
             {
+                propertyContainer.PushProperty(executor.PropertyID);
                 switch (eventInfo.resultType)
                 {
                     case PropertyType.Boolean:
@@ -264,38 +238,18 @@ namespace CrazyStorm.Core
                         break;
                     case PropertyType.Int32:
                         initialValue.intValue = VM.PopInt();
-                        if (eventInfo.changeType == EventChangeType.Increase)
-                            targetValue.intValue = initialValue.intValue + targetValue.intValue;
-                        else if (eventInfo.changeType == EventChangeType.Decrease)
-                            targetValue.intValue = initialValue.intValue - targetValue.intValue;
-
                         break;
                     case PropertyType.Single:
                         initialValue.floatValue = VM.PopFloat();
-                        if (eventInfo.changeType == EventChangeType.Increase)
-                            targetValue.floatValue = initialValue.floatValue + targetValue.floatValue;
-                        else if (eventInfo.changeType == EventChangeType.Decrease)
-                            targetValue.floatValue = initialValue.floatValue - targetValue.floatValue;
-
                         break;
                     case PropertyType.Enum:
                         initialValue.enumValue = VM.PopInt();
                         break;
                     case PropertyType.Vector2:
                         initialValue.vector2Value = VM.PopVector2();
-                        if (eventInfo.changeType == EventChangeType.Increase)
-                            targetValue.vector2Value = initialValue.vector2Value + targetValue.vector2Value;
-                        else if (eventInfo.changeType == EventChangeType.Decrease)
-                            targetValue.vector2Value = initialValue.vector2Value - targetValue.vector2Value;
-
                         break;
                     case PropertyType.RGB:
                         initialValue.rgbValue = VM.PopRGB();
-                        if (eventInfo.changeType == EventChangeType.Increase)
-                            targetValue.rgbValue = initialValue.rgbValue + targetValue.rgbValue;
-                        else if (eventInfo.changeType == EventChangeType.Decrease)
-                            targetValue.rgbValue = initialValue.rgbValue - targetValue.rgbValue;
-
                         break;
                     case PropertyType.String:
                         initialValue.stringValue = VM.PopString();

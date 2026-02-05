@@ -153,7 +153,7 @@ namespace CrazyStorm.Core
         public override bool CheckCollision(Vector2 playerLast, Vector2 player, float r)
         {
             return FogFrame >= FOG_TIME && Curve != null &&
-                Curve.IterateSegment(CurveJudge, playerLast, player, new Vector2(WidthScale, WidthScale), 2, PRotation, Length);
+                Curve.IterateSegment(CurveJudge, playerLast, player, new Vector2(WidthScale, WidthScale), 2, PRotation + 90, Length);
         }
         public override bool Update(float frameScale, float currentFrame = 1)
         {
@@ -170,7 +170,7 @@ namespace CrazyStorm.Core
                     length = Length };
                 Curve = Curve.Rent(initData);
             }
-            PRotation = PSpeedAngle + 90;
+            PRotation = PSpeedAngle;
             Curve.Update(PPosition, head, Type.Width * WidthScale, Length);
             return true;
         }

@@ -90,7 +90,7 @@ namespace CrazyStorm.Core
                 float widthScale = results[i].WidthScale;
                 float height = (results[i] is Particle) ? results[i].Type.Height : results[i].Type.Width;
                 float heightScale = (results[i] is Particle) ? (results[i] as Particle).HeightScale : results[i].WidthScale;
-                var center = MathHelper.GetActualCenter(results[i].PPosition, results[i].PRotation, results[i].Type.CenterPoint,
+                var center = MathHelper.GetActualCenter(results[i].PPosition, results[i].PRotation + 90, results[i].Type.CenterPoint,
                     new Vector2(width, height), new Vector2(widthScale, heightScale));
                 float radius = new Vector2(width * widthScale, height * heightScale).Length() * 0.5f;
                 float rotation = Rotation;

@@ -155,20 +155,20 @@ namespace CrazyStorm.Core
         {
             return FogFrame >= FOG_TIME &&
                 MathHelper.Judge(PPositionLast, PPosition, playerLast, player,
-                new Vector2(Math.Abs(WidthScale), Math.Abs(HeightScale)), r, PRotation);
+                new Vector2(Math.Abs(WidthScale), Math.Abs(HeightScale)), r, PRotation + 90);
         }
         public override bool CheckVolume(bool playerDead, Vector2 playerLast, Vector2 player, out Vector2 newPlayerPos)
         {
             newPlayerPos = player;
             return FogFrame >= FOG_TIME && 
-                MathHelper.VolumeJudge(playerDead, playerLast, player, PPositionLast, PPosition, PRotation, Type.CenterPoint, 
+                MathHelper.VolumeJudge(playerDead, playerLast, player, PPositionLast, PPosition, PRotation + 90, Type.CenterPoint, 
                 new Vector2(WidthScale, HeightScale), Type.VolumeStart, new Vector2(Type.VolumeWidth, Type.VolumeHeight), 
                 Type.VolumeJudgeArea, out newPlayerPos);
         }
         public override bool Update(float frameScale, float currentFrame = 1)
         {
             if (!base.Update(frameScale, currentFrame)) return false;
-            if (StickToSpeedAngle) PRotation = PSpeedAngle + 90;
+            if (StickToSpeedAngle) PRotation = PSpeedAngle;
             if (RetainScale && WidthScale != HeightScale) HeightScale = WidthScale;
             if (AfterimageEffect)
             {

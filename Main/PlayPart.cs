@@ -64,18 +64,18 @@ namespace CrazyStorm
                     activeParticleCountLabel = VisualHelper.VisualDownwardSearch(content, "ActiveParticleCount") as Label;
                     statusTipLabel = VisualHelper.VisualDownwardSearch(content, "StatusTip") as Label;
                     statusPanel = VisualHelper.VisualDownwardSearch(content, "StatusPanel") as StackPanel;
-                    foreach (Button button in statusPanel.Children)
+                }
+                foreach (Button button in statusPanel.Children)
+                {
+                    if ((string)button.Content == "0")
                     {
-                        if ((string)button.Content == "0")
-                        {
-                            button.Background = new SolidColorBrush(Colors.White);
-                            button.Foreground = new SolidColorBrush(Colors.Black);
-                        }
-                        else
-                        {
-                            button.Background = new SolidColorBrush(Colors.Transparent);
-                            button.Foreground = new SolidColorBrush(Colors.White);
-                        }
+                        button.Background = new SolidColorBrush(Colors.White);
+                        button.Foreground = new SolidColorBrush(Colors.Black);
+                    }
+                    else
+                    {
+                        button.Background = new SolidColorBrush(Colors.Transparent);
+                        button.Foreground = new SolidColorBrush(Colors.White);
                     }
                 }
                 activeParticleCountLabel.Visibility = Visibility.Visible;

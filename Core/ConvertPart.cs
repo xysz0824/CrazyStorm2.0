@@ -812,8 +812,10 @@ namespace CrazyStorm.Core
                     if (eventType == ConvertEventType.Particle) split[i] = ConvertEventProperty(ParticleKeywordMap, split[i]);
                     else if (eventType == ConvertEventType.CoverParticle) split[i] = ConvertEventProperty(CoverParticleKeywordMap, split[i]);
                     str += ConvertKeyword(split[i]);
-                    if (t > 0 && addtime > 1 && i >= 1 && CompareOperatorKeywords.Exists((op) => op == split[i - 1]))
+                    if (t > 0 && addtime > 1 && i >= 2 && CompareOperatorKeywords.Exists((op) => op == split[i - 1]))
                     {
+                        var property = split[i - 2];
+                        if (!property.EndsWith("帧")) continue;
                         if (eventType == ConvertEventType.Particle) str += $"+PCurrentFrame/{t}*{addtime}";
                         else if (eventType == ConvertEventType.CoverParticle) str += $"+PLayerFrame/{t}*{addtime}";
                         else str += $"+CurrentFrame/{t}*{addtime}";
@@ -1012,9 +1014,9 @@ namespace CrazyStorm.Core
                         else
                         {
                             eventInfo.resultType = PropertyTypeRule.GetValueType(type, subType, eventInfo.resultProperty);
-                            if (eventInfo.resultProperty.Contains(".")) eventInfo.resultType = PropertyType.Single;
                             eventInfo.resultValue = ConvertSpecialValue(eventInfo.resultProperty, eventInfo.resultType, ConvertKeyword(split[2]), 
                                 out eventInfo.isExpressionResult);
+                            if (eventInfo.resultProperty.Contains(".")) eventInfo.resultType = PropertyType.Single;
                         }
                     }
                 }

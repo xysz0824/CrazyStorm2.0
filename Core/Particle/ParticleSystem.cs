@@ -369,6 +369,7 @@ namespace CrazyStorm.Core
         }
         public void SetStatus(int i)
         {
+            if (Status == i) return;
             Status = i;
             StatusFrame = 0;
         }

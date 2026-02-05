@@ -280,7 +280,7 @@ namespace CrazyStorm_Player
                 var col = (int)Math.Max(1, (tex.Width - type.StartPoint.x) / rect.Width);
                 rect.Offset(frame % col * rect.Width, frame / col * rect.Height);
             }
-            var rad = MathHelper.ToRadians(particle.PRotation);
+            var rad = MathHelper.ToRadians(particle.PRotation + 90);
             spriteBatch.Draw(tex, position, rect, color, rad, origin, scale, spriteEffects, 0);
             if (!particle.AfterimageEffect) return;
             for (int i = 0; i < Particle.AFTERIMAGE_COUNT; ++i)
@@ -289,7 +289,7 @@ namespace CrazyStorm_Player
                 if (afterImage.alpha > 0)
                 {
                     position = new Vector2(afterImage.x, afterImage.y) + center;
-                    rad = MathHelper.ToRadians(afterImage.rot);
+                    rad = MathHelper.ToRadians(afterImage.rot + 90);
                     color.A = (byte)(afterImage.alpha * alpha * 255f);
                     spriteBatch.Draw(tex, position, rect, color, rad, origin, scale, spriteEffects, 0);
                 }

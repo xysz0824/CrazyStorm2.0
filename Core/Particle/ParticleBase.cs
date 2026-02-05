@@ -617,8 +617,8 @@ namespace CrazyStorm.Core
             }
             //QuadTree.Update(this);
             PPositionLast = PPosition;
-            PSpeedVector += PAcspeedVector * frameScale;
-            PPosition += PSpeedVector * frameScale;
+            pspeedVector += pacspeedVector * frameScale;
+            PPosition += pspeedVector * frameScale;
             for (int i = 0; i < ParticleEventGroups.Count; ++i)
             {
                 ParticleEventGroups[i].Execute(this, null, frameScale);
