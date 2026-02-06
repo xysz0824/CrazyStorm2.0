@@ -190,45 +190,37 @@ namespace CrazyStorm.Core
             executor.ChangeType = eventInfo.changeType;
             executor.ChangeTime = eventInfo.changeTime;
             var initialValue = new TypeSet();
-            initialValue.type = eventInfo.resultType;
             var targetValue = eventInfo.resultValue;
+            targetValue.type = eventInfo.resultType;
             if (eventInfo.isExpressionResult)
             {
-                propertyContainer.PushProperty(executor.PropertyID);
                 VM.Execute(propertyContainer, eventInfo.resultExpression, frameScale);
                 switch (eventInfo.resultType)
                 {
                     case PropertyType.Boolean:
                         targetValue.boolValue = VM.PopBool();
-                        initialValue.boolValue = VM.PopBool();
                         break;
                     case PropertyType.Int32:
                         targetValue.intValue = (int)VM.PopFloat();
-                        initialValue.intValue = (int)VM.PopFloat();
                         break;
                     case PropertyType.Single:
                         targetValue.floatValue = VM.PopFloat();
-                        initialValue.floatValue = VM.PopFloat();
                         break;
                     case PropertyType.Enum:
                         targetValue.enumValue = VM.PopInt();
-                        initialValue.enumValue = VM.PopInt();
                         break;
                     case PropertyType.Vector2:
                         targetValue.vector2Value = VM.PopVector2();
-                        initialValue.vector2Value = VM.PopVector2();
                         break;
                     case PropertyType.RGB:
                         targetValue.rgbValue = VM.PopRGB();
-                        initialValue.rgbValue = VM.PopRGB();
                         break;
                     case PropertyType.String:
                         targetValue.stringValue = VM.PopString();
-                        initialValue.stringValue = VM.PopString();
                         break;
                 }
             }
-            else if (executor.ChangeType == EventChangeType.ChangeTo)
+            if (executor.ChangeType == EventChangeType.ChangeTo)
             {
                 propertyContainer.PushProperty(executor.PropertyID);
                 switch (eventInfo.resultType)
@@ -238,25 +230,28 @@ namespace CrazyStorm.Core
                         break;
                     case PropertyType.Int32:
                         initialValue.intValue = VM.PopInt();
+                        targetValue.intValue -= initialValue.intValue;
                         break;
                     case PropertyType.Single:
                         initialValue.floatValue = VM.PopFloat();
+                        targetValue.floatValue -= initialValue.floatValue;
                         break;
                     case PropertyType.Enum:
                         initialValue.enumValue = VM.PopInt();
                         break;
                     case PropertyType.Vector2:
                         initialValue.vector2Value = VM.PopVector2();
+                        targetValue.vector2Value -= initialValue.vector2Value;
                         break;
                     case PropertyType.RGB:
                         initialValue.rgbValue = VM.PopRGB();
+                        targetValue.rgbValue -= initialValue.rgbValue;
                         break;
                     case PropertyType.String:
                         initialValue.stringValue = VM.PopString();
                         break;
                 }
             }
-            executor.InitialValue = initialValue;
             executor.TargetValue = targetValue;
             executor.Update(frameScale);
             executorList.Add(executor);
