@@ -18,7 +18,6 @@ namespace CrazyStorm.Core
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public struct ComponentData
     {
-        public int id;
         public int beginFrame;
         public int totalFrame;
         public Vector2 position;
@@ -52,11 +51,6 @@ namespace CrazyStorm.Core
         #endregion
 
         #region Public Members
-        public int ID
-        {
-            get { return componentData.id; }
-            set { componentData.id = value; }
-        }
         [StringProperty(0, 1, 15, true, true, false, false)]
         public string Name
         {
@@ -163,8 +157,8 @@ namespace CrazyStorm.Core
             get { return parent; }
             set { parent = value; }
         }
-        public int ParentID { get; set; }
-        public int BindingTargetID { get; set; }
+        public long ParentID { get; set; }
+        public long BindingTargetID { get; set; }
         public GenericContainer<VariableResource> Globals { get; set; }
         public GenericContainer<VariableResource> Locals { get; private set; }
         public Vector2 BodyPosition { get; set; }
@@ -318,20 +312,20 @@ namespace CrazyStorm.Core
         {
             var nodeName = "Component";
             var componentNode = (XmlElement)node.SelectSingleNode(nodeName);
-            if (node.Name == nodeName)
-                componentNode = node;
-
+            if (node.Name == nodeName) componentNode = node;
             XmlHelper.BuildFromFields(this, componentNode);
             //properties
             base.BuildFromXmlElement(componentNode);
+            //id
+            ID = long.Parse(componentNode.GetAttribute("id"));
             //componentData
             XmlHelper.BuildFromStruct(ref componentData, componentNode);
             //parent
             if (componentNode.HasAttribute("parent"))
             {
                 string parentAttribute = componentNode.GetAttribute("parent");
-                int parsedID;
-                if (int.TryParse(parentAttribute, out parsedID))
+                long parsedID;
+                if (long.TryParse(parentAttribute, out parsedID))
                     ParentID = parsedID;
                 else
                     throw new System.IO.FileLoadException("FileDataError");
@@ -340,8 +334,8 @@ namespace CrazyStorm.Core
             if (componentNode.HasAttribute("bindingTarget"))
             {
                 string bindingTargetAttribute = componentNode.GetAttribute("bindingTarget");
-                int parsedID;
-                if (int.TryParse(bindingTargetAttribute, out parsedID))
+                long parsedID;
+                if (long.TryParse(bindingTargetAttribute, out parsedID))
                     BindingTargetID = parsedID;
                 else
                     throw new System.IO.FileLoadException("FileDataError");
@@ -361,6 +355,10 @@ namespace CrazyStorm.Core
             XmlHelper.StoreFields(this, doc, componentNode);
             //properties
             componentNode.AppendChild(base.GetXmlElement(doc));
+            //id
+            var idAttribute = doc.CreateAttribute("id");
+            idAttribute.Value = ID.ToString();
+            componentNode.Attributes.Append(idAttribute);
             //componentData
             XmlHelper.StoreStruct(componentData, doc, componentNode);
             //parent
@@ -421,6 +419,8 @@ namespace CrazyStorm.Core
             componentBytes.AddRange(PlayDataHelper.GetStringBytes(GetType().Name));
             //stringDataFields
             PlayDataHelper.GenerateStringDataFields(this, componentBytes);
+            //id
+            componentBytes.AddRange(BitConverter.GetBytes(ID));
             //componentData
             PlayDataHelper.GenerateStruct(componentData, componentBytes);
             //parent
@@ -446,12 +446,14 @@ namespace CrazyStorm.Core
                 PlayDataHelper.ReadString(componentReader);
                 //stringDataFields
                 PlayDataHelper.ReadStringDataFields(this, componentReader);
+                //id
+                ID = componentReader.ReadInt64();
                 //componentData
                 componentData = PlayDataHelper.ReadStruct<ComponentData>(componentReader);
                 //parent
-                ParentID = componentReader.ReadInt32();
+                ParentID = componentReader.ReadInt64();
                 //bindingTarget
-                BindingTargetID = componentReader.ReadInt32();
+                BindingTargetID = componentReader.ReadInt64();
                 //variables
                 PlayDataHelper.ReadObjectList(Locals, componentReader, version);
                 //properties

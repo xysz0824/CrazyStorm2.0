@@ -57,7 +57,6 @@ namespace CrazyStorm.Core
         #endregion
 
         #region Public Members
-        public long ID { get; set; }
         public long RenderOrder { get; set; }
         public bool Alive { get; set; }
         public float FogFrame { get; private set; }

@@ -184,7 +184,9 @@ namespace CrazyStorm.Core
             var executor = EventExecutorPool.Rent(NullData.Empty).Instance;
             executor.Reset();
             executor.PropertyContainer = propertyContainer;
+            executor.PropertyContainerID = propertyContainer.ID;
             executor.BindingContainer = bindingContainer;
+            executor.BindingContainerID = bindingContainer != null ? bindingContainer.ID : 0;
             executor.PropertyID = eventInfo.resultPropertyID;
             executor.ChangeMode = eventInfo.changeMode;
             executor.ChangeType = eventInfo.changeType;
@@ -270,57 +272,40 @@ namespace CrazyStorm.Core
         {
             for (int i = 0; i < executorList.Count; ++i)
             {
-                if (executorList[i].BindingContainer == null)
+                if (executorList[i].BindingContainer != null) continue;
+                if (executorList[i].Finished || executorList[i].Invalid)
                 {
-                    if (executorList[i].Finished)
-                    {
-                        EventExecutorPool.Return(executorList[i].PoolObject);
-                        executorList.RemoveAt(i);
-                        --i;
-                    }
-                    else
-                    {
-                        var frameScale = executorList[i].PropertyContainer.System.FrameFactor *
-                            ParticleSystem.FRAME_RATE_BASE / frameRate;
-                        executorList[i].Update(frameScale);
-                    }
+                    EventExecutorPool.Return(executorList[i].PoolObject);
+                    executorList.RemoveAt(i);
+                    --i;
+                }
+                else
+                {
+                    var frameScale = executorList[i].PropertyContainer.System.FrameFactor *
+                        ParticleSystem.FRAME_RATE_BASE / frameRate;
+                    executorList[i].Update(frameScale);
                 }
             }
         }
-        public static bool BindingUpdate(PropertyContainer propertyContainer, PropertyContainer bindingContainer, float frameScale)
+        public static bool BindingUpdate(Component component, ParticleBase particle, float frameScale)
         {
             bool updated = false;
-            long id = GetUniqueKey(propertyContainer, bindingContainer);
+            long id = GetUniqueKey(component, particle);
             for (int i = 0; i < executorList.Count; ++i)
             {
-                if (executorList[i].PropertyContainer == propertyContainer && executorList[i].BindingContainer == bindingContainer)
-                {
-                    if (!cache.ContainsKey(id))
-                    {
-                        cache.Add(id, new Dictionary<int, TypeSet>());
-                    }
-                    if (!executorList[i].Finished)
-                    {
-                        executorList[i].Update(frameScale);
-                    }
-                    cache[id][executorList[i].PropertyID] = executorList[i].CurrentValue;
-                    if (executorList[i].Finished)
-                    {
-                        EventExecutorPool.Return(executorList[i].PoolObject);
-                        executorList.RemoveAt(i);
-                        --i;
-                    }
-                    updated = true;
-                }
+                if (executorList[i].PropertyContainer != component || executorList[i].BindingContainer != particle) continue;
+                if (executorList[i].Finished || executorList[i].Invalid) continue;
+                if (!cache.ContainsKey(id)) cache.Add(id, new Dictionary<int, TypeSet>());
+                executorList[i].Update(frameScale);
+                cache[id][executorList[i].PropertyID] = executorList[i].CurrentValue;
+                updated = true;
             }
             return updated;
         }
-        public static bool BindingRecover(PropertyContainer propertyContainer, PropertyContainer bindingContainer)
+        public static bool BindingRecover(Component component, ParticleBase particle)
         {
-            long id = GetUniqueKey(propertyContainer, bindingContainer);
-            if (!cache.ContainsKey(id))
-                return false;
-
+            long id = GetUniqueKey(component, particle);
+            if (!cache.ContainsKey(id)) return false;
             foreach (var item in cache[id])
             {
                 switch (item.Value.type)
@@ -347,14 +332,14 @@ namespace CrazyStorm.Core
                         VM.PushString(item.Value.stringValue);
                         break;
                 }
-                propertyContainer.SetProperty(item.Key);
+                component.SetProperty(item.Key);
                 VM.Clear();
             }
             return true;
         }
-        private static long GetUniqueKey(PropertyContainer propertyContainer, PropertyContainer bindingContainer)
+        private static long GetUniqueKey(Component component, ParticleBase particle)
         {
-            return (propertyContainer as Component).ID * ParticleManager.MaximumParticleCount + (bindingContainer as ParticleBase).ID;
+            return component.ID * ParticleManager.MaximumParticleCount + particle.ID;
         }
         public static void PlaySound(string path)
         {

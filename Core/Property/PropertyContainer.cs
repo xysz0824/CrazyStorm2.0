@@ -19,6 +19,7 @@ namespace CrazyStorm.Core
         public Dictionary<string, PropertyValue> Properties { get { return properties; } }
         Dictionary<int, VMInstruction[]> propertyExpressions;
         public Dictionary<int, VMInstruction[]> PropertyExpressions { get { return propertyExpressions; } }
+        public long ID { get; set; }
         public ParticleSystem System { get; set; }
 
         public PropertyContainer()

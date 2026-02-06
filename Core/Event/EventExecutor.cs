@@ -14,14 +14,18 @@ namespace CrazyStorm.Core
         TypeSet currentValue;
         float currentTime;
         public PropertyContainer PropertyContainer { get; set; }
+        public long PropertyContainerID { get; set; }
         public PropertyContainer BindingContainer { get; set; }
+        public long BindingContainerID { get; set; }
         public int PropertyID { get; set; }
         public EventChangeMode ChangeMode { get; set; }
         public EventChangeType ChangeType { get; set; }
-        public TypeSet CurrentValue { get { return currentValue; } }
+        public TypeSet CurrentValue => currentValue;
         public TypeSet TargetValue { get; set; }
         public int ChangeTime { get; set; }
-        public bool Finished { get { return currentTime >= ChangeTime; } }
+        public bool Finished => currentTime >= ChangeTime;
+        public bool Invalid => (PropertyContainer.ID != PropertyContainerID) || 
+            (BindingContainer != null && BindingContainer.ID != BindingContainerID);
         public EventExecutorPool PoolObject { get; set; }
         public EventExecutor()
         {
