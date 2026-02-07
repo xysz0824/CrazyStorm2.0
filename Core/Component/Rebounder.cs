@@ -246,11 +246,7 @@ namespace CrazyStorm.Core
         {
             base.Reset();
             var initialState = base.initialState as Rebounder;
-            Size = initialState.Size;
-            RebounderShape = initialState.RebounderShape;
-            Rotation = initialState.Rotation;
-            ReboundLimit = initialState.ReboundLimit;
-            ReboundOneSide = initialState.ReboundOneSide;
+            rebounderData = initialState.rebounderData;
         }
         #endregion
     }

@@ -320,16 +320,8 @@ namespace CrazyStorm.Core
         {
             base.Reset();
             var initialState = base.initialState as ForceField;
-            HalfWidth = initialState.HalfWidth;
-            HalfHeight = initialState.HalfHeight;
-            FieldShape = initialState.FieldShape;
-            Reach = initialState.Reach;
             TargetName = initialState.TargetName;
-            Force = initialState.Force;
-            Direction = initialState.Direction;
-            ForceType = initialState.ForceType;
-            Rotation = initialState.Rotation;
-            ForceImpactSpeed = initialState.ForceImpactSpeed;
+            forceFieldData = initialState.forceFieldData;
         }
         #endregion
     }

@@ -13,7 +13,7 @@ using System.Xml.Serialization;
 
 namespace CrazyStorm.Core
 {
-    public abstract class PropertyContainer : ICloneable, ICopyable<PropertyContainer>
+    public abstract class PropertyContainer : ICloneable
     {
         Dictionary<string, PropertyValue> properties;
         public Dictionary<string, PropertyValue> Properties { get { return properties; } }

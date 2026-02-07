@@ -21,8 +21,9 @@ namespace CrazyStorm
                 var selectedLayer = Parameter[1] as Layer;
                 var clone = selectedLayer.Clone() as Layer;
                 foreach (var component in clone.Components)
+                {
                     component.RebuildReferenceFromCollection(clone.Components);
-
+                }
                 foreach (var component in clone.Components)
                 {
                     component.ID = selectedParticle.GetComponentIndex();

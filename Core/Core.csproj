@@ -86,7 +86,6 @@
     <Compile Include="Expression\Token\NumberToken.cs" />
     <Compile Include="Expression\Token\Token.cs" />
     <Compile Include="Expression\VM.cs" />
-    <Compile Include="ICopyable.cs" />
     <Compile Include="IO\IGeneratePlayData.cs" />
     <Compile Include="IO\ILoadPlayData.cs" />
     <Compile Include="IO\IXmlData.cs" />
@@ -94,7 +93,6 @@
     <Compile Include="IO\PlayDataException.cs" />
     <Compile Include="IO\PlayDataHelper.cs" />
     <Compile Include="IO\XmlHelper.cs" />
-    <Compile Include="IPlayable.cs" />
     <Compile Include="Particle\Curve.cs" />
     <Compile Include="Particle\ParticleBase.cs" />
     <Compile Include="Particle\ParticleManager.cs" />

@@ -185,8 +185,8 @@ namespace CrazyStorm.Core
             clone.customTypes = new GenericContainer<ParticleType>();
             foreach (var type in customTypes) clone.customTypes.Add(type.Clone() as ParticleType);
             clone.layers = new GenericContainer<Layer>();
-            clone.componentTree = new GenericContainer<Component>();
             foreach (var layer in layers) clone.layers.Add(layer.Clone() as Layer);
+            clone.componentTree = new GenericContainer<Component>();
             clone.componentIndex = new Dictionary<int, int>();
             foreach (var kv in componentIndex) clone.componentIndex[kv.Key] = kv.Value;
             clone.typeSoundMap = new Dictionary<int, int>();

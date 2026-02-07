@@ -210,11 +210,8 @@ namespace CrazyStorm.Core
         }
         public void Reset()
         {
-            if (Visible)
-            {
-                for (int i = 0; i < Components.Count; ++i)
-                    Components[i].Reset();
-            }
+            if (!Visible) return;
+            for (int i = 0; i < Components.Count; ++i) Components[i].Reset();
         }
         #endregion
     }

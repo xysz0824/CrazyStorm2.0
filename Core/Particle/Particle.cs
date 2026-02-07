@@ -196,6 +196,12 @@ namespace CrazyStorm.Core
                 particle.AfterImageData[i] = default;
             }
         }
+        public override void Reset(ParticleBase initial)
+        {
+            base.Reset(initial);
+            var initialState = initial as Particle;
+            particleData = initialState.particleData;
+        }
         public override void Reset()
         {
             base.Reset();

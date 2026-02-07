@@ -294,15 +294,8 @@ namespace CrazyStorm.Core
         {
             base.Reset();
             var initialState = base.initialState as EventField;
-            HalfWidth = initialState.HalfWidth;
-            HalfHeight = initialState.HalfHeight;
-            FieldShape = initialState.FieldShape;
-            Reach = initialState.Reach;
             TargetName = initialState.TargetName;
-            LayerMask = initialState.LayerMask;
-            LayerMaskType = initialState.LayerMaskType;
-            LayerMaskMutex = initialState.LayerMaskMutex;
-            Rotation = initialState.Rotation;
+            eventFieldData = initialState.eventFieldData;
         }
         public void UpdateMutexMask()
         {

@@ -27,7 +27,7 @@ namespace CrazyStorm.Core
         public float acspeedAngle;
         public bool visibility;
     }
-    public class Component : PropertyContainer, INotifyPropertyChanged, IXmlData, IGeneratePlayData, IPlayable
+    public class Component : PropertyContainer, INotifyPropertyChanged, IXmlData, IGeneratePlayData
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -283,13 +283,9 @@ namespace CrazyStorm.Core
         {
             var clone = base.Clone() as Component;
             clone.parent = null;
-            if (parent != null)
-                clone.ParentID = parent.ID;
-
+            if (parent != null) clone.ParentID = parent.ID;
             clone.bindingTarget = null;
-            if (bindingTarget != null)
-                clone.BindingTargetID = bindingTarget.ID;
-
+            if (bindingTarget != null) clone.BindingTargetID = bindingTarget.ID;
             clone.Locals = new GenericContainer<VariableResource>();
             foreach (var variable in Locals)
             {
@@ -301,11 +297,7 @@ namespace CrazyStorm.Core
                 clone.componentEventGroups.Add(componentEventGroup.Clone() as EventGroup);
             }
             clone.children = new GenericContainer<Component>();
-            if (children.Count > 0)
-            {
-                foreach (var child in children)
-                    clone.children.Add(child);
-            }
+            foreach (var child in children) clone.children.Add(child);
             return clone;
         }
         public virtual XmlElement BuildFromXml(XmlElement node)
@@ -672,7 +664,7 @@ namespace CrazyStorm.Core
         {
             if (initialState == null)
             {
-                initialState = this.MemberwiseClone() as Component;
+                initialState = MemberwiseClone() as Component;
                 initialState.Locals = new GenericContainer<VariableResource>();
                 foreach (VariableResource item in Locals)
                 {
@@ -684,14 +676,7 @@ namespace CrazyStorm.Core
             else
             {
                 initialState.ExecuteExpressionsAndSet(1);
-                BeginFrame = initialState.BeginFrame;
-                TotalFrame = initialState.TotalFrame;
-                Position = initialState.Position;
-                Speed = initialState.Speed;
-                SpeedAngle = initialState.SpeedAngle;
-                Acspeed = initialState.Acspeed;
-                AcspeedAngle = initialState.AcspeedAngle;
-                Visibility = initialState.Visibility;
+                componentData = initialState.componentData;
                 for (int i = 0; i < Locals.Count; ++i)
                 {
                     Locals[i].Value = initialState.Locals[i].Value;

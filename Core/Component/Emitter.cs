@@ -358,19 +358,11 @@ namespace CrazyStorm.Core
         }
         public override void Reset()
         {
-            Template = InitialTemplate.Clone() as ParticleBase;
-            Template.Reset();
+            if (Template == null) Template = InitialTemplate.Clone() as ParticleBase;
+            else Template.Reset(InitialTemplate);
             base.Reset();
             var initialState = base.initialState as Emitter;
-            EmitPosition = initialState.EmitPosition;
-            EmitCount = initialState.EmitCount;
-            EmitCycle = initialState.EmitCycle;
-            EmitAngle = initialState.EmitAngle;
-            BindToSpeedAngle = initialState.BindToSpeedAngle;
-            EmitRange = initialState.EmitRange;
-            EmitRadius = initialState.EmitRadius;
-            EmitRoundAngle = initialState.EmitRoundAngle;
-            InstantMovement = initialState.InstantMovement;
+            emitterData = initialState.emitterData;
         }
         public void EmitParticle(float frameScale)
         {

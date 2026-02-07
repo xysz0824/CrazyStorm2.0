@@ -45,7 +45,7 @@ namespace CrazyStorm.Core
         public float vspeed;
     }
     public abstract class ParticleBase : PropertyContainer, IXmlData, ILoadPlayData, 
-        IComparable<ParticleBase>, IPlayable
+        IComparable<ParticleBase>
     {
         public const float FOG_TIME = 10;
         #region Private Members
@@ -662,6 +662,10 @@ namespace CrazyStorm.Core
             particle.FogFrame = 0;
             particle.ParticleEventGroups = ParticleEventGroups;
             particle.ReboundTime = 0;
+        }
+        public virtual void Reset(ParticleBase initial)
+        {
+            particleBaseData = initial.particleBaseData;
         }
         public virtual void Reset() { }
         public int CompareTo(ParticleBase other)
