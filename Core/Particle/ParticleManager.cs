@@ -83,7 +83,7 @@ namespace CrazyStorm.Core
             Curve.Reset(curveParticleMaximum);
             activeParticles = new List<ParticleBase>();
             searchResult = new ParticleBase[particleMaximum + curveParticleMaximum];
-            EventExecutorPool.Reset(MaximumParticleCount * 100);
+            EventExecutor.Reset(MaximumParticleCount * 10);
             OnParticleDraw = null;
             OnCurveParticleDraw = null;
         }

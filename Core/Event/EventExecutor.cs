@@ -9,7 +9,7 @@ using System.Text;
 
 namespace CrazyStorm.Core
 {
-    public class EventExecutor
+    public class EventExecutor : PoolObject<EventExecutor, NullData>
     {
         TypeSet currentValue;
         float currentTime;
@@ -26,7 +26,6 @@ namespace CrazyStorm.Core
         public bool Finished => currentTime >= ChangeTime;
         public bool Invalid => (PropertyContainer.ID != PropertyContainerID) || 
             (BindingContainer != null && BindingContainer.ID != BindingContainerID);
-        public EventExecutorPool PoolObject { get; set; }
         public EventExecutor()
         {
             Reset();
