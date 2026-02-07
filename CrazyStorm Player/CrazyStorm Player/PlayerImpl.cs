@@ -97,6 +97,7 @@ namespace CrazyStorm_Player
                 shaderMaskCount = shader.Parameters["MaskCount"];
                 shaderRenderCenter = shader.Parameters["RenderCenter"];
             }
+            shaderFile.Dispose();
             spriteBatch = new SpriteBatch(gd);
             curveBatch = new CurveBatch(gd);
             substration = new BlendState();
@@ -156,6 +157,7 @@ namespace CrazyStorm_Player
                     FileMode.Open, FileAccess.Read);
             }
             defaultTexture = Texture2D.FromStream(gd, defaultTextureStream);
+            defaultTextureStream.Dispose();
             //Load main character texture
             if (!StringUtil.IsNullOrWhiteSpace(controllable.imagePath))
             {
@@ -166,8 +168,10 @@ namespace CrazyStorm_Player
             }
             Stream pointTextureStream = assembly.GetManifestResourceStream("CrazyStorm_Player.point.png");
             pointTexture = Texture2D.FromStream(gd, pointTextureStream);
+            pointTextureStream.Dispose();
             Stream slowModeTextureStream = assembly.GetManifestResourceStream("CrazyStorm_Player.ring.png");
             slowModeTexture = Texture2D.FromStream(gd, slowModeTextureStream);
+            slowModeTextureStream.Dispose();
             //Load custom textures and types
             Environment.CurrentDirectory = ResourceDirectory;
             customTextures = new Dictionary<int, Texture2D>();

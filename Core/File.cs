@@ -321,18 +321,20 @@ namespace CrazyStorm.Core
         }
         public byte[] GeneratePlayFile()
         {
-            var stream = new MemoryStream();
-            var writer = new BinaryWriter(stream);
-            //Play file use UTF-8 encoding
-            //Write play file header
-            writer.Write(PlayDataHelper.GetStringBytes("BG"));
-            //Write play file version
-            writer.Write(PlayDataHelper.GetStringBytes(VersionInfo.PlayVersion));
-            //Write play file data
-            Compile();
-            writer.Write(GeneratePlayData(this).ToArray());
-            var bytes = stream.ToArray();
-            stream.Close();
+            byte[] bytes = null;
+            using (var stream = new MemoryStream())
+            {
+                var writer = new BinaryWriter(stream);
+                //Play file use UTF-8 encoding
+                //Write play file header
+                writer.Write(PlayDataHelper.GetStringBytes("BG"));
+                //Write play file version
+                writer.Write(PlayDataHelper.GetStringBytes(VersionInfo.PlayVersion));
+                //Write play file data
+                Compile();
+                writer.Write(GeneratePlayData(this).ToArray());
+                bytes = stream.ToArray();
+            }
             return bytes;
         }
         public void GeneratePlayFile(string filePath, string fileName)
@@ -408,9 +410,11 @@ namespace CrazyStorm.Core
                     LoadPlayData(reader, version);
                     RebuildObjectReference(this);
                     RebuildComponentTree();
+                    stream.Dispose();
                     return true;
                 }
             }
+            stream.Dispose();
             return false;
         }
         public bool LoadPlayFile(string filePath, float baseVersion)
