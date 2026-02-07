@@ -671,17 +671,16 @@ namespace CrazyStorm.Core
                     var variable = new VariableResource { ID = item.ID, Label = item.Label, Value = item.Value };
                     initialState.Locals.Add(variable);
                 }
-                initialState.ExecuteExpressionsAndSet(1);
             }
             else
             {
-                initialState.ExecuteExpressionsAndSet(1);
                 componentData = initialState.componentData;
                 for (int i = 0; i < Locals.Count; ++i)
                 {
                     Locals[i].Value = initialState.Locals[i].Value;
                 }
             }
+            initialState.ExecuteExpressionsAndSet(1);
             MathHelper.SetVector2(ref speedVector, Speed, SpeedAngle);
             MathHelper.SetVector2(ref acspeedVector, Acspeed, AcspeedAngle);
             parentAbsolutePosition = Vector2.Zero;

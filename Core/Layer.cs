@@ -138,6 +138,7 @@ namespace CrazyStorm.Core
                 if (!string.IsNullOrEmpty(specificType))
                 {
                     Component component = ComponentFactory.Create(specificType);
+                    component.Properties.Clear();
                     component.BuildFromXml(componentNode);
                     Components.Add(component);
                 }
