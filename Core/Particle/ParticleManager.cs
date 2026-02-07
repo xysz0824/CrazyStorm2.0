@@ -157,10 +157,12 @@ namespace CrazyStorm.Core
                     instance.PMasked = true;
                     continue;
                 }
-                if (instance.CheckCollision(playerLast, player, r)) searchResult[index++] = instance;
+                var logicOffset = instance.System.LogicOffset;
+                if (instance.CheckCollision(playerLast - logicOffset, player - logicOffset, r)) searchResult[index++] = instance;
                 else
                 {
-                    var judge = instance.CheckVolume(dead, playerLast, player, out newPos);
+                    var judge = instance.CheckVolume(dead, playerLast - logicOffset, player - logicOffset, out newPos);
+                    newPos += logicOffset;
                     if (judge)  searchResult[index++] = instance;
                 }
             }
@@ -169,14 +171,14 @@ namespace CrazyStorm.Core
         }
         public static bool OutOfWindow(ParticleBase particle)
         {
-            var outPoint = particle.GetOutPoint();
+            var outPoint = particle.GetOutPoint() + particle.System.LogicOffset;
             var reserved = particle is CurveParticle ? curvePreserved : particlePreserved;
             return outPoint.x < left / 2 - reserved || outPoint.x > right / 2 + reserved ||
                 outPoint.y < top / 2 - reserved || outPoint.y > bottom / 2 + reserved;
         }
         private static bool OutOfRange(ParticleBase particle)
         {
-            var outPoint = particle.GetOutPoint();
+            var outPoint = particle.GetOutPoint() + particle.System.LogicOffset;
             return outPoint.x < left || outPoint.x > right ||
                 outPoint.y < top || outPoint.y > bottom;
         }

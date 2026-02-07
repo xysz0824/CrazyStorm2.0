@@ -388,7 +388,8 @@ namespace CrazyStorm_Player
                 spriteBatch.Draw(background, backgroundPos, null, Color.White, 0, Vector2.Zero, backgroundScale, SpriteEffects.None, 0);
             }
             var particle = File.ParticleSystems[SelectedParticleSystemIndex];
-            controllable.Draw(spriteBatch, characterTexture, pointTexture, slowModeTexture, particle.ScreenOffset.ToXna());
+            var offset = (particle.ScreenOffset - particle.LogicOffset).ToXna();
+            controllable.Draw(spriteBatch, characterTexture, pointTexture, slowModeTexture, offset);
             ParticleManager.Draw(particle.OrderType);
             lastBlendType = BlendType.None;
             curveBatch.End();

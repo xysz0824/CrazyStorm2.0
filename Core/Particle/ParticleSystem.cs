@@ -66,7 +66,8 @@ namespace CrazyStorm.Core
             get { return orderType; }
             set { orderType = value; }
         }
-        public Vector2 ScreenOffset => screenOffset;
+        public Vector2 LogicOffset { get; set; }
+        public Vector2 ScreenOffset => LogicOffset + screenOffset;
         public float FrameFactor => frameFactor;
         public float CurrentFrame { get; set; }
         public int FrameSkipCount { get; set; }
