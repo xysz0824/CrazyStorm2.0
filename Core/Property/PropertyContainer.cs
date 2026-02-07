@@ -77,7 +77,6 @@ namespace CrazyStorm.Core
         }
         public virtual void CopyTo(PropertyContainer target)
         {
-            target.properties = properties;
             target.propertyExpressions = propertyExpressions;
         }
         public void BuildFromXmlElement(XmlElement node)

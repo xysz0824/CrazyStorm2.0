@@ -354,11 +354,12 @@ namespace CrazyStorm.Core
             PlayDataHelper.ReadObjectList(Sounds, reader, version);
             //Globals
             globals = new GenericContainer<VariableResource>();
-            PlayDataHelper.ReadObjectList(globals, reader, version);
+            PlayDataHelper.ReadObjectList(Globals, reader, version);
             //ParticleSystems
             PlayDataHelper.ReadObjectList(ParticleSystems, reader, version);
             foreach (var particleSystem in ParticleSystems)
             {
+                particleSystem.Sounds = sounds;
                 foreach (var layer in particleSystem.Layers)
                 {
                     foreach (var component in layer.Components)

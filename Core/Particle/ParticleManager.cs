@@ -45,12 +45,8 @@ namespace CrazyStorm.Core
         public static event CurveParticleDrawHandler OnCurveParticleDraw;
 
         //static ParticleQuadTree particleQuadTree;
-        static int left;
-        static int right;
-        static int top;
-        static int bottom;
-        static int particlePreserved;
-        static int curvePreserved;
+        static int left, right, top, bottom;
+        static int particlePreserved, curvePreserved;
         static long instanceID;
         static List<ParticleBase> activeParticles;
         static ParticleBase[] searchResult;

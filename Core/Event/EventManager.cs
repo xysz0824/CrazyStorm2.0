@@ -25,7 +25,7 @@ namespace CrazyStorm.Core
                     {
                         VM.Execute(pc, expr[0], frameScale);
                         var label = VM.PopString();
-                        var sound = Sounds.FirstOrDefault((item) => string.Equals(item.Label, label));
+                        var sound = pc.System.Sounds?.FirstOrDefault((item) => string.Equals(item.Label, label));
                         if (sound != null) OnSoundPlay(sound.AbsolutePath);
                     }
                     return false;
@@ -45,10 +45,10 @@ namespace CrazyStorm.Core
                         if (pc is Emitter) (pc as Emitter).Template.Type = ParticleType.DefaultTypes[typeId - ParticleType.DefaultTypeIndex];
                         else if (pc is ParticleBase) (pc as ParticleBase).Type = ParticleType.DefaultTypes[typeId - ParticleType.DefaultTypeIndex];
                     }
-                    else if (typeId < CustomTypes.Count)
+                    else if (typeId < pc.System.CustomTypes.Count)
                     {
-                        if (pc is Emitter) (pc as Emitter).Template.Type = CustomTypes[typeId];
-                        else if (pc is ParticleBase) (pc as ParticleBase).Type = CustomTypes[typeId];
+                        if (pc is Emitter) (pc as Emitter).Template.Type = pc.System.CustomTypes[typeId];
+                        else if (pc is ParticleBase) (pc as ParticleBase).Type = pc.System.CustomTypes[typeId];
                     }
                     return false;
                 } },
@@ -63,9 +63,9 @@ namespace CrazyStorm.Core
                         {
                             (pc as Emitter).Template.Type = ParticleType.DefaultTypes[typeId - ParticleType.DefaultTypeIndex];
                         }
-                        else if (typeId < CustomTypes.Count)
+                        else if (typeId < pc.System.CustomTypes.Count)
                         {
-                            (pc as Emitter).Template.Type = CustomTypes[typeId];
+                            (pc as Emitter).Template.Type = pc.System.CustomTypes[typeId];
                         }
                     }
                     else if (pc is ParticleBase)
@@ -75,9 +75,9 @@ namespace CrazyStorm.Core
                         {
                             (pc as ParticleBase).Type = ParticleType.DefaultTypes[typeId - ParticleType.DefaultTypeIndex];
                         }
-                        else if (typeId < CustomTypes.Count)
+                        else if (typeId < pc.System.CustomTypes.Count)
                         {
-                            (pc as ParticleBase).Type = CustomTypes[typeId];
+                            (pc as ParticleBase).Type = pc.System.CustomTypes[typeId];
                         }
                     }
                     return false;
@@ -93,9 +93,9 @@ namespace CrazyStorm.Core
                         {
                             (pc as Emitter).Template.Type = ParticleType.DefaultTypes[typeId - ParticleType.DefaultTypeIndex];
                         }
-                        else if (typeId >= 0 && typeId < CustomTypes.Count)
+                        else if (typeId >= 0 && typeId < pc.System.CustomTypes.Count)
                         {
-                            (pc as Emitter).Template.Type = CustomTypes[typeId];
+                            (pc as Emitter).Template.Type = pc.System.CustomTypes[typeId];
                         }
                     }
                     else if (pc is ParticleBase)
@@ -105,9 +105,9 @@ namespace CrazyStorm.Core
                         {
                             (pc as ParticleBase).Type = ParticleType.DefaultTypes[typeId - ParticleType.DefaultTypeIndex];
                         }
-                        else if (typeId >= 0 && typeId < CustomTypes.Count)
+                        else if (typeId >= 0 && typeId < pc.System.CustomTypes.Count)
                         {
-                            (pc as ParticleBase).Type = CustomTypes[typeId];
+                            (pc as ParticleBase).Type = pc.System.CustomTypes[typeId];
                         }
                     }
                     return false;
@@ -160,9 +160,6 @@ namespace CrazyStorm.Core
 
         static List<EventExecutor> executorList;
         static Dictionary<long, Dictionary<int, TypeSet>> cache;
-        public static GenericContainer<ParticleType> CustomTypes { get; set; }
-        public static GenericContainer<FileResource> Sounds { get; set; }
-        public static Dictionary<int, int> TypeSoundMap { get; set; }
         public static void Initialize()
         {
             OnSoundPlay = null;

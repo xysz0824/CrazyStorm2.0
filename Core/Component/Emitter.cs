@@ -167,10 +167,9 @@ namespace CrazyStorm.Core
                 newParticle.ParticleEventGroups = EmitterEventGroups;
                 Particles.Add(newParticle);
             }
-            if (EventManager.Sounds != null && EventManager.TypeSoundMap != null && 
-                EventManager.TypeSoundMap.ContainsKey(Template.Type.ID))
+            if (System.Sounds != null && System.TypeSoundMap != null && System.TypeSoundMap.ContainsKey(Template.Type.ID))
             {
-                var sound = EventManager.Sounds.FirstOrDefault((item) => item.ID == EventManager.TypeSoundMap[Template.Type.ID]);
+                var sound = System.Sounds.FirstOrDefault((item) => item.ID == System.TypeSoundMap[Template.Type.ID]);
                 if (sound != null) EventManager.PlaySound(sound.AbsolutePath);
             }
         }

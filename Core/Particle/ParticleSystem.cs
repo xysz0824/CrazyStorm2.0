@@ -88,6 +88,7 @@ namespace CrazyStorm.Core
         public GenericContainer<Component> ComponentTree { get { return componentTree; } }
         public int CustomTypeIndex { get { return customTypeIndex++; } }
         public int LayerIndex { get { return layerIndex++; } }
+        public GenericContainer<FileResource> Sounds { get; set; }
         public Dictionary<int, int> TypeSoundMap { get { return typeSoundMap; } }
         public int Status { get; private set; }
         public float StatusFrame { get; private set; }

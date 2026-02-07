@@ -84,6 +84,7 @@ namespace CrazyStorm_Player
         }
         public void Initialize(GraphicsDevice gd)
         {
+            //graphics
             var shaderFile = Assembly.GetExecutingAssembly().GetManifestResourceStream("CrazyStorm_Player.shader.mgfxo");
             using (var ms = new MemoryStream())
             {
@@ -111,7 +112,7 @@ namespace CrazyStorm_Player
             multiply.AlphaSourceBlend = Blend.One;
             multiply.ColorDestinationBlend = Blend.SourceColor;
             multiply.AlphaDestinationBlend = Blend.InverseSourceAlpha;
-
+            //controllable
             controllable = new Controllable(Width, Height);
             string[] setting = ControllableSetting.Split(',');
             if (setting.Length == 9)
@@ -123,6 +124,7 @@ namespace CrazyStorm_Player
                 controllable.selfDelay = int.Parse(setting[7]);
                 controllable.selfRadius = int.Parse(setting[8]);
             }
+            File.BodyPosition = controllable.selfPos.ToCore();
             //Load background texture
             if (!string.IsNullOrWhiteSpace(BackgroundPath))
             {
@@ -195,14 +197,15 @@ namespace CrazyStorm_Player
                 }
             }
             Environment.CurrentDirectory = AppDomain.CurrentDomain.SetupInformation.ApplicationBase;
-            FrameworkDispatcher.Update();
-            File.BodyPosition = controllable.selfPos.ToCore();
-            File.ParticleSystems[SelectedParticleSystemIndex].Reset(true);
+            //sounds
             sounds = new Dictionary<string, SoundEffect>();
+            //final
             ForceField.OnForceImpactBody += ForceImpactBody;
             EventManager.OnSoundPlay += PlaySound;
             ParticleManager.OnParticleDraw += (particle) => DrawParticle(spriteBatch, particle);
             ParticleManager.OnCurveParticleDraw += (particle) => DrawCurveParticle(spriteBatch, curveBatch, particle);
+            FrameworkDispatcher.Update();
+            File.ParticleSystems[SelectedParticleSystemIndex].Reset(true);
         }
         public void Dispose()
         {
@@ -356,9 +359,6 @@ namespace CrazyStorm_Player
             var selectedParticle = File.ParticleSystems[SelectedParticleSystemIndex];
             controllable.Update(keyboard, selectedParticle.FrameFactor * ParticleSystem.FRAME_RATE_BASE / FrameRate);
             File.BodyPosition = controllable.selfPos.ToCore();
-            EventManager.CustomTypes = selectedParticle.CustomTypes;
-            EventManager.Sounds = File.Sounds;
-            EventManager.TypeSoundMap = selectedParticle.TypeSoundMap;
             EventManager.Update(FrameRate);
             selectedParticle.Update(FrameRate, CurrentFrame);
             ParticleManager.UpdateLayerMasks(selectedParticle.Layers);
