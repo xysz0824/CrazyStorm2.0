@@ -417,7 +417,7 @@ namespace CrazyStorm.Core
                             batch.AcspeedAngle = ConvertAngle(float.Parse(submatch.Groups["aspeedd"].Value), float.Parse(submatch.Groups["randaspeedd"].Value),
                                 batch, "AcspeedAngle");
                             batch.InstantMovement = submatch.Groups["instantmovement"].Success ? bool.Parse(submatch.Groups["instantmovement"].Value) : false;
-                            var particle = batch.Particle as Particle;
+                            var particle = batch.InitialTemplate as Particle;
                             particle.MaxLife = int.Parse(submatch.Groups["sonlife"].Value);
                             var typeId = int.Parse(submatch.Groups["typeid"].Value);
                             if (typeId < ParticleType.DefaultTypes.Count) particle.Type = ParticleType.DefaultTypes[typeId];
@@ -503,7 +503,7 @@ namespace CrazyStorm.Core
                                 lase, "Acspeed");
                             lase.AcspeedAngle = ConvertAngle(float.Parse(submatch.Groups["aspeedd"].Value), float.Parse(submatch.Groups["randaspeedd"].Value),
                                 lase, "AcspeedAngle");
-                            var particle = lase.Particle as CurveParticle;
+                            var particle = lase.InitialTemplate as CurveParticle;
                             particle.MaxLife = int.Parse(submatch.Groups["sonlife"].Value);
                             var typeId = int.Parse(submatch.Groups["typeid"].Value);
                             if (typeId < ParticleType.DefaultTypes.Count) particle.Type = ParticleType.DefaultTypes[typeId];

@@ -231,7 +231,7 @@ namespace CrazyStorm
             var emitter = aimComponent as Emitter;
             if (emitter != null)
             {
-                emitter.Particle.Type = ParticleType.DefaultTypes.First();
+                emitter.InitialTemplate.Type = ParticleType.DefaultTypes.First();
             }
         }
         private void ComponentTree_GotFocus(object sender, RoutedEventArgs e)

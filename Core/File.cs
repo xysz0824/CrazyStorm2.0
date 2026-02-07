@@ -174,7 +174,7 @@ namespace CrazyStorm.Core
                     component.RebuildReferenceFromCollection(components);
                     //Rebuild particles reference
                     if (component is Emitter)
-                        (component as Emitter).Particle.RebuildReferenceFromCollection(particleTypes);
+                        (component as Emitter).InitialTemplate.RebuildReferenceFromCollection(particleTypes);
                 }
             }
         }
@@ -214,7 +214,7 @@ namespace CrazyStorm.Core
         }
         void CompilePropertyExpressions(PropertyContainer container)
         {
-            if (container is Emitter) CompilePropertyExpressions((container as Emitter).Particle);
+            if (container is Emitter) CompilePropertyExpressions((container as Emitter).InitialTemplate);
             Type containerType = container.GetType();
             var variables = new List<VariableResource>();
             if (container is Component) variables.AddRange((container as Component).Locals);
@@ -251,7 +251,7 @@ namespace CrazyStorm.Core
         {
             if (component is Emitter)
             {
-                var subType = (component as Emitter).Particle.GetType();
+                var subType = (component as Emitter).InitialTemplate.GetType();
                 CompileEvents(component, subType, component.ComponentEventGroups);
                 CompileEvents(component, subType, (component as Emitter).ParticleEventGroups);
             }

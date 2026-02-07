@@ -20,7 +20,7 @@ namespace CrazyStorm
             var emitter = Parameter[0] as Emitter;
             var newType = Parameter[1] as ParticleType;
             var update = Parameter[2] as Action<Emitter, ParticleType>;
-            History[0] = emitter.Particle.Type;
+            History[0] = emitter.InitialTemplate.Type;
             update(emitter, newType);
         }
         public override void Undo(CommandStack stack)

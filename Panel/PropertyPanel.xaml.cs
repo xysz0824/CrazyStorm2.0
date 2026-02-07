@@ -85,14 +85,15 @@ namespace CrazyStorm
             //Load particle properties.
             if (component is Emitter)
             {
+                var particle = (component as Emitter).InitialTemplate;
                 ParticlePropertyGroup.Visibility = Visibility.Visible;
-                particlePropertyList = (component as Emitter).Particle.InitializeAndGetProperties(typeof(ParticleBase));
+                particlePropertyList = particle.InitializeAndGetProperties(typeof(ParticleBase));
                 if (component is MultiEmitter)
-                    particlePropertyList.AddRange((component as Emitter).Particle.InitializeAndGetProperties(typeof(Particle)));
+                    particlePropertyList.AddRange(particle.InitializeAndGetProperties(typeof(Particle)));
                 else
-                    particlePropertyList.AddRange((component as Emitter).Particle.InitializeAndGetProperties(typeof(CurveParticle)));
+                    particlePropertyList.AddRange(particle.InitializeAndGetProperties(typeof(CurveParticle)));
 
-                LoadProperties(ParticleGrid, (component as Emitter).Particle, particlePropertyList);
+                LoadProperties(ParticleGrid, particle, particlePropertyList);
             }
             else
             {
@@ -101,8 +102,8 @@ namespace CrazyStorm
                 {
                     //Only emitter have particles, but special event of event field or rebounder need it.
                     var stub = new MultiEmitter();
-                    particlePropertyList = stub.Particle.InitializeAndGetProperties(typeof(ParticleBase));
-                    LoadProperties(ParticleGrid, stub.Particle, particlePropertyList);
+                    particlePropertyList = stub.InitialTemplate.InitializeAndGetProperties(typeof(ParticleBase));
+                    LoadProperties(ParticleGrid, stub.InitialTemplate, particlePropertyList);
                 }
             }
             //Load particle types.
@@ -248,7 +249,7 @@ namespace CrazyStorm
             var particleProperties = ParticleGrid.DataContext as IList<PropertyGridItem>;
             if (component is Emitter)
             {
-                var particle = (component as Emitter).Particle;
+                var particle = (component as Emitter).InitialTemplate;
                 UpdateProperty(particle, particleProperties);
             }
         }
@@ -288,11 +289,11 @@ namespace CrazyStorm
             ParticleType type = null;
             if (component is Emitter)
             {
-                type = (component as Emitter).Particle.Type;
+                type = (component as Emitter).InitialTemplate.Type;
                 if (!types.Contains(type))
                 {
                     ColorCombo.Items.Clear();
-                    (component as Emitter).Particle.Type = null;
+                    (component as Emitter).InitialTemplate.Type = null;
                     type = null;
                 }
             }
@@ -320,8 +321,8 @@ namespace CrazyStorm
             }
             else if (component is Emitter)
             {
-                (component as Emitter).Particle.Type = types[0];
-                type = (component as Emitter).Particle.Type;
+                (component as Emitter).InitialTemplate.Type = types[0];
+                type = (component as Emitter).InitialTemplate.Type;
                 TypeCombo.SelectedItem = typesNorepeat[0];
                 ColorCombo.SelectedIndex = 0;
             }
@@ -366,7 +367,7 @@ namespace CrazyStorm
         private void ParticleGrid_BeginningEdit(object sender, DataGridBeginningEditEventArgs e)
         {
             Grid_BeginningEdit(sender, e);
-            ShowIntellisense((component as Emitter).Particle, e);
+            ShowIntellisense((component as Emitter).InitialTemplate, e);
         }
         private void ParticleGrid_CellEditEnding(object sender, DataGridCellEditEndingEventArgs e)
         {
@@ -374,7 +375,7 @@ namespace CrazyStorm
             if ((e.EditingElement as TextBox).Text != editText)
             {
                 if (component is Emitter)
-                    SetProperty((component as Emitter).Particle, e);
+                    SetProperty((component as Emitter).InitialTemplate, e);
             }
             HideIntellisense();
         }
@@ -522,7 +523,7 @@ namespace CrazyStorm
         private void ParticleTypeUpdate(Emitter emitter, ParticleType type)
         {
             if (this == null) return;
-            emitter.Particle.Type = type;
+            emitter.InitialTemplate.Type = type;
             var types = TypeCombo.ItemsSource as List<ParticleType>;
             foreach (var item in types)
             {

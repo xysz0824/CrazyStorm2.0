@@ -35,10 +35,6 @@ namespace CrazyStorm.Core
         Vector2[] lastSpawn;
         #endregion
 
-        #region Protected Members
-        protected ParticleBase particle;
-        #endregion
-
         #region Public Members
         public ParticleBase InitialTemplate { get; protected set; }
         public ParticleBase Template { get; protected set; }
@@ -98,7 +94,6 @@ namespace CrazyStorm.Core
             get { return emitterData.instantMovement; }
             set { emitterData.instantMovement = value; }
         }
-        public ParticleBase Particle { get { return particle; } }
         public GenericContainer<EventGroup> ParticleEventGroups { get; private set; }
         #endregion
 
@@ -180,7 +175,7 @@ namespace CrazyStorm.Core
         {
             var clone = base.Clone() as Emitter;
             clone.lastSpawn = new Vector2[EmitCount];
-            clone.particle = particle.Clone() as ParticleBase;
+            clone.InitialTemplate = InitialTemplate.Clone() as ParticleBase;
             clone.ParticleEventGroups = new GenericContainer<EventGroup>();
             foreach (var item in ParticleEventGroups) clone.ParticleEventGroups.Add(item.Clone() as EventGroup);
             return clone;
@@ -192,7 +187,7 @@ namespace CrazyStorm.Core
             //emitterData
             XmlHelper.BuildFromStruct(ref emitterData, emitterNode);
             //particle
-            particle.BuildFromXml(emitterNode);
+            InitialTemplate.BuildFromXml(emitterNode);
             //particleEventGroups
             XmlHelper.BuildFromObjectList(ParticleEventGroups, new EventGroup(), emitterNode, "ParticleEventGroups");
             return emitterNode;
@@ -204,7 +199,7 @@ namespace CrazyStorm.Core
             //emitterData
             XmlHelper.StoreStruct(emitterData, doc, emitterNode);
             //particle
-            particle.StoreAsXml(doc, emitterNode);
+            InitialTemplate.StoreAsXml(doc, emitterNode);
             //particleEventGroups
             XmlHelper.StoreObjectList(ParticleEventGroups, doc, emitterNode, "ParticleEventGroups");
             node.AppendChild(emitterNode);
@@ -217,7 +212,7 @@ namespace CrazyStorm.Core
             //emitterData
             PlayDataHelper.GenerateStruct(emitterData, emitterBytes);
             //particle
-            emitterBytes.AddRange(particle.GeneratePlayData(file, this));
+            emitterBytes.AddRange(InitialTemplate.GeneratePlayData(file, this));
             //particleEventGroups
             PlayDataHelper.GenerateObjectList(file, ParticleEventGroups, emitterBytes);
             bytes.AddRange(PlayDataHelper.CreateBlock(emitterBytes));
