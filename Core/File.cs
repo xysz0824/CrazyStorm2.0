@@ -36,25 +36,6 @@ namespace CrazyStorm.Core
         public GenericContainer<FileResource> Images { get { return images; } }
         public GenericContainer<FileResource> Sounds { get { return sounds; } }
         public GenericContainer<VariableResource> Globals { get { return globals; } }
-        public Vector2 BodyPosition
-        {
-            set
-            {
-                for (int i = 0;i < particleSystems.Count; ++i)
-                {
-                    var particleSystem = particleSystems[i];
-                    for (int j = 0;j < particleSystem.Layers.Count; ++j)
-                    {
-                        var layer = particleSystem.Layers[j];
-                        for (int k = 0;k < layer.Components.Count; ++k)
-                        {
-                            var component = layer.Components[k];
-                            component.BodyPosition = value;
-                        }
-                    }
-                }
-            }
-        }
         public int ParticleIndex { get { return particleIndex++; } }
         public int FileResourceIndex { get { return fileResourceIndex++; } }
         #endregion
@@ -138,18 +119,9 @@ namespace CrazyStorm.Core
                 return VersionInfo.PlayVersion == version;
             }
         }
-        public void RebuildComponentTree(ParticleSystem particleSystem)
-        {
-            for (int i = 0; i < particleSystem.Layers.Count; ++i)
-            {
-                particleSystem.AddLayer(particleSystem.Layers[0]);
-                particleSystem.Layers.RemoveAt(0);
-            }
-        }
         public void RebuildComponentTree()
         {
-            foreach (var particleSystem in ParticleSystems)
-                RebuildComponentTree(particleSystem);
+            foreach (var particleSystem in ParticleSystems) particleSystem.RebuildComponentTree();
         }
         public void RebuildObjectReference()
         {
@@ -164,17 +136,18 @@ namespace CrazyStorm.Core
                 var particleTypes = new List<ParticleType>();
                 particleTypes.AddRange(ParticleType.DefaultTypes);
                 particleTypes.AddRange(particleSystem.CustomTypes);
-                //Collect all components
-                var components = new List<Core.Component>();
-                foreach (var layer in particleSystem.Layers)
-                    components.AddRange(layer.Components);
                 //Rebuild components reference
-                foreach (var component in components)
+                foreach (var layer in particleSystem.Layers)
                 {
-                    component.RebuildReferenceFromCollection(components);
-                    //Rebuild particles reference
-                    if (component is Emitter)
-                        (component as Emitter).InitialTemplate.RebuildReferenceFromCollection(particleTypes);
+                    foreach (var component in layer.Components)
+                    {
+                        component.RebuildReferenceFromCollection();
+                        //Rebuild particles reference
+                        if (component is Emitter)
+                        {
+                            (component as Emitter).InitialTemplate.RebuildReferenceFromCollection(particleTypes);
+                        }
+                    }
                 }
             }
         }
@@ -383,17 +356,18 @@ namespace CrazyStorm.Core
                 var particleTypes = new List<ParticleType>();
                 particleTypes.AddRange(ParticleType.DefaultTypes);
                 particleTypes.AddRange(particleSystem.CustomTypes);
-                //Collect all components
-                var components = new List<Component>();
-                foreach (var layer in particleSystem.Layers)
-                    components.AddRange(layer.Components);
                 //Rebuild components reference
-                foreach (var component in components)
+                foreach (var layer in particleSystem.Layers)
                 {
-                    component.RebuildReferenceFromCollection(components);
-                    //Rebuild particles reference
-                    if (component is Emitter)
-                        (component as Emitter).InitialTemplate.RebuildReferenceFromCollection(particleTypes);
+                    foreach (var component in layer.Components)
+                    {
+                        component.RebuildReferenceFromCollection();
+                        //Rebuild particles reference
+                        if (component is Emitter)
+                        {
+                            (component as Emitter).InitialTemplate.RebuildReferenceFromCollection(particleTypes);
+                        }
+                    }
                 }
             }
         }

@@ -27,6 +27,15 @@ namespace CrazyStorm.Core
         public int limit;
         public bool oneSide;
     }
+    public class RebounderPool : PoolObject<RebounderPool, NullData>
+    {
+        public Rebounder Instance { get; private set; }
+        public RebounderPool()
+        {
+            Instance = new Rebounder();
+            Instance.PoolObject = this;
+        }
+    }
     public class Rebounder : Component
     {
         #region Private Members
@@ -35,6 +44,7 @@ namespace CrazyStorm.Core
         #endregion
 
         #region Public Members
+        public RebounderPool PoolObject { get; set; }
         [IntProperty(14, 1, int.MaxValue)]
         public int Size
         {
@@ -135,6 +145,22 @@ namespace CrazyStorm.Core
             clone.RebounderEventGroups = new GenericContainer<EventGroup>();
             foreach (var item in RebounderEventGroups) clone.RebounderEventGroups.Add(item.Clone() as EventGroup);
             return clone;
+        }
+        public override void CopyTo(PropertyContainer propertyContainer)
+        {
+            base.CopyTo(propertyContainer);
+            var rebounder = propertyContainer as Rebounder;
+            rebounder.lastRotation = lastRotation;
+            rebounder.rebounderData = rebounderData;
+            rebounder.RebounderEventGroups = RebounderEventGroups;
+        }
+        public override Component Instantiate()
+        {
+            return RebounderPool.Rent(NullData.Empty).Instance;
+        }
+        public override void Destroy()
+        {
+            RebounderPool.Return(PoolObject);
         }
         public override XmlElement BuildFromXml(XmlElement node)
         {

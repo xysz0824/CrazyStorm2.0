@@ -182,12 +182,6 @@ namespace CrazyStorm.Core
             particle.curveParticleData = curveParticleData;
             particle.Curve = null;
         }
-        public override void Reset(ParticleBase initial)
-        {
-            base.Reset(initial);
-            var initialState = initial as CurveParticle;
-            curveParticleData = initialState.curveParticleData;
-        }
         #endregion
     }
 }

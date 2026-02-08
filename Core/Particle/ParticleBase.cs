@@ -663,10 +663,6 @@ namespace CrazyStorm.Core
             particle.ParticleEventGroups = ParticleEventGroups;
             particle.ReboundTime = 0;
         }
-        public virtual void Reset(ParticleBase initial)
-        {
-            particleBaseData = initial.particleBaseData;
-        }
         public virtual void Reset() { }
         public int CompareTo(ParticleBase other)
         {

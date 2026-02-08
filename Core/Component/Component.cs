@@ -39,9 +39,6 @@ namespace CrazyStorm.Core
         Vector2 speedVector;
         Vector2 acspeedVector;
         ComponentData componentData;
-        bool selected;
-        Component parent;
-        Emitter bindingTarget;
         GenericContainer<EventGroup> componentEventGroups;
         GenericContainer<Component> children;
         #endregion
@@ -63,11 +60,7 @@ namespace CrazyStorm.Core
             }
         }
         [ReadOnlyProperty(1)]
-        public Emitter BindingTarget
-        {
-            get { return bindingTarget; }
-            set { bindingTarget = value; }
-        }
+        public Emitter BindingTarget { get; set; }
         public string LayerName { get; set; }
         public int LayerID { get; set; }
         [RuntimeProperty(2)]
@@ -147,16 +140,8 @@ namespace CrazyStorm.Core
             get { return componentData.visibility; }
             set { componentData.visibility = value; }
         }
-        public bool Selected
-        {
-            get { return selected; }
-            set { selected = value; }
-        }
-        public Component Parent
-        {
-            get { return parent; }
-            set { parent = value; }
-        }
+        public bool Selected { get; set; }
+        public Component Parent { get; set; }
         public long ParentID { get; set; }
         public long BindingTargetID { get; set; }
         public GenericContainer<VariableResource> Globals { get; set; }
@@ -242,15 +227,15 @@ namespace CrazyStorm.Core
         public override string ToString() => Name;
         public void TransPositiontoRelative()
         {
-            if (parent != null) Position -= parent.GetAbsolutePosition();
+            if (Parent != null) Position -= Parent.GetAbsolutePosition();
         }
         public void TransPositiontoAbsolute()
         {
-            if (parent != null) Position += parent.GetAbsolutePosition();
+            if (Parent != null) Position += Parent.GetAbsolutePosition();
         }
         public Vector2 GetAbsolutePosition()
         {
-            if (parent != null) return Position + parent.GetAbsolutePosition();
+            if (Parent != null) return Position + Parent.GetAbsolutePosition();
             return Position;
         }
         public List<Component> GetPosterity()
@@ -282,10 +267,10 @@ namespace CrazyStorm.Core
         public override object Clone()
         {
             var clone = base.Clone() as Component;
-            clone.parent = null;
-            if (parent != null) clone.ParentID = parent.ID;
-            clone.bindingTarget = null;
-            if (bindingTarget != null) clone.BindingTargetID = bindingTarget.ID;
+            clone.Parent = null;
+            if (Parent != null) clone.ParentID = Parent.ID;
+            clone.BindingTarget = null;
+            if (BindingTarget != null) clone.BindingTargetID = BindingTarget.ID;
             clone.Locals = new GenericContainer<VariableResource>();
             foreach (var variable in Locals)
             {
@@ -297,9 +282,30 @@ namespace CrazyStorm.Core
                 clone.componentEventGroups.Add(componentEventGroup.Clone() as EventGroup);
             }
             clone.children = new GenericContainer<Component>();
-            foreach (var child in children) clone.children.Add(child);
             return clone;
         }
+        public override void CopyTo(PropertyContainer propertyContainer)
+        {
+            propertyContainer.ID = ID;
+            base.CopyTo(propertyContainer);
+            var component = propertyContainer as Component;
+            component.name = name;
+            component.LayerName = LayerName;
+            component.LayerID = LayerID;
+            component.componentData = componentData;
+            component.Parent = null;
+            if (Parent != null) component.ParentID = Parent.ID;
+            component.BindingTarget = null;
+            if (BindingTarget != null) component.BindingTargetID = BindingTarget.ID;
+            component.Globals = Globals;
+            component.Locals = Locals;
+            component.BodyPosition = BodyPosition;
+            component.componentEventGroups = ComponentEventGroups;
+            component.children.Clear();
+            component.initialState = initialState;
+        }
+        public virtual Component Instantiate() => null;
+        public virtual void Destroy() { }
         public virtual XmlElement BuildFromXml(XmlElement node)
         {
             var nodeName = "Component";
@@ -354,17 +360,17 @@ namespace CrazyStorm.Core
             //componentData
             XmlHelper.StoreStruct(componentData, doc, componentNode);
             //parent
-            if (parent != null)
+            if (Parent != null)
             {
                 var parentAttribute = doc.CreateAttribute("parent");
-                parentAttribute.Value = parent.ID.ToString();
+                parentAttribute.Value = Parent.ID.ToString();
                 componentNode.Attributes.Append(parentAttribute);
             }
             //bindingTarget
-            if (bindingTarget != null)
+            if (BindingTarget != null)
             {
                 var bindingTargetAttribute = doc.CreateAttribute("bindingTarget");
-                bindingTargetAttribute.Value = bindingTarget.ID.ToString();
+                bindingTargetAttribute.Value = BindingTarget.ID.ToString();
                 componentNode.Attributes.Append(bindingTargetAttribute);
             }
             //variables
@@ -376,32 +382,46 @@ namespace CrazyStorm.Core
         }
         public void RebuildReferenceFromCollection(IList<Component> collection)
         {
-            //parent
-            if (ParentID != -1)
+            foreach (var target in collection)
             {
-                foreach (var target in collection)
+                if (ParentID == -1 && BindingTargetID == -1) break;
+                //parent
+                if (ParentID != -1 && ParentID == target.ID)
                 {
-                    if (ParentID == target.ID)
-                    {
-                        parent = target;
-                        parent.children.Add(this);
-                        break;
-                    }
+                    Parent = target;
+                    Parent.children.Add(this);
+                    ParentID = -1;
                 }
-                ParentID = -1;
+                //bindingTarget
+                if (BindingTargetID != -1 && BindingTargetID == target.ID)
+                {
+                    BindingTarget = target as Emitter;
+                    BindingTargetID = -1;
+                }
             }
-            //bindingTarget
-            if (BindingTargetID != -1)
+        }
+        public void RebuildReferenceFromCollection()
+        {
+            foreach (var layer in System.Layers)
             {
-                foreach (var target in collection)
+                if (ParentID == -1 && BindingTargetID == -1) break;
+                foreach (var target in layer.Components)
                 {
-                    if (BindingTargetID == target.ID)
+                    if (ParentID == -1 && BindingTargetID == -1) break;
+                    //parent
+                    if (ParentID != -1 && ParentID == target.ID)
                     {
-                        bindingTarget = target as Emitter;
-                        break;
+                        Parent = target;
+                        Parent.children.Add(this);
+                        ParentID = -1;
+                    }
+                    //bindingTarget
+                    if (BindingTargetID != -1 && BindingTargetID == target.ID)
+                    {
+                        BindingTarget = target as Emitter;
+                        BindingTargetID = -1;
                     }
                 }
-                BindingTargetID = -1;
             }
         }
         public virtual List<byte> GeneratePlayData(File file)
@@ -416,9 +436,9 @@ namespace CrazyStorm.Core
             //componentData
             PlayDataHelper.GenerateStruct(componentData, componentBytes);
             //parent
-            componentBytes.AddRange(BitConverter.GetBytes(parent != null ? parent.ID : -1));
+            componentBytes.AddRange(BitConverter.GetBytes(Parent != null ? Parent.ID : -1));
             //bindingTarget
-            componentBytes.AddRange(BitConverter.GetBytes(bindingTarget != null ? bindingTarget.ID : -1));
+            componentBytes.AddRange(BitConverter.GetBytes(BindingTarget != null ? BindingTarget.ID : -1));
             //variables
             PlayDataHelper.GenerateObjectList(file, Locals, componentBytes);
             //properties
@@ -680,7 +700,7 @@ namespace CrazyStorm.Core
                     Locals[i].Value = initialState.Locals[i].Value;
                 }
             }
-            initialState.ExecuteExpressionsAndSet(1);
+            ExecuteExpressionsAndSet(1);
             MathHelper.SetVector2(ref speedVector, Speed, SpeedAngle);
             MathHelper.SetVector2(ref acspeedVector, Acspeed, AcspeedAngle);
             parentAbsolutePosition = Vector2.Zero;

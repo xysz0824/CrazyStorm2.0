@@ -58,6 +58,7 @@ namespace CrazyStorm_Player
         Texture2D pointTexture;
         Texture2D slowModeTexture;
         Controllable controllable;
+        ParticleSystem instance;
         BlendType lastBlendType = BlendType.None;
 
         public string ResourceDirectory { get; set; } 
@@ -124,7 +125,6 @@ namespace CrazyStorm_Player
                 controllable.selfDelay = int.Parse(setting[7]);
                 controllable.selfRadius = int.Parse(setting[8]);
             }
-            File.BodyPosition = controllable.selfPos.ToCore();
             //Load background texture
             if (!string.IsNullOrWhiteSpace(BackgroundPath))
             {
@@ -205,7 +205,9 @@ namespace CrazyStorm_Player
             ParticleManager.OnParticleDraw += (particle) => DrawParticle(spriteBatch, particle);
             ParticleManager.OnCurveParticleDraw += (particle) => DrawCurveParticle(spriteBatch, curveBatch, particle);
             FrameworkDispatcher.Update();
+            File.ParticleSystems[SelectedParticleSystemIndex].BodyPosition = controllable.selfPos.ToCore();
             File.ParticleSystems[SelectedParticleSystemIndex].Reset(true);
+            instance = File.ParticleSystems[SelectedParticleSystemIndex].Instantiate();
         }
         public void Dispose()
         {
@@ -356,12 +358,11 @@ namespace CrazyStorm_Player
         public void Update(KeyboardState keyboard, GameTime gameTime)
         {
             FrameworkDispatcher.Update();
-            var selectedParticle = File.ParticleSystems[SelectedParticleSystemIndex];
-            controllable.Update(keyboard, selectedParticle.FrameFactor * ParticleSystem.FRAME_RATE_BASE / FrameRate);
-            File.BodyPosition = controllable.selfPos.ToCore();
+            controllable.Update(keyboard, instance.FrameFactor * ParticleSystem.FRAME_RATE_BASE / FrameRate);
+            instance.BodyPosition = controllable.selfPos.ToCore();
             EventManager.Update(FrameRate);
-            selectedParticle.Update(FrameRate, CurrentFrame);
-            ParticleManager.UpdateLayerMasks(selectedParticle.Layers);
+            instance.Update(FrameRate, CurrentFrame);
+            ParticleManager.UpdateLayerMasks(instance.Layers);
             shaderMaskCount.SetValue(ParticleManager.MaskCount);
             shaderMaskSize.SetValue(ParticleManager.MaskSizeArray);
             shaderMaskPosition.SetValue(ParticleManager.MaskPositionArray);
@@ -376,7 +377,7 @@ namespace CrazyStorm_Player
             for (int i = 0; i < collidedCount; ++i) particles[i].Die();
             controllable.selfPos = newPos.ToXna();
             ParticleManager.Update(FrameRate);
-            CurrentFrame = selectedParticle.CurrentFrame;
+            CurrentFrame = instance.CurrentFrame;
         }
         public void Draw(GraphicsDevice gd, GameTime gameTime)
         {
@@ -387,10 +388,9 @@ namespace CrazyStorm_Player
             {
                 spriteBatch.Draw(background, backgroundPos, null, Color.White, 0, Vector2.Zero, backgroundScale, SpriteEffects.None, 0);
             }
-            var particle = File.ParticleSystems[SelectedParticleSystemIndex];
-            var offset = (particle.ScreenOffset - particle.LogicOffset).ToXna();
+            var offset = (instance.ScreenOffset - instance.LogicOffset).ToXna();
             controllable.Draw(spriteBatch, characterTexture, pointTexture, slowModeTexture, offset);
-            ParticleManager.Draw(particle.OrderType);
+            ParticleManager.Draw(instance.OrderType);
             lastBlendType = BlendType.None;
             curveBatch.End();
             spriteBatch.End();

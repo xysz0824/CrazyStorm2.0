@@ -42,7 +42,7 @@ namespace CrazyStorm.Core
                 searchCount++;
                 if (searchCount >= pool.Length)
                 {
-                    throw new Exception($"{nameof(T)}Pool is overflowing");
+                    throw new Exception($"{typeof(T).Name} is overflowing");
                 }
             }
             while (instance.PoolState);

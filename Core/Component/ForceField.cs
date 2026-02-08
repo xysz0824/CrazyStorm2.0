@@ -31,6 +31,15 @@ namespace CrazyStorm.Core
         public float rotation;
         public float impactSpeed;
     }
+    public class ForceFieldPool : PoolObject<ForceFieldPool, NullData>
+    {
+        public ForceField Instance { get; private set; }
+        public ForceFieldPool()
+        {
+            Instance = new ForceField();
+            Instance.PoolObject = this;
+        }
+    }
     public class ForceField : Component
     {
         public delegate void ForceImpactHandler(Vector2 impactSpeed);
@@ -44,6 +53,7 @@ namespace CrazyStorm.Core
         #endregion
 
         #region Public Members
+        public ForceFieldPool PoolObject { get; set; }
         [FloatProperty(14, 1, float.MaxValue)]
         public float HalfWidth
         {
@@ -183,6 +193,21 @@ namespace CrazyStorm.Core
         #endregion
 
         #region Public Methods
+        public override void CopyTo(PropertyContainer propertyContainer)
+        {
+            base.CopyTo(propertyContainer);
+            var forceField = propertyContainer as ForceField;
+            forceField.targetName = targetName;
+            forceField.forceFieldData = forceFieldData;
+        }
+        public override Component Instantiate()
+        {
+            return ForceFieldPool.Rent(NullData.Empty).Instance;
+        }
+        public override void Destroy()
+        {
+            ForceFieldPool.Return(PoolObject);
+        }
         public override XmlElement BuildFromXml(XmlElement node)
         {
             node = base.BuildFromXml(node);

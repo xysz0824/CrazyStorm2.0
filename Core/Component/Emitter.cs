@@ -180,6 +180,17 @@ namespace CrazyStorm.Core
             foreach (var item in ParticleEventGroups) clone.ParticleEventGroups.Add(item.Clone() as EventGroup);
             return clone;
         }
+        public override void CopyTo(PropertyContainer propertyContainer)
+        {
+            base.CopyTo(propertyContainer);
+            var emitter = propertyContainer as Emitter;
+            emitter.InitialTemplate = InitialTemplate;
+            emitter.InitialTemplate.Emitter = emitter;
+            emitter.Particles.Clear();
+            emitter.EmitterEventGroups = EmitterEventGroups;
+            emitter.emitterData = emitterData;
+            emitter.ParticleEventGroups = ParticleEventGroups;
+        }
         public override XmlElement BuildFromXml(XmlElement node)
         {
             node = base.BuildFromXml(node);
@@ -352,8 +363,7 @@ namespace CrazyStorm.Core
         }
         public override void Reset()
         {
-            if (Template == null) Template = InitialTemplate.Clone() as ParticleBase;
-            else Template.Reset(InitialTemplate);
+            InitialTemplate.CopyTo(Template);
             base.Reset();
             var initialState = base.initialState as Emitter;
             emitterData = initialState.emitterData;

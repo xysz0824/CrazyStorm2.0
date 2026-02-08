@@ -41,6 +41,15 @@ namespace CrazyStorm.Core
         public bool layerMaskMutex;
         public float rotation;
     }
+    public class EventFieldPool : PoolObject<EventFieldPool, NullData>
+    {
+        public EventField Instance { get; private set; }
+        public EventFieldPool()
+        {
+            Instance = new EventField();
+            Instance.PoolObject = this;
+        }
+    }
     public class EventField : Component
     {
         #region Private Members
@@ -51,6 +60,7 @@ namespace CrazyStorm.Core
         #endregion
 
         #region Public Members
+        public EventFieldPool PoolObject { get; set; }
         [FloatProperty(14, 1, float.MaxValue)]
         public float HalfWidth
         {
@@ -152,6 +162,22 @@ namespace CrazyStorm.Core
             clone.EventFieldEventGroups = new GenericContainer<EventGroup>();
             foreach (var item in EventFieldEventGroups) clone.EventFieldEventGroups.Add(item.Clone() as EventGroup);
             return clone;
+        }
+        public override void CopyTo(PropertyContainer propertyContainer)
+        {
+            base.CopyTo(propertyContainer);
+            var eventField = propertyContainer as EventField;
+            eventField.targetName = targetName;
+            eventField.eventFieldData = eventFieldData;
+            eventField.EventFieldEventGroups = EventFieldEventGroups;
+        }
+        public override Component Instantiate()
+        {
+            return EventFieldPool.Rent(NullData.Empty).Instance;
+        }
+        public override void Destroy()
+        {
+            EventFieldPool.Return(PoolObject);
         }
         public override XmlElement BuildFromXml(XmlElement node)
         {

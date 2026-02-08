@@ -30,7 +30,7 @@ namespace CrazyStorm.Core
         FirstAsTop,
         LastAsTop
     }
-    public class ParticleSystem : IXmlData, IGeneratePlayData, ILoadPlayData
+    public class ParticleSystem : PoolObject<ParticleSystem, NullData>, IXmlData, IGeneratePlayData, ILoadPlayData
     {
         public const float FRAME_RATE_BASE = 60;
 
@@ -93,6 +93,21 @@ namespace CrazyStorm.Core
         public Dictionary<int, int> TypeSoundMap { get { return typeSoundMap; } }
         public int Status { get; private set; }
         public float StatusFrame { get; private set; }
+        public Vector2 BodyPosition 
+        {
+            set
+            {
+                for (int j = 0; j < Layers.Count; ++j)
+                {
+                    var layer = Layers[j];
+                    for (int k = 0; k < layer.Components.Count; ++k)
+                    {
+                        var component = layer.Components[k];
+                        component.BodyPosition = value;
+                    }
+                }
+            }
+        }
         public Vector2 CenterPosition { get; private set; }
         #endregion
 
@@ -181,6 +196,16 @@ namespace CrazyStorm.Core
             }
             layers.Remove(layer);
         }
+        public void RebuildComponentTree()
+        {
+            if (componentTree == null) componentTree = new GenericContainer<Component>();
+            else componentTree.Clear();
+            for (int i = 0; i < Layers.Count; ++i)
+            {
+                AddLayer(Layers[0]);
+                Layers.RemoveAt(0);
+            }
+        }
         public object Clone()
         {
             var clone = MemberwiseClone() as ParticleSystem;
@@ -194,6 +219,39 @@ namespace CrazyStorm.Core
             clone.typeSoundMap = new Dictionary<int, int>();
             foreach (var kv in typeSoundMap) clone.typeSoundMap[kv.Key] = kv.Value;
             return clone;
+        }
+        public ParticleSystem Instantiate()
+        {
+            var instance = Rent(NullData.Empty);
+            instance.name = name;
+            instance.orderType = orderType;
+            instance.LogicOffset = default;
+            instance.customTypes = customTypes;
+            instance.layers.Clear();
+            for (int i = 0; i < layers.Count; ++i)
+            {
+                var layer = layers[i].Instantiate();
+                instance.layers.Add(layer);
+            }
+            foreach (var layer in instance.layers)
+            {
+                foreach (var component in layer.Components)
+                {
+                    component.System = instance;
+                    component.RebuildReferenceFromCollection();
+                }
+            }
+            instance.RebuildComponentTree();
+            instance.Sounds = Sounds;
+            instance.typeSoundMap = typeSoundMap;
+            instance.Status = 0;
+            instance.StatusFrame = 0;
+            return instance;
+        }
+        public void Destroy()
+        {
+            foreach (var layer in layers) layer.Destroy();
+            Return(this);
         }
         public XmlElement BuildFromXml(XmlElement node)
         {

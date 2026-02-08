@@ -10,11 +10,22 @@ using System.Xml.Serialization;
 
 namespace CrazyStorm.Core
 {
+    public class MultiEmitterPool : PoolObject<MultiEmitterPool, NullData>
+    {
+        public MultiEmitter Instance { get; private set; }
+        public MultiEmitterPool()
+        {
+            Instance = new MultiEmitter();
+            Instance.PoolObject = this;
+        }
+    }
     public class MultiEmitter : Emitter
     {
+        public MultiEmitterPool PoolObject { get; set; }
         public MultiEmitter()
         {
             InitialTemplate = new Particle();
+            Template = new Particle();
         }
         public override XmlElement BuildFromXml(XmlElement node)
         {
@@ -28,6 +39,14 @@ namespace CrazyStorm.Core
             var multiEmitterNode = doc.CreateElement("MultiEmitter");
             node.AppendChild(multiEmitterNode);
             return multiEmitterNode;
+        }
+        public override Component Instantiate()
+        {
+            return MultiEmitterPool.Rent(NullData.Empty).Instance;
+        }
+        public override void Destroy()
+        {
+            MultiEmitterPool.Return(PoolObject);
         }
     }
 }

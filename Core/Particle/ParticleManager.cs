@@ -74,6 +74,14 @@ namespace CrazyStorm.Core
             particlePreserved = particlePreservedDist;
             curvePreserved = curvePreservedDist;
             instanceID = 0;
+            ParticleSystem.Reset(100);
+            Layer.Reset(500);
+            MultiEmitterPool.Reset(5000);
+            CurveEmitterPool.Reset(500);
+            EventFieldPool.Reset(500);
+            RebounderPool.Reset(500);
+            ForceFieldPool.Reset(500);
+            CenterPool.Reset(500);
             ParticlePool.Reset(particleMaximum);
             CurveParticlePool.Reset(curveParticleMaximum);
             Curve.Reset(curveParticleMaximum);

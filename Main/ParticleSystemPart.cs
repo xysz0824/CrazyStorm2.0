@@ -84,7 +84,7 @@ namespace CrazyStorm
             var components = new List<Component>();
             foreach (var layer in particle.Layers) components.AddRange(layer.Components);
             foreach (var component in components) component.RebuildReferenceFromCollection(components);
-            file.RebuildComponentTree(particle);
+            particle.RebuildComponentTree();
             file.ParticleSystems.Add(particle);
             selectedSystem = particle;
             InitializeCommandStack(particle);

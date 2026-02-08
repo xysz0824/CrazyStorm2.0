@@ -33,7 +33,7 @@ namespace CrazyStorm.Core
         public int beginFrame;
         public int totalFrame;
     }
-    public class Layer : INotifyPropertyChanged, IXmlData, IGeneratePlayData, ILoadPlayData
+    public class Layer : PoolObject<Layer, NullData>, INotifyPropertyChanged, IXmlData, IGeneratePlayData, ILoadPlayData
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -103,13 +103,12 @@ namespace CrazyStorm.Core
         {
             Components = new GenericContainer<Component>();
         }
-        public Layer(string name)
+        public Layer(string name) : this()
         {
             this.name = name;
             layerData.visible = true;
             layerData.beginFrame = 1;
             layerData.totalFrame = 200;
-            Components = new GenericContainer<Component>();
         }
         #endregion
 
@@ -120,6 +119,25 @@ namespace CrazyStorm.Core
             clone.Components = new GenericContainer<Component>();
             foreach (var component in Components) clone.Components.Add(component.Clone() as Component);
             return clone;
+        }
+        public Layer Instantiate()
+        {
+            var instance = Rent(NullData.Empty);
+            instance.name = name;
+            instance.layerData = layerData;
+            instance.Components.Clear();
+            for (int i = 0; i < Components.Count; ++i)
+            {
+                var component = Components[i].Instantiate();
+                Components[i].CopyTo(component);
+                instance.Components.Add(component);
+            }
+            return instance;
+        }
+        public void Destroy()
+        {
+            foreach (var component in Components) component.Destroy();
+            Return(this);
         }
         public XmlElement BuildFromXml(XmlElement node)
         {
