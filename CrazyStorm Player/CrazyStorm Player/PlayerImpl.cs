@@ -395,5 +395,9 @@ namespace CrazyStorm_Player
             curveBatch.End();
             spriteBatch.End();
         }
+        public void SetStatus(int i)
+        {
+            instance.SetStatus(i);
+        }
     }
 }

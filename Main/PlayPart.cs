@@ -282,7 +282,7 @@ namespace CrazyStorm
             if (player != null)
             {
                 var status = int.Parse((string)(sender as Button).Content);
-                player.PlayerImpl.File.ParticleSystems[player.PlayerImpl.SelectedParticleSystemIndex].SetStatus(status);
+                player.PlayerImpl.SetStatus(status);
                 foreach (Button button in statusPanel.Children)
                 {
                     if ((string)button.Content == status.ToString())
