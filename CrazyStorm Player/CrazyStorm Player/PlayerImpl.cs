@@ -375,8 +375,13 @@ namespace CrazyStorm_Player
         public void Update(KeyboardState keyboard, GameTime gameTime)
         {
             FrameworkDispatcher.Update();
-            controllable.Update(keyboard, ParticleSystem.FRAME_RATE_BASE / FrameRate);
-            foreach (var instance in instances.Keys) instance.BodyPosition = controllable.selfPos.ToCore();
+            var minFrameFactor = 1f;
+            foreach (var instance in instances.Keys)
+            {
+                instance.BodyPosition = controllable.selfPos.ToCore();
+                if (minFrameFactor > instance.FrameFactor) minFrameFactor = instance.FrameFactor;
+            }
+            controllable.Update(keyboard, minFrameFactor * ParticleSystem.FRAME_RATE_BASE / FrameRate);
             EventManager.Update(FrameRate);
             foreach (var instance in instances.Keys) instance.Update(FrameRate, CurrentFrame);
 
