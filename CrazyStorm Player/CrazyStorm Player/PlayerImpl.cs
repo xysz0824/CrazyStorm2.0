@@ -174,14 +174,11 @@ namespace CrazyStorm_Player
             slowModeTexture = Texture2D.FromStream(gd, slowModeTextureStream);
             slowModeTextureStream.Dispose();
             //Load custom textures and types
+            customTextures = new Dictionary<File, Dictionary<int, Texture2D>>();
             foreach (var file in Files)
             {
-                if (string.IsNullOrEmpty(file.ResourceDirectory))
-                {
-                    Environment.CurrentDirectory = AppDomain.CurrentDomain.SetupInformation.ApplicationBase;
-                }
-                else Environment.CurrentDirectory = file.ResourceDirectory;
-                customTextures = new Dictionary<File, Dictionary<int, Texture2D>>();
+                Environment.CurrentDirectory = AppDomain.CurrentDomain.SetupInformation.ApplicationBase;
+                if (!string.IsNullOrEmpty(file.ResourceDirectory)) Environment.CurrentDirectory = file.ResourceDirectory;
                 foreach (var image in file.Images)
                 {
                     if (!customTextures.ContainsKey(file)) customTextures[file] = new Dictionary<int, Texture2D>();

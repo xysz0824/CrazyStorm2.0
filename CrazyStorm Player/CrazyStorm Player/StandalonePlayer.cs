@@ -19,7 +19,7 @@ namespace CrazyStorm_Player
         {
             Window.Title = VersionInfo.AppTitle;
 
-            var path = Environment.GetCommandLineArgs()[1];
+            var paths = Environment.GetCommandLineArgs()[1];
             var backgroundPath = Environment.GetCommandLineArgs()[2];
             var selectedParticleSystemIndex = int.Parse(Environment.GetCommandLineArgs()[3]);
             var width = int.Parse(Environment.GetCommandLineArgs()[4]);
@@ -44,9 +44,13 @@ namespace CrazyStorm_Player
             ParticleType.LoadDefaultTypes(typeLibraryPath);
 
             playerImpl.Files = new List<File>();
-            var file = new File();
-            file.LoadPlayFile(path, VersionInfo.BaseVersion);
-            playerImpl.Files.Add(file);
+            var split = paths.Split(',');
+            foreach (var path in split)
+            {
+                var file = new File();
+                file.LoadPlayFile(path, VersionInfo.BaseVersion);
+                playerImpl.Files.Add(file);
+            }
 
             graphics = new GraphicsDeviceManager(this);
             graphics.PreferMultiSampling = false;

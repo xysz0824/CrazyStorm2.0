@@ -701,7 +701,7 @@ namespace CrazyStorm.Core
                     Locals[i].Value = initialState.Locals[i].Value;
                 }
             }
-            ExecuteExpressionsAndSet(1);
+            initialState.ExecuteExpressionsAndSet(1);
             MathHelper.SetVector2(ref speedVector, Speed, SpeedAngle);
             MathHelper.SetVector2(ref acspeedVector, Acspeed, AcspeedAngle);
             parentAbsolutePosition = Vector2.Zero;

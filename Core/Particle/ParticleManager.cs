@@ -56,7 +56,21 @@ namespace CrazyStorm.Core
         static float[] maskTypeArray = new float[MAX_MASK_COUNT];
         static float[] maskRotateArray = new float[MAX_MASK_COUNT];
         public static int MaximumParticleCount => searchResult.Length;
-        public static int ActiveParticleCount => activeParticles != null ? activeParticles.Count : 0;
+        public static int ActiveParticleCount
+        {
+            get
+            {
+                int count = 0;
+                if (activeParticles != null)
+                {
+                    foreach (var particles in activeParticles)
+                    {
+                        count += particles.Value.Count;
+                    }
+                }
+                return count;
+            }
+        }
         public static Vector2[] MaskPositionArray => maskPositionArray;
         public static Vector2[] MaskSizeArray => maskSizeArray;
         public static float[] MaskShapeArray => maskShapeArray;
