@@ -15,6 +15,7 @@ namespace CrazyStorm.Core
     public class FileResource : Resource
     {
         #region Private Members
+        File file;
         [XmlAttribute]
         int id;
         string absolutePath;
@@ -24,6 +25,11 @@ namespace CrazyStorm.Core
         #endregion
 
         #region Public Members
+        public File File
+        {
+            get { return file; }
+            set { file = value; }
+        }
         public int ID
         {
             get { return id; }
@@ -35,9 +41,10 @@ namespace CrazyStorm.Core
 
         #region Constructor
         public FileResource() { }
-        public FileResource(int id, string label, string absolutePath)
+        public FileResource(File file, int id, string label, string absolutePath)
             : base(label)
         {
+            this.file = file;
             this.id = id;
             this.absolutePath = absolutePath;
             relativePath = absolutePath;
@@ -47,11 +54,11 @@ namespace CrazyStorm.Core
         #region Public Methods
         public override void CheckValid()
         {
-            if (!StringUtil.IsNullOrWhiteSpace(File.CurrentDirectory))
+            if (!StringUtil.IsNullOrWhiteSpace(file.ResourceDirectory))
             {
-                relativePath = relativePath.Replace(File.CurrentDirectory, "");
+                relativePath = relativePath.Replace(file.ResourceDirectory, "");
             }
-            absolutePath = relativePath.Contains(":") ? relativePath : File.CurrentDirectory + relativePath;
+            absolutePath = relativePath.Contains(":") ? relativePath : file.ResourceDirectory + relativePath;
             isValid = System.IO.File.Exists(absolutePath);
         }
         public override object Clone()
@@ -89,7 +96,6 @@ namespace CrazyStorm.Core
             {
                 id = fileResourceReader.ReadInt32();
                 PlayDataHelper.ReadStringDataFields(this, fileResourceReader);
-                absolutePath = relativePath.Contains(":") ? relativePath : File.CurrentDirectory + relativePath;
             }
         }
         #endregion

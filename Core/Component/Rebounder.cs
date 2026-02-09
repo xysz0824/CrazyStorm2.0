@@ -91,7 +91,7 @@ namespace CrazyStorm.Core
         void Update(float frameScale)
         {
             int count = 0;
-            var results = ParticleManager.SearchByRect(Position, Size, Size, 0, out count);
+            var results = ParticleManager.SearchByRect(System, Position, Size, Size, 0, out count);
             for (int i = 0; i < count; ++i)
             {
                 if (results[i].IgnoreRebound || results[i].Type == null || results[i].PSpeedVector == Vector2.Zero ||

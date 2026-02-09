@@ -200,6 +200,7 @@ namespace CrazyStorm.Core
                         var relativePath = match.Groups[0].Value;
                         var image = new FileResource
                         {
+                            File = this,
                             ID = FileResourceIndex,
                             Label = Path.GetFileName(relativePath),
                             RelatviePath = relativePath,
@@ -326,6 +327,7 @@ namespace CrazyStorm.Core
                             var relativePath = match.Groups["path"].Value;
                             var sound = new FileResource
                             {
+                                File = this,
                                 ID = FileResourceIndex,
                                 Label = Path.GetFileName(relativePath),
                                 RelatviePath = relativePath,
@@ -643,15 +645,17 @@ namespace CrazyStorm.Core
                             force.ForceImpactSpeed = float.Parse(submatch.Groups["addspeed"].Value);
                             layer.Components.Add(force);
                         }
-                        //binding
+                        //rebuild reference
                         foreach (var component in layer.Components)
                         {
+                            component.System = particleSystem;
                             if (component.BindingTargetID == -1) continue;
                             component.BindingTarget = batchs.Find((emitter) => emitter.Name == (component.BindingTargetID + 1).ToString());
                             component.BindingTargetID = -1;
                         }
                         if (particleSystem.Layers.Count == 0)
                         {
+                            center.System = particleSystem;
                             layer.Components.Add(center);
                         }
                         particleSystem.Layers.Add(layer);

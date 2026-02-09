@@ -52,19 +52,18 @@ namespace CrazyStorm_Player
         Vector2 backgroundScale;
         Vector2 backgroundPos;
         Texture2D defaultTexture;
-        Dictionary<int, Texture2D> customTextures;
+        Dictionary<File, Dictionary<int, Texture2D>> customTextures;
         Dictionary<string, SoundEffect> sounds;
         Texture2D characterTexture;
         Texture2D pointTexture;
         Texture2D slowModeTexture;
         Controllable controllable;
-        ParticleSystem instance;
+        Dictionary<ParticleSystem, File> instances;
         BlendType lastBlendType = BlendType.None;
 
-        public string ResourceDirectory { get; set; } 
         public string TypeLibraryPath { get; set; }
         public FrameOrientation FrameOrientation { get; set; }
-        public File File { get; set; }
+        public List<File> Files { get; set; }
         public int Width { get; set; }
         public int Height { get; set; }
         public float FrameRate { get; set; }
@@ -175,24 +174,32 @@ namespace CrazyStorm_Player
             slowModeTexture = Texture2D.FromStream(gd, slowModeTextureStream);
             slowModeTextureStream.Dispose();
             //Load custom textures and types
-            Environment.CurrentDirectory = ResourceDirectory;
-            customTextures = new Dictionary<int, Texture2D>();
-            foreach (var image in File.Images)
+            foreach (var file in Files)
             {
-                if (!System.IO.File.Exists(image.RelatviePath))
+                if (string.IsNullOrEmpty(file.ResourceDirectory))
                 {
-                    customTextures[image.ID] = null;
-                    continue;
+                    Environment.CurrentDirectory = AppDomain.CurrentDomain.SetupInformation.ApplicationBase;
                 }
-                using (var file = new FileStream(image.RelatviePath, FileMode.Open, FileAccess.Read))
+                else Environment.CurrentDirectory = file.ResourceDirectory;
+                customTextures = new Dictionary<File, Dictionary<int, Texture2D>>();
+                foreach (var image in file.Images)
                 {
-                    try
+                    if (!customTextures.ContainsKey(file)) customTextures[file] = new Dictionary<int, Texture2D>();
+                    if (!System.IO.File.Exists(image.RelatviePath))
                     {
-                        customTextures[image.ID] = Texture2D.FromStream(gd, file);
+                        customTextures[file][image.ID] = null;
+                        continue;
                     }
-                    catch
+                    using (var stream = new FileStream(image.RelatviePath, FileMode.Open, FileAccess.Read))
                     {
-                        customTextures[image.ID] = null;
+                        try
+                        {
+                            customTextures[file][image.ID] = Texture2D.FromStream(gd, stream);
+                        }
+                        catch
+                        {
+                            customTextures[file][image.ID] = null;
+                        }
                     }
                 }
             }
@@ -205,16 +212,27 @@ namespace CrazyStorm_Player
             ParticleManager.OnParticleDraw += (particle) => DrawParticle(spriteBatch, particle);
             ParticleManager.OnCurveParticleDraw += (particle) => DrawCurveParticle(spriteBatch, curveBatch, particle);
             FrameworkDispatcher.Update();
-            File.ParticleSystems[SelectedParticleSystemIndex].BodyPosition = controllable.selfPos.ToCore();
-            File.ParticleSystems[SelectedParticleSystemIndex].Reset(true);
-            instance = File.ParticleSystems[SelectedParticleSystemIndex].Instantiate();
+            instances = new Dictionary<ParticleSystem, File>();
+            foreach (var file in Files)
+            {
+                file.ParticleSystems[SelectedParticleSystemIndex].BodyPosition = controllable.selfPos.ToCore();
+                file.ParticleSystems[SelectedParticleSystemIndex].Reset(true);
+                var instance = file.ParticleSystems[SelectedParticleSystemIndex].Instantiate();
+                instances[instance] = file;
+            }
         }
         public void Dispose()
         {
             spriteBatch?.Dispose();
             background?.Dispose();
             defaultTexture?.Dispose();
-            foreach (var tex in customTextures.Values) tex?.Dispose();
+            foreach (var dict in customTextures.Values)
+            {
+                foreach (var tex in dict.Values)
+                {
+                    tex?.Dispose();
+                }
+            }
             customTextures.Clear();
             foreach (var sound in sounds.Values) sound?.Dispose();
             sounds.Clear();
@@ -262,8 +280,9 @@ namespace CrazyStorm_Player
                 }
             }
             lastBlendType = blendType;
+            var file = instances[particle.System];
             var type = particle.Type;
-            var tex = type.ID >= ParticleType.DefaultTypeIndex ? defaultTexture : type.Image != null ? customTextures[type.Image.ID] : null;
+            var tex = type.ID >= ParticleType.DefaultTypeIndex ? defaultTexture : type.Image != null ? customTextures[file][type.Image.ID] : null;
             if (tex == null) return;
             var center = new Vector2(Width / 2, Height / 2) + particle.System.ScreenOffset.ToXna();
             var origin = type.CenterPoint.ToXna();
@@ -334,8 +353,9 @@ namespace CrazyStorm_Player
                 }
             }
             lastBlendType = blendType;
+            var file = instances[particle.System];
             var type = particle.Type;
-            var tex = type.ID >= ParticleType.DefaultTypeIndex ? defaultTexture : type.Image != null ? customTextures[type.Image.ID] : null;
+            var tex = type.ID >= ParticleType.DefaultTypeIndex ? defaultTexture : type.Image != null ? customTextures[file][type.Image.ID] : null;
             if (tex == null) return;
             var center = new Vector2(Width / 2, Height / 2) + particle.System.ScreenOffset.ToXna();
             float alpha = particle.Opacity / 100f - (ParticleBase.FOG_TIME - particle.FogFrame) / ParticleBase.FOG_TIME;
@@ -358,26 +378,25 @@ namespace CrazyStorm_Player
         public void Update(KeyboardState keyboard, GameTime gameTime)
         {
             FrameworkDispatcher.Update();
-            controllable.Update(keyboard, instance.FrameFactor * ParticleSystem.FRAME_RATE_BASE / FrameRate);
-            instance.BodyPosition = controllable.selfPos.ToCore();
+            controllable.Update(keyboard, ParticleSystem.FRAME_RATE_BASE / FrameRate);
+            foreach (var instance in instances.Keys) instance.BodyPosition = controllable.selfPos.ToCore();
             EventManager.Update(FrameRate);
-            instance.Update(FrameRate, CurrentFrame);
-            ParticleManager.UpdateLayerMasks(instance.Layers);
-            shaderMaskCount.SetValue(ParticleManager.MaskCount);
-            shaderMaskSize.SetValue(ParticleManager.MaskSizeArray);
-            shaderMaskPosition.SetValue(ParticleManager.MaskPositionArray);
-            shaderMaskShape.SetValue(ParticleManager.MaskShapeArray);
-            shaderMaskType.SetValue(ParticleManager.MaskTypeArray);
-            shaderMaskRotate.SetValue(ParticleManager.MaskRotateArray);
-            shaderRenderCenter.SetValue(new Vector2(Width / 2, Height / 2));
+            foreach (var instance in instances.Keys) instance.Update(FrameRate, CurrentFrame);
+
             var collidedCount = 0;
             CrazyStorm.Core.Vector2 newPos = default;
             var particles = ParticleManager.CheckCollision(false, controllable.selfPosLast.ToCore(),
                 controllable.selfPos.ToCore(), controllable.selfRadius, out collidedCount, out newPos);
             for (int i = 0; i < collidedCount; ++i) particles[i].Die();
             controllable.selfPos = newPos.ToXna();
+
             ParticleManager.Update(FrameRate);
-            CurrentFrame = instance.CurrentFrame;
+            var minCurrentFrame = float.MaxValue;
+            foreach (var instance in instances.Keys)
+            {
+                if (minCurrentFrame > instance.CurrentFrame) minCurrentFrame = instance.CurrentFrame;
+            }
+            CurrentFrame = minCurrentFrame;
         }
         public void Draw(GraphicsDevice gd, GameTime gameTime)
         {
@@ -388,16 +407,33 @@ namespace CrazyStorm_Player
             {
                 spriteBatch.Draw(background, backgroundPos, null, Color.White, 0, Vector2.Zero, backgroundScale, SpriteEffects.None, 0);
             }
-            var offset = (instance.ScreenOffset - instance.LogicOffset).ToXna();
-            controllable.Draw(spriteBatch, characterTexture, pointTexture, slowModeTexture, offset);
-            ParticleManager.Draw(instance.OrderType);
+            var maxOffset = new Vector2(float.MinValue, float.MinValue);
+            foreach (var instance in instances.Keys)
+            {
+                var offset = (instance.ScreenOffset - instance.LogicOffset).ToXna();
+                if (maxOffset.X < offset.X) maxOffset.X = offset.X;
+                if (maxOffset.Y < offset.Y) maxOffset.Y = offset.Y;
+            }
+            controllable.Draw(spriteBatch, characterTexture, pointTexture, slowModeTexture, maxOffset);
+            shaderRenderCenter.SetValue(new Vector2(Width / 2, Height / 2));
+            foreach (var instance in instances.Keys)
+            {
+                ParticleManager.UpdateLayerMasks(instance.Layers);
+                shaderMaskCount.SetValue(ParticleManager.MaskCount);
+                shaderMaskSize.SetValue(ParticleManager.MaskSizeArray);
+                shaderMaskPosition.SetValue(ParticleManager.MaskPositionArray);
+                shaderMaskShape.SetValue(ParticleManager.MaskShapeArray);
+                shaderMaskType.SetValue(ParticleManager.MaskTypeArray);
+                shaderMaskRotate.SetValue(ParticleManager.MaskRotateArray);
+                ParticleManager.Draw(instance);
+            }
             lastBlendType = BlendType.None;
             curveBatch.End();
             spriteBatch.End();
         }
         public void SetStatus(int i)
         {
-            instance.SetStatus(i);
+            foreach(var instance in instances.Keys) instance.SetStatus(i);
         }
     }
 }

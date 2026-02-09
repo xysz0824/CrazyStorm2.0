@@ -33,13 +33,13 @@ namespace CrazyStorm
         #region Private Methods
         void GeneratePlayFile()
         {
-            if (string.IsNullOrWhiteSpace(File.CurrentDirectory))
+            if (string.IsNullOrWhiteSpace(file.ResourceDirectory))
             {
                 MessageBox.Show((string)FindResource("NeedSaveFirstStr"), (string)FindResource("TipTitleStr"),
                     MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
-            file.GeneratePlayFile(filePath, fileName);
+            file.GeneratePlayFile(fileName);
             MessageBox.Show((string)FindResource("PlayFileSavedStr"), (string)FindResource("TipTitleStr"),
                 MessageBoxButton.OK, MessageBoxImage.Information);
         }
@@ -84,22 +84,16 @@ namespace CrazyStorm
                 player.Height = config.ScreenHeight;
                 player.PlayerImpl = new PlayerImpl(config.ScreenWidth, config.ScreenHeight, config.FrameRate,
                     config.ParticleMaximum, config.CurveParticleMaximum);
-                if (string.IsNullOrWhiteSpace(File.CurrentDirectory))
-                {
-                    player.PlayerImpl.ResourceDirectory = AppDomain.CurrentDomain.SetupInformation.ApplicationBase;
-                }
-                else
-                {
-                    player.PlayerImpl.ResourceDirectory = File.CurrentDirectory;
-                }
                 player.PlayerImpl.TypeLibraryPath = config.TypeLibraryPath;
                 player.PlayerImpl.FrameOrientation = config.FrameOrientation;
                 player.PlayerImpl.BackgroundPath = config.BackgroundPath;
                 player.PlayerImpl.SelectedParticleSystemIndex = particleSystemIndex;
                 player.PlayerImpl.ControllableImagePath = config.SelfImagePath;
                 player.PlayerImpl.ControllableSetting = config.SelfSetting;
-                player.PlayerImpl.File = new File();
-                player.PlayerImpl.File.LoadPlayFile(file.GeneratePlayFile(), CrazyStorm_Player.VersionInfo.BaseVersion);
+                player.PlayerImpl.Files = new List<File>();
+                var generatedFile = new File();
+                generatedFile.LoadPlayFile(file.GeneratePlayFile(), file.ResourceDirectory, CrazyStorm_Player.VersionInfo.BaseVersion);
+                player.PlayerImpl.Files.Add(generatedFile);
                 player.PlayerImpl.CurrentFrame = selectedFrame;
                 screenContent.Background.Opacity = 0;
                 (VisualHelper.VisualDownwardSearch(screenContent, "Grid") as Canvas).Visibility = Visibility.Hidden;

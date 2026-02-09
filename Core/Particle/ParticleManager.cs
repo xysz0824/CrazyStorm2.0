@@ -48,7 +48,7 @@ namespace CrazyStorm.Core
         static int left, right, top, bottom;
         static int particlePreserved, curvePreserved;
         static long instanceID;
-        static List<ParticleBase> activeParticles;
+        static Dictionary<ParticleSystem, List<ParticleBase>> activeParticles;
         static ParticleBase[] searchResult;
         static Vector2[] maskPositionArray = new Vector2[MAX_MASK_COUNT];
         static Vector2[] maskSizeArray = new Vector2[MAX_MASK_COUNT];
@@ -85,7 +85,7 @@ namespace CrazyStorm.Core
             ParticlePool.Reset(particleMaximum);
             CurveParticlePool.Reset(curveParticleMaximum);
             Curve.Reset(curveParticleMaximum);
-            activeParticles = new List<ParticleBase>();
+            activeParticles = new Dictionary<ParticleSystem, List<ParticleBase>>();
             searchResult = new ParticleBase[particleMaximum + curveParticleMaximum];
             EventExecutor.Reset(MaximumParticleCount * 10);
             OnParticleDraw = null;
@@ -112,7 +112,8 @@ namespace CrazyStorm.Core
             particle.ID = instanceID++;
             particle.Reset();
             particle.Alive = true;
-            activeParticles.Add(particle);
+            if (!activeParticles.ContainsKey(particle.System)) activeParticles[particle.System] = new List<ParticleBase>();
+            activeParticles[particle.System].Add(particle);
             //particleQuadTree.Insert(particle);
             return particle;
         }
@@ -120,12 +121,14 @@ namespace CrazyStorm.Core
         //{
         //    particleQuadTree.Insert(particleBase);
         //}
-        public static ParticleBase[] SearchByRect(Vector2 center, float halfW, float halfH, float rotation, out int count)
+        public static ParticleBase[] SearchByRect(ParticleSystem system, 
+            Vector2 center, float halfW, float halfH, float rotation, out int count)
         {
             int index = 0;
-            for (int i = 0; i < activeParticles.Count; ++i)
+            var particles = activeParticles[system];
+            for (int i = 0; i < particles.Count; ++i)
             {
-                var instance = activeParticles[i];
+                var instance = particles[i];
                 if (!instance.Alive) continue;
                 var v = MathHelper.Rotate(instance.PPosition - center, -rotation);
                 if (v.x >= -halfW && v.x <= halfW && v.y >= -halfH && v.y <= halfH)
@@ -136,12 +139,14 @@ namespace CrazyStorm.Core
             count = index;
             return searchResult;
         }
-        public static ParticleBase[] SearchByEllipse(Vector2 center, float halfW, float halfH, float rotation, out int count)
+        public static ParticleBase[] SearchByEllipse(ParticleSystem system, 
+            Vector2 center, float halfW, float halfH, float rotation, out int count)
         {
             int index = 0;
-            for (int i = 0; i < activeParticles.Count; ++i)
+            var particles = activeParticles[system];
+            for (int i = 0; i < particles.Count; ++i)
             {
-                var instance = activeParticles[i];
+                var instance = particles[i];
                 if (!instance.Alive) continue;
                 var v = MathHelper.Rotate(instance.PPosition - center, -rotation);
                 if ((v.x * v.x) / (halfW * halfW) + (v.y * v.y) / (halfH * halfH) <= 1f)
@@ -152,26 +157,31 @@ namespace CrazyStorm.Core
             count = index;
             return searchResult;
         }
-        public static ParticleBase[] CheckCollision(bool dead, Vector2 playerLast, Vector2 player, float r, out int count, out Vector2 newPos)
+        public static ParticleBase[] CheckCollision(
+            bool dead, Vector2 playerLast, Vector2 player, float r, out int count, out Vector2 newPos)
         {
             var index = 0;
             newPos = player;
-            for (int i = 0; i < activeParticles.Count; ++i)
+            foreach (var kv in activeParticles)
             {
-                var instance = activeParticles[i];
-                if (!instance.Alive) continue;
-                if (Masked(instance.PPosition))
+                var particles = kv.Value;
+                for (int i = 0; i < particles.Count; ++i)
                 {
-                    instance.PMasked = true;
-                    continue;
-                }
-                var logicOffset = instance.System.LogicOffset;
-                if (instance.CheckCollision(playerLast - logicOffset, player - logicOffset, r)) searchResult[index++] = instance;
-                else
-                {
-                    var judge = instance.CheckVolume(dead, playerLast - logicOffset, player - logicOffset, out newPos);
-                    newPos += logicOffset;
-                    if (judge)  searchResult[index++] = instance;
+                    var instance = particles[i];
+                    if (!instance.Alive) continue;
+                    if (Masked(instance.PPosition))
+                    {
+                        instance.PMasked = true;
+                        continue;
+                    }
+                    var logicOffset = instance.System.LogicOffset;
+                    if (instance.CheckCollision(playerLast - logicOffset, player - logicOffset, r)) searchResult[index++] = instance;
+                    else
+                    {
+                        var judge = instance.CheckVolume(dead, playerLast - logicOffset, player - logicOffset, out newPos);
+                        newPos += logicOffset;
+                        if (judge) searchResult[index++] = instance;
+                    }
                 }
             }
             count = index;
@@ -257,29 +267,34 @@ namespace CrazyStorm.Core
         }
         public static void Update(float frameRate)
         {
-            for (int i = 0; i < activeParticles.Count; ++i)
+            foreach (var kv in activeParticles)
             {
-                var instance = activeParticles[i];
-                var frameScale = instance.System.FrameFactor * ParticleSystem.FRAME_RATE_BASE / frameRate;
-                if (instance.Alive && !OutOfRange(instance)) instance.Update(frameScale);
-                else if (instance.Alive) instance.Alive = false;
-                if (!instance.Alive)
+                var particles = kv.Value;
+                for (int i = 0; i < particles.Count; ++i)
                 {
-                    if (instance is Particle) ParticlePool.Return((instance as Particle).PoolObject);
-                    else if (instance is CurveParticle) CurveParticlePool.Return((instance as CurveParticle).PoolObject);
-                    instance.Emitter.Particles.Remove(instance);
-                    activeParticles.RemoveAt(i);
-                    i--;
+                    var instance = particles[i];
+                    var frameScale = instance.System.FrameFactor * ParticleSystem.FRAME_RATE_BASE / frameRate;
+                    if (instance.Alive && !OutOfRange(instance)) instance.Update(frameScale);
+                    else if (instance.Alive) instance.Alive = false;
+                    if (!instance.Alive)
+                    {
+                        if (instance is Particle) ParticlePool.Return((instance as Particle).PoolObject);
+                        else if (instance is CurveParticle) CurveParticlePool.Return((instance as CurveParticle).PoolObject);
+                        instance.Emitter.Particles.Remove(instance);
+                        particles.RemoveAt(i);
+                        i--;
+                    }
                 }
             }
         }
-        public static void Draw(OrderType orderType)
+        public static void Draw(ParticleSystem system)
         {
-            if (orderType == OrderType.FirstAsTop) activeParticles.Sort();
-            else activeParticles.Sort((a, b) => b.CompareTo(a));
-            for (int i = 0; i < activeParticles.Count; ++i)
+            var particles = activeParticles[system];
+            if (system.OrderType == OrderType.FirstAsTop) particles.Sort();
+            else particles.Sort((a, b) => b.CompareTo(a));
+            for (int i = 0; i < particles.Count; ++i)
             {
-                var instance = activeParticles[i];
+                var instance = particles[i];
                 if (!instance.Alive) continue;
                 if (instance is Particle) OnParticleDraw(instance as Particle);
                 if (instance is CurveParticle) OnCurveParticleDraw(instance as CurveParticle);

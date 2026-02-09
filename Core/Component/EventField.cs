@@ -133,8 +133,8 @@ namespace CrazyStorm.Core
         {
             int count = 0;
             var results = FieldShape == FieldShape.Rectangle ? 
-                ParticleManager.SearchByRect(Position, HalfWidth, HalfHeight, Rotation, out count) :
-                ParticleManager.SearchByEllipse(Position, HalfWidth, HalfHeight, Rotation, out count);
+                ParticleManager.SearchByRect(System, Position, HalfWidth, HalfHeight, Rotation, out count) :
+                ParticleManager.SearchByEllipse(System, Position, HalfWidth, HalfHeight, Rotation, out count);
             for (int i = 0;i < count; ++i)
             {
                 if (results[i].IgnoreMask) continue;

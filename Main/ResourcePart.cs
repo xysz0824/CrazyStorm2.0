@@ -53,11 +53,11 @@ namespace CrazyStorm
             (LeftTabControl.Items[1] as TabItem).Focus();
             using (var open = new System.Windows.Forms.OpenFileDialog())
             {
-                open.InitialDirectory = File.CurrentDirectory;
+                open.InitialDirectory = file.ResourceDirectory;
                 open.Filter = (string)FindResource("ImageTypeStr");
                 if (open.ShowDialog() == System.Windows.Forms.DialogResult.OK)
                 {
-                    var image = new FileResource(file.FileResourceIndex, open.SafeFileName, open.FileName);
+                    var image = new FileResource(file, file.FileResourceIndex, open.SafeFileName, open.FileName);
                     file.Images.Add(image);
                     DeleteImageButton.IsEnabled = true;
                 }
@@ -74,11 +74,11 @@ namespace CrazyStorm
             (LeftTabControl.Items[1] as TabItem).Focus();
             using (var open = new System.Windows.Forms.OpenFileDialog())
             {
-                open.InitialDirectory = File.CurrentDirectory;
+                open.InitialDirectory = file.ResourceDirectory;
                 open.Filter = (string)FindResource("SoundTypeStr");
                 if (open.ShowDialog() == System.Windows.Forms.DialogResult.OK)
                 {
-                    var sound = new FileResource(file.FileResourceIndex,open.SafeFileName, open.FileName);
+                    var sound = new FileResource(file, file.FileResourceIndex,open.SafeFileName, open.FileName);
                     file.Sounds.Add(sound);
                     DeleteSoundButton.IsEnabled = true;
                 }

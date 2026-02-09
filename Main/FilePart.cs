@@ -44,7 +44,6 @@ namespace CrazyStorm
                 return;
 
             var untitledStr = (string)FindResource("UntitledStr");
-            File.CurrentDirectory = string.Empty;
             file = new File(untitledStr, (string)FindResource("NewLayerStr"), (string)FindResource("BodyPositionStr"));
             fileName = untitledStr;
             filePath = string.Empty;
@@ -58,7 +57,7 @@ namespace CrazyStorm
 
             using (var open = new System.Windows.Forms.OpenFileDialog())
             {
-                open.InitialDirectory = File.CurrentDirectory;
+                open.InitialDirectory = string.IsNullOrEmpty(filePath) ? "" : System.IO.Path.GetDirectoryName(filePath);
                 open.Filter = (string)FindResource("ProjectFileExtensionStr");
                 if (open.ShowDialog() == System.Windows.Forms.DialogResult.OK)
                     Open(open.FileName);
@@ -74,7 +73,6 @@ namespace CrazyStorm
                 {
                     return false;
                 }
-                File.CurrentDirectory = System.IO.Path.GetDirectoryName(openPath) + '\\';
                 file = new File();
                 file.Load(openPath);
                 filePath = openPath;
@@ -106,7 +104,6 @@ namespace CrazyStorm
         {
             filePath = savedPath;
             fileName = System.IO.Path.GetFileNameWithoutExtension(savedPath);
-            File.CurrentDirectory = System.IO.Path.GetDirectoryName(savedPath) + '\\';
             file.UpdateResource();
             file.Save(savedPath);
             InitializeFile();
@@ -116,7 +113,7 @@ namespace CrazyStorm
         {
             using (var save = new System.Windows.Forms.SaveFileDialog())
             {
-                save.InitialDirectory = File.CurrentDirectory;
+                save.InitialDirectory = string.IsNullOrEmpty(filePath) ? "" : System.IO.Path.GetDirectoryName(filePath);
                 save.Filter = (string)FindResource("ProjectFileExtensionStr");
                 save.FileName = fileName;
                 if (save.ShowDialog() == System.Windows.Forms.DialogResult.OK)

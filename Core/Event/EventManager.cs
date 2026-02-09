@@ -275,10 +275,10 @@ namespace CrazyStorm.Core
                 }
             }
         }
-        public static bool BindingUpdate(Component component, ParticleBase particle, float frameScale)
+        public static bool BindingUpdate(int systemHash, Component component, ParticleBase particle, float frameScale)
         {
             bool updated = false;
-            long id = GetUniqueKey(component, particle);
+            long id = GetUniqueKey(systemHash, component, particle);
             for (int i = 0; i < executorList.Count; ++i)
             {
                 if (executorList[i].PropertyContainer != component || executorList[i].BindingContainer != particle) continue;
@@ -290,9 +290,9 @@ namespace CrazyStorm.Core
             }
             return updated;
         }
-        public static bool BindingRecover(Component component, ParticleBase particle)
+        public static bool BindingRecover(int systemHash, Component component, ParticleBase particle)
         {
-            long id = GetUniqueKey(component, particle);
+            long id = GetUniqueKey(systemHash, component, particle);
             if (!cache.ContainsKey(id)) return false;
             foreach (var item in cache[id])
             {
@@ -325,9 +325,9 @@ namespace CrazyStorm.Core
             }
             return true;
         }
-        private static long GetUniqueKey(Component component, ParticleBase particle)
+        private static long GetUniqueKey(int systemHash, Component component, ParticleBase particle)
         {
-            return component.ID * ParticleManager.MaximumParticleCount + particle.ID;
+            return systemHash + component.ID * ParticleManager.MaximumParticleCount + particle.ID;
         }
         public static void PlaySound(string path)
         {

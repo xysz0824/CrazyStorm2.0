@@ -31,7 +31,7 @@ namespace CrazyStorm.Core
         #endregion
 
         #region Public Members
-        public static string CurrentDirectory = string.Empty;
+        public string ResourceDirectory = string.Empty;
         public List<ParticleSystem> ParticleSystems { get { return particleSystems; } }
         public GenericContainer<FileResource> Images { get { return images; } }
         public GenericContainer<FileResource> Sounds { get { return sounds; } }
@@ -71,9 +71,9 @@ namespace CrazyStorm.Core
             //particleSystems
             XmlHelper.BuildFromObjectList(particleSystems, new ParticleSystem(""), node, "ParticleSystems");
             //images
-            XmlHelper.BuildFromObjectList(images, new FileResource(0, "", ""), node, "Images");
+            XmlHelper.BuildFromObjectList(images, new FileResource(this, 0, "", ""), node, "Images");
             //sounds
-            XmlHelper.BuildFromObjectList(sounds, new FileResource(0, "", ""), node, "Sounds");
+            XmlHelper.BuildFromObjectList(sounds, new FileResource(this, 0, "", ""), node, "Sounds");
             //globals
             XmlHelper.BuildFromObjectList(globals, new VariableResource(int.MinValue, ""), node, "Globals");
             foreach (var particleSystem in particleSystems)
@@ -153,6 +153,7 @@ namespace CrazyStorm.Core
         }
         public void Load(string filePath)
         {
+            ResourceDirectory = Path.GetDirectoryName(filePath) + '\\';
             if (IsCS1(filePath))
             {
                 ConvertFromCS1(filePath);
@@ -174,6 +175,7 @@ namespace CrazyStorm.Core
         }
         public void Save(string filePath)
         {
+            ResourceDirectory = Path.GetDirectoryName(filePath) + '\\';
             var doc = new XmlDocument();
             var declaration = doc.CreateXmlDeclaration("1.0", "UTF-8", null);
             doc.AppendChild(declaration);
@@ -310,9 +312,9 @@ namespace CrazyStorm.Core
             }
             return bytes;
         }
-        public void GeneratePlayFile(string filePath, string fileName)
+        public void GeneratePlayFile(string fileName)
         {
-            string genPath = Path.GetDirectoryName(filePath) + "\\" + fileName + ".bg";
+            string genPath = $"{ResourceDirectory}{fileName}.bg";
             using (FileStream stream = new FileStream(genPath, FileMode.Create))
             {
                 var writer = new BinaryWriter(stream);
@@ -323,10 +325,19 @@ namespace CrazyStorm.Core
         {
             //Images
             PlayDataHelper.ReadObjectList(Images, reader, version);
+            foreach (var image in Images)
+            {
+                image.File = this;
+                image.CheckValid();
+            }
             //Sounds
             PlayDataHelper.ReadObjectList(Sounds, reader, version);
+            foreach (var sound in Sounds)
+            {
+                sound.File = this;
+                sound.CheckValid();
+            }
             //Globals
-            globals = new GenericContainer<VariableResource>();
             PlayDataHelper.ReadObjectList(Globals, reader, version);
             //ParticleSystems
             PlayDataHelper.ReadObjectList(ParticleSystems, reader, version);
@@ -371,8 +382,9 @@ namespace CrazyStorm.Core
                 }
             }
         }
-        public bool LoadPlayFile(byte[] bytes, float baseVersion)
+        public bool LoadPlayFile(byte[] bytes, string resourceDict, float baseVersion)
         {
+            ResourceDirectory = resourceDict;
             var stream = new MemoryStream(bytes);
             var reader = new BinaryReader(stream);
             //Play file use UTF-8 encoding
@@ -394,7 +406,8 @@ namespace CrazyStorm.Core
         }
         public bool LoadPlayFile(string filePath, float baseVersion)
         {
-            return LoadPlayFile(System.IO.File.ReadAllBytes(filePath), baseVersion);
+            var resourceDict = Path.GetDirectoryName(filePath) + '\\';
+            return LoadPlayFile(System.IO.File.ReadAllBytes(filePath), resourceDict, baseVersion);
         }
         #endregion
     }
