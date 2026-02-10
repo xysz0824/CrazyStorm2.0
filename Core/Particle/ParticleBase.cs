@@ -44,8 +44,7 @@ namespace CrazyStorm.Core
         public bool fadeEffect;
         public float vspeed;
     }
-    public abstract class ParticleBase : PropertyContainer, IXmlData, ILoadPlayData, 
-        IComparable<ParticleBase>
+    public abstract class ParticleBase : PropertyContainer, IXmlData, ILoadPlayData
     {
         public const float FOG_TIME = 10;
         #region Private Members
@@ -664,10 +663,6 @@ namespace CrazyStorm.Core
             particle.ReboundTime = 0;
         }
         public virtual void Reset() { }
-        public int CompareTo(ParticleBase other)
-        {
-            return (int)(RenderOrder - other.RenderOrder);
-        }
         #endregion
     }
 }

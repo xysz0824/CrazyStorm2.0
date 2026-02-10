@@ -35,6 +35,26 @@ namespace CrazyStorm.Core
             }
         }
     }
+    class FirstAsTopComparer : IComparer<ParticleBase>
+    {
+        public static readonly FirstAsTopComparer Instance = new FirstAsTopComparer();
+        public int Compare(ParticleBase a, ParticleBase b)
+        {
+            int c = a.Emitter.LayerID - b.Emitter.LayerID;
+            if (c != 0) return c;
+            return (int)(a.RenderOrder - b.RenderOrder);
+        }
+    }
+    class LastAsTopComparer : IComparer<ParticleBase>
+    {
+        public static readonly LastAsTopComparer Instance = new LastAsTopComparer();
+        public int Compare(ParticleBase a, ParticleBase b)
+        {
+            int c = a.Emitter.LayerID - b.Emitter.LayerID;
+            if (c != 0) return c;
+            return (int)(b.RenderOrder - a.RenderOrder);
+        }
+    }
     public static class ParticleManager
     {
         public static readonly int MAX_MASK_COUNT = 8;
@@ -121,8 +141,7 @@ namespace CrazyStorm.Core
                 particle = poolObject.Instance;
             }
             particle.System = system;
-            long order = layerID * searchResult.Length * 10 + 9 - (int)template.BlendType;
-            particle.RenderOrder = order + instanceID * 10;
+            particle.RenderOrder = instanceID * 10 + 9 - (int)template.BlendType;
             particle.ID = instanceID++;
             particle.Reset();
             particle.Alive = true;
@@ -139,6 +158,11 @@ namespace CrazyStorm.Core
             Vector2 center, float halfW, float halfH, float rotation, out int count)
         {
             int index = 0;
+            if (!activeParticles.ContainsKey(system))
+            {
+                count = 0;
+                return searchResult;
+            }
             var particles = activeParticles[system];
             for (int i = 0; i < particles.Count; ++i)
             {
@@ -157,6 +181,11 @@ namespace CrazyStorm.Core
             Vector2 center, float halfW, float halfH, float rotation, out int count)
         {
             int index = 0;
+            if (!activeParticles.ContainsKey(system))
+            {
+                count = 0;
+                return searchResult;
+            }
             var particles = activeParticles[system];
             for (int i = 0; i < particles.Count; ++i)
             {
@@ -207,12 +236,6 @@ namespace CrazyStorm.Core
             var reserved = particle is CurveParticle ? curvePreserved : particlePreserved;
             return outPoint.x < left / 2 - reserved || outPoint.x > right / 2 + reserved ||
                 outPoint.y < top / 2 - reserved || outPoint.y > bottom / 2 + reserved;
-        }
-        private static bool OutOfRange(ParticleBase particle)
-        {
-            var outPoint = particle.GetOutPoint() + particle.System.LogicOffset;
-            return outPoint.x < left || outPoint.x > right ||
-                outPoint.y < top || outPoint.y > bottom;
         }
         private static bool Masked(Vector2 pos)
         {
@@ -288,9 +311,8 @@ namespace CrazyStorm.Core
                 {
                     var instance = particles[i];
                     var frameScale = instance.System.FrameFactor * ParticleSystem.FRAME_RATE_BASE / frameRate;
-                    if (instance.Alive && !OutOfRange(instance)) instance.Update(frameScale);
-                    else if (instance.Alive) instance.Alive = false;
-                    if (!instance.Alive)
+                    if (instance.Alive) instance.Update(frameScale);
+                    else
                     {
                         if (instance is Particle) ParticlePool.Return((instance as Particle).PoolObject);
                         else if (instance is CurveParticle) CurveParticlePool.Return((instance as CurveParticle).PoolObject);
@@ -303,9 +325,10 @@ namespace CrazyStorm.Core
         }
         public static void Draw(ParticleSystem system)
         {
+            if (!activeParticles.ContainsKey(system)) return;
             var particles = activeParticles[system];
-            if (system.OrderType == OrderType.FirstAsTop) particles.Sort();
-            else particles.Sort((a, b) => b.CompareTo(a));
+            if (system.OrderType == OrderType.FirstAsTop) particles.Sort(FirstAsTopComparer.Instance);
+            else particles.Sort(LastAsTopComparer.Instance);
             for (int i = 0; i < particles.Count; ++i)
             {
                 var instance = particles[i];
