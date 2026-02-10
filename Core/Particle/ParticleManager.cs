@@ -40,7 +40,7 @@ namespace CrazyStorm.Core
         public static readonly FirstAsTopComparer Instance = new FirstAsTopComparer();
         public int Compare(ParticleBase a, ParticleBase b)
         {
-            int c = a.Emitter.LayerID - b.Emitter.LayerID;
+            int c = b.Emitter.LayerID - a.Emitter.LayerID;
             if (c != 0) return c;
             return (int)(a.RenderOrder - b.RenderOrder);
         }
@@ -50,7 +50,7 @@ namespace CrazyStorm.Core
         public static readonly LastAsTopComparer Instance = new LastAsTopComparer();
         public int Compare(ParticleBase a, ParticleBase b)
         {
-            int c = a.Emitter.LayerID - b.Emitter.LayerID;
+            int c = b.Emitter.LayerID - a.Emitter.LayerID;
             if (c != 0) return c;
             return (int)(b.RenderOrder - a.RenderOrder);
         }

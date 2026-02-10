@@ -187,6 +187,15 @@ namespace CrazyStorm.Core
             }
             layers.Add(layer);
         }
+        public void InsertLayer(Layer layer)
+        {
+            foreach (var component in layer.Components)
+            {
+                if (component.Parent == null)
+                    componentTree.Add(component);
+            }
+            layers.Insert(0, layer);
+        }
         public void DeleteLayer(Layer layer)
         {
             foreach (var component in layer.Components)

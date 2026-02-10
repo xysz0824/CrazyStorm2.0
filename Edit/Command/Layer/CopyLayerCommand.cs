@@ -29,13 +29,13 @@ namespace CrazyStorm
                     component.ID = selectedParticle.GetComponentIndex();
                     selectedParticle.GetAndIncreaseComponentIndex(component.GetType().ToString());
                 }
-                selectedParticle.AddLayer(clone);
+                selectedParticle.InsertLayer(clone);
                 History[0] = clone;
             }
             else
             {
                 var clone = History[0] as Layer;
-                selectedParticle.AddLayer(clone);
+                selectedParticle.InsertLayer(clone);
             }
         }
         public override void Undo(CommandStack stack)

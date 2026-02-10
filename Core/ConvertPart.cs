@@ -658,7 +658,7 @@ namespace CrazyStorm.Core
                             center.System = particleSystem;
                             layer.Components.Add(center);
                         }
-                        particleSystem.Layers.Add(layer);
+                        particleSystem.Layers.Insert(0, layer);
                     }
                     line = reader.ReadLine()?.Trim();
                 }

@@ -24,7 +24,7 @@ namespace CrazyStorm
             base.Undo(stack);
             var selectedParticle = Parameter[0] as ParticleSystem;
             var selectedLayer = Parameter[1] as Layer;
-            selectedParticle.AddLayer(selectedLayer);
+            selectedParticle.InsertLayer(selectedLayer);
         }
     }
 }

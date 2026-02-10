@@ -28,10 +28,10 @@ namespace CrazyStorm
                 var newLayer = new Layer(defaultLayerName);
                 newLayer.Color = (LayerColor)((index + 1) % Enum.GetNames(typeof(LayerColor)).Length);
                 History[0] = newLayer;
-                selectedParticle.AddLayer(newLayer);
+                selectedParticle.InsertLayer(newLayer);
             }
             else
-                selectedParticle.AddLayer(History[0] as Layer);
+                selectedParticle.InsertLayer(History[0] as Layer);
         }
         public override void Undo(CommandStack stack)
         {
