@@ -340,7 +340,7 @@ namespace CrazyStorm.Core
         }
         public ParticleType(int id, string name) : this(id)
         {
-            this.name = $"{name}{id + 1}";
+            this.name = name;
         }
         #endregion
 

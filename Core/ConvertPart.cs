@@ -677,7 +677,11 @@ namespace CrazyStorm.Core
                 };
                 return 0;
             }
-            else return v;
+            else
+            {
+                propertyContainer.Properties.Remove(name);
+                return v;
+            }
         }
         public static float ConvertFloat(float v, float rand, PropertyContainer propertyContainer, string name)
         {
@@ -690,7 +694,11 @@ namespace CrazyStorm.Core
                 };
                 return 0f;
             }
-            else return v;
+            else
+            {
+                propertyContainer.Properties.Remove(name);
+                return v;
+            }
         }
         public static Vector2 ConvertVector2(float x, float y, float randx, float randy, PropertyContainer propertyContainer, string name,
             Vector2 offset)
@@ -741,7 +749,11 @@ namespace CrazyStorm.Core
                 };
                 return Vector2.Zero;
             }
-            else return new Vector2(x, y) - offset;
+            else
+            {
+                propertyContainer.Properties.Remove(name);
+                return new Vector2(x, y) - offset;
+            }
         }
         public static float ConvertAngle(float deg, float rand, PropertyContainer propertyContainer, string name)
         {
@@ -778,7 +790,11 @@ namespace CrazyStorm.Core
                 };
                 return 0;
             }
-            else return deg;
+            else
+            {
+                propertyContainer.Properties.Remove(name);
+                return deg;
+            }
         }
         public static string ConvertKeyword(string str)
         {
