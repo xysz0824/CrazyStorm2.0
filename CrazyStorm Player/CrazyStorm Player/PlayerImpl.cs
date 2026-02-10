@@ -404,7 +404,6 @@ namespace CrazyStorm_Player
         {
             gd.Clear(Color.Black);
             spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied, SamplerState.LinearWrap, null, null, shader);
-            curveBatch.Begin(BlendState.NonPremultiplied);
             if (background != null)
             {
                 spriteBatch.Draw(background, backgroundPos, null, Color.White, 0, Vector2.Zero, backgroundScale, SpriteEffects.None, 0);
@@ -416,7 +415,7 @@ namespace CrazyStorm_Player
                 if (maxOffset.X < offset.X) maxOffset.X = offset.X;
                 if (maxOffset.Y < offset.Y) maxOffset.Y = offset.Y;
             }
-            controllable.Draw(spriteBatch, characterTexture, pointTexture, slowModeTexture, maxOffset);
+            curveBatch.Begin(BlendState.NonPremultiplied);
             shaderRenderCenter.SetValue(new Vector2(Width / 2, Height / 2));
             foreach (var instance in instances.Keys)
             {
@@ -431,6 +430,7 @@ namespace CrazyStorm_Player
             }
             lastBlendType = BlendType.None;
             curveBatch.End();
+            controllable.Draw(spriteBatch, characterTexture, pointTexture, slowModeTexture, maxOffset);
             spriteBatch.End();
         }
         public void SetStatus(int i)

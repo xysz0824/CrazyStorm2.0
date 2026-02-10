@@ -864,19 +864,16 @@ namespace CrazyStorm.Core
             {
                 case "自身":
                     expressionResult = true;
-                    if (type == PropertyType.Single) return "SelfAngle";
-                    else if (type == PropertyType.Vector2) return $"Position{memberName}";
-                    break;
+                    if (string.IsNullOrEmpty(memberName) && type == PropertyType.Single) return "SelfAngle";
+                    else return $"Position{memberName}";
                 case "自机":
                     expressionResult = true;
-                    if (type == PropertyType.Single) return "BodyAngle";
-                    else if (type == PropertyType.Vector2) return $"BodyPosition{memberName}";
-                    break;
+                    if (string.IsNullOrEmpty(memberName) && type == PropertyType.Single) return "BodyAngle";
+                    else return $"BodyPosition{memberName}";
                 case "中心":
                     expressionResult = true;
-                    if (type == PropertyType.Single) return "CenterAngle";
-                    else if (type == PropertyType.Vector2) return $"CenterPosition{memberName}";
-                    break;
+                    if (string.IsNullOrEmpty(memberName) && type == PropertyType.Single) return "CenterAngle";
+                    else return $"CenterPosition{memberName}";
             }
             if (type == PropertyType.Boolean && BoolValueMap.ContainsKey(value)) return BoolValueMap[value];
             if (value.Contains("+"))
