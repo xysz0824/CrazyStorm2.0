@@ -20,6 +20,7 @@ namespace CrazyStorm.Core
         public int PropertyID { get; set; }
         public EventChangeMode ChangeMode { get; set; }
         public EventChangeType ChangeType { get; set; }
+        public TypeSet InitialValue { get; set; }
         public TypeSet CurrentValue => currentValue;
         public TypeSet TargetValue { get; set; }
         public int ChangeTime { get; set; }
@@ -44,8 +45,6 @@ namespace CrazyStorm.Core
             ratio *= 1f / ChangeTime;
             if (ChangeMode == EventChangeMode.Accelerated) ratio *= 2 * currentTime / ChangeTime;
             else if (ChangeMode == EventChangeMode.Decelerated) ratio *= (2 - 2 * currentTime / ChangeTime);
-            else if (ChangeMode == EventChangeMode.Sin) ratio *= (float)(Math.Cos(currentTime / ChangeTime * Math.PI * 2) * Math.PI * 2);
-            else if (ChangeMode == EventChangeMode.Cos) ratio *= -(float)(Math.Sin(currentTime / ChangeTime * Math.PI * 2) * Math.PI * 2);
             else if (ChangeMode == EventChangeMode.Instant) ratio *= ChangeTime;
             ratio = Math.Min(1, ratio);
             currentValue.type = TargetValue.type;
@@ -53,18 +52,44 @@ namespace CrazyStorm.Core
             {
                 case PropertyType.Boolean:
                     currentValue.boolValue = TargetValue.boolValue;
-                    VM.PushBool(CurrentValue.boolValue);
+                    VM.PushBool(currentValue.boolValue);
                     break;
                 case PropertyType.Int32:
-                    PropertyContainer.PushProperty(PropertyID);
-                    currentValue.intValue = VM.PopInt();
-                    currentValue.intValue = (int)(currentValue.intValue + ratio * TargetValue.intValue);
-                    VM.PushFloat(CurrentValue.intValue);
+                    if (ChangeMode == EventChangeMode.Sin)
+                    {
+                        currentValue.intValue = (int)(InitialValue.intValue + 
+                            sign * Math.Sin(currentTime / ChangeTime * Math.PI * 2) * TargetValue.intValue);
+                    }
+                    else if (ChangeMode == EventChangeMode.Cos)
+                    {
+                        currentValue.intValue = (int)(InitialValue.intValue +
+                            sign * Math.Cos(currentTime / ChangeTime * Math.PI * 2) * TargetValue.intValue);
+                    }
+                    else
+                    {
+                        PropertyContainer.PushProperty(PropertyID);
+                        currentValue.intValue = VM.PopInt();
+                        currentValue.intValue = (int)(currentValue.intValue + ratio * TargetValue.intValue);
+                    }
+                    VM.PushFloat(currentValue.intValue);
                     break;
                 case PropertyType.Single:
-                    PropertyContainer.PushProperty(PropertyID);
-                    currentValue.floatValue = VM.PopFloat();
-                    currentValue.floatValue = currentValue.floatValue + ratio * TargetValue.floatValue;
+                    if (ChangeMode == EventChangeMode.Sin)
+                    {
+                        currentValue.floatValue = (float)(InitialValue.floatValue +
+                            sign * Math.Sin(currentTime / ChangeTime * Math.PI * 2) * TargetValue.floatValue);
+                    }
+                    else if (ChangeMode == EventChangeMode.Cos)
+                    {
+                        currentValue.floatValue = (float)(InitialValue.floatValue +
+                            sign * Math.Cos(currentTime / ChangeTime * Math.PI * 2) * TargetValue.floatValue);
+                    }
+                    else
+                    {
+                        PropertyContainer.PushProperty(PropertyID);
+                        currentValue.floatValue = VM.PopFloat();
+                        currentValue.floatValue = currentValue.floatValue + ratio * TargetValue.floatValue;
+                    }
                     VM.PushFloat(currentValue.floatValue);
                     break;
                 case PropertyType.Enum:
@@ -72,15 +97,41 @@ namespace CrazyStorm.Core
                     VM.PushInt(currentValue.enumValue);
                     break;
                 case PropertyType.Vector2:
-                    PropertyContainer.PushProperty(PropertyID);
-                    currentValue.vector2Value = VM.PopVector2();
-                    currentValue.vector2Value = currentValue.vector2Value + TargetValue.vector2Value * ratio;
+                    if (ChangeMode == EventChangeMode.Sin)
+                    {
+                        currentValue.vector2Value = InitialValue.vector2Value + TargetValue.vector2Value *
+                            (float)(sign * Math.Sin(currentTime / ChangeTime * Math.PI * 2));
+                    }
+                    else if (ChangeMode == EventChangeMode.Cos)
+                    {
+                        currentValue.vector2Value = InitialValue.vector2Value + TargetValue.vector2Value *
+                            (float)(sign * Math.Cos(currentTime / ChangeTime * Math.PI * 2));
+                    }
+                    else
+                    {
+                        PropertyContainer.PushProperty(PropertyID);
+                        currentValue.vector2Value = VM.PopVector2();
+                        currentValue.vector2Value = currentValue.vector2Value + TargetValue.vector2Value * ratio;
+                    }
                     VM.PushVector2(currentValue.vector2Value);
                     break;
                 case PropertyType.RGB:
-                    PropertyContainer.PushProperty(PropertyID);
-                    currentValue.rgbValue = VM.PopRGB();
-                    currentValue.rgbValue = currentValue.rgbValue + TargetValue.rgbValue * ratio;
+                    if (ChangeMode == EventChangeMode.Sin)
+                    {
+                        currentValue.rgbValue = InitialValue.rgbValue + TargetValue.rgbValue *
+                            (float)(sign * Math.Sin(currentTime / ChangeTime * Math.PI * 2));
+                    }
+                    else if (ChangeMode == EventChangeMode.Cos)
+                    {
+                        currentValue.rgbValue = InitialValue.rgbValue + TargetValue.rgbValue *
+                            (float)(sign * Math.Cos(currentTime / ChangeTime * Math.PI * 2));
+                    }
+                    else
+                    {
+                        PropertyContainer.PushProperty(PropertyID);
+                        currentValue.rgbValue = VM.PopRGB();
+                        currentValue.rgbValue = currentValue.rgbValue + TargetValue.rgbValue * ratio;
+                    }
                     VM.PushRGB(currentValue.rgbValue);
                     break;
                 case PropertyType.String:
