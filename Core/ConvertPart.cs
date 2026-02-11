@@ -114,7 +114,7 @@ namespace CrazyStorm.Core
             @"(?:,(?<affectedByCover>[^,]+))?(?:,(?<affectedByRebound>[^,]+))?(?:,(?<affectedByForce>[^,]+))?" +
             @"(?:,(?<deepbind>[^,]+))?" +
             @"(?:,(?<randwscale>[^,]+))?(?:,(?<randhscale>[^,]+))?(?:,(?<syncScale>[^,]+))?" +
-            @"(?:,(?<instantMovement>[^,]+))?$", RegexOptions.Compiled);
+            @"(?:,(?<instantmovement>[^,]+))?$", RegexOptions.Compiled);
         static readonly Regex LaseMatch = new Regex(@"^(?<id>[^,]+),(?<layerid>[^,]+)," +
             @"(?<binding>[^,]+),(?<bindid>[^,]+),(?<bindwithspeedd>[^,]+),," +
             @"(?<x>[^,]+),(?<y>[^,]+),(?<begin>[^,]+),(?<life>[^,]+)," +

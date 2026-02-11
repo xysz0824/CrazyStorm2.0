@@ -65,7 +65,14 @@ namespace CrazyStorm.Core
         public int MaxLife
         {
             get { return particleBaseData.maxLife; }
-            set { particleBaseData.maxLife = value; }
+            set 
+            { 
+                particleBaseData.maxLife = value;
+                if (MaxLife <= FOG_TIME)
+                {
+                    FogFrame = (int)FOG_TIME;
+                }
+            }
         }
         [RuntimeProperty(101)]
         public float PLayerFrame => Emitter != null ? Emitter.LayerFrame : 1;
@@ -642,7 +649,9 @@ namespace CrazyStorm.Core
         public virtual void Die()
         {
             if (!Alive) return;
-            PCurrentFrame = Math.Max(MaxLife - (int)FOG_TIME + 1, 1);
+            var delta = MaxLife - (int)FOG_TIME;
+            if (delta > 0) PCurrentFrame = delta + 1;
+            else PCurrentFrame = MaxLife + 1;
         }
         public override void CopyTo(PropertyContainer target)
         {

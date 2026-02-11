@@ -79,6 +79,8 @@
                                 <TextBlock Name="Diameter" Text="{Binding Path=Diameter}" Height="0" Width="0"/>
                                 <TextBlock Name="CircleBoxX" Text="{Binding Path=CircleBoxX}" Height="0" Width="0"/>
                                 <TextBlock Name="CircleBoxY" Text="{Binding Path=CircleBoxY}" Height="0" Width="0"/>
+                                <TextBlock Name="VolumeDisplayStartX" Text="{Binding Path=VolumeDisplayStartX}" Height="0" Width="0"/>
+                                <TextBlock Name="VolumeDisplayStartY" Text="{Binding Path=VolumeDisplayStartY}" Height="0" Width="0"/>
                                 <TextBlock Name="VolumeJudgeX" Text="{Binding Path=VolumeJudgeX}" Height="0" Width="0"/>
                                 <TextBlock Name="VolumeJudgeY" Text="{Binding Path=VolumeJudgeY}" Height="0" Width="0"/>
                                 <TextBlock Name="VolumeJudgeWidth" Text="{Binding Path=VolumeJudgeWidth}" Height="0" Width="0"/>
@@ -136,7 +138,7 @@
                             <Rectangle 
                                 Fill="ForestGreen" 
                                 Width="{Binding ElementName=VolumeWidth, Path=Text}" Height="{Binding ElementName=VolumeHeight, Path=Text}" 
-                                Canvas.Left="{Binding ElementName=VolumeStartX, Path=Text}" Canvas.Top="{Binding ElementName=VolumeStartY, Path=Text}" 
+                                Canvas.Left="{Binding ElementName=VolumeDisplayStartX, Path=Text}" Canvas.Top="{Binding ElementName=VolumeDisplayStartY, Path=Text}" 
                                 Stroke="Transparent" Opacity="0.5"/>
                             <Rectangle 
                                 Fill="Red" 

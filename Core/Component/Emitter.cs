@@ -139,13 +139,15 @@ namespace CrazyStorm.Core
             Template.ExecuteExpressionsAndSet(frameScale);
             float increment = emitRange / emitCount;
             float angle = emitAngle - (emitRange + increment) / 2;
+            float roundAngle = emitRoundAngle - (emitRange + increment) / 2;
             if (BindToSpeedAngle) angle = SpeedAngle + angle;
             for (int i = 0; i < emitCount; ++i)
             {
                 angle += increment;
+                roundAngle += increment;
                 Template.PPosition = new Vector2(
-                    emitPosition.x + emitRadius * (float)Math.Cos(MathHelper.DegToRad(emitRoundAngle)),
-                    emitPosition.y + emitRadius * (float)Math.Sin(MathHelper.DegToRad(emitRoundAngle)));
+                    emitPosition.x + emitRadius * (float)Math.Cos(MathHelper.DegToRad(roundAngle)),
+                    emitPosition.y + emitRadius * (float)Math.Sin(MathHelper.DegToRad(roundAngle)));
                 Template.PSpeedAngle = angle;
                 ParticleBase newParticle = ParticleManager.GetParticle(System, LayerID, Template);
                 if (InstantMovement)

@@ -246,7 +246,6 @@ namespace CrazyStorm.Core
                     }
                     result = Intersect(p0, d0, new Vector2(boxStart.x, boxStart.y - 4), new Vector2(0, boxSize.y + 4));
                     if (result.x != float.MinValue && result.y != float.MaxValue)
-
                     {
                         newBodyPos = GetAbsolute(result + new Vector2(-1, 0) * relativepspeed.Length(), pos, deg);
                     }

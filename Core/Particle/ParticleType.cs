@@ -102,6 +102,8 @@ namespace CrazyStorm.Core
                 if (PropertyChanged != null)
                 {
                     PropertyChanged(this, new PropertyChangedEventArgs("StartPointX"));
+                    PropertyChanged(this, new PropertyChangedEventArgs("VolumeDisplayStartX"));
+                    PropertyChanged(this, new PropertyChangedEventArgs("VolumeJudgeX"));
                     PropertyChanged(this, new PropertyChangedEventArgs("CircleBoxX"));
                 }
             }
@@ -115,6 +117,8 @@ namespace CrazyStorm.Core
                 if (PropertyChanged != null)
                 {
                     PropertyChanged(this, new PropertyChangedEventArgs("StartPointY"));
+                    PropertyChanged(this, new PropertyChangedEventArgs("VolumeDisplayStartY"));
+                    PropertyChanged(this, new PropertyChangedEventArgs("VolumeJudgeY"));
                     PropertyChanged(this, new PropertyChangedEventArgs("CircleBoxY"));
                 }
             }
@@ -248,13 +252,18 @@ namespace CrazyStorm.Core
                 if (PropertyChanged != null)
                 {
                     PropertyChanged(this, new PropertyChangedEventArgs("VolumeStartX"));
+                    PropertyChanged(this, new PropertyChangedEventArgs("VolumeDisplayStartX"));
                     PropertyChanged(this, new PropertyChangedEventArgs("VolumeJudgeX"));
                 }
             }
         }
+        public float VolumeDisplayStartX
+        {
+            get { return data.startPoint.x + data.volumeStart.x; }
+        }
         public float VolumeJudgeX
         {
-            get { return data.volumeStart.x + data.volumeWidth / 2 * (1f - data.volumeJudgeArea / 100f); }
+            get { return data.startPoint.x + data.volumeStart.x + data.volumeWidth / 2 * (1f - data.volumeJudgeArea / 100f); }
         }
         public float VolumeStartY
         {
@@ -265,13 +274,18 @@ namespace CrazyStorm.Core
                 if (PropertyChanged != null)
                 {
                     PropertyChanged(this, new PropertyChangedEventArgs("VolumeStartY"));
+                    PropertyChanged(this, new PropertyChangedEventArgs("VolumeDisplayStartY"));
                     PropertyChanged(this, new PropertyChangedEventArgs("VolumeJudgeY"));
                 }
             }
         }
+        public float VolumeDisplayStartY
+        {
+            get { return data.startPoint.y + data.volumeStart.y; }
+        }
         public float VolumeJudgeY
         {
-            get { return data.volumeStart.y + data.volumeHeight / 2 * (1f - data.volumeJudgeArea / 100f); }
+            get { return data.startPoint.y + data.volumeStart.y + data.volumeHeight / 2 * (1f - data.volumeJudgeArea / 100f); }
         }
         public int VolumeWidth
         {

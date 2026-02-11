@@ -160,7 +160,7 @@ namespace CrazyStorm.Core
         public override bool CheckVolume(bool playerDead, Vector2 playerLast, Vector2 player, out Vector2 newPlayerPos)
         {
             newPlayerPos = player;
-            return FogFrame >= FOG_TIME && 
+             return FogFrame >= FOG_TIME && 
                 MathHelper.VolumeJudge(playerDead, playerLast, player, PPositionLast, PPosition, PRotation + 90, Type.CenterPoint, 
                 new Vector2(WidthScale, HeightScale), Type.VolumeStart, new Vector2(Type.VolumeWidth, Type.VolumeHeight), 
                 Type.VolumeJudgeArea, out newPlayerPos);

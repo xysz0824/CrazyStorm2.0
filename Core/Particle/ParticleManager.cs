@@ -224,6 +224,7 @@ namespace CrazyStorm.Core
                         var judge = instance.CheckVolume(dead, playerLast - logicOffset, player - logicOffset, out newPos);
                         newPos += logicOffset;
                         if (judge) searchResult[index++] = instance;
+                        player = newPos;
                     }
                 }
             }
