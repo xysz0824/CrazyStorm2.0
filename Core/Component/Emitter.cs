@@ -161,6 +161,11 @@ namespace CrazyStorm.Core
                     newParticle.PPositionLast = lastSpawn[i] == default ? newParticle.PPosition : lastSpawn[i];
                     lastSpawn[i] = newParticle.PPosition;
                 }
+                if (newParticle is Particle)
+                {
+                    var particle = newParticle as Particle;
+                    if (particle.StickToSpeedAngle) particle.PRotation = particle.PSpeedAngle;
+                }
                 newParticle.ParticleEventGroups = EmitterEventGroups;
                 Particles.Add(newParticle);
             }
