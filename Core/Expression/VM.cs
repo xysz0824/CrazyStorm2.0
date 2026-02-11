@@ -70,7 +70,10 @@ namespace CrazyStorm.Core
                         bytes.AddRange(PlayDataHelper.GetStructBytes((Vector3)operand));
                         break;
                     case VMCode.NAME:
-                        bytes.AddRange(BitConverter.GetBytes((int)operand));
+                        var isStr = operand is string;
+                        bytes.Add(isStr ? (byte)1 : (byte)0);
+                        if (isStr) bytes.AddRange(PlayDataHelper.GetStringBytes((string)operand));
+                        else bytes.AddRange(BitConverter.GetBytes((int)operand));
                         break;
                     case VMCode.BOOL:
                         bytes.AddRange(BitConverter.GetBytes((bool)operand));
@@ -105,9 +108,19 @@ namespace CrazyStorm.Core
                         list.Add(new VMInstruction { code = code, vectorOperand = v });
                         break;
                     case VMCode.NAME:
-                        int i = BitConverter.ToInt32(bytes, position);
-                        position += sizeof(int);
-                        list.Add(new VMInstruction { code = code, vectorOperand = new Vector3(i) });
+                        byte isStr = bytes[position++];
+                        if (isStr == 1)
+                        {
+                            string name = PlayDataHelper.ReadString(bytes, position);
+                            position += name.Length + 1;
+                            list.Add(new VMInstruction { code = code, stringOperand = name });
+                        }
+                        else
+                        {
+                            int i = BitConverter.ToInt32(bytes, position);
+                            position += sizeof(int);
+                            list.Add(new VMInstruction { code = code, vectorOperand = new Vector3(i) });
+                        }
                         break;
                     case VMCode.BOOL:
                         bool b = BitConverter.ToBoolean(bytes, position);
@@ -188,7 +201,8 @@ namespace CrazyStorm.Core
                         PushVector(instructions[i].vectorOperand);
                         break;
                     case VMCode.NAME:
-                        propertyContainer.PushProperty((int)instructions[i].vectorOperand.x);
+                        if (instructions[i].stringOperand != null) PushString(instructions[i].stringOperand);
+                        else propertyContainer.PushProperty((int)instructions[i].vectorOperand.x);
                         break;
                     case VMCode.CALL:
                         float count = PopInt();

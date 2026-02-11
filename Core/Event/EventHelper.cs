@@ -2,6 +2,7 @@
  * The MIT License (MIT)
  * Copyright (c) StarX 2026
  */
+using CrazyStorm.Expression;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -185,6 +186,7 @@ namespace CrazyStorm.Core
             if (!eventInfo.isSpecialEvent)
             {
                 var propertyID = Expression.Environment.GetPropertyID(eventInfo.resultProperty, type, subType, variables);
+                if (propertyID == int.MinValue) throw new Exception($"Can't find {eventInfo.resultProperty}");
                 bytes.AddRange(BitConverter.GetBytes(propertyID));
                 bytes.Add((byte)Enum.Parse(typeof(EventChangeType), eventInfo.changeType));
                 bytes.AddRange(BitConverter.GetBytes(eventInfo.isExpressionResult));

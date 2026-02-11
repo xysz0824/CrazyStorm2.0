@@ -173,7 +173,6 @@ namespace CrazyStorm.Expression
                     break;
                 }
             }
-            if (propertyID == int.MinValue) throw new Exception($"Can't find {name}");
             return propertyID;
         }
         public void PutGlobal(string name, float value) 

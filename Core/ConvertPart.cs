@@ -858,24 +858,27 @@ namespace CrazyStorm.Core
         public static string ConvertSpecialValue(string property, PropertyType type, string value, out bool expressionResult)
         {
             expressionResult = false;
+            if (type == PropertyType.Boolean && BoolValueMap.ContainsKey(value)) return BoolValueMap[value];
             var split = property.Split('.');
             var memberName = split.Length > 1 ? $".{split[1]}" : "";
-            switch (value)
+            if (value.Contains("自身"))
             {
-                case "自身":
-                    expressionResult = true;
-                    if (string.IsNullOrEmpty(memberName) && type == PropertyType.Single) return "SelfAngle";
-                    else return $"Position{memberName}";
-                case "自机":
-                    expressionResult = true;
-                    if (string.IsNullOrEmpty(memberName) && type == PropertyType.Single) return "BodyAngle";
-                    else return $"BodyPosition{memberName}";
-                case "中心":
-                    expressionResult = true;
-                    if (string.IsNullOrEmpty(memberName) && type == PropertyType.Single) return "CenterAngle";
-                    else return $"CenterPosition{memberName}";
+                expressionResult = true;
+                if (string.IsNullOrEmpty(memberName) && type == PropertyType.Single) value = value.Replace("自身", "SelfAngle");
+                else value = value.Replace("自身", $"Position{memberName}");
             }
-            if (type == PropertyType.Boolean && BoolValueMap.ContainsKey(value)) return BoolValueMap[value];
+            else if (value.Contains("自机"))
+            {
+                expressionResult = true;
+                if (string.IsNullOrEmpty(memberName) && type == PropertyType.Single) value = value.Replace("自机", "BodyAngle");
+                else value = value.Replace("自机", $"BodyPosition{memberName}");
+            }
+            else if (value.Contains("中心"))
+            {
+                expressionResult = true;
+                if (string.IsNullOrEmpty(memberName) && type == PropertyType.Single) value = value.Replace("中心", "CenterAngle");
+                else value = value.Replace("中心", $"CenterPosition{memberName}");
+            }
             if (value.Contains("+"))
             {
                 expressionResult = true;

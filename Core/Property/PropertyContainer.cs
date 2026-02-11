@@ -123,6 +123,7 @@ namespace CrazyStorm.Core
                 {
                     List<byte> pairData = new List<byte>();
                     int propertyID = Expression.Environment.GetPropertyID(pair.Key, GetType(), null, variables);
+                    if (propertyID == int.MinValue) throw new Exception($"Can't find {pair.Key}");
                     pairData.AddRange(BitConverter.GetBytes(propertyID));
                     pairData.AddRange(pair.Value.CompiledExpression);
                     newData.AddRange(PlayDataHelper.CreateBlock(pairData));
