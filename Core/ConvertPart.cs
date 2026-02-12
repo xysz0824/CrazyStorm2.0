@@ -856,7 +856,7 @@ namespace CrazyStorm.Core
             }
             return str;
         }
-        public static string ConvertSpecialValue(string property, PropertyType type, string value, out bool expressionResult)
+        public static string ConvertSpecialValue(string property, string changeType, PropertyType type, string value, out bool expressionResult)
         {
             expressionResult = false;
             if (type == PropertyType.Boolean && BoolValueMap.ContainsKey(value)) return BoolValueMap[value];
@@ -879,6 +879,18 @@ namespace CrazyStorm.Core
                 expressionResult = true;
                 if (string.IsNullOrEmpty(memberName) && type == PropertyType.Single) value = value.Replace("中心", "CenterAngle");
                 else value = value.Replace("中心", $"CenterPosition{memberName}");
+            }
+            if (changeType == "ChangeTo" && split[0].Contains("Position"))
+            {
+                split = value.Split('+');
+                float number = 0;
+                if (float.TryParse(split[0], out number))
+                {
+                    if (memberName == ".x") number -= OldCenter.x;
+                    else if (memberName == ".y") number -= OldCenter.y;
+                    if (split.Length > 1) value = $"{number}+{split[1]}";
+                    else value = $"{number}";
+                }
             }
             if (value.Contains("+"))
             {
@@ -1035,8 +1047,8 @@ namespace CrazyStorm.Core
                         else
                         {
                             eventInfo.resultType = PropertyTypeRule.GetValueType(type, subType, eventInfo.resultProperty);
-                            eventInfo.resultValue = ConvertSpecialValue(eventInfo.resultProperty, eventInfo.resultType, ConvertKeyword(split[2]), 
-                                out eventInfo.isExpressionResult);
+                            eventInfo.resultValue = ConvertSpecialValue(eventInfo.resultProperty, eventInfo.changeType, eventInfo.resultType, 
+                                ConvertKeyword(split[2]), out eventInfo.isExpressionResult);
                             if (eventInfo.resultProperty.Contains(".")) eventInfo.resultType = PropertyType.Single;
                         }
                     }
