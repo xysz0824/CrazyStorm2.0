@@ -663,6 +663,7 @@ namespace CrazyStorm.Core
                     line = reader.ReadLine()?.Trim();
                 }
                 while (!reader.EndOfStream);
+                center.TotalFrame = particleSystem.TotalFrame;
                 ParticleSystems.Add(particleSystem);
             }
         }
