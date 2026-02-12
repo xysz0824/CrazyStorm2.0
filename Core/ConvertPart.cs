@@ -464,7 +464,7 @@ namespace CrazyStorm.Core
                             //sonevents
                             eventGroups = GetEventGroups(typeof(Particle), null, submatch.Groups["sonevents"].Value, ConvertEventType.Particle, "");
                             foreach (var eventGroup in eventGroups) batch.ParticleEventGroups.Add(eventGroup);
-                            layer.Components.Add(batch);
+                            layer.Components.Insert(0, batch);
                             batchs.Add(batch);
                         }
                         var laseCount = int.Parse(match.Groups["lasecount"].Value);
@@ -529,7 +529,7 @@ namespace CrazyStorm.Core
                             //sonevents
                             eventGroups = GetEventGroups(typeof(CurveParticle), null,submatch.Groups["sonevents"].Value, ConvertEventType.Particle, "");
                             foreach (var eventGroup in eventGroups) lase.ParticleEventGroups.Add(eventGroup);
-                            layer.Components.Add(lase);
+                            layer.Components.Insert(0, lase);
                         }
                         var coverCount = int.Parse(match.Groups["covercount"].Value);
                         for (int i = 0; i < coverCount; ++i)
@@ -575,7 +575,7 @@ namespace CrazyStorm.Core
                             cover.TotalFrame = Math.Max(cover.TotalFrame, maxFrame - cover.BeginFrame + 1);
                             layer.BeginFrame = Math.Min(layer.BeginFrame, cover.BeginFrame);
                             layer.TotalFrame = Math.Max(layer.TotalFrame, cover.BeginFrame + cover.TotalFrame - layer.BeginFrame);
-                            layer.Components.Add(cover);
+                            layer.Components.Insert(0, cover);
                         }
                         var reboundCount = int.Parse(match.Groups["reboundcount"].Value);
                         for (int i = 0; i < reboundCount; ++i)
@@ -607,7 +607,7 @@ namespace CrazyStorm.Core
                             //events
                             var eventGroups = GetEventGroups(typeof(ParticleBase), null, submatch.Groups["events"].Value, ConvertEventType.Particle, "ReboundGroups");
                             foreach (var eventGroup in eventGroups) rebound.RebounderEventGroups.Add(eventGroup);
-                            layer.Components.Add(rebound);
+                            layer.Components.Insert(0, rebound);
                         }
                         var forcecount = int.Parse(match.Groups["forcecount"].Value);
                         for (int i = 0; i < forcecount; ++i)
@@ -643,7 +643,7 @@ namespace CrazyStorm.Core
                             force.ForceType = bool.Parse(submatch.Groups["suction"].Value) ? ForceType.InnerForce :
                                 bool.Parse(submatch.Groups["replusion"].Value) ? ForceType.OuterForce : ForceType.OneDirection;
                             force.ForceImpactSpeed = float.Parse(submatch.Groups["addspeed"].Value);
-                            layer.Components.Add(force);
+                            layer.Components.Insert(0, force);
                         }
                         //rebuild reference
                         foreach (var component in layer.Components)
@@ -656,7 +656,7 @@ namespace CrazyStorm.Core
                         if (particleSystem.Layers.Count == 0)
                         {
                             center.System = particleSystem;
-                            layer.Components.Add(center);
+                            layer.Components.Insert(0, center);
                         }
                         particleSystem.Layers.Insert(0, layer);
                     }
