@@ -38,13 +38,14 @@ namespace CrazyStorm.Core
         }
         public void Update(float frameScale)
         {
+            float timeNormalized = Math.Min(1, (currentTime + frameScale) / ChangeTime);
             float ratio = 0;
             var sign = ChangeType != EventChangeType.Decrease ? 1f : -1f;
             ratio = frameScale * sign;
             //Use derivatives of different lerps
             ratio *= 1f / ChangeTime;
-            if (ChangeMode == EventChangeMode.Accelerated) ratio *= 2 * currentTime / ChangeTime;
-            else if (ChangeMode == EventChangeMode.Decelerated) ratio *= (2 - 2 * currentTime / ChangeTime);
+            if (ChangeMode == EventChangeMode.Accelerated) ratio *= 2 * timeNormalized;
+            else if (ChangeMode == EventChangeMode.Decelerated) ratio *= 2 - 2 * timeNormalized;
             else if (ChangeMode == EventChangeMode.Instant) ratio *= ChangeTime;
             ratio = Math.Min(1, ratio);
             currentValue.type = TargetValue.type;
@@ -58,12 +59,12 @@ namespace CrazyStorm.Core
                     if (ChangeMode == EventChangeMode.Sin)
                     {
                         currentValue.intValue = (int)(InitialValue.intValue + 
-                            sign * Math.Sin(currentTime / ChangeTime * Math.PI * 2) * TargetValue.intValue);
+                            sign * Math.Sin(timeNormalized * Math.PI * 2) * TargetValue.intValue);
                     }
                     else if (ChangeMode == EventChangeMode.Cos)
                     {
                         currentValue.intValue = (int)(InitialValue.intValue +
-                            sign * Math.Cos(currentTime / ChangeTime * Math.PI * 2) * TargetValue.intValue);
+                            sign * Math.Cos(timeNormalized * Math.PI * 2) * TargetValue.intValue);
                     }
                     else
                     {
@@ -77,12 +78,12 @@ namespace CrazyStorm.Core
                     if (ChangeMode == EventChangeMode.Sin)
                     {
                         currentValue.floatValue = (float)(InitialValue.floatValue +
-                            sign * Math.Sin(currentTime / ChangeTime * Math.PI * 2) * TargetValue.floatValue);
+                            sign * Math.Sin(timeNormalized * Math.PI * 2) * TargetValue.floatValue);
                     }
                     else if (ChangeMode == EventChangeMode.Cos)
                     {
                         currentValue.floatValue = (float)(InitialValue.floatValue +
-                            sign * Math.Cos(currentTime / ChangeTime * Math.PI * 2) * TargetValue.floatValue);
+                            sign * Math.Cos(timeNormalized * Math.PI * 2) * TargetValue.floatValue);
                     }
                     else
                     {
@@ -100,12 +101,12 @@ namespace CrazyStorm.Core
                     if (ChangeMode == EventChangeMode.Sin)
                     {
                         currentValue.vector2Value = InitialValue.vector2Value + TargetValue.vector2Value *
-                            (float)(sign * Math.Sin(currentTime / ChangeTime * Math.PI * 2));
+                            (float)(sign * Math.Sin(timeNormalized * Math.PI * 2));
                     }
                     else if (ChangeMode == EventChangeMode.Cos)
                     {
                         currentValue.vector2Value = InitialValue.vector2Value + TargetValue.vector2Value *
-                            (float)(sign * Math.Cos(currentTime / ChangeTime * Math.PI * 2));
+                            (float)(sign * Math.Cos(timeNormalized * Math.PI * 2));
                     }
                     else
                     {
@@ -119,12 +120,12 @@ namespace CrazyStorm.Core
                     if (ChangeMode == EventChangeMode.Sin)
                     {
                         currentValue.rgbValue = InitialValue.rgbValue + TargetValue.rgbValue *
-                            (float)(sign * Math.Sin(currentTime / ChangeTime * Math.PI * 2));
+                            (float)(sign * Math.Sin(timeNormalized * Math.PI * 2));
                     }
                     else if (ChangeMode == EventChangeMode.Cos)
                     {
                         currentValue.rgbValue = InitialValue.rgbValue + TargetValue.rgbValue *
-                            (float)(sign * Math.Cos(currentTime / ChangeTime * Math.PI * 2));
+                            (float)(sign * Math.Cos(timeNormalized * Math.PI * 2));
                     }
                     else
                     {
