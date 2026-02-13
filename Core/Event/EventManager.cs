@@ -290,7 +290,11 @@ namespace CrazyStorm.Core
                 if (executorList[i].PropertyContainer != component || executorList[i].BindingContainer != particle) continue;
                 if (executorList[i].Finished || executorList[i].Invalid)
                 {
-                    if (cache.ContainsKey(id)) cache[id].Remove(executorList[i].PropertyID);
+                    if (cache.ContainsKey(id))
+                    {
+                        cache[id].Remove(executorList[i].PropertyID);
+                        if (cache[id].Count == 0) cache.Remove(id);
+                    }
                     continue;
                 }
                 if (!cache.ContainsKey(id)) cache.Add(id, new Dictionary<int, TypeSet>());
