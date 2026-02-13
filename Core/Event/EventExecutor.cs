@@ -38,16 +38,19 @@ namespace CrazyStorm.Core
         }
         public void Update(float frameScale)
         {
+            float remainTime = ChangeTime - currentTime;
             float timeNormalized = Math.Min(1, (currentTime + frameScale) / ChangeTime);
-            float ratio = 0;
-            var sign = ChangeType != EventChangeType.Decrease ? 1f : -1f;
-            ratio = frameScale * sign;
-            //Use derivatives of different lerps
-            ratio *= 1f / ChangeTime;
-            if (ChangeMode == EventChangeMode.Accelerated) ratio *= 2 * timeNormalized;
-            else if (ChangeMode == EventChangeMode.Decelerated) ratio *= 2 - 2 * timeNormalized;
-            else if (ChangeMode == EventChangeMode.Instant) ratio *= ChangeTime;
-            ratio = Math.Min(1, ratio);
+            float ratio = 0, sign = ChangeType == EventChangeType.Decrease ? -1f : 1f;
+            if (ChangeType != EventChangeType.ChangeTo)
+            {
+                ratio = frameScale * sign;
+                //Use derivatives of different lerps
+                ratio *= 1f / ChangeTime;
+                if (ChangeMode == EventChangeMode.Accelerated) ratio *= 2 * timeNormalized;
+                else if (ChangeMode == EventChangeMode.Decelerated) ratio *= 2 - 2 * timeNormalized;
+                else if (ChangeMode == EventChangeMode.Instant) ratio *= ChangeTime;
+                ratio = Math.Min(1, ratio);
+            }
             currentValue.type = TargetValue.type;
             switch (TargetValue.type)
             {
@@ -70,7 +73,11 @@ namespace CrazyStorm.Core
                     {
                         PropertyContainer.PushProperty(PropertyID);
                         currentValue.intValue = VM.PopInt();
-                        currentValue.intValue = (int)(currentValue.intValue + ratio * TargetValue.intValue);
+                        if (ChangeType == EventChangeType.ChangeTo)
+                        {
+                            currentValue.intValue = (int)((currentValue.intValue * (remainTime - 1) + TargetValue.intValue) / remainTime);
+                        }
+                        else currentValue.intValue = (int)(currentValue.intValue + ratio * TargetValue.intValue);
                     }
                     VM.PushFloat(currentValue.intValue);
                     break;
@@ -89,7 +96,11 @@ namespace CrazyStorm.Core
                     {
                         PropertyContainer.PushProperty(PropertyID);
                         currentValue.floatValue = VM.PopFloat();
-                        currentValue.floatValue = currentValue.floatValue + ratio * TargetValue.floatValue;
+                        if (ChangeType == EventChangeType.ChangeTo)
+                        {
+                            currentValue.floatValue = (currentValue.floatValue * (remainTime - 1) + TargetValue.floatValue) / remainTime;
+                        }
+                        else currentValue.floatValue = currentValue.floatValue + ratio * TargetValue.floatValue;
                     }
                     VM.PushFloat(currentValue.floatValue);
                     break;
@@ -112,7 +123,11 @@ namespace CrazyStorm.Core
                     {
                         PropertyContainer.PushProperty(PropertyID);
                         currentValue.vector2Value = VM.PopVector2();
-                        currentValue.vector2Value = currentValue.vector2Value + TargetValue.vector2Value * ratio;
+                        if (ChangeType == EventChangeType.ChangeTo)
+                        {
+                            currentValue.vector2Value = (currentValue.vector2Value * (remainTime - 1) + TargetValue.vector2Value) / remainTime;
+                        }
+                        else currentValue.vector2Value = currentValue.vector2Value + TargetValue.vector2Value * ratio;
                     }
                     VM.PushVector2(currentValue.vector2Value);
                     break;
@@ -131,7 +146,11 @@ namespace CrazyStorm.Core
                     {
                         PropertyContainer.PushProperty(PropertyID);
                         currentValue.rgbValue = VM.PopRGB();
-                        currentValue.rgbValue = currentValue.rgbValue + TargetValue.rgbValue * ratio;
+                        if (ChangeType == EventChangeType.ChangeTo)
+                        {
+                            currentValue.rgbValue = (currentValue.rgbValue * (remainTime - 1) + TargetValue.rgbValue) / remainTime;
+                        }
+                        else currentValue.rgbValue = currentValue.rgbValue + TargetValue.rgbValue * ratio;
                     }
                     VM.PushRGB(currentValue.rgbValue);
                     break;
