@@ -226,7 +226,7 @@ namespace CrazyStorm.Core
 
         #region Public Methods
         public override string ToString() => Name;
-        public override bool IsValid() => true;
+        public override bool IsValid() => CurrentFrame >= 1 && CurrentFrame <= TotalFrame;
         public void TransPositiontoRelative()
         {
             if (Parent != null) Position -= Parent.GetAbsolutePosition();
