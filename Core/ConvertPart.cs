@@ -70,6 +70,8 @@ namespace CrazyStorm.Core
             { "不透明度", "Opacity" }, { "朝向", "PRotation" },
             { "横比", "PSpeedHScale" }, { "纵比", "PSpeedVScale" },
             { "消除效果", "FadeEffect" }, { "拖影效果", "AfterimageEffect" }, { "出屏即消", "KillOutside" }, { "无敌状态", "Collision" },
+            { "长度", "Length" }, { "图案流速", "VSpeed" },
+            { "半宽", "HalfWidth" }, { "半高", "HalfHeight" }, { "ID", "TargetName" }, { "启用蒙版", "LayerMask" },
         };
         static readonly Dictionary<string, string> BoolValueMap = new Dictionary<string, string>()
         {
@@ -464,7 +466,7 @@ namespace CrazyStorm.Core
                             //sonevents
                             eventGroups = GetEventGroups(typeof(Particle), null, submatch.Groups["sonevents"].Value, ConvertEventType.Particle, "");
                             foreach (var eventGroup in eventGroups) batch.ParticleEventGroups.Add(eventGroup);
-                            layer.Components.Insert(0, batch);
+                            layer.Components.Add(batch);
                             batchs.Add(batch);
                         }
                         var laseCount = int.Parse(match.Groups["lasecount"].Value);
@@ -529,7 +531,7 @@ namespace CrazyStorm.Core
                             //sonevents
                             eventGroups = GetEventGroups(typeof(CurveParticle), null,submatch.Groups["sonevents"].Value, ConvertEventType.Particle, "");
                             foreach (var eventGroup in eventGroups) lase.ParticleEventGroups.Add(eventGroup);
-                            layer.Components.Insert(0, lase);
+                            layer.Components.Add(lase);
                         }
                         var coverCount = int.Parse(match.Groups["covercount"].Value);
                         for (int i = 0; i < coverCount; ++i)
@@ -561,7 +563,7 @@ namespace CrazyStorm.Core
                             cover.AcspeedAngle = ConvertAngle(float.Parse(submatch.Groups["aspeedd"].Value), float.Parse(submatch.Groups["randaspeedd"].Value),
                                 cover, "AcspeedAngle");
                             cover.LayerMask = submatch.Groups["maskon"].Success ? bool.Parse(submatch.Groups["maskon"].Value) : false;
-                            cover.LayerMaskType = submatch.Groups["masktype"].Success ? (LayerMaskType)int.Parse(submatch.Groups["masktype"].Value) : default;
+                            cover.LayerMaskType = submatch.Groups["masktype"].Success ? (LayerMaskType)(int.Parse(submatch.Groups["masktype"].Value) - 1) : default;
                             cover.LayerMaskMutex = submatch.Groups["maskmutex"].Success ? bool.Parse(submatch.Groups["maskmutex"].Value) : false;
                             cover.Rotation = submatch.Groups["degree"].Success ? float.Parse(submatch.Groups["degree"].Value) : 0f;
                             //events
@@ -570,12 +572,15 @@ namespace CrazyStorm.Core
                             //sonevents
                             eventGroups = GetEventGroups(typeof(ParticleBase), null,submatch.Groups["sonevents"].Value, ConvertEventType.CoverParticle, "");
                             foreach (var eventGroup in eventGroups) cover.EventFieldEventGroups.Add(eventGroup);
-                            GetFrameConditionRange(eventGroups, out int minFrame, out int maxFrame);
-                            cover.BeginFrame = Math.Min(cover.BeginFrame, minFrame);
-                            cover.TotalFrame = Math.Max(cover.TotalFrame, maxFrame - cover.BeginFrame + 1);
+                            if (eventGroups.Count > 0)
+                            {
+                                GetFrameConditionRange(eventGroups, out int minFrame, out int maxFrame);
+                                cover.BeginFrame = Math.Min(cover.BeginFrame, minFrame);
+                                cover.TotalFrame = Math.Max(cover.TotalFrame, maxFrame - cover.BeginFrame + 1);
+                            }
                             layer.BeginFrame = Math.Min(layer.BeginFrame, cover.BeginFrame);
                             layer.TotalFrame = Math.Max(layer.TotalFrame, cover.BeginFrame + cover.TotalFrame - layer.BeginFrame);
-                            layer.Components.Insert(0, cover);
+                            layer.Components.Add(cover);
                         }
                         var reboundCount = int.Parse(match.Groups["reboundcount"].Value);
                         for (int i = 0; i < reboundCount; ++i)
@@ -607,7 +612,7 @@ namespace CrazyStorm.Core
                             //events
                             var eventGroups = GetEventGroups(typeof(ParticleBase), null, submatch.Groups["events"].Value, ConvertEventType.Particle, "ReboundGroups");
                             foreach (var eventGroup in eventGroups) rebound.RebounderEventGroups.Add(eventGroup);
-                            layer.Components.Insert(0, rebound);
+                            layer.Components.Add(rebound);
                         }
                         var forcecount = int.Parse(match.Groups["forcecount"].Value);
                         for (int i = 0; i < forcecount; ++i)
@@ -643,7 +648,7 @@ namespace CrazyStorm.Core
                             force.ForceType = bool.Parse(submatch.Groups["suction"].Value) ? ForceType.InnerForce :
                                 bool.Parse(submatch.Groups["replusion"].Value) ? ForceType.OuterForce : ForceType.OneDirection;
                             force.ForceImpactSpeed = float.Parse(submatch.Groups["addspeed"].Value);
-                            layer.Components.Insert(0, force);
+                            layer.Components.Add(force);
                         }
                         //rebuild reference
                         foreach (var component in layer.Components)
@@ -656,7 +661,7 @@ namespace CrazyStorm.Core
                         if (particleSystem.Layers.Count == 0)
                         {
                             center.System = particleSystem;
-                            layer.Components.Insert(0, center);
+                            layer.Components.Add(center);
                         }
                         particleSystem.Layers.Insert(0, layer);
                     }

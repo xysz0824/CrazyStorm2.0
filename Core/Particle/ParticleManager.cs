@@ -42,6 +42,8 @@ namespace CrazyStorm.Core
         {
             int c = b.Emitter.LayerID - a.Emitter.LayerID;
             if (c != 0) return c;
+            c = (int)((9 - a.RenderOrder % 10) - (9 - b.RenderOrder % 10));
+            if (c != 0) return c;
             return (int)(a.RenderOrder - b.RenderOrder);
         }
     }
@@ -52,6 +54,10 @@ namespace CrazyStorm.Core
         {
             int c = b.Emitter.LayerID - a.Emitter.LayerID;
             if (c != 0) return c;
+            c = (int)((9 - a.RenderOrder % 10) - (9 - b.RenderOrder % 10));
+            if (c != 0) return c;
+            BlendType blendType = (BlendType)(9 - a.RenderOrder % 10);
+            if (blendType != BlendType.AlphaBlend) return (int)(a.RenderOrder - b.RenderOrder);
             return (int)(b.RenderOrder - a.RenderOrder);
         }
     }

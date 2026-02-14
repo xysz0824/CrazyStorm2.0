@@ -333,6 +333,7 @@ namespace CrazyStorm.Core
             ParticleManager.MaskTypeArray[maskCount] = LayerMaskType == LayerMaskType.OutsideMask ? 1 : 2;
             ParticleManager.MaskRotateArray[maskCount] = (float)MathHelper.DegToRad(Rotation);
             maskCount++;
+            ParticleManager.MaskCount = maskCount;
         }
         public void UpdateLayerMask()
         {
@@ -344,6 +345,7 @@ namespace CrazyStorm.Core
             ParticleManager.MaskTypeArray[maskCount] = (int)LayerMaskType + 1;
             ParticleManager.MaskRotateArray[maskCount] = (float)MathHelper.DegToRad(Rotation);
             maskCount++;
+            ParticleManager.MaskCount = maskCount;
         }
         #endregion
     }
