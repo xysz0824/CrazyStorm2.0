@@ -65,8 +65,10 @@ namespace CrazyStorm.Core
     {
         public static readonly int MAX_MASK_COUNT = 8;
 
-        public delegate void ParticleDrawHanlder(Particle particle);
-        public static event ParticleDrawHanlder OnParticleDraw;
+        public delegate void LayerDrawHandler(ParticleSystem system, Layer layer);
+        public static event LayerDrawHandler OnLayerDraw;
+        public delegate void ParticleDrawHandler(Particle particle);
+        public static event ParticleDrawHandler OnParticleDraw;
         public delegate void CurveParticleDrawHandler(CurveParticle curveParticle);
         public static event CurveParticleDrawHandler OnCurveParticleDraw;
 
@@ -267,7 +269,7 @@ namespace CrazyStorm.Core
             }
             return result == 0;
         }
-        public static void UpdateLayerMasks(GenericContainer<Layer> layers)
+        public static void ClearLayerMasks()
         {
             MaskCount = 0;
             Array.Clear(MaskPositionArray, 0, MAX_MASK_COUNT);
@@ -275,38 +277,45 @@ namespace CrazyStorm.Core
             Array.Clear(MaskShapeArray, 0, MAX_MASK_COUNT);
             Array.Clear(MaskTypeArray, 0, MAX_MASK_COUNT);
             Array.Clear(MaskRotateArray, 0, MAX_MASK_COUNT);
-            for (int i = 0; i < layers.Count; ++i)
+        }
+        public static void UpdateLayerMasks(GenericContainer<Layer> layers, Layer layer)
+        {
+            for (int j = layers.Count - 1; j >= 0; --j)
             {
-                for (int j = 0; j < layers.Count; ++j)
+                if (layers[j] == layer) continue;
+                for (int k = 0; k < layers[j].Components.Count; ++k)
                 {
-                    if (j == i) continue;
-                    for (int k = 0; k < layers[j].Components.Count; ++k)
-                    {
-                        var eventField = layers[j].Components[k] as EventField;
-                        if (eventField == null) continue;
-                        if (eventField.BindingTarget == null)
-                        {
-                            eventField.UpdateMutexMask();
-                        }
-                        else
-                        {
-                            eventField.BindingUpdate(1, false, 0);
-                        }
-                    }
-                }
-                for (int j = 0; j < layers[i].Components.Count; ++j)
-                {
-                    var eventField = layers[i].Components[j] as EventField;
+                    var eventField = layers[j].Components[k] as EventField;
                     if (eventField == null) continue;
                     if (eventField.BindingTarget == null)
                     {
-                        eventField.UpdateLayerMask();
+                        eventField.UpdateMutexMask();
                     }
                     else
                     {
-                        eventField.BindingUpdate(2, false, 0);
+                        eventField.BindingUpdate(1, false, 0);
                     }
                 }
+            }
+            for (int j = 0; j < layer.Components.Count; ++j)
+            {
+                var eventField = layer.Components[j] as EventField;
+                if (eventField == null) continue;
+                if (eventField.BindingTarget == null)
+                {
+                    eventField.UpdateLayerMask();
+                }
+                else
+                {
+                    eventField.BindingUpdate(2, false, 0);
+                }
+            }
+        }
+        public static void UpdateLayerMasks(GenericContainer<Layer> layers)
+        {
+            for (int i = layers.Count - 1; i >= 0; --i)
+            {
+                UpdateLayerMasks(layers, layers[i]);
             }
         }
         public static void Update(float frameRate)
@@ -336,10 +345,17 @@ namespace CrazyStorm.Core
             var particles = activeParticles[system];
             if (system.OrderType == OrderType.FirstAsTop) particles.Sort(FirstAsTopComparer.Instance);
             else particles.Sort(LastAsTopComparer.Instance);
+            int currentLayerID = -1;
             for (int i = 0; i < particles.Count; ++i)
             {
                 var instance = particles[i];
                 if (!instance.Alive) continue;
+                var layerID = instance.Emitter.LayerID;
+                if (currentLayerID != layerID)
+                {
+                    currentLayerID = layerID;
+                    OnLayerDraw(system, system.Layers[layerID]);
+                }
                 if (instance is Particle) OnParticleDraw(instance as Particle);
                 if (instance is CurveParticle) OnCurveParticleDraw(instance as CurveParticle);
             }

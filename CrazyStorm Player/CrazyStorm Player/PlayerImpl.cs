@@ -4,6 +4,7 @@
  */
 using CrazyStorm.Core;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using SharpDX.Direct3D9;
@@ -15,15 +16,14 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Security.Policy;
 using System.Text;
-using File = CrazyStorm.Core.File;
-using MathHelper = Microsoft.Xna.Framework.MathHelper;
-using Vector2 = Microsoft.Xna.Framework.Vector2;
 using Blend = Microsoft.Xna.Framework.Graphics.Blend;
 using Color = Microsoft.Xna.Framework.Color;
+using Effect = Microsoft.Xna.Framework.Graphics.Effect;
+using File = CrazyStorm.Core.File;
+using MathHelper = Microsoft.Xna.Framework.MathHelper;
 using Rectangle = Microsoft.Xna.Framework.Rectangle;
 using SamplerState = Microsoft.Xna.Framework.Graphics.SamplerState;
-using Microsoft.Xna.Framework.Audio;
-using Effect = Microsoft.Xna.Framework.Graphics.Effect;
+using Vector2 = Microsoft.Xna.Framework.Vector2;
 
 namespace CrazyStorm_Player
 {
@@ -206,6 +206,7 @@ namespace CrazyStorm_Player
             //final
             ForceField.OnForceImpactBody += ForceImpactBody;
             EventManager.OnSoundPlay += PlaySound;
+            ParticleManager.OnLayerDraw += (system, layer) => DrawLayer(system, layer);
             ParticleManager.OnParticleDraw += (particle) => DrawParticle(spriteBatch, particle);
             ParticleManager.OnCurveParticleDraw += (particle) => DrawCurveParticle(spriteBatch, curveBatch, particle);
             FrameworkDispatcher.Update();
@@ -252,6 +253,17 @@ namespace CrazyStorm_Player
                 }
             }
             sounds[path].Play(0.5f, 0f, 0f);
+        }
+        void DrawLayer(ParticleSystem system, Layer layer)
+        {
+            ParticleManager.ClearLayerMasks();
+            ParticleManager.UpdateLayerMasks(system.Layers, layer);
+            shaderMaskCount.SetValue(ParticleManager.MaskCount);
+            shaderMaskSize.SetValue(ParticleManager.MaskSizeArray);
+            shaderMaskPosition.SetValue(ParticleManager.MaskPositionArray);
+            shaderMaskShape.SetValue(ParticleManager.MaskShapeArray);
+            shaderMaskType.SetValue(ParticleManager.MaskTypeArray);
+            shaderMaskRotate.SetValue(ParticleManager.MaskRotateArray);
         }
         void DrawParticle(SpriteBatch spriteBatch, Particle particle)
         {
@@ -383,15 +395,18 @@ namespace CrazyStorm_Player
             }
             controllable.Update(keyboard, minFrameFactor * ParticleSystem.FRAME_RATE_BASE / FrameRate);
             EventManager.Update(FrameRate);
-            foreach (var instance in instances.Keys) instance.Update(FrameRate, CurrentFrame);
-
-            var collidedCount = 0;
-            CrazyStorm.Core.Vector2 newPos = default;
-            var particles = ParticleManager.CheckCollision(false, controllable.selfPosLast.ToCore(),
-                controllable.selfPos.ToCore(), controllable.selfRadius, out collidedCount, out newPos);
-            for (int i = 0; i < collidedCount; ++i) particles[i].Die();
-            controllable.selfPos = newPos.ToXna();
-
+            foreach (var instance in instances.Keys)
+            {
+                instance.Update(FrameRate, CurrentFrame);
+                ParticleManager.ClearLayerMasks();
+                ParticleManager.UpdateLayerMasks(instance.Layers);
+                var collidedCount = 0;
+                CrazyStorm.Core.Vector2 newPos = default;
+                var particles = ParticleManager.CheckCollision(false, controllable.selfPosLast.ToCore(),
+                    controllable.selfPos.ToCore(), controllable.selfRadius, out collidedCount, out newPos);
+                for (int i = 0; i < collidedCount; ++i) particles[i].Die();
+                controllable.selfPos = newPos.ToXna();
+            }
             ParticleManager.Update(FrameRate);
             var minCurrentFrame = float.MaxValue;
             foreach (var instance in instances.Keys)
@@ -417,17 +432,7 @@ namespace CrazyStorm_Player
             }
             curveBatch.Begin(BlendState.NonPremultiplied);
             shaderRenderCenter.SetValue(new Vector2(Width / 2, Height / 2));
-            foreach (var instance in instances.Keys)
-            {
-                ParticleManager.UpdateLayerMasks(instance.Layers);
-                shaderMaskCount.SetValue(ParticleManager.MaskCount);
-                shaderMaskSize.SetValue(ParticleManager.MaskSizeArray);
-                shaderMaskPosition.SetValue(ParticleManager.MaskPositionArray);
-                shaderMaskShape.SetValue(ParticleManager.MaskShapeArray);
-                shaderMaskType.SetValue(ParticleManager.MaskTypeArray);
-                shaderMaskRotate.SetValue(ParticleManager.MaskRotateArray);
-                ParticleManager.Draw(instance);
-            }
+            foreach (var instance in instances.Keys) ParticleManager.Draw(instance);
             lastBlendType = BlendType.None;
             curveBatch.End();
             controllable.Draw(spriteBatch, characterTexture, pointTexture, slowModeTexture, maxOffset);
