@@ -285,5 +285,6 @@ namespace CrazyStorm.Core
         }
         public abstract bool PushProperty(int propertyID);
         public abstract bool SetProperty(int propertyID);
+        public abstract bool IsValid();
     }
 }

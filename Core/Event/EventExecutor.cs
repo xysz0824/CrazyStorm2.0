@@ -13,6 +13,7 @@ namespace CrazyStorm.Core
     {
         TypeSet currentValue;
         float currentTime;
+        public long UniqueID { get; set; }
         public PropertyContainer PropertyContainer { get; set; }
         public long PropertyContainerID { get; set; }
         public PropertyContainer BindingContainer { get; set; }
@@ -25,8 +26,8 @@ namespace CrazyStorm.Core
         public TypeSet TargetValue { get; set; }
         public int ChangeTime { get; set; }
         public bool Finished => currentTime >= ChangeTime;
-        public bool Invalid => (PropertyContainer.ID != PropertyContainerID) || 
-            (BindingContainer != null && BindingContainer.ID != BindingContainerID);
+        public bool Invalid => !PropertyContainer.IsValid() || (PropertyContainer.ID != PropertyContainerID) || 
+            (BindingContainer != null && (!BindingContainer.IsValid() || BindingContainer.ID != BindingContainerID));
         public EventExecutor()
         {
             Reset();

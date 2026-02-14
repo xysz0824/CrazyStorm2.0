@@ -142,7 +142,7 @@ namespace CrazyStorm.Core
             }
             particle.System = system;
             particle.RenderOrder = instanceID * 10 + 9 - (int)template.BlendType;
-            particle.ID = instanceID++;
+            particle.ID = (instanceID++) % (MaximumParticleCount * 10);
             particle.Reset();
             particle.Alive = true;
             if (!activeParticles.ContainsKey(particle.System)) activeParticles[particle.System] = new List<ParticleBase>();

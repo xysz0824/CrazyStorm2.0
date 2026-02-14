@@ -671,6 +671,7 @@ namespace CrazyStorm.Core
             particle.ParticleEventGroups = ParticleEventGroups;
             particle.ReboundTime = 0;
         }
+        public override bool IsValid() => Alive;
         public virtual void Reset() { }
         #endregion
     }

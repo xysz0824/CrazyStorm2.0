@@ -171,6 +171,7 @@ namespace CrazyStorm.Core
         {
             var executor = EventExecutor.Rent(NullData.Empty);
             executor.Reset();
+            executor.UniqueID = GetUniqueKey(propertyContainer.System.GetHashCode(), propertyContainer, bindingContainer);
             executor.PropertyContainer = propertyContainer;
             executor.PropertyContainerID = propertyContainer.ID;
             executor.BindingContainer = bindingContainer;
@@ -266,14 +267,18 @@ namespace CrazyStorm.Core
         {
             for (int i = 0; i < executorList.Count; ++i)
             {
-                if (executorList[i].BindingContainer != null) continue;
                 if (executorList[i].Finished || executorList[i].Invalid)
                 {
+                    if (cache.ContainsKey(executorList[i].UniqueID))
+                    {
+                        cache[executorList[i].UniqueID].Remove(executorList[i].PropertyID);
+                        if (cache[executorList[i].UniqueID].Count == 0) cache.Remove(executorList[i].UniqueID);
+                    }
                     EventExecutor.Return(executorList[i]);
                     executorList.RemoveAt(i);
                     --i;
                 }
-                else
+                else if (executorList[i].BindingContainer == null)
                 {
                     var frameScale = executorList[i].PropertyContainer.System.FrameFactor *
                         ParticleSystem.FRAME_RATE_BASE / frameRate;
@@ -283,20 +288,12 @@ namespace CrazyStorm.Core
         }
         public static bool BindingUpdate(int systemHash, Component component, ParticleBase particle, float frameScale)
         {
-            bool updated = false;
             long id = GetUniqueKey(systemHash, component, particle);
+            bool updated = false;
             for (int i = 0; i < executorList.Count; ++i)
             {
                 if (executorList[i].PropertyContainer != component || executorList[i].BindingContainer != particle) continue;
-                if (executorList[i].Finished || executorList[i].Invalid)
-                {
-                    if (cache.ContainsKey(id))
-                    {
-                        cache[id].Remove(executorList[i].PropertyID);
-                        if (cache[id].Count == 0) cache.Remove(id);
-                    }
-                    continue;
-                }
+                if (executorList[i].Finished || executorList[i].Invalid) continue;
                 if (!cache.ContainsKey(id)) cache.Add(id, new Dictionary<int, TypeSet>());
                 executorList[i].Update(frameScale);
                 cache[id][executorList[i].PropertyID] = executorList[i].CurrentValue;
@@ -339,9 +336,10 @@ namespace CrazyStorm.Core
             }
             return true;
         }
-        private static long GetUniqueKey(int systemHash, Component component, ParticleBase particle)
+        private static long GetUniqueKey(int systemHash, PropertyContainer propertyContainer, PropertyContainer bindingContainer)
         {
-            return systemHash + component.ID * ParticleManager.MaximumParticleCount + particle.ID;
+            if (bindingContainer == null) return systemHash + propertyContainer.ID * ParticleManager.MaximumParticleCount * 10;
+            else return systemHash + propertyContainer.ID * ParticleManager.MaximumParticleCount * 10 + (bindingContainer.ID + 1);
         }
         public static void PlaySound(string path)
         {
