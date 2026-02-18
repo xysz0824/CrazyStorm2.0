@@ -65,7 +65,7 @@ namespace CrazyStorm.Core
     {
         public static readonly int MAX_MASK_COUNT = 8;
 
-        public delegate void LayerDrawHandler(ParticleSystem system, Layer layer);
+        public delegate void LayerDrawHandler(ParticleSystem system, Layer layer, BlendType blendType);
         public static event LayerDrawHandler OnLayerDraw;
         public delegate void ParticleDrawHandler(Particle particle);
         public static event ParticleDrawHandler OnParticleDraw;
@@ -280,7 +280,7 @@ namespace CrazyStorm.Core
         }
         public static void UpdateLayerMasks(GenericContainer<Layer> layers, Layer layer)
         {
-            for (int j = layers.Count - 1; j >= 0; --j)
+            for (int j = 0; j < layers.Count; ++j)
             {
                 if (layers[j] == layer) continue;
                 for (int k = 0; k < layers[j].Components.Count; ++k)
@@ -297,9 +297,9 @@ namespace CrazyStorm.Core
                     }
                 }
             }
-            for (int j = 0; j < layer.Components.Count; ++j)
+            for (int k = 0; k < layer.Components.Count; ++k)
             {
-                var eventField = layer.Components[j] as EventField;
+                var eventField = layer.Components[k] as EventField;
                 if (eventField == null) continue;
                 if (eventField.BindingTarget == null)
                 {
@@ -313,7 +313,7 @@ namespace CrazyStorm.Core
         }
         public static void UpdateLayerMasks(GenericContainer<Layer> layers)
         {
-            for (int i = layers.Count - 1; i >= 0; --i)
+            for (int i = 0; i < layers.Count; ++i)
             {
                 UpdateLayerMasks(layers, layers[i]);
             }
@@ -354,7 +354,8 @@ namespace CrazyStorm.Core
                 if (currentLayerID != layerID)
                 {
                     currentLayerID = layerID;
-                    OnLayerDraw(system, system.Layers[layerID]);
+                    BlendType blendType = (BlendType)(9 - instance.RenderOrder % 10);
+                    OnLayerDraw(system, system.Layers[layerID], blendType);
                 }
                 if (instance is Particle) OnParticleDraw(instance as Particle);
                 if (instance is CurveParticle) OnCurveParticleDraw(instance as CurveParticle);

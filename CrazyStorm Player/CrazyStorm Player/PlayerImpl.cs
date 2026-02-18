@@ -206,7 +206,7 @@ namespace CrazyStorm_Player
             //final
             ForceField.OnForceImpactBody += ForceImpactBody;
             EventManager.OnSoundPlay += PlaySound;
-            ParticleManager.OnLayerDraw += (system, layer) => DrawLayer(system, layer);
+            ParticleManager.OnLayerDraw += DrawLayer;
             ParticleManager.OnParticleDraw += (particle) => DrawParticle(spriteBatch, particle);
             ParticleManager.OnCurveParticleDraw += (particle) => DrawCurveParticle(spriteBatch, curveBatch, particle);
             FrameworkDispatcher.Update();
@@ -221,6 +221,9 @@ namespace CrazyStorm_Player
         }
         public void Dispose()
         {
+            ForceField.OnForceImpactBody -= ForceImpactBody;
+            EventManager.OnSoundPlay -= PlaySound;
+            ParticleManager.OnLayerDraw -= DrawLayer;
             spriteBatch?.Dispose();
             background?.Dispose();
             defaultTexture?.Dispose();
@@ -254,8 +257,10 @@ namespace CrazyStorm_Player
             }
             sounds[path].Play(0.5f, 0f, 0f);
         }
-        void DrawLayer(ParticleSystem system, Layer layer)
+        void DrawLayer(ParticleSystem system, Layer layer, BlendType blendType)
         {
+            curveBatch.End();
+            spriteBatch.End();
             ParticleManager.ClearLayerMasks();
             ParticleManager.UpdateLayerMasks(system.Layers, layer);
             shaderMaskCount.SetValue(ParticleManager.MaskCount);
@@ -264,6 +269,26 @@ namespace CrazyStorm_Player
             shaderMaskShape.SetValue(ParticleManager.MaskShapeArray);
             shaderMaskType.SetValue(ParticleManager.MaskTypeArray);
             shaderMaskRotate.SetValue(ParticleManager.MaskRotateArray);
+            switch (blendType)
+            {
+                case BlendType.AlphaBlend:
+                    spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied, SamplerState.LinearWrap, null, null, shader);
+                    curveBatch.Begin(BlendState.NonPremultiplied);
+                    break;
+                case BlendType.Additive:
+                    spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Additive, SamplerState.LinearWrap, null, null, shader);
+                    curveBatch.Begin(BlendState.Additive);
+                    break;
+                case BlendType.Substraction:
+                    spriteBatch.Begin(SpriteSortMode.Deferred, substration, SamplerState.LinearWrap, null, null, shader);
+                    curveBatch.Begin(substration);
+                    break;
+                case BlendType.Multiply:
+                    spriteBatch.Begin(SpriteSortMode.Deferred, multiply, SamplerState.LinearWrap, null, null, shader);
+                    curveBatch.Begin(multiply);
+                    break;
+            }
+            lastBlendType = blendType;
         }
         void DrawParticle(SpriteBatch spriteBatch, Particle particle)
         {

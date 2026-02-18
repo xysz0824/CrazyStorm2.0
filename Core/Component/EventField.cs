@@ -326,7 +326,7 @@ namespace CrazyStorm.Core
         public void UpdateMutexMask()
         {
             var maskCount = ParticleManager.MaskCount;
-            if (maskCount >= ParticleManager.MAX_MASK_COUNT || !LayerMask || !Visibility || !LayerMaskMutex) return;
+            if (maskCount >= ParticleManager.MAX_MASK_COUNT || !LayerMask || !Visibility || !LayerMaskMutex || !IsValid()) return;
             ParticleManager.MaskPositionArray[maskCount] = Position;
             ParticleManager.MaskSizeArray[maskCount] = new Vector2(HalfWidth, HalfHeight);
             ParticleManager.MaskShapeArray[maskCount] = FieldShape == FieldShape.Circle ? 1 : 0;
@@ -338,7 +338,7 @@ namespace CrazyStorm.Core
         public void UpdateLayerMask()
         {
             var maskCount = ParticleManager.MaskCount;
-            if (maskCount >= ParticleManager.MAX_MASK_COUNT || !LayerMask || !Visibility) return;
+            if (maskCount >= ParticleManager.MAX_MASK_COUNT || !LayerMask || !Visibility || !IsValid()) return;
             ParticleManager.MaskPositionArray[maskCount] = Position;
             ParticleManager.MaskSizeArray[maskCount] = new Vector2(HalfWidth, HalfHeight);
             ParticleManager.MaskShapeArray[maskCount] = FieldShape == FieldShape.Circle ? 1 : 0;
