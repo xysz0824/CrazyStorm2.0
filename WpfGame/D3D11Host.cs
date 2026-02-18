@@ -441,32 +441,24 @@ namespace MonoGame.Framework.WpfInterop
             }
             RenderingEventArgs renderingEventArgs = (RenderingEventArgs)eventArgs;
             bool presentNeeded = false;
-            _d3D11Image.Lock();
+            TimeSpan elapsed = TimeSpan.Zero;
             if (_lastRenderingTime != renderingEventArgs.RenderingTime)
             {
                 long dt = renderingEventArgs.RenderingTime.Ticks - _lastRenderingTime.Ticks;
                 if (dt >= TargetElapsedTime.Ticks)
                 {
-                    GraphicsDevice.SetRenderTarget(_sharedRenderTarget);
-                    Render(new GameTime(renderingEventArgs.RenderingTime, TimeSpan.FromTicks(dt)));
+                    elapsed = TimeSpan.FromTicks(dt);
                     _lastRenderingTime = renderingEventArgs.RenderingTime;
                     presentNeeded = true;
                 }
             }
-            else if (_resetBackBuffer)
-            {
-                GraphicsDevice.SetRenderTarget(_sharedRenderTarget);
-                Render(new GameTime(renderingEventArgs.RenderingTime, TimeSpan.Zero));
-                presentNeeded = true;
-            }
+            else if (_resetBackBuffer) presentNeeded = true;
             if (!presentNeeded && !_resetBackBuffer) return;
+            _d3D11Image.Lock();
+            GraphicsDevice.SetRenderTarget(_sharedRenderTarget);
+            GraphicsDevice.Clear(Microsoft.Xna.Framework.Color.Black);
+            Render(new GameTime(renderingEventArgs.RenderingTime, elapsed));
             GraphicsDevice.Flush();
-            //GraphicsDevice.SetRenderTarget(_sharedRenderTarget);
-            //_spriteBatch.Begin(SpriteSortMode.Deferred, 
-            //    BlendState.Opaque, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone, 
-            //    null, new Microsoft.Xna.Framework.Matrix?());
-            //_spriteBatch.Draw(_cachedRenderTarget, GraphicsDevice.Viewport.Bounds, Microsoft.Xna.Framework.Color.White);
-            //_spriteBatch.End();
             _d3D11Image.AddDirtyRect(new Int32Rect(0, 0, _d3D11Image.PixelWidth, _d3D11Image.PixelHeight));
             _d3D11Image.Unlock();
             _resetBackBuffer = false;
