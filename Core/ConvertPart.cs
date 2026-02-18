@@ -563,8 +563,8 @@ namespace CrazyStorm.Core
                             cover.AcspeedAngle = ConvertAngle(float.Parse(submatch.Groups["aspeedd"].Value), float.Parse(submatch.Groups["randaspeedd"].Value),
                                 cover, "AcspeedAngle");
                             cover.LayerMask = submatch.Groups["maskon"].Success ? bool.Parse(submatch.Groups["maskon"].Value) : false;
-                            cover.LayerMaskType = submatch.Groups["masktype"].Success ? (LayerMaskType)(int.Parse(submatch.Groups["masktype"].Value) - 1) : default;
-                            cover.LayerMaskMutex = submatch.Groups["maskmutex"].Success ? bool.Parse(submatch.Groups["maskmutex"].Value) : false;
+                            cover.LayerMaskType = cover.LayerMask ? (LayerMaskType)(int.Parse(submatch.Groups["masktype"].Value) - 1) : default;
+                            cover.LayerMaskMutex = cover.LayerMask ? bool.Parse(submatch.Groups["maskmutex"].Value) : false;
                             cover.Rotation = submatch.Groups["degree"].Success ? float.Parse(submatch.Groups["degree"].Value) : 0f;
                             //events
                             var eventGroups = GetEventGroups(typeof(EventField), typeof(ParticleBase), submatch.Groups["events"].Value, ConvertEventType.Component, "");
