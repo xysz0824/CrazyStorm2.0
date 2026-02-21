@@ -87,9 +87,18 @@ namespace CrazyStorm.Core
         {
             { "当前帧", "子弹当前帧" }, { "X坐标", "子弹X坐标" }, { "Y坐标", "子弹Y坐标" },
         };
+        static readonly Dictionary<string, string> CoverKeywordMap = new Dictionary<string, string>()
+        {
+            { "角度", "Rotation" },
+        };
         static readonly Dictionary<string, string> CoverParticleKeywordMap = new Dictionary<string, string>()
         {
             { "当前帧", "子弹图层帧" }, { "X坐标", "子弹X坐标" }, { "Y坐标", "子弹Y坐标" },
+        };
+        static readonly KeyValuePair<string, string> ShapeKeyMap = new KeyValuePair<string, string>("启用圆形", "FieldShape");
+        static readonly Dictionary<string, string> ShapeValueMap = new Dictionary<string, string>()
+        {
+            { "1", "Circle" }, { "0", "Rectangle" },
         };
         static readonly Regex LayerMatch = new Regex(@"^Layer(?<num>[^:]+):" +
             @"(?<name>[^,]+),(?<begin>[^,]+),(?<end>[^,]+)," +
@@ -802,8 +811,18 @@ namespace CrazyStorm.Core
                 return deg;
             }
         }
-        public static string ConvertKeyword(string str)
+        public static string ConvertKeyword(Type type, string str)
         {
+            if (type == typeof(EventField))
+            {
+                foreach (var word in CoverKeywordMap)
+                {
+                    if (str == word.Key)
+                    {
+                        str = str.Replace(word.Key, word.Value);
+                    }
+                }
+            }
             foreach (var word in KeywordMap)
             {
                 if (str == word.Key)
@@ -813,7 +832,7 @@ namespace CrazyStorm.Core
             }
             return str;
         }
-        public static string ConvertCondition(string str, int t, int addtime, ConvertEventType eventType)
+        public static string ConvertCondition(Type type, string str, int t, int addtime, ConvertEventType eventType)
         {
             foreach (var keyword in LogicOperatorKeywords)
             {
@@ -837,7 +856,7 @@ namespace CrazyStorm.Core
                 {
                     if (eventType == ConvertEventType.Particle) split[i] = ConvertEventProperty(ParticleKeywordMap, split[i]);
                     else if (eventType == ConvertEventType.CoverParticle) split[i] = ConvertEventProperty(CoverParticleKeywordMap, split[i]);
-                    str += ConvertKeyword(split[i]);
+                    str += ConvertKeyword(type, split[i]);
                     if (t > 0 && addtime > 1 && i >= 2 && CompareOperatorKeywords.Exists((op) => op == split[i - 1]))
                     {
                         var property = split[i - 2];
@@ -989,7 +1008,7 @@ namespace CrazyStorm.Core
                 var condition = split.Length >= 2 ? split[0] : "";
                 var content = split.Length >= 2 ? split[1] : split[0];
                 var eventInfo = new EventInfo();
-                eventInfo.condition = ConvertCondition(condition, t, addtime, eventType);
+                eventInfo.condition = ConvertCondition(type, condition, t, addtime, eventType);
                 if (IsSpecialEvent(content))
                 {
                     eventInfo.isSpecialEvent = true;
@@ -997,14 +1016,14 @@ namespace CrazyStorm.Core
                     else split = content.Split('(');
                     if (eventType == ConvertEventType.Particle) split[0] = ConvertEventProperty(ParticleKeywordMap, split[0]);
                     else if (eventType == ConvertEventType.CoverParticle) split[0] = ConvertEventProperty(CoverParticleKeywordMap, split[0]);
-                    eventInfo.specialEvent = ConvertKeyword(split[0]);
-                    eventInfo.arguments = ConvertKeyword(content.Replace($"{split[0]}(", "").Replace(")", "")
+                    eventInfo.specialEvent = ConvertKeyword(type, split[0]);
+                    eventInfo.arguments = ConvertKeyword(type, content.Replace($"{split[0]}(", "").Replace(")", "")
                         .Replace($"{split[0]}，", "").Replace(split[0], "").Replace("，", ","));
                 }
                 else
                 {
                     split = content.Split('，');
-                    eventInfo.changeMode = split.Length >= 2 ? ConvertKeyword(split[1]) : "Instant";
+                    eventInfo.changeMode = split.Length >= 2 ? ConvertKeyword(type, split[1]) : "Instant";
                     eventInfo.changeTime = split.Length >= 3 ? split[2].Replace("帧", "") : "1";
                     if (eventInfo.changeTime.Contains("(") && eventInfo.changeTime.EndsWith(")"))
                     {
@@ -1014,13 +1033,13 @@ namespace CrazyStorm.Core
                     split = AdjustEventText(split[0]).Split(' ');
                     if (eventType == ConvertEventType.Particle) split[0] = ConvertEventProperty(ParticleKeywordMap, split[0]);
                     else if (eventType == ConvertEventType.CoverParticle) split[0] = ConvertEventProperty(CoverParticleKeywordMap, split[0]);
-                    eventInfo.resultProperty = ConvertKeyword(split[0]);
+                    eventInfo.resultProperty = ConvertKeyword(type, split[0]);
                     if (eventInfo.resultProperty == TypeKeyword)
                     {
                         var rand = split[2].Split('+');
                         if (rand.Length >= 2) split[2] = $"{rand[0]}+{{{rand[1]}}}";
                         eventInfo.isSpecialEvent = true;
-                        switch (ConvertKeyword(split[1]))
+                        switch (ConvertKeyword(type, split[1]))
                         {
                             case "ChangeTo":
                                 eventInfo.specialEvent = "ChangeType";
@@ -1042,18 +1061,24 @@ namespace CrazyStorm.Core
                     }
                     else
                     {
-                        eventInfo.changeType = ConvertKeyword(split[1]);
+                        eventInfo.changeType = ConvertKeyword(type, split[1]);
                         if (eventInfo.resultProperty == BlendKeyMap.Key)
                         {
                             eventInfo.resultProperty = BlendKeyMap.Value;
                             eventInfo.resultType = PropertyType.Enum;
                             eventInfo.resultValue = BlendValueMap[split[2]];
                         }
+                        else if (eventInfo.resultProperty == ShapeKeyMap.Key)
+                        {
+                            eventInfo.resultProperty = ShapeKeyMap.Value;
+                            eventInfo.resultType = PropertyType.Enum;
+                            eventInfo.resultValue = ShapeValueMap[split[2]];
+                        }
                         else
                         {
                             eventInfo.resultType = PropertyTypeRule.GetValueType(type, subType, eventInfo.resultProperty);
-                            eventInfo.resultValue = ConvertSpecialValue(eventInfo.resultProperty, eventInfo.changeType, eventInfo.resultType, 
-                                ConvertKeyword(split[2]), out eventInfo.isExpressionResult);
+                            eventInfo.resultValue = ConvertSpecialValue(eventInfo.resultProperty, eventInfo.changeType, eventInfo.resultType,
+                                ConvertKeyword(type, split[2]), out eventInfo.isExpressionResult);
                             if (eventInfo.resultProperty.Contains(".")) eventInfo.resultType = PropertyType.Single;
                         }
                     }
