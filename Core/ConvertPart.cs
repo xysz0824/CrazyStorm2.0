@@ -406,8 +406,12 @@ namespace CrazyStorm.Core
                                 0, 0, batch, "Position", OldCenter + center.Position);
                             batch.BeginFrame = int.Parse(submatch.Groups["begin"].Value);
                             batch.TotalFrame = int.Parse(submatch.Groups["life"].Value);
-                            batch.EmitPosition = ConvertVector2(float.Parse(submatch.Groups["fx"].Value), float.Parse(submatch.Groups["fy"].Value),
-                                float.Parse(submatch.Groups["randfx"].Value), float.Parse(submatch.Groups["randfy"].Value), batch, "EmitPosition", OldCenter);
+                            var deepbind = bool.Parse(submatch.Groups["deepbind"].Value);
+                            if (batch.BindingTargetID < 0 || deepbind)
+                            {
+                                batch.EmitPosition = ConvertVector2(float.Parse(submatch.Groups["fx"].Value), float.Parse(submatch.Groups["fy"].Value),
+                                    float.Parse(submatch.Groups["randfx"].Value), float.Parse(submatch.Groups["randfy"].Value), batch, "EmitPosition", OldCenter);
+                            }
                             batch.EmitRadius = ConvertFloat(float.Parse(submatch.Groups["r"].Value), float.Parse(submatch.Groups["randr"].Value),
                                 batch, "EmitRadius");
                             batch.EmitRoundAngle = ConvertAngle(float.Parse(submatch.Groups["rdirection"].Value), float.Parse(submatch.Groups["randrdirection"].Value), 
