@@ -269,11 +269,7 @@ namespace CrazyStorm.Core
             {
                 if (executorList[i].Finished || executorList[i].Invalid)
                 {
-                    if (cache.ContainsKey(executorList[i].UniqueID))
-                    {
-                        cache[executorList[i].UniqueID].Remove(executorList[i].PropertyID);
-                        if (cache[executorList[i].UniqueID].Count == 0) cache.Remove(executorList[i].UniqueID);
-                    }
+                    if (executorList[i].Invalid) cache.Remove(executorList[i].UniqueID);
                     EventExecutor.Return(executorList[i]);
                     executorList.RemoveAt(i);
                     --i;
