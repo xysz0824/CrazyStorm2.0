@@ -335,21 +335,6 @@ namespace CrazyStorm.Core
             if (bindingContainer == null) return -1;
             else return systemHash * propertyContainer.ID * ParticleManager.MaximumParticleCount * 10 + bindingContainer.ID;
         }
-        public static void ClearParticleCache(long id)
-        {
-            long elementID = -1;
-            foreach (var kv in cache)
-            {
-                var key = kv.Key;
-                var idPart = key % (ParticleManager.MaximumParticleCount * 10);
-                if (idPart == id)
-                {
-                    elementID = key;
-                    break;
-                }
-            }
-            cache.Remove(elementID);
-        }
         public static void PlaySound(string path)
         {
             OnSoundPlay?.Invoke(path);
