@@ -170,9 +170,8 @@ namespace CrazyStorm.Core
         #endregion
 
         #region Protected Methods
-        public void BindingUpdate(int id, bool executeEvents, float frameScale)
+        public void BindingUpdate(int updateId, bool executeEvents, float frameScale)
         {
-            int systemHash = System.GetHashCode();
             float saveCurrentFrame = CurrentFrame;
             Vector2 savePosition = Position;
             float saveSpeed = Speed;
@@ -182,9 +181,11 @@ namespace CrazyStorm.Core
             bool eventImpacted = false;
             foreach (var particle in BindingTarget.Particles)
             {
+                long id = EventManager.GetUniqueKey(System.InstancedID, this, particle);
+
                 CurrentFrame = particle.PCurrentFrame - BeginFrame;
                 if (CurrentFrame < 1 || CurrentFrame > TotalFrame || !particle.Alive || !Visibility) continue;
-                if (executeEvents && !EventManager.BindingRecover(systemHash, this, particle) && eventImpacted)
+                if (executeEvents && !EventManager.BindingRecover(id, this) && eventImpacted)
                 {
                     Reset();
                 }
@@ -201,8 +202,8 @@ namespace CrazyStorm.Core
                         ComponentEventGroups[i].Execute(this, particle, frameScale);
                     }
                 }
-                BindingUpdate(id, frameScale);
-                if (executeEvents && EventManager.BindingUpdate(systemHash, this, particle, frameScale))
+                BindingUpdate(updateId, frameScale);
+                if (executeEvents && EventManager.BindingUpdate(id, this, particle, frameScale))
                 {
                     eventImpacted = true;
                 }

@@ -35,6 +35,7 @@ namespace CrazyStorm.Core
         public const float FRAME_RATE_BASE = 60;
 
         #region Private Members
+        int instancedID;
         [StringData]
         [XmlAttribute]
         string name;
@@ -56,6 +57,7 @@ namespace CrazyStorm.Core
         #endregion
 
         #region Public Members
+        public int InstancedID => instancedID;
         public string Name 
         { 
             get { return name; }
@@ -232,6 +234,7 @@ namespace CrazyStorm.Core
         public ParticleSystem Instantiate()
         {
             var instance = Rent(NullData.Empty);
+            instance.instancedID = InstancedID + 1;
             instance.name = name;
             instance.orderType = orderType;
             instance.LogicOffset = default;

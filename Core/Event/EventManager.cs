@@ -171,7 +171,7 @@ namespace CrazyStorm.Core
         {
             var executor = EventExecutor.Rent(NullData.Empty);
             executor.Reset();
-            executor.UniqueID = GetUniqueKey(propertyContainer.System.GetHashCode(), propertyContainer, bindingContainer);
+            executor.UniqueID = GetUniqueKey(propertyContainer.System.InstancedID, propertyContainer, bindingContainer);
             executor.PropertyContainer = propertyContainer;
             executor.PropertyContainerID = propertyContainer.ID;
             executor.BindingContainer = bindingContainer;
@@ -282,9 +282,8 @@ namespace CrazyStorm.Core
                 }
             }
         }
-        public static bool BindingUpdate(int systemHash, Component component, ParticleBase particle, float frameScale)
+        public static bool BindingUpdate(long id, Component component, ParticleBase particle, float frameScale)
         {
-            long id = GetUniqueKey(systemHash, component, particle);
             bool updated = false;
             for (int i = 0; i < executorList.Count; ++i)
             {
@@ -297,9 +296,8 @@ namespace CrazyStorm.Core
             }
             return updated;
         }
-        public static bool BindingRecover(int systemHash, Component component, ParticleBase particle)
+        public static bool BindingRecover(long id, Component component)
         {
-            long id = GetUniqueKey(systemHash, component, particle);
             if (!cache.ContainsKey(id)) return false;
             foreach (var item in cache[id])
             {
@@ -332,10 +330,25 @@ namespace CrazyStorm.Core
             }
             return true;
         }
-        private static long GetUniqueKey(int systemHash, PropertyContainer propertyContainer, PropertyContainer bindingContainer)
+        public static long GetUniqueKey(int systemHash, PropertyContainer propertyContainer, PropertyContainer bindingContainer)
         {
-            if (bindingContainer == null) return systemHash + propertyContainer.ID * ParticleManager.MaximumParticleCount * 10;
-            else return systemHash + propertyContainer.ID * ParticleManager.MaximumParticleCount * 10 + (bindingContainer.ID + 1);
+            if (bindingContainer == null) return -1;
+            else return systemHash * propertyContainer.ID * ParticleManager.MaximumParticleCount * 10 + bindingContainer.ID;
+        }
+        public static void ClearParticleCache(long id)
+        {
+            long elementID = -1;
+            foreach (var kv in cache)
+            {
+                var key = kv.Key;
+                var idPart = key % (ParticleManager.MaximumParticleCount * 10);
+                if (idPart == id)
+                {
+                    elementID = key;
+                    break;
+                }
+            }
+            cache.Remove(elementID);
         }
         public static void PlaySound(string path)
         {
