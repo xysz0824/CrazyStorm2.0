@@ -53,6 +53,7 @@ namespace CrazyStorm.Core
         ParticleType type;
         int typeID = -1;
         ParticleBaseData particleBaseData;
+        Dictionary<long, ParticleBaseData> bindingParticleBaseData;
         #endregion
 
         #region Public Members
@@ -246,6 +247,7 @@ namespace CrazyStorm.Core
             particleBaseData.collision = true;
             particleBaseData.fogEffect = true;
             particleBaseData.fadeEffect = true;
+            bindingParticleBaseData = new Dictionary<long, ParticleBaseData>();
         }
         #endregion
 
@@ -645,6 +647,18 @@ namespace CrazyStorm.Core
                 if (FogFrame <= 0) FogFrame = 0;
             }
             return true;
+        }
+        public virtual void ReadBindingData(long uniqueId)
+        {
+            if (bindingParticleBaseData.ContainsKey(uniqueId)) particleBaseData = bindingParticleBaseData[uniqueId];
+        }
+        public virtual void WriteBindingData(long uniqueId)
+        {
+            bindingParticleBaseData[uniqueId] = particleBaseData;
+        }
+        public virtual void ClearBindingData(PropertyContainer propertyContainer, long[] resultArray, int count)
+        {
+            for (int i = 0; i < count; ++i) bindingParticleBaseData.Remove(resultArray[i]);
         }
         public virtual void Die()
         {

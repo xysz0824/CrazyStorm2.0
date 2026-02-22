@@ -57,6 +57,7 @@ namespace CrazyStorm.Core
         [XmlAttribute]
         string targetName;
         EventFieldData eventFieldData;
+        Dictionary<long, EventFieldData> bindingEventFieldData;
         #endregion
 
         #region Public Members
@@ -124,6 +125,7 @@ namespace CrazyStorm.Core
             targetName = string.Empty;
             eventFieldData.halfWidth = 50;
             eventFieldData.halfHeight = 50;
+            bindingEventFieldData = new Dictionary<long, EventFieldData>();
             EventFieldEventGroups = new GenericContainer<EventGroup>();
         }
         #endregion
@@ -298,11 +300,23 @@ namespace CrazyStorm.Core
             }
             return false;
         }
-        public override void BindingUpdate(int id, float frameScale)
+        protected override int BindingClear(PropertyContainer propertyContainer, long[] resultArray)
         {
-            if (id == 0) Update(frameScale);
-            else if (id == 1) UpdateMutexMask();
-            else if (id == 2) UpdateLayerMask();
+            var count = base.BindingClear(propertyContainer, resultArray);
+            for (int i = 0; i < count; ++i) bindingEventFieldData.Remove(resultArray[i]);
+            return count;
+        }
+        protected override void BindingUpdate(ParticleBase particle, long uniqueId, int updateId, bool executeEvents, float frameScale)
+        {
+            if (bindingEventFieldData.ContainsKey(uniqueId)) eventFieldData = bindingEventFieldData[uniqueId];
+            base.BindingUpdate(particle, uniqueId, updateId, executeEvents, frameScale);
+            bindingEventFieldData[uniqueId] = eventFieldData;
+        }
+        public override void BindingUpdate(int updateId, float frameScale)
+        {
+            if (updateId == 0) Update(frameScale);
+            else if (updateId == 1) UpdateMutexMask();
+            else if (updateId == 2) UpdateLayerMask();
         }
         public override bool Update(float frameScale, float currentFrame)
         {

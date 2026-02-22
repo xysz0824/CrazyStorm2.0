@@ -32,6 +32,7 @@ namespace CrazyStorm.Core
         public const int AFTERIMAGE_COUNT = 25;
         #region Private Members
         ParticleData particleData;
+        Dictionary<long, ParticleData> bindingParticleData;
         int afterimageTime;
         AfterImage[] afterimageData = new AfterImage[AFTERIMAGE_COUNT];
         #endregion
@@ -71,6 +72,7 @@ namespace CrazyStorm.Core
             particleData.heightScale = 1;
             particleData.retainScale = true;
             particleData.stickToSpeedAngle = true;
+            bindingParticleData = new Dictionary<long, ParticleData>();
         }
         #endregion
 
@@ -183,6 +185,20 @@ namespace CrazyStorm.Core
                 afterimageTime = (afterimageTime + 1) % AFTERIMAGE_COUNT;
             }
             return true;
+        }
+        public override void ReadBindingData(long uniqueId)
+        {
+            base.ReadBindingData(uniqueId);
+            if (bindingParticleData.ContainsKey(uniqueId)) particleData = bindingParticleData[uniqueId];
+        }
+        public override void WriteBindingData(long uniqueId)
+        {
+            base.WriteBindingData(uniqueId);
+            bindingParticleData[uniqueId] = particleData;
+        }
+        public override void ClearBindingData(PropertyContainer propertyContainer, long[] resultArray, int count)
+        {
+            for (int i = 0; i < count; ++i) bindingParticleData.Remove(resultArray[i]);
         }
         public override void CopyTo(PropertyContainer target)
         {

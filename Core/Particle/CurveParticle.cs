@@ -23,6 +23,7 @@ namespace CrazyStorm.Core
     {
         #region Private Members
         CurveParticleData curveParticleData;
+        Dictionary<long, CurveParticleData> bindingCurveParticleData;
         #endregion
 
         #region Public Members
@@ -54,6 +55,7 @@ namespace CrazyStorm.Core
             curveParticleData.type = CurveType.Curve;
             curveParticleData.length = 100;
             curveParticleData.segment = 64;
+            bindingCurveParticleData = new Dictionary<long, CurveParticleData>();
         }
         #endregion
 
@@ -173,6 +175,20 @@ namespace CrazyStorm.Core
             PRotation = PSpeedAngle;
             Curve.Update(PPosition, head, Type.Width * WidthScale, Length);
             return true;
+        }
+        public override void ReadBindingData(long uniqueId)
+        {
+            base.ReadBindingData(uniqueId);
+            if (bindingCurveParticleData.ContainsKey(uniqueId)) curveParticleData = bindingCurveParticleData[uniqueId];
+        }
+        public override void WriteBindingData(long uniqueId)
+        {
+            base.WriteBindingData(uniqueId);
+            bindingCurveParticleData[uniqueId] = curveParticleData;
+        }
+        public override void ClearBindingData(PropertyContainer propertyContainer, long[] resultArray, int count)
+        {
+            for (int i = 0; i < count; ++i) bindingCurveParticleData.Remove(resultArray[i]);
         }
         public override void CopyTo(PropertyContainer target)
         {

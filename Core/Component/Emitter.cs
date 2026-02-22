@@ -32,6 +32,7 @@ namespace CrazyStorm.Core
     {
         #region Private Members
         EmitterData emitterData;
+        Dictionary<long, EmitterData> bindingEmitterData;
         Vector2[] lastSpawn;
         #endregion
 
@@ -108,6 +109,7 @@ namespace CrazyStorm.Core
             emitterData.emitCount = 1;
             emitterData.emitCycle = 10;
             emitterData.emitRange = 360;
+            bindingEmitterData = new Dictionary<long, EmitterData>();
             Particles = new List<ParticleBase>();
             EmitterEventGroups = new List<EventGroup>();
             ParticleEventGroups = new GenericContainer<EventGroup>();
@@ -356,10 +358,33 @@ namespace CrazyStorm.Core
             if (Template == null) return false;
             return Template.SetProperty(propertyID);
         }
-        public override void BindingUpdate(int id, float frameScale)
+        protected override int BindingClear(PropertyContainer propertyContainer, long[] resultArray)
         {
-            if (id == 0) EmitCyclically(frameScale);
-            else if (id == 1) Emit(frameScale);
+            var count = base.BindingClear(propertyContainer, resultArray);
+            for (int i = 0; i < count; ++i) bindingEmitterData.Remove(resultArray[i]);
+            Template.ClearBindingData(propertyContainer, resultArray, count);
+            return count;
+        }
+        protected override void BindingUpdate(ParticleBase particle, long uniqueId, int updateId, bool executeEvents, float frameScale)
+        {
+            if (bindingEmitterData.ContainsKey(uniqueId))
+            {
+                emitterData = bindingEmitterData[uniqueId];
+                Template.ReadBindingData(uniqueId);
+            }
+            else if (initialState != null)
+            {
+                emitterData = (initialState as Emitter).emitterData;
+                InitialTemplate.CopyTo(Template);
+            }
+            base.BindingUpdate(particle, uniqueId, updateId, executeEvents, frameScale);
+            bindingEmitterData[uniqueId] = emitterData;
+            Template.WriteBindingData(uniqueId);
+        }
+        public override void BindingUpdate(int updateId, float frameScale)
+        {
+            if (updateId == 0) EmitCyclically(frameScale);
+            else if (updateId == 1) Emit(frameScale);
         }
         public override bool Update(float frameScale, float currentFrame)
         {

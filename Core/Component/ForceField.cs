@@ -50,6 +50,7 @@ namespace CrazyStorm.Core
         [XmlAttribute]
         public string targetName;
         ForceFieldData forceFieldData;
+        Dictionary<long, ForceFieldData> bindingForceFieldData;
         #endregion
 
         #region Public Members
@@ -123,6 +124,7 @@ namespace CrazyStorm.Core
             forceFieldData.halfWidth = 50;
             forceFieldData.halfHeight = 50;
             forceFieldData.force = 0.1f;
+            bindingForceFieldData = new Dictionary<long, ForceFieldData>();
         }
         #endregion
 
@@ -325,7 +327,19 @@ namespace CrazyStorm.Core
             }
             return false;
         }
-        public override void BindingUpdate(int id, float frameScale)
+        protected override int BindingClear(PropertyContainer propertyContainer, long[] resultArray)
+        {
+            var count = base.BindingClear(propertyContainer, resultArray);
+            for (int i = 0; i < count; ++i) bindingForceFieldData.Remove(resultArray[i]);
+            return count;
+        }
+        protected override void BindingUpdate(ParticleBase particle, long uniqueId, int updateId, bool executeEvents, float frameScale)
+        {
+            if (bindingForceFieldData.ContainsKey(uniqueId)) forceFieldData = bindingForceFieldData[uniqueId];
+            base.BindingUpdate(particle, uniqueId, updateId, executeEvents, frameScale);
+            bindingForceFieldData[uniqueId] = forceFieldData;
+        }
+        public override void BindingUpdate(int updateId, float frameScale)
         {
             Update(frameScale);
         }

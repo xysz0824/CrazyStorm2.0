@@ -159,12 +159,10 @@ namespace CrazyStorm.Core
         public static bool CanSoundPlay => OnSoundPlay != null;
 
         static List<EventExecutor> executorList;
-        static Dictionary<long, Dictionary<int, TypeSet>> cache;
         public static void Initialize()
         {
             OnSoundPlay = null;
             executorList = new List<EventExecutor>();
-            cache = new Dictionary<long, Dictionary<int, TypeSet>>();
         }
         public static void AddEvent(PropertyContainer propertyContainer, PropertyContainer bindingContainer, VMEventInfo eventInfo, 
             float frameScale)
@@ -269,7 +267,6 @@ namespace CrazyStorm.Core
             {
                 if (executorList[i].Finished || executorList[i].Invalid)
                 {
-                    if (executorList[i].Invalid) cache.Remove(executorList[i].UniqueID);
                     EventExecutor.Return(executorList[i]);
                     executorList.RemoveAt(i);
                     --i;
@@ -282,58 +279,26 @@ namespace CrazyStorm.Core
                 }
             }
         }
-        public static bool BindingUpdate(long id, Component component, ParticleBase particle, float frameScale)
+        public static bool BindingUpdate(long uniqueId, float frameScale)
         {
             bool updated = false;
             for (int i = 0; i < executorList.Count; ++i)
             {
-                if (executorList[i].PropertyContainer != component || executorList[i].BindingContainer != particle) continue;
                 if (executorList[i].Finished || executorList[i].Invalid) continue;
-                if (!cache.ContainsKey(id)) cache.Add(id, new Dictionary<int, TypeSet>());
+                if (executorList[i].UniqueID != uniqueId) continue;
                 executorList[i].Update(frameScale);
-                cache[id][executorList[i].PropertyID] = executorList[i].CurrentValue;
                 updated = true;
             }
             return updated;
-        }
-        public static bool BindingRecover(long id, Component component)
-        {
-            if (!cache.ContainsKey(id)) return false;
-            foreach (var item in cache[id])
-            {
-                switch (item.Value.type)
-                {
-                    case PropertyType.Boolean:
-                        VM.PushBool(item.Value.boolValue);
-                        break;
-                    case PropertyType.Int32:
-                        VM.PushFloat(item.Value.intValue);
-                        break;
-                    case PropertyType.Single:
-                        VM.PushFloat(item.Value.floatValue);
-                        break;
-                    case PropertyType.Enum:
-                        VM.PushInt(item.Value.enumValue);
-                        break;
-                    case PropertyType.Vector2:
-                        VM.PushVector2(item.Value.vector2Value);
-                        break;
-                    case PropertyType.RGB:
-                        VM.PushRGB(item.Value.rgbValue);
-                        break;
-                    case PropertyType.String:
-                        VM.PushString(item.Value.stringValue);
-                        break;
-                }
-                component.SetProperty(item.Key);
-                VM.Clear();
-            }
-            return true;
         }
         public static long GetUniqueKey(int systemHash, PropertyContainer propertyContainer, PropertyContainer bindingContainer)
         {
             if (bindingContainer == null) return -1;
             else return systemHash * propertyContainer.ID * ParticleManager.MaximumParticleCount * 10 + bindingContainer.ID;
+        }
+        public static long GetBindingContainerID(long uniqueId)
+        {
+            return uniqueId % (ParticleManager.MaximumParticleCount * 10);
         }
         public static void PlaySound(string path)
         {

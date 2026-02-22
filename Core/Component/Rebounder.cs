@@ -41,6 +41,7 @@ namespace CrazyStorm.Core
         #region Private Members
         float lastRotation;
         RebounderData rebounderData;
+        Dictionary<long, RebounderData> bindingRebounderData;
         #endregion
 
         #region Public Members
@@ -83,6 +84,7 @@ namespace CrazyStorm.Core
         {
             rebounderData.size = 50;
             rebounderData.limit = 1;
+            bindingRebounderData = new Dictionary<long, RebounderData>();
             RebounderEventGroups = new GenericContainer<EventGroup>();
         }
         #endregion
@@ -252,7 +254,19 @@ namespace CrazyStorm.Core
             }
             return false;
         }
-        public override void BindingUpdate(int id, float frameScale)
+        protected override int BindingClear(PropertyContainer propertyContainer, long[] resultArray)
+        {
+            var count = base.BindingClear(propertyContainer, resultArray);
+            for (int i = 0; i < count; ++i) bindingRebounderData.Remove(resultArray[i]);
+            return count;
+        }
+        protected override void BindingUpdate(ParticleBase particle, long uniqueId, int updateId, bool executeEvents, float frameScale)
+        {
+            if (bindingRebounderData.ContainsKey(uniqueId)) rebounderData = bindingRebounderData[uniqueId];
+            base.BindingUpdate(particle, uniqueId, updateId, executeEvents, frameScale);
+            bindingRebounderData[uniqueId] = rebounderData;
+        }
+        public override void BindingUpdate(int updateId, float frameScale)
         {
             Update(frameScale);
         }

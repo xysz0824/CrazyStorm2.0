@@ -3,15 +3,16 @@
  * Copyright (c) StarX 2026
  */
 using System;
+using System.Buffers;
 using System.Collections.Generic;
-using System.Text;
-using System.Reflection;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.IO;
+using System.Reflection;
+using System.Runtime.InteropServices;
+using System.Text;
 using System.Xml;
 using System.Xml.Serialization;
-using System.Runtime.InteropServices;
-using System.IO;
 
 namespace CrazyStorm.Core
 {
@@ -39,6 +40,7 @@ namespace CrazyStorm.Core
         Vector2 speedVector;
         Vector2 acspeedVector;
         ComponentData componentData;
+        Dictionary<long, ComponentData> bindingComponentData;
         GenericContainer<EventGroup> componentEventGroups;
         GenericContainer<Component> children;
         #endregion
@@ -163,6 +165,7 @@ namespace CrazyStorm.Core
             componentData.beginFrame = 1;
             componentData.totalFrame = 200;
             componentData.visibility = true;
+            bindingComponentData = new Dictionary<long, ComponentData>();
             Locals = new GenericContainer<VariableResource>();
             componentEventGroups = new GenericContainer<EventGroup>();
             children = new GenericContainer<Component>();
@@ -172,48 +175,55 @@ namespace CrazyStorm.Core
         #region Protected Methods
         public void BindingUpdate(int updateId, bool executeEvents, float frameScale)
         {
-            float saveCurrentFrame = CurrentFrame;
-            Vector2 savePosition = Position;
-            float saveSpeed = Speed;
-            float saveSpeedAngle = SpeedAngle;
-            float saveAcspeed = Acspeed;
-            float saveAcspeedAngle = AcspeedAngle;
-            bool eventImpacted = false;
+            var longPool = ArrayPool<long>.Shared;
+            var resultArray = longPool.Rent(ParticleManager.MaximumParticleCount * 10);
             foreach (var particle in BindingTarget.Particles)
             {
-                long id = EventManager.GetUniqueKey(System.InstancedID, this, particle);
-
+                long uniqueId = EventManager.GetUniqueKey(System.InstancedID, this, particle);
                 CurrentFrame = particle.PCurrentFrame - BeginFrame;
-                if (CurrentFrame < 1 || CurrentFrame > TotalFrame || !particle.Alive || !Visibility) continue;
-                if (executeEvents && !EventManager.BindingRecover(id, this) && eventImpacted)
+                if (CurrentFrame < 1 || CurrentFrame > TotalFrame || !particle.Alive || !Visibility)
                 {
-                    Reset();
+                    if (!particle.Alive) BindingClear(particle, resultArray);
+                    continue;
                 }
-                Position = particle.PPosition;
-                Speed = particle.PSpeed;
-                SpeedAngle = particle.PSpeedAngle;
-                Acspeed = particle.PAcspeed;
-                AcspeedAngle = particle.PAcspeedAngle;
-                ExecuteDynamicExpressions(frameScale);
-                if (executeEvents)
+                BindingUpdate(particle, uniqueId, updateId, executeEvents, frameScale);
+            }
+            longPool.Return(resultArray);
+        }
+        protected virtual int BindingClear(PropertyContainer propertyContainer, long[] resultArray)
+        {
+            int resultKeyCount = 0;
+            foreach (var kv in bindingComponentData)
+            {
+                if (EventManager.GetBindingContainerID(kv.Key) == propertyContainer.ID)
                 {
-                    for (int i = 0; i < ComponentEventGroups.Count; ++i)
-                    {
-                        ComponentEventGroups[i].Execute(this, particle, frameScale);
-                    }
-                }
-                BindingUpdate(updateId, frameScale);
-                if (executeEvents && EventManager.BindingUpdate(id, this, particle, frameScale))
-                {
-                    eventImpacted = true;
+                    resultArray[resultKeyCount++] = kv.Key;
+                    break;
                 }
             }
-            CurrentFrame = saveCurrentFrame;
-            Position = savePosition;
-            Speed = saveSpeed;
-            SpeedAngle = saveSpeedAngle;
-            Acspeed = saveAcspeed;
-            AcspeedAngle = saveAcspeedAngle;
+            for (int i = 0; i < resultKeyCount; ++i) bindingComponentData.Remove(resultArray[i]);
+            return resultKeyCount;
+        }
+        protected virtual void BindingUpdate(ParticleBase particle, long uniqueId, int updateId, bool executeEvents, float frameScale)
+        {
+            if (bindingComponentData.ContainsKey(uniqueId)) componentData = bindingComponentData[uniqueId];
+            else if (initialState != null) componentData = initialState.componentData;
+            Position = particle.PPosition;
+            Speed = particle.PSpeed;
+            SpeedAngle = particle.PSpeedAngle;
+            Acspeed = particle.PAcspeed;
+            AcspeedAngle = particle.PAcspeedAngle;
+            ExecuteDynamicExpressions(frameScale);
+            if (executeEvents)
+            {
+                for (int i = 0; i < ComponentEventGroups.Count; ++i)
+                {
+                    ComponentEventGroups[i].Execute(this, particle, frameScale);
+                }
+            }
+            BindingUpdate(updateId, frameScale);
+            if (executeEvents) EventManager.BindingUpdate(uniqueId, frameScale);
+            bindingComponentData[uniqueId] = componentData;
         }
         protected bool CheckCircularBinding()
         {
@@ -661,7 +671,7 @@ namespace CrazyStorm.Core
             }
             return false;
         }
-        public virtual void BindingUpdate(int id, float frameScale) { }
+        public virtual void BindingUpdate(int updateId, float frameScale) { }
         public virtual bool Update(float frameScale, float currentFrame)
         {
             ExecuteDynamicExpressions(frameScale);
