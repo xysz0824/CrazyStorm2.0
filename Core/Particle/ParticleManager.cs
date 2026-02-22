@@ -75,7 +75,7 @@ namespace CrazyStorm.Core
         //static ParticleQuadTree particleQuadTree;
         static int left, right, top, bottom;
         static int particlePreserved, curvePreserved;
-        static long instanceID;
+        static long currentIndex;
         static Dictionary<ParticleSystem, List<ParticleBase>> activeParticles;
         static ParticleBase[] searchResult;
         static Vector2[] maskPositionArray = new Vector2[MAX_MASK_COUNT];
@@ -115,7 +115,7 @@ namespace CrazyStorm.Core
             bottom = windowHeight;
             particlePreserved = particlePreservedDist;
             curvePreserved = curvePreservedDist;
-            instanceID = 0;
+            currentIndex = 0;
             ParticleSystem.Reset(100);
             Layer.Reset(500);
             MultiEmitterPool.Reset(5000);
@@ -149,8 +149,8 @@ namespace CrazyStorm.Core
                 particle = poolObject.Instance;
             }
             particle.System = system;
-            particle.RenderOrder = instanceID * 10 + 9 - (int)template.BlendType;
-            particle.ID = (instanceID++) % (MaximumParticleCount * 10);
+            particle.RenderOrder = currentIndex * 10 + 9 - (int)template.BlendType;
+            particle.ID = (currentIndex++) % MaximumParticleCount;
             particle.Reset();
             particle.Alive = true;
             if (!activeParticles.ContainsKey(particle.System)) activeParticles[particle.System] = new List<ParticleBase>();

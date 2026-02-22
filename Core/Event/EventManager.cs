@@ -294,11 +294,11 @@ namespace CrazyStorm.Core
         public static long GetUniqueKey(int systemHash, PropertyContainer propertyContainer, PropertyContainer bindingContainer)
         {
             if (bindingContainer == null) return -1;
-            else return systemHash * propertyContainer.ID * ParticleManager.MaximumParticleCount * 10 + bindingContainer.ID;
+            else return systemHash * propertyContainer.ID * ParticleManager.MaximumParticleCount + bindingContainer.ID;
         }
         public static long GetBindingContainerID(long uniqueId)
         {
-            return uniqueId % (ParticleManager.MaximumParticleCount * 10);
+            return uniqueId % (ParticleManager.MaximumParticleCount);
         }
         public static void PlaySound(string path)
         {

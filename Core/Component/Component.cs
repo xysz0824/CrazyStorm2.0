@@ -176,7 +176,7 @@ namespace CrazyStorm.Core
         public void BindingUpdate(int updateId, bool executeEvents, float frameScale)
         {
             var longPool = ArrayPool<long>.Shared;
-            var resultArray = longPool.Rent(ParticleManager.MaximumParticleCount * 10);
+            var resultArray = longPool.Rent(ParticleManager.MaximumParticleCount);
             foreach (var particle in BindingTarget.Particles)
             {
                 long uniqueId = EventManager.GetUniqueKey(System.InstancedID, this, particle);
