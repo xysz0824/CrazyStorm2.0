@@ -1131,8 +1131,8 @@
                         </TreeView.ItemTemplate>
                     </TreeView>
                 </DockPanel>
-                <DockPanel Grid.Column ="1" Name="TimeAxis" MouseMove="TimeAxis_MouseMove" MouseDown="TimeAxis_MouseDown" MouseUp="TimeAxis_MouseUp" Loaded="TimeAxis_Loaded"
-                           ToolTipService.Placement="Relative" ScrollViewer.VerticalScrollBarVisibility="Disabled">
+                <DockPanel Grid.Column ="1" Name="TimeAxis" Loaded="TimeAxis_Loaded"
+                           ToolTipService.Placement="Relative" ScrollViewer.VerticalScrollBarVisibility="Disabled" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
                     <DockPanel.Background>
                         <ImageBrush Stretch="Uniform" ImageSource="Images/rulerscale.png" TileMode="Tile" ViewportUnits="Absolute" Viewport="0,-2,30,16"/>
                     </DockPanel.Background>
@@ -1141,7 +1141,8 @@
                             <TextBlock></TextBlock>
                         </ToolTip>
                     </DockPanel.ToolTip>
-                    <Grid DockPanel.Dock="Top" Height="30" Name="TimeScale" Margin="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ClipToBounds="True">
+                    <Grid DockPanel.Dock="Top" Height="30" Name="TimeScale" Margin="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ClipToBounds="True"
+                          MouseMove="TimeScale_MouseMove" MouseDown="TimeScale_MouseDown" MouseUp="TimeScale_MouseUp">
                         <Grid.Background>
                             <ImageBrush ImageSource="{DynamicResource RulerImage}" Stretch="Uniform" TileMode="Tile" Viewport="0,0,30,30" ViewportUnits="Absolute"/>
                         </Grid.Background>
@@ -1153,7 +1154,11 @@
                             </DockPanel.RenderTransform>
                         </DockPanel>
                     </Grid>
-                    <TreeView Name="LayerAxis" BorderBrush="{x:Null}" Background="{x:Null}" BorderThickness="0" VerticalContentAlignment="Top" Foreground="{x:Null}" Padding="0">
+                    <TreeView Name="LayerAxis" BorderBrush="{x:Null}" Background="{x:Null}" BorderThickness="0" VerticalContentAlignment="Top" Foreground="{x:Null}" Padding="0"
+                              ScrollViewer.HorizontalScrollBarVisibility="Hidden" ScrollViewer.VerticalScrollBarVisibility="Auto" 
+                              PreviewMouseWheel="LayerAxis_PreviewMouseWheel" 
+                              PreviewMouseLeftButtonDown="LayerAxis_PreviewMouseLeftButtonDown" PreviewMouseMove="LayerAxis_PreviewMouseMove"
+                              PreviewMouseLeftButtonUp="LayerAxis_PreviewMouseLeftButtonUp">
                         <TreeView.ItemTemplate>
                             <DataTemplate>
                                 <Grid Margin="0" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">

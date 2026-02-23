@@ -8,9 +8,9 @@
     </UserControl.Resources>
     <StackPanel Background="{DynamicResource ListBrush}">
         <GroupBox Padding="0,24,0,0" Style="{StaticResource FlatGroupBox}" Header="{StaticResource BasicStr}">
-            <DataGrid Name="ComponentGrid" ItemsSource="{Binding}" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch"
+            <DataGrid Name="ComponentGrid" ItemsSource="{Binding}" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" PreviewMouseWheel="Grid_PreviewMouseWheel"
                           GridLinesVisibility="Horizontal" ColumnWidth="Auto" SelectionMode="Single" AutoGenerateColumns="False"  CanUserAddRows="False" CanUserReorderColumns="False" CanUserSortColumns="False" 
-                      ScrollViewer.CanContentScroll="False" CanUserResizeRows="False" CellEditEnding="ComponentGrid_CellEditEnding" CanUserDeleteRows="False" BeginningEdit="ComponentGrid_BeginningEdit"
+                      CanUserResizeRows="False" CellEditEnding="ComponentGrid_CellEditEnding" CanUserDeleteRows="False" BeginningEdit="ComponentGrid_BeginningEdit"
                       HorizontalGridLinesBrush="{DynamicResource GroupBorderBrush}" BorderBrush="{DynamicResource GroupBorderBrush}" Background="{DynamicResource ListBrush}">
                 <DataGrid.Columns>
                     <DataGridTextColumn x:Name="ComponentKey" Header="{StaticResource PropertyNameStr}" IsReadOnly="True" Binding="{Binding DisplayName}" CanUserResize="False">
@@ -48,9 +48,9 @@
             </DataGrid>
         </GroupBox>
         <GroupBox Name="SpecificPropertyGroup" Padding="0,24,0,0" Style="{StaticResource FlatGroupBox}" Header="{StaticResource ComponentStr}">
-            <DataGrid Name="SpecificGrid" ItemsSource="{Binding}" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" 
+            <DataGrid Name="SpecificGrid" ItemsSource="{Binding}" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" PreviewMouseWheel="Grid_PreviewMouseWheel"
                           GridLinesVisibility="Horizontal" ColumnWidth="Auto" SelectionMode="Single" AutoGenerateColumns="False"  CanUserAddRows="False" CanUserReorderColumns="False" CanUserSortColumns="False" 
-                      ScrollViewer.CanContentScroll="False" CanUserResizeRows="False" CellEditEnding="ComponentGrid_CellEditEnding" CanUserDeleteRows="False" BeginningEdit="ComponentGrid_BeginningEdit"
+                      CanUserResizeRows="False" CellEditEnding="ComponentGrid_CellEditEnding" CanUserDeleteRows="False" BeginningEdit="ComponentGrid_BeginningEdit"
                       HorizontalGridLinesBrush="{DynamicResource GroupBorderBrush}" BorderBrush="{DynamicResource GroupBorderBrush}" Background="{DynamicResource ListBrush}">
                 <DataGrid.Columns>
                     <DataGridTextColumn x:Name="SpecificKey" Header="{StaticResource PropertyNameStr}" IsReadOnly="True" Binding="{Binding DisplayName}" CanUserResize="False">
@@ -109,7 +109,7 @@
                         </ComboBox.ToolTip>
                     </ComboBox>
                 </DockPanel>
-                <DataGrid Name="ParticleGrid" ItemsSource="{Binding}" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" 
+                <DataGrid Name="ParticleGrid" ItemsSource="{Binding}" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" PreviewMouseWheel="Grid_PreviewMouseWheel"
                           GridLinesVisibility="Horizontal" ColumnWidth="Auto" SelectionMode="Single" AutoGenerateColumns="False"  CanUserAddRows="False" 
                           CanUserReorderColumns="False" CanUserSortColumns="False" ScrollViewer.CanContentScroll="False" CanUserResizeRows="False" 
                           CellEditEnding="ParticleGrid_CellEditEnding" CanUserDeleteRows="False" BeginningEdit="ParticleGrid_BeginningEdit"
@@ -147,9 +147,9 @@
         </GroupBox>
         <GroupBox Padding="0,24,0,0" Style="{StaticResource FlatGroupBox}" Header="{StaticResource VariableStr}">
             <StackPanel>
-                <DataGrid Name="VariableGrid" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" 
+                <DataGrid Name="VariableGrid" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" PreviewMouseWheel="Grid_PreviewMouseWheel"
                           GridLinesVisibility="Horizontal" ColumnWidth="Auto" SelectionMode="Single" CanUserReorderColumns="False" CanUserSortColumns="False" 
-                      ScrollViewer.CanContentScroll="False" CanUserResizeRows="False" CanUserAddRows="False" CanUserDeleteRows="False" AutoGenerateColumns="False" 
+                          CanUserResizeRows="False" CanUserAddRows="False" CanUserDeleteRows="False" AutoGenerateColumns="False" 
                           CellEditEnding="VariableGrid_CellEditEnding" BeginningEdit="Grid_BeginningEdit"
                           HorizontalGridLinesBrush="{DynamicResource GroupBorderBrush}" BorderBrush="{DynamicResource GroupBorderBrush}" Background="{DynamicResource ListBrush}">
                     <DataGrid.Columns>
@@ -186,7 +186,7 @@
             </StackPanel>
         </GroupBox>
         <GroupBox Padding="0,24,0,0" Style="{StaticResource FlatGroupBox}" Header="{StaticResource ComponentEventGroupStr}" Height="130" Margin="0">
-            <TreeView Name="ComponentEventList" ItemsSource="{Binding ElementName=Name}" Padding="-12,1,1,1" 
+            <TreeView Name="ComponentEventList" ItemsSource="{Binding ElementName=Name}" Padding="-12,1,1,1" PreviewMouseWheel="Grid_PreviewMouseWheel"
                       PreviewMouseRightButtonDown="ComponentEventList_PreviewMouseRightButtonDown" 
                       MouseDoubleClick="ComponentEventList_MouseDoubleClick"
                       Background="{DynamicResource ListBrush}" BorderThickness="0,0,0,0">
@@ -223,7 +223,7 @@
             <Button Style="{StaticResource FlatButton}" Name="DelComponentEventButton" Width ="50" Content="{StaticResource DelStr}" Click="DelComponentEvent_Click" />
         </StackPanel>
         <GroupBox Padding="0,24,0,0" Style="{StaticResource FlatGroupBox}" Name="SpecificGroup" Header="{StaticResource SpecificEventGroupStr}" Height="130" Margin="0" >
-            <TreeView Name="SpecificEventList" Padding="-12,1,1,1" 
+            <TreeView Name="SpecificEventList" Padding="-12,1,1,1" PreviewMouseWheel="Grid_PreviewMouseWheel"
                       PreviewMouseRightButtonDown="SpecificEventList_PreviewMouseRightButtonDown" 
                       MouseDoubleClick="SpecificEventList_MouseDoubleClick"
                       Background="{DynamicResource ListBrush}" BorderThickness="0,0,0,0">

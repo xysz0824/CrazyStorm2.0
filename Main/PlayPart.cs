@@ -171,7 +171,6 @@ namespace CrazyStorm
                 selectedFrame = (int)player.PlayerImpl.CurrentFrame;
                 TimeAxis.IsHitTestVisible = true;
                 if (config.CollapseLayerAxis) LayerAxisDefinition.Height = new GridLength(94);
-                ScrollViewer.SetHorizontalScrollBarVisibility(LayerAxis, ScrollBarVisibility.Auto);
                 ScrollViewer.SetVerticalScrollBarVisibility(LayerAxis, ScrollBarVisibility.Auto);
                 var screen = ParticleTabControl.SelectedItem as TabItem;
                 if (screen != null)
@@ -203,7 +202,6 @@ namespace CrazyStorm
                 StopButton.Visibility = Visibility.Visible;
                 TimeAxis.IsHitTestVisible = false;
                 if (config.CollapseLayerAxis) LayerAxisDefinition.Height = new GridLength(30);
-                ScrollViewer.SetHorizontalScrollBarVisibility(LayerAxis, ScrollBarVisibility.Hidden);
                 ScrollViewer.SetVerticalScrollBarVisibility(LayerAxis, ScrollBarVisibility.Hidden);
                 SetPanelEnable(false);
                 StartPlayTimer();
@@ -218,8 +216,7 @@ namespace CrazyStorm
                     path.ToolTip = (string)FindResource("PauseStr");
                     player.PlayerImpl.CurrentFrame = selectedFrame;
                     TimeAxis.IsHitTestVisible = false;
-                    if (config.CollapseLayerAxis) LayerAxisDefinition.Height = new GridLength(94);
-                    ScrollViewer.SetHorizontalScrollBarVisibility(LayerAxis, ScrollBarVisibility.Hidden);
+                    if (config.CollapseLayerAxis) LayerAxisDefinition.Height = new GridLength(30);
                     ScrollViewer.SetVerticalScrollBarVisibility(LayerAxis, ScrollBarVisibility.Hidden);
                     var screen = ParticleTabControl.SelectedItem as TabItem;
                     if (screen != null)
@@ -263,7 +260,6 @@ namespace CrazyStorm
             path.ToolTip = (string)FindResource("PlayStr");
             TimeAxis.IsHitTestVisible = true;
             if (config.CollapseLayerAxis) LayerAxisDefinition.Height = new GridLength(94);
-            ScrollViewer.SetHorizontalScrollBarVisibility(LayerAxis, ScrollBarVisibility.Auto);
             ScrollViewer.SetVerticalScrollBarVisibility(LayerAxis, ScrollBarVisibility.Auto);
             SetPanelEnable(true);
             StopPlayTimer();

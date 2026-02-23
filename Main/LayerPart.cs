@@ -29,6 +29,8 @@ namespace CrazyStorm
         ScrollViewer layerScroll;
         int selectedFrame = 1;
         bool timeAxisSelecting;
+        bool timeAxisScrolling;
+        Point timeAxisScrollPos;
         DispatcherTimer layerTimer;
         #endregion
 
@@ -135,7 +137,7 @@ namespace CrazyStorm
             if (player == null) return;
             FitAxisScroll((int)player.PlayerImpl.CurrentFrame);
         }
-        private void TimeAxis_MouseMove(object sender, MouseEventArgs e)
+        private void TimeScale_MouseMove(object sender, MouseEventArgs e)
         {
             //Display the frame that mouse pointed on tooltip.
             var pos = e.GetPosition(TimeAxis);
@@ -162,16 +164,16 @@ namespace CrazyStorm
                 if (player != null) player.PlayerImpl.CurrentFrame = selectedFrame;
             }
         }
-        private void TimeAxis_MouseDown(object sender, MouseButtonEventArgs e)
+        private void TimeScale_MouseDown(object sender, MouseButtonEventArgs e)
         {
             timeAxisSelecting = true;
-            TimeAxis.CaptureMouse();
-            TimeAxis_MouseMove(sender, e);
+            TimeScale.CaptureMouse();
+            TimeScale_MouseMove(sender, e);
         }
-        private void TimeAxis_MouseUp(object sender, MouseButtonEventArgs e)
+        private void TimeScale_MouseUp(object sender, MouseButtonEventArgs e)
         {
             timeAxisSelecting = false;
-            TimeAxis.ReleaseMouseCapture();
+            TimeScale.ReleaseMouseCapture();
         }
         private void NewLayer_MouseUp(object sender, MouseButtonEventArgs e)
         {
@@ -304,6 +306,38 @@ namespace CrazyStorm
         private void LayerElement_PreviewMouseRightButtonDown(object sender, MouseButtonEventArgs e)
         {
             VisualHelper.FocusItem<TreeViewItem>(e);
+        }
+        private void LayerAxis_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
+        {
+            double delta = -e.Delta;
+            axisScroll.ScrollToVerticalOffset(axisScroll.VerticalOffset + delta);
+            e.Handled = true;
+        }
+        private void LayerAxis_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            if (e.OriginalSource is Border) return;
+            timeAxisScrolling = true;
+            timeAxisScrollPos = e.GetPosition(LayerAxis);
+            LayerAxis.Cursor = Cursors.SizeWE;
+            LayerAxis.CaptureMouse();
+            e.Handled = true;
+        }
+        private void LayerAxis_PreviewMouseMove(object sender, MouseEventArgs e)
+        {
+            if (!timeAxisScrolling) return;
+            var pos = e.GetPosition(LayerAxis);
+            var dx = pos.X - timeAxisScrollPos.X;
+            axisScroll.ScrollToHorizontalOffset(axisScroll.HorizontalOffset - dx);
+            timeAxisScrollPos = pos;
+            e.Handled = true;
+        }
+        private void LayerAxis_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            if (!timeAxisScrolling) return;
+            timeAxisScrolling = false;
+            LayerAxis.ReleaseMouseCapture();
+            LayerAxis.Cursor = Cursors.Arrow;
+            e.Handled = true;
         }
         #endregion
     }

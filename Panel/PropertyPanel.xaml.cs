@@ -330,6 +330,13 @@ namespace CrazyStorm
         #endregion
 
         #region Window EventHandlers
+        private void Grid_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
+        {
+            var sv = VisualHelper.VisualUpwardSearch<ScrollViewer>(sender as DependencyObject) as ScrollViewer;
+            if (sv == null) return;
+            sv.ScrollToVerticalOffset(sv.VerticalOffset - e.Delta);
+            e.Handled = true;
+        }
         private void Grid_BeginningEdit(object sender, DataGridBeginningEditEventArgs e)
         {
             var item = e.Row.Item as PropertyGridItem;
