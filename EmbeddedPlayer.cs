@@ -13,6 +13,7 @@ using System.Text;
 using System.Threading.Tasks;
 using CrazyStorm.Core;
 using CrazyStorm_Player;
+using System.Windows;
 
 namespace CrazyStorm
 {
@@ -23,6 +24,7 @@ namespace CrazyStorm
         
         public PlayerImpl PlayerImpl { get; set; }
         public bool Pause { get; set; }
+        public bool HasError { get; private set; }
         protected override void Initialize()
         {
             graphics = new WpfGraphicsDeviceService(this);
@@ -34,7 +36,16 @@ namespace CrazyStorm
 
         protected override void LoadContent()
         {
-            PlayerImpl.Initialize(GraphicsDevice);
+            try
+            {
+                PlayerImpl.Initialize(GraphicsDevice);
+            }
+            catch (PoolOverflowException ex)
+            {
+                MessageBox.Show(ex.Message, "!", MessageBoxButton.OK, MessageBoxImage.Error);
+                Pause = true;
+                HasError = true;
+            }
         }
         protected override void Dispose(bool disposing)
         {
@@ -45,7 +56,16 @@ namespace CrazyStorm
         protected override void Update(GameTime time)
         {
             if (Pause) return;
-            PlayerImpl.Update(keyboard.GetState(), time);
+            try
+            {
+                PlayerImpl.Update(keyboard.GetState(), time);
+            }
+            catch (PoolOverflowException ex)
+            {
+                MessageBox.Show(ex.Message, "!", MessageBoxButton.OK, MessageBoxImage.Error);
+                Pause = true;
+                HasError = true;
+            }
         }
 
         protected override void Draw(GameTime time)

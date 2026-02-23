@@ -158,6 +158,32 @@ namespace CrazyStorm
         private void PlayTimer_Tick(object sender, EventArgs e)
         {
             if (activeParticleCountLabel != null) activeParticleCountLabel.Content = ParticleManager.ActiveParticleCount;
+            if (player != null && player.HasError)
+            {
+                StopItem_Click(null, null);
+            }
+            else if (player != null && player.Pause)
+            {
+                var path = VisualHelper.VisualDownwardSearch<Path>(PlayButton) as Path;
+                path.Data = (Geometry)FindResource("Play_Icon");
+                path.Fill = (Brush)FindResource("PlayIconBrush");
+                path.ToolTip = (string)FindResource("PlayStr");
+                selectedFrame = (int)player.PlayerImpl.CurrentFrame;
+                TimeAxis.IsHitTestVisible = true;
+                if (config.CollapseLayerAxis) LayerAxisDefinition.Height = new GridLength(94);
+                ScrollViewer.SetHorizontalScrollBarVisibility(LayerAxis, ScrollBarVisibility.Auto);
+                ScrollViewer.SetVerticalScrollBarVisibility(LayerAxis, ScrollBarVisibility.Auto);
+                var screen = ParticleTabControl.SelectedItem as TabItem;
+                if (screen != null)
+                {
+                    var content = screen.Content as Canvas;
+                    var screenContent = VisualHelper.VisualDownwardSearch(content, "ScreenContent") as Canvas;
+                    (VisualHelper.VisualDownwardSearch(screenContent, "Grid") as Canvas).Visibility = Visibility.Visible;
+                    (VisualHelper.VisualDownwardSearch(screenContent, "ComponentLayer") as Canvas).Visibility = Visibility.Visible;
+                }
+                Panel.SetZIndex(player, -1);
+                PausePlayTimer();
+            }
         }
         private void GeneratePlayFile_Click(object sender, RoutedEventArgs e)
         {
@@ -185,28 +211,7 @@ namespace CrazyStorm
             else
             {
                 player.Pause = !player.Pause;
-                if (player.Pause)
-                {
-                    path.Data = (Geometry)FindResource("Play_Icon");
-                    path.Fill = (Brush)FindResource("PlayIconBrush");
-                    path.ToolTip = (string)FindResource("PlayStr");
-                    selectedFrame = (int)player.PlayerImpl.CurrentFrame;
-                    TimeAxis.IsHitTestVisible = true;
-                    if (config.CollapseLayerAxis) LayerAxisDefinition.Height = new GridLength(94);
-                    ScrollViewer.SetHorizontalScrollBarVisibility(LayerAxis, ScrollBarVisibility.Auto);
-                    ScrollViewer.SetVerticalScrollBarVisibility(LayerAxis, ScrollBarVisibility.Auto);
-                    var screen = ParticleTabControl.SelectedItem as TabItem;
-                    if (screen != null)
-                    {
-                        var content = screen.Content as Canvas;
-                        var screenContent = VisualHelper.VisualDownwardSearch(content, "ScreenContent") as Canvas;
-                        (VisualHelper.VisualDownwardSearch(screenContent, "Grid") as Canvas).Visibility = Visibility.Visible;
-                        (VisualHelper.VisualDownwardSearch(screenContent, "ComponentLayer") as Canvas).Visibility = Visibility.Visible;
-                    }
-                    Panel.SetZIndex(player, -1);
-                    PausePlayTimer();
-                }
-                else
+                if (!player.Pause)
                 {
                     path.Data = (Geometry)FindResource("Pause_Icon");
                     path.Fill = (Brush)FindResource("PauseIconBrush");

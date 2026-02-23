@@ -11,6 +11,10 @@ using System.Threading.Tasks;
 
 namespace CrazyStorm.Core
 {
+    public class PoolOverflowException : Exception
+    {
+        public PoolOverflowException(Type type) : base($"{type.Name} is overflowing") { }
+    }
     public struct NullData 
     {
         public static NullData Empty;
@@ -42,7 +46,7 @@ namespace CrazyStorm.Core
                 searchCount++;
                 if (searchCount >= pool.Length)
                 {
-                    throw new Exception($"{typeof(T).Name} is overflowing");
+                    throw new PoolOverflowException(typeof(T));
                 }
             }
             while (instance.PoolState);
