@@ -43,6 +43,7 @@ namespace CrazyStorm.Core
         Dictionary<long, ComponentData> bindingComponentData;
         GenericContainer<EventGroup> componentEventGroups;
         GenericContainer<Component> children;
+        bool selected;
         #endregion
 
         #region Protected Members
@@ -142,7 +143,17 @@ namespace CrazyStorm.Core
             get { return componentData.visibility; }
             set { componentData.visibility = value; }
         }
-        public bool Selected { get; set; }
+        public bool Selected
+        {
+            get { return selected; }
+            set
+            {
+                if (selected == value) return;
+                selected = value;
+                if (PropertyChanged != null)
+                    PropertyChanged(this, new PropertyChangedEventArgs("Selected"));
+            }
+        }
         public Component Parent { get; set; }
         public long ParentID { get; set; }
         public long BindingTargetID { get; set; }

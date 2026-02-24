@@ -502,11 +502,28 @@ namespace CrazyStorm
         {
             lastMouseDown = e.GetPosition(ComponentTree);
             lastSelectedItem = sender as DependencyObject;
-            //Select pointed component when mouse left-button down. 
             var textBlock = sender as TextBlock;
-            var set = new List<CrazyStorm.Core.Component>();
-            set.Add((Component)textBlock.DataContext);
-            SelectComponents(set, true);
+            if (textBlock == null) return;
+            var component = textBlock.DataContext as Component;
+            if (component == null) return;
+
+            // TreeView is single-select; handle Ctrl multi-select here and stop TreeView from selecting again.
+            if (Keyboard.Modifiers == ModifierKeys.Control)
+            {
+                var set = new List<CrazyStorm.Core.Component>();
+                set.Add(component);
+                SelectComponents(set, true);
+                e.Handled = true;
+                return;
+            }
+
+            // Clicking the same selected item will not raise SelectedItemChanged, so keep selection sync here.
+            if (ComponentTree.SelectedItem == component)
+            {
+                var set = new List<CrazyStorm.Core.Component>();
+                set.Add(component);
+                SelectComponents(set, true);
+            }
         }
         private void ComponentTree_MouseMove(object sender, MouseEventArgs e)
         {
