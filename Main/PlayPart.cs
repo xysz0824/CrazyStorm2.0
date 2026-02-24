@@ -123,6 +123,14 @@ namespace CrazyStorm
                     panel.IsEnabled = enable;
                 }
             }
+            foreach (var window in floatingPropertyWindows.Values)
+            {
+                var scroll = window.Content as ScrollViewer;
+                if (scroll == null) continue;
+
+                var panel = scroll.Content as PropertyPanel;
+                if (panel != null) panel.IsEnabled = enable;
+            }
         }
         void StartPlayTimer()
         {

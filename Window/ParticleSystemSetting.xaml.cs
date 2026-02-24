@@ -52,6 +52,7 @@ namespace CrazyStorm
             FirstAsTop.IsChecked = selectedParticle.OrderType == OrderType.FirstAsTop;
             LastAsTop.IsChecked = selectedParticle.OrderType == OrderType.LastAsTop;
             TypeList.ItemsSource = selectedParticle.CustomTypes;
+            DelType.IsEnabled = selectedParticle.CustomTypes.Count > 0;
             file.UpdateResource();
             //Load images.
             foreach (var image in file.Images)

@@ -186,7 +186,7 @@
             </StackPanel>
         </GroupBox>
         <GroupBox Padding="0,24,0,0" Style="{StaticResource FlatGroupBox}" Header="{StaticResource ComponentEventGroupStr}" Height="130" Margin="0">
-            <TreeView Name="ComponentEventList" ItemsSource="{Binding ElementName=Name}" Padding="-12,1,1,1" PreviewMouseWheel="Grid_PreviewMouseWheel"
+            <TreeView Name="ComponentEventList" ItemsSource="{Binding ElementName=Name}" Padding="-12,1,1,1" 
                       PreviewMouseRightButtonDown="ComponentEventList_PreviewMouseRightButtonDown" 
                       MouseDoubleClick="ComponentEventList_MouseDoubleClick"
                       Background="{DynamicResource ListBrush}" BorderThickness="0,0,0,0">
@@ -223,7 +223,7 @@
             <Button Style="{StaticResource FlatButton}" Name="DelComponentEventButton" Width ="50" Content="{StaticResource DelStr}" Click="DelComponentEvent_Click" />
         </StackPanel>
         <GroupBox Padding="0,24,0,0" Style="{StaticResource FlatGroupBox}" Name="SpecificGroup" Header="{StaticResource SpecificEventGroupStr}" Height="130" Margin="0" >
-            <TreeView Name="SpecificEventList" Padding="-12,1,1,1" PreviewMouseWheel="Grid_PreviewMouseWheel"
+            <TreeView Name="SpecificEventList" Padding="-12,1,1,1" 
                       PreviewMouseRightButtonDown="SpecificEventList_PreviewMouseRightButtonDown" 
                       MouseDoubleClick="SpecificEventList_MouseDoubleClick"
                       Background="{DynamicResource ListBrush}" BorderThickness="0,0,0,0">

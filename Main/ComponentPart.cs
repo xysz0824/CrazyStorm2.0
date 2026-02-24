@@ -17,6 +17,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using System.Windows.Threading;
 
 namespace CrazyStorm
 {
@@ -25,9 +26,260 @@ namespace CrazyStorm
         #region Private Members
         Point lastMouseDown;
         DependencyObject lastSelectedItem;
+        Point propertyTabDragMouseDown;
+        TabItem draggingPropertyTab;
+        bool propertyTabDragStarted;
+        Window draggingPropertyWindow;
+        DispatcherTimer floatingPropertyWindowDragTimer;
+        DateTime floatingPropertyWindowLastMoveTime;
+        Dictionary<Component, Window> floatingPropertyWindows = new Dictionary<Component, Window>();
+        HashSet<Window> dockingPropertyWindows = new HashSet<Window>();
         #endregion
 
         #region Private Methods
+        bool IsPropertyTab(TabItem item)
+        {
+            return item != null && item.DataContext is Component && item.Content is ScrollViewer;
+        }
+        void AttachPropertyTabHandlers(TabItem item)
+        {
+            if (!IsPropertyTab(item)) return;
+
+            item.PreviewMouseLeftButtonDown += PropertyTab_PreviewMouseLeftButtonDown;
+            item.PreviewMouseMove += PropertyTab_PreviewMouseMove;
+            item.PreviewMouseLeftButtonUp += PropertyTab_PreviewMouseLeftButtonUp;
+            item.LostMouseCapture += PropertyTab_LostMouseCapture;
+        }
+        void DetachPropertyTabHandlers(TabItem item)
+        {
+            if (item == null) return;
+
+            item.PreviewMouseLeftButtonDown -= PropertyTab_PreviewMouseLeftButtonDown;
+            item.PreviewMouseMove -= PropertyTab_PreviewMouseMove;
+            item.PreviewMouseLeftButtonUp -= PropertyTab_PreviewMouseLeftButtonUp;
+            item.LostMouseCapture -= PropertyTab_LostMouseCapture;
+        }
+        void ResetPropertyTabDragState()
+        {
+            var item = draggingPropertyTab;
+            draggingPropertyTab = null;
+            propertyTabDragStarted = false;
+            propertyTabDragMouseDown = new Point();
+
+            if (item != null && item.IsMouseCaptured) item.ReleaseMouseCapture();
+        }
+        Point ConvertScreenPointToWindowPosition(Point screenPoint)
+        {
+            var source = PresentationSource.FromVisual(this);
+            if (source == null || source.CompositionTarget == null) return screenPoint;
+
+            return source.CompositionTarget.TransformFromDevice.Transform(screenPoint);
+        }
+        Rect GetWorkAreaBounds(Point screenPoint)
+        {
+            var screen = System.Windows.Forms.Screen.FromPoint(
+                new System.Drawing.Point((int)Math.Round(screenPoint.X), (int)Math.Round(screenPoint.Y)));
+            var area = screen.WorkingArea;
+            var topLeft = ConvertScreenPointToWindowPosition(new Point(area.Left, area.Top));
+            var bottomRight = ConvertScreenPointToWindowPosition(new Point(area.Right, area.Bottom));
+            return new Rect(topLeft, bottomRight);
+        }
+        bool TryGetPropertyTabDropBounds(out Rect bounds)
+        {
+            bounds = Rect.Empty;
+            if (LeftTabControl == null || !LeftTabControl.IsVisible) return false;
+
+            LeftTabControl.UpdateLayout();
+            var tabPanel = VisualHelper.VisualDownwardSearch<TabPanel>(LeftTabControl) as FrameworkElement;
+            var dropTarget = tabPanel ?? (FrameworkElement)LeftTabControl;
+            if (dropTarget == null || !dropTarget.IsVisible || dropTarget.ActualWidth <= 0 || dropTarget.ActualHeight <= 0)
+            {
+                return false;
+            }
+
+            var topLeft = dropTarget.PointToScreen(new Point(0, 0));
+            var bottomRight = dropTarget.PointToScreen(new Point(dropTarget.ActualWidth, dropTarget.ActualHeight));
+            bounds = new Rect(topLeft, bottomRight);
+            bounds.Inflate(10, 10);
+            return true;
+        }
+        bool IsPointInPropertyTabDropBounds(Point screenPoint)
+        {
+            Rect bounds;
+            if (!TryGetPropertyTabDropBounds(out bounds)) return false;
+
+            return bounds.Contains(screenPoint);
+        }
+        bool IsFloatingPropertyWindowInPropertyTabDropBounds(Window window)
+        {
+            if (window == null || !window.IsVisible) return false;
+
+            if (LeftTabControl == null || !LeftTabControl.IsVisible) return false;
+            LeftTabControl.UpdateLayout();
+
+            var dropTarget = LeftTabControl as FrameworkElement;
+            if (dropTarget == null || !dropTarget.IsVisible || dropTarget.ActualWidth <= 0 || dropTarget.ActualHeight <= 0)
+            {
+                return false;
+            }
+
+            var topLeft = dropTarget.PointToScreen(new Point(0, 0));
+            var bottomRight = dropTarget.PointToScreen(new Point(dropTarget.ActualWidth, dropTarget.ActualHeight));
+            var bounds = new Rect(topLeft, bottomRight);
+            bounds.Inflate(10, 10);
+
+            var width = window.ActualWidth > 0 ? window.ActualWidth : window.Width;
+            var height = window.ActualHeight > 0 ? window.ActualHeight : window.Height;
+            if (double.IsNaN(width) || double.IsNaN(height) || width <= 0 || height <= 0)
+            {
+                return false;
+            }
+
+            var titleHeight = Math.Min(height, Math.Max(28, SystemParameters.WindowCaptionHeight + 12));
+            var anchorY = Math.Min(height - 1, Math.Max(0, titleHeight * 0.5));
+            var anchorXs = new[]
+            {
+                Math.Min(width - 1, Math.Max(0, 24)),
+                Math.Min(width - 1, Math.Max(0, Math.Min(width * 0.35, 100))),
+                Math.Min(width - 1, Math.Max(0, Math.Min(width * 0.5, 140))),
+            };
+            foreach (var anchorX in anchorXs)
+            {
+                var anchorPoint = window.PointToScreen(new Point(anchorX, anchorY));
+                if (bounds.Contains(anchorPoint)) return true;
+            }
+            return false;
+        }
+        ScrollViewer CreatePropertyPanelScroll(Component component)
+        {
+            var scroll = new ScrollViewer();
+            var baseScrollBarStyle = (Style)Application.Current.FindResource("FlatScrollBarStyle");
+            var implicitScrollBarStyle = new Style(typeof(ScrollBar), baseScrollBarStyle);
+            scroll.Resources.Add(typeof(ScrollBar), implicitScrollBarStyle);
+            var trackBrush = (Brush)Application.Current.FindResource("ScrollBarTrackBrush");
+            scroll.Resources.Add(SystemColors.ControlBrushKey, trackBrush);
+            scroll.VerticalScrollBarVisibility = ScrollBarVisibility.Auto;
+            var particleTypes = new List<ParticleType>();
+            particleTypes.AddRange(ParticleType.DefaultTypes);
+            particleTypes.AddRange(selectedSystem.CustomTypes);
+            var panel = new PropertyPanel(commandStacks[selectedSystem], config, file,
+                particleTypes, component, UpdateProperty);
+            scroll.Content = panel;
+            panel.OnBeginEditing += () => editingProperties = true;
+            panel.OnEndEditing += () => editingProperties = false;
+            return scroll;
+        }
+        TabItem CreatePropertyTabItem(Component component, ScrollViewer scroll)
+        {
+            var item = new TabItem();
+            item.DataContext = component;
+            item.Style = (Style)FindResource("CanCloseStyle");
+            item.Content = scroll;
+            AttachPropertyTabHandlers(item);
+            return item;
+        }
+        Window CreateFloatingPropertyWindow(Component component, ScrollViewer scroll, Point screenPoint)
+        {
+            var window = new Window();
+            window.DataContext = component;
+            window.Owner = this;
+            window.ShowInTaskbar = false;
+            window.WindowStyle = WindowStyle.SingleBorderWindow;
+            window.ResizeMode = ResizeMode.CanResize;
+            window.WindowStartupLocation = WindowStartupLocation.Manual;
+            window.MinWidth = 320;
+            window.MinHeight = 300;
+            window.Width = Math.Max(360, LeftTabControl.ActualWidth);
+            var workArea = GetWorkAreaBounds(screenPoint);
+            window.Height = Math.Max(window.MinHeight, workArea.Height);
+            var windowPosition = ConvertScreenPointToWindowPosition(screenPoint);
+            window.Left = Math.Max(workArea.Left, Math.Min(windowPosition.X, Math.Max(workArea.Left, workArea.Right - window.Width)));
+            window.Top = workArea.Top;
+            window.Content = scroll;
+            window.SetBinding(Window.TitleProperty, new Binding("Name"));
+            window.LocationChanged += FloatingPropertyWindow_LocationChanged;
+            window.Closed += FloatingPropertyWindow_Closed;
+            return window;
+        }
+        void EnsureFloatingPropertyWindowDragTimer()
+        {
+            if (floatingPropertyWindowDragTimer == null)
+            {
+                floatingPropertyWindowDragTimer = new DispatcherTimer();
+                floatingPropertyWindowDragTimer.Interval = TimeSpan.FromMilliseconds(40);
+                floatingPropertyWindowDragTimer.Tick += FloatingPropertyWindowDragTimer_Tick;
+            }
+            if (!floatingPropertyWindowDragTimer.IsEnabled) floatingPropertyWindowDragTimer.Start();
+        }
+        void UpdateFloatingPropertyWindowDragTimerState()
+        {
+            if (floatingPropertyWindowDragTimer == null) return;
+
+            if (floatingPropertyWindows.Count == 0) floatingPropertyWindowDragTimer.Stop();
+            else if (!floatingPropertyWindowDragTimer.IsEnabled) floatingPropertyWindowDragTimer.Start();
+        }
+        void FloatPropertyTab(TabItem item, Point screenPoint)
+        {
+            if (!IsPropertyTab(item)) return;
+            if (!LeftTabControl.Items.Contains(item)) return;
+
+            var component = item.DataContext as Component;
+            if (component == null || floatingPropertyWindows.ContainsKey(component)) return;
+
+            var scroll = item.Content as ScrollViewer;
+            DetachPropertyTabHandlers(item);
+            item.Content = null;
+            LeftTabControl.Items.Remove(item);
+            ResetLeftTab();
+
+            var window = CreateFloatingPropertyWindow(component, scroll, screenPoint);
+            floatingPropertyWindows[component] = window;
+            EnsureFloatingPropertyWindowDragTimer();
+            window.Show();
+            window.Activate();
+        }
+        void ReDockPropertyWindow(Window window)
+        {
+            if (window == null || dockingPropertyWindows.Contains(window)) return;
+
+            var component = window.DataContext as Component;
+            var scroll = window.Content as ScrollViewer;
+            if (component == null || scroll == null) return;
+
+            dockingPropertyWindows.Add(window);
+            window.Content = null;
+
+            var item = CreatePropertyTabItem(component, scroll);
+            LeftTabControl.Items.Add(item);
+            LeftTabControl.SelectedItem = item;
+            item.Focus();
+
+            window.Close();
+        }
+        void CleanupFloatingPropertyWindow(Window window)
+        {
+            if (window == null) return;
+
+            if (draggingPropertyWindow == window)
+                draggingPropertyWindow = null;
+
+            window.LocationChanged -= FloatingPropertyWindow_LocationChanged;
+            window.Closed -= FloatingPropertyWindow_Closed;
+
+            dockingPropertyWindows.Remove(window);
+
+            Window mappedWindow;
+            var component = window.DataContext as Component;
+            if (component != null && floatingPropertyWindows.TryGetValue(component, out mappedWindow) && mappedWindow == window)
+                floatingPropertyWindows.Remove(component);
+
+            UpdateFloatingPropertyWindowDragTimerState();
+        }
+        void CloseFloatingPropertyWindow(Window window)
+        {
+            if (window == null) return;
+            window.Close();
+        }
         void UpdateSelectedGroup()
         {
             //Get all visible components in this particle system.
@@ -88,36 +340,28 @@ namespace CrazyStorm
         void CreatePropertyPanel(Component component)
         {
             TabItem item;
+            Window floatingWindow;
             //Prevent from repeating tab of components.  
             for (int i = 2; i < LeftTabControl.Items.Count; ++i)
             {
                 item = LeftTabControl.Items[i] as TabItem;
                 if (item.DataContext == component)
                 {
+                    LeftTabControl.SelectedItem = item;
                     item.Focus();
                     return;
                 }
             }
-            item = new TabItem();
-            item.DataContext = component;
-            item.Style = (Style)FindResource("CanCloseStyle");
-            var scroll = new ScrollViewer();
-            var baseScrollBarStyle = (Style)Application.Current.FindResource("FlatScrollBarStyle");
-            var implicitScrollBarStyle = new Style(typeof(ScrollBar), baseScrollBarStyle);
-            scroll.Resources.Add(typeof(ScrollBar), implicitScrollBarStyle);
-            var trackBrush = (Brush)Application.Current.FindResource("ScrollBarTrackBrush");
-            scroll.Resources.Add(SystemColors.ControlBrushKey, trackBrush);
-            scroll.VerticalScrollBarVisibility = ScrollBarVisibility.Auto;
-            var particleTypes = new List<ParticleType>();
-            particleTypes.AddRange(ParticleType.DefaultTypes);
-            particleTypes.AddRange(selectedSystem.CustomTypes);
-            var panel = new PropertyPanel(commandStacks[selectedSystem], config, file, 
-                particleTypes, component, UpdateProperty);
-            scroll.Content = panel;
-            panel.OnBeginEditing += () => editingProperties = true;
-            panel.OnEndEditing += () => editingProperties = false;
-            item.Content = scroll;
+            if (floatingPropertyWindows.TryGetValue(component, out floatingWindow))
+            {
+                if (floatingWindow.WindowState == WindowState.Minimized) floatingWindow.WindowState = WindowState.Normal;
+                floatingWindow.Activate();
+                return;
+            }
+
+            item = CreatePropertyTabItem(component, CreatePropertyPanelScroll(component));
             LeftTabControl.Items.Add(item);
+            LeftTabControl.SelectedItem = item;
             item.Focus();
             saved = false;
         }
@@ -129,8 +373,16 @@ namespace CrazyStorm
                 if (scroll != null)
                 {
                     var content = scroll.Content as PropertyPanel;
-                    if (content != null)
-                        content.UpdateProperty();
+                    if (content != null) content.UpdateProperty();
+                }
+            }
+            foreach (var window in floatingPropertyWindows.Values)
+            {
+                var scroll = window.Content as ScrollViewer;
+                if (scroll != null)
+                {
+                    var content = scroll.Content as PropertyPanel;
+                    if (content != null) content.UpdateProperty();
                 }
             }
             UpdateScreen();
@@ -157,6 +409,7 @@ namespace CrazyStorm
                 //Remove the property panel which is not belonging to any component.
                 if (item.DataContext is Component && !set.Contains(item.DataContext))
                 {
+                    DetachPropertyTabHandlers(item);
                     LeftTabControl.Items.RemoveAt(i);
                     i--;
                 }
@@ -164,6 +417,13 @@ namespace CrazyStorm
                 if (item.Content is FinderPanel)
                     (item.Content as FinderPanel).Update(selectedSystem);
             }
+
+            var windowsToClose = new List<Window>();
+            foreach (var pair in floatingPropertyWindows)
+            {
+                if (!set.Contains(pair.Key)) windowsToClose.Add(pair.Value);
+            }
+            foreach (var window in windowsToClose) CloseFloatingPropertyWindow(window);
         }
         void ResetLeftTab()
         {
@@ -296,9 +556,99 @@ namespace CrazyStorm
                 CreatePropertyPanel(ComponentTree.SelectedItem as Component);
             }
         }
+        private void PropertyTab_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            if (VisualHelper.VisualUpwardSearch<Button>(e.OriginalSource as DependencyObject) != null) return;
+
+            var tabItem = sender as TabItem;
+            if (!IsPropertyTab(tabItem)) return;
+
+            // Only allow tab dragging from the header area, not from PropertyPanel content.
+            var point = e.GetPosition(tabItem);
+            var headerBounds = new Rect(0, 0, tabItem.ActualWidth, tabItem.ActualHeight);
+            if (!headerBounds.Contains(point)) return;
+
+            draggingPropertyTab = tabItem;
+            propertyTabDragMouseDown = e.GetPosition(this);
+            propertyTabDragStarted = false;
+        }
+        private void PropertyTab_PreviewMouseMove(object sender, MouseEventArgs e)
+        {
+            var tabItem = sender as TabItem;
+            if (tabItem == null || tabItem != draggingPropertyTab) return;
+
+            if (e.LeftButton != MouseButtonState.Pressed)
+            {
+                ResetPropertyTabDragState();
+                return;
+            }
+
+            var current = e.GetPosition(this);
+            if (!propertyTabDragStarted)
+            {
+                if (Math.Abs(current.X - propertyTabDragMouseDown.X) < SystemParameters.MinimumHorizontalDragDistance &&
+                    Math.Abs(current.Y - propertyTabDragMouseDown.Y) < SystemParameters.MinimumVerticalDragDistance)
+                {
+                    return;
+                }
+
+                propertyTabDragStarted = true;
+                tabItem.CaptureMouse();
+            }
+        }
+        private void PropertyTab_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            var screenPoint = PointToScreen(e.GetPosition(this));
+            var tabItem = sender as TabItem;
+            var shouldFloat = tabItem != null &&
+                tabItem == draggingPropertyTab &&
+                propertyTabDragStarted &&
+                !IsPointInPropertyTabDropBounds(screenPoint);
+
+            ResetPropertyTabDragState();
+
+            if (shouldFloat) FloatPropertyTab(tabItem, screenPoint);
+        }
+        private void PropertyTab_LostMouseCapture(object sender, MouseEventArgs e)
+        {
+            if (sender == draggingPropertyTab) ResetPropertyTabDragState();
+        }
+        private void FloatingPropertyWindow_LocationChanged(object sender, EventArgs e)
+        {
+            var window = sender as Window;
+            if (window == null || dockingPropertyWindows.Contains(window)) return;
+
+            draggingPropertyWindow = window;
+            floatingPropertyWindowLastMoveTime = DateTime.Now;
+            EnsureFloatingPropertyWindowDragTimer();
+        }
+        private void FloatingPropertyWindowDragTimer_Tick(object sender, EventArgs e)
+        {
+            if (floatingPropertyWindows.Count == 0)
+            {
+                UpdateFloatingPropertyWindowDragTimerState();
+                draggingPropertyWindow = null;
+                return;
+            }
+
+            var window = draggingPropertyWindow;
+            if (window == null || dockingPropertyWindows.Contains(window)) return;
+
+            if ((DateTime.Now - floatingPropertyWindowLastMoveTime).TotalMilliseconds < 120) return;
+
+            draggingPropertyWindow = null;
+
+            if (IsFloatingPropertyWindowInPropertyTabDropBounds(window)) ReDockPropertyWindow(window);
+        }
+        private void FloatingPropertyWindow_Closed(object sender, EventArgs e)
+        {
+            CleanupFloatingPropertyWindow(sender as Window);
+        }
         private void TabClose_Click(object sender, RoutedEventArgs e)
         {
             var tabItem = VisualHelper.VisualUpwardSearch<TabItem>(sender as DependencyObject) as TabItem;
+            if (tabItem == draggingPropertyTab) ResetPropertyTabDragState();
+            DetachPropertyTabHandlers(tabItem);
             LeftTabControl.Items.Remove(tabItem);
             ResetLeftTab();
         }

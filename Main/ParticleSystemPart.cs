@@ -97,8 +97,18 @@ namespace CrazyStorm
             particleTypes.AddRange(selectedSystem.CustomTypes);
             for (int i = 2; i < LeftTabControl.Items.Count; ++i)
             {
-                var panel = ((LeftTabControl.Items[i] as TabItem).Content as ScrollViewer).Content as PropertyPanel;
-                panel.LoadTypes(particleTypes);
+                var item = LeftTabControl.Items[i] as TabItem;
+                var scroll = item?.Content as ScrollViewer;
+                var panel = scroll?.Content as PropertyPanel;
+                if (panel != null) panel.LoadTypes(particleTypes);
+            }
+            foreach (var window in floatingPropertyWindows.Values)
+            {
+                var scroll = window.Content as ScrollViewer;
+                if (scroll == null) continue;
+
+                var panel = scroll.Content as PropertyPanel;
+                if (panel != null) panel.LoadTypes(particleTypes);
             }
         }
         void OpenSelectedParticleSystemSetting()
