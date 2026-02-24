@@ -11,7 +11,7 @@ namespace MonoGame.Framework.WpfInterop.Input
         /// If null, the default implementation is used
         /// </summary>
         /// <returns></returns>
-        public static Func<IInputElement, Window> FindWindow;
+        public static Func<IInputElement, Window> FindWindow = null;
 
         public static bool IsControlOnActiveWindow(IInputElement element)
         {
