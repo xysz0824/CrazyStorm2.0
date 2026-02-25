@@ -109,6 +109,7 @@ namespace CrazyStorm
             };
             item.DataContext = panel;
             item.Content = panel;
+            AttachPropertyTabHandlers(item);
             LeftTabControl.Items.Add(item);
             item.Focus();
         }

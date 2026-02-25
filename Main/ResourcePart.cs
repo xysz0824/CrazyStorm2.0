@@ -38,7 +38,7 @@ namespace CrazyStorm
                 var panel = scroll?.Content as PropertyPanel;
                 if (panel != null) panel.UpdateGlobals(type, variable, newName, newValue);
             }
-            foreach (var window in floatingPropertyWindows.Values)
+            foreach (var window in propertyWindows.Values)
             {
                 var scroll = window.Content as ScrollViewer;
                 if (scroll == null) continue;

@@ -23,16 +23,21 @@ namespace CrazyStorm
 {
     public partial class Main
     {
+        const double TabDragPreviewOpacity = 0.65;
+
         #region Private Members
         Point lastMouseDown;
         DependencyObject lastSelectedItem;
-        Point propertyTabDragMouseDown;
+        Point tabDragMouseDown;
+        Point tabDragPreviewMouseOffset;
         TabItem draggingPropertyTab;
-        bool propertyTabDragStarted;
+        bool tabDragStarted;
+        Popup tabDragPreviewPopup;
+        ImageSource tabDragPreviewImageSource;
         Window draggingPropertyWindow;
-        DispatcherTimer floatingPropertyWindowDragTimer;
-        DateTime floatingPropertyWindowLastMoveTime;
-        Dictionary<Component, Window> floatingPropertyWindows = new Dictionary<Component, Window>();
+        DispatcherTimer propertyWindowDragTimer;
+        DateTime propertyWindowLastMoveTime;
+        Dictionary<Component, Window> propertyWindows = new Dictionary<Component, Window>();
         HashSet<Window> dockingPropertyWindows = new HashSet<Window>();
         #endregion
 
@@ -41,9 +46,17 @@ namespace CrazyStorm
         {
             return item != null && item.DataContext is Component && item.Content is ScrollViewer;
         }
+        bool IsFinderTab(TabItem item)
+        {
+            return item != null && item.Content is FinderPanel;
+        }
+        bool IsSortableClosableTab(TabItem item)
+        {
+            return IsPropertyTab(item) || IsFinderTab(item);
+        }
         void AttachPropertyTabHandlers(TabItem item)
         {
-            if (!IsPropertyTab(item)) return;
+            if (!IsSortableClosableTab(item)) return;
 
             item.PreviewMouseLeftButtonDown += PropertyTab_PreviewMouseLeftButtonDown;
             item.PreviewMouseMove += PropertyTab_PreviewMouseMove;
@@ -59,14 +72,94 @@ namespace CrazyStorm
             item.PreviewMouseLeftButtonUp -= PropertyTab_PreviewMouseLeftButtonUp;
             item.LostMouseCapture -= PropertyTab_LostMouseCapture;
         }
-        void ResetPropertyTabDragState()
+        void ResetTabDragState()
         {
             var item = draggingPropertyTab;
             draggingPropertyTab = null;
-            propertyTabDragStarted = false;
-            propertyTabDragMouseDown = new Point();
+            tabDragStarted = false;
+            tabDragMouseDown = new Point();
+            tabDragPreviewMouseOffset = new Point();
+            tabDragPreviewImageSource = null;
+            CloseTabDragPreview();
 
             if (item != null && item.IsMouseCaptured) item.ReleaseMouseCapture();
+        }
+        ImageSource CreateTabDragPreviewImageSource(TabItem item)
+        {
+            if (item == null) return null;
+
+            item.UpdateLayout();
+            var width = item.ActualWidth;
+            var height = item.ActualHeight;
+            if (width <= 0 || height <= 0) return null;
+
+            var dpi = VisualTreeHelper.GetDpi(item);
+            var pixelWidth = Math.Max(1, (int)Math.Round(width * dpi.DpiScaleX));
+            var pixelHeight = Math.Max(1, (int)Math.Round(height * dpi.DpiScaleY));
+            var dpiX = dpi.PixelsPerInchX;
+            var dpiY = dpi.PixelsPerInchY;
+
+            var bitmap = new RenderTargetBitmap(pixelWidth, pixelHeight, dpiX, dpiY, PixelFormats.Pbgra32);
+            var brush = new VisualBrush(item) { Stretch = Stretch.Fill };
+            var drawing = new DrawingVisual();
+            using (var dc = drawing.RenderOpen())
+            {
+                dc.DrawRectangle(brush, null, new Rect(0, 0, width, height));
+            }
+            bitmap.Render(drawing);
+            bitmap.Freeze();
+            return bitmap;
+        }
+        void EnsureTabDragPreviewPopup()
+        {
+            if (tabDragPreviewPopup != null) return;
+
+            tabDragPreviewPopup = new Popup();
+            tabDragPreviewPopup.AllowsTransparency = true;
+            tabDragPreviewPopup.Placement = PlacementMode.AbsolutePoint;
+            tabDragPreviewPopup.StaysOpen = true;
+            tabDragPreviewPopup.IsHitTestVisible = false;
+        }
+        void ShowTabDragPreview(TabItem item, Point screenPoint)
+        {
+            if (item == null) return;
+
+            if (tabDragPreviewImageSource == null) return;
+
+            EnsureTabDragPreviewPopup();
+
+            var border = new Border();
+            border.Background = Brushes.Transparent;
+            border.Opacity = TabDragPreviewOpacity;
+            border.SnapsToDevicePixels = true;
+            border.IsHitTestVisible = false;
+            border.Child = new Image
+            {
+                Source = tabDragPreviewImageSource,
+                Width = item.ActualWidth,
+                Height = item.ActualHeight,
+                Stretch = Stretch.Fill,
+                IsHitTestVisible = false
+            };
+
+            tabDragPreviewPopup.Child = border;
+            UpdateTabDragPreviewPosition(screenPoint);
+            tabDragPreviewPopup.IsOpen = true;
+        }
+        void UpdateTabDragPreviewPosition(Point screenPoint)
+        {
+            if (tabDragPreviewPopup == null || !tabDragPreviewPopup.IsOpen) return;
+
+            var dipScreenPoint = ConvertScreenPointToWindowPosition(screenPoint);
+            tabDragPreviewPopup.HorizontalOffset = dipScreenPoint.X - tabDragPreviewMouseOffset.X;
+            tabDragPreviewPopup.VerticalOffset = dipScreenPoint.Y - tabDragPreviewMouseOffset.Y;
+        }
+        void CloseTabDragPreview()
+        {
+            if (tabDragPreviewPopup == null) return;
+
+            tabDragPreviewPopup.IsOpen = false;
+            tabDragPreviewPopup.Child = null;
         }
         Point ConvertScreenPointToWindowPosition(Point screenPoint)
         {
@@ -110,7 +203,49 @@ namespace CrazyStorm
 
             return bounds.Contains(screenPoint);
         }
-        bool IsFloatingPropertyWindowInPropertyTabDropBounds(Window window)
+        TabItem GetSwapTabTargetAtScreenPoint(TabItem draggingTab, Point screenPoint)
+        {
+            if (draggingTab == null || LeftTabControl == null) return null;
+
+            for (int i = 2; i < LeftTabControl.Items.Count; ++i)
+            {
+                var item = LeftTabControl.Items[i] as TabItem;
+                if (item == null || item == draggingTab || !item.IsVisible) continue;
+                if (item.ActualWidth <= 0 || item.ActualHeight <= 0) continue;
+
+                var topLeft = item.PointToScreen(new Point(0, 0));
+                var bottomRight = item.PointToScreen(new Point(item.ActualWidth, item.ActualHeight));
+                if (new Rect(topLeft, bottomRight).Contains(screenPoint)) return item;
+            }
+            return null;
+        }
+        void SwapTabs(TabItem left, TabItem right)
+        {
+            if (left == null || right == null || left == right || LeftTabControl == null) return;
+
+            var leftIndex = LeftTabControl.Items.IndexOf(left);
+            var rightIndex = LeftTabControl.Items.IndexOf(right);
+            if (leftIndex < 2 || rightIndex < 2 || leftIndex == rightIndex) return;
+
+            if (leftIndex < rightIndex)
+            {
+                LeftTabControl.Items.RemoveAt(rightIndex);
+                LeftTabControl.Items.RemoveAt(leftIndex);
+                LeftTabControl.Items.Insert(leftIndex, right);
+                LeftTabControl.Items.Insert(rightIndex, left);
+            }
+            else
+            {
+                LeftTabControl.Items.RemoveAt(leftIndex);
+                LeftTabControl.Items.RemoveAt(rightIndex);
+                LeftTabControl.Items.Insert(rightIndex, left);
+                LeftTabControl.Items.Insert(leftIndex, right);
+            }
+
+            LeftTabControl.SelectedItem = left;
+            left.Focus();
+        }
+        bool IsPropertyWindowInPropertyTabDropBounds(Window window)
         {
             if (window == null || !window.IsVisible) return false;
 
@@ -178,7 +313,7 @@ namespace CrazyStorm
             AttachPropertyTabHandlers(item);
             return item;
         }
-        Window CreateFloatingPropertyWindow(Component component, ScrollViewer scroll, Point screenPoint)
+        Window CreatePropertyWindow(Component component, ScrollViewer scroll, Point screenPoint)
         {
             var window = new Window();
             window.DataContext = component;
@@ -197,26 +332,26 @@ namespace CrazyStorm
             window.Top = workArea.Top;
             window.Content = scroll;
             window.SetBinding(Window.TitleProperty, new Binding("Name"));
-            window.LocationChanged += FloatingPropertyWindow_LocationChanged;
-            window.Closed += FloatingPropertyWindow_Closed;
+            window.LocationChanged += PropertyWindow_LocationChanged;
+            window.Closed += PropertyWindow_Closed;
             return window;
         }
-        void EnsureFloatingPropertyWindowDragTimer()
+        void EnsurePropertyWindowDragTimer()
         {
-            if (floatingPropertyWindowDragTimer == null)
+            if (propertyWindowDragTimer == null)
             {
-                floatingPropertyWindowDragTimer = new DispatcherTimer();
-                floatingPropertyWindowDragTimer.Interval = TimeSpan.FromMilliseconds(40);
-                floatingPropertyWindowDragTimer.Tick += FloatingPropertyWindowDragTimer_Tick;
+                propertyWindowDragTimer = new DispatcherTimer();
+                propertyWindowDragTimer.Interval = TimeSpan.FromMilliseconds(40);
+                propertyWindowDragTimer.Tick += PropertyWindowDragTimer_Tick;
             }
-            if (!floatingPropertyWindowDragTimer.IsEnabled) floatingPropertyWindowDragTimer.Start();
+            if (!propertyWindowDragTimer.IsEnabled) propertyWindowDragTimer.Start();
         }
-        void UpdateFloatingPropertyWindowDragTimerState()
+        void UpdatePropertyWindowDragTimerState()
         {
-            if (floatingPropertyWindowDragTimer == null) return;
+            if (propertyWindowDragTimer == null) return;
 
-            if (floatingPropertyWindows.Count == 0) floatingPropertyWindowDragTimer.Stop();
-            else if (!floatingPropertyWindowDragTimer.IsEnabled) floatingPropertyWindowDragTimer.Start();
+            if (propertyWindows.Count == 0) propertyWindowDragTimer.Stop();
+            else if (!propertyWindowDragTimer.IsEnabled) propertyWindowDragTimer.Start();
         }
         void FloatPropertyTab(TabItem item, Point screenPoint)
         {
@@ -224,7 +359,7 @@ namespace CrazyStorm
             if (!LeftTabControl.Items.Contains(item)) return;
 
             var component = item.DataContext as Component;
-            if (component == null || floatingPropertyWindows.ContainsKey(component)) return;
+            if (component == null || propertyWindows.ContainsKey(component)) return;
 
             var scroll = item.Content as ScrollViewer;
             DetachPropertyTabHandlers(item);
@@ -232,9 +367,9 @@ namespace CrazyStorm
             LeftTabControl.Items.Remove(item);
             ResetLeftTab();
 
-            var window = CreateFloatingPropertyWindow(component, scroll, screenPoint);
-            floatingPropertyWindows[component] = window;
-            EnsureFloatingPropertyWindowDragTimer();
+            var window = CreatePropertyWindow(component, scroll, screenPoint);
+            propertyWindows[component] = window;
+            EnsurePropertyWindowDragTimer();
             window.Show();
             window.Activate();
         }
@@ -256,26 +391,26 @@ namespace CrazyStorm
 
             window.Close();
         }
-        void CleanupFloatingPropertyWindow(Window window)
+        void CleanupPropertyWindow(Window window)
         {
             if (window == null) return;
 
             if (draggingPropertyWindow == window)
                 draggingPropertyWindow = null;
 
-            window.LocationChanged -= FloatingPropertyWindow_LocationChanged;
-            window.Closed -= FloatingPropertyWindow_Closed;
+            window.LocationChanged -= PropertyWindow_LocationChanged;
+            window.Closed -= PropertyWindow_Closed;
 
             dockingPropertyWindows.Remove(window);
 
             Window mappedWindow;
             var component = window.DataContext as Component;
-            if (component != null && floatingPropertyWindows.TryGetValue(component, out mappedWindow) && mappedWindow == window)
-                floatingPropertyWindows.Remove(component);
+            if (component != null && propertyWindows.TryGetValue(component, out mappedWindow) && mappedWindow == window)
+                propertyWindows.Remove(component);
 
-            UpdateFloatingPropertyWindowDragTimerState();
+            UpdatePropertyWindowDragTimerState();
         }
-        void CloseFloatingPropertyWindow(Window window)
+        void ClosePropertyWindow(Window window)
         {
             if (window == null) return;
             window.Close();
@@ -340,7 +475,7 @@ namespace CrazyStorm
         void CreatePropertyPanel(Component component)
         {
             TabItem item;
-            Window floatingWindow;
+            Window propertyWindow;
             //Prevent from repeating tab of components.  
             for (int i = 2; i < LeftTabControl.Items.Count; ++i)
             {
@@ -352,10 +487,10 @@ namespace CrazyStorm
                     return;
                 }
             }
-            if (floatingPropertyWindows.TryGetValue(component, out floatingWindow))
+            if (propertyWindows.TryGetValue(component, out propertyWindow))
             {
-                if (floatingWindow.WindowState == WindowState.Minimized) floatingWindow.WindowState = WindowState.Normal;
-                floatingWindow.Activate();
+                if (propertyWindow.WindowState == WindowState.Minimized) propertyWindow.WindowState = WindowState.Normal;
+                propertyWindow.Activate();
                 return;
             }
 
@@ -376,7 +511,7 @@ namespace CrazyStorm
                     if (content != null) content.UpdateProperty();
                 }
             }
-            foreach (var window in floatingPropertyWindows.Values)
+            foreach (var window in propertyWindows.Values)
             {
                 var scroll = window.Content as ScrollViewer;
                 if (scroll != null)
@@ -419,11 +554,11 @@ namespace CrazyStorm
             }
 
             var windowsToClose = new List<Window>();
-            foreach (var pair in floatingPropertyWindows)
+            foreach (var pair in propertyWindows)
             {
                 if (!set.Contains(pair.Key)) windowsToClose.Add(pair.Value);
             }
-            foreach (var window in windowsToClose) CloseFloatingPropertyWindow(window);
+            foreach (var window in windowsToClose) ClosePropertyWindow(window);
         }
         void ResetLeftTab()
         {
@@ -578,7 +713,7 @@ namespace CrazyStorm
             if (VisualHelper.VisualUpwardSearch<Button>(e.OriginalSource as DependencyObject) != null) return;
 
             var tabItem = sender as TabItem;
-            if (!IsPropertyTab(tabItem)) return;
+            if (!IsSortableClosableTab(tabItem)) return;
 
             // Only allow tab dragging from the header area, not from PropertyPanel content.
             var point = e.GetPosition(tabItem);
@@ -586,8 +721,9 @@ namespace CrazyStorm
             if (!headerBounds.Contains(point)) return;
 
             draggingPropertyTab = tabItem;
-            propertyTabDragMouseDown = e.GetPosition(this);
-            propertyTabDragStarted = false;
+            tabDragMouseDown = e.GetPosition(this);
+            tabDragPreviewMouseOffset = e.GetPosition(tabItem);
+            tabDragStarted = false;
         }
         private void PropertyTab_PreviewMouseMove(object sender, MouseEventArgs e)
         {
@@ -596,54 +732,66 @@ namespace CrazyStorm
 
             if (e.LeftButton != MouseButtonState.Pressed)
             {
-                ResetPropertyTabDragState();
+                ResetTabDragState();
                 return;
             }
 
             var current = e.GetPosition(this);
-            if (!propertyTabDragStarted)
+            if (!tabDragStarted)
             {
-                if (Math.Abs(current.X - propertyTabDragMouseDown.X) < SystemParameters.MinimumHorizontalDragDistance &&
-                    Math.Abs(current.Y - propertyTabDragMouseDown.Y) < SystemParameters.MinimumVerticalDragDistance)
+                if (Math.Abs(current.X - tabDragMouseDown.X) < SystemParameters.MinimumHorizontalDragDistance &&
+                    Math.Abs(current.Y - tabDragMouseDown.Y) < SystemParameters.MinimumVerticalDragDistance)
                 {
                     return;
                 }
 
-                propertyTabDragStarted = true;
+                tabDragStarted = true;
                 tabItem.CaptureMouse();
+                tabDragPreviewImageSource = CreateTabDragPreviewImageSource(tabItem);
+                ShowTabDragPreview(tabItem, PointToScreen(e.GetPosition(this)));
             }
+
+            UpdateTabDragPreviewPosition(PointToScreen(e.GetPosition(this)));
         }
         private void PropertyTab_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
             var screenPoint = PointToScreen(e.GetPosition(this));
             var tabItem = sender as TabItem;
+            var swapTarget = tabItem != null &&
+                tabItem == draggingPropertyTab &&
+                tabDragStarted &&
+                IsPointInPropertyTabDropBounds(screenPoint)
+                ? GetSwapTabTargetAtScreenPoint(tabItem, screenPoint)
+                : null;
             var shouldFloat = tabItem != null &&
                 tabItem == draggingPropertyTab &&
-                propertyTabDragStarted &&
+                tabDragStarted &&
+                IsPropertyTab(tabItem) &&
                 !IsPointInPropertyTabDropBounds(screenPoint);
 
-            ResetPropertyTabDragState();
+            ResetTabDragState();
 
             if (shouldFloat) FloatPropertyTab(tabItem, screenPoint);
+            else if (swapTarget != null) SwapTabs(tabItem, swapTarget);
         }
         private void PropertyTab_LostMouseCapture(object sender, MouseEventArgs e)
         {
-            if (sender == draggingPropertyTab) ResetPropertyTabDragState();
+            if (sender == draggingPropertyTab) ResetTabDragState();
         }
-        private void FloatingPropertyWindow_LocationChanged(object sender, EventArgs e)
+        private void PropertyWindow_LocationChanged(object sender, EventArgs e)
         {
             var window = sender as Window;
             if (window == null || dockingPropertyWindows.Contains(window)) return;
 
             draggingPropertyWindow = window;
-            floatingPropertyWindowLastMoveTime = DateTime.Now;
-            EnsureFloatingPropertyWindowDragTimer();
+            propertyWindowLastMoveTime = DateTime.Now;
+            EnsurePropertyWindowDragTimer();
         }
-        private void FloatingPropertyWindowDragTimer_Tick(object sender, EventArgs e)
+        private void PropertyWindowDragTimer_Tick(object sender, EventArgs e)
         {
-            if (floatingPropertyWindows.Count == 0)
+            if (propertyWindows.Count == 0)
             {
-                UpdateFloatingPropertyWindowDragTimerState();
+                UpdatePropertyWindowDragTimerState();
                 draggingPropertyWindow = null;
                 return;
             }
@@ -651,20 +799,20 @@ namespace CrazyStorm
             var window = draggingPropertyWindow;
             if (window == null || dockingPropertyWindows.Contains(window)) return;
 
-            if ((DateTime.Now - floatingPropertyWindowLastMoveTime).TotalMilliseconds < 120) return;
+            if ((DateTime.Now - propertyWindowLastMoveTime).TotalMilliseconds < 120) return;
 
             draggingPropertyWindow = null;
 
-            if (IsFloatingPropertyWindowInPropertyTabDropBounds(window)) ReDockPropertyWindow(window);
+            if (IsPropertyWindowInPropertyTabDropBounds(window)) ReDockPropertyWindow(window);
         }
-        private void FloatingPropertyWindow_Closed(object sender, EventArgs e)
+        private void PropertyWindow_Closed(object sender, EventArgs e)
         {
-            CleanupFloatingPropertyWindow(sender as Window);
+            CleanupPropertyWindow(sender as Window);
         }
         private void TabClose_Click(object sender, RoutedEventArgs e)
         {
             var tabItem = VisualHelper.VisualUpwardSearch<TabItem>(sender as DependencyObject) as TabItem;
-            if (tabItem == draggingPropertyTab) ResetPropertyTabDragState();
+            if (tabItem == draggingPropertyTab) ResetTabDragState();
             DetachPropertyTabHandlers(tabItem);
             LeftTabControl.Items.Remove(tabItem);
             ResetLeftTab();
