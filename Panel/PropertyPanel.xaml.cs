@@ -222,13 +222,10 @@ namespace CrazyStorm
             window.ShowDialog();
             window.Close();
         }
-        void ShowIntellisense(PropertyContainer container, DataGridBeginningEditEventArgs e)
+        void ShowIntellisense(PropertyGridItem property, UIElement element)
         {
-            var property = e.Row.Item as PropertyGridItem;
-            var presenter = VisualHelper.GetVisualChild<DataGridCellsPresenter>(e.Row);
-            var cell = (DataGridCell)presenter.ItemContainerGenerator.ContainerFromIndex(1);
             popup = new Popup();
-            UIHelper.ShowIntellisense(popup, property.Info.PropertyType, cell);
+            UIHelper.ShowIntellisense(popup, property.Info.PropertyType, element, UIHelper.BuildExpressionIntellisenseItems(environment));
         }
         void HideIntellisense()
         {
@@ -340,7 +337,7 @@ namespace CrazyStorm
         private void Grid_BeginningEdit(object sender, DataGridBeginningEditEventArgs e)
         {
             var item = e.Row.Item as PropertyGridItem;
-            if (item.ReadOnly)
+            if (item != null && item.ReadOnly)
             {
                 e.Cancel = true;
                 return;
@@ -361,7 +358,6 @@ namespace CrazyStorm
         private void ComponentGrid_BeginningEdit(object sender, DataGridBeginningEditEventArgs e)
         {
             Grid_BeginningEdit(sender, e);
-            ShowIntellisense(component, e);
         }
         private void ComponentGrid_CellEditEnding(object sender, DataGridCellEditEndingEventArgs e)
         {
@@ -374,7 +370,12 @@ namespace CrazyStorm
         private void ParticleGrid_BeginningEdit(object sender, DataGridBeginningEditEventArgs e)
         {
             Grid_BeginningEdit(sender, e);
-            ShowIntellisense((component as Emitter).InitialTemplate, e);
+        }
+        private void PropertyGrid_PreparingCellForEdit(object sender, DataGridPreparingCellForEditEventArgs e)
+        {
+            var property = e.Row.Item as PropertyGridItem;
+            if (property == null) return;
+            ShowIntellisense(property, e.EditingElement);
         }
         private void ParticleGrid_CellEditEnding(object sender, DataGridCellEditEndingEventArgs e)
         {

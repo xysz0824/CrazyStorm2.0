@@ -430,8 +430,10 @@ namespace CrazyStorm
             {
                 var item = LeftConditionComboBox.SelectedItem as VariableComboBoxItem;
                 object value = Environment.GetProperty(item.Name);
+                if (value == null) value = Environment.GetLocal(item.Name);
+                if (value == null) value = Environment.GetGlobal(item.Name);
                 popup = new Popup();
-                UIHelper.ShowIntellisense(popup, value.GetType(), LeftValue);
+                UIHelper.ShowIntellisense(popup, value != null ? value.GetType() : typeof(float), LeftValue, UIHelper.BuildExpressionIntellisenseItems(Environment));
             }
         }
         private void LeftValue_PreviewLostKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
@@ -448,8 +450,10 @@ namespace CrazyStorm
             {
                 var item = RightConditionComboBox.SelectedItem as VariableComboBoxItem;
                 object value = Environment.GetProperty(item.Name);
+                if (value == null) value = Environment.GetLocal(item.Name);
+                if (value == null) value = Environment.GetGlobal(item.Name);
                 popup = new Popup();
-                UIHelper.ShowIntellisense(popup, value.GetType(), RightValue);
+                UIHelper.ShowIntellisense(popup, value != null ? value.GetType() : typeof(float), RightValue, UIHelper.BuildExpressionIntellisenseItems(Environment));
             }
         }
         private void RightValue_PreviewLostKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
@@ -565,6 +569,11 @@ namespace CrazyStorm
             {
                 ConditionChanged?.Invoke(this, new ConditionChangedEventArgs(condition));
             }
+        }
+        private void ConditionFunctionContent_PreviewGotKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
+        {
+            popup = new Popup();
+            UIHelper.ShowIntellisense(popup, null, ConditionFunctionContent, UIHelper.BuildExpressionIntellisenseItems(Environment));
         }
         private void ConditionFunctionContent_KeyDown(object sender, KeyEventArgs e)
         {

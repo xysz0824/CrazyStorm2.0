@@ -420,7 +420,13 @@ namespace CrazyStorm
         void ShowIntellisense(object property, UIElement element)
         {
             popup = new Popup();
-            UIHelper.ShowIntellisense(popup, property.GetType(), element);
+            var type = property != null ? property.GetType() : typeof(float);
+            UIHelper.ShowIntellisense(popup, type, element, UIHelper.BuildExpressionIntellisenseItems(environment));
+        }
+        void ShowExpressionIntellisense(UIElement element)
+        {
+            popup = new Popup();
+            UIHelper.ShowIntellisense(popup, null, element, UIHelper.BuildExpressionIntellisenseItems(environment));
         }
         void HideIntellisense()
         {
@@ -607,8 +613,14 @@ namespace CrazyStorm
             {
                 var item = PropertyComboBox.SelectedItem as VariableComboBoxItem;
                 object value = environment.GetProperty(item.Name);
+                if (value == null) value = environment.GetLocal(item.Name);
+                if (value == null) value = environment.GetGlobal(item.Name);
                 ShowIntellisense(value, ResultValue);
             }
+        }
+        private void ExpressionTextBox_PreviewGotKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
+        {
+            ShowExpressionIntellisense(sender as UIElement);
         }
         private void ResultValue_PreviewLostKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
         {
@@ -676,6 +688,7 @@ namespace CrazyStorm
         }
         private void StopCondition_PreviewLostKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
         {
+            HideIntellisense();
             UIHelper.SetErrorToolTip(StopCondition, null);
             StopCondition.Text = StopCondition.Text.Trim();
             string input = ExpressionHelper.ReverseTranslate(StopCondition.Text);
@@ -696,6 +709,7 @@ namespace CrazyStorm
         }
         private void OtherFunctionLine_PreviewLostKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
         {
+            HideIntellisense();
             UIHelper.SetErrorToolTip(OtherFunctionLine, null);
             OtherFunctionLine.Text = OtherFunctionLine.Text.Trim();
             string input = ExpressionHelper.ReverseTranslate(OtherFunctionLine.Text);
@@ -723,6 +737,7 @@ namespace CrazyStorm
         private void GlobalEventParamValue_PreviewLostKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
         {
             var textBox = sender as TextBox;
+            HideIntellisense();
             UIHelper.SetErrorToolTip(textBox, null);
             textBox.Text = textBox.Text.Trim();
             if (String.IsNullOrEmpty(textBox.Text)) return;

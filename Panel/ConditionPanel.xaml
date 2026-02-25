@@ -140,7 +140,7 @@
                 <Path Data="{StaticResource ConditionMenu_Icon}" Fill="Black" Width="14" Height="14" Stretch="Uniform"/>
             </Button>
             <TextBox Name="ConditionFunctionContent" Text="" VerticalContentAlignment="Center" Background="White" MaxLines="1" 
-                 PreviewLostKeyboardFocus="ConditionFunctionContent_PreviewLostKeyboardFocus" KeyDown="ConditionFunctionContent_KeyDown"/>
+                 PreviewLostKeyboardFocus="ConditionFunctionContent_PreviewLostKeyboardFocus" PreviewGotKeyboardFocus="ConditionFunctionContent_PreviewGotKeyboardFocus" KeyDown="ConditionFunctionContent_KeyDown"/>
         </DockPanel>
     </StackPanel>
 </UserControl>

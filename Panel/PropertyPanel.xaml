@@ -11,6 +11,7 @@
             <DataGrid Name="ComponentGrid" ItemsSource="{Binding}" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" PreviewMouseWheel="Grid_PreviewMouseWheel"
                           GridLinesVisibility="Horizontal" ColumnWidth="Auto" SelectionMode="Single" AutoGenerateColumns="False"  CanUserAddRows="False" CanUserReorderColumns="False" CanUserSortColumns="False" 
                       CanUserResizeRows="False" CellEditEnding="ComponentGrid_CellEditEnding" CanUserDeleteRows="False" BeginningEdit="ComponentGrid_BeginningEdit"
+                      PreparingCellForEdit="PropertyGrid_PreparingCellForEdit"
                       HorizontalGridLinesBrush="{DynamicResource GroupBorderBrush}" BorderBrush="{DynamicResource GroupBorderBrush}" Background="{DynamicResource ListBrush}">
                 <DataGrid.Columns>
                     <DataGridTextColumn x:Name="ComponentKey" Header="{StaticResource PropertyNameStr}" IsReadOnly="True" Binding="{Binding DisplayName}" CanUserResize="False">
@@ -51,6 +52,7 @@
             <DataGrid Name="SpecificGrid" ItemsSource="{Binding}" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" PreviewMouseWheel="Grid_PreviewMouseWheel"
                           GridLinesVisibility="Horizontal" ColumnWidth="Auto" SelectionMode="Single" AutoGenerateColumns="False"  CanUserAddRows="False" CanUserReorderColumns="False" CanUserSortColumns="False" 
                       CanUserResizeRows="False" CellEditEnding="ComponentGrid_CellEditEnding" CanUserDeleteRows="False" BeginningEdit="ComponentGrid_BeginningEdit"
+                      PreparingCellForEdit="PropertyGrid_PreparingCellForEdit"
                       HorizontalGridLinesBrush="{DynamicResource GroupBorderBrush}" BorderBrush="{DynamicResource GroupBorderBrush}" Background="{DynamicResource ListBrush}">
                 <DataGrid.Columns>
                     <DataGridTextColumn x:Name="SpecificKey" Header="{StaticResource PropertyNameStr}" IsReadOnly="True" Binding="{Binding DisplayName}" CanUserResize="False">
@@ -113,6 +115,7 @@
                           GridLinesVisibility="Horizontal" ColumnWidth="Auto" SelectionMode="Single" AutoGenerateColumns="False"  CanUserAddRows="False" 
                           CanUserReorderColumns="False" CanUserSortColumns="False" ScrollViewer.CanContentScroll="False" CanUserResizeRows="False" 
                           CellEditEnding="ParticleGrid_CellEditEnding" CanUserDeleteRows="False" BeginningEdit="ParticleGrid_BeginningEdit"
+                          PreparingCellForEdit="PropertyGrid_PreparingCellForEdit"
                           HorizontalGridLinesBrush="{DynamicResource GroupBorderBrush}" BorderBrush="{DynamicResource GroupBorderBrush}" Background="{DynamicResource ListBrush}">
                     <DataGrid.Columns>
                         <DataGridTextColumn x:Name="ParticleKey"  Header="{StaticResource PropertyNameStr}" IsReadOnly="True" Binding="{Binding DisplayName}" CanUserResize="False">
