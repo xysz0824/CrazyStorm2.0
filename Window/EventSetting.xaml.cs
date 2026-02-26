@@ -719,12 +719,14 @@ namespace CrazyStorm
                 var lexer = new Lexer();
                 lexer.Load(input);
                 var syntaxTree = new Parser(lexer).Expression();
-                if (!(syntaxTree is Call)) throw new ExpressionException("IllegalInput");
-                var arguments = (syntaxTree as Call).GetArguments() as Arguments;
+                var call = syntaxTree as Call;
+                if (call == null) throw new ExpressionException("IllegalInput");
+                var arguments = call.GetArguments() as Arguments;
                 foreach (var argument in arguments.GetArguments())
                 {
+                    if (argument is Name) continue;
                     var result = argument.Eval(environment);
-                    if (!(result is int) && !(result is float) && !(result is bool)) 
+                    if (!(result is int) && !(result is float) && !(result is bool))
                         throw new ExpressionException("TypeError");
                 }
                 EditSpecialEvent();

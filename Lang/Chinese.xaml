@@ -169,6 +169,7 @@
     <sys:String x:Key="DecreaseStr">减少</sys:String>
     <sys:String x:Key="EmitParticleStr">发射粒子</sys:String>
     <sys:String x:Key="PlaySoundStr">播放音效</sys:String>
+    <sys:String x:Key="StopSoundStr">停止音效</sys:String>
     <sys:String x:Key="LoopStr">循环执行</sys:String>
     <sys:String x:Key="ChangeTypeStr">改变类型</sys:String>
     <sys:String x:Key="IncreaseTypeStr">递增类型</sys:String>

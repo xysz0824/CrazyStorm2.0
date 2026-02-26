@@ -30,6 +30,17 @@ namespace CrazyStorm.Core
                     }
                     return false;
                 } },
+                { "StopSound", (pc, expr, frameScale) =>
+                {
+                    if (OnSoundStop != null)
+                    {
+                        VM.Execute(pc, expr[0], frameScale);
+                        var label = VM.PopString();
+                        var sound = pc.System.Sounds?.FirstOrDefault((item) => string.Equals(item.Label, label));
+                        if (sound != null) OnSoundStop(sound.AbsolutePath);
+                    }
+                    return false;
+                } },
                 { "Loop", (pc, expr, frameScale) =>
                 {
                     VM.Execute(pc, expr[0], frameScale);
@@ -156,12 +167,14 @@ namespace CrazyStorm.Core
         public static Func<string, PropertyContainer, VMInstruction[][], float, bool> OnFunctionCall;
         public delegate void SoundPlayHandler(string path);
         public static event SoundPlayHandler OnSoundPlay;
+        public static event SoundPlayHandler OnSoundStop;
         public static bool CanSoundPlay => OnSoundPlay != null;
 
         static List<EventExecutor> executorList;
         public static void Initialize()
         {
             OnSoundPlay = null;
+            OnSoundStop = null;
             executorList = new List<EventExecutor>();
         }
         public static void AddEvent(PropertyContainer propertyContainer, PropertyContainer bindingContainer, VMEventInfo eventInfo, 
@@ -303,6 +316,10 @@ namespace CrazyStorm.Core
         public static void PlaySound(string path)
         {
             OnSoundPlay?.Invoke(path);
+        }
+        public static void StopSound(string path)
+        {
+            OnSoundStop?.Invoke(path);
         }
     }
 }

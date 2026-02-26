@@ -54,6 +54,7 @@ namespace CrazyStorm_Player
         Texture2D defaultTexture;
         Dictionary<File, Dictionary<int, Texture2D>> customTextures;
         Dictionary<string, SoundEffect> sounds;
+        Dictionary<string, SoundEffectInstance> soundInstances;
         Texture2D characterTexture;
         Texture2D pointTexture;
         Texture2D slowModeTexture;
@@ -203,9 +204,11 @@ namespace CrazyStorm_Player
             Environment.CurrentDirectory = AppDomain.CurrentDomain.SetupInformation.ApplicationBase;
             //sounds
             sounds = new Dictionary<string, SoundEffect>();
+            soundInstances = new Dictionary<string, SoundEffectInstance>();
             //final
             ForceField.OnForceImpactBody += ForceImpactBody;
             EventManager.OnSoundPlay += PlaySound;
+            EventManager.OnSoundStop += StopSound;
             ParticleManager.OnLayerDraw += DrawLayer;
             ParticleManager.OnParticleDraw += (particle) => DrawParticle(spriteBatch, particle);
             ParticleManager.OnCurveParticleDraw += (particle) => DrawCurveParticle(spriteBatch, curveBatch, particle);
@@ -223,6 +226,7 @@ namespace CrazyStorm_Player
         {
             ForceField.OnForceImpactBody -= ForceImpactBody;
             EventManager.OnSoundPlay -= PlaySound;
+            EventManager.OnSoundStop -= StopSound;
             ParticleManager.OnLayerDraw -= DrawLayer;
             spriteBatch?.Dispose();
             background?.Dispose();
@@ -235,6 +239,15 @@ namespace CrazyStorm_Player
                 }
             }
             customTextures.Clear();
+            if (soundInstances != null)
+            {
+                foreach (var instance in soundInstances.Values)
+                {
+                    instance?.Stop();
+                    instance?.Dispose();
+                }
+                soundInstances.Clear();
+            }
             foreach (var sound in sounds.Values) sound?.Dispose();
             sounds.Clear();
             characterTexture?.Dispose();
@@ -255,7 +268,21 @@ namespace CrazyStorm_Player
                     sounds[path] = SoundEffect.FromStream(stream);
                 }
             }
-            sounds[path].Play(0.5f, 0f, 0f);
+            if (!soundInstances.ContainsKey(path))
+            {
+                soundInstances[path] = sounds[path].CreateInstance();
+            }
+            var soundInstance = soundInstances[path];
+            soundInstance.Volume = 0.5f;
+            soundInstance.Pitch = 0f;
+            soundInstance.Pan = 0f;
+            soundInstance.Stop();
+            soundInstance.Play();
+        }
+        void StopSound(string path)
+        {
+            if (soundInstances == null || !soundInstances.ContainsKey(path)) return;
+            soundInstances[path]?.Stop();
         }
         void DrawLayer(ParticleSystem system, Layer layer, BlendType blendType)
         {
