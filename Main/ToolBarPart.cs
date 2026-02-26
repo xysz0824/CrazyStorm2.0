@@ -3,6 +3,7 @@
  * Copyright (c) StarX 2026
  */
 using System;
+using System.Diagnostics;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -15,6 +16,8 @@ namespace CrazyStorm
 {
     partial class Main
     {
+        private const string ProjectRepositoryUrl = "https://github.com/xysz0824/CrazyStorm2.0";
+
         #region Window EventHandlers
         private void ToolBar_Loaded(object sender, RoutedEventArgs e)
         {
@@ -24,6 +27,21 @@ namespace CrazyStorm
             {
                 overflowGrid.Visibility = Visibility.Hidden;
             }   
+        }
+        private void AboutItem_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                Process.Start(new ProcessStartInfo(ProjectRepositoryUrl)
+                {
+                    UseShellExecute = true
+                });
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, (string)FindResource("ErrorTitleStr"),
+                    MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
         #endregion
     }

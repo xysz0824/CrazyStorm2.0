@@ -439,7 +439,7 @@
                     <TextBlock Text="{StaticResource HelpStr}" Foreground="{DynamicResource TextBrush}" />
                 </MenuItem.Header>
                 <MenuItem Header="{StaticResource TutorialStr}" InputGestureText="F1"/>
-                <MenuItem Header="{StaticResource AboutStr}" />
+                <MenuItem Header="{StaticResource AboutStr}" Click="AboutItem_Click" />
             </MenuItem>
         </Menu>
         <!-- Status Bar -->
