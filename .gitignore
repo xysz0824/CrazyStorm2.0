@@ -5,3 +5,5 @@ obj/
 .vs/
 packages/
 *.user
+AGENTS.md
+.codex/

@@ -57,6 +57,8 @@
     <sys:String x:Key="SetPlayStr">播放设置</sys:String>
     <sys:String x:Key="HelpStr">帮助</sys:String>
     <sys:String x:Key="TutorialStr">教程</sys:String>
+    <sys:String x:Key="TutorialNotFoundStr">未找到教程页面，请确认以下路径存在：{0}</sys:String>
+    <sys:String x:Key="TutorialOpenFailedStr">打开教程失败：{0}</sys:String>
     <sys:String x:Key="AboutStr">关于</sys:String>
     <sys:String x:Key="SelectedStr">已选中</sys:String>
     <sys:String x:Key="ComponentBoardStr">组件板</sys:String>

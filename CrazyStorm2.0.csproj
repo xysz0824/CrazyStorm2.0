@@ -423,6 +423,15 @@
   <Target Name="EnsureLibraryFolder" BeforeTargets="Build">
     <MakeDir Directories="$(TargetDir)typelibrary" Condition="!Exists('$(TargetDir)typelibrary')" />
   </Target>
+  <Target Name="BuildDocs" BeforeTargets="Build" Condition="'$(DesignTimeBuild)' != 'true' and Exists('$(MSBuildProjectDirectory)\Docs\build.ps1')">
+    <Exec Command="powershell -NoProfile -ExecutionPolicy Bypass -File &quot;$(MSBuildProjectDirectory)\Docs\build.ps1&quot;" WorkingDirectory="$(MSBuildProjectDirectory)\Docs" />
+  </Target>
+  <Target Name="CopyDocsToOutput" AfterTargets="Build" Condition="'$(DesignTimeBuild)' != 'true' and Exists('$(MSBuildProjectDirectory)\Docs')">
+    <ItemGroup>
+      <_DocsToCopy Include="$(MSBuildProjectDirectory)\Docs\**\*.*" Exclude="$(MSBuildProjectDirectory)\Docs\source\**\*.*;$(MSBuildProjectDirectory)\Docs\build.ps1;$(MSBuildProjectDirectory)\Docs\README.md" />
+    </ItemGroup>
+    <Copy SourceFiles="@(_DocsToCopy)" DestinationFiles="@(_DocsToCopy->'$(TargetDir)Docs\%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" />
+  </Target>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

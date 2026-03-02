@@ -267,6 +267,7 @@
         <RoutedUICommand x:Key="SaveTo" Text="SaveTo"/>
         <RoutedUICommand x:Key="PlayCurrent" Text="PlayCurrent"/>
         <RoutedUICommand x:Key="JumpToFrame" Text="JumpToFrame"/>
+        <RoutedUICommand x:Key="OpenTutorial" Text="OpenTutorial"/>
     </Window.Resources>
     <Window.InputBindings>
         <KeyBinding  Key="Delete" Command="{StaticResource DelComponent}" />
@@ -289,6 +290,7 @@
         <KeyBinding   Modifiers="Control+Shift"  Key="S" Command="{StaticResource SaveTo}" />
         <KeyBinding   Key="F5" Command="{StaticResource PlayCurrent}" />
         <KeyBinding   Modifiers="Control" Key="G" Command="{StaticResource JumpToFrame}" />
+        <KeyBinding   Key="F1" Command="{StaticResource OpenTutorial}" />
     </Window.InputBindings>
     <Window.CommandBindings>
         <CommandBinding Command="{StaticResource DelComponent}"
@@ -351,6 +353,9 @@
         <CommandBinding Command="{StaticResource JumpToFrame}"
                                     CanExecute="CommandBinding_CanExecute"
                                     Executed="CommandBinding_Executed" />
+        <CommandBinding Command="{StaticResource OpenTutorial}"
+                                    CanExecute="OpenTutorialCommand_CanExecute"
+                                    Executed="OpenTutorialCommand_Executed" />
     </Window.CommandBindings>
     <DockPanel Height="Auto" Width="Auto">
         <!-- Top Menu -->
@@ -438,7 +443,7 @@
                 <MenuItem.Header>
                     <TextBlock Text="{StaticResource HelpStr}" Foreground="{DynamicResource TextBrush}" />
                 </MenuItem.Header>
-                <MenuItem Header="{StaticResource TutorialStr}" InputGestureText="F1"/>
+                <MenuItem Header="{StaticResource TutorialStr}" InputGestureText="F1" Click="TutorialItem_Click"/>
                 <MenuItem Header="{StaticResource AboutStr}" Click="AboutItem_Click" />
             </MenuItem>
         </Menu>
