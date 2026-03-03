@@ -1,0 +1,14 @@
+{%- if pagename != "search" %}
+{%- set ui = cs_ui_text | default({}) %}
+{%- set submit_label = ui.get("search_submit", "Search") %}
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">{{ _('Quick search') }}</h3>
+  <div class="searchformwrapper">
+    <form class="search" action="{{ pathto('search') }}" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
+      <input type="submit" value="{{ submit_label }}" />
+    </form>
+  </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block";</script>
+{%- endif %}

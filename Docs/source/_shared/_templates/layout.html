@@ -1,0 +1,120 @@
+﻿{%- extends "!layout.html" %}
+
+{%- block content %}
+{%- if theme_fixed_sidebar|lower == 'true' %}
+  <div class="document">
+    {%- set ui = cs_ui_text | default({}) %}
+    {%- set home_label = ui.get("home_label", "Home") %}
+    {%- set breadcrumb_label = ui.get("breadcrumb_label", "Breadcrumb") %}
+    {%- set language_switcher_label = ui.get("language_switcher_label", "Language switcher") %}
+    {%- set page_nav_label = ui.get("page_nav_label", "Page navigation") %}
+    {%- set page_nav_prev = ui.get("page_nav_prev", "Previous") %}
+    {%- set page_nav_next = ui.get("page_nav_next", "Next") %}
+    {%- set mobile_nav_open = ui.get("mobile_nav_open", "Open navigation") %}
+    {%- set mobile_nav_close = ui.get("mobile_nav_close", "Close navigation") %}
+    {%- set mobile_nav_label = ui.get("mobile_nav_label", "Mobile navigation") %}
+    {{ sidebar() }}
+    <div class="cs-mobile-topbar" role="navigation" aria-label="{{ mobile_nav_label }}">
+      <button class="cs-mobile-nav-toggle" type="button" aria-expanded="false" aria-label="{{ mobile_nav_open }}">
+        <span class="cs-mobile-nav-toggle-icon" aria-hidden="true"></span>
+      </button>
+      <a class="cs-mobile-topbar-home" href="{{ pathto(root_doc)|e }}" aria-label="{{ home_label }}">{{ project|striptags }}</a>
+    </div>
+    <button class="cs-mobile-nav-backdrop" type="button" tabindex="-1" aria-label="{{ mobile_nav_close }}" aria-hidden="true"></button>
+    {%- block document %}
+      <div class="documentwrapper">
+      {%- if render_sidebar %}
+        <div class="bodywrapper">
+      {%- endif %}
+
+          {%- block relbar_top %}{% endblock %}
+
+          <div class="body" role="main">
+            <script>window.CS_DOC_I18N = {{ cs_ui_text_json | default('{}') | safe }};</script>
+            {%- set body_ui = cs_ui_text | default({}) %}
+            {%- set home_label = body_ui.get("home_label", "Home") %}
+            {%- set breadcrumb_label = body_ui.get("breadcrumb_label", "Breadcrumb") %}
+            {%- set language_switcher_label = body_ui.get("language_switcher_label", "Language switcher") %}
+            {%- set page_nav_label = body_ui.get("page_nav_label", "Page navigation") %}
+            {%- set page_nav_prev = body_ui.get("page_nav_prev", "Previous") %}
+            {%- set page_nav_next = body_ui.get("page_nav_next", "Next") %}
+            {%- set is_search_page = pagename == "search" %}
+            {%- set is_root_page = pagename == root_doc %}
+            {%- set show_language_switcher = cs_language_links and (cs_language_links | length > 0) %}
+            {%- if show_language_switcher or (not is_search_page) %}
+            <div class="cs-body-topbar">
+            {%- if not is_search_page %}
+            <nav class="cs-breadcrumb" aria-label="{{ breadcrumb_label }}">
+              <ul class="cs-breadcrumb-list">
+                <li>
+                  <a class="cs-breadcrumb-home" href="{{ pathto(root_doc)|e }}" aria-label="{{ home_label }}">&#127968;</a>
+                </li>
+                {%- if not is_root_page %}
+                  {%- for parent in parents %}
+                <li class="cs-breadcrumb-sep" aria-hidden="true">&gt;&gt;</li>
+                <li>
+                  <a href="{{ parent.link|e }}">{{ parent.title }}</a>
+                </li>
+                  {%- endfor %}
+                <li class="cs-breadcrumb-sep" aria-hidden="true">&gt;&gt;</li>
+                <li class="cs-breadcrumb-current">{{ title|striptags }}</li>
+                {%- endif %}
+              </ul>
+            </nav>
+            {%- endif %}
+            {%- if show_language_switcher %}
+            <nav class="cs-language-switcher" aria-label="{{ language_switcher_label }}">
+              <ul class="cs-language-switcher-list">
+                {%- for language_item in cs_language_links %}
+                <li>
+                  {%- if language_item.is_current %}
+                  <span class="cs-language-switcher-current">{{ language_item.label }}</span>
+                  {%- else %}
+                  <a href="{{ language_item.href|e }}">{{ language_item.label }}</a>
+                  {%- endif %}
+                </li>
+                {%- endfor %}
+              </ul>
+            </nav>
+            {%- endif %}
+            </div>
+            {%- endif %}
+            {% block body %} {% endblock %}
+            {%- if not is_search_page and (prev or next) %}
+            <nav class="cs-page-nav" aria-label="{{ page_nav_label }}">
+              {%- if prev %}
+              <a class="cs-page-nav-link cs-page-nav-prev" href="{{ prev.link|e }}">
+                <span class="cs-page-nav-label">{{ page_nav_prev }}</span>
+                <span class="cs-page-nav-title">{{ prev.title }}</span>
+              </a>
+              {%- endif %}
+              {%- if next %}
+              <a class="cs-page-nav-link cs-page-nav-next" href="{{ next.link|e }}">
+                <span class="cs-page-nav-label">{{ page_nav_next }}</span>
+                <span class="cs-page-nav-title">{{ next.title }}</span>
+              </a>
+              {%- endif %}
+            </nav>
+            {%- endif %}
+          </div>
+
+          {%- block relbar_bottom %}
+            {%- if theme_show_relbar_bottom|tobool %}
+              <div class="related bottom">
+                &nbsp;
+                {{- rellink_markup () }}
+              </div>
+            {%- endif %}
+          {% endblock %}
+
+      {%- if render_sidebar %}
+        </div>
+      {%- endif %}
+      </div>
+    {%- endblock %}
+    <div class="clearer"></div>
+  </div>
+{%- else %}
+{{ super() }}
+{%- endif %}
+{%- endblock %}
