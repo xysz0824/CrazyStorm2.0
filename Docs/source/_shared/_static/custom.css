@@ -116,6 +116,7 @@ div.sphinxsidebar .cs-doc-version {
   margin: 0 8px 14px;
   color: var(--text-side-muted);
   font-size: 12px;
+  text-align: center;
 }
 
 div.sphinxsidebar a {
@@ -698,6 +699,39 @@ div.footer a {
     box-shadow: 8px 0 22px rgba(4, 14, 22, 0.45);
   }
 
+  div.sphinxsidebarwrapper {
+    padding-top: 8px;
+  }
+
+  div.sphinxsidebarwrapper::before {
+    display: none;
+  }
+
+  div.sphinxsidebar p.logo,
+  div.sphinxsidebar h1.logo,
+  div.sphinxsidebar .cs-doc-version,
+  div.sphinxsidebar #searchbox {
+    display: none !important;
+  }
+
+  div.sphinxsidebarwrapper > h3 + p.caption {
+    margin-top: 8px;
+  }
+
+  div.sphinxsidebar p.caption {
+    font-size: 12px;
+  }
+
+  div.sphinxsidebar li.toctree-l1 > a {
+    font-size: 16px;
+    padding: 10px 34px 10px 12px;
+  }
+
+  div.sphinxsidebar li.toctree-l2 > a {
+    font-size: 15px;
+    padding: 8px 12px;
+  }
+
   html.cs-mobile-nav-open div.sphinxsidebar {
     transform: translateX(0);
   }
@@ -720,14 +754,25 @@ div.footer a {
     margin-top: 0;
   }
 
+  div.body .cs-page-nav {
+    flex-wrap: nowrap;
+  }
+
   div.body .cs-page-nav-link {
-    max-width: 100%;
+    flex: 1 1 0;
+    max-width: none;
     min-width: 0;
-    width: 100%;
+    width: auto;
+  }
+
+  div.body .cs-page-nav-prev {
+    margin-right: 0;
+    text-align: left;
   }
 
   div.body .cs-page-nav-next {
-    text-align: left;
+    margin-left: 0;
+    text-align: right;
   }
 
   div.footer {

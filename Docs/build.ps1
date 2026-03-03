@@ -1,5 +1,4 @@
 param(
-    [ValidateSet("zh-cn", "en", "all")]
     [string]$Language = "all",
     [switch]$Clean,
     [switch]$CleanOnly,
@@ -11,9 +10,33 @@ $ErrorActionPreference = "Stop"
 $docsRoot = Split-Path -Parent $MyInvocation.MyCommand.Path
 $sourceRoot = Join-Path $docsRoot "source"
 
-$targets = @($Language)
-if ($Language -eq "all") {
-    $targets = @("zh-cn", "en")
+function Get-AvailableLanguageTargets {
+    param(
+        [string]$SourceRoot
+    )
+
+    if (-not (Test-Path $SourceRoot)) {
+        return @()
+    }
+
+    return @(Get-ChildItem -Path $SourceRoot -Directory |
+        Where-Object {
+            -not $_.Name.StartsWith("_") -and
+            -not $_.Name.StartsWith(".") -and
+            (Test-Path (Join-Path $_.FullName "index.rst"))
+        } |
+        Select-Object -ExpandProperty Name |
+        Sort-Object -Unique)
+}
+
+$requestedLanguage = $Language
+if ([string]::IsNullOrWhiteSpace($requestedLanguage)) {
+    $requestedLanguage = "all"
+}
+
+$targets = @($requestedLanguage)
+if ($requestedLanguage -eq "all") {
+    $targets = Get-AvailableLanguageTargets -SourceRoot $sourceRoot
 }
 
 if ($CleanOnly -and $InstallSphinx) {
@@ -139,18 +162,12 @@ foreach ($lang in $targets) {
         continue
     }
 
-    $buildLanguage = $lang
-    $searchLanguage = "en"
-    switch ($lang) {
-        "zh-cn" {
-            $buildLanguage = "zh_CN"
-            $searchLanguage = "zh"
-            Ensure-PythonPackage -PythonCommand $pythonCmd -ModuleName "jieba" -PackageName "jieba"
-        }
-        "en" {
-            $buildLanguage = "en"
-            $searchLanguage = "en"
-        }
+    $normalizedLanguage = $lang.ToLowerInvariant()
+    $buildLanguage = $normalizedLanguage.Replace("-", "_")
+    $searchLanguage = ($normalizedLanguage -split "-", 2)[0]
+    if ($normalizedLanguage.StartsWith("zh")) {
+        $searchLanguage = "zh"
+        Ensure-PythonPackage -PythonCommand $pythonCmd -ModuleName "jieba" -PackageName "jieba"
     }
 
     $langOutput = Join-Path $docsRoot $lang

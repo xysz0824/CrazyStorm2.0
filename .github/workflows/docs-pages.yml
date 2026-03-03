@@ -1,0 +1,86 @@
+name: docs-pages
+
+on:
+  push:
+    branches:
+      - master
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install docs dependencies
+        shell: pwsh
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install sphinx jieba
+
+      - name: Build docs
+        shell: pwsh
+        run: ./Docs/build.ps1 -Clean
+
+      - name: Validate docs outputs
+        shell: pwsh
+        run: |
+          $rootIndex = "Docs/index.html"
+          if (-not (Test-Path $rootIndex)) {
+            throw "Required docs output is missing: $rootIndex"
+          }
+
+          $sourceRoot = "Docs/source"
+          $languageDirs = Get-ChildItem -Path $sourceRoot -Directory |
+            Where-Object {
+              -not $_.Name.StartsWith("_") -and
+              -not $_.Name.StartsWith(".") -and
+              (Test-Path (Join-Path $_.FullName "index.rst"))
+            } |
+            Select-Object -ExpandProperty Name
+
+          if (-not $languageDirs) {
+            throw "No language source directories found under $sourceRoot."
+          }
+
+          foreach ($lang in $languageDirs) {
+            $langIndex = Join-Path "Docs" (Join-Path $lang "index.html")
+            if (-not (Test-Path $langIndex)) {
+              throw "Missing language docs output for '$lang': $langIndex"
+            }
+          }
+
+      - name: Create .nojekyll
+        shell: pwsh
+        run: New-Item -ItemType File -Path "Docs/.nojekyll" -Force | Out-Null
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: Docs
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

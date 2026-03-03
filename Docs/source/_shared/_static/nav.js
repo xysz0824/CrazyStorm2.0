@@ -31,12 +31,12 @@
 
         normalizeSearchSubmitLabels();
         setupSearchRecovery();
-        setupSidebarTopBandHeight();
 
         if (!sidebarWrapper) return;
 
         var version = "v2.0";
         injectVersion(version);
+        setupSidebarTopBandHeight();
         setupCollapsibleNav();
         setupMobileNavDrawer();
     }
@@ -729,6 +729,7 @@
             applySidebarTopBandHeight();
         }
 
+        window.addEventListener("load", applySidebarTopBandHeight);
         window.addEventListener("resize", applySidebarTopBandHeight);
     }
 
