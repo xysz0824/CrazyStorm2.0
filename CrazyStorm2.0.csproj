@@ -411,8 +411,8 @@
     <Resource Include="Images\curvegrid.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <Import Project="$(MSBuildToolsPath)\Microsoft.WinFX.targets" Condition="Exists('$(MSBuildToolsPath)\Microsoft.WinFX.targets')" />
-  <Import Project="$(MSBuildSDKsPath)\Microsoft.NET.Sdk.WindowsDesktop\targets\Microsoft.WinFX.targets" Condition="Exists('$(MSBuildSDKsPath)\Microsoft.NET.Sdk.WindowsDesktop\targets\Microsoft.WinFX.targets')" />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.WinFX.targets" Condition="'$(MSBuildRuntimeType)' == 'Core' and Exists('$(MSBuildToolsPath)\Microsoft.WinFX.targets')" />
+  <Import Project="$(MSBuildSDKsPath)\Microsoft.NET.Sdk.WindowsDesktop\targets\Microsoft.WinFX.targets" Condition="'$(MSBuildRuntimeType)' == 'Core' and !Exists('$(MSBuildToolsPath)\Microsoft.WinFX.targets') and Exists('$(MSBuildSDKsPath)\Microsoft.NET.Sdk.WindowsDesktop\targets\Microsoft.WinFX.targets')" />
   <Import Project="packages\MonoGame.Framework.WindowsDX.3.7.0.1708\build\MonoGame.Framework.WindowsDX.targets" Condition="Exists('packages\MonoGame.Framework.WindowsDX.3.7.0.1708\build\MonoGame.Framework.WindowsDX.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
@@ -422,6 +422,10 @@
   </Target>
   <Target Name="EnsureLibraryFolder" BeforeTargets="Build">
     <MakeDir Directories="$(TargetDir)typelibrary" Condition="!Exists('$(TargetDir)typelibrary')" />
+  </Target>
+  <Target Name="CleanDocs" BeforeTargets="Clean" Condition="'$(DesignTimeBuild)' != 'true' and Exists('$(MSBuildProjectDirectory)\Docs\build.ps1')">
+    <Exec Command="powershell -NoProfile -ExecutionPolicy Bypass -File &quot;$(MSBuildProjectDirectory)\Docs\build.ps1&quot; -CleanOnly" WorkingDirectory="$(MSBuildProjectDirectory)\Docs" />
+    <RemoveDir Directories="$(TargetDir)Docs" Condition="Exists('$(TargetDir)Docs')" />
   </Target>
   <Target Name="BuildDocs" BeforeTargets="Build" Condition="'$(DesignTimeBuild)' != 'true' and Exists('$(MSBuildProjectDirectory)\Docs\build.ps1')">
     <Exec Command="powershell -NoProfile -ExecutionPolicy Bypass -File &quot;$(MSBuildProjectDirectory)\Docs\build.ps1&quot;" WorkingDirectory="$(MSBuildProjectDirectory)\Docs" />
