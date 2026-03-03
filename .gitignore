@@ -7,3 +7,5 @@ packages/
 *.user
 AGENTS.md
 .codex/
+Docs/index.html
+__pycache__/
