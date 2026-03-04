@@ -23,6 +23,29 @@ namespace CrazyStorm
 {
     public partial class Main
     {
+        static readonly Point[] NoteTextOutlineOffsets =
+        {
+            new Point(-1, -1),
+            new Point(0, -1),
+            new Point(1, -1),
+            new Point(-1, 0),
+            new Point(1, 0),
+            new Point(-1, 1),
+            new Point(0, 1),
+            new Point(1, 1)
+        };
+        static readonly Point[] NoteHandleRatios =
+        {
+            new Point(0, 0),
+            new Point(0.5, 0),
+            new Point(1, 0),
+            new Point(0, 0.5),
+            new Point(1, 0.5),
+            new Point(0, 1),
+            new Point(0.5, 1),
+            new Point(1, 1)
+        };
+
         #region Private Members
         Point screenMousePos;
         ParticleSystem selectedSystem;
@@ -69,18 +92,7 @@ namespace CrazyStorm
             var textHeight = Math.Max(0, height - 10);
             if (textWidth <= 0 || textHeight <= 0) return;
 
-            var offsets = new List<Point>
-            {
-                new Point(-1, -1),
-                new Point(0, -1),
-                new Point(1, -1),
-                new Point(-1, 0),
-                new Point(1, 0),
-                new Point(-1, 1),
-                new Point(0, 1),
-                new Point(1, 1)
-            };
-            foreach (var offset in offsets)
+            foreach (var offset in NoteTextOutlineOffsets)
             {
                 var outlineText = CreateNoteTextBlock(text, Brushes.Black, textWidth, textHeight);
                 outlineText.SetValue(Canvas.LeftProperty, 7d + offset.X);
@@ -98,6 +110,8 @@ namespace CrazyStorm
             var ordered = new List<Note>();
             if (selectedSystem == null || selectedSystem.Notes == null) return ordered;
 
+            ordered.Capacity = selectedSystem.Notes.Count;
+
             foreach (var note in selectedSystem.Notes)
             {
                 if (!note.Selected) ordered.Add(note);
@@ -113,19 +127,9 @@ namespace CrazyStorm
             const double handleSize = 8;
             var width = noteCanvas.Width;
             var height = noteCanvas.Height;
-            var handlePoints = new List<Point>()
+            foreach (var ratio in NoteHandleRatios)
             {
-                new Point(0, 0),
-                new Point(width / 2, 0),
-                new Point(width, 0),
-                new Point(0, height / 2),
-                new Point(width, height / 2),
-                new Point(0, height),
-                new Point(width / 2, height),
-                new Point(width, height),
-            };
-            foreach (var point in handlePoints)
-            {
+                var point = new Point(width * ratio.X, height * ratio.Y);
                 var handle = new Border
                 {
                     Width = handleSize,
@@ -148,7 +152,11 @@ namespace CrazyStorm
             canvas.Children.Clear();
             if (selectedSystem.Notes != null && selectedSystem.Notes.Count > 0)
             {
-                int selectedCount = selectedSystem.Notes.Count(note => note.Selected);
+                int selectedCount = 0;
+                foreach (var note in selectedSystem.Notes)
+                {
+                    if (note.Selected) selectedCount++;
+                }
                 var orderedNotes = GetOrderedNotesForRender();
                 for (int i = 0; i < orderedNotes.Count; ++i)
                 {
@@ -214,20 +222,38 @@ namespace CrazyStorm
             }
             RenderNoteInteractionOverlay(canvas);
         }
-        void UpdateScreen()
+        bool TryGetCurrentScreenLayers(out Canvas noteLayer, out Canvas componentLayer)
         {
-            //Get component layer and note layer.
-            Canvas componentLayer = null;
-            Canvas noteLayer = null;
+            noteLayer = null;
+            componentLayer = null;
             foreach (TabItem item in ParticleTabControl.Items)
             {
                 var content = item.Content as Canvas;
-                if (item.Tag == selectedSystem)
-                {
-                    noteLayer = VisualHelper.VisualDownwardSearch(content, "NoteLayer") as Canvas;
-                    componentLayer = VisualHelper.VisualDownwardSearch(content, "ComponentLayer") as Canvas;
-                    break;
-                }
+                if (item.Tag != selectedSystem) continue;
+                noteLayer = VisualHelper.VisualDownwardSearch(content, "NoteLayer") as Canvas;
+                componentLayer = VisualHelper.VisualDownwardSearch(content, "ComponentLayer") as Canvas;
+                return true;
+            }
+            return false;
+        }
+        void UpdateNoteLayer()
+        {
+            Canvas noteLayer;
+            Canvas componentLayer;
+            if (!TryGetCurrentScreenLayers(out noteLayer, out componentLayer)) return;
+            RenderNoteLayer(noteLayer);
+        }
+        void UpdateScreen()
+        {
+            Canvas noteLayer;
+            Canvas componentLayer;
+            if (!TryGetCurrentScreenLayers(out noteLayer, out componentLayer)) return;
+            if (noteEditState == NoteEditState.DragNote
+                || noteEditState == NoteEditState.ResizeNote
+                || (noteEditState == NoteEditState.CreateNote && noteCreatePressed))
+            {
+                RenderNoteLayer(noteLayer);
+                return;
             }
             if (componentLayer != null)
             {
