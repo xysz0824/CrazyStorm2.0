@@ -53,6 +53,7 @@ namespace CrazyStorm
             InitializeParticle();
             InitializeEdit();
             InitializeScreen();
+            UpdateSelectedStatus();
         }
         void InitializeFile()
         {
@@ -98,6 +99,10 @@ namespace CrazyStorm
             RedoButton.IsEnabled = false;
             BindButton.IsEnabled = false;
             UnbindButton.IsEnabled = false;
+            AddNoteButton.IsEnabled = false;
+            AddNoteItem.IsEnabled = false;
+            EditNoteItem.IsEnabled = false;
+            DeleteNoteItem.IsEnabled = false;
         }
         void InitializeLayerAndComponent()
         {
@@ -115,6 +120,11 @@ namespace CrazyStorm
         {
             aimRect = null;
             aimComponent = null;
+            noteEditState = NoteEditState.Idle;
+            noteCreatePressed = false;
+            noteDragPending = false;
+            noteDragStartRects = null;
+            noteResizeTarget = null;
         }
         void UpdateSelectedStatus()
         {

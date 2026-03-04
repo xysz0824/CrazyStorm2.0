@@ -160,6 +160,12 @@
     <Compile Include="Edit\Command\Local\DelLocalCommand.cs" />
     <Compile Include="Edit\Command\Local\AddLocalCommand.cs" />
     <Compile Include="Edit\Command\Local\ModifyLocalCommand.cs" />
+    <Compile Include="Edit\Command\Note\AddNoteCommand.cs" />
+    <Compile Include="Edit\Command\Note\DelNoteCommand.cs" />
+    <Compile Include="Edit\Command\Note\MoveNoteCommand.cs" />
+    <Compile Include="Edit\Command\Note\ResizeNoteCommand.cs" />
+    <Compile Include="Edit\Command\Note\SetNoteColorCommand.cs" />
+    <Compile Include="Edit\Command\Note\SetNoteCommentCommand.cs" />
     <Compile Include="Edit\Command\Property\SetParticleTypeCommand.cs" />
     <Compile Include="Helper\ExpressionHelper.cs" />
     <Compile Include="Helper\UIHelper.cs" />
@@ -301,6 +307,7 @@
     <Compile Include="Main\ComponentPart.cs" />
     <Compile Include="Main\EditPart.cs" />
     <Compile Include="Main\LayerPart.cs" />
+    <Compile Include="Main\NotePart.cs" />
     <Compile Include="Main\ResourcePart.cs" />
     <Compile Include="Main\ShortKeyPart.cs" />
     <Compile Include="Panel\PropertyPanel.xaml.cs">

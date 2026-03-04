@@ -33,13 +33,13 @@ namespace CrazyStorm
             CopyItem.IsEnabled = CopyButton.IsEnabled;
             PasteItem.IsEnabled = PasteButton.IsEnabled;
             DelItem.IsEnabled = CutButton.IsEnabled;
+            UpdateNoteMenuStatus();
         }
         void SelectAll()
         {
             var set = new List<Component>();
             foreach (var layer in selectedSystem.Layers)
-                if (layer.Visible)
-                    set.AddRange(layer.Components);
+                if (layer.Visible) set.AddRange(layer.Components);
 
             SelectComponents(set, false);
         }

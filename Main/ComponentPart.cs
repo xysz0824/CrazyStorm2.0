@@ -618,6 +618,7 @@ namespace CrazyStorm
         private void ComponentButton_Click(object sender, RoutedEventArgs e)
         {
             //Create corresponding component according to different button.
+            CancelCreateNoteMode();
             var button = sender as Button;
             aimRect = VisualHelper.VisualDownwardSearch((DependencyObject)ParticleTabControl.SelectedContent, "AimBox");
             aimRect.SetValue(OpacityProperty, 1.0d);

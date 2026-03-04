@@ -126,6 +126,7 @@ namespace CrazyStorm
         {
             //Navigate to the corresponding function of ParticleSystem menu.
             var item = e.Source as MenuItem;
+            var markDirty = true;
             switch (item.Name)
             {
                 case "AddParticleSystemItem":
@@ -140,8 +141,19 @@ namespace CrazyStorm
                 case "SetParticleSystemItem":
                     OpenSelectedParticleSystemSetting();
                     break;
+                case "AddNoteItem":
+                    StartCreateNoteMode();
+                    markDirty = false;
+                    break;
+                case "EditNoteItem":
+                    EditSelectedNote();
+                    markDirty = false;
+                    break;
+                case "DeleteNoteItem":
+                    DeleteSelectedNotes();
+                    break;
             }
-            saved = false;
+            if (markDirty) saved = false;
         }
         #endregion
     }

@@ -37,28 +37,208 @@ namespace CrazyStorm
         #endregion
 
         #region Private Methods
+        Color GetNoteColor(LayerColor color)
+        {
+            var resource = TryFindResource($"NoteColor_{color}");
+            if (resource is Color mappedColor) return mappedColor;
+            if (resource is SolidColorBrush mappedBrush) return mappedBrush.Color;
+
+            var defaultResource = TryFindResource("NoteColor_Default");
+            if (defaultResource is Color defaultColor) return defaultColor;
+            if (defaultResource is SolidColorBrush defaultBrush) return defaultBrush.Color;
+
+            return Colors.DodgerBlue;
+        }
+        TextBlock CreateNoteTextBlock(string text, Brush foreground, double width, double maxHeight)
+        {
+            return new TextBlock
+            {
+                Text = text,
+                Foreground = foreground,
+                FontSize = 12,
+                TextWrapping = TextWrapping.Wrap,
+                Width = width,
+                MaxHeight = maxHeight,
+                TextTrimming = TextTrimming.CharacterEllipsis,
+                IsHitTestVisible = false
+            };
+        }
+        void AddOutlinedNoteText(Canvas item, string text, double width, double height)
+        {
+            var textWidth = Math.Max(0, width - 14);
+            var textHeight = Math.Max(0, height - 10);
+            if (textWidth <= 0 || textHeight <= 0) return;
+
+            var offsets = new List<Point>
+            {
+                new Point(-1, -1),
+                new Point(0, -1),
+                new Point(1, -1),
+                new Point(-1, 0),
+                new Point(1, 0),
+                new Point(-1, 1),
+                new Point(0, 1),
+                new Point(1, 1)
+            };
+            foreach (var offset in offsets)
+            {
+                var outlineText = CreateNoteTextBlock(text, Brushes.Black, textWidth, textHeight);
+                outlineText.SetValue(Canvas.LeftProperty, 7d + offset.X);
+                outlineText.SetValue(Canvas.TopProperty, 5d + offset.Y);
+                item.Children.Add(outlineText);
+            }
+
+            var mainText = CreateNoteTextBlock(text, Brushes.White, textWidth, textHeight);
+            mainText.SetValue(Canvas.LeftProperty, 7d);
+            mainText.SetValue(Canvas.TopProperty, 5d);
+            item.Children.Add(mainText);
+        }
+        List<Note> GetOrderedNotesForRender()
+        {
+            var ordered = new List<Note>();
+            if (selectedSystem == null || selectedSystem.Notes == null) return ordered;
+
+            foreach (var note in selectedSystem.Notes)
+            {
+                if (!note.Selected) ordered.Add(note);
+            }
+            foreach (var note in selectedSystem.Notes)
+            {
+                if (note.Selected) ordered.Add(note);
+            }
+            return ordered;
+        }
+        void DrawNoteHandles(Canvas noteCanvas, Brush borderBrush)
+        {
+            const double handleSize = 8;
+            var width = noteCanvas.Width;
+            var height = noteCanvas.Height;
+            var handlePoints = new List<Point>()
+            {
+                new Point(0, 0),
+                new Point(width / 2, 0),
+                new Point(width, 0),
+                new Point(0, height / 2),
+                new Point(width, height / 2),
+                new Point(0, height),
+                new Point(width / 2, height),
+                new Point(width, height),
+            };
+            foreach (var point in handlePoints)
+            {
+                var handle = new Border
+                {
+                    Width = handleSize,
+                    Height = handleSize,
+                    Background = Brushes.White,
+                    BorderBrush = borderBrush,
+                    BorderThickness = new Thickness(1),
+                    CornerRadius = new CornerRadius(1),
+                    SnapsToDevicePixels = true
+                };
+                handle.SetValue(Canvas.LeftProperty, point.X - handleSize / 2);
+                handle.SetValue(Canvas.TopProperty, point.Y - handleSize / 2);
+                noteCanvas.Children.Add(handle);
+            }
+        }
+        void RenderNoteLayer(Canvas canvas)
+        {
+            if (canvas == null || selectedSystem == null) return;
+
+            canvas.Children.Clear();
+            if (selectedSystem.Notes != null && selectedSystem.Notes.Count > 0)
+            {
+                int selectedCount = selectedSystem.Notes.Count(note => note.Selected);
+                var orderedNotes = GetOrderedNotesForRender();
+                for (int i = 0; i < orderedNotes.Count; ++i)
+                {
+                    var note = orderedNotes[i];
+                    var width = Math.Max(Note.DefaultWidth, note.Width);
+                    var height = Math.Max(Note.DefaultHeight, note.Height);
+                    var color = GetNoteColor(note.Color);
+                    var borderBrush = new SolidColorBrush(color);
+                    var fillBrush = new SolidColorBrush(Color.FromArgb(52, color.R, color.G, color.B));
+
+                    var item = new Canvas
+                    {
+                        Width = width,
+                        Height = height,
+                        Tag = note
+                    };
+                    item.SetValue(Canvas.LeftProperty, (double)note.X);
+                    item.SetValue(Canvas.TopProperty, (double)note.Y);
+                    Panel.SetZIndex(item, i + 1);
+
+                    var body = new Border
+                    {
+                        Width = width,
+                        Height = height,
+                        CornerRadius = new CornerRadius(6),
+                        Background = fillBrush,
+                        BorderBrush = borderBrush,
+                        BorderThickness = note.Selected ? new Thickness(2.5) : new Thickness(2),
+                        SnapsToDevicePixels = true
+                    };
+                    item.Children.Add(body);
+
+                    if (note.Selected)
+                    {
+                        var selectedBorder = new Border
+                        {
+                            Width = width + 4,
+                            Height = height + 4,
+                            CornerRadius = new CornerRadius(7),
+                            BorderBrush = Brushes.White,
+                            BorderThickness = new Thickness(1),
+                            Opacity = 0.85,
+                            IsHitTestVisible = false
+                        };
+                        selectedBorder.SetValue(Canvas.LeftProperty, -2d);
+                        selectedBorder.SetValue(Canvas.TopProperty, -2d);
+                        item.Children.Add(selectedBorder);
+                    }
+
+                    var editingThisNote = noteEditState == NoteEditState.EditNoteText
+                        && noteEditor != null
+                        && noteEditingTarget == note;
+                    if (!editingThisNote)
+                    {
+                        var noteText = (note.Comment ?? string.Empty).Replace('\r', ' ').Replace('\n', ' ');
+                        AddOutlinedNoteText(item, noteText, width, height);
+                    }
+
+                    if (selectedCount == 1 && note.Selected) DrawNoteHandles(item, borderBrush);
+
+                    canvas.Children.Add(item);
+                }
+            }
+            RenderNoteInteractionOverlay(canvas);
+        }
         void UpdateScreen()
         {
-            //Get component layer.
-            Canvas canvas = null;
+            //Get component layer and note layer.
+            Canvas componentLayer = null;
+            Canvas noteLayer = null;
             foreach (TabItem item in ParticleTabControl.Items)
             {
                 var content = item.Content as Canvas;
                 if (item.Tag == selectedSystem)
                 {
-                    canvas = VisualHelper.VisualDownwardSearch(content, "ComponentLayer") as Canvas;
+                    noteLayer = VisualHelper.VisualDownwardSearch(content, "NoteLayer") as Canvas;
+                    componentLayer = VisualHelper.VisualDownwardSearch(content, "ComponentLayer") as Canvas;
                     break;
                 }
             }
-            if (canvas != null)
+            if (componentLayer != null)
             {
+                RenderNoteLayer(noteLayer);
                 var center = new Point(config.ScreenWidthOver2, config.ScreenHeightOver2);
                 if (selectedComponents == null) selectedComponents = new List<Component>();
                 else selectedComponents.Clear();
-                canvas.Children.Clear();
+                componentLayer.Children.Clear();
                 //Update binding lines
-                if (bindingLines != null && !binded) foreach (var line in bindingLines) canvas.Children.Add(line);
-                else if (bindingLines != null && binded) foreach (var line in bindingLines) canvas.Children.Remove(line);
+                if (bindingLines != null && !binded) foreach (var line in bindingLines) componentLayer.Children.Add(line);
+                else if (bindingLines != null && binded) foreach (var line in bindingLines) componentLayer.Children.Remove(line);
                 //Update components on current screen.
                 var assembly = Assembly.GetExecutingAssembly();
                 var itemTemplate = FindResource("ComponentItem") as DataTemplate;
@@ -99,7 +279,7 @@ namespace CrazyStorm
                                 if (component.Selected)
                                 {
                                     var v = new Vector2(tx - x, ty - y);
-                                    DrawHelper.DrawArrow(canvas, (int)(x + center.X), (int)(y + center.Y), 
+                                    DrawHelper.DrawArrow(componentLayer, (int)(x + center.X), (int)(y + center.Y), 
                                         Math.Max(1, (int)v.Length() - 16), 3, MathHelper.GetDegree(v), Colors.White, 0.5f);
                                 }
                             }
@@ -108,11 +288,11 @@ namespace CrazyStorm
                                 selectedComponents.Add(component);
                                 //Draw component mark.
                                 var marker = assembly.CreateInstance("CrazyStorm.ComponentMarker") as IComponentMark;
-                                marker.Draw(canvas, component, (int)(x + center.X), (int)(y + center.Y));
+                                marker.Draw(componentLayer, component, (int)(x + center.X), (int)(y + center.Y));
                                 //Draw specific mark.
                                 if (component is Emitter) marker = assembly.CreateInstance("CrazyStorm.EmitterMarker") as IComponentMark;
                                 else marker = assembly.CreateInstance("CrazyStorm." + component.GetType().Name + "Marker") as IComponentMark;
-                                marker?.Draw(canvas, component, (int)(x + center.X), (int)(y + center.Y));
+                                marker?.Draw(componentLayer, component, (int)(x + center.X), (int)(y + center.Y));
                             }
                             icon.Data = (Geometry)FindResource($"{component.GetType().Name}_Icon");
                             var scale = (double)FindResource($"{component.GetType().Name}_Scale");
@@ -120,7 +300,7 @@ namespace CrazyStorm
                             icon.RenderTransform = transform;
                             item.SetValue(Canvas.LeftProperty, (double)x - box.Width / 2 + center.X);
                             item.SetValue(Canvas.TopProperty, (double)y - box.Height / 2 + center.Y);
-                            canvas.Children.Add(item);
+                            componentLayer.Children.Add(item);
                         }
                     }
                 }
@@ -153,8 +333,7 @@ namespace CrazyStorm
                         if (selectRect.IntersectsWith(componentRect))
                         {
                             //Prevent overlay shade from preceding components.
-                            if (width == 0 && height == 0 && set.Count > 0)
-                                set[set.Count - 1] = component;
+                            if (width == 0 && height == 0 && set.Count > 0) set[set.Count - 1] = component;
                             else
                                 set.Add(component);
                         }
@@ -170,6 +349,7 @@ namespace CrazyStorm
         }
         void SelectComponents(List<Component> set, bool canDoubleClick, int clickCount)
         {
+            ClearSelectedNotes();
             foreach (var layer in selectedSystem.Layers)
             {
                 if (!layer.Visible) continue;
@@ -191,17 +371,16 @@ namespace CrazyStorm
             }
             UpdateSelectedStatus();
             //If mouse double click
-            if (!(canDoubleClick && set != null && set.Count > 0 && Keyboard.Modifiers != ModifierKeys.Control))
-                return;
+            if (!(canDoubleClick && set != null && set.Count > 0 && Keyboard.Modifiers != ModifierKeys.Control)) return;
 
-            if (set.Count > 0 && clickCount == 2)
-                CreatePropertyPanel(set.First());
+            if (set.Count > 0 && clickCount == 2) CreatePropertyPanel(set.First());
         }
         void CancelAllSelection()
         {
             foreach (var layer in selectedSystem.Layers)
                 foreach (var component in layer.Components)
                     component.Selected = false;
+            ClearSelectedNotes();
 
             UpdateSelectedStatus();
         }
@@ -238,10 +417,21 @@ namespace CrazyStorm
             };
             switch (e.Key)
             {
+                case Key.Escape:
+                    if (HandleNoteEscapeKey()) e.Handled = true;
+                    break;
+                case Key.Delete:
+                    if (!IsEditingNoteText() && GetSelectedNoteCount() > 0)
+                    {
+                        DeleteSelectedNotes();
+                        e.Handled = true;
+                    }
+                    break;
                 case Key.Up:
                 case Key.Down:
                 case Key.Left:
                 case Key.Right:
+                    if (IsEditingNoteText()) return;
                     if (selectedComponents.Count > 0)
                     {
                         var gridSize = config.GridSize;
@@ -273,6 +463,7 @@ namespace CrazyStorm
             int y = (int)screenMousePos.Y;
             if (selectedComponents.Count == 1) MousePosTip.Content = $"{selectedComponents[0].X},{selectedComponents[0].Y}";
             else MousePosTip.Content = $"{x - center.X},{y - center.Y}";
+            if (TryHandleNoteMouseMove(sender, e)) return;
             //Display a rect with red edge to mark the location that component will be put on.
             if (aimRect != null)
             {
@@ -325,6 +516,11 @@ namespace CrazyStorm
         }
         private void Screen_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
         {
+            if (TryHandleNoteMouseRightButtonDown(sender, e))
+            {
+                e.Handled = true;
+                return;
+            }
             //Take away the rect.
             if (aimRect != null)
             {
@@ -335,6 +531,7 @@ namespace CrazyStorm
         private void Screen_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             if (player != null && !player.Pause) return;
+            if (TryHandleNoteMouseLeftButtonDown(sender, e)) return;
             //Show selection rect.
             Point point = e.GetPosition(sender as IInputElement);
             double x = point.X;
@@ -389,10 +586,16 @@ namespace CrazyStorm
         private void ParticleTabControl_MouseLeave(object sender, MouseEventArgs e)
         {
             //Cancel selection when mouse leaves.
-            if (selectingComponent) ParticleTabControl_MouseLeftButtonUp(sender, null);
+            if (selectingComponent
+                || noteCreatePressed
+                || noteDragPending
+                || noteEditState == NoteEditState.DragNote
+                || noteEditState == NoteEditState.ResizeNote)
+                ParticleTabControl_MouseLeftButtonUp(sender, null);
         }
         private void ParticleTabControl_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
+            if (TryHandleNoteMouseLeftButtonUp(sender, e)) return;
             selectingComponent = false;
             if (binded)
             {
@@ -409,8 +612,7 @@ namespace CrazyStorm
                 var y = (double)selectionRect.GetValue(TopProperty);
                 var width = (double)selectionRect.GetValue(WidthProperty);
                 var height = (double)selectionRect.GetValue(HeightProperty);
-                if (e != null)
-                    SelectComponents((int)x, (int)y, (int)width, (int)height, e.ClickCount);
+                if (e != null) SelectComponents((int)x, (int)y, (int)width, (int)height, e.ClickCount);
                 else
                     SelectComponents((int)x, (int)y, (int)width, (int)height, 0);
 
@@ -426,6 +628,12 @@ namespace CrazyStorm
             //Switch to selected Particle.
             if (e.AddedItems.Count > 0)
             {
+                EndNoteTextEdit(true);
+                noteCreatePressed = false;
+                noteDragStartRects = null;
+                noteResizeTarget = null;
+                noteEditState = NoteEditState.Idle;
+                ParticleTabControl.Cursor = Cursors.Arrow;
                 var tabItem = e.AddedItems[0] as TabItem;
                 foreach (var item in file.ParticleSystems)
                 {

@@ -118,6 +118,7 @@
     <Compile Include="Component\Rebounder.cs" />
     <Compile Include="File.cs" />
     <Compile Include="Layer.cs" />
+    <Compile Include="Note.cs" />
     <Compile Include="Struct\Vector2.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Property\FloatPropertyAttribute.cs" />

@@ -410,6 +410,10 @@
                 <MenuItem Name="CopyParticleSystemItem" Header="{StaticResource CopyParticleSystemStr}" />
                 <Separator/>
                 <MenuItem Name="SetParticleSystemItem" Header="{StaticResource SetParticleSystemStr}" />
+                <Separator/>
+                <MenuItem Name="AddNoteItem" Header="{StaticResource AddNoteStr}" />
+                <MenuItem Name="EditNoteItem" Header="{StaticResource EditNoteStr}" />
+                <MenuItem Name="DeleteNoteItem" Header="{StaticResource DeleteNoteStr}" />
             </MenuItem>
             <MenuItem Name="LayerMenu" Padding="10,0" Click="LayerMenu_Click">
                 <MenuItem.Header>
@@ -586,6 +590,14 @@
                             </Style.Triggers>
                         </Style>
                     </Button.Style>
+                </Button>
+                <Button Name="AddNoteButton" IsDefault="False" IsCancel="False" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" 
+                        ToolTip="{DynamicResource AddNoteStr}" Click="AddNoteButton_Click">
+                    <Path Data="{StaticResource Note_Icon}" Fill="{DynamicResource IconBrush}" Width="24" Height="24" Stretch="Uniform">
+                        <Path.Effect>
+                            <DropShadowEffect Color="Black" Opacity="1" BlurRadius="3" Direction="315" ShadowDepth="0" />
+                        </Path.Effect>
+                    </Path>
                 </Button>
                 <Separator/>
                 <Button Name="UndoButton" IsDefault="False" IsCancel="False" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" 
@@ -995,6 +1007,7 @@
                                                 <Binding Path="CenterDisplay" />
                                             </Image.Opacity>
                                         </Image>
+                                        <Canvas Name="NoteLayer" Canvas.Top="0" Canvas.Left="0" Width="{Binding Path=ScreenWidth}" Height="{Binding Path=ScreenHeight}"/>
                                         <Canvas Name="ComponentLayer" Canvas.Top="0" Canvas.Left="0" Width="{Binding Path=ScreenWidth}" Height="{Binding Path=ScreenHeight}"/>
                                         <Label Name="ActiveParticleCount" Content="0" Canvas.Top="5" Canvas.Left="5" Foreground="White" Panel.ZIndex="1000" Visibility="Hidden"/>
                                         <Label Name="StatusTip" Content="{StaticResource StatusTipStr}" Canvas.Left="5" Canvas.Bottom="30" Foreground="White" Panel.ZIndex="1000" Visibility="Hidden"/>

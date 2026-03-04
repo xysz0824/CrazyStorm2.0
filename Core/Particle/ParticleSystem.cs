@@ -43,6 +43,7 @@ namespace CrazyStorm.Core
         OrderType orderType;
         GenericContainer<ParticleType> customTypes;
         GenericContainer<Layer> layers;
+        GenericContainer<Note> notes;
         GenericContainer<Component> componentTree;
         [XmlAttribute]
         int customTypeIndex;
@@ -88,6 +89,7 @@ namespace CrazyStorm.Core
         }
         public GenericContainer<ParticleType> CustomTypes { get { return customTypes; } }
         public GenericContainer<Layer> Layers { get { return layers; } }
+        public GenericContainer<Note> Notes { get { return notes; } }
         public GenericContainer<Component> ComponentTree { get { return componentTree; } }
         public int CustomTypeIndex { get { return customTypeIndex++; } }
         public int LayerIndex { get { return layerIndex++; } }
@@ -118,6 +120,7 @@ namespace CrazyStorm.Core
         {
             customTypes = new GenericContainer<ParticleType>();
             layers = new GenericContainer<Layer>();
+            notes = new GenericContainer<Note>();
             componentTree = new GenericContainer<Component>();
         }
         public ParticleSystem(string name) : this()
@@ -224,6 +227,8 @@ namespace CrazyStorm.Core
             foreach (var type in customTypes) clone.customTypes.Add(type.Clone() as ParticleType);
             clone.layers = new GenericContainer<Layer>();
             foreach (var layer in layers) clone.layers.Add(layer.Clone() as Layer);
+            clone.notes = new GenericContainer<Note>();
+            foreach (var note in notes) clone.notes.Add(note.Clone() as Note);
             clone.componentTree = new GenericContainer<Component>();
             clone.componentIndex = new Dictionary<int, int>();
             foreach (var kv in componentIndex) clone.componentIndex[kv.Key] = kv.Value;
@@ -275,6 +280,8 @@ namespace CrazyStorm.Core
             XmlHelper.BuildFromObjectList(customTypes, new ParticleType(0), particleSystemNode, "CustomTypes");
             //layers
             XmlHelper.BuildFromObjectList(layers, new Layer(""), particleSystemNode, "Layers");
+            //notes
+            XmlHelper.BuildFromObjectList(notes, new Note(), particleSystemNode, "Notes");
             //componentIndex
             XmlHelper.BuildFromDictionary(componentIndex, particleSystemNode, "ComponentIndex");
             //typeSoundMap
@@ -289,6 +296,8 @@ namespace CrazyStorm.Core
             XmlHelper.StoreObjectList(customTypes, doc, particleSystemNode, "CustomTypes");
             //layers
             XmlHelper.StoreObjectList(layers, doc, particleSystemNode, "Layers");
+            //notes
+            XmlHelper.StoreObjectList(notes, doc, particleSystemNode, "Notes");
             //componentIndex
             XmlHelper.StoreDictionary(componentIndex, doc, particleSystemNode, "ComponentIndex");
             //typeSoundMap

@@ -25,15 +25,14 @@ namespace CrazyStorm
             e.ContinueRouting = true;
             e.CanExecute = true;
             //Check if properties are being edited.
-            if (editingProperties)
+            if (editingProperties || IsEditingNoteText())
             {
                 e.CanExecute = false;
                 return;
             }
             //If the name of command end with "Component", it need to check if it didn't have components selected.
             var command = (RoutedUICommand)e.Command;
-            if (command.Text.EndsWith("Component"))
-                e.CanExecute = selectedComponents.Count > 0;
+            if (command.Text.EndsWith("Component")) e.CanExecute = selectedComponents.Count > 0;
             //Determine if these can execute according to the status of relevant buttons. 
             switch (command.Text)
             {

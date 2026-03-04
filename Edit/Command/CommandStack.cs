@@ -51,6 +51,30 @@ namespace CrazyStorm
                     return;
                 }
             }
+            if (list.Count > 0
+                && list[list.Count - 1] is MoveNoteCommand
+                && command              is MoveNoteCommand)
+            {
+                var last = list[list.Count - 1] as MoveNoteCommand;
+                var now = command               as MoveNoteCommand;
+                if (last.IsSameTarget(now))
+                {
+                    last.Move += now.Move;
+                    return;
+                }
+            }
+            if (list.Count > 0
+                && list[list.Count - 1] is ResizeNoteCommand
+                && command              is ResizeNoteCommand)
+            {
+                var last = list[list.Count - 1] as ResizeNoteCommand;
+                var now = command               as ResizeNoteCommand;
+                if (last.IsSameTarget(now))
+                {
+                    last.NewRect = now.NewRect;
+                    return;
+                }
+            }
             list.Add(command);
         }
         #endregion
