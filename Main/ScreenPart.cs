@@ -471,6 +471,8 @@ namespace CrazyStorm
         }
         private void Screen_LostFocus(object sender, RoutedEventArgs e)
         {
+            var scrollViewer = sender as ScrollViewer;
+            if (scrollViewer != null && scrollViewer.IsKeyboardFocusWithin) return;
             CancelAllSelection();
         }
         private void Screen_MouseEnter(object sender, MouseEventArgs e)
@@ -621,8 +623,14 @@ namespace CrazyStorm
         }
         private void ParticleTabControl_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
-            if (TryHandleNoteMouseLeftButtonUp(sender, e)) return;
+            var startedAsComponentFlow = selectingComponent;
+            if (TryHandleNoteMouseLeftButtonUp(sender, e))
+            {
+                selectingComponent = false;
+                return;
+            }
             selectingComponent = false;
+            if (!startedAsComponentFlow) return;
             if (binded)
             {
                 binded = false;
@@ -656,6 +664,7 @@ namespace CrazyStorm
             {
                 EndNoteTextEdit(true);
                 noteCreatePressed = false;
+                noteLeftPressOwnedByNote = false;
                 noteDragStartRects = null;
                 noteResizeTarget = null;
                 noteEditState = NoteEditState.Idle;

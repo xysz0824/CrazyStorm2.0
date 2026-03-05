@@ -56,6 +56,7 @@ namespace CrazyStorm
         Point noteCurrentPoint;
         bool noteCreatePressed;
         bool noteDragPending;
+        bool noteLeftPressOwnedByNote;
         bool noteDragStarted;
         Vector2 noteDragMove;
         Dictionary<Note, Rect> noteDragStartRects;
@@ -528,6 +529,7 @@ namespace CrazyStorm
             SetNoteEditorLayout();
             var layer = GetCurrentNoteLayer();
             layer?.Children.Add(noteEditor);
+            UpdateNoteLayer();
             noteEditor.Focus();
             noteEditor.CaretIndex = noteEditor.Text.Length;
             noteEditor.Select(noteEditor.CaretIndex, 0);
@@ -555,6 +557,7 @@ namespace CrazyStorm
                 noteEditingTarget = null;
                 noteEditingOriginalComment = null;
                 noteEditorTextSyncing = false;
+                noteLeftPressOwnedByNote = false;
                 noteEditState = NoteEditState.Idle;
                 if (note == null)
                 {
@@ -594,6 +597,7 @@ namespace CrazyStorm
             noteEditState = NoteEditState.CreateNote;
             noteCreatePressed = false;
             noteDragPending = false;
+            noteLeftPressOwnedByNote = false;
             noteDragMove = Vector2.Zero;
             noteDragStartRects = null;
             noteDragMinLeft = 0;
@@ -616,6 +620,7 @@ namespace CrazyStorm
         void CancelCreateNoteMode()
         {
             noteCreatePressed = false;
+            noteLeftPressOwnedByNote = false;
             if (noteEditState == NoteEditState.CreateNote)
             {
                 noteEditState = NoteEditState.Idle;
@@ -680,6 +685,7 @@ namespace CrazyStorm
         {
             if (selectedSystem == null || selectedSystem.Notes == null) return false;
             noteDragPending = false;
+            noteLeftPressOwnedByNote = false;
             if (noteEditState == NoteEditState.DragNote) EndNoteDrag();
             if (noteEditState == NoteEditState.ResizeNote) EndNoteResize();
             if (noteEditState != NoteEditState.CreateNote && (aimRect != null || bindingLines != null)) return false;
@@ -689,7 +695,11 @@ namespace CrazyStorm
             {
                 var source = e.OriginalSource as DependencyObject;
                 var sourceEditor = source as TextBox ?? VisualHelper.FindParent<TextBox>(source);
-                if (sourceEditor == noteEditor) return true;
+                if (sourceEditor == noteEditor)
+                {
+                    noteLeftPressOwnedByNote = true;
+                    return true;
+                }
             }
 
             if (noteEditState == NoteEditState.CreateNote)
@@ -697,6 +707,7 @@ namespace CrazyStorm
                 noteDownPoint = point;
                 noteCurrentPoint = point;
                 noteCreatePressed = true;
+                noteLeftPressOwnedByNote = true;
                 e.Handled = true;
                 UpdateNoteLayer();
                 return true;
@@ -707,6 +718,7 @@ namespace CrazyStorm
             if (TryHitResizeHandle(point, out note, out handle))
             {
                 BeginNoteResize(note, handle, point);
+                noteLeftPressOwnedByNote = true;
                 e.Handled = true;
                 return true;
             }
@@ -719,6 +731,7 @@ namespace CrazyStorm
                     EndNoteTextEdit(true);
                     ClearSelectedNotes();
                     UpdateSelectedStatus();
+                    noteLeftPressOwnedByNote = true;
                     e.Handled = true;
                     return true;
                 }
@@ -728,6 +741,7 @@ namespace CrazyStorm
                     SelectSingleNote(noteEditingTarget);
                     UpdateSelectedStatus();
                 }
+                noteLeftPressOwnedByNote = true;
                 e.Handled = true;
                 return true;
             }
@@ -743,6 +757,7 @@ namespace CrazyStorm
                 {
                     ClearSelectedNotes();
                     UpdateSelectedStatus();
+                    noteLeftPressOwnedByNote = true;
                     e.Handled = true;
                     return true;
                 }
@@ -752,6 +767,7 @@ namespace CrazyStorm
             {
                 note.Selected = !note.Selected;
                 if (note.Selected) ClearSelectedComponents();
+                noteLeftPressOwnedByNote = true;
                 e.Handled = true;
                 noteDragPending = false;
                 noteLastClickTarget = null;
@@ -783,6 +799,7 @@ namespace CrazyStorm
             {
                 noteDragPending = false;
                 BeginNoteTextEdit(note);
+                noteLeftPressOwnedByNote = true;
                 e.Handled = true;
                 return true;
             }
@@ -790,6 +807,7 @@ namespace CrazyStorm
             noteDownPoint = point;
             noteCurrentPoint = point;
             noteDragPending = true;
+            noteLeftPressOwnedByNote = true;
             e.Handled = true;
             FocusParticleTabControl();
             return true;
@@ -878,21 +896,30 @@ namespace CrazyStorm
             if (noteEditState == NoteEditState.CreateNote)
             {
                 EndNoteCreate();
+                noteLeftPressOwnedByNote = false;
                 return true;
             }
             if (noteDragPending)
             {
                 noteDragPending = false;
+                noteLeftPressOwnedByNote = false;
                 return true;
             }
             if (noteEditState == NoteEditState.DragNote)
             {
                 EndNoteDrag();
+                noteLeftPressOwnedByNote = false;
                 return true;
             }
             if (noteEditState == NoteEditState.ResizeNote)
             {
                 EndNoteResize();
+                noteLeftPressOwnedByNote = false;
+                return true;
+            }
+            if (noteLeftPressOwnedByNote)
+            {
+                noteLeftPressOwnedByNote = false;
                 return true;
             }
             return false;
