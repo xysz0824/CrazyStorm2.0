@@ -45,6 +45,7 @@ namespace CrazyStorm
             new Point(0.5, 1),
             new Point(1, 1)
         };
+        const double ComponentDragPointerThreshold = 2;
 
         #region Private Members
         Point screenMousePos;
@@ -57,6 +58,16 @@ namespace CrazyStorm
         List<Line> bindingLines;
         bool binded;
         List<Component> selectedComponents;
+        bool componentDragPending;
+        bool componentDragStarted;
+        Point componentDragDownPoint;
+        Point componentDragCurrentPoint;
+        Vector2 componentDragMove;
+        Dictionary<Component, Vector2> componentDragStartPositions;
+        double componentDragMinMoveX;
+        double componentDragMinMoveY;
+        double componentDragMaxMoveX;
+        double componentDragMaxMoveY;
         #endregion
 
         #region Private Methods
@@ -401,8 +412,186 @@ namespace CrazyStorm
 
             if (set.Count > 0 && clickCount == 2) CreatePropertyPanel(set.First());
         }
+        Vector2 GetComponentAbsolutePosition(Component component)
+        {
+            var x = component.X;
+            var y = component.Y;
+            if (component.Parent != null)
+            {
+                var parent = component.Parent.GetAbsolutePosition();
+                x += parent.x;
+                y += parent.y;
+            }
+            return new Vector2(x, y);
+        }
+        void ResetComponentDragState(bool resetPreview)
+        {
+            if (resetPreview) ApplyComponentDragPreview(Vector2.Zero);
+            componentDragPending = false;
+            componentDragStarted = false;
+            componentDragDownPoint = new Point();
+            componentDragCurrentPoint = new Point();
+            componentDragMove = Vector2.Zero;
+            componentDragStartPositions = null;
+            componentDragMinMoveX = 0;
+            componentDragMinMoveY = 0;
+            componentDragMaxMoveX = 0;
+            componentDragMaxMoveY = 0;
+        }
+        void BeginComponentDrag(Point point)
+        {
+            if (selectedComponents == null || selectedComponents.Count == 0) return;
+
+            componentDragPending = false;
+            componentDragStarted = false;
+            componentDragDownPoint = point;
+            componentDragCurrentPoint = point;
+            componentDragMove = Vector2.Zero;
+            componentDragStartPositions = new Dictionary<Component, Vector2>();
+            componentDragMinMoveX = double.NegativeInfinity;
+            componentDragMinMoveY = double.NegativeInfinity;
+            componentDragMaxMoveX = double.PositiveInfinity;
+            componentDragMaxMoveY = double.PositiveInfinity;
+            var minAbsoluteX = -config.ScreenWidthOver2 + config.GridWidth / 2f;
+            var maxAbsoluteX = config.ScreenWidth - config.ScreenWidthOver2 - config.GridWidth / 2f;
+            var minAbsoluteY = -config.ScreenHeightOver2 + config.GridHeight / 2f;
+            var maxAbsoluteY = config.ScreenHeight - config.ScreenHeightOver2 - config.GridHeight / 2f;
+            foreach (var component in selectedComponents)
+            {
+                componentDragStartPositions[component] = new Vector2(component.X, component.Y);
+                var absolute = GetComponentAbsolutePosition(component);
+                var minMoveX = minAbsoluteX - absolute.x;
+                var minMoveY = minAbsoluteY - absolute.y;
+                var maxMoveX = maxAbsoluteX - absolute.x;
+                var maxMoveY = maxAbsoluteY - absolute.y;
+                if (minMoveX > componentDragMinMoveX) componentDragMinMoveX = minMoveX;
+                if (minMoveY > componentDragMinMoveY) componentDragMinMoveY = minMoveY;
+                if (maxMoveX < componentDragMaxMoveX) componentDragMaxMoveX = maxMoveX;
+                if (maxMoveY < componentDragMaxMoveY) componentDragMaxMoveY = maxMoveY;
+            }
+        }
+        Vector2 ClampComponentDragMove(Vector2 move)
+        {
+            if (componentDragStartPositions == null || componentDragStartPositions.Count == 0) return Vector2.Zero;
+            var result = move;
+            result.x = MathHelper.Clamp(result.x, (float)componentDragMinMoveX, (float)componentDragMaxMoveX);
+            result.y = MathHelper.Clamp(result.y, (float)componentDragMinMoveY, (float)componentDragMaxMoveY);
+            return result;
+        }
+        void ApplyComponentDragPreview(Vector2 move)
+        {
+            if (componentDragStartPositions == null) return;
+            foreach (var pair in componentDragStartPositions)
+            {
+                pair.Key.X = pair.Value.x + move.x;
+                pair.Key.Y = pair.Value.y + move.y;
+            }
+        }
+        void EndComponentDrag()
+        {
+            if (componentDragStartPositions == null)
+            {
+                ResetComponentDragState(false);
+                return;
+            }
+
+            if (componentDragStarted && (componentDragMove.x != 0 || componentDragMove.y != 0))
+            {
+                var selected = new List<Component>(componentDragStartPositions.Keys);
+                ApplyComponentDragPreview(Vector2.Zero);
+                new MoveComponentCommand(componentDragMove).Do(commandStacks[selectedSystem], selected, new Action(UpdateProperty));
+            }
+
+            ResetComponentDragState(false);
+            UpdateSelectedStatus();
+        }
+        bool TryHandleComponentMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            if (selectedSystem == null || selectedComponents == null || selectedComponents.Count == 0) return false;
+            if (aimRect != null || bindingLines != null) return false;
+            if (e.ClickCount > 1) return false;
+            if ((Keyboard.Modifiers & ModifierKeys.Control) == ModifierKeys.Control) return false;
+            var point = e.GetPosition(sender as IInputElement);
+            Component component;
+            if (!TryHitTopComponent(point, out component) || component == null || !component.Selected) return false;
+
+            componentDragPending = true;
+            componentDragStarted = false;
+            componentDragDownPoint = point;
+            componentDragCurrentPoint = point;
+            componentDragMove = Vector2.Zero;
+            e.Handled = true;
+            FocusParticleTabControl();
+            return true;
+        }
+        bool TryHandleComponentMouseMove(object sender, MouseEventArgs e)
+        {
+            var point = e.GetPosition(sender as IInputElement);
+            if (componentDragPending)
+            {
+                if (e.LeftButton != MouseButtonState.Pressed)
+                {
+                    componentDragPending = false;
+                    return false;
+                }
+                if (point == componentDragCurrentPoint) return true;
+                componentDragCurrentPoint = point;
+                var pendingMove = new Vector2(
+                    (float)(point.X - componentDragDownPoint.X),
+                    (float)(point.Y - componentDragDownPoint.Y));
+                if (Math.Abs(pendingMove.x) <= ComponentDragPointerThreshold
+                    && Math.Abs(pendingMove.y) <= ComponentDragPointerThreshold)
+                    return true;
+
+                BeginComponentDrag(componentDragDownPoint);
+                componentDragStarted = true;
+                componentDragMove = ClampComponentDragMove(pendingMove);
+                ApplyComponentDragPreview(componentDragMove);
+                UpdateScreen();
+                return true;
+            }
+            if (componentDragStartPositions != null && e.LeftButton != MouseButtonState.Pressed)
+            {
+                EndComponentDrag();
+                return false;
+            }
+            if (componentDragStartPositions != null && e.LeftButton == MouseButtonState.Pressed)
+            {
+                if (point == componentDragCurrentPoint) return true;
+                componentDragCurrentPoint = point;
+                var move = new Vector2(
+                    (float)(point.X - componentDragDownPoint.X),
+                    (float)(point.Y - componentDragDownPoint.Y));
+                if (!componentDragStarted
+                    && Math.Abs(move.x) <= ComponentDragPointerThreshold
+                    && Math.Abs(move.y) <= ComponentDragPointerThreshold)
+                    return true;
+
+                componentDragStarted = true;
+                componentDragMove = ClampComponentDragMove(move);
+                ApplyComponentDragPreview(componentDragMove);
+                UpdateScreen();
+                return true;
+            }
+            return false;
+        }
+        bool TryHandleComponentMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            if (componentDragPending)
+            {
+                componentDragPending = false;
+                return true;
+            }
+            if (componentDragStartPositions != null)
+            {
+                EndComponentDrag();
+                return true;
+            }
+            return false;
+        }
         void CancelAllSelection()
         {
+            ResetComponentDragState(true);
             foreach (var layer in selectedSystem.Layers)
                 foreach (var component in layer.Components)
                     component.Selected = false;
@@ -453,19 +642,29 @@ namespace CrazyStorm
                         e.Handled = true;
                     }
                     break;
+                case Key.Enter:
+                    if (IsEditingNoteText()) return;
+                    if (selectedComponents != null && selectedComponents.Count > 0) break;
+                    if (noteEditState != NoteEditState.Idle) break;
+                    if (GetSelectedNoteCount() != 1) break;
+                    EditSelectedNote();
+                    e.Handled = true;
+                    break;
                 case Key.Up:
                 case Key.Down:
                 case Key.Left:
                 case Key.Right:
                     if (IsEditingNoteText()) return;
-                    if (selectedComponents.Count > 0)
+                    if (selectedComponents != null && selectedComponents.Count > 0)
                     {
                         var gridSize = config.GridSize;
                         var stack = commandStacks[selectedSystem];
                         new MoveComponentCommand(moveStatusMap[e.Key], gridSize, config.GridAlignment).Do(stack, 
                             selectedComponents, new Action(UpdateProperty));
+                        e.Handled = true;
+                        break;
                     }
-                    e.Handled = true;
+                    if (TryMoveSelectedNotes(moveStatusMap[e.Key])) e.Handled = true;
                     break;
             }
         }
@@ -489,9 +688,10 @@ namespace CrazyStorm
             screenMousePos = e.GetPosition(sender as IInputElement);
             int x = (int)screenMousePos.X;
             int y = (int)screenMousePos.Y;
-            if (selectedComponents.Count == 1) MousePosTip.Content = $"{selectedComponents[0].X},{selectedComponents[0].Y}";
+            if (selectedComponents != null && selectedComponents.Count == 1) MousePosTip.Content = $"{selectedComponents[0].X},{selectedComponents[0].Y}";
             else MousePosTip.Content = $"{x - center.X},{y - center.Y}";
             if (TryHandleNoteMouseMove(sender, e)) return;
+            if (TryHandleComponentMouseMove(sender, e)) return;
             //Display a rect with red edge to mark the location that component will be put on.
             if (aimRect != null)
             {
@@ -560,6 +760,7 @@ namespace CrazyStorm
         {
             if (player != null && !player.Pause) return;
             if (TryHandleNoteMouseLeftButtonDown(sender, e)) return;
+            if (TryHandleComponentMouseLeftButtonDown(sender, e)) return;
             //Show selection rect.
             Point point = e.GetPosition(sender as IInputElement);
             double x = point.X;
@@ -617,6 +818,8 @@ namespace CrazyStorm
             if (selectingComponent
                 || noteCreatePressed
                 || noteDragPending
+                || componentDragPending
+                || componentDragStartPositions != null
                 || noteEditState == NoteEditState.DragNote
                 || noteEditState == NoteEditState.ResizeNote)
                 ParticleTabControl_MouseLeftButtonUp(sender, null);
@@ -625,6 +828,11 @@ namespace CrazyStorm
         {
             var startedAsComponentFlow = selectingComponent;
             if (TryHandleNoteMouseLeftButtonUp(sender, e))
+            {
+                selectingComponent = false;
+                return;
+            }
+            if (TryHandleComponentMouseLeftButtonUp(sender, e))
             {
                 selectingComponent = false;
                 return;
@@ -667,6 +875,7 @@ namespace CrazyStorm
                 noteLeftPressOwnedByNote = false;
                 noteDragStartRects = null;
                 noteResizeTarget = null;
+                ResetComponentDragState(true);
                 noteEditState = NoteEditState.Idle;
                 ParticleTabControl.Cursor = Cursors.Arrow;
                 var tabItem = e.AddedItems[0] as TabItem;

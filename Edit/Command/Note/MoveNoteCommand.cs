@@ -19,6 +19,30 @@ namespace CrazyStorm
         {
             this.move = move;
         }
+        public MoveNoteCommand(MoveStatus status, Vector2 gridSize, bool gridAlignment)
+        {
+            move = Vector2.Zero;
+            switch (status)
+            {
+                case MoveStatus.Up:
+                    move = new Vector2(0, -1);
+                    break;
+                case MoveStatus.Down:
+                    move = new Vector2(0, 1);
+                    break;
+                case MoveStatus.Left:
+                    move = new Vector2(-1, 0);
+                    break;
+                case MoveStatus.Right:
+                    move = new Vector2(1, 0);
+                    break;
+            }
+            if (gridAlignment)
+            {
+                move.x *= gridSize.x / 2;
+                move.y *= gridSize.y / 2;
+            }
+        }
         public bool IsSameTarget(MoveNoteCommand command)
         {
             if (command == null) 

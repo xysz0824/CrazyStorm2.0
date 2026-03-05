@@ -49,6 +49,10 @@ namespace CrazyStorm
                 move.y *= gridSize.y / 2;
             }
         }
+        public MoveComponentCommand(Vector2 move)
+        {
+            this.move = move;
+        }
         public bool IsSameTarget(MoveComponentCommand command)
         {
             if (command == null)

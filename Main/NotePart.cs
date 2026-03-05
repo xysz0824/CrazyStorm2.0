@@ -38,7 +38,8 @@ namespace CrazyStorm
     {
         const double NotePointerThreshold = 2;
         const double NoteResizeHitSize = 10;
-        const int NoteDoubleClickFallbackMs = 650;
+        const int NoteStrictDoubleClickMs = 400;
+        const double NoteStrictDoubleClickDistance = 4;
         static readonly LayerColor[] NoteColorOptions =
         {
             LayerColor.Blue,
@@ -78,6 +79,8 @@ namespace CrazyStorm
         Note noteColorTarget;
         Note noteLastClickTarget;
         int noteLastClickTimestamp;
+        Point noteLastClickPoint;
+        bool noteLastClickWasSingleSelected;
         #endregion
 
         #region Private Methods
@@ -357,6 +360,53 @@ namespace CrazyStorm
             result.x = MathHelper.Clamp(result.x, (float)minMoveX, (float)maxMoveX);
             result.y = MathHelper.Clamp(result.y, (float)minMoveY, (float)maxMoveY);
             return result;
+        }
+        Vector2 ClampSelectedNoteMove(List<Note> notes, Vector2 move)
+        {
+            if (notes == null || notes.Count == 0) return Vector2.Zero;
+
+            var minLeft = double.MaxValue;
+            var minTop = double.MaxValue;
+            var maxRight = double.MinValue;
+            var maxBottom = double.MinValue;
+            foreach (var note in notes)
+            {
+                var rect = GetNoteRect(note);
+                if (rect.Left < minLeft) minLeft = rect.Left;
+                if (rect.Top < minTop) minTop = rect.Top;
+                if (rect.Right > maxRight) maxRight = rect.Right;
+                if (rect.Bottom > maxBottom) maxBottom = rect.Bottom;
+            }
+
+            var minMoveX = -minLeft;
+            var minMoveY = -minTop;
+            var maxMoveX = GetCanvasWidth() - maxRight;
+            var maxMoveY = GetCanvasHeight() - maxBottom;
+            var result = move;
+            result.x = MathHelper.Clamp(result.x, (float)minMoveX, (float)maxMoveX);
+            result.y = MathHelper.Clamp(result.y, (float)minMoveY, (float)maxMoveY);
+            return result;
+        }
+        bool TryMoveSelectedNotes(MoveStatus status)
+        {
+            if (selectedSystem == null || selectedSystem.Notes == null) return false;
+            if (IsEditingNoteText()) return false;
+            if (noteEditState == NoteEditState.CreateNote
+                || noteEditState == NoteEditState.DragNote
+                || noteEditState == NoteEditState.ResizeNote)
+                return false;
+            if (selectedComponents != null && selectedComponents.Count > 0) return false;
+
+            var selected = GetSelectedNotes();
+            if (selected.Count == 0) return false;
+            var command = new MoveNoteCommand(status, config.GridSize, config.GridAlignment);
+            command.Move = ClampSelectedNoteMove(selected, command.Move);
+            if (command.Move.x == 0 && command.Move.y == 0) return true;
+
+            noteDragPending = false;
+            command.Do(commandStacks[selectedSystem], selected);
+            UpdateSelectedStatus();
+            return true;
         }
         void ApplyDragPreview(Vector2 move)
         {
@@ -675,6 +725,9 @@ namespace CrazyStorm
             if (GetSelectedNoteCount() > 0)
             {
                 noteDragPending = false;
+                noteLastClickTarget = null;
+                noteLastClickTimestamp = 0;
+                noteLastClickWasSingleSelected = false;
                 ClearSelectedNotes();
                 UpdateSelectedStatus();
                 return true;
@@ -753,6 +806,7 @@ namespace CrazyStorm
             {
                 noteLastClickTarget = null;
                 noteLastClickTimestamp = 0;
+                noteLastClickWasSingleSelected = false;
                 if ((Keyboard.Modifiers & ModifierKeys.Control) != ModifierKeys.Control && GetSelectedNoteCount() > 0)
                 {
                     ClearSelectedNotes();
@@ -772,12 +826,14 @@ namespace CrazyStorm
                 noteDragPending = false;
                 noteLastClickTarget = null;
                 noteLastClickTimestamp = 0;
+                noteLastClickWasSingleSelected = false;
                 FocusParticleTabControl();
                 UpdateSelectedStatus();
                 return true;
             }
 
-            if (!note.Selected || GetSelectedNoteCount() != 1)
+            var wasSingleSelectedBeforeClick = note.Selected && GetSelectedNoteCount() == 1;
+            if (!note.Selected)
             {
                 SelectSingleNote(note);
                 UpdateSelectedStatus();
@@ -787,13 +843,21 @@ namespace CrazyStorm
                 UpdateNoteLayer();
             }
 
+            var withinDoubleClickArea = Math.Abs(point.X - noteLastClickPoint.X) <= NoteStrictDoubleClickDistance
+                && Math.Abs(point.Y - noteLastClickPoint.Y) <= NoteStrictDoubleClickDistance;
             var fallbackDoubleClick = noteLastClickTarget == note
+                && e.ClickCount == 1
                 && noteLastClickTimestamp > 0
                 && e.Timestamp > noteLastClickTimestamp
-                && e.Timestamp - noteLastClickTimestamp <= NoteDoubleClickFallbackMs;
+                && e.Timestamp - noteLastClickTimestamp <= NoteStrictDoubleClickMs
+                && withinDoubleClickArea
+                && noteLastClickWasSingleSelected
+                && wasSingleSelectedBeforeClick;
             var isDoubleClick = e.ClickCount == 2 || fallbackDoubleClick;
             noteLastClickTarget = note;
             noteLastClickTimestamp = e.Timestamp;
+            noteLastClickPoint = point;
+            noteLastClickWasSingleSelected = wasSingleSelectedBeforeClick;
 
             if (isDoubleClick)
             {
@@ -993,10 +1057,12 @@ namespace CrazyStorm
             {
                 case Key.Enter:
                     EndNoteTextEdit(true);
+                    FocusParticleTabControl();
                     e.Handled = true;
                     break;
                 case Key.Escape:
                     EndNoteTextEdit(false);
+                    FocusParticleTabControl();
                     e.Handled = true;
                     break;
             }

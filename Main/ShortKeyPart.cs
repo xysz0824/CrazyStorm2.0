@@ -30,9 +30,22 @@ namespace CrazyStorm
                 e.CanExecute = false;
                 return;
             }
-            //If the name of command end with "Component", it need to check if it didn't have components selected.
             var command = (RoutedUICommand)e.Command;
-            if (command.Text.EndsWith("Component")) e.CanExecute = selectedComponents.Count > 0;
+            var hasSelectedComponent = selectedComponents != null && selectedComponents.Count > 0;
+            var hasSelectedNote = GetSelectedNoteCount() > 0;
+            switch (command.Text)
+            {
+                case "UpComponent":
+                case "DownComponent":
+                case "LeftComponent":
+                case "RightComponent":
+                    e.CanExecute = hasSelectedComponent || hasSelectedNote;
+                    break;
+                default:
+                    //If the name of command end with "Component", it need to check if it didn't have components selected.
+                    if (command.Text.EndsWith("Component")) e.CanExecute = hasSelectedComponent;
+                    break;
+            }
             //Determine if these can execute according to the status of relevant buttons. 
             switch (command.Text)
             {
@@ -58,20 +71,48 @@ namespace CrazyStorm
                     Del();
                     break;
                 case "UpComponent":
-                    new MoveComponentCommand(MoveStatus.Up, gridSize, config.GridAlignment).Do(stack, selectedComponents, 
-                        new Action(UpdateProperty));
+                    if (selectedComponents != null && selectedComponents.Count > 0)
+                    {
+                        new MoveComponentCommand(MoveStatus.Up, gridSize, config.GridAlignment).Do(stack, selectedComponents,
+                            new Action(UpdateProperty));
+                    }
+                    else
+                    {
+                        TryMoveSelectedNotes(MoveStatus.Up);
+                    }
                     break;
                 case "DownComponent":
-                    new MoveComponentCommand(MoveStatus.Down, gridSize, config.GridAlignment).Do(stack, selectedComponents,
-                        new Action(UpdateProperty));
+                    if (selectedComponents != null && selectedComponents.Count > 0)
+                    {
+                        new MoveComponentCommand(MoveStatus.Down, gridSize, config.GridAlignment).Do(stack, selectedComponents,
+                            new Action(UpdateProperty));
+                    }
+                    else
+                    {
+                        TryMoveSelectedNotes(MoveStatus.Down);
+                    }
                     break;
                 case "LeftComponent":
-                    new MoveComponentCommand(MoveStatus.Left, gridSize, config.GridAlignment).Do(stack, selectedComponents,
-                        new Action(UpdateProperty));
+                    if (selectedComponents != null && selectedComponents.Count > 0)
+                    {
+                        new MoveComponentCommand(MoveStatus.Left, gridSize, config.GridAlignment).Do(stack, selectedComponents,
+                            new Action(UpdateProperty));
+                    }
+                    else
+                    {
+                        TryMoveSelectedNotes(MoveStatus.Left);
+                    }
                     break;
                 case "RightComponent":
-                    new MoveComponentCommand(MoveStatus.Right, gridSize, config.GridAlignment).Do(stack, selectedComponents,
-                        new Action(UpdateProperty));
+                    if (selectedComponents != null && selectedComponents.Count > 0)
+                    {
+                        new MoveComponentCommand(MoveStatus.Right, gridSize, config.GridAlignment).Do(stack, selectedComponents,
+                            new Action(UpdateProperty));
+                    }
+                    else
+                    {
+                        TryMoveSelectedNotes(MoveStatus.Right);
+                    }
                     break;
                 case "SelectAll":
                     SelectAll();
