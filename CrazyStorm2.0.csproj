@@ -288,6 +288,7 @@
     <Compile Include="Edit\Command\Component\DelComponentCommand.cs" />
     <Compile Include="Edit\Command\Layer\DelLayerCommand.cs" />
     <Compile Include="Edit\Command\Layer\AddLayerCommand.cs" />
+    <Compile Include="Edit\Command\Layer\MoveLayerCommand.cs" />
     <Compile Include="Edit\Command\Layer\SetLayerCommand.cs" />
     <Compile Include="Edit\Command\Component\MoveComponentCommand.cs" />
     <Compile Include="Converter\LayerAxisConverter.cs" />

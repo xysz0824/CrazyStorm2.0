@@ -222,12 +222,9 @@ namespace CrazyStorm
                 return;
 
             int index = selectedSystem.Layers.IndexOf(selectedLayer);
-            if (index != selectedSystem.Layers.Count - 1)
-            {
-                var temp = selectedSystem.Layers[index];
-                selectedSystem.Layers[index] = selectedSystem.Layers[index + 1];
-                selectedSystem.Layers[index + 1] = temp;
-            }
+            if (index == selectedSystem.Layers.Count - 1) return;
+            new MoveLayerCommand(1).Do(commandStacks[selectedSystem], selectedSystem, selectedLayer);
+            UpdateSelectedStatus();
         }
         private void LayerUp_MouseUp(object sender, MouseButtonEventArgs e)
         {
@@ -238,12 +235,9 @@ namespace CrazyStorm
                 return;
 
             int index = selectedSystem.Layers.IndexOf(selectedLayer);
-            if (index != 0)
-            {
-                var temp = selectedSystem.Layers[index];
-                selectedSystem.Layers[index] = selectedSystem.Layers[index - 1];
-                selectedSystem.Layers[index - 1] = temp;
-            }
+            if (index == 0) return;
+            new MoveLayerCommand(-1).Do(commandStacks[selectedSystem], selectedSystem, selectedLayer);
+            UpdateSelectedStatus();
         }
         private void LayerColor_MouseUp(object sender, MouseButtonEventArgs e)
         {
