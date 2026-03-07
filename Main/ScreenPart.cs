@@ -507,13 +507,27 @@ namespace CrazyStorm
         }
         bool TryHandleComponentMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            if (selectedSystem == null || selectedComponents == null || selectedComponents.Count == 0) return false;
+            if (selectedSystem == null) return false;
             if (aimRect != null || bindingLines != null) return false;
             if (e.ClickCount > 1) return false;
             if ((Keyboard.Modifiers & ModifierKeys.Control) == ModifierKeys.Control) return false;
             var point = e.GetPosition(sender as IInputElement);
             Component component;
-            if (!TryHitTopComponent(point, out component) || component == null || !component.Selected) return false;
+            if (!TryHitTopComponent(point, out component) || component == null) return false;
+
+            if (!component.Selected)
+            {
+                ClearSelectedNotes();
+                ClearSelectedComponents();
+                component.Selected = true;
+                UpdateSelectedStatus();
+            }
+            else if (selectedComponents == null || selectedComponents.Count == 0)
+            {
+                UpdateSelectedStatus();
+            }
+
+            if (selectedComponents == null || selectedComponents.Count == 0) return false;
 
             componentDragPending = true;
             componentDragStarted = false;
