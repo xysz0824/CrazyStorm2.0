@@ -704,10 +704,17 @@ namespace CrazyStorm
         }
         private void ComponentTree_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
-            if (e.OriginalSource is TextBlock && ComponentTree.SelectedItem != null)
-            {
-                CreatePropertyPanel(ComponentTree.SelectedItem as Component);
-            }
+            var source = e.OriginalSource as DependencyObject;
+            var text = source as TextBlock ?? VisualHelper.FindParent<TextBlock>(source);
+            var icon = source as Path ?? VisualHelper.FindParent<Path>(source);
+            var component = default(Component);
+
+            if (text != null && text.Name == "ComponentTreeItemText")
+                component = text.DataContext as Component;
+            else if (icon != null && icon.Name == "ComponentTreeItemIcon")
+                component = icon.DataContext as Component;
+
+            if (component != null) CreatePropertyPanel(component);
         }
         private void PropertyTab_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
