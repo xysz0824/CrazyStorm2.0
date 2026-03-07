@@ -134,7 +134,7 @@ namespace CrazyStorm.Core
                         var component = pc as Component;
                         if (args1 == 0 || args1 >= component.System.FrameSkipCount)
                         {
-                            component.System.CurrentFrame = args0;
+                            component.System.SkipFrame(args0, false);
                             component.System.FrameSkipCount++;
                         }
                     }
@@ -274,14 +274,18 @@ namespace CrazyStorm.Core
             }
             return SpecialEvents[eventName](propertyContainer, argumentExpressions, frameScale);
         }
+        static void RemoveExecutorAt(int index)
+        {
+            EventExecutor.Return(executorList[index]);
+            executorList.RemoveAt(index);
+        }
         public static void Update(float frameRate)
         {
             for (int i = 0; i < executorList.Count; ++i)
             {
                 if (executorList[i].Finished || executorList[i].Invalid)
                 {
-                    EventExecutor.Return(executorList[i]);
-                    executorList.RemoveAt(i);
+                    RemoveExecutorAt(i);
                     --i;
                 }
                 else if (executorList[i].BindingContainer == null)
@@ -290,6 +294,30 @@ namespace CrazyStorm.Core
                         ParticleSystem.FRAME_RATE_BASE / frameRate;
                     executorList[i].Update(frameScale);
                 }
+            }
+        }
+        public static void SkipFrame(ParticleSystem system, bool replayFromStart, float frameRate)
+        {
+            for (int i = 0; i < executorList.Count; ++i)
+            {
+                var executor = executorList[i];
+                if (executor.Finished || executor.Invalid)
+                {
+                    RemoveExecutorAt(i);
+                    --i;
+                    continue;
+                }
+                if (executor.PropertyContainer.System != system) continue;
+                if (replayFromStart)
+                {
+                    RemoveExecutorAt(i);
+                    --i;
+                    continue;
+                }
+                if (executor.BindingContainer != null) continue;
+                var frameScale = executor.PropertyContainer.System.FrameFactor *
+                    ParticleSystem.FRAME_RATE_BASE / frameRate;
+                executor.Update(frameScale);
             }
         }
         public static bool BindingUpdate(long uniqueId, float frameScale)

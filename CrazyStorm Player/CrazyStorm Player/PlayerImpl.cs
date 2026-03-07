@@ -216,11 +216,11 @@ namespace CrazyStorm_Player
             instances = new Dictionary<ParticleSystem, File>();
             foreach (var file in Files)
             {
-                file.ParticleSystems[SelectedParticleSystemIndex].BodyPosition = controllable.selfPos.ToCore();
-                file.ParticleSystems[SelectedParticleSystemIndex].Reset(true);
                 var instance = file.ParticleSystems[SelectedParticleSystemIndex].Instantiate();
+                instance.Reset(true);
                 instances[instance] = file;
             }
+            if (CurrentFrame != 1) SkipFrame(CurrentFrame, true);
         }
         public void Dispose()
         {
@@ -283,6 +283,15 @@ namespace CrazyStorm_Player
         {
             if (soundInstances == null || !soundInstances.ContainsKey(path)) return;
             soundInstances[path]?.Stop();
+        }
+        void UpdateCurrentFrame()
+        {
+            var minCurrentFrame = float.MaxValue;
+            foreach (var instance in instances.Keys)
+            {
+                if (minCurrentFrame > instance.CurrentFrame) minCurrentFrame = instance.CurrentFrame;
+            }
+            if (minCurrentFrame != float.MaxValue) CurrentFrame = minCurrentFrame;
         }
         void DrawLayer(ParticleSystem system, Layer layer, BlendType blendType)
         {
@@ -449,7 +458,7 @@ namespace CrazyStorm_Player
             EventManager.Update(FrameRate);
             foreach (var instance in instances.Keys)
             {
-                instance.Update(FrameRate, CurrentFrame);
+                instance.Update(FrameRate);
                 ParticleManager.ClearLayerMasks();
                 ParticleManager.UpdateLayerMasks(instance.Layers);
                 var collidedCount = 0;
@@ -460,12 +469,7 @@ namespace CrazyStorm_Player
                 controllable.selfPos = newPos.ToXna();
             }
             ParticleManager.Update(FrameRate);
-            var minCurrentFrame = float.MaxValue;
-            foreach (var instance in instances.Keys)
-            {
-                if (minCurrentFrame > instance.CurrentFrame) minCurrentFrame = instance.CurrentFrame;
-            }
-            CurrentFrame = minCurrentFrame;
+            UpdateCurrentFrame();
         }
         public void Draw(GraphicsDevice gd, GameTime gameTime)
         {
@@ -493,6 +497,16 @@ namespace CrazyStorm_Player
         public void SetStatus(int i)
         {
             foreach(var instance in instances.Keys) instance.SetStatus(i);
+        }
+        public void SkipFrame(float targetFrame, bool replayFromStart)
+        {
+            if (instances == null || instances.Count == 0) return;
+            foreach (var instance in instances.Keys)
+            {
+                instance.BodyPosition = controllable.selfPos.ToCore();
+                instance.SkipFrame(targetFrame, replayFromStart, FrameRate);
+            }
+            UpdateCurrentFrame();
         }
     }
 }

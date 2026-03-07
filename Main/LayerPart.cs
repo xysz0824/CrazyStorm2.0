@@ -139,6 +139,12 @@ namespace CrazyStorm
         }
         private void TimeScale_MouseMove(object sender, MouseEventArgs e)
         {
+            if (player != null && !player.Pause && timeAxisSelecting)
+            {
+                timeAxisSelecting = false;
+                TimeScale.ReleaseMouseCapture();
+                return;
+            }
             //Display the frame that mouse pointed on tooltip.
             var pos = e.GetPosition(TimeAxis);
             var frame = ((int)(pos.X + axisScroll.HorizontalOffset + 1) / 3) + 1;
@@ -161,11 +167,11 @@ namespace CrazyStorm
                 selectedFrame = frame;
                 TimeScalePointerFrame.Content = selectedFrame.ToString();
                 TimeScalePointerTransform.X = (selectedFrame - 1) * 3 - axisScroll.HorizontalOffset;
-                if (player != null) player.PlayerImpl.CurrentFrame = selectedFrame;
             }
         }
         private void TimeScale_MouseDown(object sender, MouseButtonEventArgs e)
         {
+            if (player != null && !player.Pause) return;
             timeAxisSelecting = true;
             TimeScale.CaptureMouse();
             TimeScale_MouseMove(sender, e);

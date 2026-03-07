@@ -53,7 +53,6 @@ namespace CrazyStorm.Core
         Dictionary<int, int> typeSoundMap;
         Vector2 screenOffset;
         ShakeScreenEvent shakeScreenEvent;
-        float frameFactor = 1;
         ScaleFrameEvent scaleFrameEvent;
         #endregion
 
@@ -71,8 +70,8 @@ namespace CrazyStorm.Core
         }
         public Vector2 LogicOffset { get; set; }
         public Vector2 ScreenOffset => LogicOffset + screenOffset;
-        public float FrameFactor => frameFactor;
-        public float CurrentFrame { get; set; }
+        public float FrameFactor { get; private set; }
+        public float CurrentFrame { get; private set; }
         public int FrameSkipCount { get; set; }
         public int TotalFrame
         {
@@ -132,6 +131,34 @@ namespace CrazyStorm.Core
         public ParticleSystem(string name, string defaultLayerName) : this(name)
         {
             layers.Add(new Layer(defaultLayerName));
+        }
+        #endregion
+
+        #region Private Methods
+        float ClampTargetFrame(float targetFrame)
+        {
+            int totalFrame = Math.Max(1, TotalFrame);
+            int normalizedFrame = (int)targetFrame;
+            if (normalizedFrame < 1) return 1;
+            if (normalizedFrame > totalFrame) return totalFrame;
+            return normalizedFrame;
+        }
+        bool StepUpdate(float frameRate, bool resetWhenFinished)
+        {
+            var frameScale = FRAME_RATE_BASE / frameRate;
+            UpdateGlobalEvents(frameScale);
+            StatusFrame += frameScale;
+            CenterPosition = GetCenterPositionRuntime();
+            for (int i = 0; i < ComponentTree.Count; ++i)
+            {
+                ComponentTree[i].Status = Status;
+                ComponentTree[i].StatusFrame = StatusFrame;
+                ComponentTree[i].CenterPosition = CenterPosition;
+                UpdateComponent(ComponentTree[i], FrameFactor * frameScale, CurrentFrame);
+            }
+            CurrentFrame += frameScale;
+            if (CurrentFrame > Math.Max(1, TotalFrame) && resetWhenFinished) Reset(false);
+            return true;
         }
         #endregion
 
@@ -386,39 +413,37 @@ namespace CrazyStorm.Core
             if (scaleFrameEvent.frame < scaleFrameEvent.duration)
             {
                 scaleFrameEvent.frame = Math.Min(scaleFrameEvent.frame + frameScale, scaleFrameEvent.duration);
-                if (scaleFrameEvent.frame == scaleFrameEvent.duration) frameFactor = 1;
-                else if (scaleFrameEvent.level >= 1) frameFactor = 0;
+                if (scaleFrameEvent.frame == scaleFrameEvent.duration) FrameFactor = 1;
+                else if (scaleFrameEvent.level >= 1) FrameFactor = 0;
                 else
                 {
                     float t = scaleFrameEvent.frame / scaleFrameEvent.duration;
                     double percent = MathHelper.Lerp(0.5f, 1f, Math.Max(0, scaleFrameEvent.level));
                     double fadeTime = 0.8d;
-                    frameFactor = 1.0f - (float)(percent * (1.0d - Math.Pow(Math.Max(0, 1d / (1d - fadeTime) * (t - fadeTime)), 3)));
+                    FrameFactor = 1.0f - (float)(percent * (1.0d - Math.Pow(Math.Max(0, 1d / (1d - fadeTime) * (t - fadeTime)), 3)));
                 }
             }
         }
-        public bool Update(float frameRate, float currentFrame = 1)
+        public bool Update(float frameRate) => StepUpdate(frameRate, true);
+        public void SkipFrame(float targetFrame, bool replayFromStart, float frameRate = FRAME_RATE_BASE)
         {
-            var frameScale = FRAME_RATE_BASE / frameRate;
-            UpdateGlobalEvents(frameScale);
-            if (currentFrame != CurrentFrame)
+            var normalizedFrame = ClampTargetFrame(targetFrame);
+            if (!replayFromStart)
             {
-                Reset(true);
-                for (float i = 1; i < currentFrame; i += frameScale) Update(frameScale, i);
-                CurrentFrame = currentFrame;
+                CurrentFrame = normalizedFrame;
+                return;
             }
-            StatusFrame += frameScale;
-            CenterPosition = GetCenterPositionRuntime();
-            for (int i = 0; i < ComponentTree.Count; ++i)
+
+            Reset(true);
+            EventManager.SkipFrame(this, true, frameRate);
+            ParticleManager.SkipFrame(this, true, frameRate);
+            while (CurrentFrame < normalizedFrame)
             {
-                ComponentTree[i].Status = Status;
-                ComponentTree[i].StatusFrame = StatusFrame;
-                ComponentTree[i].CenterPosition = CenterPosition;
-                UpdateComponent(ComponentTree[i], FrameFactor * frameScale, CurrentFrame);
+                EventManager.SkipFrame(this, false, frameRate);
+                StepUpdate(frameRate, false);
+                ParticleManager.SkipFrame(this, false, frameRate);
             }
-            CurrentFrame += frameScale;
-            if (CurrentFrame > TotalFrame) Reset(false);
-            return true;
+            CurrentFrame = normalizedFrame;
         }
         public void UpdateComponent(Component component, float frameScale, float currentFrame)
         {
@@ -440,10 +465,11 @@ namespace CrazyStorm.Core
             CurrentFrame = 1;
             if (includeGlobalEvents)
             {
+                StatusFrame = 0;
                 FrameSkipCount = 0;
                 screenOffset = new Vector2(0, 0);
                 shakeScreenEvent = default;
-                frameFactor = 1;
+                FrameFactor = 1;
                 scaleFrameEvent = default;
             }
             for (int i = 0; i < Layers.Count; ++i) Layers[i].Reset();

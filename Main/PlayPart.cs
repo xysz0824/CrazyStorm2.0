@@ -154,11 +154,28 @@ namespace CrazyStorm
             PauseLayerTimer();
             playTimer?.Stop();
         }
+        bool TrySkipPlayerFrame(float targetFrame, bool replayFromStart)
+        {
+            if (player == null) return false;
+            try
+            {
+                player.PlayerImpl.SkipFrame(targetFrame, replayFromStart);
+                return true;
+            }
+            catch (PoolOverflowException ex)
+            {
+                MessageBox.Show(ex.Message, "!", MessageBoxButton.OK, MessageBoxImage.Error);
+                StopItem_Click(null, null);
+                return false;
+            }
+        }
         void OpenJumpToFrame()
         {
             var window = new JumpToFrame(selectedFrame, selectedSystem.TotalFrame);
             window.ShowDialog();
-            if (window.Confirmed) JumpToFrame(window.TargetFrame);
+            if (!window.Confirmed) return;
+            JumpToFrame(window.TargetFrame);
+            if (player != null) TrySkipPlayerFrame(selectedFrame, true);
         }
         #endregion
 
@@ -216,13 +233,13 @@ namespace CrazyStorm
             }
             else
             {
+                if (player.Pause && !TrySkipPlayerFrame(selectedFrame, true)) return;
                 player.Pause = !player.Pause;
                 if (!player.Pause)
                 {
                     path.Data = (Geometry)FindResource("Pause_Icon");
                     path.Fill = (Brush)FindResource("PauseIconBrush");
                     path.ToolTip = (string)FindResource("PauseStr");
-                    player.PlayerImpl.CurrentFrame = selectedFrame;
                     TimeAxis.IsHitTestVisible = false;
                     if (config.CollapseLayerAxis) LayerAxisDefinition.Height = new GridLength(30);
                     ScrollViewer.SetVerticalScrollBarVisibility(LayerAxis, ScrollBarVisibility.Hidden);

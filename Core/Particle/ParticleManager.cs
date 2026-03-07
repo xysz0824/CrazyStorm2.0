@@ -63,6 +63,26 @@ namespace CrazyStorm.Core
     }
     public static class ParticleManager
     {
+        static void ReturnParticle(ParticleBase instance)
+        {
+            if (instance is Particle) ParticlePool.Return((instance as Particle).PoolObject);
+            else if (instance is CurveParticle) CurveParticlePool.Return((instance as CurveParticle).PoolObject);
+            instance.Emitter?.Particles.Remove(instance);
+        }
+        static void UpdateParticles(List<ParticleBase> particles, float frameScale)
+        {
+            for (int i = 0; i < particles.Count; ++i)
+            {
+                var instance = particles[i];
+                if (instance.Alive) instance.Update(frameScale);
+                else
+                {
+                    ReturnParticle(instance);
+                    particles.RemoveAt(i);
+                    i--;
+                }
+            }
+        }
         public static readonly int MAX_MASK_COUNT = 8;
 
         public delegate void LayerDrawHandler(ParticleSystem system, Layer layer, BlendType blendType);
@@ -323,21 +343,26 @@ namespace CrazyStorm.Core
             foreach (var kv in activeParticles)
             {
                 var particles = kv.Value;
+                var frameScale = kv.Key.FrameFactor * ParticleSystem.FRAME_RATE_BASE / frameRate;
+                UpdateParticles(particles, frameScale);
+            }
+        }
+        public static void SkipFrame(ParticleSystem system, bool replayFromStart, float frameRate)
+        {
+            if (!activeParticles.ContainsKey(system)) return;
+            var particles = activeParticles[system];
+            if (replayFromStart)
+            {
                 for (int i = 0; i < particles.Count; ++i)
                 {
-                    var instance = particles[i];
-                    var frameScale = instance.System.FrameFactor * ParticleSystem.FRAME_RATE_BASE / frameRate;
-                    if (instance.Alive) instance.Update(frameScale);
-                    else
-                    {
-                        if (instance is Particle) ParticlePool.Return((instance as Particle).PoolObject);
-                        else if (instance is CurveParticle) CurveParticlePool.Return((instance as CurveParticle).PoolObject);
-                        instance.Emitter.Particles.Remove(instance);
-                        particles.RemoveAt(i);
-                        i--;
-                    }
+                    ReturnParticle(particles[i]);
                 }
+                particles.Clear();
+                activeParticles.Remove(system);
+                return;
             }
+            var frameScale = system.FrameFactor * ParticleSystem.FRAME_RATE_BASE / frameRate;
+            UpdateParticles(particles, frameScale);
         }
         public static void Draw(ParticleSystem system)
         {
