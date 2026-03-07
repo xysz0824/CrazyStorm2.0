@@ -46,6 +46,9 @@ namespace CrazyStorm
             new Point(1, 1)
         };
         const double ComponentDragPointerThreshold = 2;
+        const string ComponentMarkerHostTag = "ComponentMarkerHost";
+        const string ComponentBindingOverlayTag = "ComponentBindingOverlay";
+        const string ComponentVisualBodyTag = "ComponentVisualBody";
 
         #region Private Members
         Point screenMousePos;
@@ -68,6 +71,8 @@ namespace CrazyStorm
         double componentDragMinMoveY;
         double componentDragMaxMoveX;
         double componentDragMaxMoveY;
+        Dictionary<Component, Canvas> componentDragVisuals;
+        Canvas componentDragBindingOverlay;
         #endregion
 
         #region Private Methods
@@ -76,11 +81,9 @@ namespace CrazyStorm
             var resource = TryFindResource($"NoteColor_{color}");
             if (resource is Color mappedColor) return mappedColor;
             if (resource is SolidColorBrush mappedBrush) return mappedBrush.Color;
-
             var defaultResource = TryFindResource("NoteColor_Default");
             if (defaultResource is Color defaultColor) return defaultColor;
             if (defaultResource is SolidColorBrush defaultBrush) return defaultBrush.Color;
-
             return Colors.DodgerBlue;
         }
         TextBlock CreateNoteTextBlock(string text, Brush foreground, double width, double maxHeight)
@@ -102,7 +105,6 @@ namespace CrazyStorm
             var textWidth = Math.Max(0, width - 14);
             var textHeight = Math.Max(0, height - 10);
             if (textWidth <= 0 || textHeight <= 0) return;
-
             foreach (var offset in NoteTextOutlineOffsets)
             {
                 var outlineText = CreateNoteTextBlock(text, Brushes.Black, textWidth, textHeight);
@@ -110,7 +112,6 @@ namespace CrazyStorm
                 outlineText.SetValue(Canvas.TopProperty, 5d + offset.Y);
                 item.Children.Add(outlineText);
             }
-
             var mainText = CreateNoteTextBlock(text, Brushes.White, textWidth, textHeight);
             mainText.SetValue(Canvas.LeftProperty, 7d);
             mainText.SetValue(Canvas.TopProperty, 5d);
@@ -156,79 +157,88 @@ namespace CrazyStorm
                 noteCanvas.Children.Add(handle);
             }
         }
+        Canvas CreateNoteVisual(Note note, int zIndex)
+        {
+            var item = new Canvas
+            {
+                Tag = note
+            };
+            Panel.SetZIndex(item, zIndex);
+            RefreshSingleNoteVisual(item);
+            return item;
+        }
+        void RefreshSingleNoteVisual(Canvas noteCanvas)
+        {
+            var note = noteCanvas?.Tag as Note;
+            if (note == null) return;
+            var width = Math.Max(Note.DefaultWidth, note.Width);
+            var height = Math.Max(Note.DefaultHeight, note.Height);
+            var color = GetNoteColor(note.Color);
+            var borderBrush = new SolidColorBrush(color);
+            var fillBrush = new SolidColorBrush(Color.FromArgb(52, color.R, color.G, color.B));
+            noteCanvas.Children.Clear();
+            noteCanvas.Width = width;
+            noteCanvas.Height = height;
+            noteCanvas.SetValue(Canvas.LeftProperty, (double)note.X);
+            noteCanvas.SetValue(Canvas.TopProperty, (double)note.Y);
+            var body = new Border
+            {
+                Width = width,
+                Height = height,
+                CornerRadius = new CornerRadius(6),
+                Background = fillBrush,
+                BorderBrush = borderBrush,
+                BorderThickness = note.Selected ? new Thickness(2.5) : new Thickness(2),
+                SnapsToDevicePixels = true
+            };
+            noteCanvas.Children.Add(body);
+
+            if (note.Selected)
+            {
+                var selectedBorder = new Border
+                {
+                    Width = width + 4,
+                    Height = height + 4,
+                    CornerRadius = new CornerRadius(7),
+                    BorderBrush = Brushes.White,
+                    BorderThickness = new Thickness(1),
+                    Opacity = 0.85,
+                    IsHitTestVisible = false
+                };
+                selectedBorder.SetValue(Canvas.LeftProperty, -2d);
+                selectedBorder.SetValue(Canvas.TopProperty, -2d);
+                noteCanvas.Children.Add(selectedBorder);
+            }
+            var editingThisNote = noteEditState == NoteEditState.EditNoteText
+                && noteEditor != null
+                && noteEditingTarget == note;
+            if (!editingThisNote)
+            {
+                var noteText = (note.Comment ?? string.Empty).Replace('\r', ' ').Replace('\n', ' ');
+                AddOutlinedNoteText(noteCanvas, noteText, width, height);
+            }
+            if (GetSelectedNoteCount() == 1 && note.Selected) DrawNoteHandles(noteCanvas, borderBrush);
+        }
+        Canvas FindNoteVisual(Canvas noteLayer, Note note)
+        {
+            if (noteLayer == null || note == null) return null;
+            foreach (var child in noteLayer.Children)
+            {
+                var canvas = child as Canvas;
+                if (canvas?.Tag == note) return canvas;
+            }
+            return null;
+        }
         void RenderNoteLayer(Canvas canvas)
         {
             if (canvas == null || selectedSystem == null) return;
-
             canvas.Children.Clear();
             if (selectedSystem.Notes != null && selectedSystem.Notes.Count > 0)
             {
-                int selectedCount = 0;
-                foreach (var note in selectedSystem.Notes)
-                {
-                    if (note.Selected) selectedCount++;
-                }
                 var orderedNotes = GetOrderedNotesForRender();
                 for (int i = 0; i < orderedNotes.Count; ++i)
                 {
-                    var note = orderedNotes[i];
-                    var width = Math.Max(Note.DefaultWidth, note.Width);
-                    var height = Math.Max(Note.DefaultHeight, note.Height);
-                    var color = GetNoteColor(note.Color);
-                    var borderBrush = new SolidColorBrush(color);
-                    var fillBrush = new SolidColorBrush(Color.FromArgb(52, color.R, color.G, color.B));
-
-                    var item = new Canvas
-                    {
-                        Width = width,
-                        Height = height,
-                        Tag = note
-                    };
-                    item.SetValue(Canvas.LeftProperty, (double)note.X);
-                    item.SetValue(Canvas.TopProperty, (double)note.Y);
-                    Panel.SetZIndex(item, i + 1);
-
-                    var body = new Border
-                    {
-                        Width = width,
-                        Height = height,
-                        CornerRadius = new CornerRadius(6),
-                        Background = fillBrush,
-                        BorderBrush = borderBrush,
-                        BorderThickness = note.Selected ? new Thickness(2.5) : new Thickness(2),
-                        SnapsToDevicePixels = true
-                    };
-                    item.Children.Add(body);
-
-                    if (note.Selected)
-                    {
-                        var selectedBorder = new Border
-                        {
-                            Width = width + 4,
-                            Height = height + 4,
-                            CornerRadius = new CornerRadius(7),
-                            BorderBrush = Brushes.White,
-                            BorderThickness = new Thickness(1),
-                            Opacity = 0.85,
-                            IsHitTestVisible = false
-                        };
-                        selectedBorder.SetValue(Canvas.LeftProperty, -2d);
-                        selectedBorder.SetValue(Canvas.TopProperty, -2d);
-                        item.Children.Add(selectedBorder);
-                    }
-
-                    var editingThisNote = noteEditState == NoteEditState.EditNoteText
-                        && noteEditor != null
-                        && noteEditingTarget == note;
-                    if (!editingThisNote)
-                    {
-                        var noteText = (note.Comment ?? string.Empty).Replace('\r', ' ').Replace('\n', ' ');
-                        AddOutlinedNoteText(item, noteText, width, height);
-                    }
-
-                    if (selectedCount == 1 && note.Selected) DrawNoteHandles(item, borderBrush);
-
-                    canvas.Children.Add(item);
+                    canvas.Children.Add(CreateNoteVisual(orderedNotes[i], i + 1));
                 }
             }
             RenderNoteInteractionOverlay(canvas);
@@ -273,9 +283,15 @@ namespace CrazyStorm
                 if (selectedComponents == null) selectedComponents = new List<Component>();
                 else selectedComponents.Clear();
                 componentLayer.Children.Clear();
+                var bindingOverlay = new Canvas
+                {
+                    Width = config.ScreenWidth,
+                    Height = config.ScreenHeight,
+                    Tag = ComponentBindingOverlayTag,
+                    IsHitTestVisible = false
+                };
                 //Update binding lines
                 if (bindingLines != null && !binded) foreach (var line in bindingLines) componentLayer.Children.Add(line);
-                else if (bindingLines != null && binded) foreach (var line in bindingLines) componentLayer.Children.Remove(line);
                 //Update components on current screen.
                 var assembly = Assembly.GetExecutingAssembly();
                 var itemTemplate = FindResource("ComponentItem") as DataTemplate;
@@ -285,62 +301,127 @@ namespace CrazyStorm
                     {
                         foreach (var component in layer.Components)
                         {
-                            var item = itemTemplate.LoadContent() as Canvas;
-                            var frame = VisualHelper.VisualDownwardSearch(item, "Frame") as Label;
-                            var icon = VisualHelper.VisualDownwardSearch(item, "Icon") as Path;
-                            var box = VisualHelper.VisualDownwardSearch(item, "Box") as Border;
-                            var id = VisualHelper.VisualDownwardSearch(item, "ID") as Label;
-                            id.Content = component.Name;
-                            frame.DataContext = layer;
-                            box.Opacity = component.Selected ? 1 : 0;
-                            //If component has a parent, caculate the absolute position.
-                            float x = component.X;
-                            float y = component.Y;
-                            if (component.Parent != null)
-                            {
-                                Vector2 parent = component.Parent.GetAbsolutePosition();
-                                x += parent.x;
-                                y += parent.y;
-                            }
-                            //Draw binding line.
-                            if (component.BindingTarget != null)
-                            {
-                                float tx = component.BindingTarget.X;
-                                float ty = component.BindingTarget.Y;
-                                if (component.BindingTarget.Parent != null)
-                                {
-                                    Vector2 parent = component.BindingTarget.Parent.GetAbsolutePosition();
-                                    tx += parent.x;
-                                    ty += parent.y;
-                                }
-                                if (component.Selected)
-                                {
-                                    var v = new Vector2(tx - x, ty - y);
-                                    DrawHelper.DrawArrow(componentLayer, (int)(x + center.X), (int)(y + center.Y), 
-                                        Math.Max(1, (int)v.Length() - 16), 3, MathHelper.GetDegree(v), Colors.White, 0.5f);
-                                }
-                            }
-                            if (component.Selected)
-                            {
-                                selectedComponents.Add(component);
-                                //Draw component mark.
-                                var marker = assembly.CreateInstance("CrazyStorm.ComponentMarker") as IComponentMark;
-                                marker.Draw(componentLayer, component, (int)(x + center.X), (int)(y + center.Y));
-                                //Draw specific mark.
-                                if (component is Emitter) marker = assembly.CreateInstance("CrazyStorm.EmitterMarker") as IComponentMark;
-                                else marker = assembly.CreateInstance("CrazyStorm." + component.GetType().Name + "Marker") as IComponentMark;
-                                marker?.Draw(componentLayer, component, (int)(x + center.X), (int)(y + center.Y));
-                            }
-                            icon.Data = (Geometry)FindResource($"{component.GetType().Name}_Icon");
-                            var scale = (double)FindResource($"{component.GetType().Name}_Scale");
-                            var transform = new ScaleTransform(scale, scale, icon.ActualWidth / 2, icon.ActualHeight / 2);
-                            icon.RenderTransform = transform;
-                            item.SetValue(Canvas.LeftProperty, (double)x - box.Width / 2 + center.X);
-                            item.SetValue(Canvas.TopProperty, (double)y - box.Height / 2 + center.Y);
-                            componentLayer.Children.Add(item);
+                            var item = CreateComponentVisual(component, layer, itemTemplate, assembly, bindingOverlay, center);
+                            if (item != null) componentLayer.Children.Add(item);
                         }
                     }
                 }
+                componentLayer.Children.Add(bindingOverlay);
+            }
+        }
+        Canvas CreateComponentVisual(Component component, Layer layer, DataTemplate itemTemplate,
+            Assembly assembly, Canvas bindingOverlay, Point center)
+        {
+            var item = itemTemplate?.LoadContent() as Canvas;
+            if (item == null) return null;
+            var frame = VisualHelper.VisualDownwardSearch(item, "Frame") as Label;
+            var icon = VisualHelper.VisualDownwardSearch(item, "Icon") as Path;
+            var box = VisualHelper.VisualDownwardSearch(item, "Box") as Border;
+            var id = VisualHelper.VisualDownwardSearch(item, "ID") as Label;
+            if (frame == null || icon == null || box == null || id == null) return item;
+            id.Content = component.Name;
+            frame.DataContext = layer;
+            box.Opacity = component.Selected ? 1 : 0;
+            icon.Data = (Geometry)FindResource($"{component.GetType().Name}_Icon");
+            var scale = (double)FindResource($"{component.GetType().Name}_Scale");
+            icon.RenderTransform = new ScaleTransform(scale, scale, icon.ActualWidth / 2, icon.ActualHeight / 2);
+            var root = new Canvas
+            {
+                Tag = component,
+                ClipToBounds = false,
+                IsHitTestVisible = false
+            };
+            var markerHost = new Canvas
+            {
+                Width = config.ScreenWidth,
+                Height = config.ScreenHeight,
+                Tag = ComponentMarkerHostTag,
+                ClipToBounds = false,
+                IsHitTestVisible = false,
+                Visibility = component.Selected ? Visibility.Visible : Visibility.Collapsed
+            };
+            root.Children.Add(markerHost);
+            item.Tag = ComponentVisualBodyTag;
+            item.SetValue(Canvas.LeftProperty, -box.Width / 2);
+            item.SetValue(Canvas.TopProperty, -box.Height / 2);
+            root.Children.Add(item);
+            UpdateComponentVisualPosition(root, component);
+            if (!component.Selected) return root;
+            selectedComponents.Add(component);
+            var absolute = GetComponentAbsolutePosition(component);
+            var absoluteX = (int)(absolute.x + center.X);
+            var absoluteY = (int)(absolute.y + center.Y);
+            if (component.BindingTarget != null && bindingOverlay != null)
+            {
+                float tx = component.BindingTarget.X;
+                float ty = component.BindingTarget.Y;
+                if (component.BindingTarget.Parent != null)
+                {
+                    Vector2 parent = component.BindingTarget.Parent.GetAbsolutePosition();
+                    tx += parent.x;
+                    ty += parent.y;
+                }
+                var v = new Vector2(tx - absolute.x, ty - absolute.y);
+                DrawHelper.DrawArrow(bindingOverlay, absoluteX, absoluteY,
+                    Math.Max(1, (int)v.Length() - 16), 3, MathHelper.GetDegree(v), Colors.White, 0.5f);
+            }
+            var marker = assembly.CreateInstance("CrazyStorm.ComponentMarker") as IComponentMark;
+            marker?.Draw(markerHost, component, absoluteX, absoluteY);
+            if (component is Emitter) marker = assembly.CreateInstance("CrazyStorm.EmitterMarker") as IComponentMark;
+            else marker = assembly.CreateInstance("CrazyStorm." + component.GetType().Name + "Marker") as IComponentMark;
+            marker?.Draw(markerHost, component, absoluteX, absoluteY);
+            return root;
+        }
+        Canvas GetComponentMarkerHost(Canvas componentVisual)
+        {
+            if (componentVisual == null) return null;
+            foreach (var child in componentVisual.Children)
+            {
+                var canvas = child as Canvas;
+                if (canvas != null && Equals(canvas.Tag, ComponentMarkerHostTag)) return canvas;
+            }
+            return null;
+        }
+        void UpdateComponentVisualPosition(Canvas componentVisual, Component component)
+        {
+            if (componentVisual == null || component == null) return;
+            var absolute = GetComponentAbsolutePosition(component);
+            var center = new Point(config.ScreenWidthOver2, config.ScreenHeightOver2);
+            var screenX = (double)absolute.x + center.X;
+            var screenY = (double)absolute.y + center.Y;
+            componentVisual.SetValue(Canvas.LeftProperty, screenX);
+            componentVisual.SetValue(Canvas.TopProperty, screenY);
+            var markerHost = GetComponentMarkerHost(componentVisual);
+            if (markerHost != null)
+            {
+                markerHost.SetValue(Canvas.LeftProperty, -screenX);
+                markerHost.SetValue(Canvas.TopProperty, -screenY);
+            }
+        }
+        void SetComponentDragVisualState(bool visible)
+        {
+            if (componentDragVisuals != null)
+            {
+                foreach (var visual in componentDragVisuals.Values)
+                {
+                    var markerHost = GetComponentMarkerHost(visual);
+                    if (markerHost != null)
+                    {
+                        markerHost.Visibility = visible ? Visibility.Visible : Visibility.Collapsed;
+                    }
+                }
+            }
+            if (componentDragBindingOverlay != null)
+            {
+                componentDragBindingOverlay.Visibility = visible ? Visibility.Visible : Visibility.Collapsed;
+            }
+        }
+        void UpdateDraggedComponentVisuals()
+        {
+            if (componentDragVisuals == null) return;
+            foreach (var pair in componentDragVisuals)
+            {
+                UpdateComponentVisualPosition(pair.Value, pair.Key);
             }
         }
         void SelectComponents(int x, int y, int width, int height, int clickCount)
@@ -372,7 +453,9 @@ namespace CrazyStorm
                             //Prevent overlay shade from preceding components.
                             if (width == 0 && height == 0 && set.Count > 0) set[set.Count - 1] = component;
                             else
+                            {
                                 set.Add(component);
+                            }
                         }
                         index++;
                     }
@@ -409,7 +492,6 @@ namespace CrazyStorm
             UpdateSelectedStatus();
             //If mouse double click
             if (!(canDoubleClick && set != null && set.Count > 0 && Keyboard.Modifiers != ModifierKeys.Control)) return;
-
             if (set.Count > 0 && clickCount == 2) CreatePropertyPanel(set.First());
         }
         Vector2 GetComponentAbsolutePosition(Component component)
@@ -437,11 +519,12 @@ namespace CrazyStorm
             componentDragMinMoveY = 0;
             componentDragMaxMoveX = 0;
             componentDragMaxMoveY = 0;
+            componentDragVisuals = null;
+            componentDragBindingOverlay = null;
         }
         void BeginComponentDrag(Point point)
         {
             if (selectedComponents == null || selectedComponents.Count == 0) return;
-
             componentDragPending = false;
             componentDragStarted = false;
             componentDragDownPoint = point;
@@ -469,6 +552,24 @@ namespace CrazyStorm
                 if (maxMoveX < componentDragMaxMoveX) componentDragMaxMoveX = maxMoveX;
                 if (maxMoveY < componentDragMaxMoveY) componentDragMaxMoveY = maxMoveY;
             }
+            componentDragVisuals = new Dictionary<Component, Canvas>();
+            componentDragBindingOverlay = null;
+            Canvas noteLayer;
+            Canvas componentLayer;
+            if (!TryGetCurrentScreenLayers(out noteLayer, out componentLayer) || componentLayer == null) return;
+            foreach (var child in componentLayer.Children)
+            {
+                var canvas = child as Canvas;
+                if (canvas?.Tag is Component component && component.Selected)
+                {
+                    componentDragVisuals[component] = canvas;
+                }
+                else if (canvas != null && Equals(canvas.Tag, ComponentBindingOverlayTag))
+                {
+                    componentDragBindingOverlay = canvas;
+                }
+            }
+            SetComponentDragVisualState(false);
         }
         Vector2 ClampComponentDragMove(Vector2 move)
         {
@@ -494,14 +595,12 @@ namespace CrazyStorm
                 ResetComponentDragState(false);
                 return;
             }
-
             if (componentDragStarted && (componentDragMove.x != 0 || componentDragMove.y != 0))
             {
                 var selected = new List<Component>(componentDragStartPositions.Keys);
                 ApplyComponentDragPreview(Vector2.Zero);
                 new MoveComponentCommand(componentDragMove).Do(commandStacks[selectedSystem], selected, new Action(UpdateProperty));
             }
-
             ResetComponentDragState(false);
             UpdateSelectedStatus();
         }
@@ -514,7 +613,6 @@ namespace CrazyStorm
             var point = e.GetPosition(sender as IInputElement);
             Component component;
             if (!TryHitTopComponent(point, out component) || component == null) return false;
-
             if (!component.Selected)
             {
                 ClearSelectedNotes();
@@ -526,9 +624,7 @@ namespace CrazyStorm
             {
                 UpdateSelectedStatus();
             }
-
             if (selectedComponents == null || selectedComponents.Count == 0) return false;
-
             componentDragPending = true;
             componentDragStarted = false;
             componentDragDownPoint = point;
@@ -553,15 +649,16 @@ namespace CrazyStorm
                 var pendingMove = new Vector2(
                     (float)(point.X - componentDragDownPoint.X),
                     (float)(point.Y - componentDragDownPoint.Y));
-                if (Math.Abs(pendingMove.x) <= ComponentDragPointerThreshold
-                    && Math.Abs(pendingMove.y) <= ComponentDragPointerThreshold)
+                if (Math.Abs(pendingMove.x) <= ComponentDragPointerThreshold &&
+                    Math.Abs(pendingMove.y) <= ComponentDragPointerThreshold)
+                {
                     return true;
-
+                }
                 BeginComponentDrag(componentDragDownPoint);
                 componentDragStarted = true;
                 componentDragMove = ClampComponentDragMove(pendingMove);
                 ApplyComponentDragPreview(componentDragMove);
-                UpdateScreen();
+                UpdateDraggedComponentVisuals();
                 return true;
             }
             if (componentDragStartPositions != null && e.LeftButton != MouseButtonState.Pressed)
@@ -584,7 +681,7 @@ namespace CrazyStorm
                 componentDragStarted = true;
                 componentDragMove = ClampComponentDragMove(move);
                 ApplyComponentDragPreview(componentDragMove);
-                UpdateScreen();
+                UpdateDraggedComponentVisuals();
                 return true;
             }
             return false;
@@ -605,10 +702,15 @@ namespace CrazyStorm
         }
         void CancelAllSelection()
         {
+            ResetNoteInteractionState(true);
             ResetComponentDragState(true);
             foreach (var layer in selectedSystem.Layers)
+            {
                 foreach (var component in layer.Components)
+                {
                     component.Selected = false;
+                }
+            }
             ClearSelectedNotes();
 
             UpdateSelectedStatus();
@@ -836,7 +938,9 @@ namespace CrazyStorm
                 || componentDragStartPositions != null
                 || noteEditState == NoteEditState.DragNote
                 || noteEditState == NoteEditState.ResizeNote)
+            {
                 ParticleTabControl_MouseLeftButtonUp(sender, null);
+            }
         }
         private void ParticleTabControl_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
@@ -869,15 +973,15 @@ namespace CrazyStorm
                 var width = (double)selectionRect.GetValue(WidthProperty);
                 var height = (double)selectionRect.GetValue(HeightProperty);
                 if (e != null) SelectComponents((int)x, (int)y, (int)width, (int)height, e.ClickCount);
-                else
-                    SelectComponents((int)x, (int)y, (int)width, (int)height, 0);
-
+                else SelectComponents((int)x, (int)y, (int)width, (int)height, 0);
                 selectionRect.SetValue(WidthProperty, 0.0d);
                 selectionRect.SetValue(HeightProperty, 0.0d);
                 selectionRect = null;
             }
             else
+            {
                 CancelAllSelection();
+            }
         }
         private void ParticleTabControl_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
@@ -885,13 +989,8 @@ namespace CrazyStorm
             if (e.AddedItems.Count > 0)
             {
                 EndNoteTextEdit(true);
-                noteCreatePressed = false;
-                noteLeftPressOwnedByNote = false;
-                noteDragStartRects = null;
-                noteResizeTarget = null;
+                ResetNoteInteractionState(true);
                 ResetComponentDragState(true);
-                noteEditState = NoteEditState.Idle;
-                ParticleTabControl.Cursor = Cursors.Arrow;
                 var tabItem = e.AddedItems[0] as TabItem;
                 foreach (var item in file.ParticleSystems)
                 {

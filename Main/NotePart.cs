@@ -61,15 +61,18 @@ namespace CrazyStorm
         bool noteDragStarted;
         Vector2 noteDragMove;
         Dictionary<Note, Rect> noteDragStartRects;
+        Dictionary<Note, Canvas> noteDragVisuals;
         double noteDragMinLeft;
         double noteDragMinTop;
         double noteDragMaxRight;
         double noteDragMaxBottom;
         Note noteResizeTarget;
+        Canvas noteResizeVisual;
         NoteResizeHandle noteResizeHandle;
         Rect noteResizeStartRect;
         Rect noteResizeCurrentRect;
         bool noteResizeStarted;
+        Border noteCreatePreview;
         TextBox noteEditor;
         Note noteEditingTarget;
         string noteEditingOriginalComment;
@@ -222,7 +225,6 @@ namespace CrazyStorm
         {
             component = null;
             if (selectedSystem == null || selectedSystem.Layers == null) return false;
-
             var center = new Point(config.ScreenWidthOver2, config.ScreenHeightOver2);
             foreach (var layer in selectedSystem.Layers)
             {
@@ -269,7 +271,9 @@ namespace CrazyStorm
             foreach (MenuItem item in noteColorMenu.Items)
             {
                 if (item.Tag is LayerColor color)
+                {
                     item.IsChecked = color == note.Color;
+                }
             }
             noteColorMenu.PlacementTarget = placementTarget;
             noteColorMenu.Placement = PlacementMode.MousePoint;
@@ -284,8 +288,12 @@ namespace CrazyStorm
         {
             if (selectedSystem == null || selectedSystem.Layers == null) return;
             foreach (var layer in selectedSystem.Layers)
+            {
                 foreach (var component in layer.Components)
+                {
                     component.Selected = false;
+                }
+            }
         }
         void SelectSingleNote(Note note)
         {
@@ -364,7 +372,6 @@ namespace CrazyStorm
         Vector2 ClampSelectedNoteMove(List<Note> notes, Vector2 move)
         {
             if (notes == null || notes.Count == 0) return Vector2.Zero;
-
             var minLeft = double.MaxValue;
             var minTop = double.MaxValue;
             var maxRight = double.MinValue;
@@ -377,7 +384,6 @@ namespace CrazyStorm
                 if (rect.Right > maxRight) maxRight = rect.Right;
                 if (rect.Bottom > maxBottom) maxBottom = rect.Bottom;
             }
-
             var minMoveX = -minLeft;
             var minMoveY = -minTop;
             var maxMoveX = GetCanvasWidth() - maxRight;
@@ -394,7 +400,9 @@ namespace CrazyStorm
             if (noteEditState == NoteEditState.CreateNote
                 || noteEditState == NoteEditState.DragNote
                 || noteEditState == NoteEditState.ResizeNote)
+            {
                 return false;
+            }
             if (selectedComponents != null && selectedComponents.Count > 0) return false;
 
             var selected = GetSelectedNotes();
@@ -417,6 +425,104 @@ namespace CrazyStorm
                 pair.Key.Y = (float)(pair.Value.Y + move.y);
             }
         }
+        void UpdateDraggedNotesVisual()
+        {
+            if (noteDragVisuals == null) return;
+            foreach (var pair in noteDragVisuals)
+            {
+                if (pair.Value == null) continue;
+                pair.Value.SetValue(Canvas.LeftProperty, (double)pair.Key.X);
+                pair.Value.SetValue(Canvas.TopProperty, (double)pair.Key.Y);
+            }
+        }
+        void UpdateNoteResizeVisual()
+        {
+            if (noteResizeVisual == null || noteResizeTarget == null) return;
+            RefreshSingleNoteVisual(noteResizeVisual);
+        }
+        Border EnsureNoteCreatePreview()
+        {
+            if (noteCreatePreview != null) return noteCreatePreview;
+
+            noteCreatePreview = new Border
+            {
+                CornerRadius = new CornerRadius(6),
+                BorderBrush = Brushes.White,
+                BorderThickness = new Thickness(1),
+                Background = new SolidColorBrush(Color.FromArgb(40, 255, 255, 255)),
+                IsHitTestVisible = false
+            };
+            return noteCreatePreview;
+        }
+        void RemoveNoteCreatePreview()
+        {
+            if (noteCreatePreview == null) return;
+            var parent = noteCreatePreview.Parent as Panel;
+            parent?.Children.Remove(noteCreatePreview);
+        }
+        void UpdateNoteCreatePreview(Canvas noteLayer = null)
+        {
+            if (noteEditState != NoteEditState.CreateNote || !noteCreatePressed)
+            {
+                RemoveNoteCreatePreview();
+                return;
+            }
+
+            noteLayer = noteLayer ?? GetCurrentNoteLayer();
+            if (noteLayer == null) return;
+
+            var preview = EnsureNoteCreatePreview();
+            var rect = BuildCreateRect(noteDownPoint, noteCurrentPoint);
+            preview.Width = rect.Width;
+            preview.Height = rect.Height;
+            preview.SetValue(Canvas.LeftProperty, rect.X);
+            preview.SetValue(Canvas.TopProperty, rect.Y);
+            if (preview.Parent != noteLayer)
+            {
+                var parent = preview.Parent as Panel;
+                parent?.Children.Remove(preview);
+                noteLayer.Children.Add(preview);
+            }
+            Panel.SetZIndex(preview, int.MaxValue - 2);
+        }
+        void ResetNoteInteractionState(bool resetPreview)
+        {
+            if (resetPreview && noteDragStartRects != null)
+            {
+                foreach (var pair in noteDragStartRects)
+                {
+                    pair.Key.X = (float)pair.Value.X;
+                    pair.Key.Y = (float)pair.Value.Y;
+                }
+            }
+            if (resetPreview && noteResizeTarget != null && noteResizeStartRect != Rect.Empty)
+            {
+                noteResizeTarget.X = (float)noteResizeStartRect.X;
+                noteResizeTarget.Y = (float)noteResizeStartRect.Y;
+                noteResizeTarget.Width = (float)noteResizeStartRect.Width;
+                noteResizeTarget.Height = (float)noteResizeStartRect.Height;
+            }
+            noteCreatePressed = false;
+            noteDragPending = false;
+            noteLeftPressOwnedByNote = false;
+            noteDragStarted = false;
+            noteDragMove = Vector2.Zero;
+            noteDragStartRects = null;
+            noteDragVisuals = null;
+            noteDragMinLeft = 0;
+            noteDragMinTop = 0;
+            noteDragMaxRight = 0;
+            noteDragMaxBottom = 0;
+            noteResizeTarget = null;
+            noteResizeVisual = null;
+            noteResizeHandle = NoteResizeHandle.None;
+            noteResizeStartRect = Rect.Empty;
+            noteResizeCurrentRect = Rect.Empty;
+            noteResizeStarted = false;
+            RemoveNoteCreatePreview();
+            ParticleTabControl.Cursor = Cursors.Arrow;
+            if (noteEditState != NoteEditState.EditNoteText) noteEditState = NoteEditState.Idle;
+        }
         void BeginNoteDrag(Point point)
         {
             var selected = GetSelectedNotes();
@@ -428,14 +534,17 @@ namespace CrazyStorm
             noteDragMove = Vector2.Zero;
             noteDragStarted = false;
             noteDragStartRects = new Dictionary<Note, Rect>();
+            noteDragVisuals = new Dictionary<Note, Canvas>();
             noteDragMinLeft = double.MaxValue;
             noteDragMinTop = double.MaxValue;
             noteDragMaxRight = double.MinValue;
             noteDragMaxBottom = double.MinValue;
+            var noteLayer = GetCurrentNoteLayer();
             foreach (var note in selected)
             {
                 var rect = GetNoteRect(note);
                 noteDragStartRects[note] = rect;
+                if (noteLayer != null) noteDragVisuals[note] = FindNoteVisual(noteLayer, note);
                 if (rect.Left < noteDragMinLeft) noteDragMinLeft = rect.Left;
                 if (rect.Top < noteDragMinTop) noteDragMinTop = rect.Top;
                 if (rect.Right > noteDragMaxRight) noteDragMaxRight = rect.Right;
@@ -449,7 +558,6 @@ namespace CrazyStorm
                 noteEditState = NoteEditState.Idle;
                 return;
             }
-
             if (noteDragStarted && (noteDragMove.x != 0 || noteDragMove.y != 0))
             {
                 var selected = new List<Note>(noteDragStartRects.Keys);
@@ -460,9 +568,9 @@ namespace CrazyStorm
                 }
                 new MoveNoteCommand(noteDragMove).Do(commandStacks[selectedSystem], selected);
             }
-
             noteDragMove = Vector2.Zero;
             noteDragStartRects = null;
+            noteDragVisuals = null;
             noteDragPending = false;
             noteDragStarted = false;
             noteDragMinLeft = 0;
@@ -478,6 +586,7 @@ namespace CrazyStorm
             noteResizeHandle = handle;
             noteResizeStartRect = GetNoteRect(note);
             noteResizeCurrentRect = noteResizeStartRect;
+            noteResizeVisual = FindNoteVisual(GetCurrentNoteLayer(), note);
             noteDownPoint = point;
             noteCurrentPoint = point;
             noteResizeStarted = false;
@@ -490,7 +599,6 @@ namespace CrazyStorm
                 noteEditState = NoteEditState.Idle;
                 return;
             }
-
             if (noteResizeStarted && noteResizeCurrentRect != noteResizeStartRect)
             {
                 noteResizeTarget.X = (float)noteResizeStartRect.X;
@@ -500,8 +608,8 @@ namespace CrazyStorm
                 new ResizeNoteCommand(noteResizeStartRect, noteResizeCurrentRect).Do(
                     commandStacks[selectedSystem], noteResizeTarget);
             }
-
             noteResizeTarget = null;
+            noteResizeVisual = null;
             noteResizeHandle = NoteResizeHandle.None;
             noteResizeStartRect = Rect.Empty;
             noteResizeCurrentRect = Rect.Empty;
@@ -513,10 +621,10 @@ namespace CrazyStorm
         {
             if (!noteCreatePressed)
             {
+                RemoveNoteCreatePreview();
                 noteEditState = NoteEditState.Idle;
                 return;
             }
-
             var rect = BuildCreateRect(noteDownPoint, noteCurrentPoint);
             var note = new Note();
             note.X = (float)rect.X;
@@ -528,6 +636,7 @@ namespace CrazyStorm
             ClearSelectedComponents();
             new AddNoteCommand().Do(commandStacks[selectedSystem], selectedSystem, note);
             note.Selected = true;
+            RemoveNoteCreatePreview();
             noteCreatePressed = false;
             noteEditState = NoteEditState.Idle;
             ParticleTabControl.Cursor = Cursors.Arrow;
@@ -556,7 +665,6 @@ namespace CrazyStorm
                 noteEditor.Focus();
                 return;
             }
-
             EndNoteTextEdit(true);
             noteEditingTarget = note;
             noteEditingOriginalComment = note.Comment ?? string.Empty;
@@ -598,7 +706,6 @@ namespace CrazyStorm
                     var parent = noteEditor.Parent as Panel;
                     parent?.Children.Remove(noteEditor);
                 }
-
                 var editorText = noteEditor != null ? noteEditor.Text : string.Empty;
                 var text = NormalizeNoteComment(editorText);
                 var note = noteEditingTarget;
@@ -614,7 +721,6 @@ namespace CrazyStorm
                     UpdateNoteLayer();
                     return;
                 }
-
                 if (commit)
                 {
                     if (!string.Equals(text, oldText, StringComparison.Ordinal))
@@ -650,14 +756,17 @@ namespace CrazyStorm
             noteLeftPressOwnedByNote = false;
             noteDragMove = Vector2.Zero;
             noteDragStartRects = null;
+            noteDragVisuals = null;
             noteDragMinLeft = 0;
             noteDragMinTop = 0;
             noteDragMaxRight = 0;
             noteDragMaxBottom = 0;
             noteResizeTarget = null;
+            noteResizeVisual = null;
             noteResizeHandle = NoteResizeHandle.None;
             noteResizeStartRect = Rect.Empty;
             noteResizeCurrentRect = Rect.Empty;
+            RemoveNoteCreatePreview();
             if (aimRect != null)
             {
                 aimRect.SetValue(OpacityProperty, 0.0d);
@@ -671,11 +780,12 @@ namespace CrazyStorm
         {
             noteCreatePressed = false;
             noteLeftPressOwnedByNote = false;
+            RemoveNoteCreatePreview();
             if (noteEditState == NoteEditState.CreateNote)
             {
                 noteEditState = NoteEditState.Idle;
                 ParticleTabControl.Cursor = Cursors.Arrow;
-                UpdateNoteLayer();
+                UpdateSelectedStatus();
             }
         }
         void EditSelectedNote()
@@ -702,8 +812,9 @@ namespace CrazyStorm
             var selected = new List<Note>();
             if (selectedSystem == null || selectedSystem.Notes == null) return selected;
             foreach (var note in selectedSystem.Notes)
+            {
                 if (note.Selected) selected.Add(note);
-
+            }
             return selected;
         }
         bool IsEditingNoteText()
@@ -743,7 +854,6 @@ namespace CrazyStorm
             if (noteEditState == NoteEditState.ResizeNote) EndNoteResize();
             if (noteEditState != NoteEditState.CreateNote && (aimRect != null || bindingLines != null)) return false;
             var point = e.GetPosition(sender as IInputElement);
-
             if (IsEditingNoteText() && noteEditor != null)
             {
                 var source = e.OriginalSource as DependencyObject;
@@ -754,7 +864,6 @@ namespace CrazyStorm
                     return true;
                 }
             }
-
             if (noteEditState == NoteEditState.CreateNote)
             {
                 noteDownPoint = point;
@@ -762,10 +871,9 @@ namespace CrazyStorm
                 noteCreatePressed = true;
                 noteLeftPressOwnedByNote = true;
                 e.Handled = true;
-                UpdateNoteLayer();
+                UpdateNoteCreatePreview();
                 return true;
             }
-
             Note note;
             NoteResizeHandle handle;
             if (TryHitResizeHandle(point, out note, out handle))
@@ -775,7 +883,6 @@ namespace CrazyStorm
                 e.Handled = true;
                 return true;
             }
-
             var hitNoteBody = TryHitNoteBody(point, out note);
             if (IsEditingNoteText())
             {
@@ -788,7 +895,6 @@ namespace CrazyStorm
                     e.Handled = true;
                     return true;
                 }
-
                 if (noteEditingTarget != null && (!noteEditingTarget.Selected || GetSelectedNoteCount() != 1))
                 {
                     SelectSingleNote(noteEditingTarget);
@@ -798,10 +904,8 @@ namespace CrazyStorm
                 e.Handled = true;
                 return true;
             }
-
             Component component;
             if (TryHitTopComponent(point, out component)) return false;
-
             if (!hitNoteBody)
             {
                 noteLastClickTarget = null;
@@ -831,7 +935,6 @@ namespace CrazyStorm
                 UpdateSelectedStatus();
                 return true;
             }
-
             var wasSingleSelectedBeforeClick = note.Selected && GetSelectedNoteCount() == 1;
             if (!note.Selected)
             {
@@ -842,7 +945,6 @@ namespace CrazyStorm
             {
                 UpdateNoteLayer();
             }
-
             var withinDoubleClickArea = Math.Abs(point.X - noteLastClickPoint.X) <= NoteStrictDoubleClickDistance
                 && Math.Abs(point.Y - noteLastClickPoint.Y) <= NoteStrictDoubleClickDistance;
             var fallbackDoubleClick = noteLastClickTarget == note
@@ -858,7 +960,6 @@ namespace CrazyStorm
             noteLastClickTimestamp = e.Timestamp;
             noteLastClickPoint = point;
             noteLastClickWasSingleSelected = wasSingleSelectedBeforeClick;
-
             if (isDoubleClick)
             {
                 noteDragPending = false;
@@ -867,7 +968,6 @@ namespace CrazyStorm
                 e.Handled = true;
                 return true;
             }
-
             noteDownPoint = point;
             noteCurrentPoint = point;
             noteDragPending = true;
@@ -888,17 +988,17 @@ namespace CrazyStorm
                 }
                 if (point == noteCurrentPoint) return true;
                 noteCurrentPoint = point;
-
                 var pendingMove = new Vector2((float)(point.X - noteDownPoint.X), (float)(point.Y - noteDownPoint.Y));
                 if (Math.Abs(pendingMove.x) <= NotePointerThreshold &&
                     Math.Abs(pendingMove.y) <= NotePointerThreshold)
+                {
                     return true;
-
+                }
                 BeginNoteDrag(noteDownPoint);
                 noteDragStarted = true;
                 noteDragMove = ClampGroupMove(pendingMove);
                 ApplyDragPreview(noteDragMove);
-                UpdateNoteLayer();
+                UpdateDraggedNotesVisual();
                 return true;
             }
             if (noteEditState == NoteEditState.DragNote && e.LeftButton != MouseButtonState.Pressed)
@@ -915,7 +1015,7 @@ namespace CrazyStorm
             {
                 if (point == noteCurrentPoint) return true;
                 noteCurrentPoint = point;
-                UpdateNoteLayer();
+                UpdateNoteCreatePreview();
                 return true;
             }
             if (noteEditState == NoteEditState.DragNote && noteDragStartRects != null && e.LeftButton == MouseButtonState.Pressed)
@@ -926,12 +1026,13 @@ namespace CrazyStorm
                 if (!noteDragStarted &&
                     Math.Abs(move.x) <= NotePointerThreshold &&
                     Math.Abs(move.y) <= NotePointerThreshold)
+                {
                     return true;
-
+                }
                 noteDragStarted = true;
                 noteDragMove = ClampGroupMove(move);
                 ApplyDragPreview(noteDragMove);
-                UpdateNoteLayer();
+                UpdateDraggedNotesVisual();
                 return true;
             }
             if (noteEditState == NoteEditState.ResizeNote && noteResizeTarget != null && e.LeftButton == MouseButtonState.Pressed)
@@ -942,15 +1043,16 @@ namespace CrazyStorm
                 if (!noteResizeStarted &&
                     Math.Abs(move.x) <= NotePointerThreshold &&
                     Math.Abs(move.y) <= NotePointerThreshold)
+                {
                     return true;
-
+                }
                 noteResizeStarted = true;
                 noteResizeCurrentRect = CalculateResizeRect(noteResizeStartRect, noteResizeHandle, move);
                 noteResizeTarget.X = (float)noteResizeCurrentRect.X;
                 noteResizeTarget.Y = (float)noteResizeCurrentRect.Y;
                 noteResizeTarget.Width = (float)noteResizeCurrentRect.Width;
                 noteResizeTarget.Height = (float)noteResizeCurrentRect.Height;
-                UpdateNoteLayer();
+                UpdateNoteResizeVisual();
                 return true;
             }
             return false;
@@ -1000,7 +1102,6 @@ namespace CrazyStorm
             if (selectedSystem == null || selectedSystem.Notes == null) return false;
             var target = sender as UIElement;
             if (target == null) return false;
-
             Note note;
             if (!TryHitNoteBody(e.GetPosition(target), out note)) return false;
             if (!note.Selected || GetSelectedNoteCount() != 1)
@@ -1016,21 +1117,11 @@ namespace CrazyStorm
             if (canvas == null) return;
             if (noteEditState == NoteEditState.CreateNote && noteCreatePressed)
             {
-                var rect = BuildCreateRect(noteDownPoint, noteCurrentPoint);
-                var preview = new Border
-                {
-                    Width = rect.Width,
-                    Height = rect.Height,
-                    CornerRadius = new CornerRadius(6),
-                    BorderBrush = Brushes.White,
-                    BorderThickness = new Thickness(1),
-                    Background = new SolidColorBrush(Color.FromArgb(40, 255, 255, 255)),
-                    IsHitTestVisible = false
-                };
-                preview.SetValue(Canvas.LeftProperty, rect.X);
-                preview.SetValue(Canvas.TopProperty, rect.Y);
-                Panel.SetZIndex(preview, int.MaxValue - 2);
-                canvas.Children.Add(preview);
+                UpdateNoteCreatePreview(canvas);
+            }
+            else
+            {
+                RemoveNoteCreatePreview();
             }
             if (noteEditor != null && noteEditingTarget != null)
             {
