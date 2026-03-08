@@ -103,6 +103,8 @@ namespace CrazyStorm.Core
         static float[] maskShapeArray = new float[MAX_MASK_COUNT];
         static float[] maskTypeArray = new float[MAX_MASK_COUNT];
         static float[] maskRotateArray = new float[MAX_MASK_COUNT];
+        static Vector2[] maskRotateTrigArray = new Vector2[MAX_MASK_COUNT];
+        static Vector2[] maskEllipseInvSizeSqArray = new Vector2[MAX_MASK_COUNT];
         public static int MaximumParticleCount => searchResult.Length;
         public static int ActiveParticleCount
         {
@@ -124,6 +126,8 @@ namespace CrazyStorm.Core
         public static float[] MaskShapeArray => maskShapeArray;
         public static float[] MaskTypeArray => maskTypeArray;
         public static float[] MaskRotateArray => maskRotateArray;
+        public static Vector2[] MaskRotateTrigArray => maskRotateTrigArray;
+        public static Vector2[] MaskEllipseInvSizeSqArray => maskEllipseInvSizeSqArray;
         public static int MaskCount { get; set; }
         public static void Initialize(int windowWidth, int windowHeight, int particlePreservedDist, int curvePreservedDist,
             int particleMaximum, int curveParticleMaximum)
@@ -297,6 +301,8 @@ namespace CrazyStorm.Core
             Array.Clear(MaskShapeArray, 0, MAX_MASK_COUNT);
             Array.Clear(MaskTypeArray, 0, MAX_MASK_COUNT);
             Array.Clear(MaskRotateArray, 0, MAX_MASK_COUNT);
+            Array.Clear(MaskRotateTrigArray, 0, MAX_MASK_COUNT);
+            Array.Clear(MaskEllipseInvSizeSqArray, 0, MAX_MASK_COUNT);
         }
         public static void UpdateLayerMasks(GenericContainer<Layer> layers, Layer layer)
         {

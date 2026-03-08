@@ -341,11 +341,16 @@ namespace CrazyStorm.Core
         {
             var maskCount = ParticleManager.MaskCount;
             if (maskCount >= ParticleManager.MAX_MASK_COUNT || !LayerMask || !Visibility || !LayerMaskMutex || !IsValid()) return;
+            var rotation = (float)MathHelper.DegToRad(Rotation);
+            var halfWidthSq = HalfWidth * HalfWidth;
+            var halfHeightSq = HalfHeight * HalfHeight;
             ParticleManager.MaskPositionArray[maskCount] = Position;
             ParticleManager.MaskSizeArray[maskCount] = new Vector2(HalfWidth, HalfHeight);
             ParticleManager.MaskShapeArray[maskCount] = FieldShape == FieldShape.Circle ? 1 : 0;
             ParticleManager.MaskTypeArray[maskCount] = LayerMaskType == LayerMaskType.OutsideMask ? 1 : 2;
-            ParticleManager.MaskRotateArray[maskCount] = (float)MathHelper.DegToRad(Rotation);
+            ParticleManager.MaskRotateArray[maskCount] = rotation;
+            ParticleManager.MaskRotateTrigArray[maskCount] = new Vector2((float)Math.Cos(rotation), (float)Math.Sin(rotation));
+            ParticleManager.MaskEllipseInvSizeSqArray[maskCount] = new Vector2(1f / halfWidthSq, 1f / halfHeightSq);
             maskCount++;
             ParticleManager.MaskCount = maskCount;
         }
@@ -353,11 +358,16 @@ namespace CrazyStorm.Core
         {
             var maskCount = ParticleManager.MaskCount;
             if (maskCount >= ParticleManager.MAX_MASK_COUNT || !LayerMask || !Visibility || !IsValid()) return;
+            var rotation = (float)MathHelper.DegToRad(Rotation);
+            var halfWidthSq = HalfWidth * HalfWidth;
+            var halfHeightSq = HalfHeight * HalfHeight;
             ParticleManager.MaskPositionArray[maskCount] = Position;
             ParticleManager.MaskSizeArray[maskCount] = new Vector2(HalfWidth, HalfHeight);
             ParticleManager.MaskShapeArray[maskCount] = FieldShape == FieldShape.Circle ? 1 : 0;
             ParticleManager.MaskTypeArray[maskCount] = (int)LayerMaskType + 1;
-            ParticleManager.MaskRotateArray[maskCount] = (float)MathHelper.DegToRad(Rotation);
+            ParticleManager.MaskRotateArray[maskCount] = rotation;
+            ParticleManager.MaskRotateTrigArray[maskCount] = new Vector2((float)Math.Cos(rotation), (float)Math.Sin(rotation));
+            ParticleManager.MaskEllipseInvSizeSqArray[maskCount] = new Vector2(1f / halfWidthSq, 1f / halfHeightSq);
             maskCount++;
             ParticleManager.MaskCount = maskCount;
         }

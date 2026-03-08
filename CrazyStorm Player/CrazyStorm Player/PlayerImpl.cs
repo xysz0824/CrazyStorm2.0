@@ -42,7 +42,8 @@ namespace CrazyStorm_Player
         EffectParameter shaderMaskPosition;
         EffectParameter shaderMaskType;
         EffectParameter shaderMaskShape;
-        EffectParameter shaderMaskRotate;
+        EffectParameter shaderMaskRotateTrig;
+        EffectParameter shaderMaskEllipseInvSizeSq;
         EffectParameter shaderMaskCount;
         EffectParameter shaderRenderCenter;
         SpriteBatch spriteBatch;
@@ -98,7 +99,8 @@ namespace CrazyStorm_Player
                 shaderMaskPosition = shader.Parameters["MaskPosition"];
                 shaderMaskType = shader.Parameters["MaskType"];
                 shaderMaskShape = shader.Parameters["MaskShape"];
-                shaderMaskRotate = shader.Parameters["MaskRotate"];
+                shaderMaskRotateTrig = shader.Parameters["MaskRotateTrig"];
+                shaderMaskEllipseInvSizeSq = shader.Parameters["MaskEllipseInvSizeSq"];
                 shaderMaskCount = shader.Parameters["MaskCount"];
                 shaderRenderCenter = shader.Parameters["RenderCenter"];
             }
@@ -310,7 +312,8 @@ namespace CrazyStorm_Player
                 shaderMaskPosition.SetValue(ParticleManager.MaskPositionArray);
                 shaderMaskShape.SetValue(ParticleManager.MaskShapeArray);
                 shaderMaskType.SetValue(ParticleManager.MaskTypeArray);
-                shaderMaskRotate.SetValue(ParticleManager.MaskRotateArray);
+                shaderMaskRotateTrig.SetValue(ParticleManager.MaskRotateTrigArray);
+                shaderMaskEllipseInvSizeSq.SetValue(ParticleManager.MaskEllipseInvSizeSqArray);
                 shaderRenderCenter.SetValue(new Vector2(Width / 2, Height / 2));
             }
             BeginParticleBatches(blendType);

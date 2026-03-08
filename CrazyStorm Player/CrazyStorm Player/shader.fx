@@ -17,7 +17,8 @@ uniform float2 MaskSize[MASK_COUNT];
 uniform float2 MaskPosition[MASK_COUNT];
 uniform float MaskType[MASK_COUNT];
 uniform float MaskShape[MASK_COUNT];
-uniform float MaskRotate[MASK_COUNT];
+uniform float2 MaskRotateTrig[MASK_COUNT];
+uniform float2 MaskEllipseInvSizeSq[MASK_COUNT];
 uniform int MaskCount;
 uniform float2 RenderCenter;
 
@@ -37,14 +38,23 @@ float4 mainPS(float4 position : SV_Position, float4 color : COLOR0, float2 texCo
     for (int i = 0; i < MaskCount; ++i)
     {
         float2 maskD = (pos - MaskPosition[i].xy);
-        maskD = float2(maskD.x * cos(MaskRotate[i]) + maskD.y * sin(MaskRotate[i]),
-                       -maskD.x * sin(MaskRotate[i]) + maskD.y * cos(MaskRotate[i]));
-        float rectJudge = min(1, smoothstep(MaskSize[i].x - 1, MaskSize[i].x + 1, maskD.x) + 
-                                 smoothstep(maskD.x - 1, maskD.x + 1, -MaskSize[i].x) + 
-                                 smoothstep(MaskSize[i].y - 1, MaskSize[i].y + 1, maskD.y) + 
-                                 smoothstep(maskD.y - 1, maskD.y + 1, -MaskSize[i].y));
-        float circleJudge = smoothstep(1 - 0.01, 1 + 0.01, sqrt(maskD.x * maskD.x / (MaskSize[i].x * MaskSize[i].x) + maskD.y * maskD.y / (MaskSize[i].y * MaskSize[i].y)));
-        float judge = lerp(rectJudge, circleJudge, MaskShape[i]);
+        float2 rotateTrig = MaskRotateTrig[i];
+        maskD = float2(maskD.x * rotateTrig.x + maskD.y * rotateTrig.y,
+                       -maskD.x * rotateTrig.y + maskD.y * rotateTrig.x);
+        float judge = 0;
+        if (MaskShape[i] == 0)
+        {
+            judge = min(1, smoothstep(MaskSize[i].x - 1, MaskSize[i].x + 1, maskD.x) +
+                           smoothstep(maskD.x - 1, maskD.x + 1, -MaskSize[i].x) +
+                           smoothstep(MaskSize[i].y - 1, MaskSize[i].y + 1, maskD.y) +
+                           smoothstep(maskD.y - 1, maskD.y + 1, -MaskSize[i].y));
+        }
+        else if (MaskShape[i] == 1)
+        {
+            float2 maskDSq = maskD * maskD;
+            float ellipseDistance = sqrt(maskDSq.x * MaskEllipseInvSizeSq[i].x + maskDSq.y * MaskEllipseInvSizeSq[i].y);
+            judge = smoothstep(1 - 0.01, 1 + 0.01, ellipseDistance);
+        }
         judge = lerp(1, 0, judge);
         result = lerp(result, lerp(result + judge, result * (1 - judge), MaskType[i] - 1), min(1, MaskType[i]));
     }

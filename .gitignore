@@ -11,3 +11,4 @@ Docs/en
 Docs/zh-cn
 Docs/index.html
 __pycache__/
+*.mgfxo
