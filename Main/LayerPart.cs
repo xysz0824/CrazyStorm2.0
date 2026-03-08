@@ -44,7 +44,7 @@ namespace CrazyStorm
             if (selectedSystem.Layers.Count > 1)
             {
                 new DelLayerCommand().Do(commandStacks[selectedSystem], selectedSystem, selectedLayer);
-                UpdateSelectedStatus();
+                UpdateUIAndPanels();
             }
             else
                 MessageBox.Show((string)FindResource("CanNotDeleteAllLayerStr"), (string)FindResource("TipTitleStr"),
@@ -217,7 +217,7 @@ namespace CrazyStorm
 
             var visible = sender as Grid;
             selectedLayer.Visible = visible.Opacity == 0;
-            UpdateSelectedStatus();
+            UpdateUIAndPanels();
         }
         private void LayerDown_MouseUp(object sender, MouseButtonEventArgs e)
         {
@@ -230,7 +230,7 @@ namespace CrazyStorm
             int index = selectedSystem.Layers.IndexOf(selectedLayer);
             if (index == selectedSystem.Layers.Count - 1) return;
             new MoveLayerCommand(1).Do(commandStacks[selectedSystem], selectedSystem, selectedLayer);
-            UpdateSelectedStatus();
+            UpdateUIAndPanels();
         }
         private void LayerUp_MouseUp(object sender, MouseButtonEventArgs e)
         {
@@ -243,7 +243,7 @@ namespace CrazyStorm
             int index = selectedSystem.Layers.IndexOf(selectedLayer);
             if (index == 0) return;
             new MoveLayerCommand(-1).Do(commandStacks[selectedSystem], selectedSystem, selectedLayer);
-            UpdateSelectedStatus();
+            UpdateUIAndPanels();
         }
         private void LayerColor_MouseUp(object sender, MouseButtonEventArgs e)
         {

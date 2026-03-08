@@ -48,14 +48,14 @@ namespace CrazyStorm
             var stack = commandStacks[selectedSystem];
             var command = stack.RedoPop();
             command.Undo(stack);
-            UpdateSelectedStatus();
+            UpdateUIAndPanels();
         }
         void Redo()
         {
             var stack = commandStacks[selectedSystem];
             var command = stack.UndoPop();
             command.Redo(stack);
-            UpdateSelectedStatus();
+            UpdateUIAndPanels();
         }
         void Cut()
         {
@@ -67,18 +67,18 @@ namespace CrazyStorm
         {
             clipBoard.Clear();
             clipBoard.AddRange(selectedComponents);
-            UpdateSelectedStatus();
+            UpdateUIAndPanels();
         }
         void Paste()
         {
             CancelAllSelection();
             new PasteComponentCommand().Do(commandStacks[selectedSystem], selectedSystem, selectedLayer, clipBoard);
-            UpdateSelectedStatus();
+            UpdateUIAndPanels();
         }
         void Del()
         {
             new DelComponentCommand().Do(commandStacks[selectedSystem], selectedSystem, selectedComponents);
-            UpdateSelectedStatus();
+            UpdateUIAndPanels();
             ResetLeftTab();
         }
         void Find()

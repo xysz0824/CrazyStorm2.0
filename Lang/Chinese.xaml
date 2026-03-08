@@ -210,6 +210,8 @@
     <sys:String x:Key="BasicStr">基本</sys:String>
     <sys:String x:Key="PropertyNameStr">属性名</sys:String>
     <sys:String x:Key="PropertyValueStr">属性值</sys:String>
+    <sys:String x:Key="PropertyStr">属性</sys:String>
+    <sys:String x:Key="EventStr">事件</sys:String>
     <sys:String x:Key="ParticleStr">粒子</sys:String>
     <sys:String x:Key="VariableStr">变量</sys:String>
     <sys:String x:Key="ComponentEventGroupStr">一般事件组</sys:String>

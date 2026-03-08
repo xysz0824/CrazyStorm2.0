@@ -18,6 +18,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Windows.Threading;
 
 namespace CrazyStorm
 {
@@ -60,7 +61,32 @@ namespace CrazyStorm
         }
         #endregion
 
+        #region Public Methods
+        public void ScrollToEventSection()
+        {
+            ScrollToEventSectionCore();
+            Dispatcher.BeginInvoke(DispatcherPriority.Background, new Action(ScrollToEventSectionCore));
+        }
+        #endregion
+
         #region Private Methods
+        void ScrollToEventSectionCore()
+        {
+            UpdateLayout();
+
+            var parent = Parent as DependencyObject;
+            while (parent != null)
+            {
+                var scroll = parent as ScrollViewer;
+                if (scroll != null)
+                {
+                    scroll.UpdateLayout();
+                    scroll.ScrollToBottom();
+                    return;
+                }
+                parent = VisualTreeHelper.GetParent(parent) ?? LogicalTreeHelper.GetParent(parent);
+            }
+        }
         void InitializeEnvironment()
         {
             environment = new Expression.Environment();

@@ -778,7 +778,8 @@
                                               IsTextSearchEnabled="True" Background="{DynamicResource ListBrush}" BorderThickness="0,0,0,0">
                                         <TreeView.ItemTemplate >
                                             <HierarchicalDataTemplate ItemsSource="{Binding Children}">
-                                                <Border x:Name="ComponentTreeItemBorder" Background="Transparent" CornerRadius="2" Padding="2,1">
+                                                <Border x:Name="ComponentTreeItemBorder" Background="Transparent" CornerRadius="2" Padding="2,1"
+                                                        PreviewMouseRightButtonDown="ComponentTreeItem_PreviewMouseRightButtonDown">
                                                     <StackPanel Orientation="Horizontal">
                                                         <Path x:Name="ComponentTreeItemIcon" Data="{Binding Converter={StaticResource TypeIconConverter}}" 
                                                               Fill="{Binding ElementName=ComponentTreeItemText, Path=Foreground}" Width="12" Height="12" Margin="0,0,4,0" Stretch="Uniform" />

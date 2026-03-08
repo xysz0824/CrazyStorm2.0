@@ -39,6 +39,8 @@ namespace CrazyStorm
         DateTime propertyWindowLastMoveTime;
         Dictionary<Component, Window> propertyWindows = new Dictionary<Component, Window>();
         HashSet<Window> dockingPropertyWindows = new HashSet<Window>();
+        ContextMenu componentMenu;
+        bool suppressComponentTreeSelectionChanged;
         #endregion
 
         #region Private Methods
@@ -472,8 +474,36 @@ namespace CrazyStorm
             else
                 SelectedGroup.Opacity = 0;
         }
-        void CreatePropertyPanel(Component component)
+        ContextMenu BuildComponentMenu()
         {
+            var menu = new ContextMenu();
+
+            var propertyItem = new MenuItem();
+            propertyItem.Header = FindResource("PropertyStr");
+            propertyItem.Click += ComponentPropertyMenuItem_Click;
+            menu.Items.Add(propertyItem);
+
+            var eventItem = new MenuItem();
+            eventItem.Header = FindResource("EventStr");
+            eventItem.Click += ComponentEventMenuItem_Click;
+            menu.Items.Add(eventItem);
+
+            return menu;
+        }
+        void OpenComponentMenu(UIElement placementTarget, Component component)
+        {
+            if (placementTarget == null || component == null) return;
+            if (componentMenu == null) componentMenu = BuildComponentMenu();
+
+            componentMenu.Tag = component;
+            componentMenu.PlacementTarget = placementTarget;
+            componentMenu.Placement = PlacementMode.MousePoint;
+            componentMenu.IsOpen = true;
+        }
+        PropertyPanel OpenPropertyPanel(Component component)
+        {
+            if (component == null) return null;
+
             TabItem item;
             Window propertyWindow;
             //Prevent from repeating tab of components.  
@@ -484,21 +514,72 @@ namespace CrazyStorm
                 {
                     LeftTabControl.SelectedItem = item;
                     item.Focus();
-                    return;
+                    var scroll = item.Content as ScrollViewer;
+                    return scroll?.Content as PropertyPanel;
                 }
             }
             if (propertyWindows.TryGetValue(component, out propertyWindow))
             {
                 if (propertyWindow.WindowState == WindowState.Minimized) propertyWindow.WindowState = WindowState.Normal;
                 propertyWindow.Activate();
-                return;
+                var scroll = propertyWindow.Content as ScrollViewer;
+                return scroll?.Content as PropertyPanel;
             }
 
-            item = CreatePropertyTabItem(component, CreatePropertyPanelScroll(component));
+            var panelScroll = CreatePropertyPanelScroll(component);
+            item = CreatePropertyTabItem(component, panelScroll);
             LeftTabControl.Items.Add(item);
             LeftTabControl.SelectedItem = item;
             item.Focus();
             saved = false;
+            return panelScroll.Content as PropertyPanel;
+        }
+        void CreatePropertyPanel(Component component)
+        {
+            OpenPropertyPanel(component);
+        }
+        void SelectSingleComponent(Component component)
+        {
+            if (component == null) return;
+
+            if (IsEditingNoteText()) EndNoteTextEdit(true);
+            else ClearSelectedNotes();
+
+            ClearSelectedComponents();
+            component.Selected = true;
+            UpdateSelectionUI();
+        }
+        Component GetComponentTreeNodeComponent(DependencyObject source)
+        {
+            var element = source as FrameworkElement;
+            if (element?.DataContext is Component directComponent) return directComponent;
+
+            var text = source as TextBlock ?? VisualHelper.FindParent<TextBlock>(source);
+            if (text != null && text.Name == "ComponentTreeItemText") return text.DataContext as Component;
+
+            var icon = source as Path ?? VisualHelper.FindParent<Path>(source);
+            if (icon != null && icon.Name == "ComponentTreeItemIcon") return icon.DataContext as Component;
+
+            var border = source as Border ?? VisualHelper.FindParent<Border>(source);
+            if (border != null && border.Name == "ComponentTreeItemBorder") return border.DataContext as Component;
+
+            return null;
+        }
+        TreeViewItem GetComponentTreeViewItem(DependencyObject source)
+        {
+            var item = source as TreeViewItem;
+            if (item != null) return item;
+
+            return VisualHelper.FindParent<TreeViewItem>(source);
+        }
+        void SyncComponentTreeSelection(TreeViewItem item)
+        {
+            if (item == null) return;
+
+            suppressComponentTreeSelectionChanged = true;
+            item.IsSelected = true;
+            Keyboard.Focus(item);
+            suppressComponentTreeSelectionChanged = false;
         }
         void UpdateProperty()
         {
@@ -697,24 +778,44 @@ namespace CrazyStorm
         }
         private void ComponentTree_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
+            if (suppressComponentTreeSelectionChanged) return;
             if (ComponentTree.SelectedItem == null) return;
             var set = new List<CrazyStorm.Core.Component>();
             set.Add(ComponentTree.SelectedItem as Component);
             SelectComponents(set, true);
         }
+        private void ComponentTreeItem_PreviewMouseRightButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            var originalSource = e.OriginalSource as DependencyObject;
+            var source = originalSource ?? sender as DependencyObject;
+            var component = GetComponentTreeNodeComponent(source);
+            if (component == null) return;
+
+            var treeItem = GetComponentTreeViewItem(originalSource) ?? GetComponentTreeViewItem(sender as DependencyObject);
+            SyncComponentTreeSelection(treeItem);
+            SelectSingleComponent(component);
+            OpenComponentMenu(treeItem ?? sender as UIElement, component);
+            e.Handled = true;
+        }
         private void ComponentTree_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
             var source = e.OriginalSource as DependencyObject;
-            var text = source as TextBlock ?? VisualHelper.FindParent<TextBlock>(source);
-            var icon = source as Path ?? VisualHelper.FindParent<Path>(source);
-            var component = default(Component);
-
-            if (text != null && text.Name == "ComponentTreeItemText")
-                component = text.DataContext as Component;
-            else if (icon != null && icon.Name == "ComponentTreeItemIcon")
-                component = icon.DataContext as Component;
+            var component = GetComponentTreeNodeComponent(source);
 
             if (component != null) CreatePropertyPanel(component);
+        }
+        private void ComponentPropertyMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            var menu = (sender as MenuItem)?.Parent as ContextMenu;
+            var component = menu?.Tag as Component;
+            OpenPropertyPanel(component);
+        }
+        private void ComponentEventMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            var menu = (sender as MenuItem)?.Parent as ContextMenu;
+            var component = menu?.Tag as Component;
+            var panel = OpenPropertyPanel(component);
+            panel?.ScrollToEventSection();
         }
         private void PropertyTab_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {

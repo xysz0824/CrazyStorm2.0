@@ -413,7 +413,7 @@ namespace CrazyStorm
 
             noteDragPending = false;
             command.Do(commandStacks[selectedSystem], selected);
-            UpdateSelectedStatus();
+            UpdateUIAndPanels();
             return true;
         }
         void ApplyDragPreview(Vector2 move)
@@ -578,7 +578,7 @@ namespace CrazyStorm
             noteDragMaxRight = 0;
             noteDragMaxBottom = 0;
             noteEditState = NoteEditState.Idle;
-            UpdateSelectedStatus();
+            UpdateUIAndPanels();
         }
         void BeginNoteResize(Note note, NoteResizeHandle handle, Point point)
         {
@@ -615,7 +615,7 @@ namespace CrazyStorm
             noteResizeCurrentRect = Rect.Empty;
             noteResizeStarted = false;
             noteEditState = NoteEditState.Idle;
-            UpdateSelectedStatus();
+            UpdateUIAndPanels();
         }
         void EndNoteCreate()
         {
@@ -641,7 +641,7 @@ namespace CrazyStorm
             noteEditState = NoteEditState.Idle;
             ParticleTabControl.Cursor = Cursors.Arrow;
             FocusParticleTabControl();
-            UpdateSelectedStatus();
+            UpdateUIAndPanels();
         }
         void SetNoteEditorLayout()
         {
@@ -658,7 +658,7 @@ namespace CrazyStorm
             if (!note.Selected || GetSelectedNoteCount() != 1)
             {
                 SelectSingleNote(note);
-                UpdateSelectedStatus();
+                UpdateUIAndPanels();
             }
             if (noteEditor != null && noteEditingTarget == note)
             {
@@ -732,7 +732,7 @@ namespace CrazyStorm
                 {
                     note.Comment = oldText;
                 }
-                UpdateSelectedStatus();
+                UpdateUIAndPanels();
             }
             finally
             {
@@ -785,7 +785,7 @@ namespace CrazyStorm
             {
                 noteEditState = NoteEditState.Idle;
                 ParticleTabControl.Cursor = Cursors.Arrow;
-                UpdateSelectedStatus();
+                UpdateUIAndPanels();
             }
         }
         void EditSelectedNote()
@@ -800,7 +800,7 @@ namespace CrazyStorm
             var selected = GetSelectedNotes();
             if (selected.Count == 0) return;
             new DelNoteCommand().Do(commandStacks[selectedSystem], selectedSystem, selected);
-            UpdateSelectedStatus();
+            UpdateUIAndPanels();
         }
         int GetSelectedNoteCount()
         {
@@ -840,7 +840,7 @@ namespace CrazyStorm
                 noteLastClickTimestamp = 0;
                 noteLastClickWasSingleSelected = false;
                 ClearSelectedNotes();
-                UpdateSelectedStatus();
+                UpdateUIAndPanels();
                 return true;
             }
             return false;
@@ -890,7 +890,7 @@ namespace CrazyStorm
                 {
                     EndNoteTextEdit(true);
                     ClearSelectedNotes();
-                    UpdateSelectedStatus();
+                    UpdateUIAndPanels();
                     noteLeftPressOwnedByNote = true;
                     e.Handled = true;
                     return true;
@@ -898,7 +898,7 @@ namespace CrazyStorm
                 if (noteEditingTarget != null && (!noteEditingTarget.Selected || GetSelectedNoteCount() != 1))
                 {
                     SelectSingleNote(noteEditingTarget);
-                    UpdateSelectedStatus();
+                    UpdateUIAndPanels();
                 }
                 noteLeftPressOwnedByNote = true;
                 e.Handled = true;
@@ -914,7 +914,7 @@ namespace CrazyStorm
                 if ((Keyboard.Modifiers & ModifierKeys.Control) != ModifierKeys.Control && GetSelectedNoteCount() > 0)
                 {
                     ClearSelectedNotes();
-                    UpdateSelectedStatus();
+                    UpdateUIAndPanels();
                     noteLeftPressOwnedByNote = true;
                     e.Handled = true;
                     return true;
@@ -932,14 +932,14 @@ namespace CrazyStorm
                 noteLastClickTimestamp = 0;
                 noteLastClickWasSingleSelected = false;
                 FocusParticleTabControl();
-                UpdateSelectedStatus();
+                UpdateUIAndPanels();
                 return true;
             }
             var wasSingleSelectedBeforeClick = note.Selected && GetSelectedNoteCount() == 1;
             if (!note.Selected)
             {
                 SelectSingleNote(note);
-                UpdateSelectedStatus();
+                UpdateUIAndPanels();
             }
             else
             {
@@ -1107,7 +1107,7 @@ namespace CrazyStorm
             if (!note.Selected || GetSelectedNoteCount() != 1)
             {
                 SelectSingleNote(note);
-                UpdateSelectedStatus();
+                UpdateUIAndPanels();
             }
             OpenNoteColorMenu(target, note);
             return true;
@@ -1180,7 +1180,7 @@ namespace CrazyStorm
             var color = (LayerColor)item.Tag;
             if (noteColorTarget.Color == color) return;
             new SetNoteColorCommand().Do(commandStacks[selectedSystem], noteColorTarget, color);
-            UpdateSelectedStatus();
+            UpdateUIAndPanels();
         }
         #endregion
     }

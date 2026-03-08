@@ -53,7 +53,7 @@ namespace CrazyStorm
             InitializeParticle();
             InitializeEdit();
             InitializeScreen();
-            UpdateSelectedStatus();
+            UpdateUIAndPanels();
         }
         void InitializeFile()
         {
@@ -126,7 +126,7 @@ namespace CrazyStorm
             noteDragStartRects = null;
             noteResizeTarget = null;
         }
-        void UpdateSelectedStatus()
+        void UpdateUIAndPanels()
         {
             //Be careful that UpdateScreen() needs to update first,
             //because it will refresh selectedComponents set.

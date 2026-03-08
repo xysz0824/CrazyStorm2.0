@@ -382,6 +382,63 @@ namespace CrazyStorm
             }
             return null;
         }
+        Canvas GetComponentVisualBody(Canvas componentVisual)
+        {
+            if (componentVisual == null) return null;
+            foreach (var child in componentVisual.Children)
+            {
+                var canvas = child as Canvas;
+                if (canvas != null && Equals(canvas.Tag, ComponentVisualBodyTag)) return canvas;
+            }
+            return null;
+        }
+        void RefreshSelectedComponents()
+        {
+            if (selectedComponents == null) selectedComponents = new List<Component>();
+            else selectedComponents.Clear();
+
+            if (selectedSystem?.Layers == null) return;
+            foreach (var layer in selectedSystem.Layers)
+            {
+                if (!layer.Visible) continue;
+                foreach (var component in layer.Components)
+                {
+                    if (component.Selected) selectedComponents.Add(component);
+                }
+            }
+        }
+        void UpdateComponentSelectionVisuals()
+        {
+            RefreshSelectedComponents();
+
+            Canvas noteLayer;
+            Canvas componentLayer;
+            if (!TryGetCurrentScreenLayers(out noteLayer, out componentLayer) || componentLayer == null) return;
+
+            foreach (var child in componentLayer.Children)
+            {
+                var componentVisual = child as Canvas;
+                if (!(componentVisual?.Tag is Component component)) continue;
+
+                var body = GetComponentVisualBody(componentVisual);
+                var box = VisualHelper.VisualDownwardSearch(body, "Box") as Border;
+                if (box != null) box.Opacity = component.Selected ? 1 : 0;
+
+                var markerHost = GetComponentMarkerHost(componentVisual);
+                if (markerHost != null)
+                {
+                    markerHost.Visibility = component.Selected ? Visibility.Visible : Visibility.Collapsed;
+                }
+            }
+        }
+        void UpdateSelectionUI()
+        {
+            UpdateNoteLayer();
+            UpdateComponentSelectionVisuals();
+            UpdateSelectedGroup();
+            UpdateComponentMenu();
+            UpdateEditStatus();
+        }
         void UpdateComponentVisualPosition(Canvas componentVisual, Component component)
         {
             if (componentVisual == null || component == null) return;
@@ -489,7 +546,7 @@ namespace CrazyStorm
                     }
                 }
             }
-            UpdateSelectedStatus();
+            UpdateSelectionUI();
             //If mouse double click
             if (!(canDoubleClick && set != null && set.Count > 0 && Keyboard.Modifiers != ModifierKeys.Control)) return;
             if (set.Count > 0 && clickCount == 2) CreatePropertyPanel(set.First());
@@ -602,7 +659,7 @@ namespace CrazyStorm
                 new MoveComponentCommand(componentDragMove).Do(commandStacks[selectedSystem], selected, new Action(UpdateProperty));
             }
             ResetComponentDragState(false);
-            UpdateSelectedStatus();
+            UpdateUIAndPanels();
         }
         bool TryHandleComponentMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
@@ -618,11 +675,11 @@ namespace CrazyStorm
                 ClearSelectedNotes();
                 ClearSelectedComponents();
                 component.Selected = true;
-                UpdateSelectedStatus();
+                UpdateUIAndPanels();
             }
             else if (selectedComponents == null || selectedComponents.Count == 0)
             {
-                UpdateSelectedStatus();
+                UpdateUIAndPanels();
             }
             if (selectedComponents == null || selectedComponents.Count == 0) return false;
             componentDragPending = true;
@@ -632,6 +689,21 @@ namespace CrazyStorm
             componentDragMove = Vector2.Zero;
             e.Handled = true;
             FocusParticleTabControl();
+            return true;
+        }
+        bool TryHandleComponentMouseRightButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            if (selectedSystem == null) return false;
+            if (aimRect != null || bindingLines != null) return false;
+
+            var target = sender as UIElement;
+            if (target == null) return false;
+
+            Component component;
+            if (!TryHitTopComponent(e.GetPosition(target), out component) || component == null) return false;
+
+            SelectSingleComponent(component);
+            OpenComponentMenu(target, component);
             return true;
         }
         bool TryHandleComponentMouseMove(object sender, MouseEventArgs e)
@@ -713,7 +785,7 @@ namespace CrazyStorm
             }
             ClearSelectedNotes();
 
-            UpdateSelectedStatus();
+            UpdateUIAndPanels();
         }
         #endregion
 
@@ -860,16 +932,31 @@ namespace CrazyStorm
         }
         private void Screen_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
         {
-            if (TryHandleNoteMouseRightButtonDown(sender, e))
-            {
-                e.Handled = true;
-                return;
-            }
-            //Take away the rect.
             if (aimRect != null)
             {
                 aimRect.SetValue(OpacityProperty, 0.0d);
                 aimRect = null;
+                e.Handled = true;
+                return;
+            }
+            if (bindingLines != null)
+            {
+                e.Handled = true;
+                return;
+            }
+            if (noteEditState == NoteEditState.CreateNote && TryHandleNoteMouseRightButtonDown(sender, e))
+            {
+                e.Handled = true;
+                return;
+            }
+            if (TryHandleComponentMouseRightButtonDown(sender, e))
+            {
+                e.Handled = true;
+                return;
+            }
+            if (TryHandleNoteMouseRightButtonDown(sender, e))
+            {
+                e.Handled = true;
             }
         }
         private void Screen_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
@@ -901,7 +988,7 @@ namespace CrazyStorm
                 aimComponent.X = (int)(boxX + (double)aimRect.GetValue(Canvas.WidthProperty) / 2 - center.X);
                 aimComponent.Y = (int)(boxY + (double)aimRect.GetValue(Canvas.HeightProperty) / 2 - center.Y);
                 new AddComponentCommand().Do(commandStacks[selectedSystem], selectedSystem, selectedLayer, aimComponent);
-                UpdateSelectedStatus();
+                UpdateUIAndPanels();
                 aimComponent = null;
                 aimRect = null;
             }
@@ -1001,7 +1088,7 @@ namespace CrazyStorm
                     }
                 }
                 InitializeLayerAndComponent();
-                UpdateSelectedStatus();
+                UpdateUIAndPanels();
             }
         }
         private void StyleItem_Loaded(object sender, RoutedEventArgs e)
