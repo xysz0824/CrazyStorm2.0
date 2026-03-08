@@ -49,6 +49,9 @@ namespace CrazyStorm
         const string ComponentMarkerHostTag = "ComponentMarkerHost";
         const string ComponentBindingOverlayTag = "ComponentBindingOverlay";
         const string ComponentVisualBodyTag = "ComponentVisualBody";
+        static readonly Assembly mainAssembly = typeof(Main).Assembly;
+        static readonly IComponentMark componentMarker = new ComponentMarker();
+        static readonly Dictionary<string, IComponentMark> componentMarkers = new Dictionary<string, IComponentMark>();
 
         #region Private Members
         Point screenMousePos;
@@ -283,6 +286,7 @@ namespace CrazyStorm
                 if (selectedComponents == null) selectedComponents = new List<Component>();
                 else selectedComponents.Clear();
                 componentLayer.Children.Clear();
+                var itemTemplate = FindResource("ComponentItem") as DataTemplate;
                 var bindingOverlay = new Canvas
                 {
                     Width = config.ScreenWidth,
@@ -293,24 +297,22 @@ namespace CrazyStorm
                 //Update binding lines
                 if (bindingLines != null && !binded) foreach (var line in bindingLines) componentLayer.Children.Add(line);
                 //Update components on current screen.
-                var assembly = Assembly.GetExecutingAssembly();
-                var itemTemplate = FindResource("ComponentItem") as DataTemplate;
                 foreach (var layer in selectedSystem.Layers)
                 {
                     if (layer.Visible)
                     {
                         foreach (var component in layer.Components)
                         {
-                            var item = CreateComponentVisual(component, layer, itemTemplate, assembly, bindingOverlay, center);
+                            var item = CreateComponentVisual(component, layer, itemTemplate, center);
                             if (item != null) componentLayer.Children.Add(item);
                         }
                     }
                 }
                 componentLayer.Children.Add(bindingOverlay);
+                RefreshComponentBindingOverlay(componentLayer, center);
             }
         }
-        Canvas CreateComponentVisual(Component component, Layer layer, DataTemplate itemTemplate,
-            Assembly assembly, Canvas bindingOverlay, Point center)
+        Canvas CreateComponentVisual(Component component, Layer layer, DataTemplate itemTemplate, Point center)
         {
             var item = itemTemplate?.LoadContent() as Canvas;
             if (item == null) return null;
@@ -346,30 +348,8 @@ namespace CrazyStorm
             item.SetValue(Canvas.TopProperty, -box.Height / 2);
             root.Children.Add(item);
             UpdateComponentVisualPosition(root, component);
-            if (!component.Selected) return root;
-            selectedComponents.Add(component);
-            var absolute = GetComponentAbsolutePosition(component);
-            var absoluteX = (int)(absolute.x + center.X);
-            var absoluteY = (int)(absolute.y + center.Y);
-            if (component.BindingTarget != null && bindingOverlay != null)
-            {
-                float tx = component.BindingTarget.X;
-                float ty = component.BindingTarget.Y;
-                if (component.BindingTarget.Parent != null)
-                {
-                    Vector2 parent = component.BindingTarget.Parent.GetAbsolutePosition();
-                    tx += parent.x;
-                    ty += parent.y;
-                }
-                var v = new Vector2(tx - absolute.x, ty - absolute.y);
-                DrawHelper.DrawArrow(bindingOverlay, absoluteX, absoluteY,
-                    Math.Max(1, (int)v.Length() - 16), 3, MathHelper.GetDegree(v), Colors.White, 0.5f);
-            }
-            var marker = assembly.CreateInstance("CrazyStorm.ComponentMarker") as IComponentMark;
-            marker?.Draw(markerHost, component, absoluteX, absoluteY);
-            if (component is Emitter) marker = assembly.CreateInstance("CrazyStorm.EmitterMarker") as IComponentMark;
-            else marker = assembly.CreateInstance("CrazyStorm." + component.GetType().Name + "Marker") as IComponentMark;
-            marker?.Draw(markerHost, component, absoluteX, absoluteY);
+            if (component.Selected) selectedComponents.Add(component);
+            RefreshComponentMarker(root, component, center);
             return root;
         }
         Canvas GetComponentMarkerHost(Canvas componentVisual)
@@ -382,6 +362,16 @@ namespace CrazyStorm
             }
             return null;
         }
+        Canvas GetComponentBindingOverlay(Canvas componentLayer)
+        {
+            if (componentLayer == null) return null;
+            foreach (var child in componentLayer.Children)
+            {
+                var canvas = child as Canvas;
+                if (canvas != null && Equals(canvas.Tag, ComponentBindingOverlayTag)) return canvas;
+            }
+            return null;
+        }
         Canvas GetComponentVisualBody(Canvas componentVisual)
         {
             if (componentVisual == null) return null;
@@ -391,6 +381,73 @@ namespace CrazyStorm
                 if (canvas != null && Equals(canvas.Tag, ComponentVisualBodyTag)) return canvas;
             }
             return null;
+        }
+        IComponentMark GetComponentMarker(string markerTypeName)
+        {
+            if (string.IsNullOrEmpty(markerTypeName)) return null;
+            if (componentMarkers.TryGetValue(markerTypeName, out IComponentMark marker)) return marker;
+
+            marker = mainAssembly.CreateInstance(markerTypeName) as IComponentMark;
+            if (marker != null) componentMarkers[markerTypeName] = marker;
+            return marker;
+        }
+        IComponentMark GetSpecificComponentMarker(Component component)
+        {
+            if (component == null) return null;
+            if (component is Emitter) return GetComponentMarker("CrazyStorm.EmitterMarker");
+            return GetComponentMarker("CrazyStorm." + component.GetType().Name + "Marker");
+        }
+        void RefreshComponentMarker(Canvas componentVisual, Component component, Point center)
+        {
+            var markerHost = GetComponentMarkerHost(componentVisual);
+            if (markerHost == null) return;
+
+            markerHost.Children.Clear();
+            if (component == null || !component.Selected)
+            {
+                markerHost.Visibility = Visibility.Collapsed;
+                return;
+            }
+
+            var absolute = GetComponentAbsolutePosition(component);
+            var absoluteX = (int)(absolute.x + center.X);
+            var absoluteY = (int)(absolute.y + center.Y);
+            componentMarker.Draw(markerHost, component, absoluteX, absoluteY);
+            var marker = GetSpecificComponentMarker(component);
+            marker?.Draw(markerHost, component, absoluteX, absoluteY);
+            markerHost.Visibility = Visibility.Visible;
+        }
+        void RefreshComponentBindingOverlay(Canvas componentLayer, Point center)
+        {
+            var bindingOverlay = GetComponentBindingOverlay(componentLayer);
+            if (bindingOverlay == null) return;
+
+            bindingOverlay.Children.Clear();
+            if (selectedSystem?.Layers == null) return;
+
+            foreach (var layer in selectedSystem.Layers)
+            {
+                if (!layer.Visible) continue;
+                foreach (var component in layer.Components)
+                {
+                    if (!component.Selected || component.BindingTarget == null) continue;
+
+                    var absolute = GetComponentAbsolutePosition(component);
+                    var absoluteX = (int)(absolute.x + center.X);
+                    var absoluteY = (int)(absolute.y + center.Y);
+                    float targetX = component.BindingTarget.X;
+                    float targetY = component.BindingTarget.Y;
+                    if (component.BindingTarget.Parent != null)
+                    {
+                        var parent = component.BindingTarget.Parent.GetAbsolutePosition();
+                        targetX += parent.x;
+                        targetY += parent.y;
+                    }
+                    var direction = new Vector2(targetX - absolute.x, targetY - absolute.y);
+                    DrawHelper.DrawArrow(bindingOverlay, absoluteX, absoluteY,
+                        Math.Max(1, (int)direction.Length() - 16), 3, MathHelper.GetDegree(direction), Colors.White, 0.5f);
+                }
+            }
         }
         void RefreshSelectedComponents()
         {
@@ -414,6 +471,7 @@ namespace CrazyStorm
             Canvas noteLayer;
             Canvas componentLayer;
             if (!TryGetCurrentScreenLayers(out noteLayer, out componentLayer) || componentLayer == null) return;
+            var center = new Point(config.ScreenWidthOver2, config.ScreenHeightOver2);
 
             foreach (var child in componentLayer.Children)
             {
@@ -427,9 +485,10 @@ namespace CrazyStorm
                 var markerHost = GetComponentMarkerHost(componentVisual);
                 if (markerHost != null)
                 {
-                    markerHost.Visibility = component.Selected ? Visibility.Visible : Visibility.Collapsed;
+                    RefreshComponentMarker(componentVisual, component, center);
                 }
             }
+            RefreshComponentBindingOverlay(componentLayer, center);
         }
         void UpdateSelectionUI()
         {
