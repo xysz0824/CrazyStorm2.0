@@ -61,6 +61,9 @@ namespace CrazyStorm_Player
         Controllable controllable;
         Dictionary<ParticleSystem, File> instances;
         BlendType lastBlendType = BlendType.None;
+        bool currentLayerHasMask;
+        bool spriteBatchBegun;
+        bool curveBatchBegun;
 
         public string TypeLibraryPath { get; set; }
         public FrameOrientation FrameOrientation { get; set; }
@@ -295,35 +298,22 @@ namespace CrazyStorm_Player
         }
         void DrawLayer(ParticleSystem system, Layer layer, BlendType blendType)
         {
-            curveBatch.End();
-            spriteBatch.End();
+            EndCurveBatch();
+            EndSpriteBatch();
             ParticleManager.ClearLayerMasks();
             ParticleManager.UpdateLayerMasks(system.Layers, layer);
-            shaderMaskCount.SetValue(ParticleManager.MaskCount);
-            shaderMaskSize.SetValue(ParticleManager.MaskSizeArray);
-            shaderMaskPosition.SetValue(ParticleManager.MaskPositionArray);
-            shaderMaskShape.SetValue(ParticleManager.MaskShapeArray);
-            shaderMaskType.SetValue(ParticleManager.MaskTypeArray);
-            shaderMaskRotate.SetValue(ParticleManager.MaskRotateArray);
-            switch (blendType)
+            currentLayerHasMask = ParticleManager.MaskCount > 0;
+            if (currentLayerHasMask)
             {
-                case BlendType.AlphaBlend:
-                    spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied, SamplerState.LinearWrap, null, null, shader);
-                    curveBatch.Begin(BlendState.NonPremultiplied);
-                    break;
-                case BlendType.Additive:
-                    spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Additive, SamplerState.LinearWrap, null, null, shader);
-                    curveBatch.Begin(BlendState.Additive);
-                    break;
-                case BlendType.Substraction:
-                    spriteBatch.Begin(SpriteSortMode.Deferred, substration, SamplerState.LinearWrap, null, null, shader);
-                    curveBatch.Begin(substration);
-                    break;
-                case BlendType.Multiply:
-                    spriteBatch.Begin(SpriteSortMode.Deferred, multiply, SamplerState.LinearWrap, null, null, shader);
-                    curveBatch.Begin(multiply);
-                    break;
+                shaderMaskCount.SetValue(ParticleManager.MaskCount);
+                shaderMaskSize.SetValue(ParticleManager.MaskSizeArray);
+                shaderMaskPosition.SetValue(ParticleManager.MaskPositionArray);
+                shaderMaskShape.SetValue(ParticleManager.MaskShapeArray);
+                shaderMaskType.SetValue(ParticleManager.MaskTypeArray);
+                shaderMaskRotate.SetValue(ParticleManager.MaskRotateArray);
+                shaderRenderCenter.SetValue(new Vector2(Width / 2, Height / 2));
             }
+            BeginParticleBatches(blendType);
             lastBlendType = blendType;
         }
         void DrawParticle(SpriteBatch spriteBatch, Particle particle)
@@ -332,22 +322,8 @@ namespace CrazyStorm_Player
             BlendType blendType = (BlendType)(9 - particle.RenderOrder % 10);
             if (lastBlendType != blendType)
             {
-                spriteBatch.End();
-                switch (blendType)
-                {
-                    case BlendType.AlphaBlend:
-                        spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied, SamplerState.LinearWrap, null, null, shader);
-                        break;
-                    case BlendType.Additive:
-                        spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Additive, SamplerState.LinearWrap, null, null, shader);
-                        break;
-                    case BlendType.Substraction:
-                        spriteBatch.Begin(SpriteSortMode.Deferred, substration, SamplerState.LinearWrap, null, null, shader);
-                        break;
-                    case BlendType.Multiply:
-                        spriteBatch.Begin(SpriteSortMode.Deferred, multiply, SamplerState.LinearWrap, null, null, shader);
-                        break;
-                }
+                EndSpriteBatch();
+                BeginSpriteBatch(blendType);
             }
             lastBlendType = blendType;
             var file = instances[particle.System];
@@ -400,27 +376,9 @@ namespace CrazyStorm_Player
             BlendType blendType = (BlendType)(9 - particle.RenderOrder % 10);
             if (lastBlendType != blendType)
             {
-                curveBatch.End();
-                spriteBatch.End();
-                switch (blendType)
-                {
-                    case BlendType.AlphaBlend:
-                        spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied, SamplerState.LinearWrap, null, null, shader);
-                        curveBatch.Begin(BlendState.NonPremultiplied);
-                        break;
-                    case BlendType.Additive:
-                        spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Additive, SamplerState.LinearWrap, null, null, shader);
-                        curveBatch.Begin(BlendState.Additive);
-                        break;
-                    case BlendType.Substraction:
-                        spriteBatch.Begin(SpriteSortMode.Deferred, substration, SamplerState.LinearWrap, null, null, shader);
-                        curveBatch.Begin(substration);
-                        break;
-                    case BlendType.Multiply:
-                        spriteBatch.Begin(SpriteSortMode.Deferred, multiply, SamplerState.LinearWrap, null, null, shader);
-                        curveBatch.Begin(multiply);
-                        break;
-                }
+                EndCurveBatch();
+                EndSpriteBatch();
+                BeginParticleBatches(blendType);
             }
             lastBlendType = blendType;
             var file = instances[particle.System];
@@ -474,11 +432,12 @@ namespace CrazyStorm_Player
         public void Draw(GraphicsDevice gd, GameTime gameTime)
         {
             gd.Clear(Color.Black);
-            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied, SamplerState.LinearWrap, null, null, shader);
+            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied, SamplerState.LinearWrap, null, null, null);
             if (background != null)
             {
                 spriteBatch.Draw(background, backgroundPos, null, Color.White, 0, Vector2.Zero, backgroundScale, SpriteEffects.None, 0);
             }
+            spriteBatch.End();
             var maxOffset = new Vector2(float.MinValue, float.MinValue);
             foreach (var instance in instances.Keys)
             {
@@ -486,13 +445,54 @@ namespace CrazyStorm_Player
                 if (maxOffset.X < offset.X) maxOffset.X = offset.X;
                 if (maxOffset.Y < offset.Y) maxOffset.Y = offset.Y;
             }
-            curveBatch.Begin(BlendState.NonPremultiplied);
-            shaderRenderCenter.SetValue(new Vector2(Width / 2, Height / 2));
-            foreach (var instance in instances.Keys) ParticleManager.Draw(instance);
+            currentLayerHasMask = false;
+            spriteBatchBegun = false;
+            curveBatchBegun = false;
             lastBlendType = BlendType.None;
-            curveBatch.End();
+            foreach (var instance in instances.Keys) ParticleManager.Draw(instance);
+            EndCurveBatch();
+            EndSpriteBatch();
+            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied, SamplerState.LinearWrap, null, null, null);
             controllable.Draw(spriteBatch, characterTexture, pointTexture, slowModeTexture, maxOffset);
             spriteBatch.End();
+        }
+        BlendState GetBlendState(BlendType blendType)
+        {
+            switch (blendType)
+            {
+                case BlendType.Additive:
+                    return BlendState.Additive;
+                case BlendType.Substraction:
+                    return substration;
+                case BlendType.Multiply:
+                    return multiply;
+                default:
+                    return BlendState.NonPremultiplied;
+            }
+        }
+        void BeginSpriteBatch(BlendType blendType)
+        {
+            var effect = currentLayerHasMask ? shader : null;
+            spriteBatch.Begin(SpriteSortMode.Deferred, GetBlendState(blendType), SamplerState.LinearWrap, null, null, effect);
+            spriteBatchBegun = true;
+        }
+        void BeginParticleBatches(BlendType blendType)
+        {
+            BeginSpriteBatch(blendType);
+            curveBatch.Begin(GetBlendState(blendType));
+            curveBatchBegun = true;
+        }
+        void EndSpriteBatch()
+        {
+            if (!spriteBatchBegun) return;
+            spriteBatch.End();
+            spriteBatchBegun = false;
+        }
+        void EndCurveBatch()
+        {
+            if (!curveBatchBegun) return;
+            curveBatch.End();
+            curveBatchBegun = false;
         }
         public void SetStatus(int i)
         {
