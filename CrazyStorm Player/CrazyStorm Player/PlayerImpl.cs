@@ -311,7 +311,7 @@ namespace CrazyStorm_Player
                 shaderMaskSize.SetValue(ParticleManager.MaskSizeArray);
                 shaderMaskPosition.SetValue(ParticleManager.MaskPositionArray);
                 shaderMaskShape.SetValue(ParticleManager.MaskShapeArray);
-                shaderMaskType.SetValue(ParticleManager.MaskTypeArray);
+                shaderMaskType.SetValue(ParticleManager.MaskLayerArray);
                 shaderMaskRotateTrig.SetValue(ParticleManager.MaskRotateTrigArray);
                 shaderMaskEllipseInvSizeSq.SetValue(ParticleManager.MaskEllipseInvSizeSqArray);
                 shaderRenderCenter.SetValue(new Vector2(Width / 2, Height / 2));

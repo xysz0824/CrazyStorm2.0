@@ -15,7 +15,7 @@ DECLARE_TEXTURE(Texture, 0, Wrap)
 
 uniform float2 MaskSize[MASK_COUNT];
 uniform float2 MaskPosition[MASK_COUNT];
-uniform float MaskType[MASK_COUNT];
+uniform float MaskLayer[MASK_COUNT];
 uniform float MaskShape[MASK_COUNT];
 uniform float2 MaskRotateTrig[MASK_COUNT];
 uniform float2 MaskEllipseInvSizeSq[MASK_COUNT];
@@ -33,7 +33,7 @@ technique PostProcess
 float4 mainPS(float4 position : SV_Position, float4 color : COLOR0, float2 texCoord : TEXCOORD0) : COLOR
 {
     float4 Color = SAMPLE_TEXTURE(Texture, texCoord) * color;
-    float result = lerp(1, lerp(0, 1, MaskType[0] - 1), min(1, MaskType[0]));
+    float result = lerp(1, lerp(0, 1, MaskLayer[0] - 1), min(1, MaskLayer[0]));
     float2 pos = position.xy - RenderCenter;
     for (int i = 0; i < MaskCount; ++i)
     {
@@ -56,7 +56,7 @@ float4 mainPS(float4 position : SV_Position, float4 color : COLOR0, float2 texCo
             judge = smoothstep(1 - 0.01, 1 + 0.01, ellipseDistance);
         }
         judge = lerp(1, 0, judge);
-        result = lerp(result, lerp(result + judge, result * (1 - judge), MaskType[i] - 1), min(1, MaskType[i]));
+        result = lerp(result, lerp(result + judge, result * (1 - judge), MaskLayer[i] - 1), min(1, MaskLayer[i]));
     }
     Color.a *= saturate(result);
     return Color;

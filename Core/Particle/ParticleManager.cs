@@ -101,7 +101,7 @@ namespace CrazyStorm.Core
         static Vector2[] maskPositionArray = new Vector2[MAX_MASK_COUNT];
         static Vector2[] maskSizeArray = new Vector2[MAX_MASK_COUNT];
         static float[] maskShapeArray = new float[MAX_MASK_COUNT];
-        static float[] maskTypeArray = new float[MAX_MASK_COUNT];
+        static float[] maskLayerArray = new float[MAX_MASK_COUNT];
         static float[] maskRotateArray = new float[MAX_MASK_COUNT];
         static Vector2[] maskRotateTrigArray = new Vector2[MAX_MASK_COUNT];
         static Vector2[] maskEllipseInvSizeSqArray = new Vector2[MAX_MASK_COUNT];
@@ -124,7 +124,7 @@ namespace CrazyStorm.Core
         public static Vector2[] MaskPositionArray => maskPositionArray;
         public static Vector2[] MaskSizeArray => maskSizeArray;
         public static float[] MaskShapeArray => maskShapeArray;
-        public static float[] MaskTypeArray => maskTypeArray;
+        public static float[] MaskLayerArray => maskLayerArray;
         public static float[] MaskRotateArray => maskRotateArray;
         public static Vector2[] MaskRotateTrigArray => maskRotateTrigArray;
         public static Vector2[] MaskEllipseInvSizeSqArray => maskEllipseInvSizeSqArray;
@@ -273,7 +273,7 @@ namespace CrazyStorm.Core
         private static bool Masked(Vector2 pos)
         {
             if (MaskCount == 0) return false;
-            float result = MathHelper.Lerp(1, MathHelper.Lerp(0, 1, MaskTypeArray[0] - 1), MaskTypeArray[0]);
+            float result = MathHelper.Lerp(1, MathHelper.Lerp(0, 1, MaskLayerArray[0] - 1), MaskLayerArray[0]);
             for (int i = 0; i < MaskCount; ++i)
             {
                 bool masked = false;
@@ -289,7 +289,7 @@ namespace CrazyStorm.Core
                     d.y *= d.y;
                     masked = d.x / (MaskSizeArray[i].x * MaskSizeArray[i].x) + d.y / (MaskSizeArray[i].y * MaskSizeArray[i].y) >= 1;
                 }
-                result = MathHelper.Lerp(result, MathHelper.Lerp(result + (masked ? 0 : 1), result * (masked ? 1 : 0), MaskTypeArray[i] - 1), Math.Min(1, MaskTypeArray[i]));
+                result = MathHelper.Lerp(result, MathHelper.Lerp(result + (masked ? 0 : 1), result * (masked ? 1 : 0), MaskLayerArray[i] - 1), Math.Min(1, MaskLayerArray[i]));
             }
             return result == 0;
         }
@@ -299,7 +299,7 @@ namespace CrazyStorm.Core
             Array.Clear(MaskPositionArray, 0, MAX_MASK_COUNT);
             Array.Clear(MaskSizeArray, 0, MAX_MASK_COUNT);
             Array.Clear(MaskShapeArray, 0, MAX_MASK_COUNT);
-            Array.Clear(MaskTypeArray, 0, MAX_MASK_COUNT);
+            Array.Clear(MaskLayerArray, 0, MAX_MASK_COUNT);
             Array.Clear(MaskRotateArray, 0, MAX_MASK_COUNT);
             Array.Clear(MaskRotateTrigArray, 0, MAX_MASK_COUNT);
             Array.Clear(MaskEllipseInvSizeSqArray, 0, MAX_MASK_COUNT);

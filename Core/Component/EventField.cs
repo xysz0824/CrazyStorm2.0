@@ -347,7 +347,7 @@ namespace CrazyStorm.Core
             ParticleManager.MaskPositionArray[maskCount] = Position;
             ParticleManager.MaskSizeArray[maskCount] = new Vector2(HalfWidth, HalfHeight);
             ParticleManager.MaskShapeArray[maskCount] = FieldShape == FieldShape.Circle ? 1 : 0;
-            ParticleManager.MaskTypeArray[maskCount] = LayerMaskType == LayerMaskType.OutsideMask ? 1 : 2;
+            ParticleManager.MaskLayerArray[maskCount] = LayerMaskType == LayerMaskType.OutsideMask ? 1 : 2;
             ParticleManager.MaskRotateArray[maskCount] = rotation;
             ParticleManager.MaskRotateTrigArray[maskCount] = new Vector2((float)Math.Cos(rotation), (float)Math.Sin(rotation));
             ParticleManager.MaskEllipseInvSizeSqArray[maskCount] = new Vector2(1f / halfWidthSq, 1f / halfHeightSq);
@@ -364,7 +364,7 @@ namespace CrazyStorm.Core
             ParticleManager.MaskPositionArray[maskCount] = Position;
             ParticleManager.MaskSizeArray[maskCount] = new Vector2(HalfWidth, HalfHeight);
             ParticleManager.MaskShapeArray[maskCount] = FieldShape == FieldShape.Circle ? 1 : 0;
-            ParticleManager.MaskTypeArray[maskCount] = (int)LayerMaskType + 1;
+            ParticleManager.MaskLayerArray[maskCount] = (int)LayerMaskType + 1;
             ParticleManager.MaskRotateArray[maskCount] = rotation;
             ParticleManager.MaskRotateTrigArray[maskCount] = new Vector2((float)Math.Cos(rotation), (float)Math.Sin(rotation));
             ParticleManager.MaskEllipseInvSizeSqArray[maskCount] = new Vector2(1f / halfWidthSq, 1f / halfHeightSq);

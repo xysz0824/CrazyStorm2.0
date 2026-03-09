@@ -143,7 +143,7 @@
     <sys:String x:Key="HalfHeightStr">半宽</sys:String>
     <sys:String x:Key="FieldShapeStr">场形状</sys:String>
     <sys:String x:Key="LayerMaskStr">图层遮罩</sys:String>
-    <sys:String x:Key="LayerMaskTypeStr">遮罩类型</sys:String>
+    <sys:String x:Key="LayerMaskTypeStr">图层遮罩类型</sys:String>
     <sys:String x:Key="LayerMaskMutexStr">遮罩与其他图层互斥</sys:String>
     <sys:String x:Key="InsideMaskStr">范围内遮罩</sys:String>
     <sys:String x:Key="OutsideMaskStr">范围外遮罩</sys:String>
