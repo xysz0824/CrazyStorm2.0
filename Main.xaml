@@ -557,7 +557,7 @@
                 <Separator/>
                 <Button Name="BindButton" IsDefault="False" IsCancel="False" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" 
                         ToolTip="{DynamicResource BindComponentStr}" Click="BindComponentItem_Click">
-                    <Path Data="{StaticResource Bind_Icon}" Fill="{DynamicResource IconBrush}" Width="24" Height="24" Stretch="Uniform">
+                    <Path Data="{StaticResource Bind_Icon}" Fill="{DynamicResource IconBrush}" Width="24" Height="22" Stretch="Uniform">
                         <Path.Effect>
                             <DropShadowEffect Color="Black" Opacity="1" BlurRadius="3" Direction="315" ShadowDepth="0" />
                         </Path.Effect>
@@ -575,7 +575,7 @@
                 </Button>
                 <Button Name="UnbindButton" IsDefault="False" IsCancel="False" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" 
                         ToolTip="{DynamicResource UnbindComponentStr}" Click="UnbindComponentItem_Click">
-                    <Path Data="{StaticResource Unbind_Icon}" Fill="{DynamicResource IconBrush}" Width="24" Height="24" Stretch="Uniform">
+                    <Path Data="{StaticResource Unbind_Icon}" Fill="{DynamicResource IconBrush}" Width="24" Height="22" Stretch="Uniform">
                         <Path.Effect>
                             <DropShadowEffect Color="Black" Opacity="1" BlurRadius="3" Direction="315" ShadowDepth="0" />
                         </Path.Effect>
@@ -593,7 +593,7 @@
                 </Button>
                 <Button Name="AddNoteButton" IsDefault="False" IsCancel="False" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" 
                         ToolTip="{DynamicResource AddNoteStr}" Click="AddNoteButton_Click">
-                    <Path Data="{StaticResource Note_Icon}" Fill="{DynamicResource IconBrush}" Width="24" Height="24" Stretch="Uniform">
+                    <Path Data="{StaticResource Note_Icon}" Fill="{DynamicResource IconBrush}" Width="24" Height="22" Stretch="Uniform">
                         <Path.Effect>
                             <DropShadowEffect Color="Black" Opacity="1" BlurRadius="3" Direction="315" ShadowDepth="0" />
                         </Path.Effect>

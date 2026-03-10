@@ -11,12 +11,9 @@ using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Windows.Threading;
 
@@ -37,6 +34,7 @@ namespace CrazyStorm
         Action updateFunc;
         string editText;
         Popup popup;
+        bool suppressComboBoxEvent;
         #endregion
 
         #region Public Members
@@ -51,7 +49,7 @@ namespace CrazyStorm
             this.commandStack = commandStack;
             this.config = config;
             this.file = file;
-            this.types = types;
+            this.types = types ?? new List<ParticleType>();
             this.component = component;
             this.updateFunc = updateFunc;
             InitializeComponent();
@@ -66,6 +64,44 @@ namespace CrazyStorm
         {
             ScrollToEventSectionCore();
             Dispatcher.BeginInvoke(DispatcherPriority.Background, new Action(ScrollToEventSectionCore));
+        }
+        public void UpdateProperty()
+        {
+            UpdateProperty(component, ComponentGrid.DataContext as IList<PropertyGridItem>);
+            UpdateProperty(component, SpecificGrid.DataContext as IList<PropertyGridItem>);
+            if (component is Emitter)
+            {
+                UpdateProperty((component as Emitter).InitialTemplate, ParticleGrid.DataContext as IList<PropertyGridItem>);
+            }
+        }
+        public void UpdateGlobals(UpdateType type, VariableResource variable, string newName, float newValue)
+        {
+            switch (type)
+            {
+                case UpdateType.Add:
+                    environment.PutGlobal(variable.Label, variable.Value);
+                    break;
+                case UpdateType.Delete:
+                    environment.RemoveGlobal(variable.Label);
+                    break;
+                case UpdateType.Modify:
+                    environment.RemoveGlobal(variable.Label);
+                    environment.PutGlobal(newName, newValue);
+                    break;
+            }
+        }
+        public void LoadTypes(List<ParticleType> types)
+        {
+            this.types = types ?? new List<ParticleType>();
+            var emitter = component as Emitter;
+            if (emitter == null) return;
+
+            var currentType = emitter.InitialTemplate.Type;
+            if (currentType != null && !this.types.Contains(currentType))
+            {
+                emitter.InitialTemplate.Type = null;
+            }
+            RefreshParticlePseudoProperties();
         }
         #endregion
 
@@ -90,25 +126,20 @@ namespace CrazyStorm
         void InitializeEnvironment()
         {
             environment = new Expression.Environment();
-            //Put globals.
             foreach (VariableResource item in file.Globals) environment.PutGlobal(item.Label, item.Value);
-            //Put locals.
             foreach (VariableResource item in component.Locals) environment.PutLocal(item.Label, item.Value);
         }
         void LoadContent()
         {
-            //Load component properties.
             componentPropertyList = component.InitializeAndGetProperties(typeof(Component));
-            LoadProperties(ComponentGrid, component, componentPropertyList);
-            //Load specific properties.
+            LoadProperties(ComponentGrid, component, componentPropertyList, false);
             if (component is Emitter)
                 specificPropertyList = component.InitializeAndGetProperties(typeof(Emitter));
             else
                 specificPropertyList = component.InitializeAndGetProperties(component.GetType());
 
-            LoadProperties(SpecificGrid, component, specificPropertyList);
+            LoadProperties(SpecificGrid, component, specificPropertyList, false);
             SpecificPropertyGroup.Visibility = specificPropertyList.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
-            //Load particle properties.
             if (component is Emitter)
             {
                 var particle = (component as Emitter).InitialTemplate;
@@ -119,29 +150,23 @@ namespace CrazyStorm
                 else
                     particlePropertyList.AddRange(particle.InitializeAndGetProperties(typeof(CurveParticle)));
 
-                LoadProperties(ParticleGrid, particle, particlePropertyList);
+                LoadProperties(ParticleGrid, particle, particlePropertyList, true);
             }
             else
             {
                 ParticlePropertyGroup.Visibility = Visibility.Collapsed;
                 if (component is EventField || component is Rebounder)
                 {
-                    //Only emitter have particles, but special event of event field or rebounder need it.
                     var stub = new MultiEmitter();
                     particlePropertyList = stub.InitialTemplate.InitializeAndGetProperties(typeof(ParticleBase));
-                    LoadProperties(ParticleGrid, stub.InitialTemplate, particlePropertyList);
+                    LoadProperties(ParticleGrid, stub.InitialTemplate, particlePropertyList, false);
                 }
             }
-            //Load particle types.
-            //First needs to merge repeated type name.
             LoadTypes(types);
-            //Load variables.
             VariableGrid.ItemsSource = component.Locals;
             DeleteVariable.IsEnabled = component.Locals.Count > 0;
-            //Load component events.
             ComponentEventList.ItemsSource = component.ComponentEventGroups;
             DelComponentEventButton.IsEnabled = component.ComponentEventGroups.Count > 0;
-            //Load specific events.
             if (component is Emitter)
             {
                 SpecificGroup.Visibility = Visibility.Visible;
@@ -173,72 +198,53 @@ namespace CrazyStorm
                 DelSpecificEventButton.Visibility = Visibility.Collapsed;
             }
         }
-        void LoadProperties(FrameworkElement element, PropertyContainer container, IList<PropertyInfo> infos)
+        void LoadProperties(FrameworkElement element, PropertyContainer container, IList<PropertyInfo> infos, bool includeParticlePseudoProperties)
         {
             var propertyItems = new ObservableCollection<PropertyGridItem>();
+            if (includeParticlePseudoProperties && component is Emitter)
+            {
+                propertyItems.Add(CreateParticleTypePropertyItem(component as Emitter));
+                propertyItems.Add(CreateParticleColorPropertyItem(component as Emitter));
+            }
             foreach (var item in infos)
             {
-                var attributes = item.GetCustomAttributes(false);
-                var runtimeProperty = attributes.FirstOrDefault((attr) => attr is RuntimePropertyAttribute);
-                var readonlyProperty = attributes.FirstOrDefault((attr) => attr is ReadOnlyPropertyAttribute);
-                var value = container.Properties[item.Name].Value;
-                if (!(attributes.Length > 0 && runtimeProperty != null))
-                {
-                    var property = new PropertyGridItem()
-                    {
-                        Info = item,
-                        DisplayName = (string)FindResource(item.Name + "Str"),
-                        DisplayValue = item.PropertyType != typeof(string) && readonlyProperty == null ? 
-                            ExpressionHelper.Translate(value) : value,
-                        ReadOnly = readonlyProperty != null,
-                    };
-                    propertyItems.Add(property);
-                }
-                //Put this property into environment.
+                var property = CreatePropertyGridItem(container, item);
+                if (property != null) propertyItems.Add(property);
                 environment.PutProperty(item.Name, item.GetGetMethod().Invoke(container, null));
             }
             element.DataContext = propertyItems;
         }
-        void SetProperty(PropertyContainer container, DataGridCellEditEndingEventArgs e)
-        {
-            if (e.EditAction == DataGridEditAction.Commit)
-            {
-                var property = e.Row.Item as PropertyGridItem;
-                var presenter = VisualHelper.GetVisualChild<DataGridCellsPresenter>(e.Row);
-                var cell = (DataGridCell)presenter.ItemContainerGenerator.ContainerFromIndex(1);
-                var text = (e.EditingElement as TextBox).Text;
-                var newValue = property.Info.PropertyType != typeof(string) ? ExpressionHelper.ReverseTranslate(text) : text;
-                var attribute = property.Info.GetCustomAttributes(false)[0] as PropertyAttribute;
-                new SetPropertyCommand().Do(commandStack, environment, container, property, cell, newValue, attribute, updateFunc);
-            }
-        }
         void UpdateProperty(PropertyContainer container, IList<PropertyGridItem> properties)
         {
+            if (properties == null) return;
             foreach (var item in properties)
             {
+                if (item == null || item.IsParticlePseudoProperty || item.Info == null) continue;
                 if (!item.ReadOnly && !container.Properties[item.Info.Name].Expression)
                 {
                     var result = item.Info.GetGetMethod().Invoke(container, null).ToString();
                     container.Properties[item.Info.Name].Value = result;
                 }
-                var value = container.Properties[item.Info.Name].Value;
-                item.DisplayValue = item.Info.PropertyType != typeof(string) && !item.ReadOnly ? 
-                    ExpressionHelper.Translate(value) : value ;
+                ApplyReflectionPropertyValue(item, container.Properties[item.Info.Name].Value);
             }
         }
-        void InitializeColorCombo()
+        PropertyGridItem CreatePropertyGridItem(PropertyContainer container, PropertyInfo info)
         {
-            ColorCombo.Items.Clear();
-            var selectedItem = TypeCombo.SelectedItem as ParticleType;
-            foreach (var item in types)
+            var attributes = info.GetCustomAttributes(false);
+            if (attributes.OfType<RuntimePropertyAttribute>().Any()) return null;
+
+            var propertyAttribute = GetEditablePropertyAttribute(info);
+            var editorKind = GetEditorKind(propertyAttribute);
+            var item = new PropertyGridItem()
             {
-                if (item.Name == selectedItem.Name)
-                {
-                    var color = new ComboBoxItem();
-                    color.Content = ExpressionHelper.Translate(item.Color.ToString());
-                    ColorCombo.Items.Add(color);
-                }
-            }
+                Info = info,
+                DisplayName = (string)FindResource(info.Name + "Str"),
+                ReadOnly = attributes.OfType<ReadOnlyPropertyAttribute>().Any(),
+                EditorKind = editorKind,
+                ItemsSource = BuildItemsSource(editorKind, info.PropertyType),
+            };
+            ApplyReflectionPropertyValue(item, container.Properties[info.Name].Value);
+            return item;
         }
         void OpenEventSetting(EventGroup eventGroup, Expression.Environment environment, 
             bool emitter, bool aboutParticle, bool center)
@@ -257,98 +263,331 @@ namespace CrazyStorm
         {
             UIHelper.HideIntellisense(popup);
         }
-        #endregion
-
-        #region Public Methods
-        public void UpdateProperty()
+        PropertyEditorKind GetEditorKind(PropertyAttribute attribute)
         {
-            //Update component property.
-            var componentProperties = ComponentGrid.DataContext as IList<PropertyGridItem>;
-            UpdateProperty(component, componentProperties);
-            //Update specific property.
-            var specificProperties = SpecificGrid.DataContext as IList<PropertyGridItem>;
-            UpdateProperty(component, specificProperties);
-            //Update particle property.
-            var particleProperties = ParticleGrid.DataContext as IList<PropertyGridItem>;
-            if (component is Emitter)
+            if (attribute != null && attribute.GetType().Name == "EnumPropertyAttribute") return PropertyEditorKind.EnumCombo;
+            if (attribute != null && attribute.GetType().Name == "BoolPropertyAttribute") return PropertyEditorKind.BoolCheckBox;
+            return PropertyEditorKind.Text;
+        }
+        IList<string> BuildItemsSource(PropertyEditorKind editorKind, Type propertyType)
+        {
+            if (editorKind != PropertyEditorKind.EnumCombo || propertyType == null || !propertyType.IsEnum) return null;
+            return Enum.GetNames(propertyType).Select(ExpressionHelper.Translate).ToList();
+        }
+        void ApplyReflectionPropertyValue(PropertyGridItem item, string internalValue)
+        {
+            if (item.EditorKind == PropertyEditorKind.BoolCheckBox)
             {
-                var particle = (component as Emitter).InitialTemplate;
-                UpdateProperty(particle, particleProperties);
+                bool parsed;
+                bool.TryParse(internalValue, out parsed);
+                item.BoolValue = parsed;
+                item.DisplayValue = ExpressionHelper.Translate(parsed.ToString());
+                return;
+            }
+            if (item.EditorKind == PropertyEditorKind.EnumCombo)
+            {
+                item.DisplayValue = ExpressionHelper.Translate(internalValue);
+                return;
+            }
+            item.DisplayValue = item.Info != null && item.Info.PropertyType != typeof(string) && !item.ReadOnly ?
+                ExpressionHelper.Translate(internalValue) : internalValue;
+        }
+        PropertyGridItem CreateParticleTypePropertyItem(Emitter emitter)
+        {
+            var type = emitter.InitialTemplate.Type;
+            return new PropertyGridItem()
+            {
+                DisplayName = (string)FindResource("TypeStr"),
+                DisplayValue = type != null ? type.Name : string.Empty,
+                EditorKind = PropertyEditorKind.ParticleTypeCombo,
+                IsParticlePseudoProperty = true,
+                PseudoPropertyKind = PropertyPseudoKind.ParticleType,
+                ItemsSource = GetDistinctParticleTypeNames(),
+            };
+        }
+        PropertyGridItem CreateParticleColorPropertyItem(Emitter emitter)
+        {
+            var type = emitter.InitialTemplate.Type;
+            var colorItems = type != null ? BuildParticleColorItems(type.Name) : new List<string>();
+            return new PropertyGridItem()
+            {
+                DisplayName = (string)FindResource("RGBStr"),
+                DisplayValue = type != null ? ExpressionHelper.Translate(type.Color.ToString()) : string.Empty,
+                EditorKind = PropertyEditorKind.ParticleColorCombo,
+                IsParticlePseudoProperty = true,
+                PseudoPropertyKind = PropertyPseudoKind.ParticleColor,
+                ItemsSource = colorItems,
+            };
+        }
+        List<string> GetDistinctParticleTypeNames()
+        {
+            return types.Select(item => item.Name).Distinct().ToList();
+        }
+        List<string> BuildParticleColorItems(string typeName)
+        {
+            if (string.IsNullOrEmpty(typeName)) return new List<string>();
+            return types.Where(item => item.Name == typeName)
+                .Select(item => ExpressionHelper.Translate(item.Color.ToString()))
+                .Distinct()
+                .ToList();
+        }
+        void RefreshParticlePseudoProperties()
+        {
+            var emitter = component as Emitter;
+            if (emitter == null) return;
+
+            var items = ParticleGrid.DataContext as IList<PropertyGridItem>;
+            if (items == null) return;
+
+            var typeItem = items.FirstOrDefault(item => item.PseudoPropertyKind == PropertyPseudoKind.ParticleType);
+            var colorItem = items.FirstOrDefault(item => item.PseudoPropertyKind == PropertyPseudoKind.ParticleColor);
+            if (typeItem == null || colorItem == null) return;
+
+            var currentType = emitter.InitialTemplate.Type;
+            suppressComboBoxEvent = true;
+            try
+            {
+                var typeNames = GetDistinctParticleTypeNames();
+                typeItem.ItemsSource = typeNames;
+                typeItem.DisplayValue = currentType != null ? currentType.Name : string.Empty;
+
+                var colorItems = currentType != null ? BuildParticleColorItems(currentType.Name) : new List<string>();
+                colorItem.ItemsSource = colorItems;
+                colorItem.DisplayValue = currentType != null ? ExpressionHelper.Translate(currentType.Color.ToString()) : string.Empty;
+            }
+            finally
+            {
+                suppressComboBoxEvent = false;
             }
         }
-        public void UpdateGlobals(UpdateType type, VariableResource variable, string newName, float newValue)
+        void PreviewParticleTypeSelection(string typeName)
         {
-            switch (type)
+            var items = ParticleGrid.DataContext as IList<PropertyGridItem>;
+            if (items == null) return;
+
+            var colorItem = items.FirstOrDefault(item => item.PseudoPropertyKind == PropertyPseudoKind.ParticleColor);
+            if (colorItem == null) return;
+
+            var colorItems = BuildParticleColorItems(typeName);
+            suppressComboBoxEvent = true;
+            try
             {
-                case UpdateType.Add:
-                    environment.PutGlobal(variable.Label, variable.Value);
-                    break;
-                case UpdateType.Delete:
-                    environment.RemoveGlobal(variable.Label);
-                    break;
-                case UpdateType.Modify:
-                    environment.RemoveGlobal(variable.Label);
-                    environment.PutGlobal(newName, newValue);
-                    break;
+                colorItem.ItemsSource = colorItems;
+                colorItem.DisplayValue = colorItems.Count > 0 ? colorItems[0] : string.Empty;
+            }
+            finally
+            {
+                suppressComboBoxEvent = false;
             }
         }
-        public void LoadTypes(List<ParticleType> types)
+        PropertyAttribute GetEditablePropertyAttribute(PropertyInfo propertyInfo)
         {
-            this.types = types;
-            var typesNorepeat = new List<ParticleType>();
-            foreach (var item in types)
+            return propertyInfo.GetCustomAttributes(false).OfType<PropertyAttribute>()
+                .FirstOrDefault(attr => !(attr is RuntimePropertyAttribute) && !(attr is ReadOnlyPropertyAttribute));
+        }
+        bool TryGetTargetContainer(DataGrid grid, out PropertyContainer container)
+        {
+            container = null;
+            if (grid == ComponentGrid || grid == SpecificGrid)
             {
-                bool exist = false;
-                for (int i = 0; i < typesNorepeat.Count; ++i)
-                    if (item.Name == typesNorepeat[i].Name)
-                    {
-                        exist = true;
-                        break;
-                    }
+                container = component;
+                return true;
+            }
+            if (grid == ParticleGrid && component is Emitter)
+            {
+                container = (component as Emitter).InitialTemplate;
+                return true;
+            }
+            return false;
+        }
+        DataGridCell GetEditingCell(DataGridCellEditEndingEventArgs e)
+        {
+            var directCell = VisualHelper.FindParent<DataGridCell>(e.EditingElement);
+            if (directCell != null) return directCell;
 
-                if (!exist) typesNorepeat.Add(item);
-            }
-            TypeCombo.ItemsSource = typesNorepeat;
-            ParticleType type = null;
-            if (component is Emitter)
+            var presenter = VisualHelper.GetVisualChild<DataGridCellsPresenter>(e.Row);
+            return presenter != null ? presenter.ItemContainerGenerator.ContainerFromIndex(e.Column.DisplayIndex) as DataGridCell : null;
+        }
+        TextBox GetEditingTextBox(FrameworkElement element)
+        {
+            var textBox = element as TextBox;
+            if (textBox != null) return textBox;
+
+            var visual = element as Visual;
+            return visual != null ? VisualHelper.GetVisualChild<TextBox>(visual) : null;
+        }
+        void CommitTextBoxValue(TextBox textBox)
+        {
+            var property = textBox != null ? textBox.DataContext as PropertyGridItem : null;
+            if (textBox == null || property == null || property.EditorKind != PropertyEditorKind.Text || property.Info == null) return;
+
+            var originalText = textBox.Tag as string ?? string.Empty;
+            if (textBox.Text == originalText) return;
+
+            var grid = VisualHelper.FindParent<DataGrid>(textBox);
+            PropertyContainer container;
+            if (grid == null || !TryGetTargetContainer(grid, out container)) return;
+
+            var cell = VisualHelper.FindParent<DataGridCell>(textBox);
+            if (cell == null) return;
+
+            CommitReflectionProperty(container, property, cell, textBox.Text);
+            textBox.Tag = property.DisplayValue;
+        }
+        void CommitReflectionProperty(PropertyContainer container, PropertyGridItem property, DataGridCell cell, string displayValue)
+        {
+            if (container == null || property == null || property.Info == null || cell == null) return;
+
+            var attribute = GetEditablePropertyAttribute(property.Info);
+            if (attribute == null) return;
+
+            string newValue;
+            if (property.EditorKind == PropertyEditorKind.EnumCombo)
+                newValue = ExpressionHelper.ReverseTranslate(displayValue);
+            else if (property.EditorKind == PropertyEditorKind.BoolCheckBox)
+                newValue = property.BoolValue.ToString();
+            else
+                newValue = property.Info.PropertyType != typeof(string) ? ExpressionHelper.ReverseTranslate(displayValue) : displayValue;
+
+            new SetPropertyCommand().Do(commandStack, environment, container, property, cell, newValue, attribute, updateFunc);
+        }
+        void CommitTextEdit(DataGridCellEditEndingEventArgs e)
+        {
+            var property = e.Row.Item as PropertyGridItem;
+            if (property == null || property.EditorKind != PropertyEditorKind.Text || e.EditAction != DataGridEditAction.Commit) return;
+
+            var textBox = GetEditingTextBox(e.EditingElement);
+            if (textBox == null || textBox.Text == editText) return;
+
+            var grid = VisualHelper.FindParent<DataGrid>(e.EditingElement);
+            PropertyContainer container;
+            if (grid == null || !TryGetTargetContainer(grid, out container)) return;
+            CommitReflectionProperty(container, property, GetEditingCell(e), textBox.Text);
+        }
+        void CommitComboSelection(ComboBox comboBox)
+        {
+            var property = comboBox.DataContext as PropertyGridItem;
+            if (property == null) return;
+
+            var displayValue = comboBox.SelectedItem as string ?? string.Empty;
+            if (property.EditorKind == PropertyEditorKind.ParticleTypeCombo)
             {
-                type = (component as Emitter).InitialTemplate.Type;
-                if (!types.Contains(type))
+                CommitParticleTypeSelection(displayValue);
+            }
+            else if (property.EditorKind == PropertyEditorKind.ParticleColorCombo)
+            {
+                CommitParticleColorSelection(displayValue);
+            }
+            else if (displayValue != property.DisplayValue)
+            {
+                property.DisplayValue = displayValue;
+                DataGrid grid;
+                PropertyContainer container;
+                if (TryGetDataGrid(comboBox, out grid) && TryGetTargetContainer(grid, out container))
                 {
-                    ColorCombo.Items.Clear();
-                    (component as Emitter).InitialTemplate.Type = null;
-                    type = null;
+                    CommitReflectionProperty(container, property, VisualHelper.FindParent<DataGridCell>(comboBox), displayValue);
                 }
             }
-            if (type != null)
+            CommitGridEditHost(comboBox);
+        }
+        void CommitParticleTypeSelection(string typeName)
+        {
+            var emitter = component as Emitter;
+            if (emitter == null) return;
+
+            var currentType = emitter.InitialTemplate.Type;
+            if (currentType != null && currentType.Name == typeName) return;
+
+            var colorItems = BuildParticleColorItems(typeName);
+            var selectedColor = colorItems.FirstOrDefault();
+            var targetType = ResolveParticleType(typeName, selectedColor);
+            if (currentType == targetType) return;
+
+            new SetParticleTypeCommand().Do(commandStack, emitter, targetType,
+                new Action<Emitter, ParticleType>(ParticleTypeUpdate));
+        }
+        void CommitParticleColorSelection(string colorDisplayValue)
+        {
+            var emitter = component as Emitter;
+            if (emitter == null) return;
+
+            var items = ParticleGrid.DataContext as IList<PropertyGridItem>;
+            if (items == null) return;
+
+            var typeItem = items.FirstOrDefault(item => item.PseudoPropertyKind == PropertyPseudoKind.ParticleType);
+            var targetType = ResolveParticleType(typeItem != null ? typeItem.DisplayValue : string.Empty, colorDisplayValue);
+            if (emitter.InitialTemplate.Type == targetType) return;
+
+            new SetParticleTypeCommand().Do(commandStack, emitter, targetType,
+                new Action<Emitter, ParticleType>(ParticleTypeUpdate));
+        }
+        ParticleType ResolveParticleType(string typeName, string colorDisplayValue)
+        {
+            if (string.IsNullOrEmpty(typeName)) return null;
+
+            var colorName = !string.IsNullOrEmpty(colorDisplayValue) ? ExpressionHelper.ReverseTranslate(colorDisplayValue) : null;
+            var selectedColor = default(ParticleColor);
+            var hasColor = !string.IsNullOrEmpty(colorName) && Enum.TryParse(colorName, out selectedColor);
+            foreach (var type in types)
             {
-                //Select specific type.
-                foreach (var item in typesNorepeat)
-                {
-                    if (item.Name == type.Name)
-                    {
-                        TypeCombo.SelectedItem = item;
-                        break;
-                    }
-                }
-                //Select specific color.
-                InitializeColorCombo();
-                for (int i = 0; i < ColorCombo.Items.Count; ++i)
-                {
-                    if (ExpressionHelper.Translate(type.Color.ToString()) == (string)((ColorCombo.Items[i] as ComboBoxItem).Content))
-                    {
-                        ColorCombo.SelectedIndex = i;
-                        break;
-                    }
-                }
+                if (type.Name != typeName) continue;
+                if (!hasColor || type.Color == selectedColor) return type;
             }
-            else if (component is Emitter)
+            return null;
+        }
+        void ParticleTypeUpdate(Emitter emitter, ParticleType type)
+        {
+            if (this == null) return;
+            emitter.InitialTemplate.Type = type;
+            RefreshParticlePseudoProperties();
+            if (updateFunc != null) updateFunc();
+        }
+        bool TryGetDataGrid(DependencyObject source, out DataGrid grid)
+        {
+            grid = VisualHelper.FindParent<DataGrid>(source);
+            return grid != null;
+        }
+        void CommitGridEditHost(DependencyObject source)
+        {
+            DataGrid grid;
+            if (!TryGetDataGrid(source, out grid)) return;
+            grid.CommitEdit(DataGridEditingUnit.Cell, true);
+            grid.CommitEdit(DataGridEditingUnit.Row, true);
+        }
+        ToolTip BuildParticleTypeToolTip(ParticleType selectedType)
+        {
+            if (selectedType == null) return null;
+
+            var rectangle = new Rectangle() { Width = selectedType.Width, Height = selectedType.Height };
+            var imageBrush = new ImageBrush();
+            rectangle.Fill = imageBrush;
+            if (selectedType.ID >= ParticleType.DefaultTypeIndex)
             {
-                (component as Emitter).InitialTemplate.Type = types[0];
-                type = (component as Emitter).InitialTemplate.Type;
-                TypeCombo.SelectedItem = typesNorepeat[0];
-                ColorCombo.SelectedIndex = 0;
+                if (string.IsNullOrEmpty(config.TypeLibraryPath))
+                    imageBrush.ImageSource = new BitmapImage(new Uri("pack://application:,,,/Images/barrages.png", UriKind.Absolute));
+                else
+                    imageBrush.ImageSource = new BitmapImage(new Uri($"typelibrary\\{System.IO.Path.GetFileNameWithoutExtension(config.TypeLibraryPath)}.png", UriKind.Relative));
             }
+            else if (selectedType.Image != null)
+            {
+                imageBrush.ImageSource = new BitmapImage(new Uri(selectedType.Image.AbsolutePath));
+            }
+            var bitmap = imageBrush.ImageSource as BitmapImage;
+            if (bitmap != null)
+            {
+                imageBrush.Viewbox = new Rect(selectedType.StartPointX / bitmap.PixelWidth,
+                    selectedType.StartPointY / bitmap.PixelHeight,
+                    (float)selectedType.Width / bitmap.PixelWidth,
+                    (float)selectedType.Height / bitmap.PixelHeight);
+            }
+            return new ToolTip() { Content = rectangle };
+        }
+        ParticleType ResolvePreviewParticleType(string typeName)
+        {
+            var emitter = component as Emitter;
+            if (emitter != null && emitter.InitialTemplate.Type != null && emitter.InitialTemplate.Type.Name == typeName)
+                return emitter.InitialTemplate.Type;
+            return types.FirstOrDefault(item => item.Name == typeName);
         }
         #endregion
 
@@ -360,6 +599,60 @@ namespace CrazyStorm
             sv.ScrollToVerticalOffset(sv.VerticalOffset - e.Delta);
             e.Handled = true;
         }
+        private void PropertyGridCell_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            var cell = sender as DataGridCell ?? VisualHelper.FindParent<DataGridCell>(e.OriginalSource as DependencyObject);
+            if (cell == null || cell.IsEditing || cell.Column == null || cell.Column.DisplayIndex != 1) return;
+
+            var item = cell.DataContext as PropertyGridItem;
+            if (item == null || item.ReadOnly || item.EditorKind != PropertyEditorKind.Text) return;
+
+            var grid = VisualHelper.FindParent<DataGrid>(cell);
+            if (grid == null) return;
+
+            if (!cell.IsFocused) cell.Focus();
+            var row = VisualHelper.FindParent<DataGridRow>(cell);
+            if (row != null && !row.IsSelected) row.IsSelected = true;
+            grid.CurrentCell = new DataGridCellInfo(cell);
+            if (!cell.IsEditing)
+            {
+                grid.BeginEdit(e);
+                e.Handled = true;
+            }
+        }
+        private void PropertyTextBox_Loaded(object sender, RoutedEventArgs e)
+        {
+            var textBox = sender as TextBox;
+            if (textBox != null) textBox.Tag = textBox.Text;
+        }
+        private void PropertyTextBox_GotFocus(object sender, RoutedEventArgs e)
+        {
+            var textBox = sender as TextBox;
+            var property = textBox != null ? textBox.DataContext as PropertyGridItem : null;
+            if (textBox == null || property == null || property.EditorKind != PropertyEditorKind.Text || property.Info == null) return;
+
+            editText = textBox.Text;
+            textBox.Tag = textBox.Text;
+            if (OnBeginEditing != null) OnBeginEditing();
+            ShowIntellisense(property, textBox);
+        }
+        private void PropertyTextBox_LostFocus(object sender, RoutedEventArgs e)
+        {
+            var textBox = sender as TextBox;
+            CommitTextBoxValue(textBox);
+            HideIntellisense();
+            if (OnEndEditing != null) OnEndEditing();
+        }
+        private void PropertyTextBox_PreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key != Key.Enter) return;
+
+            var textBox = sender as TextBox;
+            CommitTextBoxValue(textBox);
+            HideIntellisense();
+            if (OnEndEditing != null) OnEndEditing();
+            e.Handled = true;
+        }
         private void Grid_BeginningEdit(object sender, DataGridBeginningEditEventArgs e)
         {
             var item = e.Row.Item as PropertyGridItem;
@@ -368,13 +661,9 @@ namespace CrazyStorm
                 e.Cancel = true;
                 return;
             }
-            var textBlock = e.EditingEventArgs.OriginalSource as TextBlock;
-            if (textBlock != null)
-            {
-                editText = textBlock.Text;
-                if (OnBeginEditing != null)
-                    OnBeginEditing();
-            }
+            editText = item != null ? item.DisplayValue : string.Empty;
+            if (OnBeginEditing != null)
+                OnBeginEditing();
         }
         private void Grid_CellEditEnding(object sender, DataGridCellEditEndingEventArgs e)
         {
@@ -388,9 +677,7 @@ namespace CrazyStorm
         private void ComponentGrid_CellEditEnding(object sender, DataGridCellEditEndingEventArgs e)
         {
             Grid_CellEditEnding(sender, e);
-            if ((e.EditingElement as TextBox).Text != editText)
-                SetProperty(component, e);
-
+            CommitTextEdit(e);
             HideIntellisense();
         }
         private void ParticleGrid_BeginningEdit(object sender, DataGridBeginningEditEventArgs e)
@@ -400,18 +687,125 @@ namespace CrazyStorm
         private void PropertyGrid_PreparingCellForEdit(object sender, DataGridPreparingCellForEditEventArgs e)
         {
             var property = e.Row.Item as PropertyGridItem;
-            if (property == null) return;
-            ShowIntellisense(property, e.EditingElement);
+            if (property == null || property.EditorKind != PropertyEditorKind.Text || property.Info == null)
+            {
+                HideIntellisense();
+                return;
+            }
+
+            var editor = GetEditingTextBox(e.EditingElement);
+            if (editor != null)
+            {
+                ShowIntellisense(property, editor);
+                Dispatcher.BeginInvoke(new Action(() =>
+                {
+                    editor.Focus();
+                    editor.SelectAll();
+                }), DispatcherPriority.Input);
+            }
         }
         private void ParticleGrid_CellEditEnding(object sender, DataGridCellEditEndingEventArgs e)
         {
             Grid_CellEditEnding(sender, e);
-            if ((e.EditingElement as TextBox).Text != editText)
-            {
-                if (component is Emitter)
-                    SetProperty((component as Emitter).InitialTemplate, e);
-            }
+            CommitTextEdit(e);
             HideIntellisense();
+        }
+        private void PropertyComboBox_Loaded(object sender, RoutedEventArgs e)
+        {
+            var comboBox = sender as ComboBox;
+            if (comboBox != null) comboBox.Tag = false;
+        }
+        private void PropertyComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (suppressComboBoxEvent) return;
+
+            var comboBox = sender as ComboBox;
+            var property = comboBox != null ? comboBox.DataContext as PropertyGridItem : null;
+            if (comboBox == null || property == null) return;
+
+            if (property.EditorKind == PropertyEditorKind.ParticleTypeCombo && comboBox.IsDropDownOpen)
+            {
+                PreviewParticleTypeSelection(comboBox.SelectedItem as string);
+            }
+            else if (!comboBox.IsDropDownOpen && comboBox.IsKeyboardFocusWithin)
+            {
+                CommitComboSelection(comboBox);
+            }
+        }
+        private void PropertyComboBox_PreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            var comboBox = sender as ComboBox;
+            if (comboBox == null || e.Key != Key.Enter) return;
+
+            if (!comboBox.IsDropDownOpen)
+            {
+                comboBox.IsDropDownOpen = true;
+            }
+            else
+            {
+                comboBox.Tag = true;
+                CommitComboSelection(comboBox);
+                comboBox.IsDropDownOpen = false;
+            }
+            e.Handled = true;
+        }
+        private void PropertyComboBox_DropDownClosed(object sender, EventArgs e)
+        {
+            var comboBox = sender as ComboBox;
+            if (comboBox == null) return;
+
+            if (comboBox.Tag is bool && (bool)comboBox.Tag)
+            {
+                comboBox.Tag = false;
+                return;
+            }
+            CommitComboSelection(comboBox);
+        }
+        private void PropertyCheckBox_Click(object sender, RoutedEventArgs e)
+        {
+            var checkBox = sender as CheckBox;
+            var property = checkBox != null ? checkBox.DataContext as PropertyGridItem : null;
+            if (checkBox == null || property == null) return;
+
+            var newValue = checkBox.IsChecked == true;
+            if (property.BoolValue != newValue)
+            {
+                property.BoolValue = newValue;
+                property.DisplayValue = ExpressionHelper.Translate(newValue.ToString());
+
+                DataGrid grid;
+                PropertyContainer container;
+                if (TryGetDataGrid(checkBox, out grid) && TryGetTargetContainer(grid, out container))
+                {
+                    CommitReflectionProperty(container, property, VisualHelper.FindParent<DataGridCell>(checkBox), property.DisplayValue);
+                }
+            }
+            CommitGridEditHost(checkBox);
+        }
+        private void PropertyCheckBox_PreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key != Key.Space) return;
+
+            var checkBox = sender as CheckBox;
+            if (checkBox == null) return;
+
+            checkBox.IsChecked = !(checkBox.IsChecked == true);
+            PropertyCheckBox_Click(checkBox, e);
+            e.Handled = true;
+        }
+        private void PropertyValueTextBlock_ToolTipOpening(object sender, ToolTipEventArgs e)
+        {
+            var textBlock = sender as TextBlock;
+            var property = textBlock != null ? textBlock.DataContext as PropertyGridItem : null;
+            if (textBlock == null || property == null ||
+                property.PseudoPropertyKind != PropertyPseudoKind.ParticleType)
+            {
+                if (textBlock != null) textBlock.ToolTip = null;
+                return;
+            }
+
+            textBlock.ToolTip = BuildParticleTypeToolTip(ResolvePreviewParticleType(property.DisplayValue));
+            if (textBlock.ToolTip == null) e.Handled = true;
         }
         private void AddVariable_Click(object sender, RoutedEventArgs e)
         {
@@ -484,92 +878,6 @@ namespace CrazyStorm
                     new ModifyLocalCommand().Do(commandStack, editItem, editItem.Label, value.ToString(), environment);
                 }
             }
-        }
-        private void TypeCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            if (TypeCombo.SelectedItem != null)
-            {
-                var selectedType = TypeCombo.SelectedItem as ParticleType;
-                //Refresh color combobox.
-                InitializeColorCombo();
-                if (ColorCombo.Items.Count > 0) ColorCombo.SelectedIndex = 0;
-                //Show default type preview
-                TypeComboTip.Visibility = Visibility.Visible;
-                TypeImageRect.Width = selectedType.Width;
-                TypeImageRect.Height = selectedType.Height;
-                var imageBrush = TypeImageRect.Fill as ImageBrush;
-                if (selectedType.ID >= ParticleType.DefaultTypeIndex)
-                {
-                    if (string.IsNullOrEmpty(config.TypeLibraryPath))
-                    {
-                        var path = "pack://application:,,,/Images/barrages.png";
-                        imageBrush.ImageSource = new BitmapImage(new Uri(path, UriKind.Absolute));
-                    }
-                    else
-                    {
-                        var path = $"typelibrary\\{System.IO.Path.GetFileNameWithoutExtension(config.TypeLibraryPath)}.png";
-                        imageBrush.ImageSource = new BitmapImage(new Uri(path, UriKind.Relative));
-                    }
-                }
-                else
-                {
-                    var path = selectedType.Image.AbsolutePath;
-                    imageBrush.ImageSource = new BitmapImage(new Uri(path));
-                }
-                var bitmap = imageBrush.ImageSource as BitmapImage;
-                imageBrush.Viewbox = new Rect(selectedType.StartPointX / bitmap.PixelWidth,
-                    selectedType.StartPointY / bitmap.PixelHeight,
-                    (float)selectedType.Width / bitmap.PixelWidth, 
-                    (float)selectedType.Height / bitmap.PixelHeight);
-            }
-        }
-        bool typeChangingByUI;
-        private void ColorCombo_SelectionChanging(object sender, InputEventArgs e)
-        {
-            typeChangingByUI = true;
-        }
-        private void ColorCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            var selectedType = TypeCombo.SelectedItem as ParticleType;
-            ParticleColor selectedColor = default;
-            if (ColorCombo.SelectedItem != null)
-            {
-                var str = (string)(ColorCombo.SelectedItem as ComboBoxItem).Content;
-                str = ExpressionHelper.ReverseTranslate(str);
-                selectedColor = (ParticleColor)Enum.Parse(typeof(ParticleColor), str);
-                foreach (var type in types)
-                {
-                    if (type.Name == selectedType.Name && type.Color == selectedColor)
-                    {
-                        selectedType = type;
-                        break;
-                    }
-                }
-                if (typeChangingByUI)
-                {
-                    new SetParticleTypeCommand().Do(commandStack, component as Emitter, selectedType,
-                        new Action<Emitter, ParticleType>(ParticleTypeUpdate));
-                    typeChangingByUI = false;
-                    ColorCombo.Focusable = false;
-                }
-            }
-        }
-        private void ParticleTypeUpdate(Emitter emitter, ParticleType type)
-        {
-            if (this == null) return;
-            emitter.InitialTemplate.Type = type;
-            var types = TypeCombo.ItemsSource as List<ParticleType>;
-            foreach (var item in types)
-            {
-                if (item.Name == type.Name)
-                {
-                    TypeCombo.SelectedItem = item;
-                    break;
-                }
-            }
-            ColorCombo.SelectedIndex = ColorCombo.Items.IndexOf(
-                ColorCombo.Items.Cast<ComboBoxItem>().First(i => (string)i.Content == 
-                ExpressionHelper.Translate(type.Color.ToString())));
         }
         private void AddComponentEvent_Click(object sender, RoutedEventArgs e)
         {
