@@ -9,5 +9,14 @@ namespace CrazyStorm
 {
     public partial class App : Application
     {
+        protected override void OnStartup(StartupEventArgs e)
+        {
+            base.OnStartup(e);
+            ExpressionHelper.InitializeTranslationCache();
+
+            var startupWindow = new StartupWindow();
+            MainWindow = startupWindow;
+            startupWindow.Show();
+        }
     }
 }

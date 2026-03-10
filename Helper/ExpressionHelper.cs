@@ -13,54 +13,63 @@ namespace CrazyStorm
     {
         static Dictionary<string, string> logicOperatorMap = new Dictionary<string, string>()
         { {"&", "And"}, {"|", "Or"} };
+        static Dictionary<string, string> translationMap = new Dictionary<string, string>();
+        static Dictionary<string, string> reverseTranslationMap = new Dictionary<string, string>();
+
+        public static void InitializeTranslationCache()
+        {
+            translationMap.Clear();
+            reverseTranslationMap.Clear();
+
+            var application = App.Current;
+            if (application == null) return;
+
+            foreach (var dictionary in application.Resources.MergedDictionaries)
+            {
+                if (dictionary.Source == null ||
+                    !dictionary.Source.OriginalString.StartsWith("Lang\\", StringComparison.Ordinal))
+                    continue;
+
+                foreach (DictionaryEntry entry in dictionary)
+                {
+                    var resourceKey = entry.Key as string;
+                    if (resourceKey == null) continue;
+
+                    var resourceValue = entry.Value as string;
+                    if (resourceValue == null) continue;
+
+                    translationMap[resourceKey] = resourceValue;
+                    if (!reverseTranslationMap.ContainsKey(resourceValue))
+                        reverseTranslationMap.Add(resourceValue, resourceKey);
+                }
+            }
+        }
+
         public static string FindTranslation(string original)
         {
-            var str = $"{original}Str";
-            var merged = App.Current.Resources.MergedDictionaries;
-            var lang = merged.Where(d => d.Source != null && d.Source.OriginalString.StartsWith("Lang\\"));
             foreach (var logicKV in logicOperatorMap)
             {
                 if (original == logicKV.Key)
                 {
-                    str = $"{logicKV.Value}Str";
+                    original = logicKV.Value;
                     break;
                 }
             }
-            foreach (var langE in lang)
-            {
-                foreach (DictionaryEntry e in langE)
-                {
-                    var resourceKey = e.Key as string;
-                    if (resourceKey == null) continue;
-                    var resourceValue = e.Value as string;
-                    if (resourceValue == null) continue;
-                    if (resourceKey == str)
-                    {
-                        return resourceValue;
-                    }
-                }
-            }
+
+            var resourceKey = $"{original}Str";
+            string translated;
+            if (translationMap.TryGetValue(resourceKey, out translated))
+                return translated;
+
             return original;
         }
         public static string FindReverseTranslation(string translated)
         {
-            var merged = App.Current.Resources.MergedDictionaries;
-            var lang = merged.Where(d => d.Source != null && d.Source.OriginalString.StartsWith("Lang\\"));
-            foreach (var langE in lang)
-            {
-                foreach (DictionaryEntry e in langE)
-                {
-                    var resourceKey = e.Key as string;
-                    if (resourceKey == null) continue;
-                    var resourceValue = e.Value as string;
-                    if (resourceValue == null) continue;
-                    if (resourceValue == translated)
-                    {
-                        translated = resourceKey.Replace("Str", "");
-                        break;
-                    }
-                }
-            }
+            string resourceKey;
+            if (reverseTranslationMap.TryGetValue(translated, out resourceKey) &&
+                resourceKey.EndsWith("Str", StringComparison.Ordinal))
+                translated = resourceKey.Substring(0, resourceKey.Length - 3);
+
             foreach (var logicKV in logicOperatorMap)
             {
                 if (translated == logicKV.Value)

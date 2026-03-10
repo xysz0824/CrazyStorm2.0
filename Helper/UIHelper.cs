@@ -28,6 +28,7 @@ namespace CrazyStorm
             public ListView ListView;
             public List<string> EnumItems = new List<string>();
             public List<string> ExpressionItems = new List<string>();
+            public IList<string> VisibleItems = new List<string>();
             public TextChangedEventHandler TextChangedHandler;
             public KeyEventHandler PreviewKeyDownHandler;
         }
@@ -55,6 +56,7 @@ namespace CrazyStorm
                 TextBox = ResolveTextBox(target),
                 ListView = listView,
             };
+            listView.ItemsSource = context.VisibleItems;
             if (type == typeof(bool))
             {
                 context.EnumItems.Add((string)popup.FindResource($"{true}Str"));
@@ -71,9 +73,10 @@ namespace CrazyStorm
 
             if (expressionItems != null)
             {
+                var expressionItemSet = new HashSet<string>();
                 foreach (var item in expressionItems)
                 {
-                    if (!string.IsNullOrEmpty(item) && !context.ExpressionItems.Contains(item))
+                    if (!string.IsNullOrEmpty(item) && expressionItemSet.Add(item))
                     {
                         context.ExpressionItems.Add(item);
                     }
@@ -176,7 +179,6 @@ namespace CrazyStorm
         static void RefreshIntellisense(IntellisenseContext context)
         {
             if (context == null || context.Popup == null || context.ListView == null) return;
-            context.ListView.Items.Clear();
             var prefix = string.Empty;
             bool hasPrefix = false;
             if (context.TextBox != null)
@@ -184,32 +186,32 @@ namespace CrazyStorm
                 hasPrefix = TryGetIdentifierPrefix(context.TextBox, out prefix);
             }
 
+            var items = new List<string>();
             if (hasPrefix)
             {
                 foreach (var item in context.EnumItems)
                 {
-                    if (item.StartsWith(prefix, StringComparison.CurrentCultureIgnoreCase))
-                    {
-                        context.ListView.Items.Add(item);
-                    }
+                    if (item.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
+                        items.Add(item);
                 }
                 foreach (var item in context.ExpressionItems)
                 {
-                    if (item.StartsWith(prefix, StringComparison.CurrentCultureIgnoreCase))
-                    {
-                        context.ListView.Items.Add(item);
-                    }
+                    if (item.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
+                        items.Add(item);
                 }
             }
             else
             {
                 foreach (var item in context.EnumItems)
                 {
-                    context.ListView.Items.Add(item);
+                    items.Add(item);
                 }
             }
 
-            if (context.ListView.Items.Count > 0)
+            context.VisibleItems = items;
+            context.ListView.ItemsSource = context.VisibleItems;
+
+            if (context.VisibleItems.Count > 0)
             {
                 context.ListView.SelectedIndex = -1;
                 context.Popup.IsOpen = true;
