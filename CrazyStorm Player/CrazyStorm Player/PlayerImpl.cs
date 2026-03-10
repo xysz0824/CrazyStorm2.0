@@ -24,6 +24,7 @@ using MathHelper = Microsoft.Xna.Framework.MathHelper;
 using Rectangle = Microsoft.Xna.Framework.Rectangle;
 using SamplerState = Microsoft.Xna.Framework.Graphics.SamplerState;
 using Vector2 = Microsoft.Xna.Framework.Vector2;
+using Vector4 = Microsoft.Xna.Framework.Vector4;
 
 namespace CrazyStorm_Player
 {
@@ -40,10 +41,15 @@ namespace CrazyStorm_Player
         Effect shader;
         EffectParameter shaderMaskSize;
         EffectParameter shaderMaskPosition;
-        EffectParameter shaderMaskType;
+        EffectParameter shaderMaskLayer;
         EffectParameter shaderMaskShape;
         EffectParameter shaderMaskRotateTrig;
         EffectParameter shaderMaskEllipseInvSizeSq;
+        EffectParameter shaderMaskTexture;
+        EffectParameter shaderMaskFrameRect;
+        EffectParameter shaderMaskDissolveStrength;
+        EffectParameter shaderMaskDissolveEdgeWidth;
+        EffectParameter shaderMaskTextureEnabled;
         EffectParameter shaderMaskCount;
         EffectParameter shaderRenderCenter;
         SpriteBatch spriteBatch;
@@ -54,6 +60,7 @@ namespace CrazyStorm_Player
         Vector2 backgroundPos;
         Texture2D defaultTexture;
         Dictionary<File, Dictionary<int, Texture2D>> customTextures;
+        Dictionary<ParticleSystem, Texture2D> maskTextures;
         Dictionary<string, SoundEffect> sounds;
         Dictionary<string, SoundEffectInstance> soundInstances;
         Texture2D characterTexture;
@@ -65,6 +72,9 @@ namespace CrazyStorm_Player
         bool currentLayerHasMask;
         bool spriteBatchBegun;
         bool curveBatchBegun;
+        Texture2D fallbackMaskTexture;
+        Vector4[] maskFrameRects;
+        float[] maskTextureEnabled;
 
         public string TypeLibraryPath { get; set; }
         public FrameOrientation FrameOrientation { get; set; }
@@ -97,16 +107,25 @@ namespace CrazyStorm_Player
                 shader = new Effect(gd, ms.ToArray());
                 shaderMaskSize = shader.Parameters["MaskSize"];
                 shaderMaskPosition = shader.Parameters["MaskPosition"];
-                shaderMaskType = shader.Parameters["MaskType"];
+                shaderMaskLayer = shader.Parameters["MaskLayer"];
                 shaderMaskShape = shader.Parameters["MaskShape"];
                 shaderMaskRotateTrig = shader.Parameters["MaskRotateTrig"];
                 shaderMaskEllipseInvSizeSq = shader.Parameters["MaskEllipseInvSizeSq"];
+                shaderMaskTexture = shader.Parameters["MaskTexture"];
+                shaderMaskFrameRect = shader.Parameters["MaskFrameRect"];
+                shaderMaskDissolveStrength = shader.Parameters["MaskDissolveStrength"];
+                shaderMaskDissolveEdgeWidth = shader.Parameters["MaskDissolveEdgeWidth"];
+                shaderMaskTextureEnabled = shader.Parameters["MaskTextureEnabled"];
                 shaderMaskCount = shader.Parameters["MaskCount"];
                 shaderRenderCenter = shader.Parameters["RenderCenter"];
             }
             shaderFile.Dispose();
             spriteBatch = new SpriteBatch(gd);
             curveBatch = new CurveBatch(gd);
+            fallbackMaskTexture = new Texture2D(gd, 1, 1);
+            fallbackMaskTexture.SetData(new[] { Color.White });
+            maskFrameRects = new Vector4[ParticleManager.MAX_MASK_COUNT];
+            maskTextureEnabled = new float[ParticleManager.MAX_MASK_COUNT];
             substration = new BlendState();
             substration.ColorSourceBlend = Blend.SourceAlpha;
             substration.AlphaSourceBlend = Blend.One;
@@ -207,6 +226,7 @@ namespace CrazyStorm_Player
                 }
             }
             Environment.CurrentDirectory = AppDomain.CurrentDomain.SetupInformation.ApplicationBase;
+            maskTextures = new Dictionary<ParticleSystem, Texture2D>();
             //sounds
             sounds = new Dictionary<string, SoundEffect>();
             soundInstances = new Dictionary<string, SoundEffectInstance>();
@@ -224,6 +244,7 @@ namespace CrazyStorm_Player
                 var instance = file.ParticleSystems[SelectedParticleSystemIndex].Instantiate();
                 instance.Reset(true);
                 instances[instance] = file;
+                maskTextures[instance] = ResolveMaskTexture(file, instance);
             }
             if (CurrentFrame != 1) SkipFrame(CurrentFrame, true);
         }
@@ -236,6 +257,7 @@ namespace CrazyStorm_Player
             spriteBatch?.Dispose();
             background?.Dispose();
             defaultTexture?.Dispose();
+            fallbackMaskTexture?.Dispose();
             foreach (var dict in customTextures.Values)
             {
                 foreach (var tex in dict.Values)
@@ -244,6 +266,7 @@ namespace CrazyStorm_Player
                 }
             }
             customTextures.Clear();
+            maskTextures?.Clear();
             if (soundInstances != null)
             {
                 foreach (var instance in soundInstances.Values)
@@ -298,6 +321,88 @@ namespace CrazyStorm_Player
             }
             if (minCurrentFrame != float.MaxValue) CurrentFrame = minCurrentFrame;
         }
+        Texture2D ResolveMaskTexture(File file, ParticleSystem system)
+        {
+            if (file == null || system == null || system.MaskImage == null) return null;
+            Dictionary<int, Texture2D> textures;
+            if (!customTextures.TryGetValue(file, out textures)) return null;
+            Texture2D texture;
+            return textures.TryGetValue(system.MaskImage.ID, out texture) ? texture : null;
+        }
+        bool TryBuildMaskFrameRect(Texture2D texture, int maskIndex, out Vector4 rect)
+        {
+            rect = Vector4.Zero;
+            if (texture == null || ParticleManager.MaskTextureEnabledArray[maskIndex] == 0) return false;
+
+            var startPoint = ParticleManager.MaskTextureStartPointArray[maskIndex];
+            var size = ParticleManager.MaskTextureSizeArray[maskIndex];
+            if (size.x <= 0 || size.y <= 0 || startPoint.x < 0 || startPoint.y < 0) return false;
+
+            var width = (int)size.x;
+            var height = (int)size.y;
+            var x = (int)startPoint.x;
+            var y = (int)startPoint.y;
+            if (x >= texture.Width || y >= texture.Height) return false;
+
+            var frame = (int)ParticleManager.MaskTextureFrameArray[maskIndex];
+            if (FrameOrientation == FrameOrientation.Vertical)
+            {
+                var rows = Math.Max(1, (texture.Height - y) / height);
+                var cols = Math.Max(1, (texture.Width - x) / width);
+                if (frame >= rows * cols) return false;
+                x += frame / rows * width;
+                y += frame % rows * height;
+            }
+            else
+            {
+                var cols = Math.Max(1, (texture.Width - x) / width);
+                var rows = Math.Max(1, (texture.Height - y) / height);
+                if (frame >= rows * cols) return false;
+                x += frame % cols * width;
+                y += frame / cols * height;
+            }
+            if (x >= texture.Width || y >= texture.Height) return false;
+
+            // Keep editor/runtime behavior aligned: oversized frame rects remain valid and
+            // the out-of-range area is resolved by the mask sampler's Clamp addressing.
+            rect = new Vector4(x / (float)texture.Width, y / (float)texture.Height,
+                width / (float)texture.Width, height / (float)texture.Height);
+            return true;
+        }
+        void UpdateMaskShaderParameters(ParticleSystem system)
+        {
+            Array.Clear(maskFrameRects, 0, maskFrameRects.Length);
+            Array.Clear(maskTextureEnabled, 0, maskTextureEnabled.Length);
+
+            Texture2D maskTexture;
+            if (!maskTextures.TryGetValue(system, out maskTexture))
+            {
+                maskTexture = ResolveMaskTexture(instances[system], system);
+                maskTextures[system] = maskTexture;
+            }
+            for (int i = 0; i < ParticleManager.MaskCount; ++i)
+            {
+                Vector4 frameRect;
+                if (TryBuildMaskFrameRect(maskTexture, i, out frameRect))
+                {
+                    maskFrameRects[i] = frameRect;
+                    maskTextureEnabled[i] = 1;
+                }
+            }
+            shaderMaskCount.SetValue(ParticleManager.MaskCount);
+            shaderMaskSize.SetValue(ParticleManager.MaskSizeArray);
+            shaderMaskPosition.SetValue(ParticleManager.MaskPositionArray);
+            shaderMaskShape.SetValue(ParticleManager.MaskShapeArray);
+            shaderMaskLayer.SetValue(ParticleManager.MaskLayerArray);
+            shaderMaskRotateTrig.SetValue(ParticleManager.MaskRotateTrigArray);
+            shaderMaskEllipseInvSizeSq.SetValue(ParticleManager.MaskEllipseInvSizeSqArray);
+            shaderMaskFrameRect.SetValue(maskFrameRects);
+            shaderMaskDissolveStrength.SetValue(ParticleManager.MaskDissolveStrengthArray);
+            shaderMaskDissolveEdgeWidth.SetValue(ParticleManager.MaskDissolveEdgeWidthArray);
+            shaderMaskTextureEnabled.SetValue(maskTextureEnabled);
+            shaderMaskTexture.SetValue(maskTexture ?? fallbackMaskTexture);
+            shaderRenderCenter.SetValue(new Vector2(Width / 2, Height / 2) + system.ScreenOffset.ToXna());
+        }
         void DrawLayer(ParticleSystem system, Layer layer, BlendType blendType)
         {
             EndCurveBatch();
@@ -307,14 +412,7 @@ namespace CrazyStorm_Player
             currentLayerHasMask = ParticleManager.MaskCount > 0;
             if (currentLayerHasMask)
             {
-                shaderMaskCount.SetValue(ParticleManager.MaskCount);
-                shaderMaskSize.SetValue(ParticleManager.MaskSizeArray);
-                shaderMaskPosition.SetValue(ParticleManager.MaskPositionArray);
-                shaderMaskShape.SetValue(ParticleManager.MaskShapeArray);
-                shaderMaskType.SetValue(ParticleManager.MaskLayerArray);
-                shaderMaskRotateTrig.SetValue(ParticleManager.MaskRotateTrigArray);
-                shaderMaskEllipseInvSizeSq.SetValue(ParticleManager.MaskEllipseInvSizeSqArray);
-                shaderRenderCenter.SetValue(new Vector2(Width / 2, Height / 2));
+                UpdateMaskShaderParameters(system);
             }
             BeginParticleBatches(blendType);
             lastBlendType = blendType;
@@ -482,7 +580,7 @@ namespace CrazyStorm_Player
         void BeginParticleBatches(BlendType blendType)
         {
             BeginSpriteBatch(blendType);
-            curveBatch.Begin(GetBlendState(blendType));
+            curveBatch.Begin(GetBlendState(blendType), currentLayerHasMask ? shader : null);
             curveBatchBegun = true;
         }
         void EndSpriteBatch()

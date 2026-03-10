@@ -15,12 +15,14 @@ namespace CrazyStorm
         BoolCheckBox,
         ParticleTypeCombo,
         ParticleColorCombo,
+        EventFieldMaskTypeCombo,
     }
     public enum PropertyPseudoKind
     {
         None,
         ParticleType,
         ParticleColor,
+        EventFieldMaskType,
     }
     public class PropertyGridItem : INotifyPropertyChanged
     {

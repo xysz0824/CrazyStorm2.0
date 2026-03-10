@@ -232,7 +232,20 @@ namespace CrazyStorm
         private void DeleteMaskType_Click(object sender, RoutedEventArgs e)
         {
             if (selectedMaskType == null) return;
+            foreach (var layer in selectedParticle.Layers)
+            {
+                foreach (var component in layer.Components)
+                {
+                    var eventField = component as EventField;
+                    if (eventField != null && eventField.MaskType == selectedMaskType)
+                    {
+                        eventField.MaskType = null;
+                    }
+                }
+            }
             selectedParticle.CustomMaskTypes.Remove(selectedMaskType);
+            selectedMaskType = null;
+            MaskTypeList.SelectedItem = null;
             DelMaskType.IsEnabled = selectedParticle.CustomMaskTypes.Count > 0;
         }
         private void ColorPanel_MouseUp(object sender, MouseButtonEventArgs e)

@@ -150,6 +150,7 @@ namespace CrazyStorm.Core
                         }
                     }
                 }
+                particleSystem.RebuildMaskTypeReferences();
             }
         }
         public void Load(string filePath)
@@ -382,6 +383,7 @@ namespace CrazyStorm.Core
                         }
                     }
                 }
+                particleSystem.RebuildMaskTypeReferences();
             }
         }
         public bool LoadPlayFile(byte[] bytes, string resourceDict, float baseVersion)

@@ -31,11 +31,12 @@ namespace CrazyStorm_Player
         int indexIndex;
         int vertexIndex;
         bool beginCalled;
+        Effect effect;
         public CurveBatch(GraphicsDevice graphicsDevice)
         {
             g = graphicsDevice;
         }
-        public void Begin(BlendState blend)
+        public void Begin(BlendState blend, Effect effect)
         {
             if (beginCalled)
             {
@@ -43,6 +44,7 @@ namespace CrazyStorm_Player
             }
             beginCalled = true;
             blendState = blend;
+            this.effect = effect;
         }
         public void Draw(Curve curve, Texture2D tex, Rectangle rect, Vector2 offset, Color color)
         {
@@ -101,8 +103,21 @@ namespace CrazyStorm_Player
         {
             if (batchCurveCount <= 0) return;
             g.BlendState = blendState;
-            g.Textures[0] = curveTexs[curves[batchCurveCount - 1]];
-            g.DrawUserIndexedPrimitives(PrimitiveType.TriangleList, vertices, 0, vertexIndex, indices, 0, indexIndex / 3, VertexPositionColorTexture.VertexDeclaration);
+            if (effect != null)
+            {
+                var texture = curveTexs[curves[batchCurveCount - 1]];
+                var textureParameter = effect.Parameters["Texture"];
+                if (textureParameter != null) textureParameter.SetValue(texture);
+                foreach (var pass in effect.CurrentTechnique.Passes)
+                {
+                    pass.Apply();
+                    g.DrawUserIndexedPrimitives(PrimitiveType.TriangleList, vertices, 0, vertexIndex, indices, 0, indexIndex / 3, VertexPositionColorTexture.VertexDeclaration);
+                }
+            }
+            else
+            {
+                g.DrawUserIndexedPrimitives(PrimitiveType.TriangleList, vertices, 0, vertexIndex, indices, 0, indexIndex / 3, VertexPositionColorTexture.VertexDeclaration);
+            }
             batchCurveCount = 0;
             vertexIndex = 0;
             indexIndex = 0;

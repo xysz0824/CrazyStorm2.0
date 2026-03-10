@@ -40,6 +40,8 @@ namespace CrazyStorm.Core
         public LayerMaskType layerMaskType;
         public bool layerMaskMutex;
         public float rotation;
+        public float dissolveStrength;
+        public float dissolveEdgeWidth;
     }
     public class EventFieldPool : PoolObject<EventFieldPool, NullData>
     {
@@ -56,8 +58,10 @@ namespace CrazyStorm.Core
         [StringData]
         [XmlAttribute]
         string targetName;
+        int maskTypeID = -1;
         EventFieldData eventFieldData;
         Dictionary<long, EventFieldData> bindingEventFieldData;
+        MaskType maskType;
         #endregion
 
         #region Public Members
@@ -116,6 +120,28 @@ namespace CrazyStorm.Core
             get { return eventFieldData.rotation; }
             set { eventFieldData.rotation = value; }
         }
+        [ReadOnlyProperty(23)]
+        public MaskType MaskType
+        {
+            get { return maskType; }
+            set
+            {
+                maskType = value;
+                maskTypeID = value != null ? value.ID : -1;
+            }
+        }
+        [FloatProperty(24, 0, 1)]
+        public float DissolveStrength
+        {
+            get { return eventFieldData.dissolveStrength; }
+            set { eventFieldData.dissolveStrength = Math.Max(0, Math.Min(1, value)); }
+        }
+        [FloatProperty(25, 0, float.MaxValue)]
+        public float DissolveEdgeWidth
+        {
+            get { return eventFieldData.dissolveEdgeWidth; }
+            set { eventFieldData.dissolveEdgeWidth = value >= 0 ? value : 0; }
+        }
         public GenericContainer<EventGroup> EventFieldEventGroups { get; private set; }
         #endregion
 
@@ -131,6 +157,32 @@ namespace CrazyStorm.Core
         #endregion
 
         #region Private Methods
+        int GetMaskFrameIndex(MaskType type)
+        {
+            if (type == null || type.Frames <= 1) return 0;
+            return (int)Math.Max(CurrentFrame - 1, 0) / (type.Delay + 1) % type.Frames;
+        }
+        void UpdateMaskTextureData(int maskIndex)
+        {
+            var selectedMaskType = MaskType;
+            var hasTexture = 0f;
+            var startPoint = Vector2.Zero;
+            var size = Vector2.Zero;
+            var frame = 0f;
+            if (selectedMaskType != null)
+            {
+                hasTexture = 1f;
+                startPoint = selectedMaskType.StartPoint;
+                size = new Vector2(selectedMaskType.Width, selectedMaskType.Height);
+                frame = GetMaskFrameIndex(selectedMaskType);
+            }
+            ParticleManager.MaskTextureStartPointArray[maskIndex] = startPoint;
+            ParticleManager.MaskTextureSizeArray[maskIndex] = size;
+            ParticleManager.MaskTextureFrameArray[maskIndex] = frame;
+            ParticleManager.MaskDissolveStrengthArray[maskIndex] = DissolveStrength;
+            ParticleManager.MaskDissolveEdgeWidthArray[maskIndex] = DissolveEdgeWidth;
+            ParticleManager.MaskTextureEnabledArray[maskIndex] = hasTexture;
+        }
         void Update(float frameScale)
         {
             int count = 0;
@@ -170,7 +222,9 @@ namespace CrazyStorm.Core
             base.CopyTo(propertyContainer);
             var eventField = propertyContainer as EventField;
             eventField.targetName = targetName;
+            eventField.maskTypeID = maskTypeID;
             eventField.eventFieldData = eventFieldData;
+            eventField.maskType = maskType;
             eventField.EventFieldEventGroups = EventFieldEventGroups;
         }
         public override Component Instantiate()
@@ -186,6 +240,14 @@ namespace CrazyStorm.Core
             node = base.BuildFromXml(node);
             var eventFieldNode = (XmlElement)node.SelectSingleNode("EventField");
             XmlHelper.BuildFromFields(this, eventFieldNode);
+            if (eventFieldNode.HasAttribute("maskType"))
+            {
+                int parsedID;
+                if (int.TryParse(eventFieldNode.GetAttribute("maskType"), out parsedID)) maskTypeID = parsedID;
+                else throw new FileLoadException("FileDataError");
+            }
+            else maskTypeID = -1;
+            maskType = null;
             //eventFieldData
             XmlHelper.BuildFromStruct(ref eventFieldData, eventFieldNode);
             //eventFieldEventGroups
@@ -197,6 +259,12 @@ namespace CrazyStorm.Core
             node = base.StoreAsXml(doc, node);
             var eventFieldNode = doc.CreateElement("EventField");
             XmlHelper.StoreFields(this, doc, eventFieldNode);
+            if (maskType != null)
+            {
+                var maskTypeAttribute = doc.CreateAttribute("maskType");
+                maskTypeAttribute.Value = maskType.ID.ToString();
+                eventFieldNode.Attributes.Append(maskTypeAttribute);
+            }
             //eventFieldData
             XmlHelper.StoreStruct(eventFieldData, doc, eventFieldNode);
             //eventFieldEventGroups
@@ -212,6 +280,7 @@ namespace CrazyStorm.Core
             PlayDataHelper.GenerateStringDataFields(this, eventFieldBytes);
             //eventFieldData
             PlayDataHelper.GenerateStruct(eventFieldData, eventFieldBytes);
+            eventFieldBytes.AddRange(BitConverter.GetBytes(maskTypeID));
             //eventFieldEventGroups
             PlayDataHelper.GenerateObjectList(file, EventFieldEventGroups, eventFieldBytes);
             bytes.AddRange(PlayDataHelper.CreateBlock(eventFieldBytes));
@@ -226,6 +295,8 @@ namespace CrazyStorm.Core
                 PlayDataHelper.ReadStringDataFields(this, eventFieldReader);
                 //eventFieldData
                 eventFieldData = PlayDataHelper.ReadStruct<EventFieldData>(eventFieldReader);
+                maskTypeID = eventFieldReader.ReadInt32();
+                maskType = null;
                 //eventFieldEventGroups
                 PlayDataHelper.ReadObjectList(EventFieldEventGroups, eventFieldReader, version);
             }
@@ -262,6 +333,12 @@ namespace CrazyStorm.Core
                 case 22:
                     VM.PushFloat(Rotation);
                     return true;
+                case 24:
+                    VM.PushFloat(DissolveStrength);
+                    return true;
+                case 25:
+                    VM.PushFloat(DissolveEdgeWidth);
+                    return true;
             }
             return false;
         }
@@ -297,13 +374,22 @@ namespace CrazyStorm.Core
                 case 22:
                     Rotation = VM.PopFloat();
                     return true;
+                case 24:
+                    DissolveStrength = VM.PopFloat();
+                    return true;
+                case 25:
+                    DissolveEdgeWidth = VM.PopFloat();
+                    return true;
             }
             return false;
         }
         protected override int BindingClear(PropertyContainer propertyContainer, long[] resultArray)
         {
             var count = base.BindingClear(propertyContainer, resultArray);
-            for (int i = 0; i < count; ++i) bindingEventFieldData.Remove(resultArray[i]);
+            for (int i = 0; i < count; ++i)
+            {
+                bindingEventFieldData.Remove(resultArray[i]);
+            }
             return count;
         }
         protected override void BindingUpdate(ParticleBase particle, long uniqueId, int updateId, bool executeEvents, float frameScale)
@@ -336,6 +422,21 @@ namespace CrazyStorm.Core
             var initialState = base.initialState as EventField;
             TargetName = initialState.TargetName;
             eventFieldData = initialState.eventFieldData;
+            maskTypeID = initialState.maskTypeID;
+            MaskType = initialState.MaskType;
+        }
+        public void RebuildMaskTypeReference(IList<MaskType> maskTypes)
+        {
+            maskType = null;
+            if (maskTypeID < 0 || maskTypes == null) return;
+            for (int i = 0; i < maskTypes.Count; ++i)
+            {
+                if (maskTypes[i].ID == maskTypeID)
+                {
+                    maskType = maskTypes[i];
+                    return;
+                }
+            }
         }
         public void UpdateMutexMask()
         {
@@ -351,6 +452,7 @@ namespace CrazyStorm.Core
             ParticleManager.MaskRotateArray[maskCount] = rotation;
             ParticleManager.MaskRotateTrigArray[maskCount] = new Vector2((float)Math.Cos(rotation), (float)Math.Sin(rotation));
             ParticleManager.MaskEllipseInvSizeSqArray[maskCount] = new Vector2(1f / halfWidthSq, 1f / halfHeightSq);
+            UpdateMaskTextureData(maskCount);
             maskCount++;
             ParticleManager.MaskCount = maskCount;
         }
@@ -368,6 +470,7 @@ namespace CrazyStorm.Core
             ParticleManager.MaskRotateArray[maskCount] = rotation;
             ParticleManager.MaskRotateTrigArray[maskCount] = new Vector2((float)Math.Cos(rotation), (float)Math.Sin(rotation));
             ParticleManager.MaskEllipseInvSizeSqArray[maskCount] = new Vector2(1f / halfWidthSq, 1f / halfHeightSq);
+            UpdateMaskTextureData(maskCount);
             maskCount++;
             ParticleManager.MaskCount = maskCount;
         }

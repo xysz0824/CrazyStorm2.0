@@ -191,6 +191,8 @@
     <sys:String x:Key="TargetStr">目标</sys:String>
     <sys:String x:Key="CountStr">次数</sys:String>
     <sys:String x:Key="StrengthStr">强度</sys:String>
+    <sys:String x:Key="DissolveStrengthStr">消融强度</sys:String>
+    <sys:String x:Key="DissolveEdgeWidthStr">消融边缘宽度</sys:String>
     <sys:String x:Key="DurationStr">耗时</sys:String>
     <sys:String x:Key="IntensityStr">程度</sys:String>
     <sys:String x:Key="TipTitleStr">提示</sys:String>

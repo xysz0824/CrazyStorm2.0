@@ -27,6 +27,7 @@ namespace CrazyStorm
         File file;
         CommandStack commandStack;
         List<ParticleType> types;
+        List<MaskType> maskTypes;
         Component component;
         List<PropertyInfo> componentPropertyList;
         List<PropertyInfo> specificPropertyList;
@@ -50,6 +51,9 @@ namespace CrazyStorm
             this.config = config;
             this.file = file;
             this.types = types ?? new List<ParticleType>();
+            this.maskTypes = component != null && component.System != null ?
+                component.System.CustomMaskTypes.ToList() :
+                new List<MaskType>();
             this.component = component;
             this.updateFunc = updateFunc;
             InitializeComponent();
@@ -102,6 +106,18 @@ namespace CrazyStorm
                 emitter.InitialTemplate.Type = null;
             }
             RefreshParticlePseudoProperties();
+        }
+        public void LoadMaskTypes(IList<MaskType> maskTypes)
+        {
+            this.maskTypes = maskTypes != null ? maskTypes.ToList() : new List<MaskType>();
+            var eventField = component as EventField;
+            if (eventField == null) return;
+
+            if (eventField.MaskType != null && !this.maskTypes.Contains(eventField.MaskType))
+            {
+                eventField.MaskType = null;
+            }
+            RefreshEventFieldMaskPseudoProperty();
         }
         #endregion
 
@@ -163,6 +179,7 @@ namespace CrazyStorm
                 }
             }
             LoadTypes(types);
+            LoadMaskTypes(maskTypes);
             VariableGrid.ItemsSource = component.Locals;
             DeleteVariable.IsEnabled = component.Locals.Count > 0;
             ComponentEventList.ItemsSource = component.ComponentEventGroups;
@@ -219,7 +236,13 @@ namespace CrazyStorm
             if (properties == null) return;
             foreach (var item in properties)
             {
-                if (item == null || item.IsParticlePseudoProperty || item.Info == null) continue;
+                if (item == null) continue;
+                if (item.PseudoPropertyKind == PropertyPseudoKind.EventFieldMaskType)
+                {
+                    ApplyEventFieldMaskTypeValue(item, container as EventField);
+                    continue;
+                }
+                if (item.IsParticlePseudoProperty || item.Info == null) continue;
                 if (!item.ReadOnly && !container.Properties[item.Info.Name].Expression)
                 {
                     var result = item.Info.GetGetMethod().Invoke(container, null).ToString();
@@ -244,6 +267,14 @@ namespace CrazyStorm
                 ItemsSource = BuildItemsSource(editorKind, info.PropertyType),
             };
             ApplyReflectionPropertyValue(item, container.Properties[info.Name].Value);
+            if (component is EventField && info.Name == "MaskType")
+            {
+                item.ReadOnly = false;
+                item.EditorKind = PropertyEditorKind.EventFieldMaskTypeCombo;
+                item.PseudoPropertyKind = PropertyPseudoKind.EventFieldMaskType;
+                item.ItemsSource = BuildEventFieldMaskTypeItems();
+                ApplyEventFieldMaskTypeValue(item, container as EventField);
+            }
             return item;
         }
         void OpenEventSetting(EventGroup eventGroup, Expression.Environment environment, 
@@ -274,6 +305,12 @@ namespace CrazyStorm
             if (editorKind != PropertyEditorKind.EnumCombo || propertyType == null || !propertyType.IsEnum) return null;
             return Enum.GetNames(propertyType).Select(ExpressionHelper.Translate).ToList();
         }
+        List<string> BuildEventFieldMaskTypeItems()
+        {
+            var items = new List<string> { string.Empty };
+            items.AddRange(maskTypes.Select(item => item.Name));
+            return items;
+        }
         void ApplyReflectionPropertyValue(PropertyGridItem item, string internalValue)
         {
             if (item.EditorKind == PropertyEditorKind.BoolCheckBox)
@@ -291,6 +328,11 @@ namespace CrazyStorm
             }
             item.DisplayValue = item.Info != null && item.Info.PropertyType != typeof(string) && !item.ReadOnly ?
                 ExpressionHelper.Translate(internalValue) : internalValue;
+        }
+        void ApplyEventFieldMaskTypeValue(PropertyGridItem item, EventField eventField)
+        {
+            if (item == null || eventField == null) return;
+            item.DisplayValue = eventField.MaskType != null ? eventField.MaskType.Name : string.Empty;
         }
         PropertyGridItem CreateParticleTypePropertyItem(Emitter emitter)
         {
@@ -354,6 +396,28 @@ namespace CrazyStorm
                 var colorItems = currentType != null ? BuildParticleColorItems(currentType.Name) : new List<string>();
                 colorItem.ItemsSource = colorItems;
                 colorItem.DisplayValue = currentType != null ? ExpressionHelper.Translate(currentType.Color.ToString()) : string.Empty;
+            }
+            finally
+            {
+                suppressComboBoxEvent = false;
+            }
+        }
+        void RefreshEventFieldMaskPseudoProperty()
+        {
+            var eventField = component as EventField;
+            if (eventField == null) return;
+
+            var items = SpecificGrid.DataContext as IList<PropertyGridItem>;
+            if (items == null) return;
+
+            var maskTypeItem = items.FirstOrDefault(item => item.PseudoPropertyKind == PropertyPseudoKind.EventFieldMaskType);
+            if (maskTypeItem == null) return;
+
+            suppressComboBoxEvent = true;
+            try
+            {
+                maskTypeItem.ItemsSource = BuildEventFieldMaskTypeItems();
+                ApplyEventFieldMaskTypeValue(maskTypeItem, eventField);
             }
             finally
             {
@@ -478,6 +542,10 @@ namespace CrazyStorm
             {
                 CommitParticleColorSelection(displayValue);
             }
+            else if (property.EditorKind == PropertyEditorKind.EventFieldMaskTypeCombo)
+            {
+                CommitEventFieldMaskTypeSelection(displayValue);
+            }
             else if (displayValue != property.DisplayValue)
             {
                 property.DisplayValue = displayValue;
@@ -521,6 +589,17 @@ namespace CrazyStorm
             new SetParticleTypeCommand().Do(commandStack, emitter, targetType,
                 new Action<Emitter, ParticleType>(ParticleTypeUpdate));
         }
+        void CommitEventFieldMaskTypeSelection(string maskTypeName)
+        {
+            var eventField = component as EventField;
+            if (eventField == null) return;
+
+            var targetMaskType = maskTypes.FirstOrDefault(item => item.Name == maskTypeName);
+            if (eventField.MaskType == targetMaskType) return;
+
+            new SetEventFieldMaskTypeCommand().Do(commandStack, eventField, targetMaskType,
+                new Action<EventField, MaskType>(EventFieldMaskTypeUpdate));
+        }
         ParticleType ResolveParticleType(string typeName, string colorDisplayValue)
         {
             if (string.IsNullOrEmpty(typeName)) return null;
@@ -540,6 +619,13 @@ namespace CrazyStorm
             if (this == null) return;
             emitter.InitialTemplate.Type = type;
             RefreshParticlePseudoProperties();
+            if (updateFunc != null) updateFunc();
+        }
+        void EventFieldMaskTypeUpdate(EventField eventField, MaskType maskType)
+        {
+            if (this == null) return;
+            eventField.MaskType = maskType;
+            RefreshEventFieldMaskPseudoProperty();
             if (updateFunc != null) updateFunc();
         }
         bool TryGetDataGrid(DependencyObject source, out DataGrid grid)

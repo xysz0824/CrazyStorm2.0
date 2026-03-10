@@ -306,6 +306,7 @@ namespace CrazyStorm.Core
                     component.RebuildReferenceFromCollection();
                 }
             }
+            instance.RebuildMaskTypeReferences();
             instance.RebuildComponentTree();
             instance.Sounds = Sounds;
             instance.typeSoundMap = typeSoundMap;
@@ -433,6 +434,20 @@ namespace CrazyStorm.Core
                 }
             }
             maskImageID = -1;
+        }
+        public void RebuildMaskTypeReferences()
+        {
+            foreach (var layer in Layers)
+            {
+                foreach (var component in layer.Components)
+                {
+                    var eventField = component as EventField;
+                    if (eventField != null)
+                    {
+                        eventField.RebuildMaskTypeReference(CustomMaskTypes);
+                    }
+                }
+            }
         }
         Vector2 GetCenterPositionRuntime()
         {

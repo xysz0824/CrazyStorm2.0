@@ -84,6 +84,7 @@ namespace CrazyStorm
             var components = new List<Component>();
             foreach (var layer in particle.Layers) components.AddRange(layer.Components);
             foreach (var component in components) component.RebuildReferenceFromCollection(components);
+            particle.RebuildMaskTypeReferences();
             particle.RebuildComponentTree();
             file.ParticleSystems.Add(particle);
             selectedSystem = particle;
@@ -95,12 +96,17 @@ namespace CrazyStorm
             var particleTypes = new List<ParticleType>();
             particleTypes.AddRange(ParticleType.DefaultTypes);
             particleTypes.AddRange(selectedSystem.CustomTypes);
+            var systemMaskTypes = selectedSystem.CustomMaskTypes.ToList();
             for (int i = 2; i < LeftTabControl.Items.Count; ++i)
             {
                 var item = LeftTabControl.Items[i] as TabItem;
                 var scroll = item?.Content as ScrollViewer;
                 var panel = scroll?.Content as PropertyPanel;
-                if (panel != null) panel.LoadTypes(particleTypes);
+                if (panel != null)
+                {
+                    panel.LoadTypes(particleTypes);
+                    panel.LoadMaskTypes(systemMaskTypes);
+                }
             }
             foreach (var window in propertyWindows.Values)
             {
@@ -108,7 +114,11 @@ namespace CrazyStorm
                 if (scroll == null) continue;
 
                 var panel = scroll.Content as PropertyPanel;
-                if (panel != null) panel.LoadTypes(particleTypes);
+                if (panel != null)
+                {
+                    panel.LoadTypes(particleTypes);
+                    panel.LoadMaskTypes(systemMaskTypes);
+                }
             }
         }
         void OpenSelectedParticleSystemSetting()
@@ -118,6 +128,7 @@ namespace CrazyStorm
             window.ShowDialog();
             window.Close();
             ReloadTypes();
+            UpdateProperty();
         }
         #endregion
 
