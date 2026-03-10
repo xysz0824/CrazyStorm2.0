@@ -20,6 +20,10 @@
                     <RadioButton Name="LastAsTop" Content="{StaticResource LastAsTopStr}" Margin="0,0" VerticalAlignment="Center"
                                  Checked="LastAsTop_Checked"/>
                 </StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+                    <Label Content="{StaticResource MaskPatternStr}"/>
+                    <ComboBox Name="MaskPatternCombo" Width="150" Margin="22,0,0,0" SelectionChanged="MaskPatternCombo_SelectionChanged"/>
+                </StackPanel>
             </StackPanel>
         </GroupBox>
         <TabControl>
@@ -159,6 +163,75 @@
                                 Width="{Binding ElementName=Diameter, Path=Text}" Height="{Binding ElementName=Diameter, Path=Text}"
                                 Canvas.Left="{Binding ElementName=CircleBoxX, Path=Text}" Canvas.Top="{Binding ElementName=CircleBoxY, Path=Text}" 
                                 Stroke="Red" Opacity="0.5"/>
+                        </Canvas>
+                    </ScrollViewer>
+                </DockPanel>
+            </TabItem>
+            <TabItem Header="{StaticResource CustomMaskTypeStr}">
+                <DockPanel>
+                    <GroupBox DockPanel.Dock="Bottom" Name="MaskSetting" IsEnabled="False" Header="{StaticResource SettingStr}" MinWidth="550" Height="90" HorizontalAlignment="Stretch">
+                        <StackPanel>
+                            <WrapPanel Margin="0">
+                                <Label Content="{StaticResource NameStr}" Margin="0,1,7,1"/>
+                                <TextBox Text="{Binding Path=Name}" Width="141" Margin="0,1" VerticalContentAlignment="Center" MaxLines="1" MaxLength="20"/>
+                            </WrapPanel>
+                            <WrapPanel VerticalAlignment="Top">
+                                <Label Content="{StaticResource StartPointXStr}" BorderThickness="0" Margin="0,1" />
+                                <TextBox Name="MaskStartPointX" Text="{Binding Path=StartPointX}" Width="50" Margin="0,1" VerticalContentAlignment="Center" MaxLines="1" MaxLength="9" TextChanged="MaskTextBox_TextChanged"
+                                         KeyDown="TextBox_KeyDown"/>
+                                <Label Content="{StaticResource StartPointYStr}" Margin="0,1" />
+                                <TextBox Name="MaskStartPointY" Text="{Binding Path=StartPointY}" Width="50" Margin="0,1" VerticalContentAlignment="Center" MaxLength="9" MaxLines="1" TextChanged="MaskTextBox_TextChanged"
+                                         KeyDown="TextBox_KeyDown"/>
+                                <Label Content="{StaticResource WidthStr}" Margin="0,1" />
+                                <TextBox Name="MaskRectWidth" Text="{Binding Path=Width}" Width="50" Margin="0,1" VerticalContentAlignment="Center" MaxLength="9" MaxLines="1" TextChanged="MaskTextBox_TextChanged"
+                                         KeyDown="TextBox_KeyDown"/>
+                                <Label Content="{StaticResource HeightStr}" Margin="0,1" />
+                                <TextBox Name="MaskRectHeight" Text="{Binding Path=Height}" Width="50" Margin="0,1" VerticalContentAlignment="Center" MaxLength="9" MaxLines="1" TextChanged="MaskTextBox_TextChanged"
+                                         KeyDown="TextBox_KeyDown"/>
+                                <Label Content="{StaticResource FramesStr}" Margin="0,1" />
+                                <TextBox Name="MaskFrames" Text="{Binding Path=Frames}" Width="50" Margin="0,1" VerticalContentAlignment="Center" TextChanged="MaskTextBox_TextChanged" MaxLength="9" MaxLines="1"
+                                         KeyDown="TextBox_KeyDown"/>
+                                <Label Content="{StaticResource DelayStr}" Margin="0,1" />
+                                <TextBox Text="{Binding Path=Delay}" Width="50" Margin="0,1" VerticalContentAlignment="Center" MaxLength="9" MaxLines="1"
+                                         KeyDown="TextBox_KeyDown"/>
+                            </WrapPanel>
+                        </StackPanel>
+                    </GroupBox>
+                    <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Margin="0,1">
+                        <Button Name="AddMaskType" Content="{StaticResource AddStr}" Width="40" Margin="2,0" HorizontalAlignment="Left" Click="AddNewMaskType_Click"/>
+                        <Button Name="DelMaskType" Content="{StaticResource DelStr}" Width="40" Margin="2,0 " HorizontalAlignment="Left" Click="DeleteMaskType_Click" IsEnabled="False"/>
+                    </StackPanel>
+                    <ListView Name="MaskTypeList" DockPanel.Dock="Left" Width="120" SelectionChanged="MaskTypeList_SelectionChanged" SelectionMode="Single">
+                        <ListView.ContextMenu>
+                            <ContextMenu>
+                                <MenuItem Header="{StaticResource AddStr}" Click="AddNewMaskType_Click" />
+                            </ContextMenu>
+                        </ListView.ContextMenu>
+                        <ListView.ItemTemplate>
+                            <DataTemplate>
+                                <DockPanel>
+                                    <DockPanel.ContextMenu>
+                                        <ContextMenu>
+                                            <MenuItem Header="{StaticResource DelStr}" Click="DeleteMaskType_Click" />
+                                        </ContextMenu>
+                                    </DockPanel.ContextMenu>
+                                    <TextBlock Text="{Binding Path=Name}"/>
+                                </DockPanel>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
+                    <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+                        <Canvas Name="MaskPreview" HorizontalAlignment="Left" VerticalAlignment="Top" Height="{Binding ElementName=MaskImage, Path=ActualHeight}" Width="{Binding ElementName=MaskImage, Path=ActualWidth}">
+                            <Image Name="MaskImage" Canvas.Left="0" Canvas.Top="0"/>
+                            <Rectangle
+                                Fill="Blue"
+                                Width="{Binding ElementName=MaskRectWidth, Path=Text}" Height="{Binding ElementName=MaskRectHeight, Path=Text}"
+                                Canvas.Left="{Binding ElementName=MaskStartPointX, Path=Text}" Canvas.Top="{Binding ElementName=MaskStartPointY, Path=Text}"
+                                Stroke="Black" Opacity="0.5"/>
+                            <Rectangle
+                                Width="{Binding ElementName=MaskRectWidth, Path=Text}" Height="{Binding ElementName=MaskRectHeight, Path=Text}"
+                                Canvas.Left="{Binding ElementName=MaskStartPointX, Path=Text}" Canvas.Top="{Binding ElementName=MaskStartPointY, Path=Text}"
+                                Stroke="Red" Opacity="0.8"/>
                         </Canvas>
                     </ScrollViewer>
                 </DockPanel>

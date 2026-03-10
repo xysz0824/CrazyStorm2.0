@@ -41,10 +41,15 @@ namespace CrazyStorm.Core
         string name;
         [XmlAttribute]
         OrderType orderType;
+        GenericContainer<MaskType> customMaskTypes;
         GenericContainer<ParticleType> customTypes;
         GenericContainer<Layer> layers;
         GenericContainer<Note> notes;
         GenericContainer<Component> componentTree;
+        FileResource maskImage;
+        int maskImageID = -1;
+        [XmlAttribute]
+        int customMaskTypeIndex;
         [XmlAttribute]
         int customTypeIndex;
         [XmlAttribute]
@@ -86,10 +91,21 @@ namespace CrazyStorm.Core
                 return totalFrame;
             }
         }
+        public GenericContainer<MaskType> CustomMaskTypes { get { return customMaskTypes; } }
         public GenericContainer<ParticleType> CustomTypes { get { return customTypes; } }
         public GenericContainer<Layer> Layers { get { return layers; } }
         public GenericContainer<Note> Notes { get { return notes; } }
         public GenericContainer<Component> ComponentTree { get { return componentTree; } }
+        public FileResource MaskImage
+        {
+            get { return maskImage; }
+            set
+            {
+                maskImage = value;
+                maskImageID = value != null ? value.ID : -1;
+            }
+        }
+        public int CustomMaskTypeIndex { get { return customMaskTypeIndex++; } }
         public int CustomTypeIndex { get { return customTypeIndex++; } }
         public int LayerIndex { get { return layerIndex++; } }
         public GenericContainer<FileResource> Sounds { get; set; }
@@ -117,6 +133,7 @@ namespace CrazyStorm.Core
         #region Constructor
         public ParticleSystem()
         {
+            customMaskTypes = new GenericContainer<MaskType>();
             customTypes = new GenericContainer<ParticleType>();
             layers = new GenericContainer<Layer>();
             notes = new GenericContainer<Note>();
@@ -250,6 +267,8 @@ namespace CrazyStorm.Core
         public object Clone()
         {
             var clone = MemberwiseClone() as ParticleSystem;
+            clone.customMaskTypes = new GenericContainer<MaskType>();
+            foreach (var type in customMaskTypes) clone.customMaskTypes.Add(type.Clone() as MaskType);
             clone.customTypes = new GenericContainer<ParticleType>();
             foreach (var type in customTypes) clone.customTypes.Add(type.Clone() as ParticleType);
             clone.layers = new GenericContainer<Layer>();
@@ -270,6 +289,8 @@ namespace CrazyStorm.Core
             instance.name = name;
             instance.orderType = orderType;
             instance.LogicOffset = default;
+            instance.customMaskTypes = customMaskTypes;
+            instance.MaskImage = maskImage;
             instance.customTypes = customTypes;
             instance.layers.Clear();
             for (int i = 0; i < layers.Count; ++i)
@@ -303,6 +324,15 @@ namespace CrazyStorm.Core
             var particleSystemNode = (XmlElement)node.SelectSingleNode(nodeName);
             if (node.Name == nodeName) particleSystemNode = node;
             XmlHelper.BuildFromFields(this, particleSystemNode);
+            if (particleSystemNode.HasAttribute("maskImage"))
+            {
+                int parsedID;
+                if (int.TryParse(particleSystemNode.GetAttribute("maskImage"), out parsedID)) maskImageID = parsedID;
+                else throw new FileLoadException("FileDataError");
+            }
+            else maskImageID = -1;
+            maskImage = null;
+            XmlHelper.BuildFromObjectList(customMaskTypes, new MaskType(0), particleSystemNode, "CustomMaskTypes");
             //customTypes
             XmlHelper.BuildFromObjectList(customTypes, new ParticleType(0), particleSystemNode, "CustomTypes");
             //layers
@@ -316,9 +346,16 @@ namespace CrazyStorm.Core
             return particleSystemNode;
         }
         public XmlElement StoreAsXml(XmlDocument doc, XmlElement node)
-        {;
+        {
             var particleSystemNode = doc.CreateElement("ParticleSystem");
             XmlHelper.StoreFields(this, doc, particleSystemNode);
+            if (maskImage != null)
+            {
+                var maskImageAttribute = doc.CreateAttribute("maskImage");
+                maskImageAttribute.Value = maskImage.ID.ToString();
+                particleSystemNode.Attributes.Append(maskImageAttribute);
+            }
+            XmlHelper.StoreObjectList(customMaskTypes, doc, particleSystemNode, "CustomMaskTypes");
             //customTypes
             XmlHelper.StoreObjectList(customTypes, doc, particleSystemNode, "CustomTypes");
             //layers
@@ -339,6 +376,8 @@ namespace CrazyStorm.Core
             PlayDataHelper.GenerateStruct(orderType, particleSystemBytes);
             //stringDataField
             PlayDataHelper.GenerateStringDataFields(this, particleSystemBytes);
+            particleSystemBytes.AddRange(BitConverter.GetBytes(maskImage != null ? maskImage.ID : -1));
+            PlayDataHelper.GenerateObjectList(file, customMaskTypes, particleSystemBytes);
             //customTypes
             PlayDataHelper.GenerateObjectList(file, customTypes, particleSystemBytes);
             //layers
@@ -360,6 +399,8 @@ namespace CrazyStorm.Core
                 orderType = PlayDataHelper.ReadStruct<OrderType>(particleSystemReader);
                 //stringDataFields
                 PlayDataHelper.ReadStringDataFields(this, particleSystemReader);
+                maskImageID = particleSystemReader.ReadInt32();
+                PlayDataHelper.ReadObjectList(CustomMaskTypes, particleSystemReader, version);
                 //customTypes
                 PlayDataHelper.ReadObjectList(CustomTypes, particleSystemReader, version);
                 //layers
@@ -379,6 +420,19 @@ namespace CrazyStorm.Core
                     typeSoundMap.Add(key, value);
                 }
             }
+        }
+        public void RebuildMaskImageReference(GenericContainer<FileResource> collection)
+        {
+            if (maskImageID == -1) return;
+            foreach (var target in collection)
+            {
+                if (maskImageID == target.ID)
+                {
+                    MaskImage = target;
+                    break;
+                }
+            }
+            maskImageID = -1;
         }
         Vector2 GetCenterPositionRuntime()
         {

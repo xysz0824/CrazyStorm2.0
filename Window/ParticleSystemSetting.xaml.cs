@@ -27,6 +27,7 @@ namespace CrazyStorm
         Config config;
         File file;
         ParticleSystem selectedParticle;
+        MaskType selectedMaskType;
         ParticleType selectedType;
         TabItem selectedTab;
         List<ParticleType> types;
@@ -51,6 +52,10 @@ namespace CrazyStorm
             ParticleSystemName.DataContext = selectedParticle;
             FirstAsTop.IsChecked = selectedParticle.OrderType == OrderType.FirstAsTop;
             LastAsTop.IsChecked = selectedParticle.OrderType == OrderType.LastAsTop;
+            MaskPatternCombo.ItemsSource = file.Images;
+            MaskPatternCombo.SelectedItem = selectedParticle.MaskImage;
+            MaskTypeList.ItemsSource = selectedParticle.CustomMaskTypes;
+            DelMaskType.IsEnabled = selectedParticle.CustomMaskTypes.Count > 0;
             TypeList.ItemsSource = selectedParticle.CustomTypes;
             DelType.IsEnabled = selectedParticle.CustomTypes.Count > 0;
             file.UpdateResource();
@@ -88,40 +93,76 @@ namespace CrazyStorm
         }
         void UpdatePreview()
         {
-            if (Setting.DataContext == null) return;
+            UpdatePreview(Preview, Image, Frames, RectWidth, RectHeight, StartPointX, StartPointY);
+        }
+        void UpdateMaskPreview()
+        {
+            UpdateImagePreview(selectedParticle.MaskImage, MaskImage);
+            UpdatePreview(MaskPreview, MaskImage, MaskFrames, MaskRectWidth, MaskRectHeight, MaskStartPointX, MaskStartPointY);
+        }
+        void UpdatePreview(Canvas preview, System.Windows.Controls.Image image, TextBox frames, TextBox widthBox,
+            TextBox heightBox, TextBox startPointXBox, TextBox startPointYBox)
+        {
+            if (frames.DataContext == null) return;
             int frame = 0, width = 0, height = 0, startPointX = 0, startPointY = 0;
-            if (!int.TryParse(Frames.Text, out frame) || !int.TryParse(RectWidth.Text, out width) ||
-                !int.TryParse(RectHeight.Text, out height) || !int.TryParse(StartPointX.Text, out startPointX) ||
-                !int.TryParse(StartPointY.Text, out startPointY)) return;
-            for (int i = 0; i < Preview.Children.Count;++i)
+            if (!int.TryParse(frames.Text, out frame) || !int.TryParse(widthBox.Text, out width) ||
+                !int.TryParse(heightBox.Text, out height) || !int.TryParse(startPointXBox.Text, out startPointX) ||
+                !int.TryParse(startPointYBox.Text, out startPointY)) return;
+            for (int i = 0; i < preview.Children.Count; ++i)
             {
-                if (((FrameworkElement)Preview.Children[i]).Name == "FrameRect")
+                if (((FrameworkElement)preview.Children[i]).Name == "FrameRect")
                 {
-                    Preview.Children.RemoveAt(i);
+                    preview.Children.RemoveAt(i);
                     i--;
                 }
             }
-            for (int i = 1;i < frame;++i)
+            for (int i = 1; i < frame; ++i)
             {
                 var rect = new Rectangle();
                 rect.Name = "FrameRect";
                 rect.Width = width;
                 rect.Height = height;
                 rect.Stroke = new SolidColorBrush(Colors.Red);
-                Preview.Children.Add(rect);
+                preview.Children.Add(rect);
                 if (config.FrameOrientation == FrameOrientation.Vertical)
                 {
-                    var rows = (int)Math.Max(1, (Image.Height - startPointY) / height);
+                    var rows = (int)Math.Max(1, (image.Height - startPointY) / height);
                     Canvas.SetLeft(rect, startPointX + (i / rows) * width);
                     Canvas.SetTop(rect, startPointY + (i % rows) * height);
                 }
                 else
                 {
-                    var cols = (int)Math.Max(1, (Image.Width - startPointX) / width);
+                    var cols = (int)Math.Max(1, (image.Width - startPointX) / width);
                     Canvas.SetLeft(rect, startPointX + (i % cols) * width);
                     Canvas.SetTop(rect, startPointY + (i / cols) * height);
                 }
                 rect.Opacity = 0.8f;
+            }
+        }
+        void UpdateImagePreview(ComboBox comboBox, System.Windows.Controls.Image image)
+        {
+            UpdateImagePreview(comboBox.SelectedItem as FileResource, image);
+        }
+        void UpdateImagePreview(FileResource fileResource, System.Windows.Controls.Image image)
+        {
+            if (fileResource == null)
+            {
+                image.Source = null;
+                image.Width = image.Height = 0;
+            }
+            else
+            {
+                try
+                {
+                    var bitmap = new BitmapImage(new Uri(fileResource.AbsolutePath));
+                    image.Source = bitmap;
+                    image.Width = bitmap.PixelWidth;
+                    image.Height = bitmap.PixelHeight;
+                }
+                catch
+                {
+                    image.Source = null;
+                }
             }
         }
         #endregion
@@ -162,6 +203,38 @@ namespace CrazyStorm
                 (string)FindResource("ParticleTypeStr")));
             DelType.IsEnabled = true;
         }
+        private void MaskPatternCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            selectedParticle.MaskImage = MaskPatternCombo.SelectedItem as FileResource;
+            UpdateMaskPreview();
+        }
+        private void MaskTypeList_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (e.AddedItems.Count > 0)
+            {
+                selectedMaskType = e.AddedItems[0] as MaskType;
+                MaskSetting.IsEnabled = true;
+                MaskSetting.DataContext = selectedMaskType;
+            }
+            else
+            {
+                selectedMaskType = null;
+                MaskSetting.IsEnabled = false;
+                MaskSetting.DataContext = null;
+            }
+        }
+        private void AddNewMaskType_Click(object sender, RoutedEventArgs e)
+        {
+            selectedParticle.CustomMaskTypes.Add(new MaskType(selectedParticle.CustomMaskTypeIndex,
+                (string)FindResource("MaskTypeStr")));
+            DelMaskType.IsEnabled = true;
+        }
+        private void DeleteMaskType_Click(object sender, RoutedEventArgs e)
+        {
+            if (selectedMaskType == null) return;
+            selectedParticle.CustomMaskTypes.Remove(selectedMaskType);
+            DelMaskType.IsEnabled = selectedParticle.CustomMaskTypes.Count > 0;
+        }
         private void ColorPanel_MouseUp(object sender, MouseButtonEventArgs e)
         {
             var selectedColor = e.Source as Label;
@@ -184,6 +257,10 @@ namespace CrazyStorm
         {
             UpdatePreview();
         }
+        private void MaskTextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            UpdateMaskPreview();
+        }
         private void TextBox_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.Enter)
@@ -193,25 +270,8 @@ namespace CrazyStorm
         }
         private void ImageCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (ImageCombo.SelectedItem == null)
-            {
-                Image.Source = null;
-                Image.Width = Image.Height = 0;
-            }
-            else
-            {
-                try
-                {
-                    var bitmap = new BitmapImage(new Uri((ImageCombo.SelectedItem as FileResource).AbsolutePath));
-                    Image.Source = bitmap;
-                    Image.Width = bitmap.PixelWidth;
-                    Image.Height = bitmap.PixelHeight;
-                }
-                catch
-                {
-                    Image.Source = null;
-                }
-            }
+            UpdateImagePreview(ImageCombo, Image);
+            UpdatePreview();
         }
         private void FirstAsTop_Checked(object sender, RoutedEventArgs e)
         {

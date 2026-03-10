@@ -127,6 +127,7 @@ namespace CrazyStorm.Core
         {
             foreach (var particleSystem in ParticleSystems)
             {
+                particleSystem.RebuildMaskImageReference(Images);
                 //Rebuild all custom types
                 foreach (var customType in particleSystem.CustomTypes)
                 {
@@ -358,6 +359,7 @@ namespace CrazyStorm.Core
         {
             foreach (var particleSystem in file.ParticleSystems)
             {
+                particleSystem.RebuildMaskImageReference(file.Images);
                 //Rebuild all custom types
                 foreach (var customType in particleSystem.CustomTypes)
                 {
