@@ -554,6 +554,22 @@ namespace CrazyStorm
             grid.CommitEdit(DataGridEditingUnit.Cell, true);
             grid.CommitEdit(DataGridEditingUnit.Row, true);
         }
+        void RefreshPropertyComboBoxToolTip(ComboBox comboBox)
+        {
+            var property = comboBox != null ? comboBox.DataContext as PropertyGridItem : null;
+            if (comboBox == null || property == null ||
+                property.PseudoPropertyKind != PropertyPseudoKind.ParticleType)
+            {
+                if (comboBox != null) comboBox.ToolTip = null;
+                return;
+            }
+
+            var selectedTypeName = comboBox.SelectedItem as string;
+            if (string.IsNullOrEmpty(selectedTypeName))
+                selectedTypeName = property.DisplayValue;
+
+            comboBox.ToolTip = BuildParticleTypeToolTip(ResolvePreviewParticleType(selectedTypeName));
+        }
         ToolTip BuildParticleTypeToolTip(ParticleType selectedType)
         {
             if (selectedType == null) return null;
@@ -713,7 +729,11 @@ namespace CrazyStorm
         private void PropertyComboBox_Loaded(object sender, RoutedEventArgs e)
         {
             var comboBox = sender as ComboBox;
-            if (comboBox != null) comboBox.Tag = false;
+            if (comboBox != null)
+            {
+                comboBox.Tag = false;
+                RefreshPropertyComboBoxToolTip(comboBox);
+            }
         }
         private void PropertyComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
@@ -722,6 +742,8 @@ namespace CrazyStorm
             var comboBox = sender as ComboBox;
             var property = comboBox != null ? comboBox.DataContext as PropertyGridItem : null;
             if (comboBox == null || property == null) return;
+
+            RefreshPropertyComboBoxToolTip(comboBox);
 
             if (property.EditorKind == PropertyEditorKind.ParticleTypeCombo && comboBox.IsDropDownOpen)
             {
@@ -753,6 +775,8 @@ namespace CrazyStorm
         {
             var comboBox = sender as ComboBox;
             if (comboBox == null) return;
+
+            RefreshPropertyComboBoxToolTip(comboBox);
 
             if (comboBox.Tag is bool && (bool)comboBox.Tag)
             {
@@ -792,20 +816,6 @@ namespace CrazyStorm
             checkBox.IsChecked = !(checkBox.IsChecked == true);
             PropertyCheckBox_Click(checkBox, e);
             e.Handled = true;
-        }
-        private void PropertyValueTextBlock_ToolTipOpening(object sender, ToolTipEventArgs e)
-        {
-            var textBlock = sender as TextBlock;
-            var property = textBlock != null ? textBlock.DataContext as PropertyGridItem : null;
-            if (textBlock == null || property == null ||
-                property.PseudoPropertyKind != PropertyPseudoKind.ParticleType)
-            {
-                if (textBlock != null) textBlock.ToolTip = null;
-                return;
-            }
-
-            textBlock.ToolTip = BuildParticleTypeToolTip(ResolvePreviewParticleType(property.DisplayValue));
-            if (textBlock.ToolTip == null) e.Handled = true;
         }
         private void AddVariable_Click(object sender, RoutedEventArgs e)
         {
