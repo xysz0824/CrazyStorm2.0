@@ -9,7 +9,7 @@ using System.Text;
 namespace CrazyStorm.Core
 {
     [AttributeUsage(AttributeTargets.Property, AllowMultiple = false, Inherited = false)]
-    sealed class EnumPropertyAttribute : PropertyAttribute
+    public sealed class EnumPropertyAttribute : PropertyAttribute
     {
         Type type;
         public EnumPropertyAttribute(int id, Type enumType) : base(id)

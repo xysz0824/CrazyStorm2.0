@@ -45,15 +45,13 @@ namespace CrazyStorm
 
         #region Constructor
         public PropertyPanel(CommandStack commandStack, Config config, File file,
-            List<ParticleType> types, Component component, Action updateFunc)
+            List<ParticleType> types, List<MaskType> maskTypes, Component component, Action updateFunc)
         {
             this.commandStack = commandStack;
             this.config = config;
             this.file = file;
             this.types = types ?? new List<ParticleType>();
-            this.maskTypes = component != null && component.System != null ?
-                component.System.CustomMaskTypes.ToList() :
-                new List<MaskType>();
+            this.maskTypes = maskTypes ?? new List<MaskType>();
             this.component = component;
             this.updateFunc = updateFunc;
             InitializeComponent();
@@ -107,9 +105,9 @@ namespace CrazyStorm
             }
             RefreshParticlePseudoProperties();
         }
-        public void LoadMaskTypes(IList<MaskType> maskTypes)
+        public void LoadMaskTypes(List<MaskType> maskTypes)
         {
-            this.maskTypes = maskTypes != null ? maskTypes.ToList() : new List<MaskType>();
+            this.maskTypes = maskTypes ?? new List<MaskType>();
             var eventField = component as EventField;
             if (eventField == null) return;
 
@@ -215,10 +213,10 @@ namespace CrazyStorm
                 DelSpecificEventButton.Visibility = Visibility.Collapsed;
             }
         }
-        void LoadProperties(FrameworkElement element, PropertyContainer container, IList<PropertyInfo> infos, bool includeParticlePseudoProperties)
+        void LoadProperties(FrameworkElement element, PropertyContainer container, IList<PropertyInfo> infos, bool addParticleType)
         {
             var propertyItems = new ObservableCollection<PropertyGridItem>();
-            if (includeParticlePseudoProperties && component is Emitter)
+            if (addParticleType && component is Emitter)
             {
                 propertyItems.Add(CreateParticleTypePropertyItem(component as Emitter));
                 propertyItems.Add(CreateParticleColorPropertyItem(component as Emitter));
@@ -267,7 +265,7 @@ namespace CrazyStorm
                 ItemsSource = BuildItemsSource(editorKind, info.PropertyType),
             };
             ApplyReflectionPropertyValue(item, container.Properties[info.Name].Value);
-            if (component is EventField && info.Name == "MaskType")
+            if (component is EventField && info.PropertyType == typeof(MaskType))
             {
                 item.ReadOnly = false;
                 item.EditorKind = PropertyEditorKind.EventFieldMaskTypeCombo;
@@ -296,8 +294,8 @@ namespace CrazyStorm
         }
         PropertyEditorKind GetEditorKind(PropertyAttribute attribute)
         {
-            if (attribute != null && attribute.GetType().Name == "EnumPropertyAttribute") return PropertyEditorKind.EnumCombo;
-            if (attribute != null && attribute.GetType().Name == "BoolPropertyAttribute") return PropertyEditorKind.BoolCheckBox;
+            if (attribute != null && attribute is EnumPropertyAttribute) return PropertyEditorKind.EnumCombo;
+            if (attribute != null && attribute is BoolPropertyAttribute) return PropertyEditorKind.BoolCheckBox;
             return PropertyEditorKind.Text;
         }
         IList<string> BuildItemsSource(PropertyEditorKind editorKind, Type propertyType)

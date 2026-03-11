@@ -299,9 +299,9 @@ namespace CrazyStorm
             var particleTypes = new List<ParticleType>();
             particleTypes.AddRange(ParticleType.DefaultTypes);
             particleTypes.AddRange(selectedSystem.CustomTypes);
+            var maskTypes = selectedSystem.CustomMaskTypes.ToList();
             var panel = new PropertyPanel(commandStacks[selectedSystem], config, file,
-                particleTypes, component, UpdateProperty);
-            panel.LoadMaskTypes(selectedSystem.CustomMaskTypes.ToList());
+                particleTypes, maskTypes, component, UpdateProperty);
             scroll.Content = panel;
             panel.OnBeginEditing += () => editingProperties = true;
             panel.OnEndEditing += () => editingProperties = false;
