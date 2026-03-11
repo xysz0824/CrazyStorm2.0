@@ -445,6 +445,13 @@ namespace CrazyStorm.Core
                     if (eventField != null)
                     {
                         eventField.RebuildMaskTypeReference(CustomMaskTypes);
+                        continue;
+                    }
+
+                    var emitter = component as Emitter;
+                    if (emitter != null && emitter.InitialTemplate != null)
+                    {
+                        emitter.InitialTemplate.RebuildMaskTypeReference(CustomMaskTypes);
                     }
                 }
             }

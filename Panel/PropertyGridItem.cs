@@ -16,6 +16,7 @@ namespace CrazyStorm
         ParticleTypeCombo,
         ParticleColorCombo,
         EventFieldMaskTypeCombo,
+        EmitterMaskTypeCombo,
     }
     public enum PropertyPseudoKind
     {
@@ -23,6 +24,7 @@ namespace CrazyStorm
         ParticleType,
         ParticleColor,
         EventFieldMaskType,
+        EmitterMaskType,
     }
     public class PropertyGridItem : INotifyPropertyChanged
     {

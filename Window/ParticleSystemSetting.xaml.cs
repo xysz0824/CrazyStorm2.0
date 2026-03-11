@@ -240,6 +240,13 @@ namespace CrazyStorm
                     if (eventField != null && eventField.MaskType == selectedMaskType)
                     {
                         eventField.MaskType = null;
+                        continue;
+                    }
+
+                    var emitter = component as Emitter;
+                    if (emitter != null && emitter.InitialTemplate != null && emitter.InitialTemplate.MaskType == selectedMaskType)
+                    {
+                        emitter.InitialTemplate.MaskType = null;
                     }
                 }
             }

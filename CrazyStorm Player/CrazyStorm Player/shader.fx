@@ -26,6 +26,11 @@ uniform float MaskDissolveEdgeWidth[MASK_COUNT];
 uniform float MaskTextureEnabled[MASK_COUNT];
 uniform int MaskCount;
 uniform float2 RenderCenter;
+uniform float4 ParticleMaskFrameRect;
+uniform float4 ParticleSourceRect;
+uniform float ParticleMaskDissolveStrength;
+uniform float ParticleMaskDissolveEdgeWidth;
+uniform float ParticleMaskTextureEnabled;
 float EvaluateMaskJudge(float2 pos, int index)
 {
     float2 maskD = pos - MaskPosition[index].xy;
@@ -75,6 +80,31 @@ float EvaluateMaskJudge(float2 pos, int index)
     }
     return shapeMask * dissolveJudge;
 }
+float EvaluateParticleMask(float2 texCoord)
+{
+    if (ParticleMaskTextureEnabled == 0 || ParticleSourceRect.z <= 0 || ParticleSourceRect.w <= 0)
+    {
+        return 1;
+    }
+
+    float2 localUv = (texCoord - ParticleSourceRect.xy) / ParticleSourceRect.zw;
+    if (localUv.x < 0 || localUv.x > 1 || localUv.y < 0 || localUv.y > 1)
+    {
+        return 1;
+    }
+
+    float2 maskUv = ParticleMaskFrameRect.xy + localUv * ParticleMaskFrameRect.zw;
+    float maskValue = SAMPLE_TEXTURE(MaskTexture, maskUv).r;
+    if (ParticleMaskDissolveEdgeWidth <= 0)
+    {
+        return maskValue > ParticleMaskDissolveStrength ? 1 : 0;
+    }
+
+    float halfEdge = max(fwidth(maskValue) * ParticleMaskDissolveEdgeWidth * 0.5, 1e-5);
+    return smoothstep(ParticleMaskDissolveStrength - halfEdge,
+                      ParticleMaskDissolveStrength + halfEdge,
+                      maskValue);
+}
 
 technique PostProcess
 {
@@ -94,6 +124,6 @@ float4 mainPS(float4 position : SV_Position, float4 color : COLOR0, float2 texCo
         float judge = EvaluateMaskJudge(pos, i);
         result = lerp(result, lerp(result + judge, result * (1 - judge), MaskLayer[i] - 1), min(1, MaskLayer[i]));
     }
-    Color.a *= saturate(result);
+    Color.a *= saturate(result * EvaluateParticleMask(texCoord));
     return Color;
 }

@@ -109,13 +109,18 @@ namespace CrazyStorm
         {
             this.maskTypes = maskTypes ?? new List<MaskType>();
             var eventField = component as EventField;
-            if (eventField == null) return;
-
-            if (eventField.MaskType != null && !this.maskTypes.Contains(eventField.MaskType))
+            if (eventField != null && eventField.MaskType != null && !this.maskTypes.Contains(eventField.MaskType))
             {
                 eventField.MaskType = null;
             }
+
+            var emitter = component as Emitter;
+            if (emitter != null && emitter.InitialTemplate.MaskType != null && !this.maskTypes.Contains(emitter.InitialTemplate.MaskType))
+            {
+                emitter.InitialTemplate.MaskType = null;
+            }
             RefreshEventFieldMaskPseudoProperty();
+            RefreshEmitterMaskPseudoProperty();
         }
         #endregion
 
@@ -240,6 +245,11 @@ namespace CrazyStorm
                     ApplyEventFieldMaskTypeValue(item, container as EventField);
                     continue;
                 }
+                if (item.PseudoPropertyKind == PropertyPseudoKind.EmitterMaskType)
+                {
+                    ApplyEmitterMaskTypeValue(item, container as ParticleBase);
+                    continue;
+                }
                 if (item.IsParticlePseudoProperty || item.Info == null) continue;
                 if (!item.ReadOnly && !container.Properties[item.Info.Name].Expression)
                 {
@@ -272,6 +282,14 @@ namespace CrazyStorm
                 item.PseudoPropertyKind = PropertyPseudoKind.EventFieldMaskType;
                 item.ItemsSource = BuildEventFieldMaskTypeItems();
                 ApplyEventFieldMaskTypeValue(item, container as EventField);
+            }
+            else if (component is Emitter && container is ParticleBase && info.PropertyType == typeof(MaskType))
+            {
+                item.ReadOnly = false;
+                item.EditorKind = PropertyEditorKind.EmitterMaskTypeCombo;
+                item.PseudoPropertyKind = PropertyPseudoKind.EmitterMaskType;
+                item.ItemsSource = BuildEmitterMaskTypeItems();
+                ApplyEmitterMaskTypeValue(item, container as ParticleBase);
             }
             return item;
         }
@@ -309,6 +327,12 @@ namespace CrazyStorm
             items.AddRange(maskTypes.Select(item => item.Name));
             return items;
         }
+        List<string> BuildEmitterMaskTypeItems()
+        {
+            var items = new List<string> { string.Empty };
+            items.AddRange(maskTypes.Select(item => item.Name));
+            return items;
+        }
         void ApplyReflectionPropertyValue(PropertyGridItem item, string internalValue)
         {
             if (item.EditorKind == PropertyEditorKind.BoolCheckBox)
@@ -331,6 +355,11 @@ namespace CrazyStorm
         {
             if (item == null || eventField == null) return;
             item.DisplayValue = eventField.MaskType != null ? eventField.MaskType.Name : string.Empty;
+        }
+        void ApplyEmitterMaskTypeValue(PropertyGridItem item, ParticleBase particle)
+        {
+            if (item == null || particle == null) return;
+            item.DisplayValue = particle.MaskType != null ? particle.MaskType.Name : string.Empty;
         }
         PropertyGridItem CreateParticleTypePropertyItem(Emitter emitter)
         {
@@ -416,6 +445,28 @@ namespace CrazyStorm
             {
                 maskTypeItem.ItemsSource = BuildEventFieldMaskTypeItems();
                 ApplyEventFieldMaskTypeValue(maskTypeItem, eventField);
+            }
+            finally
+            {
+                suppressComboBoxEvent = false;
+            }
+        }
+        void RefreshEmitterMaskPseudoProperty()
+        {
+            var emitter = component as Emitter;
+            if (emitter == null) return;
+
+            var items = ParticleGrid.DataContext as IList<PropertyGridItem>;
+            if (items == null) return;
+
+            var maskTypeItem = items.FirstOrDefault(item => item.PseudoPropertyKind == PropertyPseudoKind.EmitterMaskType);
+            if (maskTypeItem == null) return;
+
+            suppressComboBoxEvent = true;
+            try
+            {
+                maskTypeItem.ItemsSource = BuildEmitterMaskTypeItems();
+                ApplyEmitterMaskTypeValue(maskTypeItem, emitter.InitialTemplate);
             }
             finally
             {
@@ -544,6 +595,10 @@ namespace CrazyStorm
             {
                 CommitEventFieldMaskTypeSelection(displayValue);
             }
+            else if (property.EditorKind == PropertyEditorKind.EmitterMaskTypeCombo)
+            {
+                CommitEmitterMaskTypeSelection(displayValue);
+            }
             else if (displayValue != property.DisplayValue)
             {
                 property.DisplayValue = displayValue;
@@ -598,6 +653,17 @@ namespace CrazyStorm
             new SetEventFieldMaskTypeCommand().Do(commandStack, eventField, targetMaskType,
                 new Action<EventField, MaskType>(EventFieldMaskTypeUpdate));
         }
+        void CommitEmitterMaskTypeSelection(string maskTypeName)
+        {
+            var emitter = component as Emitter;
+            if (emitter == null) return;
+
+            var targetMaskType = maskTypes.FirstOrDefault(item => item.Name == maskTypeName);
+            if (emitter.InitialTemplate.MaskType == targetMaskType) return;
+
+            new SetEmitterMaskTypeCommand().Do(commandStack, emitter, targetMaskType,
+                new Action<Emitter, MaskType>(EmitterMaskTypeUpdate));
+        }
         ParticleType ResolveParticleType(string typeName, string colorDisplayValue)
         {
             if (string.IsNullOrEmpty(typeName)) return null;
@@ -624,6 +690,13 @@ namespace CrazyStorm
             if (this == null) return;
             eventField.MaskType = maskType;
             RefreshEventFieldMaskPseudoProperty();
+            if (updateFunc != null) updateFunc();
+        }
+        void EmitterMaskTypeUpdate(Emitter emitter, MaskType maskType)
+        {
+            if (this == null) return;
+            emitter.InitialTemplate.MaskType = maskType;
+            RefreshEmitterMaskPseudoProperty();
             if (updateFunc != null) updateFunc();
         }
         bool TryGetDataGrid(DependencyObject source, out DataGrid grid)

@@ -32,9 +32,16 @@ namespace CrazyStorm_Player
         int vertexIndex;
         bool beginCalled;
         Effect effect;
+        BasicEffect basicEffect;
         public CurveBatch(GraphicsDevice graphicsDevice)
         {
             g = graphicsDevice;
+            basicEffect = new BasicEffect(graphicsDevice)
+            {
+                TextureEnabled = true,
+                VertexColorEnabled = true,
+                LightingEnabled = false
+            };
         }
         public void Begin(BlendState blend, Effect effect)
         {
@@ -103,9 +110,9 @@ namespace CrazyStorm_Player
         {
             if (batchCurveCount <= 0) return;
             g.BlendState = blendState;
+            var texture = curveTexs[curves[batchCurveCount - 1]];
             if (effect != null)
             {
-                var texture = curveTexs[curves[batchCurveCount - 1]];
                 var textureParameter = effect.Parameters["Texture"];
                 if (textureParameter != null) textureParameter.SetValue(texture);
                 foreach (var pass in effect.CurrentTechnique.Passes)
@@ -116,7 +123,16 @@ namespace CrazyStorm_Player
             }
             else
             {
-                g.DrawUserIndexedPrimitives(PrimitiveType.TriangleList, vertices, 0, vertexIndex, indices, 0, indexIndex / 3, VertexPositionColorTexture.VertexDeclaration);
+                var viewport = g.Viewport;
+                basicEffect.World = Matrix.Identity;
+                basicEffect.View = Matrix.Identity;
+                basicEffect.Projection = Matrix.CreateOrthographicOffCenter(0, viewport.Width, viewport.Height, 0, 0, 1);
+                basicEffect.Texture = texture;
+                foreach (var pass in basicEffect.CurrentTechnique.Passes)
+                {
+                    pass.Apply();
+                    g.DrawUserIndexedPrimitives(PrimitiveType.TriangleList, vertices, 0, vertexIndex, indices, 0, indexIndex / 3, VertexPositionColorTexture.VertexDeclaration);
+                }
             }
             batchCurveCount = 0;
             vertexIndex = 0;

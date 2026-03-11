@@ -43,6 +43,8 @@ namespace CrazyStorm.Core
         public bool fogEffect;
         public bool fadeEffect;
         public float vspeed;
+        public float dissolveStrength;
+        public float dissolveEdgeWidth;
     }
     public abstract class ParticleBase : PropertyContainer, IXmlData, ILoadPlayData
     {
@@ -52,6 +54,8 @@ namespace CrazyStorm.Core
         Vector2 pacspeedVector;
         ParticleType type;
         int typeID = -1;
+        int maskTypeID = -1;
+        MaskType maskType;
         ParticleBaseData particleBaseData;
         Dictionary<long, ParticleBaseData> bindingParticleBaseData;
         #endregion
@@ -92,6 +96,16 @@ namespace CrazyStorm.Core
             {
                 if (type != value) PAnimateFrame = 1;
                 type = value; 
+            }
+        }
+        [ReadOnlyProperty(136)]
+        public MaskType MaskType
+        {
+            get { return maskType; }
+            set
+            {
+                maskType = value;
+                maskTypeID = value != null ? value.ID : -1;
             }
         }
         [RGBProperty(107)]
@@ -225,6 +239,18 @@ namespace CrazyStorm.Core
             get { return particleBaseData.vspeed; }
             set { particleBaseData.vspeed = value; }
         }
+        [FloatProperty(134, 0, 1)]
+        public float DissolveStrength
+        {
+            get { return particleBaseData.dissolveStrength; }
+            set { particleBaseData.dissolveStrength = Math.Max(0, Math.Min(1, value)); }
+        }
+        [FloatProperty(135, 0, float.MaxValue)]
+        public float DissolveEdgeWidth
+        {
+            get { return particleBaseData.dissolveEdgeWidth; }
+            set { particleBaseData.dissolveEdgeWidth = value >= 0 ? value : 0; }
+        }
         public int ReboundTime { get; set; }
         public List<EventGroup> ParticleEventGroups { get; set; }
         #endregion
@@ -271,6 +297,17 @@ namespace CrazyStorm.Core
                 else
                     throw new System.IO.FileLoadException("FileDataError");
             }
+            if (particleBaseNode.HasAttribute("maskType"))
+            {
+                string maskTypeAttribute = particleBaseNode.GetAttribute("maskType");
+                int parsedID;
+                if (int.TryParse(maskTypeAttribute, out parsedID))
+                    maskTypeID = parsedID;
+                else
+                    throw new System.IO.FileLoadException("FileDataError");
+            }
+            else maskTypeID = -1;
+            maskType = null;
             //particleBaseData
             XmlHelper.BuildFromStruct(ref particleBaseData, particleBaseNode);
             return particleBaseNode;
@@ -286,6 +323,12 @@ namespace CrazyStorm.Core
                 var typeAttribute = doc.CreateAttribute("type");
                 typeAttribute.Value = type.ID.ToString();
                 particleBaseNode.Attributes.Append(typeAttribute);
+            }
+            if (maskType != null)
+            {
+                var maskTypeAttribute = doc.CreateAttribute("maskType");
+                maskTypeAttribute.Value = maskType.ID.ToString();
+                particleBaseNode.Attributes.Append(maskTypeAttribute);
             }
             //particleBaseData
             XmlHelper.StoreStruct(particleBaseData, doc, particleBaseNode);
@@ -308,6 +351,19 @@ namespace CrazyStorm.Core
                 typeID = -1;
             }
         }
+        public void RebuildMaskTypeReference(IList<MaskType> maskTypes)
+        {
+            maskType = null;
+            if (maskTypeID < 0 || maskTypes == null) return;
+            for (int i = 0; i < maskTypes.Count; ++i)
+            {
+                if (maskTypes[i].ID == maskTypeID)
+                {
+                    maskType = maskTypes[i];
+                    return;
+                }
+            }
+        }
         public virtual List<byte> GeneratePlayData(File file, Emitter emitter)
         {
             var particleBaseBytes = new List<byte>();
@@ -318,6 +374,7 @@ namespace CrazyStorm.Core
             base.GeneratePropertyExpressions(variables, particleBaseBytes);
             //type
             particleBaseBytes.AddRange(BitConverter.GetBytes(type != null ? type.ID : -1));
+            particleBaseBytes.AddRange(BitConverter.GetBytes(maskType != null ? maskType.ID : maskTypeID));
             //particleBaseData
             PlayDataHelper.GenerateStruct(particleBaseData, particleBaseBytes);
             return PlayDataHelper.CreateBlock(particleBaseBytes);
@@ -329,6 +386,8 @@ namespace CrazyStorm.Core
                 //properties
                 base.LoadPropertyExpressions(particleBaseReader);
                 typeID = particleBaseReader.ReadInt32();
+                maskTypeID = particleBaseReader.ReadInt32();
+                maskType = null;
                 //particleBaseData
                 particleBaseData = PlayDataHelper.ReadStruct<ParticleBaseData>(particleBaseReader);
             }
@@ -469,6 +528,12 @@ namespace CrazyStorm.Core
                 case 129:
                     VM.PushFloat(VSpeed);
                     return true;
+                case 134:
+                    VM.PushFloat(DissolveStrength);
+                    return true;
+                case 135:
+                    VM.PushFloat(DissolveEdgeWidth);
+                    return true;
             }
             for (int i = 0; i < Emitter.Locals.Count; ++i)
             {
@@ -582,6 +647,12 @@ namespace CrazyStorm.Core
                 case 129:
                     VSpeed = VM.PopFloat();
                     return true;
+                case 134:
+                    DissolveStrength = VM.PopFloat();
+                    return true;
+                case 135:
+                    DissolveEdgeWidth = VM.PopFloat();
+                    return true;
             }
             for (int i = 0; i < Emitter.Locals.Count; ++i)
             {
@@ -667,6 +738,11 @@ namespace CrazyStorm.Core
             if (delta > 0) PCurrentFrame = delta + 1;
             else PCurrentFrame = MaxLife + 1;
         }
+        public int GetMaskFrameIndex()
+        {
+            if (maskType == null || maskType.Frames <= 1) return 0;
+            return (int)Math.Max(PCurrentFrame - 1, 0) / (maskType.Delay + 1) % maskType.Frames;
+        }
         public override void CopyTo(PropertyContainer target)
         {
             base.CopyTo(target);
@@ -674,6 +750,8 @@ namespace CrazyStorm.Core
             if (particle == null) return;
             particle.type = type;
             particle.typeID = typeID;
+            particle.maskTypeID = maskTypeID;
+            particle.maskType = maskType;
             particle.particleBaseData = particleBaseData;
             particle.PCurrentFrame = 1;
             particle.PAnimateFrame = 1;
