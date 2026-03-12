@@ -1,13 +1,13 @@
 #define PS_SHADERMODEL ps_4_0
 
 #define DECLARE_TEXTURE(Name, index, address) \
-    texture2D Name; \
-    sampler Name##Sampler : register(s##index) = sampler_state { Texture = (Name); \
+    Texture2D Name : register(t##index); \
+    SamplerState Name##Sampler : register(s##index) { \
     AddressU = address; \
     AddressV = address; \
     AddressW = address; };
 
-#define SAMPLE_TEXTURE(Name, texCoord)  tex2D(Name##Sampler, texCoord)
+#define SAMPLE_TEXTURE(Name, texCoord)  Name.Sample(Name##Sampler, texCoord)
 
 DECLARE_TEXTURE(Texture, 0, Wrap)
 DECLARE_TEXTURE(MaskTexture, 1, Clamp)
