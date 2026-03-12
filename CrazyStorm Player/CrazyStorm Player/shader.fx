@@ -20,11 +20,11 @@ uniform float MaskLayer[MASK_COUNT];
 uniform float MaskShape[MASK_COUNT];
 uniform float2 MaskRotateTrig[MASK_COUNT];
 uniform float2 MaskEllipseInvSizeSq[MASK_COUNT];
+uniform float2 MaskInvDiameter[MASK_COUNT];
 uniform float4 MaskFrameRect[MASK_COUNT];
 uniform float MaskDissolveStrength[MASK_COUNT];
 uniform float MaskDissolveEdgeWidth[MASK_COUNT];
-uniform float MaskDissolveVSpeed[MASK_COUNT];
-uniform float MaskAnimateFrame[MASK_COUNT];
+uniform float MaskAnimateOffset[MASK_COUNT];
 uniform float MaskTextureEnabled[MASK_COUNT];
 uniform int MaskCount;
 uniform float2 RenderCenter;
@@ -32,8 +32,7 @@ uniform float4 ParticleMaskFrameRect;
 uniform float4 ParticleSourceRect;
 uniform float ParticleMaskDissolveStrength;
 uniform float ParticleMaskDissolveEdgeWidth;
-uniform float ParticleMaskDissolveVSpeed;
-uniform float ParticleMaskAnimateFrame;
+uniform float ParticleMaskAnimateOffset;
 uniform float ParticleMaskTextureEnabled;
 
 float WrapUnit(float value)
@@ -43,55 +42,65 @@ float WrapUnit(float value)
 
 float EvaluateMaskJudge(float2 pos, int index)
 {
-    float2 maskD = pos - MaskPosition[index].xy;
+    float2 maskPosition = MaskPosition[index].xy;
     float2 rotateTrig = MaskRotateTrig[index];
+    float2 maskSize = MaskSize[index];
+    float maskShape = MaskShape[index];
+    float2 ellipseInvSizeSq = MaskEllipseInvSizeSq[index];
+    float2 maskInvDiameter = MaskInvDiameter[index];
+    float4 frameRect = MaskFrameRect[index];
+    float dissolveStrength = MaskDissolveStrength[index];
+    float dissolveEdgeWidth = MaskDissolveEdgeWidth[index];
+    float maskAnimateOffset = MaskAnimateOffset[index];
+    float maskTextureEnabled = MaskTextureEnabled[index];
+
+    float2 maskD = pos - maskPosition;
     maskD = float2(maskD.x * rotateTrig.x + maskD.y * rotateTrig.y,
                    -maskD.x * rotateTrig.y + maskD.y * rotateTrig.x);
     float shapeJudge = 0;
-    if (MaskShape[index] == 0)
+    if (maskShape == 0)
     {
-        shapeJudge = min(1, smoothstep(MaskSize[index].x - 1, MaskSize[index].x + 1, maskD.x) +
-                            smoothstep(maskD.x - 1, maskD.x + 1, -MaskSize[index].x) +
-                            smoothstep(MaskSize[index].y - 1, MaskSize[index].y + 1, maskD.y) +
-                            smoothstep(maskD.y - 1, maskD.y + 1, -MaskSize[index].y));
+        shapeJudge = min(1, smoothstep(maskSize.x - 1, maskSize.x + 1, maskD.x) +
+                            smoothstep(maskD.x - 1, maskD.x + 1, -maskSize.x) +
+                            smoothstep(maskSize.y - 1, maskSize.y + 1, maskD.y) +
+                            smoothstep(maskD.y - 1, maskD.y + 1, -maskSize.y));
     }
-    else if (MaskShape[index] == 1)
+    else if (maskShape == 1)
     {
         float2 maskDSq = maskD * maskD;
-        float ellipseDistance = sqrt(maskDSq.x * MaskEllipseInvSizeSq[index].x + maskDSq.y * MaskEllipseInvSizeSq[index].y);
-        shapeJudge = smoothstep(1 - 0.01, 1 + 0.01, ellipseDistance);
+        float ellipseDistanceSq = maskDSq.x * ellipseInvSizeSq.x + maskDSq.y * ellipseInvSizeSq.y;
+        shapeJudge = smoothstep((1 - 0.01) * (1 - 0.01), (1 + 0.01) * (1 + 0.01), ellipseDistanceSq);
     }
     float shapeMask = lerp(1, 0, shapeJudge);
-    if (shapeMask <= 0 || MaskTextureEnabled[index] == 0)
+    if (shapeMask <= 0 || maskTextureEnabled == 0)
     {
         return shapeMask;
     }
 
-    float2 localUv = maskD / (MaskSize[index] * 2) + 0.5;
+    float2 localUv = maskD * maskInvDiameter + 0.5;
     if (localUv.x < 0 || localUv.x > 1 || localUv.y < 0 || localUv.y > 1)
     {
         return 0;
     }
 
-    float4 frameRect = MaskFrameRect[index];
     if (frameRect.z <= 0 || frameRect.w <= 0)
     {
         return 0;
     }
 
-    localUv.y = WrapUnit(localUv.y + floor(MaskAnimateFrame[index]) * MaskDissolveVSpeed[index]);
+    localUv.y = WrapUnit(localUv.y + maskAnimateOffset);
     float2 maskUv = frameRect.xy + localUv * frameRect.zw;
     float maskValue = SAMPLE_TEXTURE(MaskTexture, maskUv).r;
     float dissolveJudge = 0;
-    if (MaskDissolveEdgeWidth[index] <= 0)
+    if (dissolveEdgeWidth <= 0)
     {
-        dissolveJudge = maskValue > MaskDissolveStrength[index] ? 1 : 0;
+        dissolveJudge = maskValue > dissolveStrength ? 1 : 0;
     }
     else
     {
-        float halfEdge = max(fwidth(maskValue) * MaskDissolveEdgeWidth[index] * 0.5, 1e-5);
-        dissolveJudge = smoothstep(MaskDissolveStrength[index] - halfEdge,
-                                   MaskDissolveStrength[index] + halfEdge,
+        float halfEdge = max(fwidth(maskValue) * dissolveEdgeWidth * 0.5, 1e-5);
+        dissolveJudge = smoothstep(dissolveStrength - halfEdge,
+                                   dissolveStrength + halfEdge,
                                    maskValue);
     }
     return shapeMask * dissolveJudge;
@@ -114,7 +123,7 @@ float EvaluateParticleMask(float2 texCoord)
         return 1;
     }
 
-    localUv.y = WrapUnit(localUv.y + floor(ParticleMaskAnimateFrame) * ParticleMaskDissolveVSpeed);
+    localUv.y = WrapUnit(localUv.y + ParticleMaskAnimateOffset);
     float2 maskUv = ParticleMaskFrameRect.xy + localUv * ParticleMaskFrameRect.zw;
     float maskValue = SAMPLE_TEXTURE(MaskTexture, maskUv).r;
     if (ParticleMaskDissolveEdgeWidth <= 0)
