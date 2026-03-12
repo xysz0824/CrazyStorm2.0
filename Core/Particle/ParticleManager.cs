@@ -110,6 +110,7 @@ namespace CrazyStorm.Core
         static float[] maskTextureFrameArray = new float[MAX_MASK_COUNT];
         static float[] maskDissolveStrengthArray = new float[MAX_MASK_COUNT];
         static float[] maskDissolveEdgeWidthArray = new float[MAX_MASK_COUNT];
+        static float[] maskDissolveUSpeedArray = new float[MAX_MASK_COUNT];
         static float[] maskDissolveVSpeedArray = new float[MAX_MASK_COUNT];
         static float[] maskAnimateFrameArray = new float[MAX_MASK_COUNT];
         static float[] maskTextureEnabledArray = new float[MAX_MASK_COUNT];
@@ -141,6 +142,7 @@ namespace CrazyStorm.Core
         public static float[] MaskTextureFrameArray => maskTextureFrameArray;
         public static float[] MaskDissolveStrengthArray => maskDissolveStrengthArray;
         public static float[] MaskDissolveEdgeWidthArray => maskDissolveEdgeWidthArray;
+        public static float[] MaskDissolveUSpeedArray => maskDissolveUSpeedArray;
         public static float[] MaskDissolveVSpeedArray => maskDissolveVSpeedArray;
         public static float[] MaskAnimateFrameArray => maskAnimateFrameArray;
         public static float[] MaskTextureEnabledArray => maskTextureEnabledArray;
@@ -324,6 +326,7 @@ namespace CrazyStorm.Core
             Array.Clear(MaskTextureFrameArray, 0, MAX_MASK_COUNT);
             Array.Clear(MaskDissolveStrengthArray, 0, MAX_MASK_COUNT);
             Array.Clear(MaskDissolveEdgeWidthArray, 0, MAX_MASK_COUNT);
+            Array.Clear(MaskDissolveUSpeedArray, 0, MAX_MASK_COUNT);
             Array.Clear(MaskDissolveVSpeedArray, 0, MAX_MASK_COUNT);
             Array.Clear(MaskAnimateFrameArray, 0, MAX_MASK_COUNT);
             Array.Clear(MaskTextureEnabledArray, 0, MAX_MASK_COUNT);

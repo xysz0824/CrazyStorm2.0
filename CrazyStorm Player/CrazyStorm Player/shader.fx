@@ -25,7 +25,7 @@ uniform float2 MaskInvDiameter[MASK_COUNT];
 uniform float4 MaskFrameRect[MASK_COUNT];
 uniform float MaskDissolveStrength[MASK_COUNT];
 uniform float MaskDissolveEdgeWidth[MASK_COUNT];
-uniform float MaskAnimateOffset[MASK_COUNT];
+uniform float2 MaskAnimateOffset[MASK_COUNT];
 uniform float MaskTextureEnabled[MASK_COUNT];
 uniform int MaskCount;
 uniform float2 RenderCenter;
@@ -33,7 +33,7 @@ uniform float4 ParticleMaskFrameRect;
 uniform float4 ParticleSourceRect;
 uniform float ParticleMaskDissolveStrength;
 uniform float ParticleMaskDissolveEdgeWidth;
-uniform float ParticleMaskAnimateOffset;
+uniform float2 ParticleMaskAnimateOffset;
 uniform float ParticleMaskTextureEnabled;
 uniform float4 ParticleDistortFrameRect;
 uniform float ParticleDistortStrength;
@@ -56,7 +56,7 @@ float EvaluateMaskJudge(float2 pos, int index)
     float4 frameRect = MaskFrameRect[index];
     float dissolveStrength = MaskDissolveStrength[index];
     float dissolveEdgeWidth = MaskDissolveEdgeWidth[index];
-    float maskAnimateOffset = MaskAnimateOffset[index];
+    float2 maskAnimateOffset = MaskAnimateOffset[index];
     float maskTextureEnabled = MaskTextureEnabled[index];
 
     float2 maskD = pos - maskPosition;
@@ -93,9 +93,19 @@ float EvaluateMaskJudge(float2 pos, int index)
         return 0;
     }
 
-    localUv.y = WrapUnit(localUv.y + maskAnimateOffset);
-    float2 maskUv = frameRect.xy + localUv * frameRect.zw;
-    float maskValue = SAMPLE_TEXTURE(MaskTexture, maskUv).r;
+    float2 animateUv = float2(
+        WrapUnit(localUv.x + maskAnimateOffset.x),
+        WrapUnit(localUv.y + maskAnimateOffset.y));
+    float2 maskUv = frameRect.xy + animateUv * frameRect.zw;
+    float2 maskOffset = SAMPLE_TEXTURE(MaskTexture, maskUv).rg * 2 - 1;
+    float2 displacedLocalUv = localUv + maskOffset;
+    if (displacedLocalUv.x < 0 || displacedLocalUv.x > 1 || displacedLocalUv.y < 0 || displacedLocalUv.y > 1)
+    {
+        return 0;
+    }
+
+    float2 displacedMaskUv = frameRect.xy + displacedLocalUv * frameRect.zw;
+    float maskValue = SAMPLE_TEXTURE(MaskTexture, displacedMaskUv).r;
     float dissolveJudge = 0;
     if (dissolveEdgeWidth <= 0)
     {
@@ -128,9 +138,19 @@ float EvaluateParticleMask(float2 texCoord)
         return 1;
     }
 
-    localUv.y = WrapUnit(localUv.y + ParticleMaskAnimateOffset);
-    float2 maskUv = ParticleMaskFrameRect.xy + localUv * ParticleMaskFrameRect.zw;
-    float maskValue = SAMPLE_TEXTURE(MaskTexture, maskUv).r;
+    float2 animateUv = float2(
+        WrapUnit(localUv.x + ParticleMaskAnimateOffset.x),
+        WrapUnit(localUv.y + ParticleMaskAnimateOffset.y));
+    float2 maskUv = ParticleMaskFrameRect.xy + animateUv * ParticleMaskFrameRect.zw;
+    float2 maskOffset = SAMPLE_TEXTURE(MaskTexture, maskUv).rg * 2 - 1;
+    float2 displacedLocalUv = localUv + maskOffset;
+    if (displacedLocalUv.x < 0 || displacedLocalUv.x > 1 || displacedLocalUv.y < 0 || displacedLocalUv.y > 1)
+    {
+        return 0;
+    }
+
+    float2 displacedMaskUv = ParticleMaskFrameRect.xy + displacedLocalUv * ParticleMaskFrameRect.zw;
+    float maskValue = SAMPLE_TEXTURE(MaskTexture, displacedMaskUv).r;
     if (ParticleMaskDissolveEdgeWidth <= 0)
     {
         return maskValue > ParticleMaskDissolveStrength ? 1 : 0;

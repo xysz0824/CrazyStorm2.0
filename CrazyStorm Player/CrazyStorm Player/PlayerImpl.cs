@@ -90,7 +90,7 @@ namespace CrazyStorm_Player
         Vector4[] maskFrameRects;
         float[] maskTextureEnabled;
         Vector2[] maskInvDiameters;
-        float[] maskAnimateOffsets;
+        Vector2[] maskAnimateOffsets;
 
         public string TypeLibraryPath { get; set; }
         public FrameOrientation FrameOrientation { get; set; }
@@ -156,7 +156,7 @@ namespace CrazyStorm_Player
             maskFrameRects = new Vector4[ParticleManager.MAX_MASK_COUNT];
             maskTextureEnabled = new float[ParticleManager.MAX_MASK_COUNT];
             maskInvDiameters = new Vector2[ParticleManager.MAX_MASK_COUNT];
-            maskAnimateOffsets = new float[ParticleManager.MAX_MASK_COUNT];
+            maskAnimateOffsets = new Vector2[ParticleManager.MAX_MASK_COUNT];
             ResetParticleMaskShaderParameters();
             ResetParticleDistortShaderParameters();
             substration = new BlendState();
@@ -462,7 +462,7 @@ namespace CrazyStorm_Player
             shaderParticleSourceRect?.SetValue(Vector4.Zero);
             shaderParticleMaskDissolveStrength?.SetValue(0f);
             shaderParticleMaskDissolveEdgeWidth?.SetValue(0f);
-            shaderParticleMaskAnimateOffset?.SetValue(0f);
+            shaderParticleMaskAnimateOffset?.SetValue(Vector2.Zero);
             shaderParticleMaskTextureEnabled?.SetValue(0f);
         }
         void ResetParticleDistortShaderParameters()
@@ -494,7 +494,10 @@ namespace CrazyStorm_Player
             shaderParticleSourceRect.SetValue(BuildSourceRect(texture, rect));
             shaderParticleMaskDissolveStrength.SetValue(particle.DissolveStrength);
             shaderParticleMaskDissolveEdgeWidth.SetValue(particle.DissolveEdgeWidth);
-            shaderParticleMaskAnimateOffset.SetValue((float)Math.Floor(particle.PAnimateFrame) * particle.DissolveVSpeed);
+            var animateFrame = (float)Math.Floor(particle.PAnimateFrame);
+            shaderParticleMaskAnimateOffset.SetValue(new Vector2(
+                animateFrame * particle.DissolveUSpeed,
+                animateFrame * particle.DissolveVSpeed));
             shaderParticleMaskTextureEnabled.SetValue(1f);
         }
         void UpdateParticleDistortShaderParameters(ParticleBase particle, Texture2D texture, Rectangle rect)
@@ -550,8 +553,10 @@ namespace CrazyStorm_Player
                     maskInvDiameters[i] = new Vector2(0.5f / maskSize.x, 0.5f / maskSize.y);
                 }
 
-                maskAnimateOffsets[i] = (float)Math.Floor(ParticleManager.MaskAnimateFrameArray[i]) *
-                    ParticleManager.MaskDissolveVSpeedArray[i];
+                var animateFrame = (float)Math.Floor(ParticleManager.MaskAnimateFrameArray[i]);
+                maskAnimateOffsets[i] = new Vector2(
+                    animateFrame * ParticleManager.MaskDissolveUSpeedArray[i],
+                    animateFrame * ParticleManager.MaskDissolveVSpeedArray[i]);
             }
             shaderMaskCount.SetValue(ParticleManager.MaskCount);
             shaderMaskSize.SetValue(ParticleManager.MaskSizeArray);

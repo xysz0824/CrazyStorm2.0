@@ -45,6 +45,7 @@ namespace CrazyStorm.Core
         public float vspeed;
         public float dissolveStrength;
         public float dissolveEdgeWidth;
+        public float dissolveUSpeed;
         public float dissolveVSpeed;
         public float distortStrength;
         public float distortUSpeed;
@@ -266,6 +267,12 @@ namespace CrazyStorm.Core
         {
             get { return particleBaseData.dissolveEdgeWidth; }
             set { particleBaseData.dissolveEdgeWidth = value >= 0 ? value : 0; }
+        }
+        [FloatProperty(142, float.MinValue, float.MaxValue)]
+        public float DissolveUSpeed
+        {
+            get { return particleBaseData.dissolveUSpeed; }
+            set { particleBaseData.dissolveUSpeed = value; }
         }
         [FloatProperty(137, float.MinValue, float.MaxValue)]
         public float DissolveVSpeed
@@ -607,6 +614,9 @@ namespace CrazyStorm.Core
                 case 135:
                     VM.PushFloat(DissolveEdgeWidth);
                     return true;
+                case 142:
+                    VM.PushFloat(DissolveUSpeed);
+                    return true;
                 case 137:
                     VM.PushFloat(DissolveVSpeed);
                     return true;
@@ -737,6 +747,9 @@ namespace CrazyStorm.Core
                     return true;
                 case 135:
                     DissolveEdgeWidth = VM.PopFloat();
+                    return true;
+                case 142:
+                    DissolveUSpeed = VM.PopFloat();
                     return true;
                 case 137:
                     DissolveVSpeed = VM.PopFloat();

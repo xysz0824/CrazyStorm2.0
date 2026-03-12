@@ -194,7 +194,8 @@
     <sys:String x:Key="StrengthStr">强度</sys:String>
     <sys:String x:Key="DissolveStrengthStr">消融强度</sys:String>
     <sys:String x:Key="DissolveEdgeWidthStr">消融边缘宽度</sys:String>
-    <sys:String x:Key="DissolveVSpeedStr">消融图案流速</sys:String>
+    <sys:String x:Key="DissolveUSpeedStr">消融图案U流速</sys:String>
+    <sys:String x:Key="DissolveVSpeedStr">消融图案V流速</sys:String>
     <sys:String x:Key="DistortStrengthStr">扭曲强度</sys:String>
     <sys:String x:Key="DistortUSpeedStr">扭曲图案U流速</sys:String>
     <sys:String x:Key="DistortVSpeedStr">扭曲图案V流速</sys:String>

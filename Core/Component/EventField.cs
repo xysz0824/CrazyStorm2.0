@@ -42,6 +42,7 @@ namespace CrazyStorm.Core
         public float rotation;
         public float dissolveStrength;
         public float dissolveEdgeWidth;
+        public float dissolveUSpeed;
         public float dissolveVSpeed;
     }
     public class EventFieldPool : PoolObject<EventFieldPool, NullData>
@@ -144,6 +145,12 @@ namespace CrazyStorm.Core
             set { eventFieldData.dissolveEdgeWidth = value >= 0 ? value : 0; }
         }
         [FloatProperty(26, float.MinValue, float.MaxValue)]
+        public float DissolveUSpeed
+        {
+            get { return eventFieldData.dissolveUSpeed; }
+            set { eventFieldData.dissolveUSpeed = value; }
+        }
+        [FloatProperty(27, float.MinValue, float.MaxValue)]
         public float DissolveVSpeed
         {
             get { return eventFieldData.dissolveVSpeed; }
@@ -188,6 +195,7 @@ namespace CrazyStorm.Core
             ParticleManager.MaskTextureFrameArray[maskIndex] = frame;
             ParticleManager.MaskDissolveStrengthArray[maskIndex] = DissolveStrength;
             ParticleManager.MaskDissolveEdgeWidthArray[maskIndex] = DissolveEdgeWidth;
+            ParticleManager.MaskDissolveUSpeedArray[maskIndex] = selectedMaskType != null ? DissolveUSpeed : 0;
             ParticleManager.MaskDissolveVSpeedArray[maskIndex] = selectedMaskType != null ? DissolveVSpeed : 0;
             ParticleManager.MaskAnimateFrameArray[maskIndex] = selectedMaskType != null ? CurrentFrame : 0;
             ParticleManager.MaskTextureEnabledArray[maskIndex] = hasTexture;
@@ -349,6 +357,9 @@ namespace CrazyStorm.Core
                     VM.PushFloat(DissolveEdgeWidth);
                     return true;
                 case 26:
+                    VM.PushFloat(DissolveUSpeed);
+                    return true;
+                case 27:
                     VM.PushFloat(DissolveVSpeed);
                     return true;
             }
@@ -393,6 +404,9 @@ namespace CrazyStorm.Core
                     DissolveEdgeWidth = VM.PopFloat();
                     return true;
                 case 26:
+                    DissolveUSpeed = VM.PopFloat();
+                    return true;
+                case 27:
                     DissolveVSpeed = VM.PopFloat();
                     return true;
             }
