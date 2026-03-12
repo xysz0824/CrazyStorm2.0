@@ -58,6 +58,11 @@ namespace CrazyStorm_Player
         EffectParameter shaderParticleMaskDissolveEdgeWidth;
         EffectParameter shaderParticleMaskAnimateOffset;
         EffectParameter shaderParticleMaskTextureEnabled;
+        EffectParameter shaderDistortTexture;
+        EffectParameter shaderParticleDistortFrameRect;
+        EffectParameter shaderParticleDistortStrength;
+        EffectParameter shaderParticleDistortAnimateOffset;
+        EffectParameter shaderParticleDistortTextureEnabled;
         EffectParameter shaderMaskCount;
         EffectParameter shaderRenderCenter;
         SpriteBatch spriteBatch;
@@ -68,6 +73,7 @@ namespace CrazyStorm_Player
         Vector2 backgroundPos;
         Texture2D defaultTexture;
         Dictionary<File, Dictionary<int, Texture2D>> customTextures;
+        Dictionary<ParticleSystem, Texture2D> distortTextures;
         Dictionary<ParticleSystem, Texture2D> maskTextures;
         Dictionary<string, SoundEffect> sounds;
         Dictionary<string, SoundEffectInstance> soundInstances;
@@ -134,6 +140,11 @@ namespace CrazyStorm_Player
                 shaderParticleMaskDissolveEdgeWidth = shader.Parameters["ParticleMaskDissolveEdgeWidth"];
                 shaderParticleMaskAnimateOffset = shader.Parameters["ParticleMaskAnimateOffset"];
                 shaderParticleMaskTextureEnabled = shader.Parameters["ParticleMaskTextureEnabled"];
+                shaderDistortTexture = shader.Parameters["DistortTexture"];
+                shaderParticleDistortFrameRect = shader.Parameters["ParticleDistortFrameRect"];
+                shaderParticleDistortStrength = shader.Parameters["ParticleDistortStrength"];
+                shaderParticleDistortAnimateOffset = shader.Parameters["ParticleDistortAnimateOffset"];
+                shaderParticleDistortTextureEnabled = shader.Parameters["ParticleDistortTextureEnabled"];
                 shaderMaskCount = shader.Parameters["MaskCount"];
                 shaderRenderCenter = shader.Parameters["RenderCenter"];
             }
@@ -147,6 +158,7 @@ namespace CrazyStorm_Player
             maskInvDiameters = new Vector2[ParticleManager.MAX_MASK_COUNT];
             maskAnimateOffsets = new float[ParticleManager.MAX_MASK_COUNT];
             ResetParticleMaskShaderParameters();
+            ResetParticleDistortShaderParameters();
             substration = new BlendState();
             substration.ColorSourceBlend = Blend.SourceAlpha;
             substration.AlphaSourceBlend = Blend.One;
@@ -247,6 +259,7 @@ namespace CrazyStorm_Player
                 }
             }
             Environment.CurrentDirectory = AppDomain.CurrentDomain.SetupInformation.ApplicationBase;
+            distortTextures = new Dictionary<ParticleSystem, Texture2D>();
             maskTextures = new Dictionary<ParticleSystem, Texture2D>();
             //sounds
             sounds = new Dictionary<string, SoundEffect>();
@@ -265,6 +278,7 @@ namespace CrazyStorm_Player
                 var instance = file.ParticleSystems[SelectedParticleSystemIndex].Instantiate();
                 instance.Reset(true);
                 instances[instance] = file;
+                distortTextures[instance] = ResolveDistortTexture(file, instance);
                 maskTextures[instance] = ResolveMaskTexture(file, instance);
             }
             if (CurrentFrame != 1) SkipFrame(CurrentFrame, true);
@@ -287,6 +301,7 @@ namespace CrazyStorm_Player
                 }
             }
             customTextures.Clear();
+            distortTextures?.Clear();
             maskTextures?.Clear();
             if (soundInstances != null)
             {
@@ -350,11 +365,47 @@ namespace CrazyStorm_Player
             Texture2D texture;
             return textures.TryGetValue(system.MaskImage.ID, out texture) ? texture : null;
         }
+        Texture2D ResolveDistortTexture(File file, ParticleSystem system)
+        {
+            if (file == null || system == null || system.DistortImage == null) return null;
+            Dictionary<int, Texture2D> textures;
+            if (!customTextures.TryGetValue(file, out textures)) return null;
+            Texture2D texture;
+            return textures.TryGetValue(system.DistortImage.ID, out texture) ? texture : null;
+        }
         Vector4 BuildSourceRect(Texture2D texture, Rectangle rect)
         {
             if (texture == null || rect.Width <= 0 || rect.Height <= 0) return Vector4.Zero;
             return new Vector4(rect.X / (float)texture.Width, rect.Y / (float)texture.Height,
                 rect.Width / (float)texture.Width, rect.Height / (float)texture.Height);
+        }
+        bool TryBuildFrameRect(Texture2D texture, int x, int y, int width, int height, int frame, out Vector4 rect)
+        {
+            rect = Vector4.Zero;
+            if (texture == null || width <= 0 || height <= 0 || x < 0 || y < 0) return false;
+            if (x >= texture.Width || y >= texture.Height) return false;
+
+            if (FrameOrientation == FrameOrientation.Vertical)
+            {
+                var rows = Math.Max(1, (texture.Height - y) / height);
+                var cols = Math.Max(1, (texture.Width - x) / width);
+                if (frame >= rows * cols) return false;
+                x += frame / rows * width;
+                y += frame % rows * height;
+            }
+            else
+            {
+                var cols = Math.Max(1, (texture.Width - x) / width);
+                var rows = Math.Max(1, (texture.Height - y) / height);
+                if (frame >= rows * cols) return false;
+                x += frame % cols * width;
+                y += frame / cols * height;
+            }
+            if (x >= texture.Width || y >= texture.Height) return false;
+
+            rect = new Vector4(x / (float)texture.Width, y / (float)texture.Height,
+                width / (float)texture.Width, height / (float)texture.Height);
+            return true;
         }
         bool TryBuildMaskFrameRect(Texture2D texture, int maskIndex, out Vector4 rect)
         {
@@ -369,32 +420,11 @@ namespace CrazyStorm_Player
             var height = (int)size.y;
             var x = (int)startPoint.x;
             var y = (int)startPoint.y;
-            if (x >= texture.Width || y >= texture.Height) return false;
-
             var frame = (int)ParticleManager.MaskTextureFrameArray[maskIndex];
-            if (FrameOrientation == FrameOrientation.Vertical)
-            {
-                var rows = Math.Max(1, (texture.Height - y) / height);
-                var cols = Math.Max(1, (texture.Width - x) / width);
-                if (frame >= rows * cols) return false;
-                x += frame / rows * width;
-                y += frame % rows * height;
-            }
-            else
-            {
-                var cols = Math.Max(1, (texture.Width - x) / width);
-                var rows = Math.Max(1, (texture.Height - y) / height);
-                if (frame >= rows * cols) return false;
-                x += frame % cols * width;
-                y += frame / cols * height;
-            }
-            if (x >= texture.Width || y >= texture.Height) return false;
 
             // Keep editor/runtime behavior aligned: oversized frame rects remain valid and
             // the out-of-range area is resolved by the mask sampler's Clamp addressing.
-            rect = new Vector4(x / (float)texture.Width, y / (float)texture.Height,
-                width / (float)texture.Width, height / (float)texture.Height);
-            return true;
+            return TryBuildFrameRect(texture, x, y, width, height, frame, out rect);
         }
         bool TryBuildMaskFrameRect(Texture2D texture, MaskType maskType, int frame, out Vector4 rect)
         {
@@ -409,28 +439,22 @@ namespace CrazyStorm_Player
             var height = maskType.Height;
             var x = (int)maskType.StartPoint.x;
             var y = (int)maskType.StartPoint.y;
-            if (x >= texture.Width || y >= texture.Height) return false;
-            if (FrameOrientation == FrameOrientation.Vertical)
+            return TryBuildFrameRect(texture, x, y, width, height, frame, out rect);
+        }
+        bool TryBuildDistortFrameRect(Texture2D texture, DistortType distortType, int frame, out Vector4 rect)
+        {
+            rect = Vector4.Zero;
+            if (texture == null || distortType == null || distortType.Width <= 0 || distortType.Height <= 0 ||
+                distortType.StartPoint.x < 0 || distortType.StartPoint.y < 0)
             {
-                var rows = Math.Max(1, (texture.Height - y) / height);
-                var cols = Math.Max(1, (texture.Width - x) / width);
-                if (frame >= rows * cols) return false;
-                x += frame / rows * width;
-                y += frame % rows * height;
+                return false;
             }
-            else
-            {
-                var cols = Math.Max(1, (texture.Width - x) / width);
-                var rows = Math.Max(1, (texture.Height - y) / height);
-                if (frame >= rows * cols) return false;
-                x += frame % cols * width;
-                y += frame / cols * height;
-            }
-            if (x >= texture.Width || y >= texture.Height) return false;
 
-            rect = new Vector4(x / (float)texture.Width, y / (float)texture.Height,
-                width / (float)texture.Width, height / (float)texture.Height);
-            return true;
+            var width = distortType.Width;
+            var height = distortType.Height;
+            var x = (int)distortType.StartPoint.x;
+            var y = (int)distortType.StartPoint.y;
+            return TryBuildFrameRect(texture, x, y, width, height, frame, out rect);
         }
         void ResetParticleMaskShaderParameters()
         {
@@ -440,6 +464,14 @@ namespace CrazyStorm_Player
             shaderParticleMaskDissolveEdgeWidth?.SetValue(0f);
             shaderParticleMaskAnimateOffset?.SetValue(0f);
             shaderParticleMaskTextureEnabled?.SetValue(0f);
+        }
+        void ResetParticleDistortShaderParameters()
+        {
+            shaderDistortTexture?.SetValue(fallbackMaskTexture);
+            shaderParticleDistortFrameRect?.SetValue(Vector4.Zero);
+            shaderParticleDistortStrength?.SetValue(0f);
+            shaderParticleDistortAnimateOffset?.SetValue(Vector2.Zero);
+            shaderParticleDistortTextureEnabled?.SetValue(0f);
         }
         void UpdateParticleMaskShaderParameters(ParticleBase particle, Texture2D texture, Rectangle rect)
         {
@@ -464,6 +496,31 @@ namespace CrazyStorm_Player
             shaderParticleMaskDissolveEdgeWidth.SetValue(particle.DissolveEdgeWidth);
             shaderParticleMaskAnimateOffset.SetValue((float)Math.Floor(particle.PAnimateFrame) * particle.DissolveVSpeed);
             shaderParticleMaskTextureEnabled.SetValue(1f);
+        }
+        void UpdateParticleDistortShaderParameters(ParticleBase particle, Texture2D texture, Rectangle rect)
+        {
+            ResetParticleDistortShaderParameters();
+
+            if (particle == null || particle.DistortType == null || texture == null) return;
+
+            Texture2D distortTexture;
+            if (!distortTextures.TryGetValue(particle.System, out distortTexture))
+            {
+                distortTexture = ResolveDistortTexture(instances[particle.System], particle.System);
+                distortTextures[particle.System] = distortTexture;
+            }
+
+            Vector4 frameRect;
+            if (!TryBuildDistortFrameRect(distortTexture, particle.DistortType, particle.GetDistortFrameIndex(), out frameRect)) return;
+
+            shaderDistortTexture.SetValue(distortTexture ?? fallbackMaskTexture);
+            shaderParticleSourceRect.SetValue(BuildSourceRect(texture, rect));
+            shaderParticleDistortFrameRect.SetValue(frameRect);
+            shaderParticleDistortStrength.SetValue(particle.DistortStrength);
+            shaderParticleDistortAnimateOffset.SetValue(new Vector2(
+                (float)Math.Floor(particle.PAnimateFrame) * particle.DistortUSpeed,
+                (float)Math.Floor(particle.PAnimateFrame) * particle.DistortVSpeed));
+            shaderParticleDistortTextureEnabled.SetValue(1f);
         }
         void UpdateMaskShaderParameters(ParticleSystem system)
         {
@@ -512,6 +569,7 @@ namespace CrazyStorm_Player
             shaderMaskTexture.SetValue(maskTexture ?? fallbackMaskTexture);
             shaderRenderCenter.SetValue(new Vector2(Width / 2, Height / 2) + system.ScreenOffset.ToXna());
             ResetParticleMaskShaderParameters();
+            ResetParticleDistortShaderParameters();
         }
         void DrawLayer(ParticleSystem system, Layer layer, BlendType blendType)
         {
@@ -563,9 +621,9 @@ namespace CrazyStorm_Player
                 rect.Offset(frame % col * rect.Width, frame / col * rect.Height);
             }
             var rad = MathHelper.ToRadians(particle.PRotation + 90);
-            if (particle.MaskType != null)
+            if (particle.MaskType != null || particle.DistortType != null)
             {
-                DrawParticleWithInstanceMask(tex, particle, rect, color, rad, origin, scale, spriteEffects, blendType, position, center, alpha);
+                DrawParticleWithShader(tex, particle, rect, color, rad, origin, scale, spriteEffects, blendType, position, center, alpha);
                 return;
             }
             spriteBatch.Draw(tex, position, rect, color, rad, origin, scale, spriteEffects, 0);
@@ -583,12 +641,13 @@ namespace CrazyStorm_Player
                 particle.AfterImageData[i] = afterImage;
             }
         }
-        void DrawParticleWithInstanceMask(Texture2D texture, Particle particle, Rectangle rect, Color color, float rotation,
+        void DrawParticleWithShader(Texture2D texture, Particle particle, Rectangle rect, Color color, float rotation,
             Vector2 origin, Vector2 scale, SpriteEffects spriteEffects, BlendType blendType, Vector2 position, Vector2 center, float alpha)
         {
             EndCurveBatch();
             EndSpriteBatch();
             UpdateParticleMaskShaderParameters(particle, texture, rect);
+            UpdateParticleDistortShaderParameters(particle, texture, rect);
             spriteBatch.Begin(SpriteSortMode.Deferred, GetBlendState(blendType), SamplerState.LinearWrap, null, null, shader);
             spriteBatch.Draw(texture, position, rect, color, rotation, origin, scale, spriteEffects, 0);
             if (particle.AfterimageEffect)
@@ -606,6 +665,7 @@ namespace CrazyStorm_Player
             }
             spriteBatch.End();
             ResetParticleMaskShaderParameters();
+            ResetParticleDistortShaderParameters();
             BeginParticleBatches(blendType);
         }
         void DrawCurveParticle(SpriteBatch spriteBatch, CurveBatch curveBatch, CurveParticle particle)
@@ -639,23 +699,25 @@ namespace CrazyStorm_Player
                 var col = (int)Math.Max(1, (tex.Width - type.StartPoint.x) / rect.Width);
                 rect.Offset(frame % col * rect.Width, frame / col * rect.Height);
             }
-            if (particle.MaskType != null)
+            if (particle.MaskType != null || particle.DistortType != null)
             {
-                DrawCurveParticleWithInstanceMask(curveBatch, particle, tex, rect, center, color, blendType);
+                DrawCurveParticleWithShader(curveBatch, particle, tex, rect, center, color, blendType);
                 return;
             }
             if (tex != null) curveBatch.Draw(particle.Curve, tex, rect, center, color);
         }
-        void DrawCurveParticleWithInstanceMask(CurveBatch curveBatch, CurveParticle particle, Texture2D texture,
+        void DrawCurveParticleWithShader(CurveBatch curveBatch, CurveParticle particle, Texture2D texture,
             Rectangle rect, Vector2 center, Color color, BlendType blendType)
         {
             EndCurveBatch();
             EndSpriteBatch();
             UpdateParticleMaskShaderParameters(particle, texture, rect);
+            UpdateParticleDistortShaderParameters(particle, texture, rect);
             curveBatch.Begin(GetBlendState(blendType), shader);
             curveBatch.Draw(particle.Curve, texture, rect, center, color);
             curveBatch.End();
             ResetParticleMaskShaderParameters();
+            ResetParticleDistortShaderParameters();
             BeginParticleBatches(blendType);
         }
         public void Update(KeyboardState keyboard, GameTime gameTime)

@@ -80,6 +80,9 @@
                             <DataTrigger Binding="{Binding EditorKind}" Value="{x:Static local:PropertyEditorKind.EmitterMaskTypeCombo}">
                                 <Setter Property="ContentTemplate" Value="{StaticResource PropertyComboEditorTemplate}" />
                             </DataTrigger>
+                            <DataTrigger Binding="{Binding EditorKind}" Value="{x:Static local:PropertyEditorKind.EmitterDistortTypeCombo}">
+                                <Setter Property="ContentTemplate" Value="{StaticResource PropertyComboEditorTemplate}" />
+                            </DataTrigger>
                         </Style.Triggers>
                     </Style>
                 </ContentControl.Style>
@@ -107,6 +110,9 @@
                                 <Setter Property="ContentTemplate" Value="{StaticResource PropertyComboDisplayTemplate}" />
                             </DataTrigger>
                             <DataTrigger Binding="{Binding EditorKind}" Value="{x:Static local:PropertyEditorKind.EmitterMaskTypeCombo}">
+                                <Setter Property="ContentTemplate" Value="{StaticResource PropertyComboDisplayTemplate}" />
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding EditorKind}" Value="{x:Static local:PropertyEditorKind.EmitterDistortTypeCombo}">
                                 <Setter Property="ContentTemplate" Value="{StaticResource PropertyComboDisplayTemplate}" />
                             </DataTrigger>
                         </Style.Triggers>

@@ -27,6 +27,7 @@ namespace CrazyStorm
         Config config;
         File file;
         ParticleSystem selectedParticle;
+        DistortType selectedDistortType;
         MaskType selectedMaskType;
         ParticleType selectedType;
         TabItem selectedTab;
@@ -54,6 +55,10 @@ namespace CrazyStorm
             LastAsTop.IsChecked = selectedParticle.OrderType == OrderType.LastAsTop;
             MaskPatternCombo.ItemsSource = file.Images;
             MaskPatternCombo.SelectedItem = selectedParticle.MaskImage;
+            DistortPatternCombo.ItemsSource = file.Images;
+            DistortPatternCombo.SelectedItem = selectedParticle.DistortImage;
+            DistortTypeList.ItemsSource = selectedParticle.CustomDistortTypes;
+            DelDistortType.IsEnabled = selectedParticle.CustomDistortTypes.Count > 0;
             MaskTypeList.ItemsSource = selectedParticle.CustomMaskTypes;
             DelMaskType.IsEnabled = selectedParticle.CustomMaskTypes.Count > 0;
             TypeList.ItemsSource = selectedParticle.CustomTypes;
@@ -99,6 +104,11 @@ namespace CrazyStorm
         {
             UpdateImagePreview(selectedParticle.MaskImage, MaskImage);
             UpdatePreview(MaskPreview, MaskImage, MaskFrames, MaskRectWidth, MaskRectHeight, MaskStartPointX, MaskStartPointY);
+        }
+        void UpdateDistortPreview()
+        {
+            UpdateImagePreview(selectedParticle.DistortImage, DistortImage);
+            UpdatePreview(DistortPreview, DistortImage, DistortFrames, DistortRectWidth, DistortRectHeight, DistortStartPointX, DistortStartPointY);
         }
         void UpdatePreview(Canvas preview, System.Windows.Controls.Image image, TextBox frames, TextBox widthBox,
             TextBox heightBox, TextBox startPointXBox, TextBox startPointYBox)
@@ -208,6 +218,51 @@ namespace CrazyStorm
             selectedParticle.MaskImage = MaskPatternCombo.SelectedItem as FileResource;
             UpdateMaskPreview();
         }
+        private void DistortPatternCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            selectedParticle.DistortImage = DistortPatternCombo.SelectedItem as FileResource;
+            UpdateDistortPreview();
+        }
+        private void DistortTypeList_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (e.AddedItems.Count > 0)
+            {
+                selectedDistortType = e.AddedItems[0] as DistortType;
+                DistortSetting.IsEnabled = true;
+                DistortSetting.DataContext = selectedDistortType;
+            }
+            else
+            {
+                selectedDistortType = null;
+                DistortSetting.IsEnabled = false;
+                DistortSetting.DataContext = null;
+            }
+        }
+        private void AddNewDistortType_Click(object sender, RoutedEventArgs e)
+        {
+            selectedParticle.CustomDistortTypes.Add(new DistortType(selectedParticle.CustomDistortTypeIndex,
+                (string)FindResource("DistortTypeStr")));
+            DelDistortType.IsEnabled = true;
+        }
+        private void DeleteDistortType_Click(object sender, RoutedEventArgs e)
+        {
+            if (selectedDistortType == null) return;
+            foreach (var layer in selectedParticle.Layers)
+            {
+                foreach (var component in layer.Components)
+                {
+                    var emitter = component as Emitter;
+                    if (emitter != null && emitter.InitialTemplate != null && emitter.InitialTemplate.DistortType == selectedDistortType)
+                    {
+                        emitter.InitialTemplate.DistortType = null;
+                    }
+                }
+            }
+            selectedParticle.CustomDistortTypes.Remove(selectedDistortType);
+            selectedDistortType = null;
+            DistortTypeList.SelectedItem = null;
+            DelDistortType.IsEnabled = selectedParticle.CustomDistortTypes.Count > 0;
+        }
         private void MaskTypeList_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (e.AddedItems.Count > 0)
@@ -280,6 +335,10 @@ namespace CrazyStorm
         private void MaskTextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
             UpdateMaskPreview();
+        }
+        private void DistortTextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            UpdateDistortPreview();
         }
         private void TextBox_KeyDown(object sender, KeyEventArgs e)
         {

@@ -46,6 +46,9 @@ namespace CrazyStorm.Core
         public float dissolveStrength;
         public float dissolveEdgeWidth;
         public float dissolveVSpeed;
+        public float distortStrength;
+        public float distortUSpeed;
+        public float distortVSpeed;
     }
     public abstract class ParticleBase : PropertyContainer, IXmlData, ILoadPlayData
     {
@@ -57,6 +60,8 @@ namespace CrazyStorm.Core
         int typeID = -1;
         int maskTypeID = -1;
         MaskType maskType;
+        int distortTypeID = -1;
+        DistortType distortType;
         ParticleBaseData particleBaseData;
         Dictionary<long, ParticleBaseData> bindingParticleBaseData;
         #endregion
@@ -107,6 +112,16 @@ namespace CrazyStorm.Core
             {
                 maskType = value;
                 maskTypeID = value != null ? value.ID : -1;
+            }
+        }
+        [ReadOnlyProperty(138)]
+        public DistortType DistortType
+        {
+            get { return distortType; }
+            set
+            {
+                distortType = value;
+                distortTypeID = value != null ? value.ID : -1;
             }
         }
         [RGBProperty(107)]
@@ -258,6 +273,24 @@ namespace CrazyStorm.Core
             get { return particleBaseData.dissolveVSpeed; }
             set { particleBaseData.dissolveVSpeed = value; }
         }
+        [FloatProperty(139, float.MinValue, float.MaxValue)]
+        public float DistortStrength
+        {
+            get { return particleBaseData.distortStrength; }
+            set { particleBaseData.distortStrength = value; }
+        }
+        [FloatProperty(140, float.MinValue, float.MaxValue)]
+        public float DistortUSpeed
+        {
+            get { return particleBaseData.distortUSpeed; }
+            set { particleBaseData.distortUSpeed = value; }
+        }
+        [FloatProperty(141, float.MinValue, float.MaxValue)]
+        public float DistortVSpeed
+        {
+            get { return particleBaseData.distortVSpeed; }
+            set { particleBaseData.distortVSpeed = value; }
+        }
         public int ReboundTime { get; set; }
         public List<EventGroup> ParticleEventGroups { get; set; }
         #endregion
@@ -315,6 +348,17 @@ namespace CrazyStorm.Core
             }
             else maskTypeID = -1;
             maskType = null;
+            if (particleBaseNode.HasAttribute("distortType"))
+            {
+                string distortTypeAttribute = particleBaseNode.GetAttribute("distortType");
+                int parsedID;
+                if (int.TryParse(distortTypeAttribute, out parsedID))
+                    distortTypeID = parsedID;
+                else
+                    throw new System.IO.FileLoadException("FileDataError");
+            }
+            else distortTypeID = -1;
+            distortType = null;
             //particleBaseData
             XmlHelper.BuildFromStruct(ref particleBaseData, particleBaseNode);
             return particleBaseNode;
@@ -336,6 +380,12 @@ namespace CrazyStorm.Core
                 var maskTypeAttribute = doc.CreateAttribute("maskType");
                 maskTypeAttribute.Value = maskType.ID.ToString();
                 particleBaseNode.Attributes.Append(maskTypeAttribute);
+            }
+            if (distortType != null)
+            {
+                var distortTypeAttribute = doc.CreateAttribute("distortType");
+                distortTypeAttribute.Value = distortType.ID.ToString();
+                particleBaseNode.Attributes.Append(distortTypeAttribute);
             }
             //particleBaseData
             XmlHelper.StoreStruct(particleBaseData, doc, particleBaseNode);
@@ -371,6 +421,19 @@ namespace CrazyStorm.Core
                 }
             }
         }
+        public void RebuildDistortTypeReference(IList<DistortType> distortTypes)
+        {
+            distortType = null;
+            if (distortTypeID < 0 || distortTypes == null) return;
+            for (int i = 0; i < distortTypes.Count; ++i)
+            {
+                if (distortTypes[i].ID == distortTypeID)
+                {
+                    distortType = distortTypes[i];
+                    return;
+                }
+            }
+        }
         public virtual List<byte> GeneratePlayData(File file, Emitter emitter)
         {
             var particleBaseBytes = new List<byte>();
@@ -382,6 +445,7 @@ namespace CrazyStorm.Core
             //type
             particleBaseBytes.AddRange(BitConverter.GetBytes(type != null ? type.ID : -1));
             particleBaseBytes.AddRange(BitConverter.GetBytes(maskType != null ? maskType.ID : maskTypeID));
+            particleBaseBytes.AddRange(BitConverter.GetBytes(distortType != null ? distortType.ID : distortTypeID));
             //particleBaseData
             PlayDataHelper.GenerateStruct(particleBaseData, particleBaseBytes);
             return PlayDataHelper.CreateBlock(particleBaseBytes);
@@ -394,7 +458,9 @@ namespace CrazyStorm.Core
                 base.LoadPropertyExpressions(particleBaseReader);
                 typeID = particleBaseReader.ReadInt32();
                 maskTypeID = particleBaseReader.ReadInt32();
+                distortTypeID = particleBaseReader.ReadInt32();
                 maskType = null;
+                distortType = null;
                 //particleBaseData
                 particleBaseData = PlayDataHelper.ReadStruct<ParticleBaseData>(particleBaseReader);
             }
@@ -544,6 +610,15 @@ namespace CrazyStorm.Core
                 case 137:
                     VM.PushFloat(DissolveVSpeed);
                     return true;
+                case 139:
+                    VM.PushFloat(DistortStrength);
+                    return true;
+                case 140:
+                    VM.PushFloat(DistortUSpeed);
+                    return true;
+                case 141:
+                    VM.PushFloat(DistortVSpeed);
+                    return true;
             }
             for (int i = 0; i < Emitter.Locals.Count; ++i)
             {
@@ -666,6 +741,15 @@ namespace CrazyStorm.Core
                 case 137:
                     DissolveVSpeed = VM.PopFloat();
                     return true;
+                case 139:
+                    DistortStrength = VM.PopFloat();
+                    return true;
+                case 140:
+                    DistortUSpeed = VM.PopFloat();
+                    return true;
+                case 141:
+                    DistortVSpeed = VM.PopFloat();
+                    return true;
             }
             for (int i = 0; i < Emitter.Locals.Count; ++i)
             {
@@ -756,6 +840,11 @@ namespace CrazyStorm.Core
             if (maskType == null || maskType.Frames <= 1) return 0;
             return (int)Math.Max(PCurrentFrame - 1, 0) / (maskType.Delay + 1) % maskType.Frames;
         }
+        public int GetDistortFrameIndex()
+        {
+            if (distortType == null || distortType.Frames <= 1) return 0;
+            return (int)Math.Max(PCurrentFrame - 1, 0) / (distortType.Delay + 1) % distortType.Frames;
+        }
         public override void CopyTo(PropertyContainer target)
         {
             base.CopyTo(target);
@@ -765,6 +854,8 @@ namespace CrazyStorm.Core
             particle.typeID = typeID;
             particle.maskTypeID = maskTypeID;
             particle.maskType = maskType;
+            particle.distortTypeID = distortTypeID;
+            particle.distortType = distortType;
             particle.particleBaseData = particleBaseData;
             particle.PCurrentFrame = 1;
             particle.PAnimateFrame = 1;

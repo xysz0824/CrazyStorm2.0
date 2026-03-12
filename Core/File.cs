@@ -127,6 +127,7 @@ namespace CrazyStorm.Core
         {
             foreach (var particleSystem in ParticleSystems)
             {
+                particleSystem.RebuildDistortImageReference(Images);
                 particleSystem.RebuildMaskImageReference(Images);
                 //Rebuild all custom types
                 foreach (var customType in particleSystem.CustomTypes)
@@ -150,6 +151,7 @@ namespace CrazyStorm.Core
                         }
                     }
                 }
+                particleSystem.RebuildDistortTypeReferences();
                 particleSystem.RebuildMaskTypeReferences();
             }
         }
@@ -360,6 +362,7 @@ namespace CrazyStorm.Core
         {
             foreach (var particleSystem in file.ParticleSystems)
             {
+                particleSystem.RebuildDistortImageReference(file.Images);
                 particleSystem.RebuildMaskImageReference(file.Images);
                 //Rebuild all custom types
                 foreach (var customType in particleSystem.CustomTypes)
@@ -383,6 +386,7 @@ namespace CrazyStorm.Core
                         }
                     }
                 }
+                particleSystem.RebuildDistortTypeReferences();
                 particleSystem.RebuildMaskTypeReferences();
             }
         }

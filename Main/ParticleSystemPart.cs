@@ -84,6 +84,7 @@ namespace CrazyStorm
             var components = new List<Component>();
             foreach (var layer in particle.Layers) components.AddRange(layer.Components);
             foreach (var component in components) component.RebuildReferenceFromCollection(components);
+            particle.RebuildDistortTypeReferences();
             particle.RebuildMaskTypeReferences();
             particle.RebuildComponentTree();
             file.ParticleSystems.Add(particle);
@@ -97,6 +98,7 @@ namespace CrazyStorm
             particleTypes.AddRange(ParticleType.DefaultTypes);
             particleTypes.AddRange(selectedSystem.CustomTypes);
             var systemMaskTypes = selectedSystem.CustomMaskTypes.ToList();
+            var systemDistortTypes = selectedSystem.CustomDistortTypes.ToList();
             for (int i = 2; i < LeftTabControl.Items.Count; ++i)
             {
                 var item = LeftTabControl.Items[i] as TabItem;
@@ -106,6 +108,7 @@ namespace CrazyStorm
                 {
                     panel.LoadTypes(particleTypes);
                     panel.LoadMaskTypes(systemMaskTypes);
+                    panel.LoadDistortTypes(systemDistortTypes);
                 }
             }
             foreach (var window in propertyWindows.Values)
@@ -118,6 +121,7 @@ namespace CrazyStorm
                 {
                     panel.LoadTypes(particleTypes);
                     panel.LoadMaskTypes(systemMaskTypes);
+                    panel.LoadDistortTypes(systemDistortTypes);
                 }
             }
         }

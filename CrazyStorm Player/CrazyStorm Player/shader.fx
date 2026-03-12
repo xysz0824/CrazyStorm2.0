@@ -11,6 +11,7 @@
 
 DECLARE_TEXTURE(Texture, 0, Wrap)
 DECLARE_TEXTURE(MaskTexture, 1, Clamp)
+DECLARE_TEXTURE(DistortTexture, 2, Clamp)
 
 #define MASK_COUNT 8
 
@@ -34,6 +35,10 @@ uniform float ParticleMaskDissolveStrength;
 uniform float ParticleMaskDissolveEdgeWidth;
 uniform float ParticleMaskAnimateOffset;
 uniform float ParticleMaskTextureEnabled;
+uniform float4 ParticleDistortFrameRect;
+uniform float ParticleDistortStrength;
+uniform float2 ParticleDistortAnimateOffset;
+uniform float ParticleDistortTextureEnabled;
 
 float WrapUnit(float value)
 {
@@ -136,6 +141,32 @@ float EvaluateParticleMask(float2 texCoord)
                       ParticleMaskDissolveStrength + halfEdge,
                       maskValue);
 }
+float2 ApplyParticleDistort(float2 texCoord)
+{
+    if (ParticleDistortTextureEnabled == 0 || ParticleSourceRect.z <= 0 || ParticleSourceRect.w <= 0)
+    {
+        return texCoord;
+    }
+
+    float2 localUv = (texCoord - ParticleSourceRect.xy) / ParticleSourceRect.zw;
+    if (localUv.x < 0 || localUv.x > 1 || localUv.y < 0 || localUv.y > 1)
+    {
+        return texCoord;
+    }
+
+    if (ParticleDistortFrameRect.z <= 0 || ParticleDistortFrameRect.w <= 0 || ParticleDistortStrength == 0)
+    {
+        return texCoord;
+    }
+
+    float2 distortLocalUv = float2(
+        WrapUnit(localUv.x + ParticleDistortAnimateOffset.x),
+        WrapUnit(localUv.y + ParticleDistortAnimateOffset.y));
+    float2 distortUv = ParticleDistortFrameRect.xy + distortLocalUv * ParticleDistortFrameRect.zw;
+    float2 distortSample = SAMPLE_TEXTURE(DistortTexture, distortUv).rg * 2 - 1;
+    float2 distortedLocalUv = localUv + distortSample * ParticleDistortStrength;
+    return ParticleSourceRect.xy + distortedLocalUv * ParticleSourceRect.zw;
+}
 
 technique PostProcess
 {
@@ -147,7 +178,7 @@ technique PostProcess
 
 float4 mainPS(float4 position : SV_Position, float4 color : COLOR0, float2 texCoord : TEXCOORD0) : COLOR
 {
-    float4 Color = SAMPLE_TEXTURE(Texture, texCoord) * color;
+    float4 Color = SAMPLE_TEXTURE(Texture, ApplyParticleDistort(texCoord)) * color;
     float result = lerp(1, lerp(0, 1, MaskLayer[0] - 1), min(1, MaskLayer[0]));
     float2 pos = position.xy - RenderCenter;
     for (int i = 0; i < MaskCount; ++i)

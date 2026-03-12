@@ -107,6 +107,7 @@
     <Compile Include="Property\EnumPropertyAttribute.cs" />
     <Compile Include="Property\RGBPropertyAttribute.cs" />
     <Compile Include="Particle\Particle.cs" />
+    <Compile Include="Particle\DistortType.cs" />
     <Compile Include="Particle\MaskType.cs" />
     <Compile Include="Particle\ParticleType.cs" />
     <Compile Include="Component\Component.cs" />

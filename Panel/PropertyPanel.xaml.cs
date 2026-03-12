@@ -28,6 +28,7 @@ namespace CrazyStorm
         CommandStack commandStack;
         List<ParticleType> types;
         List<MaskType> maskTypes;
+        List<DistortType> distortTypes;
         Component component;
         List<PropertyInfo> componentPropertyList;
         List<PropertyInfo> specificPropertyList;
@@ -45,13 +46,14 @@ namespace CrazyStorm
 
         #region Constructor
         public PropertyPanel(CommandStack commandStack, Config config, File file,
-            List<ParticleType> types, List<MaskType> maskTypes, Component component, Action updateFunc)
+            List<ParticleType> types, List<MaskType> maskTypes, List<DistortType> distortTypes, Component component, Action updateFunc)
         {
             this.commandStack = commandStack;
             this.config = config;
             this.file = file;
             this.types = types ?? new List<ParticleType>();
             this.maskTypes = maskTypes ?? new List<MaskType>();
+            this.distortTypes = distortTypes ?? new List<DistortType>();
             this.component = component;
             this.updateFunc = updateFunc;
             InitializeComponent();
@@ -122,6 +124,17 @@ namespace CrazyStorm
             RefreshEventFieldMaskPseudoProperty();
             RefreshEmitterMaskPseudoProperty();
         }
+        public void LoadDistortTypes(List<DistortType> distortTypes)
+        {
+            this.distortTypes = distortTypes ?? new List<DistortType>();
+            var emitter = component as Emitter;
+            if (emitter != null && emitter.InitialTemplate.DistortType != null &&
+                !this.distortTypes.Contains(emitter.InitialTemplate.DistortType))
+            {
+                emitter.InitialTemplate.DistortType = null;
+            }
+            RefreshEmitterDistortPseudoProperty();
+        }
         #endregion
 
         #region Private Methods
@@ -183,6 +196,7 @@ namespace CrazyStorm
             }
             LoadTypes(types);
             LoadMaskTypes(maskTypes);
+            LoadDistortTypes(distortTypes);
             VariableGrid.ItemsSource = component.Locals;
             DeleteVariable.IsEnabled = component.Locals.Count > 0;
             ComponentEventList.ItemsSource = component.ComponentEventGroups;
@@ -250,6 +264,11 @@ namespace CrazyStorm
                     ApplyEmitterMaskTypeValue(item, container as ParticleBase);
                     continue;
                 }
+                if (item.PseudoPropertyKind == PropertyPseudoKind.EmitterDistortType)
+                {
+                    ApplyEmitterDistortTypeValue(item, container as ParticleBase);
+                    continue;
+                }
                 if (item.IsParticlePseudoProperty || item.Info == null) continue;
                 if (!item.ReadOnly && !container.Properties[item.Info.Name].Expression)
                 {
@@ -290,6 +309,14 @@ namespace CrazyStorm
                 item.PseudoPropertyKind = PropertyPseudoKind.EmitterMaskType;
                 item.ItemsSource = BuildEmitterMaskTypeItems();
                 ApplyEmitterMaskTypeValue(item, container as ParticleBase);
+            }
+            else if (component is Emitter && container is ParticleBase && info.PropertyType == typeof(DistortType))
+            {
+                item.ReadOnly = false;
+                item.EditorKind = PropertyEditorKind.EmitterDistortTypeCombo;
+                item.PseudoPropertyKind = PropertyPseudoKind.EmitterDistortType;
+                item.ItemsSource = BuildEmitterDistortTypeItems();
+                ApplyEmitterDistortTypeValue(item, container as ParticleBase);
             }
             return item;
         }
@@ -333,6 +360,12 @@ namespace CrazyStorm
             items.AddRange(maskTypes.Select(item => item.Name));
             return items;
         }
+        List<string> BuildEmitterDistortTypeItems()
+        {
+            var items = new List<string> { string.Empty };
+            items.AddRange(distortTypes.Select(item => item.Name));
+            return items;
+        }
         void ApplyReflectionPropertyValue(PropertyGridItem item, string internalValue)
         {
             if (item.EditorKind == PropertyEditorKind.BoolCheckBox)
@@ -360,6 +393,11 @@ namespace CrazyStorm
         {
             if (item == null || particle == null) return;
             item.DisplayValue = particle.MaskType != null ? particle.MaskType.Name : string.Empty;
+        }
+        void ApplyEmitterDistortTypeValue(PropertyGridItem item, ParticleBase particle)
+        {
+            if (item == null || particle == null) return;
+            item.DisplayValue = particle.DistortType != null ? particle.DistortType.Name : string.Empty;
         }
         PropertyGridItem CreateParticleTypePropertyItem(Emitter emitter)
         {
@@ -467,6 +505,28 @@ namespace CrazyStorm
             {
                 maskTypeItem.ItemsSource = BuildEmitterMaskTypeItems();
                 ApplyEmitterMaskTypeValue(maskTypeItem, emitter.InitialTemplate);
+            }
+            finally
+            {
+                suppressComboBoxEvent = false;
+            }
+        }
+        void RefreshEmitterDistortPseudoProperty()
+        {
+            var emitter = component as Emitter;
+            if (emitter == null) return;
+
+            var items = ParticleGrid.DataContext as IList<PropertyGridItem>;
+            if (items == null) return;
+
+            var distortTypeItem = items.FirstOrDefault(item => item.PseudoPropertyKind == PropertyPseudoKind.EmitterDistortType);
+            if (distortTypeItem == null) return;
+
+            suppressComboBoxEvent = true;
+            try
+            {
+                distortTypeItem.ItemsSource = BuildEmitterDistortTypeItems();
+                ApplyEmitterDistortTypeValue(distortTypeItem, emitter.InitialTemplate);
             }
             finally
             {
@@ -599,6 +659,10 @@ namespace CrazyStorm
             {
                 CommitEmitterMaskTypeSelection(displayValue);
             }
+            else if (property.EditorKind == PropertyEditorKind.EmitterDistortTypeCombo)
+            {
+                CommitEmitterDistortTypeSelection(displayValue);
+            }
             else if (displayValue != property.DisplayValue)
             {
                 property.DisplayValue = displayValue;
@@ -664,6 +728,17 @@ namespace CrazyStorm
             new SetEmitterMaskTypeCommand().Do(commandStack, emitter, targetMaskType,
                 new Action<Emitter, MaskType>(EmitterMaskTypeUpdate));
         }
+        void CommitEmitterDistortTypeSelection(string distortTypeName)
+        {
+            var emitter = component as Emitter;
+            if (emitter == null) return;
+
+            var targetDistortType = distortTypes.FirstOrDefault(item => item.Name == distortTypeName);
+            if (emitter.InitialTemplate.DistortType == targetDistortType) return;
+
+            new SetEmitterDistortTypeCommand().Do(commandStack, emitter, targetDistortType,
+                new Action<Emitter, DistortType>(EmitterDistortTypeUpdate));
+        }
         ParticleType ResolveParticleType(string typeName, string colorDisplayValue)
         {
             if (string.IsNullOrEmpty(typeName)) return null;
@@ -697,6 +772,13 @@ namespace CrazyStorm
             if (this == null) return;
             emitter.InitialTemplate.MaskType = maskType;
             RefreshEmitterMaskPseudoProperty();
+            if (updateFunc != null) updateFunc();
+        }
+        void EmitterDistortTypeUpdate(Emitter emitter, DistortType distortType)
+        {
+            if (this == null) return;
+            emitter.InitialTemplate.DistortType = distortType;
+            RefreshEmitterDistortPseudoProperty();
             if (updateFunc != null) updateFunc();
         }
         bool TryGetDataGrid(DependencyObject source, out DataGrid grid)

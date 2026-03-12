@@ -41,13 +41,18 @@ namespace CrazyStorm.Core
         string name;
         [XmlAttribute]
         OrderType orderType;
+        GenericContainer<DistortType> customDistortTypes;
         GenericContainer<MaskType> customMaskTypes;
         GenericContainer<ParticleType> customTypes;
         GenericContainer<Layer> layers;
         GenericContainer<Note> notes;
         GenericContainer<Component> componentTree;
+        FileResource distortImage;
+        int distortImageID = -1;
         FileResource maskImage;
         int maskImageID = -1;
+        [XmlAttribute]
+        int customDistortTypeIndex;
         [XmlAttribute]
         int customMaskTypeIndex;
         [XmlAttribute]
@@ -91,11 +96,21 @@ namespace CrazyStorm.Core
                 return totalFrame;
             }
         }
+        public GenericContainer<DistortType> CustomDistortTypes { get { return customDistortTypes; } }
         public GenericContainer<MaskType> CustomMaskTypes { get { return customMaskTypes; } }
         public GenericContainer<ParticleType> CustomTypes { get { return customTypes; } }
         public GenericContainer<Layer> Layers { get { return layers; } }
         public GenericContainer<Note> Notes { get { return notes; } }
         public GenericContainer<Component> ComponentTree { get { return componentTree; } }
+        public FileResource DistortImage
+        {
+            get { return distortImage; }
+            set
+            {
+                distortImage = value;
+                distortImageID = value != null ? value.ID : -1;
+            }
+        }
         public FileResource MaskImage
         {
             get { return maskImage; }
@@ -105,6 +120,7 @@ namespace CrazyStorm.Core
                 maskImageID = value != null ? value.ID : -1;
             }
         }
+        public int CustomDistortTypeIndex { get { return customDistortTypeIndex++; } }
         public int CustomMaskTypeIndex { get { return customMaskTypeIndex++; } }
         public int CustomTypeIndex { get { return customTypeIndex++; } }
         public int LayerIndex { get { return layerIndex++; } }
@@ -133,6 +149,7 @@ namespace CrazyStorm.Core
         #region Constructor
         public ParticleSystem()
         {
+            customDistortTypes = new GenericContainer<DistortType>();
             customMaskTypes = new GenericContainer<MaskType>();
             customTypes = new GenericContainer<ParticleType>();
             layers = new GenericContainer<Layer>();
@@ -267,6 +284,8 @@ namespace CrazyStorm.Core
         public object Clone()
         {
             var clone = MemberwiseClone() as ParticleSystem;
+            clone.customDistortTypes = new GenericContainer<DistortType>();
+            foreach (var type in customDistortTypes) clone.customDistortTypes.Add(type.Clone() as DistortType);
             clone.customMaskTypes = new GenericContainer<MaskType>();
             foreach (var type in customMaskTypes) clone.customMaskTypes.Add(type.Clone() as MaskType);
             clone.customTypes = new GenericContainer<ParticleType>();
@@ -289,6 +308,8 @@ namespace CrazyStorm.Core
             instance.name = name;
             instance.orderType = orderType;
             instance.LogicOffset = default;
+            instance.customDistortTypes = customDistortTypes;
+            instance.DistortImage = distortImage;
             instance.customMaskTypes = customMaskTypes;
             instance.MaskImage = maskImage;
             instance.customTypes = customTypes;
@@ -306,6 +327,7 @@ namespace CrazyStorm.Core
                     component.RebuildReferenceFromCollection();
                 }
             }
+            instance.RebuildDistortTypeReferences();
             instance.RebuildMaskTypeReferences();
             instance.RebuildComponentTree();
             instance.Sounds = Sounds;
@@ -325,6 +347,14 @@ namespace CrazyStorm.Core
             var particleSystemNode = (XmlElement)node.SelectSingleNode(nodeName);
             if (node.Name == nodeName) particleSystemNode = node;
             XmlHelper.BuildFromFields(this, particleSystemNode);
+            if (particleSystemNode.HasAttribute("distortImage"))
+            {
+                int parsedID;
+                if (int.TryParse(particleSystemNode.GetAttribute("distortImage"), out parsedID)) distortImageID = parsedID;
+                else throw new FileLoadException("FileDataError");
+            }
+            else distortImageID = -1;
+            distortImage = null;
             if (particleSystemNode.HasAttribute("maskImage"))
             {
                 int parsedID;
@@ -333,6 +363,7 @@ namespace CrazyStorm.Core
             }
             else maskImageID = -1;
             maskImage = null;
+            XmlHelper.BuildFromObjectList(customDistortTypes, new DistortType(0), particleSystemNode, "CustomDistortTypes");
             XmlHelper.BuildFromObjectList(customMaskTypes, new MaskType(0), particleSystemNode, "CustomMaskTypes");
             //customTypes
             XmlHelper.BuildFromObjectList(customTypes, new ParticleType(0), particleSystemNode, "CustomTypes");
@@ -350,12 +381,19 @@ namespace CrazyStorm.Core
         {
             var particleSystemNode = doc.CreateElement("ParticleSystem");
             XmlHelper.StoreFields(this, doc, particleSystemNode);
+            if (distortImage != null)
+            {
+                var distortImageAttribute = doc.CreateAttribute("distortImage");
+                distortImageAttribute.Value = distortImage.ID.ToString();
+                particleSystemNode.Attributes.Append(distortImageAttribute);
+            }
             if (maskImage != null)
             {
                 var maskImageAttribute = doc.CreateAttribute("maskImage");
                 maskImageAttribute.Value = maskImage.ID.ToString();
                 particleSystemNode.Attributes.Append(maskImageAttribute);
             }
+            XmlHelper.StoreObjectList(customDistortTypes, doc, particleSystemNode, "CustomDistortTypes");
             XmlHelper.StoreObjectList(customMaskTypes, doc, particleSystemNode, "CustomMaskTypes");
             //customTypes
             XmlHelper.StoreObjectList(customTypes, doc, particleSystemNode, "CustomTypes");
@@ -377,7 +415,9 @@ namespace CrazyStorm.Core
             PlayDataHelper.GenerateStruct(orderType, particleSystemBytes);
             //stringDataField
             PlayDataHelper.GenerateStringDataFields(this, particleSystemBytes);
+            particleSystemBytes.AddRange(BitConverter.GetBytes(distortImage != null ? distortImage.ID : -1));
             particleSystemBytes.AddRange(BitConverter.GetBytes(maskImage != null ? maskImage.ID : -1));
+            PlayDataHelper.GenerateObjectList(file, customDistortTypes, particleSystemBytes);
             PlayDataHelper.GenerateObjectList(file, customMaskTypes, particleSystemBytes);
             //customTypes
             PlayDataHelper.GenerateObjectList(file, customTypes, particleSystemBytes);
@@ -400,7 +440,9 @@ namespace CrazyStorm.Core
                 orderType = PlayDataHelper.ReadStruct<OrderType>(particleSystemReader);
                 //stringDataFields
                 PlayDataHelper.ReadStringDataFields(this, particleSystemReader);
+                distortImageID = particleSystemReader.ReadInt32();
                 maskImageID = particleSystemReader.ReadInt32();
+                PlayDataHelper.ReadObjectList(CustomDistortTypes, particleSystemReader, version);
                 PlayDataHelper.ReadObjectList(CustomMaskTypes, particleSystemReader, version);
                 //customTypes
                 PlayDataHelper.ReadObjectList(CustomTypes, particleSystemReader, version);
@@ -434,6 +476,33 @@ namespace CrazyStorm.Core
                 }
             }
             maskImageID = -1;
+        }
+        public void RebuildDistortImageReference(GenericContainer<FileResource> collection)
+        {
+            if (distortImageID == -1) return;
+            foreach (var target in collection)
+            {
+                if (distortImageID == target.ID)
+                {
+                    DistortImage = target;
+                    break;
+                }
+            }
+            distortImageID = -1;
+        }
+        public void RebuildDistortTypeReferences()
+        {
+            foreach (var layer in Layers)
+            {
+                foreach (var component in layer.Components)
+                {
+                    var emitter = component as Emitter;
+                    if (emitter != null && emitter.InitialTemplate != null)
+                    {
+                        emitter.InitialTemplate.RebuildDistortTypeReference(CustomDistortTypes);
+                    }
+                }
+            }
         }
         public void RebuildMaskTypeReferences()
         {
