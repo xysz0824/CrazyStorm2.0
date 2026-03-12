@@ -23,6 +23,8 @@ uniform float2 MaskEllipseInvSizeSq[MASK_COUNT];
 uniform float4 MaskFrameRect[MASK_COUNT];
 uniform float MaskDissolveStrength[MASK_COUNT];
 uniform float MaskDissolveEdgeWidth[MASK_COUNT];
+uniform float MaskDissolveVSpeed[MASK_COUNT];
+uniform float MaskAnimateFrame[MASK_COUNT];
 uniform float MaskTextureEnabled[MASK_COUNT];
 uniform int MaskCount;
 uniform float2 RenderCenter;
@@ -30,7 +32,15 @@ uniform float4 ParticleMaskFrameRect;
 uniform float4 ParticleSourceRect;
 uniform float ParticleMaskDissolveStrength;
 uniform float ParticleMaskDissolveEdgeWidth;
+uniform float ParticleMaskDissolveVSpeed;
+uniform float ParticleMaskAnimateFrame;
 uniform float ParticleMaskTextureEnabled;
+
+float WrapUnit(float value)
+{
+    return frac(frac(value) + 1);
+}
+
 float EvaluateMaskJudge(float2 pos, int index)
 {
     float2 maskD = pos - MaskPosition[index].xy;
@@ -64,6 +74,12 @@ float EvaluateMaskJudge(float2 pos, int index)
     }
 
     float4 frameRect = MaskFrameRect[index];
+    if (frameRect.z <= 0 || frameRect.w <= 0)
+    {
+        return 0;
+    }
+
+    localUv.y = WrapUnit(localUv.y + floor(MaskAnimateFrame[index]) * MaskDissolveVSpeed[index]);
     float2 maskUv = frameRect.xy + localUv * frameRect.zw;
     float maskValue = SAMPLE_TEXTURE(MaskTexture, maskUv).r;
     float dissolveJudge = 0;
@@ -93,6 +109,12 @@ float EvaluateParticleMask(float2 texCoord)
         return 1;
     }
 
+    if (ParticleMaskFrameRect.z <= 0 || ParticleMaskFrameRect.w <= 0)
+    {
+        return 1;
+    }
+
+    localUv.y = WrapUnit(localUv.y + floor(ParticleMaskAnimateFrame) * ParticleMaskDissolveVSpeed);
     float2 maskUv = ParticleMaskFrameRect.xy + localUv * ParticleMaskFrameRect.zw;
     float maskValue = SAMPLE_TEXTURE(MaskTexture, maskUv).r;
     if (ParticleMaskDissolveEdgeWidth <= 0)

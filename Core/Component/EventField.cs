@@ -42,6 +42,7 @@ namespace CrazyStorm.Core
         public float rotation;
         public float dissolveStrength;
         public float dissolveEdgeWidth;
+        public float dissolveVSpeed;
     }
     public class EventFieldPool : PoolObject<EventFieldPool, NullData>
     {
@@ -142,6 +143,12 @@ namespace CrazyStorm.Core
             get { return eventFieldData.dissolveEdgeWidth; }
             set { eventFieldData.dissolveEdgeWidth = value >= 0 ? value : 0; }
         }
+        [FloatProperty(26, float.MinValue, float.MaxValue)]
+        public float DissolveVSpeed
+        {
+            get { return eventFieldData.dissolveVSpeed; }
+            set { eventFieldData.dissolveVSpeed = value; }
+        }
         public GenericContainer<EventGroup> EventFieldEventGroups { get; private set; }
         #endregion
 
@@ -181,6 +188,8 @@ namespace CrazyStorm.Core
             ParticleManager.MaskTextureFrameArray[maskIndex] = frame;
             ParticleManager.MaskDissolveStrengthArray[maskIndex] = DissolveStrength;
             ParticleManager.MaskDissolveEdgeWidthArray[maskIndex] = DissolveEdgeWidth;
+            ParticleManager.MaskDissolveVSpeedArray[maskIndex] = selectedMaskType != null ? DissolveVSpeed : 0;
+            ParticleManager.MaskAnimateFrameArray[maskIndex] = selectedMaskType != null ? CurrentFrame : 0;
             ParticleManager.MaskTextureEnabledArray[maskIndex] = hasTexture;
         }
         void Update(float frameScale)
@@ -339,6 +348,9 @@ namespace CrazyStorm.Core
                 case 25:
                     VM.PushFloat(DissolveEdgeWidth);
                     return true;
+                case 26:
+                    VM.PushFloat(DissolveVSpeed);
+                    return true;
             }
             return false;
         }
@@ -379,6 +391,9 @@ namespace CrazyStorm.Core
                     return true;
                 case 25:
                     DissolveEdgeWidth = VM.PopFloat();
+                    return true;
+                case 26:
+                    DissolveVSpeed = VM.PopFloat();
                     return true;
             }
             return false;

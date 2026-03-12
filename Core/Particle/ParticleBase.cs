@@ -45,6 +45,7 @@ namespace CrazyStorm.Core
         public float vspeed;
         public float dissolveStrength;
         public float dissolveEdgeWidth;
+        public float dissolveVSpeed;
     }
     public abstract class ParticleBase : PropertyContainer, IXmlData, ILoadPlayData
     {
@@ -250,6 +251,12 @@ namespace CrazyStorm.Core
         {
             get { return particleBaseData.dissolveEdgeWidth; }
             set { particleBaseData.dissolveEdgeWidth = value >= 0 ? value : 0; }
+        }
+        [FloatProperty(137, float.MinValue, float.MaxValue)]
+        public float DissolveVSpeed
+        {
+            get { return particleBaseData.dissolveVSpeed; }
+            set { particleBaseData.dissolveVSpeed = value; }
         }
         public int ReboundTime { get; set; }
         public List<EventGroup> ParticleEventGroups { get; set; }
@@ -534,6 +541,9 @@ namespace CrazyStorm.Core
                 case 135:
                     VM.PushFloat(DissolveEdgeWidth);
                     return true;
+                case 137:
+                    VM.PushFloat(DissolveVSpeed);
+                    return true;
             }
             for (int i = 0; i < Emitter.Locals.Count; ++i)
             {
@@ -652,6 +662,9 @@ namespace CrazyStorm.Core
                     return true;
                 case 135:
                     DissolveEdgeWidth = VM.PopFloat();
+                    return true;
+                case 137:
+                    DissolveVSpeed = VM.PopFloat();
                     return true;
             }
             for (int i = 0; i < Emitter.Locals.Count; ++i)

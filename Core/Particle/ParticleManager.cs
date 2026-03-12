@@ -110,6 +110,8 @@ namespace CrazyStorm.Core
         static float[] maskTextureFrameArray = new float[MAX_MASK_COUNT];
         static float[] maskDissolveStrengthArray = new float[MAX_MASK_COUNT];
         static float[] maskDissolveEdgeWidthArray = new float[MAX_MASK_COUNT];
+        static float[] maskDissolveVSpeedArray = new float[MAX_MASK_COUNT];
+        static float[] maskAnimateFrameArray = new float[MAX_MASK_COUNT];
         static float[] maskTextureEnabledArray = new float[MAX_MASK_COUNT];
         public static int MaximumParticleCount => searchResult.Length;
         public static int ActiveParticleCount
@@ -139,6 +141,8 @@ namespace CrazyStorm.Core
         public static float[] MaskTextureFrameArray => maskTextureFrameArray;
         public static float[] MaskDissolveStrengthArray => maskDissolveStrengthArray;
         public static float[] MaskDissolveEdgeWidthArray => maskDissolveEdgeWidthArray;
+        public static float[] MaskDissolveVSpeedArray => maskDissolveVSpeedArray;
+        public static float[] MaskAnimateFrameArray => maskAnimateFrameArray;
         public static float[] MaskTextureEnabledArray => maskTextureEnabledArray;
         public static int MaskCount { get; set; }
         public static void Initialize(int windowWidth, int windowHeight, int particlePreservedDist, int curvePreservedDist,
@@ -320,6 +324,8 @@ namespace CrazyStorm.Core
             Array.Clear(MaskTextureFrameArray, 0, MAX_MASK_COUNT);
             Array.Clear(MaskDissolveStrengthArray, 0, MAX_MASK_COUNT);
             Array.Clear(MaskDissolveEdgeWidthArray, 0, MAX_MASK_COUNT);
+            Array.Clear(MaskDissolveVSpeedArray, 0, MAX_MASK_COUNT);
+            Array.Clear(MaskAnimateFrameArray, 0, MAX_MASK_COUNT);
             Array.Clear(MaskTextureEnabledArray, 0, MAX_MASK_COUNT);
         }
         public static void UpdateLayerMasks(GenericContainer<Layer> layers, Layer layer)
