@@ -13,6 +13,7 @@ using CrazyStorm.Core;
 using Curve = CrazyStorm.Core.Curve;
 using Vector2 = Microsoft.Xna.Framework.Vector2;
 using Vector3 = Microsoft.Xna.Framework.Vector3;
+using Vector4 = Microsoft.Xna.Framework.Vector4;
 
 namespace CrazyStorm_Player
 {
@@ -31,11 +32,13 @@ namespace CrazyStorm_Player
         int indexIndex;
         int vertexIndex;
         bool beginCalled;
-        Effect effect;
+        readonly PlayerShaderContext shaderContext;
         BasicEffect basicEffect;
-        public CurveBatch(GraphicsDevice graphicsDevice)
+        ParticleBatchPass shaderPass;
+        internal CurveBatch(GraphicsDevice graphicsDevice, PlayerShaderContext shaderContext)
         {
             g = graphicsDevice;
+            this.shaderContext = shaderContext;
             basicEffect = new BasicEffect(graphicsDevice)
             {
                 TextureEnabled = true,
@@ -43,7 +46,7 @@ namespace CrazyStorm_Player
                 LightingEnabled = false
             };
         }
-        public void Begin(BlendState blend, Effect effect)
+        internal void Begin(BlendState blend, ParticleBatchPass pass = ParticleBatchPass.Textured)
         {
             if (beginCalled)
             {
@@ -51,9 +54,23 @@ namespace CrazyStorm_Player
             }
             beginCalled = true;
             blendState = blend;
-            this.effect = effect;
+            shaderPass = pass;
+        }
+        internal void DrawCurve(Curve curve, CurveRenderData renderData, Vector2 offset, Color color)
+        {
+            Draw(curve, renderData.Texture, renderData.SourceRect, offset, color);
         }
         public void Draw(Curve curve, Texture2D tex, Rectangle rect, Vector2 offset, Color color)
+        {
+            if (tex == null)
+            {
+                Draw(curve, tex, Vector4.Zero, offset, color);
+                return;
+            }
+            Draw(curve, tex, new Vector4(rect.X / (float)tex.Width, rect.Y / (float)tex.Height,
+                rect.Width / (float)tex.Width, rect.Height / (float)tex.Height), offset, color);
+        }
+        void Draw(Curve curve, Texture2D tex, Vector4 sourceRect, Vector2 offset, Color color)
         {
             if (!beginCalled)
             {
@@ -69,8 +86,8 @@ namespace CrazyStorm_Player
             {
                 Flush();
             }
-            var coordOffset = new Vector2(rect.X / (float)tex.Width, rect.Y / (float)tex.Height);
-            var coordScale = new Vector2(rect.Width / (float)tex.Width, rect.Height / (float)tex.Height);
+            var coordOffset = new Vector2(sourceRect.X, sourceRect.Y);
+            var coordScale = new Vector2(sourceRect.Z, sourceRect.W);
             curves[batchCurveCount++] = curve;
             for (int i = 0; i < curve.Indices.Length; ++i)
             {
@@ -111,8 +128,11 @@ namespace CrazyStorm_Player
             if (batchCurveCount <= 0) return;
             g.BlendState = blendState;
             var texture = curveTexs[curves[batchCurveCount - 1]];
+            var effect = shaderContext != null ? shaderContext.Effect : null;
             if (effect != null)
             {
+                var technique = GetTechnique(shaderPass);
+                if (technique != null) effect.CurrentTechnique = technique;
                 var textureParameter = effect.Parameters["Texture"];
                 if (textureParameter != null) textureParameter.SetValue(texture);
                 foreach (var pass in effect.CurrentTechnique.Passes)
@@ -137,6 +157,24 @@ namespace CrazyStorm_Player
             batchCurveCount = 0;
             vertexIndex = 0;
             indexIndex = 0;
+        }
+        EffectTechnique GetTechnique(ParticleBatchPass pass)
+        {
+            var effect = shaderContext?.Effect;
+            if (effect == null) return null;
+            switch (pass)
+            {
+                case ParticleBatchPass.Textured:
+                    return effect.Techniques["CurveTextured"];
+                case ParticleBatchPass.TexturedMask:
+                    return effect.Techniques["CurveTexturedMask"] ?? effect.Techniques["CurveTextured"];
+                case ParticleBatchPass.TexturedDistort:
+                    return effect.Techniques["CurveTexturedDistort"] ?? effect.Techniques["CurveTextured"];
+                case ParticleBatchPass.TexturedMaskDistort:
+                    return effect.Techniques["CurveTexturedMaskDistort"] ?? effect.Techniques["CurveTextured"];
+                default:
+                    return effect.Techniques["CurveTextured"];
+            }
         }
     }
 }
