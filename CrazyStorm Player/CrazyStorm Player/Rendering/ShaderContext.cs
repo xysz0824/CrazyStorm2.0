@@ -35,7 +35,7 @@ namespace CrazyStorm_Player
         public bool RequiresShader;
     }
 
-    internal sealed class PlayerShaderContext : IDisposable
+    internal sealed class ShaderContext : IDisposable
     {
         readonly Effect shader;
         readonly Texture2D whiteTexture;
@@ -62,7 +62,7 @@ namespace CrazyStorm_Player
         readonly BlendState substration;
         readonly BlendState multiply;
 
-        public PlayerShaderContext(GraphicsDevice graphicsDevice, int width, int height, FrameOrientation frameOrientation)
+        public ShaderContext(GraphicsDevice graphicsDevice, int width, int height, FrameOrientation frameOrientation)
         {
             Width = width;
             Height = height;

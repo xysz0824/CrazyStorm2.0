@@ -33,10 +33,10 @@ namespace CrazyStorm_Player
         int vertexIndex;
         bool beginCalled;
         BasicEffect basicEffect;
-        readonly PlayerShaderContext shaderContext;
+        readonly ShaderContext shaderContext;
         readonly RasterizerState rasterizerState;
         ParticleBatchPass shaderPass;
-        internal CurveBatch(GraphicsDevice graphicsDevice, PlayerShaderContext shaderContext)
+        internal CurveBatch(GraphicsDevice graphicsDevice, ShaderContext shaderContext)
         {
             g = graphicsDevice;
             this.shaderContext = shaderContext;

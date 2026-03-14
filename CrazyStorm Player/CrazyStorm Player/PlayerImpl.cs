@@ -36,7 +36,7 @@ namespace CrazyStorm_Player
         const int PARTICLE_PRESERVED_DIST = 50;
         const int CURVE_PRESERVED_DIST = 100;
 
-        PlayerShaderContext shaderContext;
+        ShaderContext shaderContext;
         SpriteBatch spriteBatch;
         ParticleBatch particleBatch;
         CurveBatch curveBatch;
@@ -82,7 +82,7 @@ namespace CrazyStorm_Player
         public void Initialize(GraphicsDevice gd)
         {
             //graphics
-            shaderContext = new PlayerShaderContext(gd, Width, Height, FrameOrientation);
+            shaderContext = new ShaderContext(gd, Width, Height, FrameOrientation);
             spriteBatch = new SpriteBatch(gd);
             particleBatch = new ParticleBatch(gd, shaderContext);
             curveBatch = new CurveBatch(gd, shaderContext);

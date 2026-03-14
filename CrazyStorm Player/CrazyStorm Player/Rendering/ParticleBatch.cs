@@ -94,7 +94,7 @@ namespace CrazyStorm_Player
         }
 
         readonly GraphicsDevice graphicsDevice;
-        readonly PlayerShaderContext shaderContext;
+        readonly ShaderContext shaderContext;
         readonly DynamicVertexBuffer instanceBuffer;
         readonly VertexBuffer quadVertexBuffer;
         readonly IndexBuffer quadIndexBuffer;
@@ -106,7 +106,7 @@ namespace CrazyStorm_Player
         bool hasBatchKey;
         bool beginCalled;
 
-        internal ParticleBatch(GraphicsDevice graphicsDevice, PlayerShaderContext shaderContext)
+        internal ParticleBatch(GraphicsDevice graphicsDevice, ShaderContext shaderContext)
         {
             this.graphicsDevice = graphicsDevice;
             this.shaderContext = shaderContext;
