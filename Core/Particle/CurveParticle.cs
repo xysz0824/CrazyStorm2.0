@@ -163,15 +163,28 @@ namespace CrazyStorm.Core
             return false;
         }
         public override Vector2 GetOutPoint() => Curve != null ? Curve.GetCurveEnd() : base.GetOutPoint();
-        bool CurveJudge(Vector2 head, Vector2 tail, float scale, Vector2 bp, Vector2 p, Vector2 s, float r, float deg)
+        bool JudgeCurveSegment(Vector2 head, Vector2 tail, float headWidth, float tailWidth, Vector2 bp, Vector2 p, float r, float deg)
+        {
+            var width = Math.Abs((headWidth + tailWidth) * 0.5f);
+            var widthScale = Type != null && Type.Width != 0 ? width / Type.Width : 0;
+            return MathHelper.Judge(head, tail, bp, p, new Vector2(widthScale, widthScale), r, deg) & widthScale >= 0.5f;
+        }
+        bool CurveJudge(Vector2 head, Vector2 tail, float scale, float tailWidth, float headWidth, Vector2 bp, Vector2 p, float r, float deg)
         {
             if (scale < 0.3f || scale > 0.7f) return false;
-            return MathHelper.Judge(head, tail, bp, p, s, r, deg) & Math.Abs(WidthScale) >= 0.5f;
+            if (headWidth == 0f && tailWidth == 0f) return false;
+            if ((headWidth > 0f && tailWidth < 0f) || (headWidth < 0f && tailWidth > 0f))
+            {
+                var zeroPoint = head + (tail - head) * (headWidth / (headWidth - tailWidth));
+                return JudgeCurveSegment(head, zeroPoint, headWidth, 0f, bp, p, r, deg) |
+                    JudgeCurveSegment(zeroPoint, tail, 0f, tailWidth, bp, p, r, deg);
+            }
+            return JudgeCurveSegment(head, tail, headWidth, tailWidth, bp, p, r, deg);
         }
         public override bool CheckCollision(Vector2 playerLast, Vector2 player, float r)
         {
             return FogFrame >= FOG_TIME && Curve != null &&
-                Curve.IterateSegment(CurveJudge, playerLast, player, new Vector2(WidthScale, WidthScale), 2, PRotation + 90, Length);
+                Curve.IterateSegment(CurveJudge, playerLast, player, 2, PRotation + 90, Length);
         }
         public override bool Update(float frameScale, float currentFrame = 1)
         {
@@ -190,7 +203,6 @@ namespace CrazyStorm.Core
                 Curve = Curve.Rent(initData);
             }
             PRotation = PSpeedAngle;
-            Curve.SetSnakeUpdate(SnakeUpdate);
             Curve.Update(PPosition, head, Type.Width * WidthScale, Length);
             return true;
         }

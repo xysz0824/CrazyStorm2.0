@@ -32,13 +32,15 @@ namespace CrazyStorm_Player
         int indexIndex;
         int vertexIndex;
         bool beginCalled;
-        readonly PlayerShaderContext shaderContext;
         BasicEffect basicEffect;
+        readonly PlayerShaderContext shaderContext;
+        readonly RasterizerState rasterizerState;
         ParticleBatchPass shaderPass;
         internal CurveBatch(GraphicsDevice graphicsDevice, PlayerShaderContext shaderContext)
         {
             g = graphicsDevice;
             this.shaderContext = shaderContext;
+            rasterizerState = new RasterizerState { CullMode = CullMode.None };
             basicEffect = new BasicEffect(graphicsDevice)
             {
                 TextureEnabled = true,
@@ -128,6 +130,9 @@ namespace CrazyStorm_Player
         {
             if (batchCurveCount <= 0) return;
             g.BlendState = blendState;
+            g.DepthStencilState = DepthStencilState.None;
+            g.RasterizerState = rasterizerState;
+            g.SamplerStates[0] = SamplerState.LinearWrap;
             var texture = curveTexs[curves[batchCurveCount - 1]];
             var effect = shaderContext != null ? shaderContext.Effect : null;
             if (effect != null)
