@@ -124,6 +124,7 @@
     <Compile Include="Input\Controllable.cs" />
     <Compile Include="Rendering\CurveBatch.cs" />
     <Compile Include="Global\VersionInfo.cs" />
+    <Compile Include="Rendering\MSDFAtlasNative.cs" />
     <Compile Include="Rendering\ParticleBatch.cs" />
     <Compile Include="PlayerImpl.cs" />
     <Compile Include="Rendering\ShaderContext.cs" />
@@ -174,6 +175,9 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="logo.ico" />
+    <None Include="msdf-atlas-gen-c.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <FxShader Include="shader.fx">
       <Mgfxo>$(ProjectDir)shader.mgfxo</Mgfxo>
     </FxShader>
