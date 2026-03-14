@@ -18,6 +18,7 @@ namespace CrazyStorm.Core
         public CurveType type;
         public int length;
         public int segment;
+        public bool snakeUpdate;
     }
     public class CurveParticle : ParticleBase
     {
@@ -33,7 +34,7 @@ namespace CrazyStorm.Core
             get { return  curveParticleData.type; }
             set { curveParticleData.type = value; }
         }
-        [IntProperty(131, 0, int.MaxValue)]
+        [IntProperty(131, 1, int.MaxValue)]
         public int Length
         {
             get { return curveParticleData.length; }
@@ -45,6 +46,12 @@ namespace CrazyStorm.Core
             get { return curveParticleData.segment; }
             set { curveParticleData.segment = value; }
         }
+        [BoolProperty(133)]
+        public bool SnakeUpdate
+        {
+            get { return curveParticleData.snakeUpdate; }
+            set { curveParticleData.snakeUpdate = value; }
+        }
         public Curve Curve { get; private set; }
         public CurveParticlePool PoolObject { get; set; }
         #endregion
@@ -55,6 +62,7 @@ namespace CrazyStorm.Core
             curveParticleData.type = CurveType.Curve;
             curveParticleData.length = 100;
             curveParticleData.segment = 64;
+            curveParticleData.snakeUpdate = false;
             bindingCurveParticleData = new Dictionary<long, CurveParticleData>();
         }
         #endregion
@@ -109,6 +117,9 @@ namespace CrazyStorm.Core
                 case 132:
                     VM.PushInt(Segment);
                     return true;
+                case 133:
+                    VM.PushBool(SnakeUpdate);
+                    return true;
             }
             return false;
         }
@@ -131,17 +142,22 @@ namespace CrazyStorm.Core
                             segment = Segment,
                             type = newCurveType,
                             head = head,
-                            length = Length
+                            length = Length,
+                            snakeUpdate = SnakeUpdate
                         };
                         Curve = Curve.Rent(initData);
                     }
                     CurveType = newCurveType;
                     return true;
                 case 131:
-                    Length = VM.PopInt();
+                    Length = Math.Max(1, VM.PopInt());
                     return true;
                 case 132:
                     Segment = VM.PopInt();
+                    return true;
+                case 133:
+                    SnakeUpdate = VM.PopBool();
+                    Curve?.SetSnakeUpdate(SnakeUpdate);
                     return true;
             }
             return false;
@@ -169,10 +185,12 @@ namespace CrazyStorm.Core
                     segment = Segment, 
                     type = CurveType, 
                     head = head,
-                    length = Length };
+                    length = Length,
+                    snakeUpdate = SnakeUpdate };
                 Curve = Curve.Rent(initData);
             }
             PRotation = PSpeedAngle;
+            Curve.SetSnakeUpdate(SnakeUpdate);
             Curve.Update(PPosition, head, Type.Width * WidthScale, Length);
             return true;
         }

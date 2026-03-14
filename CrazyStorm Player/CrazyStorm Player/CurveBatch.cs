@@ -82,19 +82,20 @@ namespace CrazyStorm_Player
             {
                 Flush();
             }
-            if (indexIndex + curve.Indices.Length > indices.Length || vertexIndex + curve.Vertices.Length > vertices.Length)
+            if (curve.ActiveIndexCount <= 0 || curve.ActiveVertexCount <= 0) return;
+            if (indexIndex + curve.ActiveIndexCount > indices.Length || vertexIndex + curve.ActiveVertexCount > vertices.Length)
             {
                 Flush();
             }
             var coordOffset = new Vector2(sourceRect.X, sourceRect.Y);
             var coordScale = new Vector2(sourceRect.Z, sourceRect.W);
             curves[batchCurveCount++] = curve;
-            for (int i = 0; i < curve.Indices.Length; ++i)
+            for (int i = 0; i < curve.ActiveIndexCount; ++i)
             {
                 indices[indexIndex + i] = (short)(vertexIndex + curve.Indices[i]);
             }
-            indexIndex += curve.Indices.Length;
-            for (int i = 0; i < curve.Vertices.Length; ++i)
+            indexIndex += curve.ActiveIndexCount;
+            for (int i = 0; i < curve.ActiveVertexCount; ++i)
             {
                 var vertex = curve.Vertices[i];
                 var pos = new Vector3(vertex.Pos.x, vertex.Pos.y, vertex.Pos.z);
@@ -108,7 +109,7 @@ namespace CrazyStorm_Player
                 vertices[vertexIndex + i].TextureCoordinate = texcoord * coordScale + coordOffset;
                 vertices[vertexIndex + i].Color = color;
             }
-            vertexIndex += curve.Vertices.Length;
+            vertexIndex += curve.ActiveVertexCount;
             if (indexIndex == indices.Length || vertexIndex == vertices.Length || curves.Length == batchCurveCount)
             {
                 Flush();
