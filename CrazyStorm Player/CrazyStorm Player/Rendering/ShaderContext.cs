@@ -31,6 +31,7 @@ namespace CrazyStorm_Player
         public Vector4 Distort;
         public Texture2D MaskTexture;
         public Texture2D DistortTexture;
+        public bool IsTextType;
         public ParticleBatchPass Pass;
         public bool RequiresShader;
     }
@@ -48,6 +49,7 @@ namespace CrazyStorm_Player
         readonly EffectParameter shaderCurveMaskFrameRect;
         readonly EffectParameter shaderCurveSourceRect;
         readonly EffectParameter shaderCurveMaskDissolve;
+        readonly EffectParameter shaderCurveTypeInfo;
         readonly EffectParameter shaderDistortTexture;
         readonly EffectParameter shaderCurveDistortFrameRect;
         readonly EffectParameter shaderCurveDistort;
@@ -88,6 +90,7 @@ namespace CrazyStorm_Player
             shaderCurveMaskFrameRect = shader.Parameters["CurveMaskFrameRect"];
             shaderCurveSourceRect = shader.Parameters["CurveSourceRect"];
             shaderCurveMaskDissolve = shader.Parameters["CurveMaskDissolve"];
+            shaderCurveTypeInfo = shader.Parameters["CurveTypeInfo"];
             shaderDistortTexture = shader.Parameters["DistortTexture"];
             shaderCurveDistortFrameRect = shader.Parameters["CurveDistortFrameRect"];
             shaderCurveDistort = shader.Parameters["CurveDistort"];
@@ -248,6 +251,7 @@ namespace CrazyStorm_Player
                 animateFrame * particle.DissolveVSpeed,
                 animateFrame * particle.DistortUSpeed,
                 animateFrame * particle.DistortVSpeed);
+            instance.TypeInfo = new Vector4(particle.Type != null && particle.Type.IsTextType ? 1f : 0f, 0f, 0f, 0f);
 
             return new ParticleRenderData
             {
@@ -274,11 +278,12 @@ namespace CrazyStorm_Player
                 SourceRect = BuildSourceRect(texture, rect),
                 MaskTexture = maskTexture,
                 DistortTexture = distortTexture,
-                Pass = ParticleBatchPass.Textured
+                Pass = ParticleBatchPass.Textured,
+                IsTextType = particle != null && particle.Type != null && particle.Type.IsTextType
             };
             if (particle == null || texture == null)
             {
-                renderData.RequiresShader = LayerHasMask;
+                renderData.RequiresShader = LayerHasMask || renderData.IsTextType;
                 return renderData;
             }
 
@@ -303,7 +308,7 @@ namespace CrazyStorm_Player
             }
 
             renderData.Pass = ResolveBatchPass(renderData.MaskFrameRect, renderData.DistortFrameRect, particle.DistortStrength);
-            renderData.RequiresShader = LayerHasMask || renderData.Pass != ParticleBatchPass.Textured;
+            renderData.RequiresShader = LayerHasMask || renderData.Pass != ParticleBatchPass.Textured || renderData.IsTextType;
             return renderData;
         }
 
@@ -330,6 +335,7 @@ namespace CrazyStorm_Player
             {
                 shaderCurveSourceRect?.SetValue(renderData.SourceRect);
             }
+            shaderCurveTypeInfo?.SetValue(new Vector4(renderData.IsTextType ? 1f : 0f, 0f, 0f, 0f));
         }
 
         public void ResetCurveShaderState()
@@ -337,6 +343,7 @@ namespace CrazyStorm_Player
             shaderCurveMaskFrameRect?.SetValue(Vector4.Zero);
             shaderCurveSourceRect?.SetValue(Vector4.Zero);
             shaderCurveMaskDissolve?.SetValue(Vector4.Zero);
+            shaderCurveTypeInfo?.SetValue(Vector4.Zero);
             shaderDistortTexture?.SetValue(whiteTexture);
             shaderCurveDistortFrameRect?.SetValue(Vector4.Zero);
             shaderCurveDistort?.SetValue(Vector4.Zero);

@@ -62,6 +62,7 @@ namespace CrazyStorm_Player
         public Vector4 DistortFrameRect;
         public Vector4 MaskAndDistort;
         public Vector4 AnimateOffsets;
+        public Vector4 TypeInfo;
 
         public static readonly VertexDeclaration VertexDeclaration = new VertexDeclaration(
             new VertexElement(0, VertexElementFormat.Vector4, VertexElementUsage.TextureCoordinate, 1),
@@ -72,7 +73,8 @@ namespace CrazyStorm_Player
             new VertexElement(80, VertexElementFormat.Vector4, VertexElementUsage.TextureCoordinate, 6),
             new VertexElement(96, VertexElementFormat.Vector4, VertexElementUsage.TextureCoordinate, 7),
             new VertexElement(112, VertexElementFormat.Vector4, VertexElementUsage.TextureCoordinate, 8),
-            new VertexElement(128, VertexElementFormat.Vector4, VertexElementUsage.TextureCoordinate, 9));
+            new VertexElement(128, VertexElementFormat.Vector4, VertexElementUsage.TextureCoordinate, 9),
+            new VertexElement(144, VertexElementFormat.Vector4, VertexElementUsage.TextureCoordinate, 10));
 
         VertexDeclaration IVertexType.VertexDeclaration => VertexDeclaration;
     }

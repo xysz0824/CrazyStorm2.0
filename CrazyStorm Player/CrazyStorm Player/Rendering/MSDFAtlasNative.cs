@@ -72,7 +72,9 @@ namespace CrazyStorm_Player
     [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
     internal struct MSDFOptionsNative
     {
+        [MarshalAs(UnmanagedType.LPUTF8Str)]
         public string font_path;
+        [MarshalAs(UnmanagedType.LPUTF8Str)]
         public string charset_utf8;
         public double em_size;
         public double px_range;
@@ -145,7 +147,7 @@ namespace CrazyStorm_Player
         public double MaxCornerAngle { get; set; } = 3.0;
         public int Width { get; set; }
         public int Height { get; set; }
-        public int ThreadCount { get; set; }
+        public int ThreadCount { get; set; } = 1;
         public bool PreprocessGeometry { get; set; } = true;
         public bool EnableKerning { get; set; } = true;
         public MSDFImageType ImageType { get; set; } = MSDFImageType.MSDF;

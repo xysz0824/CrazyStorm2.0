@@ -271,6 +271,8 @@
     <sys:Double x:Key="Center_Scale">0.9</sys:Double>
     <Geometry x:Key="Group_Icon">m 5.875,5.8125 v 23.375 h 23.5 V 5.8125 Z m 25,5.8125 V 30.8125 H 11.5 v 5.8125 h 25 v -25 z m 7.25,5.625 V 38.125 H 17.25 v 4.125 h 25 v -25 z</Geometry>
     <sys:Double x:Key="Group_Scale">0.8</sys:Double>
+    <Geometry x:Key="Text_Icon">M18.5,4L19.66,8.35L18.7,8.61C18.25,7.74 17.79,6.87 17.26,6.43C16.73,6 16.11,6 15.5,6H13V16.5C13,17 13,17.5 13.33,17.75C13.67,18 14.33,18 15,18V19H9V18C9.67,18 10.33,18 10.67,17.75C11,17.5 11,17 11,16.5V6H8.5C7.89,6 7.27,6 6.74,6.43C6.21,6.87 5.75,7.74 5.3,8.61L4.34,8.35L5.5,4H18.5Z</Geometry>
+    <sys:Double x:Key="Text_Scale">0.8</sys:Double>
     <Geometry x:Key="NewLayer_Icon">m8.3594 3.5723v25.75h12.656v15.105h18.625v-40.855h-31.281zm0 27.875v12.98h10.406v-12.98h-10.406z</Geometry>
     <Geometry x:Key="LayerUp_Icon">m24.188 7.6055-19.828 19.498h39.656l-19.828-19.498z</Geometry>
     <Geometry x:Key="LayerDown_Icon">m4.3594 20.801 19.828 19.498 19.828-19.498h-39.656z</Geometry>

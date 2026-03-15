@@ -30,7 +30,7 @@ namespace CrazyStorm.Core
                 var attributes = property.GetCustomAttributes(false);
                 foreach (var attribute in attributes)
                 {
-                    if (attribute is StringPropertyAttribute) return PropertyType.String;
+                    if (attribute is StringPropertyAttribute || attribute is FontPropertyAttribute) return PropertyType.String;
                     if (attribute is BoolPropertyAttribute) return PropertyType.Boolean;
                     if (attribute is IntPropertyAttribute) return PropertyType.Int32;
                     if (attribute is FloatPropertyAttribute) return PropertyType.Single;

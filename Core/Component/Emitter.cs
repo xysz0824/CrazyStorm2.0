@@ -168,6 +168,8 @@ namespace CrazyStorm.Core
                     var particle = newParticle as Particle;
                     if (particle.StickToSpeedAngle) particle.PRotation = particle.PSpeedAngle;
                 }
+                var textType = System.ResolveBindingTextType(this);
+                if (textType != null) newParticle.Type = textType;
                 newParticle.ParticleEventGroups = EmitterEventGroups;
                 Particles.Add(newParticle);
             }

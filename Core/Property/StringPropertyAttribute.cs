@@ -12,12 +12,19 @@ namespace CrazyStorm.Core
     public sealed class StringPropertyAttribute : PropertyAttribute
     {
         int minLength, maxLength;
+        bool allowWhitespace;
         bool supportNumber, supportAlpha, supportPunctuation, supportSymbol;
         public StringPropertyAttribute(int id, int minLength, int maxLength, 
+            bool supportNumber, bool supportAlpha, bool supportPunctuation, bool supportSymbol)
+            : this(id, minLength, maxLength, false, supportNumber, supportAlpha, supportPunctuation, supportSymbol)
+        {
+        }
+        public StringPropertyAttribute(int id, int minLength, int maxLength, bool allowWhitespace,
             bool supportNumber, bool supportAlpha, bool supportPunctuation, bool supportSymbol) : base(id)
         {
             this.minLength = minLength;
             this.maxLength = maxLength;
+            this.allowWhitespace = allowWhitespace;
             this.supportNumber = supportNumber;
             this.supportAlpha = supportAlpha;
             this.supportPunctuation = supportPunctuation;
@@ -28,7 +35,7 @@ namespace CrazyStorm.Core
             value = null;
             foreach (char item in newValue)
             {
-                if (char.IsWhiteSpace(item) || char.IsControl(item))
+                if ((!allowWhitespace && char.IsWhiteSpace(item)) || char.IsControl(item))
                     return false;
                 if (!supportNumber && char.IsControl(item))
                     return false;

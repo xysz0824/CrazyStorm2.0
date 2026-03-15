@@ -166,6 +166,7 @@ namespace CrazyStorm.Core
             RebounderPool.Reset(500);
             ForceFieldPool.Reset(500);
             CenterPool.Reset(500);
+            TextPool.Reset(50);
             ParticlePool.Reset(particleMaximum);
             CurveParticlePool.Reset(curveParticleMaximum);
             Curve.Reset(curveParticleMaximum);

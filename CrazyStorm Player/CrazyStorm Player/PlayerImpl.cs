@@ -44,6 +44,7 @@ namespace CrazyStorm_Player
         Vector2 backgroundScale;
         Vector2 backgroundPos;
         Texture2D defaultTexture;
+        Texture2D transparentTexture;
         Dictionary<File, Dictionary<int, Texture2D>> customTextures;
         Dictionary<ParticleSystem, Texture2D> distortTextures;
         Dictionary<ParticleSystem, Texture2D> maskTextures;
@@ -133,6 +134,8 @@ namespace CrazyStorm_Player
             }
             defaultTexture = Texture2D.FromStream(gd, defaultTextureStream);
             defaultTextureStream.Dispose();
+            transparentTexture = new Texture2D(gd, 1, 1);
+            transparentTexture.SetData(new[] { new Color(255, 255, 255, 0) });
             //Load main character texture
             if (!StringUtil.IsNullOrWhiteSpace(controllable.imagePath))
             {
@@ -194,6 +197,7 @@ namespace CrazyStorm_Player
                 var instance = file.ParticleSystems[SelectedParticleSystemIndex].Instantiate();
                 instance.Reset(true);
                 instances[instance] = file;
+                InitializeRuntimeTextResources(gd, file, instance);
                 distortTextures[instance] = ResolveDistortTexture(file, instance);
                 maskTextures[instance] = ResolveMaskTexture(file, instance);
             }
@@ -212,6 +216,7 @@ namespace CrazyStorm_Player
             spriteBatch?.Dispose();
             background?.Dispose();
             defaultTexture?.Dispose();
+            transparentTexture?.Dispose();
             foreach (var dict in customTextures.Values)
             {
                 foreach (var tex in dict.Values)
@@ -275,6 +280,47 @@ namespace CrazyStorm_Player
             }
             if (minCurrentFrame != float.MaxValue) CurrentFrame = minCurrentFrame;
         }
+        void InitializeRuntimeTextResources(GraphicsDevice gd, File file, ParticleSystem instance)
+        {
+            if (gd == null || file == null || instance == null) return;
+            foreach (var layer in instance.Layers)
+            {
+                foreach (var component in layer.Components)
+                {
+                    var text = component as CrazyStorm.Core.Text;
+                    if (text == null || text.BindingTarget == null || string.IsNullOrEmpty(text.TextValue))
+                    {
+                        continue;
+                    }
+
+                    try
+                    {
+                        var result = FontHelper.BuildRuntimeText(file, instance, text.Font, text.TextValue, text.CharsetPixelSize);
+                        if (result == null || result.AtlasResource == null || result.AtlasPngBytes == null || result.CharacterTypes == null)
+                        {
+                            text.ClearRuntimeResources();
+                            continue;
+                        }
+
+                        if (!customTextures.ContainsKey(file)) customTextures[file] = new Dictionary<int, Texture2D>();
+                        using (var stream = new MemoryStream(result.AtlasPngBytes, false))
+                        {
+                            customTextures[file][result.AtlasResource.ID] = Texture2D.FromStream(gd, stream);
+                        }
+                        foreach (var characterType in result.CharacterTypes)
+                        {
+                            instance.CustomTypes.Add(characterType);
+                        }
+                        text.ApplyRuntimeResources(result.CharacterTypes);
+                    }
+                    catch
+                    {
+                        text.ClearRuntimeResources();
+                    }
+                }
+            }
+            instance.RebuildBindingTexts();
+        }
         Texture2D ResolveMaskTexture(File file, ParticleSystem system)
         {
             if (file == null || system == null || system.MaskImage == null) return null;
@@ -305,6 +351,7 @@ namespace CrazyStorm_Player
         {
             var type = particle.Type;
             if (type == null) return null;
+            if (type.IsTransparentPlaceholder) return transparentTexture;
             var file = instances[particle.System];
             return type.ID >= ParticleType.DefaultTypeIndex ? defaultTexture : type.Image != null ? customTextures[file][type.Image.ID] : null;
         }

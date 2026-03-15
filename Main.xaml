@@ -768,6 +768,17 @@
                                                     </Path.RenderTransform>
                                                 </Path>
                                             </Button>
+                                            <Button Style="{StaticResource FlatComponentButton}" Name="Text" Width="32" Height="32" Click="ComponentButton_Click">
+                                                <Path Data="{StaticResource Text_Icon}"
+                                                  Fill="White" Width="28" Height="28" Stretch="Uniform" ToolTip="{StaticResource TextStr}">
+                                                    <Path.Effect>
+                                                        <DropShadowEffect Color="Black" Opacity="0.9" BlurRadius="5" Direction="315" ShadowDepth="0" />
+                                                    </Path.Effect>
+                                                    <Path.RenderTransform>
+                                                        <ScaleTransform CenterX="14" CenterY="14" ScaleX="{StaticResource Text_Scale}" ScaleY="{StaticResource Text_Scale}"/>
+                                                    </Path.RenderTransform>
+                                                </Path>
+                                            </Button>
                                         </StackPanel>
                                     </StackPanel>
                                 </GroupBox>

@@ -170,6 +170,7 @@
     <Compile Include="Edit\Command\Property\SetEmitterMaskTypeCommand.cs" />
     <Compile Include="Edit\Command\Property\SetEventFieldMaskTypeCommand.cs" />
     <Compile Include="Edit\Command\Property\SetParticleTypeCommand.cs" />
+    <Compile Include="Helper\FontRegistry.cs" />
     <Compile Include="Helper\ExpressionHelper.cs" />
     <Compile Include="Helper\UIHelper.cs" />
     <Compile Include="Main\FilePart.cs" />

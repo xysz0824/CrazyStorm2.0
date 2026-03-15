@@ -12,6 +12,7 @@ namespace CrazyStorm
     {
         Text,
         EnumCombo,
+        FontCombo,
         BoolCheckBox,
         ParticleTypeCombo,
         ParticleColorCombo,

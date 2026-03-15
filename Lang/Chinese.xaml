@@ -84,6 +84,7 @@
     <sys:String x:Key="RebounderStr">反弹板</sys:String>
     <sys:String x:Key="ForceFieldStr">力场</sys:String>
     <sys:String x:Key="CenterStr">中心</sys:String>
+    <sys:String x:Key="TextStr">文字</sys:String>
     <sys:String x:Key="ParticleEventGroupStr">粒子事件组</sys:String>
     <sys:String x:Key="EventFieldEventGroupStr">事件场事件组</sys:String>
     <sys:String x:Key="RebounderEventGroupStr">反弹板事件组</sys:String>
@@ -98,6 +99,9 @@
     <sys:String x:Key="AcspeedStr">加速度</sys:String>
     <sys:String x:Key="AcspeedAngleStr">加速度角</sys:String>
     <sys:String x:Key="VisibilityStr">可见</sys:String>
+    <sys:String x:Key="FontStr">字体</sys:String>
+    <sys:String x:Key="TextValueStr">文本</sys:String>
+    <sys:String x:Key="CharsetPixelSizeStr">字集像素尺寸</sys:String>
     <sys:String x:Key="EmitPositionStr">发射坐标</sys:String>
     <sys:String x:Key="EmitCountStr">发射条数</sys:String>
     <sys:String x:Key="EmitCycleStr">发射周期</sys:String>
@@ -337,6 +341,7 @@
     <sys:String x:Key="ComponentLifeTimeStr">作用帧：[{0} -> {1}]</sys:String>
     <sys:String x:Key="BindingTargetStr">绑定至</sys:String>
     <sys:String x:Key="BindingTargetTipStr">绑定至：{0}</sys:String>
+    <sys:String x:Key="TextBindingEmitterHintStr">需绑定到发射器才生效</sys:String>
     <sys:String x:Key="StatusStr">状态</sys:String>
     <sys:String x:Key="StatusFrameStr">状态帧</sys:String>
     <sys:String x:Key="StatusTipStr">状态：</sys:String>

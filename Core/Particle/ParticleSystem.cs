@@ -64,6 +64,7 @@ namespace CrazyStorm.Core
         Vector2 screenOffset;
         ShakeScreenEvent shakeScreenEvent;
         ScaleFrameEvent scaleFrameEvent;
+        Dictionary<long, Text> bindingTexts;
         #endregion
 
         #region Public Members
@@ -155,6 +156,7 @@ namespace CrazyStorm.Core
             layers = new GenericContainer<Layer>();
             notes = new GenericContainer<Note>();
             componentTree = new GenericContainer<Component>();
+            bindingTexts = new Dictionary<long, Text>();
         }
         public ParticleSystem(string name) : this()
         {
@@ -299,6 +301,7 @@ namespace CrazyStorm.Core
             foreach (var kv in componentIndex) clone.componentIndex[kv.Key] = kv.Value;
             clone.typeSoundMap = new Dictionary<int, int>();
             foreach (var kv in typeSoundMap) clone.typeSoundMap[kv.Key] = kv.Value;
+            clone.bindingTexts = new Dictionary<long, Text>();
             return clone;
         }
         public ParticleSystem Instantiate()
@@ -312,7 +315,9 @@ namespace CrazyStorm.Core
             instance.DistortImage = distortImage;
             instance.customMaskTypes = customMaskTypes;
             instance.MaskImage = maskImage;
-            instance.customTypes = customTypes;
+            instance.customTypes = new GenericContainer<ParticleType>();
+            foreach (var type in customTypes) instance.customTypes.Add(type);
+            instance.customTypeIndex = customTypeIndex;
             instance.layers.Clear();
             for (int i = 0; i < layers.Count; ++i)
             {
@@ -330,6 +335,7 @@ namespace CrazyStorm.Core
             instance.RebuildDistortTypeReferences();
             instance.RebuildMaskTypeReferences();
             instance.RebuildComponentTree();
+            instance.RebuildBindingTexts();
             instance.Sounds = Sounds;
             instance.typeSoundMap = typeSoundMap;
             instance.Status = 0;
@@ -524,6 +530,27 @@ namespace CrazyStorm.Core
                     }
                 }
             }
+        }
+        public void RebuildBindingTexts()
+        {
+            if (bindingTexts == null) bindingTexts = new Dictionary<long, Text>();
+            else bindingTexts.Clear();
+
+            foreach (var layer in Layers)
+            {
+                foreach (var component in layer.Components)
+                {
+                    var text = component as Text;
+                    if (text == null || text.BindingTarget == null) continue;
+                    bindingTexts[text.BindingTarget.ID] = text;
+                }
+            }
+        }
+        public ParticleType ResolveBindingTextType(Emitter emitter)
+        {
+            if (emitter == null || bindingTexts == null) return null;
+            Text text;
+            return bindingTexts.TryGetValue(emitter.ID, out text) ? text.GetNextParticleType() : null;
         }
         Vector2 GetCenterPositionRuntime()
         {

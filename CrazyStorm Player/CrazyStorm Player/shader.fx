@@ -26,6 +26,7 @@ uniform float2 ViewportSize;
 uniform float4 CurveMaskFrameRect;
 uniform float4 CurveSourceRect;
 uniform float4 CurveMaskDissolve;
+uniform float4 CurveTypeInfo;
 uniform float4 CurveDistortFrameRect;
 uniform float4 CurveDistort;
 
@@ -185,6 +186,7 @@ struct ParticleInstancedVSInput
     float4 InstanceDistortFrameRect : TEXCOORD7;
     float4 InstanceMaskAndDistort : TEXCOORD8;
     float4 InstanceAnimateOffsets : TEXCOORD9;
+    float4 InstanceTypeInfo : TEXCOORD10;
 };
 
 struct ParticleInstancedPSInput
@@ -197,6 +199,7 @@ struct ParticleInstancedPSInput
     float4 DistortFrameRect : TEXCOORD3;
     float4 MaskAndDistort : TEXCOORD4;
     float4 AnimateOffsets : TEXCOORD5;
+    float4 TypeInfo : TEXCOORD6;
 };
 
 struct CurveBatchVSInput
@@ -254,7 +257,20 @@ ParticleInstancedPSInput ParticleInstancedVS(ParticleInstancedVSInput input)
     output.DistortFrameRect = input.InstanceDistortFrameRect;
     output.MaskAndDistort = input.InstanceMaskAndDistort;
     output.AnimateOffsets = input.InstanceAnimateOffsets;
+    output.TypeInfo = input.InstanceTypeInfo;
     return output;
+}
+
+float Median3(float3 value)
+{
+    return max(min(value.r, value.g), min(max(value.r, value.g), value.b));
+}
+
+float ComputeTextAlpha(float4 sampleValue)
+{
+    float signedDistance = max(Median3(sampleValue.rgb), sampleValue.a) - 0.5;
+    float width = max(fwidth(signedDistance) * 0.8, 1e-5);
+    return saturate(signedDistance / width + 0.5);
 }
 
 float EvaluateLayerMaskAlpha(float2 position)
@@ -282,7 +298,12 @@ float4 ApplyCurveColor(CurveBatchPSInput input, bool useMask, bool useDistort) :
             CurveDistort.yz);
     }
 
-    float4 Color = SAMPLE_TEXTURE(Texture, texCoord) * input.Color;
+    float4 sampled = SAMPLE_TEXTURE(Texture, texCoord);
+    float4 Color = sampled * input.Color;
+    if (CurveTypeInfo.x > 0.5)
+    {
+        Color = float4(input.Color.rgb, input.Color.a * ComputeTextAlpha(sampled));
+    }
     float alpha = EvaluateLayerMaskAlpha(input.Position.xy);
     if (useMask)
     {
@@ -332,7 +353,12 @@ float4 ApplyParticleColor(ParticleInstancedPSInput input, bool useMask, bool use
             input.AnimateOffsets.zw);
     }
 
-    float4 Color = SAMPLE_TEXTURE(Texture, texCoord) * input.Color;
+    float4 sampled = SAMPLE_TEXTURE(Texture, texCoord);
+    float4 Color = sampled * input.Color;
+    if (input.TypeInfo.x > 0.5)
+    {
+        Color = float4(input.Color.rgb, input.Color.a * ComputeTextAlpha(sampled));
+    }
     float alpha = EvaluateLayerMaskAlpha(input.Position.xy);
     if (useMask)
     {

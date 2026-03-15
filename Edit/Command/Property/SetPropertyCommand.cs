@@ -61,7 +61,7 @@ namespace CrazyStorm
                     updateFunc();
                     return true;
                 }
-                if (attribute is StringPropertyAttribute) throw new ExpressionException("IllegalInput");
+                if (attribute is StringPropertyAttribute || attribute is FontPropertyAttribute) throw new ExpressionException("IllegalInput");
                 var lexer = new Lexer();
                 lexer.Load(newValue);
                 var syntaxTree = new Parser(lexer).Expression();

@@ -65,6 +65,9 @@
                             <DataTrigger Binding="{Binding EditorKind}" Value="{x:Static local:PropertyEditorKind.EnumCombo}">
                                 <Setter Property="ContentTemplate" Value="{StaticResource PropertyComboEditorTemplate}" />
                             </DataTrigger>
+                            <DataTrigger Binding="{Binding EditorKind}" Value="{x:Static local:PropertyEditorKind.FontCombo}">
+                                <Setter Property="ContentTemplate" Value="{StaticResource PropertyComboEditorTemplate}" />
+                            </DataTrigger>
                             <DataTrigger Binding="{Binding EditorKind}" Value="{x:Static local:PropertyEditorKind.BoolCheckBox}">
                                 <Setter Property="ContentTemplate" Value="{StaticResource PropertyBoolEditorTemplate}" />
                             </DataTrigger>
@@ -95,6 +98,9 @@
                         <Setter Property="ContentTemplate" Value="{StaticResource PropertyTextDisplayTemplate}" />
                         <Style.Triggers>
                             <DataTrigger Binding="{Binding EditorKind}" Value="{x:Static local:PropertyEditorKind.EnumCombo}">
+                                <Setter Property="ContentTemplate" Value="{StaticResource PropertyComboDisplayTemplate}" />
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding EditorKind}" Value="{x:Static local:PropertyEditorKind.FontCombo}">
                                 <Setter Property="ContentTemplate" Value="{StaticResource PropertyComboDisplayTemplate}" />
                             </DataTrigger>
                             <DataTrigger Binding="{Binding EditorKind}" Value="{x:Static local:PropertyEditorKind.BoolCheckBox}">
@@ -222,6 +228,8 @@
                 </DataGrid.Resources>
             </DataGrid>
         </GroupBox>
+        <TextBlock Name="TextBindingHint" Margin="8,4,8,8" Foreground="#FF8B8B8B" Visibility="Collapsed"
+                   Text="{StaticResource TextBindingEmitterHintStr}" TextWrapping="Wrap" />
         <GroupBox Padding="0,24,0,0" Style="{StaticResource FlatGroupBox}" Name="ParticlePropertyGroup" Header="{StaticResource ParticleStr}">
             <DataGrid Name="ParticleGrid" ItemsSource="{Binding}" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" PreviewMouseWheel="Grid_PreviewMouseWheel"
                       GridLinesVisibility="Horizontal" ColumnWidth="Auto" SelectionMode="Single" AutoGenerateColumns="False" CanUserAddRows="False"

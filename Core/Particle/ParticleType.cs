@@ -83,6 +83,8 @@ namespace CrazyStorm.Core
                     PropertyChanged(this, new PropertyChangedEventArgs("Image"));
             }
         }
+        public bool IsTextType { get; set; }
+        public bool IsTransparentPlaceholder { get; set; }
         public Vector2 StartPoint
         {
             get { return data.startPoint; }

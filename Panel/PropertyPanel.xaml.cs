@@ -172,6 +172,7 @@ namespace CrazyStorm
 
             LoadProperties(SpecificGrid, component, specificPropertyList, false);
             SpecificPropertyGroup.Visibility = specificPropertyList.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
+            TextBindingHint.Visibility = component is CrazyStorm.Core.Text ? Visibility.Visible : Visibility.Collapsed;
             if (component is Emitter)
             {
                 var particle = (component as Emitter).InitialTemplate;
@@ -339,12 +340,14 @@ namespace CrazyStorm
         }
         PropertyEditorKind GetEditorKind(PropertyAttribute attribute)
         {
+            if (attribute != null && attribute is FontPropertyAttribute) return PropertyEditorKind.FontCombo;
             if (attribute != null && attribute is EnumPropertyAttribute) return PropertyEditorKind.EnumCombo;
             if (attribute != null && attribute is BoolPropertyAttribute) return PropertyEditorKind.BoolCheckBox;
             return PropertyEditorKind.Text;
         }
         IList<string> BuildItemsSource(PropertyEditorKind editorKind, Type propertyType)
         {
+            if (editorKind == PropertyEditorKind.FontCombo) return FontRegistry.FontNames.ToList();
             if (editorKind != PropertyEditorKind.EnumCombo || propertyType == null || !propertyType.IsEnum) return null;
             return Enum.GetNames(propertyType).Select(ExpressionHelper.Translate).ToList();
         }
@@ -379,6 +382,11 @@ namespace CrazyStorm
             if (item.EditorKind == PropertyEditorKind.EnumCombo)
             {
                 item.DisplayValue = ExpressionHelper.Translate(internalValue);
+                return;
+            }
+            if (item.EditorKind == PropertyEditorKind.FontCombo)
+            {
+                item.DisplayValue = internalValue;
                 return;
             }
             item.DisplayValue = item.Info != null && item.Info.PropertyType != typeof(string) && !item.ReadOnly ?
