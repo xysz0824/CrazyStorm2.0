@@ -104,8 +104,7 @@ namespace CrazyStorm
                 {
                     config.TypeLibraryPath = string.Empty;
                 }
-                ParticleType.DefaultTypes.Clear();
-                ParticleType.LoadDefaultTypes(config.TypeLibraryPath);
+                ParticleType.LoadDefaultTypes(config.TypeLibraryPath, true);
                 if (OnButtonClick != null) OnButtonClick();
                 config.Save();
                 this.Close();

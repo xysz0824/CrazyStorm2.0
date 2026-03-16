@@ -361,9 +361,10 @@ namespace CrazyStorm.Core
         #endregion
 
         #region Public Methods
-        public static void LoadDefaultTypes(string libraryPath)
+        public static void LoadDefaultTypes(string libraryPath, bool clear = false)
         {
-            if (DefaultTypes.Count > 0) return;
+            if (clear) DefaultTypes.Clear();
+            else if (DefaultTypes.Count > 0) return;
             Stream libraryStream = null;
             if (string.IsNullOrEmpty(libraryPath))
             {

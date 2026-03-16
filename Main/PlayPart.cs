@@ -90,7 +90,6 @@ namespace CrazyStorm
                 player.PlayerImpl.SelectedParticleSystemIndex = particleSystemIndex;
                 player.PlayerImpl.ControllableImagePath = config.SelfImagePath;
                 player.PlayerImpl.ControllableSetting = config.SelfSetting;
-                player.PlayerImpl.Files = new List<File>();
                 var generatedFile = new File();
                 generatedFile.LoadPlayFile(file.GeneratePlayFile(), file.ResourceDirectory, CrazyStorm_Player.VersionInfo.BaseVersion);
                 player.PlayerImpl.Files.Add(generatedFile);

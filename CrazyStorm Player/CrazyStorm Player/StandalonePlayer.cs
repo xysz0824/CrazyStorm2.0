@@ -41,9 +41,6 @@ namespace CrazyStorm_Player
             playerImpl.ControllableImagePath = controllableImagePath;
             playerImpl.ControllableSetting = controllableSetting;
 
-            ParticleType.LoadDefaultTypes(typeLibraryPath);
-
-            playerImpl.Files = new List<File>();
             var split = paths.Split(',');
             foreach (var path in split)
             {

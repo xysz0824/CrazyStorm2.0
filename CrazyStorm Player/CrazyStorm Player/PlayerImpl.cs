@@ -61,7 +61,7 @@ namespace CrazyStorm_Player
 
         public string TypeLibraryPath { get; set; }
         public FrameOrientation FrameOrientation { get; set; }
-        public List<File> Files { get; set; }
+        public List<File> Files { get; private set; } = new List<File>();
         public int Width { get; set; }
         public int Height { get; set; }
         public float FrameRate { get; set; }
@@ -119,6 +119,8 @@ namespace CrazyStorm_Player
                     }
                 }
             }
+            //Load default types
+            ParticleType.LoadDefaultTypes(TypeLibraryPath);
             //Load default textures
             var assembly = Assembly.GetExecutingAssembly();
             Environment.CurrentDirectory = AppDomain.CurrentDomain.SetupInformation.ApplicationBase;
