@@ -16,6 +16,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using System.Windows.Threading;
+using CrazyStorm_Player;
 
 namespace CrazyStorm
 {
@@ -347,7 +348,7 @@ namespace CrazyStorm
         }
         IList<string> BuildItemsSource(PropertyEditorKind editorKind, Type propertyType)
         {
-            if (editorKind == PropertyEditorKind.FontCombo) return FontRegistry.FontNames.ToList();
+            if (editorKind == PropertyEditorKind.FontCombo) return FontHelper.FontNames.ToList();
             if (editorKind != PropertyEditorKind.EnumCombo || propertyType == null || !propertyType.IsEnum) return null;
             return Enum.GetNames(propertyType).Select(ExpressionHelper.Translate).ToList();
         }

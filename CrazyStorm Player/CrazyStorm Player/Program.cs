@@ -27,6 +27,7 @@ namespace CrazyStorm_Player
             if (args.Length == 0)
                 return;
 
+            FontHelper.EnsureInitialized();
             OutputArgs(args);
             using (var player = new StandalonePlayer())
             {

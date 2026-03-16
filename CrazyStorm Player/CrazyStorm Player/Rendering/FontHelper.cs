@@ -21,9 +21,43 @@ namespace CrazyStorm_Player
     public static class FontHelper
     {
         const int PlaceholderGlyphSize = 1;
-        static readonly object fontPathCacheSyncRoot = new object();
-        static readonly Dictionary<string, string> fontPathCache = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-        static readonly HashSet<string> missingFontNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        static readonly object syncRoot = new object();
+        static Dictionary<string, string> fontPathCache = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        static List<string> fontNames = new List<string>();
+        static bool initialized;
+
+        public static IReadOnlyList<string> FontNames
+        {
+            get
+            {
+                EnsureInitialized();
+                return fontNames;
+            }
+        }
+
+        public static void EnsureInitialized()
+        {
+            if (initialized) return;
+            lock (syncRoot)
+            {
+                if (initialized) return;
+                var map = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+                foreach (var path in EnumerateFontFiles())
+                {
+                    foreach (var fontName in LoadFontNames(path))
+                    {
+                        string existingPath;
+                        if (!map.TryGetValue(fontName, out existingPath) || CompareFontPath(path, existingPath) < 0)
+                        {
+                            map[fontName] = path;
+                        }
+                    }
+                }
+                fontPathCache = map;
+                fontNames = map.Keys.OrderBy(item => item, StringComparer.CurrentCultureIgnoreCase).ToList();
+                initialized = true;
+            }
+        }
 
         public static RuntimeTextBuildResult BuildRuntimeText(CrazyStorm.Core.File file, ParticleSystem particleSystem, string fontName, string text,
             int charsetPixelSize)
@@ -69,33 +103,8 @@ namespace CrazyStorm_Player
         {
             fontPath = null;
             if (StringUtil.IsNullOrWhiteSpace(fontName)) return false;
-
-            lock (fontPathCacheSyncRoot)
-            {
-                if (fontPathCache.TryGetValue(fontName, out fontPath)) return true;
-                if (missingFontNames.Contains(fontName)) return false;
-            }
-
-            foreach (var path in EnumerateFontFiles())
-            {
-                if (!LoadFontNames(path).Contains(fontName, StringComparer.OrdinalIgnoreCase)) continue;
-                if (fontPath == null || CompareFontPath(path, fontPath) < 0) fontPath = path;
-            }
-
-            if (fontPath != null)
-            {
-                lock (fontPathCacheSyncRoot)
-                {
-                    fontPathCache[fontName] = fontPath;
-                }
-                return true;
-            }
-
-            lock (fontPathCacheSyncRoot)
-            {
-                missingFontNames.Add(fontName);
-            }
-            return false;
+            EnsureInitialized();
+            return fontPathCache.TryGetValue(fontName, out fontPath);
         }
 
         static string BuildCharset(string text)

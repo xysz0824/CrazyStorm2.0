@@ -5,6 +5,7 @@ using System.Data;
 using System.Linq;
 using System.Windows;
 using CrazyStorm.Core;
+using CrazyStorm_Player;
 
 namespace CrazyStorm
 {
@@ -14,8 +15,8 @@ namespace CrazyStorm
         {
             base.OnStartup(e);
             ExpressionHelper.InitializeTranslationCache();
-            FontPropertyAttribute.FontValidator = fontName => FontRegistry.TryGetFontPath(fontName, out _);
-            FontRegistry.EnsureInitialized();
+            FontPropertyAttribute.FontValidator = fontName => FontHelper.TryResolveSystemFontPath(fontName, out _);
+            FontHelper.EnsureInitialized();
 
             var startupWindow = new StartupWindow();
             MainWindow = startupWindow;
