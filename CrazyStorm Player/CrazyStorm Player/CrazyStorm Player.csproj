@@ -124,6 +124,7 @@
     <Compile Include="Input\Controllable.cs" />
     <Compile Include="Rendering\CurveBatch.cs" />
     <Compile Include="Rendering\FontHelper.cs" />
+    <Compile Include="Rendering\FontTextManager.cs" />
     <Compile Include="Global\VersionInfo.cs" />
     <Compile Include="Rendering\MSDFAtlasNative.cs" />
     <Compile Include="Rendering\ParticleBatch.cs" />

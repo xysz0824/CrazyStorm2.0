@@ -11,11 +11,79 @@ using System.Linq;
 
 namespace CrazyStorm_Player
 {
-    public sealed class RuntimeTextBuildResult
+    public sealed class TextAtlasKey : IEquatable<TextAtlasKey>
     {
-        public FileResource AtlasResource { get; set; }
+        public TextAtlasKey(string fontName, int charsetPixelSize)
+        {
+            FontName = fontName ?? string.Empty;
+            CharsetPixelSize = charsetPixelSize;
+        }
+
+        public string FontName { get; }
+        public int CharsetPixelSize { get; }
+
+        public bool Equals(TextAtlasKey other)
+        {
+            if (ReferenceEquals(this, other)) return true;
+            if (ReferenceEquals(other, null)) return false;
+            return CharsetPixelSize == other.CharsetPixelSize &&
+                string.Equals(FontName, other.FontName, StringComparison.OrdinalIgnoreCase);
+        }
+
+        public override bool Equals(object obj)
+        {
+            return Equals(obj as TextAtlasKey);
+        }
+
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                return (StringComparer.OrdinalIgnoreCase.GetHashCode(FontName) * 397) ^ CharsetPixelSize;
+            }
+        }
+    }
+
+    public sealed class TextCharacterKey : IEquatable<TextCharacterKey>
+    {
+        public TextCharacterKey(TextAtlasKey atlasKey, char character)
+        {
+            AtlasKey = atlasKey;
+            Character = character;
+        }
+
+        public TextAtlasKey AtlasKey { get; }
+        public char Character { get; }
+
+        public bool Equals(TextCharacterKey other)
+        {
+            if (ReferenceEquals(this, other)) return true;
+            if (ReferenceEquals(other, null)) return false;
+            return Character == other.Character && Equals(AtlasKey, other.AtlasKey);
+        }
+
+        public override bool Equals(object obj)
+        {
+            return Equals(obj as TextCharacterKey);
+        }
+
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                return ((AtlasKey?.GetHashCode() ?? 0) * 397) ^ Character.GetHashCode();
+            }
+        }
+    }
+
+    public sealed class TextBuildResult
+    {
+        public TextAtlasKey AtlasKey { get; set; }
+        public int AtlasVersion { get; set; }
+        public bool AtlasUpdated { get; set; }
         public byte[] AtlasPngBytes { get; set; }
-        public List<ParticleType> CharacterTypes { get; set; }
+        public IReadOnlyDictionary<uint, MSDFGlyph> GlyphMap { get; set; }
+        public List<char> Characters { get; set; }
     }
 
     public static class FontHelper
@@ -23,8 +91,20 @@ namespace CrazyStorm_Player
         const int PlaceholderGlyphSize = 1;
         static readonly object syncRoot = new object();
         static Dictionary<string, string> fontPathCache = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        static Dictionary<TextAtlasKey, TextAtlasCacheEntry> TextAtlasCache =
+            new Dictionary<TextAtlasKey, TextAtlasCacheEntry>();
         static List<string> fontNames = new List<string>();
         static bool initialized;
+
+        sealed class TextAtlasCacheEntry
+        {
+            public TextAtlasKey AtlasKey { get; set; }
+            public string Charset { get; set; }
+            public HashSet<char> CharsetSet { get; set; }
+            public byte[] AtlasPngBytes { get; set; }
+            public Dictionary<uint, MSDFGlyph> GlyphMap { get; set; }
+            public int Version { get; set; }
+        }
 
         public static IReadOnlyList<string> FontNames
         {
@@ -59,44 +139,51 @@ namespace CrazyStorm_Player
             }
         }
 
-        public static RuntimeTextBuildResult BuildRuntimeText(CrazyStorm.Core.File file, ParticleSystem particleSystem, string fontName, string text,
-            int charsetPixelSize)
+        public static TextBuildResult EnsureTextAtlas(string fontName, string text, int charsetPixelSize)
         {
-            if (file == null || particleSystem == null || StringUtil.IsNullOrWhiteSpace(fontName) || string.IsNullOrEmpty(text))
-            {
-                return null;
-            }
+            if (StringUtil.IsNullOrWhiteSpace(fontName) || string.IsNullOrEmpty(text)) return null;
 
             string fontPath;
             if (!TryResolveSystemFontPath(fontName, out fontPath)) return null;
 
-            var charset = BuildCharset(text);
+            var requestedCharacters = text.ToList();
+            var charset = BuildCharset(requestedCharacters);
             if (string.IsNullOrEmpty(charset)) return null;
 
-            var options = new MSDFAtlasOptions
+            var atlasKey = new TextAtlasKey(fontName, charsetPixelSize);
+            lock (syncRoot)
             {
-                FontPath = fontPath,
-                Charset = charset,
-                EmSize = charsetPixelSize,
-                ImageType = MSDFImageType.Mtsdf,
-                YOrigin = MSDFYOrigin.Top
-            };
-            var atlasResult = MSDFAtlasNative.Generate(options);
-            var atlasPngBytes = MSDFAtlasNative.GeneratePng(options);
-            var atlasResource = new FileResource(file, file.FileResourceIndex, $"{fontName}_{particleSystem.Name}_TextAtlas", "__runtime_text_atlas__");
-            var glyphMap = BuildGlyphMap(atlasResult);
-            var characterTypes = new List<ParticleType>(text.Length);
-            foreach (char character in text)
-            {
-                characterTypes.Add(BuildCharacterType(particleSystem, atlasResource, character, glyphMap));
-            }
+                TextAtlasCacheEntry cacheEntry;
+                bool atlasUpdated = false;
+                if (!TextAtlasCache.TryGetValue(atlasKey, out cacheEntry))
+                {
+                    cacheEntry = BuildTextAtlasEntry(atlasKey, fontPath, charset, null);
+                    if (cacheEntry == null) return null;
+                    TextAtlasCache[atlasKey] = cacheEntry;
+                    atlasUpdated = true;
+                }
+                else if (!ContainsAllCharacters(cacheEntry.CharsetSet, requestedCharacters))
+                {
+                    var mergedCharset = MergeCharset(cacheEntry.Charset, requestedCharacters);
+                    var updatedEntry = BuildTextAtlasEntry(atlasKey, fontPath, mergedCharset, cacheEntry);
+                    if (updatedEntry != null)
+                    {
+                        cacheEntry = updatedEntry;
+                        TextAtlasCache[atlasKey] = cacheEntry;
+                        atlasUpdated = true;
+                    }
+                }
 
-            return new RuntimeTextBuildResult
-            {
-                AtlasResource = atlasResource,
-                AtlasPngBytes = atlasPngBytes,
-                CharacterTypes = characterTypes
-            };
+                return new TextBuildResult
+                {
+                    AtlasKey = cacheEntry.AtlasKey,
+                    AtlasVersion = cacheEntry.Version,
+                    AtlasUpdated = atlasUpdated,
+                    AtlasPngBytes = cacheEntry.AtlasPngBytes,
+                    GlyphMap = cacheEntry.GlyphMap,
+                    Characters = requestedCharacters
+                };
+            }
         }
 
         public static bool TryResolveSystemFontPath(string fontName, out string fontPath)
@@ -107,15 +194,105 @@ namespace CrazyStorm_Player
             return fontPathCache.TryGetValue(fontName, out fontPath);
         }
 
-        static string BuildCharset(string text)
+        public static void UpdateCharacterType(ParticleType particleType, FileResource atlasResource, char character,
+            IReadOnlyDictionary<uint, MSDFGlyph> glyphMap)
+        {
+            if (particleType == null) return;
+
+            particleType.Name = character.ToString();
+            particleType.Image = atlasResource;
+            particleType.IsTextType = true;
+
+            MSDFGlyph glyph;
+            if (glyphMap == null || !glyphMap.TryGetValue(character, out glyph) ||
+                glyph.AtlasBounds.Right <= glyph.AtlasBounds.Left ||
+                glyph.AtlasBounds.Bottom <= glyph.AtlasBounds.Top)
+            {
+                particleType.IsTransparentPlaceholder = true;
+                particleType.StartPoint = Vector2.Zero;
+                particleType.Width = PlaceholderGlyphSize;
+                particleType.Height = PlaceholderGlyphSize;
+                particleType.CenterPoint = new Vector2(0.5f, 0.5f);
+                particleType.Radius = 0;
+                return;
+            }
+
+            particleType.IsTransparentPlaceholder = false;
+            int width = Math.Max(1, (int)Math.Ceiling(glyph.AtlasBounds.Right - glyph.AtlasBounds.Left));
+            int height = Math.Max(1, (int)Math.Ceiling(glyph.AtlasBounds.Bottom - glyph.AtlasBounds.Top));
+            particleType.StartPoint = new Vector2((float)Math.Floor(glyph.AtlasBounds.Left), (float)Math.Floor(glyph.AtlasBounds.Top));
+            particleType.Width = width;
+            particleType.Height = height;
+            particleType.CenterPoint = new Vector2(width / 2f, height / 2f);
+            particleType.Radius = Math.Max(width, height) / 2;
+        }
+
+        static string BuildCharset(IEnumerable<char> characters)
         {
             var seen = new HashSet<char>();
             var chars = new List<char>();
-            foreach (char item in text)
+            foreach (char item in characters)
             {
                 if (seen.Add(item)) chars.Add(item);
             }
             return new string(chars.ToArray());
+        }
+
+        static bool ContainsAllCharacters(HashSet<char> existingCharacters, IEnumerable<char> requestedCharacters)
+        {
+            foreach (char character in requestedCharacters)
+            {
+                if (!existingCharacters.Contains(character)) return false;
+            }
+            return true;
+        }
+
+        static string MergeCharset(string existingCharset, IEnumerable<char> requestedCharacters)
+        {
+            var mergedCharacters = new List<char>(existingCharset?.Length ?? 0);
+            var seen = new HashSet<char>();
+            if (!string.IsNullOrEmpty(existingCharset))
+            {
+                foreach (char character in existingCharset)
+                {
+                    if (seen.Add(character)) mergedCharacters.Add(character);
+                }
+            }
+            foreach (char character in requestedCharacters)
+            {
+                if (seen.Add(character)) mergedCharacters.Add(character);
+            }
+            return new string(mergedCharacters.ToArray());
+        }
+
+        static TextAtlasCacheEntry BuildTextAtlasEntry(TextAtlasKey atlasKey, string fontPath, string charset,
+            TextAtlasCacheEntry previousEntry)
+        {
+            try
+            {
+                var options = new MSDFAtlasOptions
+                {
+                    FontPath = fontPath,
+                    Charset = charset,
+                    EmSize = atlasKey.CharsetPixelSize,
+                    ImageType = MSDFImageType.Mtsdf,
+                    YOrigin = MSDFYOrigin.Top
+                };
+                var atlasResult = MSDFAtlasNative.Generate(options);
+                return new TextAtlasCacheEntry
+                {
+                    AtlasKey = atlasKey,
+                    Charset = charset,
+                    CharsetSet = new HashSet<char>(charset),
+                    AtlasPngBytes = atlasResult.Pixels,
+                    GlyphMap = BuildGlyphMap(atlasResult.Glyphs),
+                    Version = previousEntry != null ? previousEntry.Version + 1 : 1
+                };
+            }
+            catch
+            {
+                return null;
+            }
         }
 
         static IEnumerable<string> EnumerateFontFiles()
@@ -177,46 +354,16 @@ namespace CrazyStorm_Player
             return 2;
         }
 
-        static Dictionary<uint, MSDFGlyph> BuildGlyphMap(MSDFAtlasResult result)
+        static Dictionary<uint, MSDFGlyph> BuildGlyphMap(MSDFGlyph[] glyphs)
         {
             var glyphMap = new Dictionary<uint, MSDFGlyph>();
-            if (result?.Glyphs == null) return glyphMap;
-            foreach (var glyph in result.Glyphs)
+            if (glyphs == null) return glyphMap;
+            foreach (var glyph in glyphs)
             {
                 glyphMap[glyph.Unicode] = glyph;
             }
             return glyphMap;
         }
 
-        static ParticleType BuildCharacterType(ParticleSystem particleSystem, FileResource atlasResource, char character,
-            IDictionary<uint, MSDFGlyph> glyphMap)
-        {
-            var particleType = new ParticleType(particleSystem.CustomTypeIndex, character.ToString());
-            particleType.Image = atlasResource;
-            particleType.IsTextType = true;
-
-            MSDFGlyph glyph;
-            if (!glyphMap.TryGetValue(character, out glyph) ||
-                glyph.AtlasBounds.Right <= glyph.AtlasBounds.Left ||
-                glyph.AtlasBounds.Bottom <= glyph.AtlasBounds.Top)
-            {
-                particleType.IsTransparentPlaceholder = true;
-                particleType.StartPoint = Vector2.Zero;
-                particleType.Width = PlaceholderGlyphSize;
-                particleType.Height = PlaceholderGlyphSize;
-                particleType.CenterPoint = new Vector2(0.5f, 0.5f);
-                particleType.Radius = 0;
-                return particleType;
-            }
-
-            int width = Math.Max(1, (int)Math.Ceiling(glyph.AtlasBounds.Right - glyph.AtlasBounds.Left));
-            int height = Math.Max(1, (int)Math.Ceiling(glyph.AtlasBounds.Bottom - glyph.AtlasBounds.Top));
-            particleType.StartPoint = new Vector2((float)Math.Floor(glyph.AtlasBounds.Left), (float)Math.Floor(glyph.AtlasBounds.Top));
-            particleType.Width = width;
-            particleType.Height = height;
-            particleType.CenterPoint = new Vector2(width / 2f, height / 2f);
-            particleType.Radius = Math.Max(width, height) / 2;
-            return particleType;
-        }
     }
 }

@@ -156,16 +156,8 @@ namespace CrazyStorm_Player
 
     public sealed class MSDFAtlasResult
     {
-        public int Width { get; set; }
-        public int Height { get; set; }
-        public int Channels { get; set; }
         public byte[] Pixels { get; set; } = Array.Empty<byte>();
         public MSDFGlyph[] Glyphs { get; set; } = Array.Empty<MSDFGlyph>();
-        public MSDFFontMetrics Metrics { get; set; }
-        public double AtlasEmSize { get; set; }
-        public double DistanceRange { get; set; }
-        public MSDFImageType ImageType { get; set; }
-        public MSDFYOrigin YOrigin { get; set; }
     }
 
     public static class MSDFAtlasNative
@@ -216,12 +208,23 @@ namespace CrazyStorm_Player
             if (status != MSDFStatus.Success)
                 throw new InvalidOperationException(GetLastError(status));
 
+            IntPtr pngPtr = default;
             try
             {
-                var nativeResult = Marshal.PtrToStructure<MSDFResultNative>(resultPtr);
-                var pixels = new byte[checked((int)nativeResult.pixel_count)];
-                Marshal.Copy(nativeResult.pixels, pixels, 0, pixels.Length);
+                status = msdf_atlas_c_encode_png(resultPtr, out pngPtr, out var pngSize);
+                if (status != MSDFStatus.Success)
+                    throw new InvalidOperationException(GetLastError(status));
 
+                var nativeResult = Marshal.PtrToStructure<MSDFResultNative>(resultPtr);
+                var pixels = new byte[checked((int)pngSize)];
+                try
+                {
+                    Marshal.Copy(pngPtr, pixels, 0, pixels.Length);
+                }
+                finally
+                {
+                    msdf_atlas_c_free(pngPtr);
+                }
                 var glyphs = new MSDFGlyph[nativeResult.glyph_count];
                 var glyphSize = Marshal.SizeOf<MSDFGlyphNative>();
                 for (var i = 0; i < glyphs.Length; i++)
@@ -252,74 +255,9 @@ namespace CrazyStorm_Player
 
                 return new MSDFAtlasResult
                 {
-                    Width = nativeResult.width,
-                    Height = nativeResult.height,
-                    Channels = nativeResult.channels,
                     Pixels = pixels,
                     Glyphs = glyphs,
-                    Metrics = new MSDFFontMetrics
-                    {
-                        EmSize = nativeResult.metrics.em_size,
-                        LineHeight = nativeResult.metrics.line_height,
-                        Ascender = nativeResult.metrics.ascender,
-                        Descender = nativeResult.metrics.descender,
-                        UnderlineY = nativeResult.metrics.underline_y,
-                        UnderlineThickness = nativeResult.metrics.underline_thickness
-                    },
-                    AtlasEmSize = nativeResult.atlas_em_size,
-                    DistanceRange = nativeResult.distance_range,
-                    ImageType = nativeResult.image_type,
-                    YOrigin = nativeResult.y_origin
                 };
-            }
-            finally
-            {
-                msdf_atlas_c_result_destroy(resultPtr);
-            }
-        }
-
-        public static byte[] GeneratePng(MSDFAtlasOptions options)
-        {
-            if (options == null)
-                throw new ArgumentNullException(nameof(options));
-            if (string.IsNullOrWhiteSpace(options.FontPath))
-                throw new ArgumentException("FontPath is required.", nameof(options));
-
-            msdf_atlas_c_default_options(out var nativeOptions);
-            nativeOptions.font_path = options.FontPath;
-            nativeOptions.charset_utf8 = string.IsNullOrEmpty(options.Charset) ? null : options.Charset;
-            nativeOptions.em_size = options.EmSize;
-            nativeOptions.px_range = options.PxRange;
-            nativeOptions.miter_limit = options.MiterLimit;
-            nativeOptions.max_corner_angle = options.MaxCornerAngle;
-            nativeOptions.width = options.Width;
-            nativeOptions.height = options.Height;
-            nativeOptions.thread_count = options.ThreadCount;
-            nativeOptions.preprocess_geometry = options.PreprocessGeometry ? 1 : 0;
-            nativeOptions.enable_kerning = options.EnableKerning ? 1 : 0;
-            nativeOptions.image_type = options.ImageType;
-            nativeOptions.y_origin = options.YOrigin;
-
-            var status = msdf_atlas_c_generate(ref nativeOptions, out var resultPtr);
-            if (status != MSDFStatus.Success)
-                throw new InvalidOperationException(GetLastError(status));
-
-            try
-            {
-                status = msdf_atlas_c_encode_png(resultPtr, out var pngPtr, out var pngSize);
-                if (status != MSDFStatus.Success)
-                    throw new InvalidOperationException(GetLastError(status));
-
-                try
-                {
-                    var png = new byte[checked((int)pngSize)];
-                    Marshal.Copy(pngPtr, png, 0, png.Length);
-                    return png;
-                }
-                finally
-                {
-                    msdf_atlas_c_free(pngPtr);
-                }
             }
             finally
             {

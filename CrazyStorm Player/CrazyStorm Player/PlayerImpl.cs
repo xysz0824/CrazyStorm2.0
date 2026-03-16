@@ -227,6 +227,7 @@ namespace CrazyStorm_Player
                 }
             }
             customTextures.Clear();
+            FontTextManager.Clear();
             distortTextures?.Clear();
             maskTextures?.Clear();
             if (soundInstances != null)
@@ -284,7 +285,6 @@ namespace CrazyStorm_Player
         }
         void InitializeRuntimeTextResources(GraphicsDevice gd, File file, ParticleSystem instance)
         {
-            if (gd == null || file == null || instance == null) return;
             foreach (var layer in instance.Layers)
             {
                 foreach (var component in layer.Components)
@@ -293,35 +293,23 @@ namespace CrazyStorm_Player
                     if (text == null || text.BindingTarget == null || string.IsNullOrEmpty(text.TextValue))
                     {
                         continue;
-                    }
-
-                    try
+                    } 
+                    FontTextManager.UpdateTextResources(file, instance, text, instances, (id, pngBytes) =>
                     {
-                        var result = FontHelper.BuildRuntimeText(file, instance, text.Font, text.TextValue, text.CharsetPixelSize);
-                        if (result == null || result.AtlasResource == null || result.AtlasPngBytes == null || result.CharacterTypes == null)
+                        Texture2D newTexture = null;
+                        using (var stream = new MemoryStream(pngBytes, false))
                         {
-                            text.ClearRuntimeResources();
-                            continue;
+                            newTexture = Texture2D.FromStream(gd, stream);
                         }
 
                         if (!customTextures.ContainsKey(file)) customTextures[file] = new Dictionary<int, Texture2D>();
-                        using (var stream = new MemoryStream(result.AtlasPngBytes, false))
-                        {
-                            customTextures[file][result.AtlasResource.ID] = Texture2D.FromStream(gd, stream);
-                        }
-                        foreach (var characterType in result.CharacterTypes)
-                        {
-                            instance.CustomTypes.Add(characterType);
-                        }
-                        text.ApplyRuntimeResources(result.CharacterTypes);
-                    }
-                    catch
-                    {
-                        text.ClearRuntimeResources();
-                    }
+                        Texture2D oldTexture;
+                        customTextures[file].TryGetValue(id, out oldTexture);
+                        customTextures[file][id] = newTexture;
+                        oldTexture?.Dispose();
+                    });
                 }
             }
-            instance.RebuildBindingTexts();
         }
         Texture2D ResolveMaskTexture(File file, ParticleSystem system)
         {
