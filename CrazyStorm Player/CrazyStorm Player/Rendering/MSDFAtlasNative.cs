@@ -142,7 +142,7 @@ namespace CrazyStorm_Player
         public string FontPath { get; set; } = "";
         public string Charset { get; set; } = "";
         public double EmSize { get; set; } = 32.0;
-        public double PxRange { get; set; } = 2.0;
+        public double PxRange { get; set; } = 4.0;
         public double MiterLimit { get; set; } = 1.0;
         public double MaxCornerAngle { get; set; } = 3.0;
         public int Width { get; set; }

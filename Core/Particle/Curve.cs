@@ -22,6 +22,13 @@ namespace CrazyStorm.Core
         Ray,
         Curve
     }
+    public enum CurveSampleDegree
+    {
+        Zero,
+        Quarter,
+        Half,
+        ThreeQuarters,
+    }
     public struct CurveInitData
     {
         public Vector2 pos;
@@ -29,6 +36,7 @@ namespace CrazyStorm.Core
         public int length;
         public int segment;
         public CurveType type;
+        public CurveSampleDegree sampleDegree;
         public bool snakeUpdate;
     }
     public class Curve : PoolObject<Curve, CurveInitData>
@@ -36,12 +44,17 @@ namespace CrazyStorm.Core
         const float POSITION_EPSILON = 0.0001f;
         const float POSITION_EPSILON_SQUARED = POSITION_EPSILON * POSITION_EPSILON;
 
-        delegate bool SegmentHandler(Vector2 tailPoint, Vector2 headPoint, float tailWidth, float headWidth, float scale);
+        delegate bool SegmentHandler(Vector2 tailPoint, Vector2 headPoint, float tailWidth, float headWidth, 
+            float tailRot, float headRot, float scale);
+        public delegate bool SegmentJudgeHandler(Vector2 tailPoint, Vector2 headPoint, float tailWidth, float headWidth,
+            float scale, Vector2 bp, Vector2 p, float pdr, float deg);
 
         CurveType type;
+        CurveSampleDegree sampleDegree;
         bool snakeUpdate;
         Vector2[] points;
         float[] widths;
+        float[] rots;
         int current;
         float actualLength;
         short[] indices;
@@ -51,6 +64,7 @@ namespace CrazyStorm.Core
         int activeVertexCount;
 
         public CurveType Type => type;
+        public CurveSampleDegree SampleDegree { get => sampleDegree; set => sampleDegree = value; }
         public Vector2[] Points => points;
         public short[] Indices => indices;
         public CurveVertex[] Vertices => vertices;
@@ -60,9 +74,11 @@ namespace CrazyStorm.Core
         public override void Initialize(CurveInitData init)
         {
             type = init.type;
+            sampleDegree = init.sampleDegree;
             snakeUpdate = init.snakeUpdate && type == CurveType.Curve;
             points = new Vector2[init.segment + 1];
             widths = new float[init.segment + 1];
+            rots = new float[init.segment + 1];
             indices = new short[init.segment * 6];
             vertices = new CurveVertex[init.segment * 2 + 2];
             current = 0;
@@ -80,7 +96,6 @@ namespace CrazyStorm.Core
                 for (int i = 0; i < points.Length; ++i)
                 {
                     points[i] = init.pos;
-                    widths[i] = 0;
                 }
                 activePointCount = snakeUpdate ? 1 : points.Length;
             }
@@ -90,18 +105,17 @@ namespace CrazyStorm.Core
         {
             if (activePointCount <= 0) return Vector2.Zero;
             Vector2 result = points[current];
-            IterateSegments((tailPoint, headPoint, tailWidth, headWidth, scale) =>
+            IterateSegment((tailPoint, headPoint, tailWidth, headWidth, tailRot, headRot, scale) =>
             {
                 result = tailPoint;
                 return false;
             }, actualLength);
             return result;
         }
-        public bool IterateSegment(Func<Vector2, Vector2, float, float, float, Vector2, Vector2, float, float, bool> func,
-            Vector2 bp, Vector2 p, float pdr, float deg, float length)
+        public bool SegmentJudge(SegmentJudgeHandler func, Vector2 bp, Vector2 p, float pdr, float deg, float length)
         {
             if (func == null) return false;
-            return IterateSegments((tailPoint, headPoint, tailWidth, headWidth, scale) =>
+            return IterateSegment((tailPoint, headPoint, tailWidth, headWidth, tailRot, headRot, scale) =>
             {
                 return func(tailPoint, headPoint, scale, tailWidth, headWidth, bp, p, pdr, deg);
             }, length);
@@ -110,13 +124,13 @@ namespace CrazyStorm.Core
         {
             snakeUpdate = enabled && type == CurveType.Curve;
         }
-        public void Update(Vector2 pos, Vector2 head, float width, float length)
+        public void Update(Vector2 pos, Vector2 head, float width, float rot, float length)
         {
             if (type == CurveType.Curve)
             {
                 if (!snakeUpdate || activePointCount <= 0 || (pos - points[current]).LengthSquared() > POSITION_EPSILON_SQUARED)
                 {
-                    AppendCurvePoint(pos, width);
+                    AppendCurvePoint(pos, width, rot);
                 }
             }
             else
@@ -133,12 +147,13 @@ namespace CrazyStorm.Core
             if (index < 0) index += points.Length;
             return index;
         }
-        void AppendCurvePoint(Vector2 pos, float width)
+        void AppendCurvePoint(Vector2 pos, float width, float rot)
         {
             if (activePointCount <= 0)
             {
                 points[0] = pos;
                 widths[0] = width;
+                rots[0] = rot;
                 current = 0;
                 activePointCount = 1;
                 actualLength = 0;
@@ -162,6 +177,7 @@ namespace CrazyStorm.Core
             points[newIndex] = pos;
             current = newIndex;
             widths[current] = width;
+            rots[current] = rot;
             actualLength += (points[current] - previous).Length();
         }
         void RebuildStraightPoints(Vector2 pos, Vector2 head, float length, float width)
@@ -177,7 +193,7 @@ namespace CrazyStorm.Core
                 widths[i] = width;
             }
         }
-        bool IterateSegments(SegmentHandler func, float length)
+        bool IterateSegment(SegmentHandler func, float length)
         {
             if (func == null || activePointCount <= 1) return false;
             var scaleLength = Math.Min(actualLength, Math.Max(0, length));
@@ -194,7 +210,9 @@ namespace CrazyStorm.Core
 
                 var fullSegmentLength = segmentLength;
                 var headWidth = widths[GetPointIndex(i)];
+                var headRot = rots[GetPointIndex(i)];
                 var tailWidth = widths[GetPointIndex(i + 1)];
+                var tailRot = rots[GetPointIndex(i + 1)];
                 var dir = delta / segmentLength;
                 var remainingLength = scaleLength - currentLength;
                 if (segmentLength > remainingLength)
@@ -207,7 +225,7 @@ namespace CrazyStorm.Core
 
                 currentLength += segmentLength;
                 var scale = currentLength / scaleLength;
-                if (func(tailPoint, headPoint, tailWidth, headWidth, scale)) return true;
+                if (func(tailPoint, headPoint, tailWidth, headWidth, tailRot, headRot, scale)) return true;
                 if (currentLength >= scaleLength - POSITION_EPSILON) break;
             }
             return false;
@@ -221,24 +239,52 @@ namespace CrazyStorm.Core
             if (activePointCount <= 1 || scaleLength <= POSITION_EPSILON) return;
 
             var segmentIndex = 0;
-            IterateSegments((tailPoint, headPoint, tailWidth, headWidth, scale) =>
+            IterateSegment((tailPoint, headPoint, tailWidth, headWidth, tailRot, headRot, scale) =>
             {
                 var delta = headPoint - tailPoint;
                 var segmentLength = delta.Length();
                 if (segmentLength <= POSITION_EPSILON) return false;
 
                 var dir = delta / segmentLength;
-                var headLeft = MathHelper.Rotate(dir, -90) * (headWidth * 0.5f);
-                var headRight = MathHelper.Rotate(dir, 90) * (headWidth * 0.5f);
-                var tailLeft = MathHelper.Rotate(dir, -90) * (tailWidth * 0.5f);
-                var tailRight = MathHelper.Rotate(dir, 90) * (tailWidth * 0.5f);
+                var headLeft = MathHelper.Rotate(dir, -90 + headRot) * (headWidth * 0.5f);
+                var headRight = MathHelper.Rotate(dir, 90 + headRot) * (headWidth * 0.5f);
+                var tailLeft = MathHelper.Rotate(dir, -90 + tailRot) * (tailWidth * 0.5f);
+                var tailRight = MathHelper.Rotate(dir, 90 + tailRot) * (tailWidth * 0.5f);
                 if (segmentIndex == 0)
                 {
                     vertices[activeVertexCount].Pos = new Vector3(headPoint + headLeft, 0);
-                    vertices[activeVertexCount].TexCoord = new Vector2(0, 0);
+                    switch (sampleDegree)
+                    {
+                        case CurveSampleDegree.Zero:
+                            vertices[activeVertexCount].TexCoord = new Vector2(0, 0);
+                            break;
+                        case CurveSampleDegree.Quarter:
+                            vertices[activeVertexCount].TexCoord = new Vector2(0, 1);
+                            break;
+                        case CurveSampleDegree.Half:
+                            vertices[activeVertexCount].TexCoord = new Vector2(1, 1);
+                            break;
+                        case CurveSampleDegree.ThreeQuarters:
+                            vertices[activeVertexCount].TexCoord = new Vector2(1, 0);
+                            break;
+                    }
                     activeVertexCount++;
                     vertices[activeVertexCount].Pos = new Vector3(headPoint + headRight, 0);
-                    vertices[activeVertexCount].TexCoord = new Vector2(1, 0);
+                    switch (sampleDegree)
+                    {
+                        case CurveSampleDegree.Zero:
+                            vertices[activeVertexCount].TexCoord = new Vector2(1, 0);
+                            break;
+                        case CurveSampleDegree.Quarter:
+                            vertices[activeVertexCount].TexCoord = new Vector2(0, 0);
+                            break;
+                        case CurveSampleDegree.Half:
+                            vertices[activeVertexCount].TexCoord = new Vector2(0, 1);
+                            break;
+                        case CurveSampleDegree.ThreeQuarters:
+                            vertices[activeVertexCount].TexCoord = new Vector2(1, 1);
+                            break;
+                    }
                     activeVertexCount++;
                 }
 
@@ -251,10 +297,38 @@ namespace CrazyStorm.Core
                 indices[activeIndexCount++] = (short)(baseVertexIndex + 2);
 
                 vertices[activeVertexCount].Pos = new Vector3(tailPoint + tailLeft, 0);
-                vertices[activeVertexCount].TexCoord = new Vector2(0, scale);
+                switch (sampleDegree)
+                {
+                    case CurveSampleDegree.Zero:
+                        vertices[activeVertexCount].TexCoord = new Vector2(0, scale);
+                        break;
+                    case CurveSampleDegree.Quarter:
+                        vertices[activeVertexCount].TexCoord = new Vector2(scale, 1);
+                        break;
+                    case CurveSampleDegree.Half:
+                        vertices[activeVertexCount].TexCoord = new Vector2(1, 1 - scale);
+                        break;
+                    case CurveSampleDegree.ThreeQuarters:
+                        vertices[activeVertexCount].TexCoord = new Vector2(1 - scale, 0);
+                        break;
+                }
                 activeVertexCount++;
                 vertices[activeVertexCount].Pos = new Vector3(tailPoint + tailRight, 0);
-                vertices[activeVertexCount].TexCoord = new Vector2(1, scale);
+                switch (sampleDegree)
+                {
+                    case CurveSampleDegree.Zero:
+                        vertices[activeVertexCount].TexCoord = new Vector2(1, scale);
+                        break;
+                    case CurveSampleDegree.Quarter:
+                        vertices[activeVertexCount].TexCoord = new Vector2(scale, 0);
+                        break;
+                    case CurveSampleDegree.Half:
+                        vertices[activeVertexCount].TexCoord = new Vector2(0, 1 - scale);
+                        break;
+                    case CurveSampleDegree.ThreeQuarters:
+                        vertices[activeVertexCount].TexCoord = new Vector2(1 - scale, 1);
+                        break;
+                }
                 activeVertexCount++;
                 segmentIndex++;
                 return false;

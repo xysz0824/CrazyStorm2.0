@@ -266,11 +266,30 @@ float Median3(float3 value)
     return max(min(value.r, value.g), min(max(value.r, value.g), value.b));
 }
 
-float ComputeTextAlpha(float4 sampleValue)
+float ComputeTextAlpha(float2 uv, float4 sampleValue)
 {
-    float signedDistance = max(Median3(sampleValue.rgb), sampleValue.a) - 0.5;
-    float width = max(fwidth(signedDistance) * 0.8, 1e-5);
-    return saturate(signedDistance / width + 0.5);
+    float signedDistance = Median3(sampleValue.rgb) - 0.5;
+
+    uint texWidth, texHeight;
+    Texture.GetDimensions(texWidth, texHeight);
+    float2 texSize = float2(texWidth, texHeight);
+
+    float pxRange = 4.0;
+
+    float2 duv_dx = ddx(uv);
+    float2 duv_dy = ddy(uv);
+
+    float2 dtex_dx = duv_dx * texSize;
+    float2 dtex_dy = duv_dy * texSize;
+
+    float sx = length(dtex_dx);
+    float sy = length(dtex_dy);
+
+    float texelsPerPixel = max(sx, sy);
+
+    float screenPxRange = max(pxRange / max(texelsPerPixel, 1e-5), 1.0);
+
+    return saturate(signedDistance * screenPxRange + 0.5);
 }
 
 float EvaluateLayerMaskAlpha(float2 position)
@@ -302,7 +321,7 @@ float4 ApplyCurveColor(CurveBatchPSInput input, bool useMask, bool useDistort) :
     float4 Color = sampled * input.Color;
     if (CurveTypeInfo.x > 0.5)
     {
-        Color = float4(input.Color.rgb, input.Color.a * ComputeTextAlpha(sampled));
+        Color = float4(input.Color.rgb, input.Color.a * ComputeTextAlpha(texCoord, sampled));
     }
     float alpha = EvaluateLayerMaskAlpha(input.Position.xy);
     if (useMask)
@@ -357,7 +376,7 @@ float4 ApplyParticleColor(ParticleInstancedPSInput input, bool useMask, bool use
     float4 Color = sampled * input.Color;
     if (input.TypeInfo.x > 0.5)
     {
-        Color = float4(input.Color.rgb, input.Color.a * ComputeTextAlpha(sampled));
+        Color = float4(input.Color.rgb, input.Color.a * ComputeTextAlpha(texCoord, sampled));
     }
     float alpha = EvaluateLayerMaskAlpha(input.Position.xy);
     if (useMask)

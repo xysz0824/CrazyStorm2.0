@@ -16,6 +16,7 @@ namespace CrazyStorm.Core
     public struct CurveParticleData
     {
         public CurveType type;
+        public CurveSampleDegree sampleDegree;
         public int length;
         public int segment;
         public bool snakeUpdate;
@@ -31,8 +32,14 @@ namespace CrazyStorm.Core
         [EnumProperty(130,typeof(CurveType))]
         public CurveType CurveType
         {
-            get { return  curveParticleData.type; }
+            get { return curveParticleData.type; }
             set { curveParticleData.type = value; }
+        }
+        [EnumProperty(134, typeof(CurveSampleDegree))]
+        public CurveSampleDegree SampleDegree
+        {
+            get { return curveParticleData.sampleDegree; }
+            set { curveParticleData.sampleDegree = value; }
         }
         [IntProperty(131, 1, int.MaxValue)]
         public int Length
@@ -60,6 +67,7 @@ namespace CrazyStorm.Core
         public CurveParticle()
         {
             curveParticleData.type = CurveType.Curve;
+            curveParticleData.sampleDegree = CurveSampleDegree.Zero;
             curveParticleData.length = 100;
             curveParticleData.segment = 64;
             curveParticleData.snakeUpdate = false;
@@ -111,6 +119,9 @@ namespace CrazyStorm.Core
                 case 130:
                     VM.PushInt((int)CurveType);
                     return true;
+                case 134:
+                    VM.PushInt((int)SampleDegree);
+                    return true;
                 case 131:
                     VM.PushInt(Length);
                     return true;
@@ -149,6 +160,10 @@ namespace CrazyStorm.Core
                     }
                     CurveType = newCurveType;
                     return true;
+                case 134:
+                    var newSampleDegree = (CurveSampleDegree)VM.PopInt();
+                    if (Curve != null) Curve.SampleDegree = newSampleDegree;
+                    return true;
                 case 131:
                     Length = Math.Max(1, VM.PopInt());
                     return true;
@@ -169,7 +184,8 @@ namespace CrazyStorm.Core
             var widthScale = Type != null && Type.Width != 0 ? width / Type.Width : 0;
             return MathHelper.Judge(head, tail, bp, p, new Vector2(widthScale, widthScale), r, deg) & widthScale >= 0.5f;
         }
-        bool CurveJudge(Vector2 head, Vector2 tail, float scale, float tailWidth, float headWidth, Vector2 bp, Vector2 p, float r, float deg)
+        bool CurveJudge(Vector2 head, Vector2 tail, float scale, float tailWidth, float headWidth, 
+            Vector2 bp, Vector2 p, float r, float deg)
         {
             if (scale < 0.3f || scale > 0.7f) return false;
             if (headWidth == 0f && tailWidth == 0f) return false;
@@ -184,7 +200,7 @@ namespace CrazyStorm.Core
         public override bool CheckCollision(Vector2 playerLast, Vector2 player, float r)
         {
             return FogFrame >= FOG_TIME && Curve != null &&
-                Curve.IterateSegment(CurveJudge, playerLast, player, 2, PRotation + 90, Length);
+                Curve.SegmentJudge(CurveJudge, playerLast, player, 2, PRotation + 90, Length);
         }
         public override bool Update(float frameScale, float currentFrame = 1)
         {
@@ -197,13 +213,14 @@ namespace CrazyStorm.Core
                 var initData = new CurveInitData { pos = PPosition, 
                     segment = Segment, 
                     type = CurveType, 
+                    sampleDegree = SampleDegree,
                     head = head,
                     length = Length,
                     snakeUpdate = SnakeUpdate };
                 Curve = Curve.Rent(initData);
             }
-            PRotation = PSpeedAngle;
-            Curve.Update(PPosition, head, Type.Width * WidthScale, Length);
+            if (CurveType != CurveType.Curve) PRotation = PSpeedAngle;
+            Curve.Update(PPosition, head, Type.Width * WidthScale, PRotation, Length);
             return true;
         }
         public override void ReadBindingData(long uniqueId)
