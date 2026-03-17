@@ -126,6 +126,11 @@ namespace CrazyStorm_Player
             beginCalled = false;
             Flush();
         }
+        public void Dispose()
+        {
+            basicEffect?.Dispose();
+            rasterizerState?.Dispose();
+        }
         void Flush()
         {
             if (batchCurveCount <= 0) return;
@@ -133,6 +138,8 @@ namespace CrazyStorm_Player
             g.DepthStencilState = DepthStencilState.None;
             g.RasterizerState = rasterizerState;
             g.SamplerStates[0] = SamplerState.LinearWrap;
+            g.SamplerStates[1] = SamplerState.LinearClamp;
+            g.SamplerStates[2] = SamplerState.LinearClamp;
             var texture = curveTexs[curves[batchCurveCount - 1]];
             var effect = shaderContext != null ? shaderContext.Effect : null;
             if (effect != null)
@@ -166,8 +173,7 @@ namespace CrazyStorm_Player
         }
         EffectTechnique GetTechnique(ParticleBatchPass pass)
         {
-            var effect = shaderContext?.Effect;
-            if (effect == null) return null;
+            var effect = shaderContext.Effect;
             switch (pass)
             {
                 case ParticleBatchPass.Textured:

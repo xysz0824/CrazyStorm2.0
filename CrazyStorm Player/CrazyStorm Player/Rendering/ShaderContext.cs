@@ -315,7 +315,7 @@ namespace CrazyStorm_Player
         public void ApplyCurveShader(CurveRenderData renderData)
         {
             ResetCurveShaderState();
-            if (renderData.Pass == ParticleBatchPass.Textured && !LayerHasMask) return;
+            if (renderData.Pass == ParticleBatchPass.Textured && !renderData.RequiresShader) return;
 
             if (HasValidFrameRect(renderData.MaskFrameRect))
             {

@@ -214,6 +214,7 @@ namespace CrazyStorm_Player
             ParticleManager.OnParticleDraw -= DrawParticle;
             ParticleManager.OnCurveParticleDraw -= DrawCurveParticle;
             particleBatch?.Dispose();
+            curveBatch?.Dispose();
             shaderContext?.Dispose();
             spriteBatch?.Dispose();
             background?.Dispose();

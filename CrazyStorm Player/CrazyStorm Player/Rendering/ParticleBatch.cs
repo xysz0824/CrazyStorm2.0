@@ -95,7 +95,7 @@ namespace CrazyStorm_Player
             VertexDeclaration IVertexType.VertexDeclaration => VertexDeclaration;
         }
 
-        readonly GraphicsDevice graphicsDevice;
+        readonly GraphicsDevice g;
         readonly ShaderContext shaderContext;
         readonly DynamicVertexBuffer instanceBuffer;
         readonly VertexBuffer quadVertexBuffer;
@@ -110,7 +110,7 @@ namespace CrazyStorm_Player
 
         internal ParticleBatch(GraphicsDevice graphicsDevice, ShaderContext shaderContext)
         {
-            this.graphicsDevice = graphicsDevice;
+            this.g = graphicsDevice;
             this.shaderContext = shaderContext;
             instances = new ParticleBatchInstance[MAX_INSTANCE_COUNT];
             instanceBuffer = new DynamicVertexBuffer(graphicsDevice, ParticleBatchInstance.VertexDeclaration, MAX_INSTANCE_COUNT, BufferUsage.WriteOnly);
@@ -189,14 +189,14 @@ namespace CrazyStorm_Player
             if (instanceCount <= 0 || !hasBatchKey) return;
 
             instanceBuffer.SetData(instances, 0, instanceCount, SetDataOptions.Discard);
-            graphicsDevice.BlendState = blendState;
-            graphicsDevice.DepthStencilState = DepthStencilState.None;
-            graphicsDevice.RasterizerState = rasterizerState;
-            graphicsDevice.SamplerStates[0] = SamplerState.LinearWrap;
-            graphicsDevice.SamplerStates[1] = SamplerState.LinearClamp;
-            graphicsDevice.SamplerStates[2] = SamplerState.LinearClamp;
-            graphicsDevice.Indices = quadIndexBuffer;
-            graphicsDevice.SetVertexBuffers(
+            g.BlendState = blendState;
+            g.DepthStencilState = DepthStencilState.None;
+            g.RasterizerState = rasterizerState;
+            g.SamplerStates[0] = SamplerState.LinearWrap;
+            g.SamplerStates[1] = SamplerState.LinearClamp;
+            g.SamplerStates[2] = SamplerState.LinearClamp;
+            g.Indices = quadIndexBuffer;
+            g.SetVertexBuffers(
                 new VertexBufferBinding(quadVertexBuffer, 0, 0),
                 new VertexBufferBinding(instanceBuffer, 0, 1));
 
@@ -209,12 +209,12 @@ namespace CrazyStorm_Player
             effect.Parameters["Texture"]?.SetValue(currentKey.Texture ?? shaderContext.FallbackTexture);
             effect.Parameters["MaskTexture"]?.SetValue(currentKey.MaskTexture ?? shaderContext.FallbackTexture);
             effect.Parameters["DistortTexture"]?.SetValue(currentKey.DistortTexture ?? shaderContext.FallbackTexture);
-            effect.Parameters["ViewportSize"]?.SetValue(new Vector2(graphicsDevice.Viewport.Width, graphicsDevice.Viewport.Height));
+            effect.Parameters["ViewportSize"]?.SetValue(new Vector2(g.Viewport.Width, g.Viewport.Height));
 
             foreach (var pass in effect.CurrentTechnique.Passes)
             {
                 pass.Apply();
-                graphicsDevice.DrawInstancedPrimitives(PrimitiveType.TriangleList, 0, 0, 2, instanceCount);
+                g.DrawInstancedPrimitives(PrimitiveType.TriangleList, 0, 0, 2, instanceCount);
             }
 
             instanceCount = 0;
@@ -224,22 +224,18 @@ namespace CrazyStorm_Player
         EffectTechnique GetTechnique(ParticleBatchPass pass)
         {
             var effect = shaderContext.Effect;
-            var texturedTechnique = effect.Techniques["BatchTexturedInstanced"];
-            var texturedMaskTechnique = effect.Techniques["BatchTexturedMaskInstanced"];
-            var texturedDistortTechnique = effect.Techniques["BatchTexturedDistortInstanced"];
-            var texturedMaskDistortTechnique = effect.Techniques["BatchTexturedMaskDistortInstanced"];
             switch (pass)
             {
                 case ParticleBatchPass.Textured:
-                    return texturedTechnique;
+                    return effect.Techniques["BatchTexturedInstanced"];
                 case ParticleBatchPass.TexturedMask:
-                    return texturedMaskTechnique ?? texturedTechnique;
+                    return effect.Techniques["BatchTexturedMaskInstanced"] ?? effect.Techniques["BatchTexturedInstanced"];
                 case ParticleBatchPass.TexturedDistort:
-                    return texturedDistortTechnique ?? texturedTechnique;
+                    return effect.Techniques["BatchTexturedDistortInstanced"] ?? effect.Techniques["BatchTexturedInstanced"];
                 case ParticleBatchPass.TexturedMaskDistort:
-                    return texturedMaskDistortTechnique ?? texturedTechnique;
+                    return effect.Techniques["BatchTexturedMaskDistortInstanced"] ?? effect.Techniques["BatchTexturedInstanced"];
                 default:
-                    return texturedTechnique;
+                    return effect.Techniques["BatchTexturedInstanced"];
             }
         }
     }
