@@ -1,13 +1,9 @@
-﻿/*
+/*
  * The MIT License (MIT)
  * Copyright (c) StarX 2026
  */
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CrazyStorm_Player
 {
@@ -29,7 +25,7 @@ namespace CrazyStorm_Player
         SoftMask = 2,
         Sdf = 3,
         Psdf = 4,
-        MSDF = 5,
+        Msdf = 5,
         Mtsdf = 6
     }
 
@@ -87,6 +83,10 @@ namespace CrazyStorm_Player
         public int enable_kerning;
         public MSDFImageType image_type;
         public MSDFYOrigin y_origin;
+        public int face_index;
+        public int font_weight;
+        public int font_stretch;
+        public int font_style;
     }
 
     [StructLayout(LayoutKind.Sequential)]
@@ -150,14 +150,26 @@ namespace CrazyStorm_Player
         public int ThreadCount { get; set; } = 1;
         public bool PreprocessGeometry { get; set; } = true;
         public bool EnableKerning { get; set; } = true;
-        public MSDFImageType ImageType { get; set; } = MSDFImageType.MSDF;
+        public MSDFImageType ImageType { get; set; } = MSDFImageType.Msdf;
         public MSDFYOrigin YOrigin { get; set; } = MSDFYOrigin.Bottom;
+        public int FaceIndex { get; set; }
+        public int FontWeight { get; set; }
+        public int FontStretch { get; set; }
+        public int FontStyle { get; set; } = -1;
     }
 
     public sealed class MSDFAtlasResult
     {
+        public int Width { get; set; }
+        public int Height { get; set; }
+        public int Channels { get; set; }
         public byte[] Pixels { get; set; } = Array.Empty<byte>();
         public MSDFGlyph[] Glyphs { get; set; } = Array.Empty<MSDFGlyph>();
+        public MSDFFontMetrics Metrics { get; set; }
+        public double AtlasEmSize { get; set; }
+        public double DistanceRange { get; set; }
+        public MSDFImageType ImageType { get; set; }
+        public MSDFYOrigin YOrigin { get; set; }
     }
 
     public static class MSDFAtlasNative
@@ -184,8 +196,7 @@ namespace CrazyStorm_Player
 
         public static MSDFAtlasResult Generate(MSDFAtlasOptions options)
         {
-            if (options == null)
-                throw new ArgumentNullException(nameof(options));
+            if (options == null) throw new ArgumentNullException(nameof(options));
             if (string.IsNullOrWhiteSpace(options.FontPath))
                 throw new ArgumentException("FontPath is required.", nameof(options));
 
@@ -203,6 +214,10 @@ namespace CrazyStorm_Player
             nativeOptions.enable_kerning = options.EnableKerning ? 1 : 0;
             nativeOptions.image_type = options.ImageType;
             nativeOptions.y_origin = options.YOrigin;
+            nativeOptions.face_index = options.FaceIndex;
+            nativeOptions.font_weight = options.FontWeight;
+            nativeOptions.font_stretch = options.FontStretch;
+            nativeOptions.font_style = options.FontStyle;
 
             var status = msdf_atlas_c_generate(ref nativeOptions, out var resultPtr);
             if (status != MSDFStatus.Success)
@@ -255,8 +270,24 @@ namespace CrazyStorm_Player
 
                 return new MSDFAtlasResult
                 {
+                    Width = nativeResult.width,
+                    Height = nativeResult.height,
+                    Channels = nativeResult.channels,
                     Pixels = pixels,
                     Glyphs = glyphs,
+                    Metrics = new MSDFFontMetrics
+                    {
+                        EmSize = nativeResult.metrics.em_size,
+                        LineHeight = nativeResult.metrics.line_height,
+                        Ascender = nativeResult.metrics.ascender,
+                        Descender = nativeResult.metrics.descender,
+                        UnderlineY = nativeResult.metrics.underline_y,
+                        UnderlineThickness = nativeResult.metrics.underline_thickness
+                    },
+                    AtlasEmSize = nativeResult.atlas_em_size,
+                    DistanceRange = nativeResult.distance_range,
+                    ImageType = nativeResult.image_type,
+                    YOrigin = nativeResult.y_origin
                 };
             }
             finally
