@@ -70,12 +70,14 @@ namespace CrazyStorm_Player
         public string ControllableImagePath { get; set; }
         public string ControllableSetting { get; set; }
         public float CurrentFrame { get; set; }
-        public PlayerImpl(int width, int height, float frameRate, int particleMaximum, int curveParticleMaximum)
+        public PlayerImpl(string typeLibraryPath, int width, int height, float frameRate, int particleMaximum, int curveParticleMaximum)
         {
             Width = width;
             Height = height;
             FrameRate = frameRate;
             CurrentFrame = 1;
+            TypeLibraryPath = typeLibraryPath;
+            ParticleType.LoadDefaultTypes(typeLibraryPath);
             EventManager.Initialize();
             ParticleManager.Initialize(width, height, PARTICLE_PRESERVED_DIST, CURVE_PRESERVED_DIST, 
                 particleMaximum, curveParticleMaximum);

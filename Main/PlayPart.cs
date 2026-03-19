@@ -82,9 +82,8 @@ namespace CrazyStorm
                 player = new EmbeddedPlayer();
                 player.Width = config.ScreenWidth;
                 player.Height = config.ScreenHeight;
-                player.PlayerImpl = new PlayerImpl(config.ScreenWidth, config.ScreenHeight, config.FrameRate,
+                player.PlayerImpl = new PlayerImpl(config.TypeLibraryPath, config.ScreenWidth, config.ScreenHeight, config.FrameRate,
                     config.ParticleMaximum, config.CurveParticleMaximum);
-                player.PlayerImpl.TypeLibraryPath = config.TypeLibraryPath;
                 player.PlayerImpl.FrameOrientation = config.FrameOrientation;
                 player.PlayerImpl.BackgroundPath = config.BackgroundPath;
                 player.PlayerImpl.SelectedParticleSystemIndex = particleSystemIndex;

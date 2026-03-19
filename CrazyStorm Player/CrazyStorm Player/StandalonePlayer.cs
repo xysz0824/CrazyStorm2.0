@@ -33,15 +33,12 @@ namespace CrazyStorm_Player
             var typeLibraryPath = Environment.GetCommandLineArgs()[12];
             var frameOrientation = int.Parse(Environment.GetCommandLineArgs()[13]);
 
-            playerImpl = new PlayerImpl(width, height, frameRate, particleMaximum, curveParticleMaximum);
-            playerImpl.TypeLibraryPath = typeLibraryPath;
+            playerImpl = new PlayerImpl(typeLibraryPath, width, height, frameRate, particleMaximum, curveParticleMaximum);
             playerImpl.FrameOrientation = (FrameOrientation)frameOrientation;
             playerImpl.BackgroundPath = backgroundPath;
             playerImpl.SelectedParticleSystemIndex = selectedParticleSystemIndex;
             playerImpl.ControllableImagePath = controllableImagePath;
             playerImpl.ControllableSetting = controllableSetting;
-
-            ParticleType.LoadDefaultTypes(typeLibraryPath);
 
             var split = paths.Split(',');
             foreach (var path in split)
