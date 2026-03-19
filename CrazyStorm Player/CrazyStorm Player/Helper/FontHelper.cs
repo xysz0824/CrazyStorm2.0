@@ -8,38 +8,51 @@ using System.Collections.Generic;
 using System.Drawing.Text;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
+using Win32;
+using Win32.Graphics.DirectWrite;
+using static Win32.Apis;
+using static Win32.Graphics.DirectWrite.Apis;
 
 namespace CrazyStorm_Player
 {
+    public sealed class FontFace
+    {
+        public string FamilyLocaleName { get; set; }
+        public uint FaceIndex { get; set; }
+        public string FaceName { get; set; }
+        public string FaceLocaleName { get; set; }
+        public string FontPath { get; set; }
+        public string Weight { get; set; }
+        public string Style { get; set; }
+        public string stretch { get; set; }
+    }
     public sealed class TextAtlasKey : IEquatable<TextAtlasKey>
     {
-        public TextAtlasKey(string fontName, int charsetPixelSize)
+        public string FontFamily { get; }
+        public string FontFace { get; }
+        public int CharsetPixelSize { get; }
+        public TextAtlasKey(string fontFamily, string fontFace, int charsetPixelSize)
         {
-            FontName = fontName ?? string.Empty;
+            FontFamily = fontFamily;
+            FontFace = fontFace;
             CharsetPixelSize = charsetPixelSize;
         }
-
-        public string FontName { get; }
-        public int CharsetPixelSize { get; }
-
         public bool Equals(TextAtlasKey other)
         {
             if (ReferenceEquals(this, other)) return true;
             if (ReferenceEquals(other, null)) return false;
             return CharsetPixelSize == other.CharsetPixelSize &&
-                string.Equals(FontName, other.FontName, StringComparison.OrdinalIgnoreCase);
+                string.Equals(FontFamily, other.FontFamily) &&
+                string.Equals(FontFace, other.FontFace);
         }
-
-        public override bool Equals(object obj)
-        {
-            return Equals(obj as TextAtlasKey);
-        }
-
+        public override bool Equals(object obj) => Equals(obj as TextAtlasKey);
         public override int GetHashCode()
         {
             unchecked
             {
-                return (StringComparer.OrdinalIgnoreCase.GetHashCode(FontName) * 397) ^ CharsetPixelSize;
+                return (StringComparer.OrdinalIgnoreCase.GetHashCode(FontFamily) * 
+                    StringComparer.OrdinalIgnoreCase.GetHashCode(FontFace) * 397) ^ CharsetPixelSize;
             }
         }
     }
@@ -51,22 +64,15 @@ namespace CrazyStorm_Player
             AtlasKey = atlasKey;
             Character = character;
         }
-
         public TextAtlasKey AtlasKey { get; }
         public char Character { get; }
-
         public bool Equals(TextCharacterKey other)
         {
             if (ReferenceEquals(this, other)) return true;
             if (ReferenceEquals(other, null)) return false;
             return Character == other.Character && Equals(AtlasKey, other.AtlasKey);
         }
-
-        public override bool Equals(object obj)
-        {
-            return Equals(obj as TextCharacterKey);
-        }
-
+        public override bool Equals(object obj) => Equals(obj as TextCharacterKey);
         public override int GetHashCode()
         {
             unchecked
@@ -89,14 +95,12 @@ namespace CrazyStorm_Player
     public static class FontHelper
     {
         const int PlaceholderGlyphSize = 1;
-        static readonly object syncRoot = new object();
-        static Dictionary<string, string> fontPathCache = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-        static Dictionary<TextAtlasKey, TextAtlasCacheEntry> TextAtlasCache =
-            new Dictionary<TextAtlasKey, TextAtlasCacheEntry>();
-        static List<string> fontNames = new List<string>();
-        static bool initialized;
+        static Dictionary<string, List<FontFace>> fontPathDict = new Dictionary<string, List<FontFace>>();
+        static Dictionary<TextAtlasKey, TextAtlasCache> TextAtlasCaches =
+            new Dictionary<TextAtlasKey, TextAtlasCache>();
+        static List<string> fontFamilyNames = new List<string>();
 
-        sealed class TextAtlasCacheEntry
+        sealed class TextAtlasCache
         {
             public TextAtlasKey AtlasKey { get; set; }
             public string Charset { get; set; }
@@ -105,93 +109,253 @@ namespace CrazyStorm_Player
             public Dictionary<uint, MSDFGlyph> GlyphMap { get; set; }
             public int Version { get; set; }
         }
-
-        public static IReadOnlyList<string> FontNames
+        public static List<string> GetFontFamilysLocale()
         {
-            get
+            var fontFamilys = new List<string>();
+            foreach (var fontFamily in fontPathDict)
             {
-                EnsureInitialized();
-                return fontNames;
+                var face = fontFamily.Value.FirstOrDefault();
+                fontFamilys.Add(face.FamilyLocaleName);
+            }
+            return fontFamilys;
+        }
+        public static string GetFontFamilyLocale(string fontFamily)
+        {
+            if (fontPathDict.ContainsKey(fontFamily))
+            {
+                var face = fontPathDict[fontFamily].FirstOrDefault();
+                return face.FamilyLocaleName;
+            }
+            return null;
+        }
+        public static string GetFontFamilyByLocale(string familyLocale)
+        {
+            foreach (var fontFamily in fontPathDict)
+            {
+                var face = fontFamily.Value.FirstOrDefault(item => string.Equals(item.FamilyLocaleName, familyLocale));
+                if (face != null) return fontFamily.Key;
+            }
+            return null;
+        }
+        public static List<string> GetFontFaces(string fontFamily)
+        {
+            var fontFaces = new List<string>();
+            if (fontPathDict.ContainsKey(fontFamily))
+            {
+                foreach (var face in fontPathDict[fontFamily])
+                {
+                    fontFaces.Add(face.FaceName);
+                }
+            }
+            return fontFaces;
+        }
+        public static List<string> GetFontFacesLocale(string fontFamily)
+        {
+            var fontFaces = new List<string>();
+            if (fontPathDict.ContainsKey(fontFamily))
+            {
+                foreach (var face in fontPathDict[fontFamily])
+                {
+                    fontFaces.Add(face.FaceLocaleName);
+                }
+            }
+            return fontFaces;
+        }
+        public static string GetFontFaceLocale(string fontFamily, string fontFace)
+        {
+            if (fontPathDict.ContainsKey(fontFamily))
+            {
+                var face = fontPathDict[fontFamily].FirstOrDefault(item => string.Equals(item.FaceName, fontFace));
+                return face?.FaceLocaleName;
+            }
+            return null;
+        }
+        public static string GetFontFaceByLocale(string fontFamily, string faceLocale)
+        {
+            if (fontPathDict.ContainsKey(fontFamily))
+            {
+                var face = fontPathDict[fontFamily].FirstOrDefault(item => string.Equals(item.FaceLocaleName, faceLocale));
+                return face?.FaceName;
+            }
+            return null;
+        }
+        private static unsafe int FindLocale(IDWriteLocalizedStrings* strings, string localeName)
+        {
+            if (string.IsNullOrEmpty(localeName)) return -1;
+            fixed (char* pLocale = localeName)
+            {
+                uint index = 0;
+                Bool32 exists = 0;
+                var result = strings->FindLocaleName((ushort*)pLocale, &index, &exists);
+                if (result.Failure) return -1;
+                return exists != 0 ? (int)index : -1;
             }
         }
-
-        public static void EnsureInitialized()
+        private unsafe static string ReadStringAt(IDWriteLocalizedStrings* list, uint index)
         {
-            if (initialized) return;
-            lock (syncRoot)
+            uint length = 0;
+            var result = list->GetStringLength(index, &length);
+            if (result.Failure) return null;
+
+            char* buffer = stackalloc char[(int)length + 1];
+            result = list->GetString(index, (ushort*)buffer, length + 1);
+            if (result.Failure) return null;
+
+            return new string(buffer);
+        }
+        private unsafe static string GetFirstPropertyString(IDWriteFontSet* fontSet, uint listIndex, FontPropertyId propertyId, bool local)
+        {
+            using (ComPtr<IDWriteLocalizedStrings> values = default)
             {
-                if (initialized) return;
-                var map = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-                foreach (var path in EnumerateFontFiles())
+                Bool32 exists = default;
                 {
-                    foreach (var fontName in LoadFontNames(path))
+                    var hr = fontSet->GetPropertyValues(listIndex, propertyId, &exists, values.GetAddressOf());
+                    if (hr.Failure || values.Get() == null) return string.Empty;
+                    uint count = values.Get()->GetCount();
+                    if (count == 0) return string.Empty;
+                    if (!local) return ReadStringAt(values.Get(), 0);
+                    string locale = LocaleHelper.GetSystemCulture().Name;
+                    int index = FindLocale(values.Get(), locale);
+                    if (index < 0) index = 0;
+                    return ReadStringAt(values.Get(), (uint)index);
+                }
+            }
+        }
+        private unsafe static string TryGetLocalFilePath(IDWriteFontFaceReference* faceRef)
+        {
+            using (ComPtr<IDWriteFontFile> fontFile = default)
+            {
+                var result = faceRef->GetFontFile(fontFile.GetAddressOf());
+                if (result.Failure) return null;
+                void* referenceKey = null;
+                uint referenceKeySize = 0;
+                fontFile.Get()->GetReferenceKey(&referenceKey, &referenceKeySize);
+                if (referenceKey == null || referenceKeySize == 0) return null;
+                using (ComPtr<IDWriteFontFileLoader> loader = default)
+                {
+                    result = fontFile.Get()->GetLoader(loader.GetAddressOf());
+                    if (result.Failure) return null;
+                    using (ComPtr<IDWriteLocalFontFileLoader> localLoader = default)
                     {
-                        string existingPath;
-                        if (!map.TryGetValue(fontName, out existingPath) || CompareFontPath(path, existingPath) < 0)
-                        {
-                            map[fontName] = path;
-                        }
+                        result = loader.Get()->QueryInterface(__uuidof<IDWriteLocalFontFileLoader>(), localLoader.GetVoidAddressOf());
+                        if (result.Failure) return null;
+                        uint pathLength = 0;
+                        localLoader.Get()->GetFilePathLengthFromKey(referenceKey, referenceKeySize, &pathLength);
+                        char* buffer = stackalloc char[(int)pathLength + 1];
+                        localLoader.Get()->GetFilePathFromKey(referenceKey, referenceKeySize, (ushort*)buffer, pathLength + 1);
+                        return new string(buffer);
                     }
                 }
-                fontPathCache = map;
-                fontNames = map.Keys.OrderBy(item => item, StringComparer.CurrentCultureIgnoreCase).ToList();
-                initialized = true;
             }
         }
-
-        public static TextBuildResult EnsureTextAtlas(string fontName, string text, int charsetPixelSize)
+        public unsafe static void EnsureInitialized()
         {
-            if (StringUtil.IsNullOrWhiteSpace(fontName) || string.IsNullOrEmpty(text)) return null;
+            if (fontPathDict.Count > 0) return;
+            using (ComPtr<IDWriteFactory3> factory = default)
+            {
+                var result = DWriteCreateFactory(FactoryType.Shared, __uuidof<IDWriteFactory3>(), factory.GetVoidAddressOf());
+                if (result.Failure || factory.Get() == null) return;
+                using (ComPtr<IDWriteFontSet> fontSet = default)
+                {
+                    result = factory.Get()->GetSystemFontSet(fontSet.GetAddressOf());
+                    if (result.Failure) return;
+                    uint fontCount = fontSet.Get()->GetFontCount();
+                    for (uint i = 0; i < fontCount; ++i)
+                    {
+                        using (ComPtr<IDWriteFontFaceReference> faceRef = default)
+                        {
+                            result = fontSet.Get()->GetFontFaceReference(i, faceRef.GetAddressOf());
+                            if (result.Failure) continue;
+                            uint faceIndex = faceRef.Get()->GetFontFaceIndex();
+                            string familyName = GetFirstPropertyString(fontSet.Get(), i, FontPropertyId.FamilyName, false);
+                            string familyLocaleName = GetFirstPropertyString(fontSet.Get(), i, FontPropertyId.FamilyName, true);
+                            string faceName = GetFirstPropertyString(fontSet.Get(), i, FontPropertyId.FaceName, false);
+                            string faceLocaleName = GetFirstPropertyString(fontSet.Get(), i, FontPropertyId.FaceName, true);
+                            string fullName = GetFirstPropertyString(fontSet.Get(), i, FontPropertyId.FullName, true);
+                            string weight = GetFirstPropertyString(fontSet.Get(), i, FontPropertyId.Weight, false);
+                            string style = GetFirstPropertyString(fontSet.Get(), i, FontPropertyId.Style, false);
+                            string stretch = GetFirstPropertyString(fontSet.Get(), i, FontPropertyId.Stretch, false);
+                            string filePath = TryGetLocalFilePath(faceRef.Get());
+                            if (string.IsNullOrEmpty(filePath)) continue;
+                            if (!fontPathDict.ContainsKey(familyName)) fontPathDict[familyName] = new List<FontFace>();
+                            fontPathDict[familyName].Insert(MathHelper.Clamp((int)faceIndex, 0, fontPathDict[familyName].Count), new FontFace
+                            {
+                                FamilyLocaleName = familyLocaleName,
+                                FaceIndex = faceIndex,
+                                FaceName = faceName,
+                                FaceLocaleName = faceLocaleName,
+                                FontPath = filePath,
+                                Weight = weight,
+                                Style = style,
+                                stretch = stretch,
+                            });
+                        }
+
+                    }
+                }
+            }
+            fontFamilyNames = fontPathDict.Keys.OrderBy(item => item, StringComparer.CurrentCultureIgnoreCase).ToList();
+        }
+
+        public static TextBuildResult EnsureTextAtlas(string fontFamily, string fontFace, string text, int charsetPixelSize)
+        {
+            if (string.IsNullOrEmpty(text)) return null;
 
             string fontPath;
-            if (!TryResolveSystemFontPath(fontName, out fontPath)) return null;
+            if (!TryResolveSystemFontPath(fontFamily, fontFace, out fontPath)) return null;
 
             var requestedCharacters = text.ToList();
             var charset = BuildCharset(requestedCharacters);
             if (string.IsNullOrEmpty(charset)) return null;
 
-            var atlasKey = new TextAtlasKey(fontName, charsetPixelSize);
-            lock (syncRoot)
+            var atlasKey = new TextAtlasKey(fontFamily, fontFace, charsetPixelSize);
+            TextAtlasCache cache;
+            bool atlasUpdated = false;
+            if (!TextAtlasCaches.TryGetValue(atlasKey, out cache))
             {
-                TextAtlasCacheEntry cacheEntry;
-                bool atlasUpdated = false;
-                if (!TextAtlasCache.TryGetValue(atlasKey, out cacheEntry))
+                cache = BuildTextAtlas(atlasKey, fontPath, charset, null);
+                if (cache == null) return null;
+                TextAtlasCaches[atlasKey] = cache;
+                atlasUpdated = true;
+            }
+            else if (!ContainsAllCharacters(cache.CharsetSet, requestedCharacters))
+            {
+                var mergedCharset = MergeCharset(cache.Charset, requestedCharacters);
+                var updated = BuildTextAtlas(atlasKey, fontPath, mergedCharset, cache);
+                if (updated != null)
                 {
-                    cacheEntry = BuildTextAtlasEntry(atlasKey, fontPath, charset, null);
-                    if (cacheEntry == null) return null;
-                    TextAtlasCache[atlasKey] = cacheEntry;
+                    cache = updated;
+                    TextAtlasCaches[atlasKey] = cache;
                     atlasUpdated = true;
                 }
-                else if (!ContainsAllCharacters(cacheEntry.CharsetSet, requestedCharacters))
-                {
-                    var mergedCharset = MergeCharset(cacheEntry.Charset, requestedCharacters);
-                    var updatedEntry = BuildTextAtlasEntry(atlasKey, fontPath, mergedCharset, cacheEntry);
-                    if (updatedEntry != null)
-                    {
-                        cacheEntry = updatedEntry;
-                        TextAtlasCache[atlasKey] = cacheEntry;
-                        atlasUpdated = true;
-                    }
-                }
-
-                return new TextBuildResult
-                {
-                    AtlasKey = cacheEntry.AtlasKey,
-                    AtlasVersion = cacheEntry.Version,
-                    AtlasUpdated = atlasUpdated,
-                    AtlasPngBytes = cacheEntry.AtlasPngBytes,
-                    GlyphMap = cacheEntry.GlyphMap,
-                    Characters = requestedCharacters
-                };
             }
+
+            return new TextBuildResult
+            {
+                AtlasKey = cache.AtlasKey,
+                AtlasVersion = cache.Version,
+                AtlasUpdated = atlasUpdated,
+                AtlasPngBytes = cache.AtlasPngBytes,
+                GlyphMap = cache.GlyphMap,
+                Characters = requestedCharacters
+            };
         }
 
-        public static bool TryResolveSystemFontPath(string fontName, out string fontPath)
+        public static bool TryResolveSystemFontPath(string fontFamily, string fontFace, out string fontPath)
         {
             fontPath = null;
-            if (StringUtil.IsNullOrWhiteSpace(fontName)) return false;
             EnsureInitialized();
-            return fontPathCache.TryGetValue(fontName, out fontPath);
+            if (fontPathDict.ContainsKey(fontFamily))
+            {
+                var faces = fontPathDict[fontFamily];
+                var face = faces.FirstOrDefault(item => string.Equals(item.FaceName, fontFace));
+                if (face != null)
+                {
+                    fontPath = face.FontPath;
+                    return true;
+                }
+            }
+            return false;
         }
 
         public static void UpdateCharacterType(ParticleType particleType, FileResource atlasResource, char character,
@@ -265,8 +429,8 @@ namespace CrazyStorm_Player
             return new string(mergedCharacters.ToArray());
         }
 
-        static TextAtlasCacheEntry BuildTextAtlasEntry(TextAtlasKey atlasKey, string fontPath, string charset,
-            TextAtlasCacheEntry previousEntry)
+        static TextAtlasCache BuildTextAtlas(TextAtlasKey atlasKey, string fontPath, string charset,
+            TextAtlasCache previous)
         {
             try
             {
@@ -279,14 +443,14 @@ namespace CrazyStorm_Player
                     YOrigin = MSDFYOrigin.Top
                 };
                 var atlasResult = MSDFAtlasNative.Generate(options);
-                return new TextAtlasCacheEntry
+                return new TextAtlasCache
                 {
                     AtlasKey = atlasKey,
                     Charset = charset,
                     CharsetSet = new HashSet<char>(charset),
                     AtlasPngBytes = atlasResult.Pixels,
                     GlyphMap = BuildGlyphMap(atlasResult.Glyphs),
-                    Version = previousEntry != null ? previousEntry.Version + 1 : 1
+                    Version = previous != null ? previous.Version + 1 : 1
                 };
             }
             catch

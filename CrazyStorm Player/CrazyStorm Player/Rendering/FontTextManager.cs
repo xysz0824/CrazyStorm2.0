@@ -31,7 +31,7 @@ namespace CrazyStorm_Player
         {
             try
             {
-                var result = FontHelper.EnsureTextAtlas(text.Font, text.TextValue, text.CharsetPixelSize);
+                var result = FontHelper.EnsureTextAtlas(text.FontFamily, text.FontFace, text.TextValue, text.CharsetPixelSize);
                 if (result == null || result.AtlasKey == null || result.AtlasPngBytes == null ||
                     result.GlyphMap == null || result.Characters == null)
                 {
@@ -102,7 +102,7 @@ namespace CrazyStorm_Player
                 binding = new TextFileBinding
                 {
                     AtlasResource = new FileResource(file, file.FileResourceIndex,
-                        $"{result.AtlasKey.FontName}_{system.Name}_TextAtlas", "___text_atlas__")
+                        $"{result.AtlasKey.FontFamily}_{result.AtlasKey.FontFace}_{system.Name}_TextAtlas", "")
                 };
                 bindings[result.AtlasKey] = binding;
             }

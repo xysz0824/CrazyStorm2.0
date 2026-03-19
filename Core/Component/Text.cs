@@ -26,7 +26,10 @@ namespace CrazyStorm.Core
         #region Private Members
         [StringData]
         [XmlAttribute]
-        string font;
+        string fontFamily;
+        [StringData]
+        [XmlAttribute]
+        string fontFace;
         [StringData]
         [XmlAttribute]
         string textValue;
@@ -38,19 +41,23 @@ namespace CrazyStorm.Core
 
         #region Public Members
         public TextPool PoolObject { get; set; }
-        [FontProperty(25, 1, 128)]
-        public string Font
+        public string FontFamily
         {
-            get { return font; }
-            set { font = value; }
+            get { return fontFamily; }
+            set { fontFamily = value; }
         }
-        [StringProperty(26, 0, 1024, true, true, true, true, true)]
+        public string FontFace
+        {
+            get { return fontFace; }
+            set { fontFace = value; }
+        }
+        [StringProperty(25, 0, 1024, true, true, true, true, true)]
         public string TextValue
         {
             get { return textValue; }
             set { textValue = value; }
         }
-        [IntProperty(27, 1, 1024)]
+        [IntProperty(26, 1, 1024)]
         public int CharsetPixelSize
         {
             get { return charsetPixelSize; }
@@ -62,7 +69,7 @@ namespace CrazyStorm.Core
         #region Constructor
         public Text()
         {
-            font = string.Empty;
+            fontFamily = fontFace = string.Empty;
             textValue = string.Empty;
             charsetPixelSize = 48;
         }
@@ -78,7 +85,8 @@ namespace CrazyStorm.Core
         {
             base.CopyTo(propertyContainer);
             var text = propertyContainer as Text;
-            text.font = font;
+            text.fontFamily = fontFamily;
+            text.fontFace = fontFace;
             text.textValue = textValue;
             text.charsetPixelSize = charsetPixelSize;
             text.runtimeCharacterTypes = null;
@@ -103,8 +111,9 @@ namespace CrazyStorm.Core
         {
             var bytes = base.GeneratePlayData(file);
             var textBytes = new List<byte>();
-            textBytes.AddRange(PlayDataHelper.GetStringBytes(font ?? string.Empty));
-            textBytes.AddRange(PlayDataHelper.GetStringBytes(textValue ?? string.Empty));
+            textBytes.AddRange(PlayDataHelper.GetStringBytes(fontFamily));
+            textBytes.AddRange(PlayDataHelper.GetStringBytes(fontFace));
+            textBytes.AddRange(PlayDataHelper.GetStringBytes(textValue));
             textBytes.AddRange(BitConverter.GetBytes(charsetPixelSize));
             bytes.AddRange(PlayDataHelper.CreateBlock(textBytes));
             return bytes;
@@ -115,7 +124,8 @@ namespace CrazyStorm.Core
             base.LoadPlayData(reader, version);
             using (var textReader = PlayDataHelper.GetBlockReader(reader))
             {
-                font = PlayDataHelper.ReadString(textReader);
+                fontFamily = PlayDataHelper.ReadString(textReader);
+                fontFace = PlayDataHelper.ReadString(textReader);
                 textValue = PlayDataHelper.ReadString(textReader);
                 charsetPixelSize = textReader.ReadInt32();
             }
@@ -159,12 +169,9 @@ namespace CrazyStorm.Core
             switch (propertyID)
             {
                 case 25:
-                    VM.PushString(Font);
-                    return true;
-                case 26:
                     VM.PushString(TextValue);
                     return true;
-                case 27:
+                case 26:
                     VM.PushInt(CharsetPixelSize);
                     return true;
             }

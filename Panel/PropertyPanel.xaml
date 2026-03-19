@@ -65,7 +65,10 @@
                             <DataTrigger Binding="{Binding EditorKind}" Value="{x:Static local:PropertyEditorKind.EnumCombo}">
                                 <Setter Property="ContentTemplate" Value="{StaticResource PropertyComboEditorTemplate}" />
                             </DataTrigger>
-                            <DataTrigger Binding="{Binding EditorKind}" Value="{x:Static local:PropertyEditorKind.FontCombo}">
+                            <DataTrigger Binding="{Binding EditorKind}" Value="{x:Static local:PropertyEditorKind.FontFamilyCombo}">
+                                <Setter Property="ContentTemplate" Value="{StaticResource PropertyComboEditorTemplate}" />
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding EditorKind}" Value="{x:Static local:PropertyEditorKind.FontFaceCombo}">
                                 <Setter Property="ContentTemplate" Value="{StaticResource PropertyComboEditorTemplate}" />
                             </DataTrigger>
                             <DataTrigger Binding="{Binding EditorKind}" Value="{x:Static local:PropertyEditorKind.BoolCheckBox}">
@@ -100,7 +103,10 @@
                             <DataTrigger Binding="{Binding EditorKind}" Value="{x:Static local:PropertyEditorKind.EnumCombo}">
                                 <Setter Property="ContentTemplate" Value="{StaticResource PropertyComboDisplayTemplate}" />
                             </DataTrigger>
-                            <DataTrigger Binding="{Binding EditorKind}" Value="{x:Static local:PropertyEditorKind.FontCombo}">
+                            <DataTrigger Binding="{Binding EditorKind}" Value="{x:Static local:PropertyEditorKind.FontFamilyCombo}">
+                                <Setter Property="ContentTemplate" Value="{StaticResource PropertyComboDisplayTemplate}" />
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding EditorKind}" Value="{x:Static local:PropertyEditorKind.FontFaceCombo}">
                                 <Setter Property="ContentTemplate" Value="{StaticResource PropertyComboDisplayTemplate}" />
                             </DataTrigger>
                             <DataTrigger Binding="{Binding EditorKind}" Value="{x:Static local:PropertyEditorKind.BoolCheckBox}">

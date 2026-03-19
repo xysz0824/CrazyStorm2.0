@@ -13,7 +13,7 @@ using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using CrazyStorm.Core;
+using CrazyStorm_Player;
 
 namespace CrazyStorm
 {
@@ -22,8 +22,6 @@ namespace CrazyStorm
         private const string ProjectRepositoryUrl = "https://github.com/xysz0824/CrazyStorm2.0";
         private const string TutorialDirectoryRelativePath = @"Docs";
         private const string TutorialRootRelativePath = @"Docs\index.html";
-        [DllImport("kernel32.dll")]
-        private static extern ushort GetUserDefaultUILanguage();
 
         #region Private Methods
         private void OpenTutorial()
@@ -59,7 +57,7 @@ namespace CrazyStorm
             var candidates = new List<string>();
             var docsDirectory = Path.Combine(baseDirectory, TutorialDirectoryRelativePath);
             var languageIndexes = GetLanguageIndexFiles(docsDirectory);
-            var systemCulture = GetSystemCulture();
+            var systemCulture = LocaleHelper.GetSystemCulture();
             var preferred = FindPreferredLanguageIndex(languageIndexes, systemCulture);
             AddTutorialCandidate(candidates, preferred);
             foreach (var indexFile in languageIndexes)
@@ -68,12 +66,6 @@ namespace CrazyStorm
             }
             AddTutorialCandidate(candidates, Path.Combine(baseDirectory, TutorialRootRelativePath));
             return candidates;
-        }
-        private CultureInfo GetSystemCulture()
-        {
-            var languageId = GetUserDefaultUILanguage();
-            if (languageId == 0) return CultureInfo.CurrentUICulture;
-            return CultureInfo.GetCultureInfo(languageId);
         }
         private List<string> GetLanguageIndexFiles(string docsDirectory)
         {

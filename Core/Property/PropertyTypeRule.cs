@@ -30,7 +30,7 @@ namespace CrazyStorm.Core
                 var attributes = property.GetCustomAttributes(false);
                 foreach (var attribute in attributes)
                 {
-                    if (attribute is StringPropertyAttribute || attribute is FontPropertyAttribute) return PropertyType.String;
+                    if (attribute is StringPropertyAttribute) return PropertyType.String;
                     if (attribute is BoolPropertyAttribute) return PropertyType.Boolean;
                     if (attribute is IntPropertyAttribute) return PropertyType.Int32;
                     if (attribute is FloatPropertyAttribute) return PropertyType.Single;
@@ -56,9 +56,9 @@ namespace CrazyStorm.Core
                 return PropertyType.Single;
             else if (value is Enum)
                 return PropertyType.Enum;
-            else if (value is Core.Vector2)
+            else if (value is Vector2)
                 return PropertyType.Vector2;
-            else if (value is Core.RGB)
+            else if (value is RGB)
                 return PropertyType.RGB;
             else if (value is string)
                 return PropertyType.String;
@@ -130,16 +130,16 @@ namespace CrazyStorm.Core
                 result = Enum.IsDefined(target.GetType(), text);
                 output = result ? Enum.Parse(target.GetType(), text) : null;
             }
-            else if (target is Core.Vector2)
+            else if (target is Vector2)
             {
-                Core.Vector2 value;
-                result = Core.Vector2.TryParse(text, out value);
+                Vector2 value;
+                result = Vector2.TryParse(text, out value);
                 output = value;
             }
-            else if (target is Core.RGB)
+            else if (target is RGB)
             {
-                Core.RGB value;
-                result = Core.RGB.TryParse(text, out value);
+                RGB value;
+                result = RGB.TryParse(text, out value);
                 output = value;
             }
             else if (target is string)

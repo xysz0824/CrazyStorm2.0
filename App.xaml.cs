@@ -15,7 +15,6 @@ namespace CrazyStorm
         {
             base.OnStartup(e);
             ExpressionHelper.InitializeTranslationCache();
-            FontPropertyAttribute.FontValidator = fontName => FontHelper.TryResolveSystemFontPath(fontName, out _);
             FontHelper.EnsureInitialized();
 
             var startupWindow = new StartupWindow();

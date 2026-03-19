@@ -165,13 +165,10 @@ namespace CrazyStorm
         void LoadContent()
         {
             componentPropertyList = component.InitializeAndGetProperties(typeof(Component));
-            LoadProperties(ComponentGrid, component, componentPropertyList, false);
-            if (component is Emitter)
-                specificPropertyList = component.InitializeAndGetProperties(typeof(Emitter));
-            else
-                specificPropertyList = component.InitializeAndGetProperties(component.GetType());
-
-            LoadProperties(SpecificGrid, component, specificPropertyList, false);
+            LoadProperties(ComponentGrid, component, componentPropertyList);
+            if (component is Emitter) specificPropertyList = component.InitializeAndGetProperties(typeof(Emitter));
+            else specificPropertyList = component.InitializeAndGetProperties(component.GetType());
+            LoadProperties(SpecificGrid, component, specificPropertyList);
             SpecificPropertyGroup.Visibility = specificPropertyList.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
             TextBindingHint.Visibility = component is CrazyStorm.Core.Text ? Visibility.Visible : Visibility.Collapsed;
             if (component is Emitter)
@@ -179,12 +176,9 @@ namespace CrazyStorm
                 var particle = (component as Emitter).InitialTemplate;
                 ParticlePropertyGroup.Visibility = Visibility.Visible;
                 particlePropertyList = particle.InitializeAndGetProperties(typeof(ParticleBase));
-                if (component is MultiEmitter)
-                    particlePropertyList.AddRange(particle.InitializeAndGetProperties(typeof(Particle)));
-                else
-                    particlePropertyList.AddRange(particle.InitializeAndGetProperties(typeof(CurveParticle)));
-
-                LoadProperties(ParticleGrid, particle, particlePropertyList, true);
+                if (component is MultiEmitter) particlePropertyList.AddRange(particle.InitializeAndGetProperties(typeof(Particle)));
+                else particlePropertyList.AddRange(particle.InitializeAndGetProperties(typeof(CurveParticle)));
+                LoadProperties(ParticleGrid, particle, particlePropertyList);
             }
             else
             {
@@ -193,7 +187,7 @@ namespace CrazyStorm
                 {
                     var stub = new MultiEmitter();
                     particlePropertyList = stub.InitialTemplate.InitializeAndGetProperties(typeof(ParticleBase));
-                    LoadProperties(ParticleGrid, stub.InitialTemplate, particlePropertyList, false);
+                    LoadProperties(ParticleGrid, stub.InitialTemplate, particlePropertyList);
                 }
             }
             LoadTypes(types);
@@ -234,13 +228,18 @@ namespace CrazyStorm
                 DelSpecificEventButton.Visibility = Visibility.Collapsed;
             }
         }
-        void LoadProperties(FrameworkElement element, PropertyContainer container, IList<PropertyInfo> infos, bool addParticleType)
+        void LoadProperties(FrameworkElement element, PropertyContainer container, IList<PropertyInfo> infos)
         {
             var propertyItems = new ObservableCollection<PropertyGridItem>();
-            if (addParticleType && component is Emitter)
+            if (element == ParticleGrid && component is Emitter)
             {
                 propertyItems.Add(CreateParticleTypePropertyItem(component as Emitter));
                 propertyItems.Add(CreateParticleColorPropertyItem(component as Emitter));
+            }
+            if (element == SpecificGrid && component is Text)
+            {
+                propertyItems.Add(CreateFontFamilyPropertyItem(component as Text));
+                propertyItems.Add(CreateFontFacePropertyItem(component as Text));
             }
             foreach (var item in infos)
             {
@@ -271,7 +270,7 @@ namespace CrazyStorm
                     ApplyEmitterDistortTypeValue(item, container as ParticleBase);
                     continue;
                 }
-                if (item.IsParticlePseudoProperty || item.Info == null) continue;
+                if (item.PseudoPropertyKind != PropertyPseudoKind.None) continue;
                 if (!item.ReadOnly && !container.Properties[item.Info.Name].Expression)
                 {
                     var result = item.Info.GetGetMethod().Invoke(container, null).ToString();
@@ -341,14 +340,12 @@ namespace CrazyStorm
         }
         PropertyEditorKind GetEditorKind(PropertyAttribute attribute)
         {
-            if (attribute != null && attribute is FontPropertyAttribute) return PropertyEditorKind.FontCombo;
             if (attribute != null && attribute is EnumPropertyAttribute) return PropertyEditorKind.EnumCombo;
             if (attribute != null && attribute is BoolPropertyAttribute) return PropertyEditorKind.BoolCheckBox;
             return PropertyEditorKind.Text;
         }
         IList<string> BuildItemsSource(PropertyEditorKind editorKind, Type propertyType)
         {
-            if (editorKind == PropertyEditorKind.FontCombo) return FontHelper.FontNames.ToList();
             if (editorKind != PropertyEditorKind.EnumCombo || propertyType == null || !propertyType.IsEnum) return null;
             return Enum.GetNames(propertyType).Select(ExpressionHelper.Translate).ToList();
         }
@@ -385,11 +382,6 @@ namespace CrazyStorm
                 item.DisplayValue = ExpressionHelper.Translate(internalValue);
                 return;
             }
-            if (item.EditorKind == PropertyEditorKind.FontCombo)
-            {
-                item.DisplayValue = internalValue;
-                return;
-            }
             item.DisplayValue = item.Info != null && item.Info.PropertyType != typeof(string) && !item.ReadOnly ?
                 ExpressionHelper.Translate(internalValue) : internalValue;
         }
@@ -416,7 +408,6 @@ namespace CrazyStorm
                 DisplayName = (string)FindResource("TypeStr"),
                 DisplayValue = type != null ? type.Name : string.Empty,
                 EditorKind = PropertyEditorKind.ParticleTypeCombo,
-                IsParticlePseudoProperty = true,
                 PseudoPropertyKind = PropertyPseudoKind.ParticleType,
                 ItemsSource = GetDistinctParticleTypeNames(),
             };
@@ -430,7 +421,6 @@ namespace CrazyStorm
                 DisplayName = (string)FindResource("RGBStr"),
                 DisplayValue = type != null ? ExpressionHelper.Translate(type.Color.ToString()) : string.Empty,
                 EditorKind = PropertyEditorKind.ParticleColorCombo,
-                IsParticlePseudoProperty = true,
                 PseudoPropertyKind = PropertyPseudoKind.ParticleColor,
                 ItemsSource = colorItems,
             };
@@ -446,6 +436,28 @@ namespace CrazyStorm
                 .Select(item => ExpressionHelper.Translate(item.Color.ToString()))
                 .Distinct()
                 .ToList();
+        }
+        PropertyGridItem CreateFontFamilyPropertyItem(Text text)
+        {
+            return new PropertyGridItem()
+            {
+                DisplayName = (string)FindResource("FontFamilyStr"),
+                DisplayValue = FontHelper.GetFontFamilyLocale(text.FontFamily),
+                EditorKind = PropertyEditorKind.FontFamilyCombo,
+                PseudoPropertyKind = PropertyPseudoKind.FontFamily,
+                ItemsSource = FontHelper.GetFontFamilysLocale(),
+            };
+        }
+        PropertyGridItem CreateFontFacePropertyItem(Text text)
+        {
+            return new PropertyGridItem()
+            {
+                DisplayName = (string)FindResource("FontFaceStr"),
+                DisplayValue = FontHelper.GetFontFaceLocale(text.FontFamily, text.FontFace),
+                EditorKind = PropertyEditorKind.FontFaceCombo,
+                PseudoPropertyKind = PropertyPseudoKind.FontFace,
+                ItemsSource = FontHelper.GetFontFacesLocale(text.FontFamily),
+            };
         }
         void RefreshParticlePseudoProperties()
         {
@@ -536,6 +548,30 @@ namespace CrazyStorm
             {
                 distortTypeItem.ItemsSource = BuildEmitterDistortTypeItems();
                 ApplyEmitterDistortTypeValue(distortTypeItem, emitter.InitialTemplate);
+            }
+            finally
+            {
+                suppressComboBoxEvent = false;
+            }
+        }
+        void RefreshFontPseudoProperties()
+        {
+            var text = component as Text;
+            if (text == null) return;
+
+            var items = SpecificGrid.DataContext as IList<PropertyGridItem>;
+            if (items == null) return;
+
+            var familyItem = items.FirstOrDefault(item => item.PseudoPropertyKind == PropertyPseudoKind.FontFamily);
+            var faceItem = items.FirstOrDefault(item => item.PseudoPropertyKind == PropertyPseudoKind.FontFace);
+            if (faceItem == null) return;
+
+            suppressComboBoxEvent = true;
+            try
+            {
+                familyItem.DisplayValue = FontHelper.GetFontFamilyLocale(text.FontFamily);
+                faceItem.ItemsSource = FontHelper.GetFontFacesLocale(text.FontFamily);
+                faceItem.DisplayValue = FontHelper.GetFontFaceLocale(text.FontFamily, text.FontFace);
             }
             finally
             {
@@ -652,7 +688,15 @@ namespace CrazyStorm
             if (property == null) return;
 
             var displayValue = comboBox.SelectedItem as string ?? string.Empty;
-            if (property.EditorKind == PropertyEditorKind.ParticleTypeCombo)
+            if (property.EditorKind == PropertyEditorKind.FontFamilyCombo)
+            {
+                CommitFontFamilySelection(displayValue);
+            }
+            else if (property.EditorKind == PropertyEditorKind.FontFaceCombo)
+            {
+                CommitFontFaceSelection(displayValue);
+            }
+            else if (property.EditorKind == PropertyEditorKind.ParticleTypeCombo)
             {
                 CommitParticleTypeSelection(displayValue);
             }
@@ -748,6 +792,22 @@ namespace CrazyStorm
             new SetEmitterDistortTypeCommand().Do(commandStack, emitter, targetDistortType,
                 new Action<Emitter, DistortType>(EmitterDistortTypeUpdate));
         }
+        void CommitFontFamilySelection(string fontFamilyLocale)
+        {
+            var text = component as Text;
+            var fontFamily = FontHelper.GetFontFamilyByLocale(fontFamilyLocale);
+            if (text == null || text.FontFamily == fontFamily) return;
+            var fontFaces = FontHelper.GetFontFaces(fontFamily);
+            var selectedFace = fontFaces.FirstOrDefault();
+            new SetFontCommand().Do(commandStack, text, fontFamily, selectedFace, new Action<Text, string, string>(FontUpdate));
+        }
+        void CommitFontFaceSelection(string fontFaceLocale)
+        {
+            var text = component as Text;
+            var fontFace = FontHelper.GetFontFaceByLocale(text.FontFamily, fontFaceLocale);
+            if (text == null || text.FontFace == fontFace) return;
+            new SetFontCommand().Do(commandStack, text, text.FontFamily, fontFace, new Action<Text, string, string>(FontUpdate));
+        }
         ParticleType ResolveParticleType(string typeName, string colorDisplayValue)
         {
             if (string.IsNullOrEmpty(typeName)) return null;
@@ -767,6 +827,14 @@ namespace CrazyStorm
             if (this == null) return;
             emitter.InitialTemplate.Type = type;
             RefreshParticlePseudoProperties();
+            if (updateFunc != null) updateFunc();
+        }
+        void FontUpdate(Text text, string family, string face)
+        {
+            if (this == null) return;
+            text.FontFamily = family;
+            text.FontFace = face;
+            RefreshFontPseudoProperties();
             if (updateFunc != null) updateFunc();
         }
         void EventFieldMaskTypeUpdate(EventField eventField, MaskType maskType)

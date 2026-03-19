@@ -99,7 +99,8 @@
     <sys:String x:Key="AcspeedStr">加速度</sys:String>
     <sys:String x:Key="AcspeedAngleStr">加速度角</sys:String>
     <sys:String x:Key="VisibilityStr">可见</sys:String>
-    <sys:String x:Key="FontStr">字体</sys:String>
+    <sys:String x:Key="FontFamilyStr">字体家族</sys:String>
+    <sys:String x:Key="FontFaceStr">字体样式</sys:String>
     <sys:String x:Key="TextValueStr">文本</sys:String>
     <sys:String x:Key="CharsetPixelSizeStr">字集像素尺寸</sys:String>
     <sys:String x:Key="EmitPositionStr">发射坐标</sys:String>

@@ -12,13 +12,14 @@ namespace CrazyStorm
     {
         Text,
         EnumCombo,
-        FontCombo,
         BoolCheckBox,
         ParticleTypeCombo,
         ParticleColorCombo,
         EventFieldMaskTypeCombo,
         EmitterMaskTypeCombo,
         EmitterDistortTypeCombo,
+        FontFamilyCombo,
+        FontFaceCombo,
     }
     public enum PropertyPseudoKind
     {
@@ -28,6 +29,8 @@ namespace CrazyStorm
         EventFieldMaskType,
         EmitterMaskType,
         EmitterDistortType,
+        FontFamily,
+        FontFace,
     }
     public class PropertyGridItem : INotifyPropertyChanged
     {
@@ -40,7 +43,6 @@ namespace CrazyStorm
         private bool boolValue;
         private IList<string> itemsSource;
         private PropertyEditorKind editorKind;
-        private bool isParticlePseudoProperty;
         private PropertyPseudoKind pseudoPropertyKind;
 
         public PropertyInfo Info
@@ -100,15 +102,6 @@ namespace CrazyStorm
             {
                 editorKind = value;
                 OnPropertyChanged("EditorKind");
-            }
-        }
-        public bool IsParticlePseudoProperty
-        {
-            get { return isParticlePseudoProperty; }
-            set
-            {
-                isParticlePseudoProperty = value;
-                OnPropertyChanged("IsParticlePseudoProperty");
             }
         }
         public PropertyPseudoKind PseudoPropertyKind
