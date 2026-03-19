@@ -123,7 +123,7 @@ namespace CrazyStorm_Player
         }
         public static string GetFontFamilyLocale(string fontFamily)
         {
-            if (fontPathDict.ContainsKey(fontFamily))
+            if (fontFamily != null && fontPathDict.ContainsKey(fontFamily))
             {
                 var face = fontPathDict[fontFamily].FirstOrDefault();
                 return face.FamilyLocaleName;
@@ -142,7 +142,7 @@ namespace CrazyStorm_Player
         public static List<string> GetFontFaces(string fontFamily)
         {
             var fontFaces = new List<string>();
-            if (fontPathDict.ContainsKey(fontFamily))
+            if (fontFamily != null && fontPathDict.ContainsKey(fontFamily))
             {
                 foreach (var face in fontPathDict[fontFamily])
                 {
@@ -154,7 +154,7 @@ namespace CrazyStorm_Player
         public static List<string> GetFontFacesLocale(string fontFamily)
         {
             var fontFaces = new List<string>();
-            if (fontPathDict.ContainsKey(fontFamily))
+            if (fontFamily != null && fontPathDict.ContainsKey(fontFamily))
             {
                 foreach (var face in fontPathDict[fontFamily])
                 {
@@ -165,7 +165,7 @@ namespace CrazyStorm_Player
         }
         public static string GetFontFaceLocale(string fontFamily, string fontFace)
         {
-            if (fontPathDict.ContainsKey(fontFamily))
+            if (fontFamily != null && fontPathDict.ContainsKey(fontFamily))
             {
                 var face = fontPathDict[fontFamily].FirstOrDefault(item => string.Equals(item.FaceName, fontFace));
                 return face?.FaceLocaleName;
@@ -174,7 +174,7 @@ namespace CrazyStorm_Player
         }
         public static string GetFontFaceByLocale(string fontFamily, string faceLocale)
         {
-            if (fontPathDict.ContainsKey(fontFamily))
+            if (fontFamily != null && fontPathDict.ContainsKey(fontFamily))
             {
                 var face = fontPathDict[fontFamily].FirstOrDefault(item => string.Equals(item.FaceLocaleName, faceLocale));
                 return face?.FaceName;
