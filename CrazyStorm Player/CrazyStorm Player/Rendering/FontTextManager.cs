@@ -120,7 +120,8 @@ namespace CrazyStorm_Player
             foreach (var item in characterTypes)
             {
                 if (!Equals(item.Key.AtlasKey, result.AtlasKey)) continue;
-                FontHelper.UpdateCharacterType(item.Value, atlasResource, item.Key.Character, result.GlyphMap);
+                FontHelper.UpdateCharacterType(item.Value, atlasResource, item.Key.Character,
+                    result.GlyphMap, result.DistanceRange);
             }
         }
 
@@ -145,7 +146,8 @@ namespace CrazyStorm_Player
                     instance.CustomTypes.Add(particleType);
                     characterTypes[characterKey] = particleType;
                 }
-                FontHelper.UpdateCharacterType(particleType, atlasResource, character, result.GlyphMap);
+                FontHelper.UpdateCharacterType(particleType, atlasResource, character,
+                    result.GlyphMap, result.DistanceRange);
                 resolvedTypes.Add(particleType);
             }
             return resolvedTypes;

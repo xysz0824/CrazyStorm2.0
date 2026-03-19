@@ -85,6 +85,7 @@ namespace CrazyStorm.Core
         }
         public bool IsTextType { get; set; }
         public bool IsTransparentPlaceholder { get; set; }
+        public double TextPxRange { get; set; }
         public Vector2 StartPoint
         {
             get { return data.startPoint; }

@@ -119,8 +119,6 @@ namespace CrazyStorm_Player
                     }
                 }
             }
-            //Load default types
-            ParticleType.LoadDefaultTypes(TypeLibraryPath);
             //Load default textures
             var assembly = Assembly.GetExecutingAssembly();
             Environment.CurrentDirectory = AppDomain.CurrentDomain.SetupInformation.ApplicationBase;

@@ -32,6 +32,7 @@ namespace CrazyStorm_Player
         public Texture2D MaskTexture;
         public Texture2D DistortTexture;
         public bool IsTextType;
+        public double TextPxRange;
         public ParticleBatchPass Pass;
         public bool RequiresShader;
     }
@@ -251,7 +252,9 @@ namespace CrazyStorm_Player
                 animateFrame * particle.DissolveVSpeed,
                 animateFrame * particle.DistortUSpeed,
                 animateFrame * particle.DistortVSpeed);
-            instance.TypeInfo = new Vector4(particle.Type != null && particle.Type.IsTextType ? 1f : 0f, 0f, 0f, 0f);
+            var isTextType = particle.Type != null && particle.Type.IsTextType;
+            var textPxRange = isTextType ? particle.Type.TextPxRange : 0f;
+            instance.TypeInfo = new Vector4(isTextType ? 1f : 0f, (float)textPxRange, 0f, 0f);
 
             return new ParticleRenderData
             {
@@ -279,7 +282,10 @@ namespace CrazyStorm_Player
                 MaskTexture = maskTexture,
                 DistortTexture = distortTexture,
                 Pass = ParticleBatchPass.Textured,
-                IsTextType = particle != null && particle.Type != null && particle.Type.IsTextType
+                IsTextType = particle != null && particle.Type != null && particle.Type.IsTextType,
+                TextPxRange = particle != null && particle.Type != null && particle.Type.IsTextType
+                    ? particle.Type.TextPxRange
+                    : 0f
             };
             if (particle == null || texture == null)
             {
@@ -335,7 +341,7 @@ namespace CrazyStorm_Player
             {
                 shaderCurveSourceRect?.SetValue(renderData.SourceRect);
             }
-            shaderCurveTypeInfo?.SetValue(new Vector4(renderData.IsTextType ? 1f : 0f, 0f, 0f, 0f));
+            shaderCurveTypeInfo?.SetValue(new Vector4(renderData.IsTextType ? 1f : 0f, (float)renderData.TextPxRange, 0f, 0f));
         }
 
         public void ResetCurveShaderState()

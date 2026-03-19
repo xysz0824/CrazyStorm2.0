@@ -90,6 +90,7 @@ namespace CrazyStorm_Player
         public byte[] AtlasPngBytes { get; set; }
         public IReadOnlyDictionary<uint, MSDFGlyph> GlyphMap { get; set; }
         public List<char> Characters { get; set; }
+        public double DistanceRange { get; set; }
     }
 
     public static class FontHelper
@@ -107,6 +108,7 @@ namespace CrazyStorm_Player
             public HashSet<char> CharsetSet { get; set; }
             public byte[] AtlasPngBytes { get; set; }
             public Dictionary<uint, MSDFGlyph> GlyphMap { get; set; }
+            public double DistanceRange { get; set; }
             public int Version { get; set; }
         }
         public static List<string> GetFontFamilysLocale()
@@ -337,7 +339,8 @@ namespace CrazyStorm_Player
                 AtlasUpdated = atlasUpdated,
                 AtlasPngBytes = cache.AtlasPngBytes,
                 GlyphMap = cache.GlyphMap,
-                Characters = requestedCharacters
+                Characters = requestedCharacters,
+                DistanceRange = cache.DistanceRange
             };
         }
 
@@ -359,13 +362,14 @@ namespace CrazyStorm_Player
         }
 
         public static void UpdateCharacterType(ParticleType particleType, FileResource atlasResource, char character,
-            IReadOnlyDictionary<uint, MSDFGlyph> glyphMap)
+            IReadOnlyDictionary<uint, MSDFGlyph> glyphMap, double distanceRange)
         {
             if (particleType == null) return;
 
             particleType.Name = character.ToString();
             particleType.Image = atlasResource;
             particleType.IsTextType = true;
+            particleType.TextPxRange = distanceRange;
 
             MSDFGlyph glyph;
             if (glyphMap == null || !glyphMap.TryGetValue(character, out glyph) ||
@@ -446,7 +450,7 @@ namespace CrazyStorm_Player
                     FontStyle = int.Parse(face.Style),
                     Charset = charset,
                     EmSize = atlasKey.CharsetPixelSize,
-                    ImageType = MSDFImageType.Mtsdf,
+                    ImageType = MSDFImageType.Sdf,
                     YOrigin = MSDFYOrigin.Top
                 };
                 var atlasResult = MSDFAtlasNative.Generate(options);
@@ -457,6 +461,7 @@ namespace CrazyStorm_Player
                     CharsetSet = new HashSet<char>(charset),
                     AtlasPngBytes = atlasResult.Pixels,
                     GlyphMap = BuildGlyphMap(atlasResult.Glyphs),
+                    DistanceRange = atlasResult.DistanceRange,
                     Version = previous != null ? previous.Version + 1 : 1
                 };
             }
@@ -476,6 +481,5 @@ namespace CrazyStorm_Player
             }
             return glyphMap;
         }
-
     }
 }
