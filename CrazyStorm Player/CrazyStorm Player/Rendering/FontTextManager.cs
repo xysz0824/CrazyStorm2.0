@@ -113,7 +113,7 @@ namespace CrazyStorm_Player
             if (!systems.Contains(instance)) systems.Add(instance);
         }
         static void UpdateTextAtlas(TextBuildResult result, Dictionary<ParticleSystem, File> instanceMap, 
-            Action<int, byte[]> onTextureUpdate)
+            Action<FileResource, byte[]> onTextureUpdate)
         {
             List<ParticleSystem> systems;
             if (!TextAtlasSystems.TryGetValue(result.AtlasKey, out systems)) return;
@@ -128,7 +128,7 @@ namespace CrazyStorm_Player
             }
         }
         static TextFileBinding EnsureTextFileBinding(File file, ParticleSystem system, TextBuildResult result,
-             Action<int, byte[]> onTextureUpdate)
+             Action<FileResource, byte[]> onTextureUpdate)
         {
             Dictionary<TextAtlasKey, TextFileBinding> bindings;
             if (!TextBindings.TryGetValue(file, out bindings))
@@ -148,7 +148,7 @@ namespace CrazyStorm_Player
                 bindings[result.AtlasKey] = binding;
             }
             if (binding.AtlasVersion == result.AtlasVersion) return binding;
-            onTextureUpdate?.Invoke(binding.AtlasResource.ID, result.AtlasPngBytes);
+            onTextureUpdate?.Invoke(binding.AtlasResource, result.AtlasPngBytes);
             binding.AtlasVersion = result.AtlasVersion;
             return binding;
         }
@@ -344,7 +344,7 @@ namespace CrazyStorm_Player
         }
 
         public static List<ParticleType> UpdateTextResources(File file, ParticleSystem instance, Text text,
-            Dictionary<ParticleSystem, File> instanceMap, Action<int, byte[]> onTextureUpdate)
+            Dictionary<ParticleSystem, File> instanceMap, Action<FileResource, byte[]> onTextureUpdate)
         {
             var result = EnsureTextAtlas(text.FontFamily, text.FontFace, text.TextValue, text.CharsetPixelSize);
             if (result == null) throw new InvalidDataException();
@@ -360,9 +360,48 @@ namespace CrazyStorm_Player
             TextCharacterTypes.Clear();
             TextAtlasSystems.Clear();
         }
-        public static void Clear(ParticleSystem instance)
+        public static void Clear(ParticleSystem instance, Action<FileResource> onTextureDestroy)
         {
-            //TODO
+            if (instance == null) return;
+            Dictionary<TextCharacterKey, ParticleType> characterTypes;
+            if (TextCharacterTypes.TryGetValue(instance, out characterTypes))
+            {
+                foreach (var type in characterTypes.Values)
+                {
+                    instance.CustomTypes.Remove(type);
+                }
+                TextCharacterTypes.Remove(instance);
+            }
+            var removedAtlasKeys = new List<TextAtlasKey>();
+            foreach (var atlasEntry in TextAtlasSystems)
+            {
+                var systems = atlasEntry.Value;
+                if (systems == null) continue;
+                systems.RemoveAll(system => ReferenceEquals(system, instance));
+                if (systems.Count == 0) removedAtlasKeys.Add(atlasEntry.Key);
+            }
+            foreach (var atlasKey in removedAtlasKeys)
+            {
+                TextAtlasSystems.Remove(atlasKey);
+            }
+            if (removedAtlasKeys.Count == 0) return;
+            var emptyFiles = new List<File>();
+            foreach (var fileEntry in TextBindings)
+            {
+                var bindings = fileEntry.Value;
+                foreach (var atlasKey in removedAtlasKeys)
+                {
+                    TextFileBinding binding;
+                    if (!bindings.TryGetValue(atlasKey, out binding)) continue;
+                    bindings.Remove(atlasKey);
+                    if (binding?.AtlasResource != null) onTextureDestroy?.Invoke(binding.AtlasResource);
+                }
+                if (bindings.Count == 0) emptyFiles.Add(fileEntry.Key);
+            }
+            foreach (var file in emptyFiles)
+            {
+                TextBindings.Remove(file);
+            }
         }
     }
 }

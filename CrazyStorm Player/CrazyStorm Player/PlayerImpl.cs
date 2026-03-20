@@ -248,16 +248,16 @@ namespace CrazyStorm_Player
         {
             if (!instances.ContainsKey(system)) return null;
             var file = instances[system];
-            return FontTextManager.UpdateTextResources(file, system, text, instances, (id, pngBytes) =>
+            return FontTextManager.UpdateTextResources(file, system, text, instances, (fileResource, pngBytes) =>
             {
                 Texture2D newTexture = null;
                 using (var stream = new MemoryStream(pngBytes, false))
                 {
                     newTexture = Texture2D.FromStream(graphicsDevice, stream);
                 }
-                if (!customTextures.ContainsKey(file)) customTextures[file] = new Dictionary<int, Texture2D>();
-                customTextures[file].TryGetValue(id, out var oldTexture);
-                customTextures[file][id] = newTexture;
+                if (!customTextures.ContainsKey(fileResource.File)) customTextures[fileResource.File] = new Dictionary<int, Texture2D>();
+                customTextures[fileResource.File].TryGetValue(fileResource.ID, out var oldTexture);
+                customTextures[fileResource.File][fileResource.ID] = newTexture;
                 oldTexture?.Dispose();
             });
         }
