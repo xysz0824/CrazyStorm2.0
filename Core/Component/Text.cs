@@ -23,6 +23,9 @@ namespace CrazyStorm.Core
 
     public class Text : Component
     {
+        public delegate List<ParticleType> TextTypeHandler(ParticleSystem system, Text text);
+        public static event TextTypeHandler OnNeedTextType;
+
         #region Private Members
         [StringData]
         [XmlAttribute]
@@ -36,7 +39,7 @@ namespace CrazyStorm.Core
         [XmlAttribute]
         int charsetPixelSize;
         int emitCursor;
-        List<ParticleType> runtimeCharacterTypes;
+        List<ParticleType> runtimeTypes;
         #endregion
 
         #region Public Members
@@ -63,7 +66,7 @@ namespace CrazyStorm.Core
             get { return charsetPixelSize; }
             set { charsetPixelSize = value; }
         }
-        public bool HasRuntimeText => runtimeCharacterTypes != null && runtimeCharacterTypes.Count > 0;
+        public bool HasRuntimeText => runtimeTypes != null && runtimeTypes.Count > 0;
         #endregion
 
         #region Constructor
@@ -89,7 +92,7 @@ namespace CrazyStorm.Core
             text.fontFace = fontFace;
             text.textValue = textValue;
             text.charsetPixelSize = charsetPixelSize;
-            text.runtimeCharacterTypes = null;
+            text.runtimeTypes = null;
             text.emitCursor = 0;
         }
 
@@ -133,7 +136,7 @@ namespace CrazyStorm.Core
 
         public override void Destroy()
         {
-            runtimeCharacterTypes = null;
+            runtimeTypes = null;
             TextPool.Return(PoolObject);
         }
 
@@ -141,26 +144,15 @@ namespace CrazyStorm.Core
         {
             base.Reset();
             emitCursor = 0;
-        }
-
-        public void ApplyRuntimeResources(List<ParticleType> characterTypes)
-        {
-            runtimeCharacterTypes = characterTypes;
-            emitCursor = 0;
+            runtimeTypes = OnNeedTextType?.Invoke(System, this);
         }
 
         public ParticleType GetNextParticleType()
         {
             if (!HasRuntimeText) return null;
-            var type = runtimeCharacterTypes[emitCursor];
-            emitCursor = (emitCursor + 1) % runtimeCharacterTypes.Count;
+            var type = runtimeTypes[emitCursor];
+            emitCursor = (emitCursor + 1) % runtimeTypes.Count;
             return type;
-        }
-
-        public void ClearRuntimeResources()
-        {
-            runtimeCharacterTypes = null;
-            emitCursor = 0;
         }
 
         public override bool PushProperty(int propertyID)

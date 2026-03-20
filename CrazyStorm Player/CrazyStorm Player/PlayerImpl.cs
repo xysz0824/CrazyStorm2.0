@@ -7,22 +7,16 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using SharpDX.Direct3D9;
 using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.IO;
 using System.Reflection;
-using System.Runtime.InteropServices;
-using System.Security.Policy;
-using System.Text;
 using Color = Microsoft.Xna.Framework.Color;
 using File = CrazyStorm.Core.File;
 using MathHelper = Microsoft.Xna.Framework.MathHelper;
 using Rectangle = Microsoft.Xna.Framework.Rectangle;
 using SamplerState = Microsoft.Xna.Framework.Graphics.SamplerState;
 using Vector2 = Microsoft.Xna.Framework.Vector2;
-using Vector4 = Microsoft.Xna.Framework.Vector4;
 
 namespace CrazyStorm_Player
 {
@@ -36,6 +30,7 @@ namespace CrazyStorm_Player
         const int PARTICLE_PRESERVED_DIST = 50;
         const int CURVE_PRESERVED_DIST = 100;
 
+        GraphicsDevice graphicsDevice;
         ShaderContext shaderContext;
         SpriteBatch spriteBatch;
         ParticleBatch particleBatch;
@@ -77,6 +72,7 @@ namespace CrazyStorm_Player
             FrameRate = frameRate;
             CurrentFrame = 1;
             TypeLibraryPath = typeLibraryPath;
+            FontHelper.EnsureInitialized();
             ParticleType.LoadDefaultTypes(typeLibraryPath);
             EventManager.Initialize();
             ParticleManager.Initialize(width, height, PARTICLE_PRESERVED_DIST, CURVE_PRESERVED_DIST, 
@@ -85,6 +81,7 @@ namespace CrazyStorm_Player
         public void Initialize(GraphicsDevice gd)
         {
             //graphics
+            graphicsDevice = gd;
             shaderContext = new ShaderContext(gd, Width, Height, FrameOrientation);
             spriteBatch = new SpriteBatch(gd);
             particleBatch = new ParticleBatch(gd, shaderContext);
@@ -192,14 +189,14 @@ namespace CrazyStorm_Player
             ParticleManager.OnLayerDraw += DrawLayer;
             ParticleManager.OnParticleDraw += DrawParticle;
             ParticleManager.OnCurveParticleDraw += DrawCurveParticle;
+            Text.OnNeedTextType += EnsureTextTypes;
             FrameworkDispatcher.Update();
             instances = new Dictionary<ParticleSystem, File>();
             foreach (var file in Files)
             {
                 var instance = file.ParticleSystems[SelectedParticleSystemIndex].Instantiate();
-                instance.Reset(true);
                 instances[instance] = file;
-                InitializeRuntimeTextResources(gd, file, instance);
+                instance.Reset(true);
                 distortTextures[instance] = ResolveDistortTexture(file, instance);
                 maskTextures[instance] = ResolveMaskTexture(file, instance);
             }
@@ -213,6 +210,7 @@ namespace CrazyStorm_Player
             ParticleManager.OnLayerDraw -= DrawLayer;
             ParticleManager.OnParticleDraw -= DrawParticle;
             ParticleManager.OnCurveParticleDraw -= DrawCurveParticle;
+            Text.OnNeedTextType -= EnsureTextTypes;
             particleBatch?.Dispose();
             curveBatch?.Dispose();
             shaderContext?.Dispose();
@@ -245,6 +243,23 @@ namespace CrazyStorm_Player
             characterTexture?.Dispose();
             pointTexture?.Dispose();
             slowModeTexture?.Dispose();
+        }
+        List<ParticleType> EnsureTextTypes(ParticleSystem system, Text text)
+        {
+            if (!instances.ContainsKey(system)) return null;
+            var file = instances[system];
+            return FontTextManager.UpdateTextResources(file, system, text, instances, (id, pngBytes) =>
+            {
+                Texture2D newTexture = null;
+                using (var stream = new MemoryStream(pngBytes, false))
+                {
+                    newTexture = Texture2D.FromStream(graphicsDevice, stream);
+                }
+                if (!customTextures.ContainsKey(file)) customTextures[file] = new Dictionary<int, Texture2D>();
+                customTextures[file].TryGetValue(id, out var oldTexture);
+                customTextures[file][id] = newTexture;
+                oldTexture?.Dispose();
+            });
         }
         void ForceImpactBody(CrazyStorm.Core.Vector2 speedVector)
         {
@@ -283,34 +298,6 @@ namespace CrazyStorm_Player
                 if (minCurrentFrame > instance.CurrentFrame) minCurrentFrame = instance.CurrentFrame;
             }
             if (minCurrentFrame != float.MaxValue) CurrentFrame = minCurrentFrame;
-        }
-        void InitializeRuntimeTextResources(GraphicsDevice gd, File file, ParticleSystem instance)
-        {
-            foreach (var layer in instance.Layers)
-            {
-                foreach (var component in layer.Components)
-                {
-                    var text = component as CrazyStorm.Core.Text;
-                    if (text == null || text.BindingTarget == null || string.IsNullOrEmpty(text.TextValue))
-                    {
-                        continue;
-                    } 
-                    FontTextManager.UpdateTextResources(file, instance, text, instances, (id, pngBytes) =>
-                    {
-                        Texture2D newTexture = null;
-                        using (var stream = new MemoryStream(pngBytes, false))
-                        {
-                            newTexture = Texture2D.FromStream(gd, stream);
-                        }
-
-                        if (!customTextures.ContainsKey(file)) customTextures[file] = new Dictionary<int, Texture2D>();
-                        Texture2D oldTexture;
-                        customTextures[file].TryGetValue(id, out oldTexture);
-                        customTextures[file][id] = newTexture;
-                        oldTexture?.Dispose();
-                    });
-                }
-            }
         }
         Texture2D ResolveMaskTexture(File file, ParticleSystem system)
         {
