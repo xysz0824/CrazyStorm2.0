@@ -50,7 +50,7 @@ namespace CrazyStorm.Core
         }
         public File(string defaultParticleSystemName, string defaultLayerName, string defaultBodyPositionName) : this()
         {
-            particleSystems.Add(new ParticleSystem(defaultParticleSystemName, defaultLayerName));
+            particleSystems.Add(new ParticleSystem(this, defaultParticleSystemName, defaultLayerName));
         }
         #endregion
 
@@ -69,7 +69,7 @@ namespace CrazyStorm.Core
         {
             XmlHelper.BuildFromFields(this, node);
             //particleSystems
-            XmlHelper.BuildFromObjectList(particleSystems, new ParticleSystem(""), node, "ParticleSystems");
+            XmlHelper.BuildFromObjectList(particleSystems, new ParticleSystem(this, ""), node, "ParticleSystems");
             //images
             XmlHelper.BuildFromObjectList(images, new FileResource(this, 0, "", ""), node, "Images");
             //sounds
@@ -347,6 +347,7 @@ namespace CrazyStorm.Core
             PlayDataHelper.ReadObjectList(ParticleSystems, reader, version);
             foreach (var particleSystem in ParticleSystems)
             {
+                particleSystem.File = this;
                 particleSystem.Sounds = sounds;
                 foreach (var layer in particleSystem.Layers)
                 {

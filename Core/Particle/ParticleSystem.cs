@@ -68,6 +68,7 @@ namespace CrazyStorm.Core
         #endregion
 
         #region Public Members
+        public File File { get; set; }
         public int InstancedID => instancedID;
         public string Name 
         { 
@@ -158,13 +159,14 @@ namespace CrazyStorm.Core
             componentTree = new GenericContainer<Component>();
             bindingTexts = new Dictionary<long, Text>();
         }
-        public ParticleSystem(string name) : this()
+        public ParticleSystem(File file, string name) : this()
         {
+            File = file;
             this.name = name;
             componentIndex = new Dictionary<int, int>();
             typeSoundMap = new Dictionary<int, int>();
         }
-        public ParticleSystem(string name, string defaultLayerName) : this(name)
+        public ParticleSystem(File file, string name, string defaultLayerName) : this(file, name)
         {
             layers.Add(new Layer(defaultLayerName));
         }
@@ -304,9 +306,10 @@ namespace CrazyStorm.Core
             clone.bindingTexts = new Dictionary<long, Text>();
             return clone;
         }
-        public ParticleSystem Instantiate()
+        public ParticleSystem Instantiate(File file)
         {
             var instance = Rent(NullData.Empty);
+            instance.File = file;
             instance.instancedID = InstancedID + 1;
             instance.name = name;
             instance.orderType = orderType;

@@ -112,17 +112,14 @@ namespace CrazyStorm_Player
             }
             if (!systems.Contains(instance)) systems.Add(instance);
         }
-        static void UpdateTextAtlas(TextBuildResult result, Dictionary<ParticleSystem, File> instanceMap, 
+        static void UpdateTextAtlas(TextBuildResult result, List<ParticleSystem> instances, 
             Action<FileResource, byte[]> onTextureUpdate)
         {
             List<ParticleSystem> systems;
             if (!TextAtlasSystems.TryGetValue(result.AtlasKey, out systems)) return;
             foreach (var system in systems)
             {
-                File boundFile;
-                if (!instanceMap.TryGetValue(system, out boundFile)) continue;
-
-                var binding = EnsureTextFileBinding(boundFile, system, result, onTextureUpdate);
+                var binding = EnsureTextFileBinding(system.File, system, result, onTextureUpdate);
                 if (binding == null || binding.AtlasResource == null) continue;
                 UpdateTextCharacterTypes(system, result, binding.AtlasResource);
             }
@@ -344,13 +341,13 @@ namespace CrazyStorm_Player
         }
 
         public static List<ParticleType> UpdateTextResources(File file, ParticleSystem instance, Text text,
-            Dictionary<ParticleSystem, File> instanceMap, Action<FileResource, byte[]> onTextureUpdate)
+            List<ParticleSystem> instances, Action<FileResource, byte[]> onTextureUpdate)
         {
             var result = EnsureTextAtlas(text.FontFamily, text.FontFace, text.TextValue, text.CharsetPixelSize);
             if (result == null) throw new InvalidDataException();
             RegisterTextAtlasSystem(result.AtlasKey, instance);
             EnsureTextFileBinding(file, instance, result, onTextureUpdate);
-            if (result.AtlasUpdated) UpdateTextAtlas(result, instanceMap, onTextureUpdate);
+            if (result.AtlasUpdated) UpdateTextAtlas(result, instances, onTextureUpdate);
             return EnsureTextCharacterTypes(file, instance, result);
         }
 

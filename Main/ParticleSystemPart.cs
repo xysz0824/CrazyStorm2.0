@@ -24,7 +24,8 @@ namespace CrazyStorm
         #region Private Methods
         void CreateNewParticleSystem()
         {
-            var particleSystem = new ParticleSystem((string)FindResource("ParticleSystemStr") + (file.ParticleIndex + 1),
+            var particleSystem = new ParticleSystem(file, 
+                (string)FindResource("ParticleSystemStr") + (file.ParticleIndex + 1),
                 (string)FindResource("NewLayerStr"));
             file.ParticleSystems.Add(particleSystem);
             selectedSystem = particleSystem;

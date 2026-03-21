@@ -195,7 +195,7 @@ namespace CrazyStorm.Core
                 reader.ReadLine();
                 match = RenderingOrderMatch.Match(reader.ReadLine());
                 //particleSystem
-                var particleSystem = new ParticleSystem(Path.GetFileNameWithoutExtension(filePath));
+                var particleSystem = new ParticleSystem(this, Path.GetFileNameWithoutExtension(filePath));
                 if (match.Success)
                 {
                     particleSystem.OrderType = (OrderType)int.Parse(match.Groups[1].Value);

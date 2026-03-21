@@ -49,7 +49,7 @@ namespace CrazyStorm_Player
         Texture2D pointTexture;
         Texture2D slowModeTexture;
         Controllable controllable;
-        Dictionary<ParticleSystem, File> instances;
+        List<ParticleSystem> instances;
         BlendType lastBlendType = BlendType.None;
         bool particleBatchBegun;
         bool curveBatchBegun;
@@ -191,11 +191,11 @@ namespace CrazyStorm_Player
             ParticleManager.OnCurveParticleDraw += DrawCurveParticle;
             Text.OnNeedTextType += EnsureTextTypes;
             FrameworkDispatcher.Update();
-            instances = new Dictionary<ParticleSystem, File>();
+            instances = new List<ParticleSystem>();
             foreach (var file in Files)
             {
-                var instance = file.ParticleSystems[SelectedParticleSystemIndex].Instantiate();
-                instances[instance] = file;
+                var instance = file.ParticleSystems[SelectedParticleSystemIndex].Instantiate(file);
+                instances.Add(instance);
                 instance.Reset(true);
                 distortTextures[instance] = ResolveDistortTexture(file, instance);
                 maskTextures[instance] = ResolveMaskTexture(file, instance);
@@ -246,9 +246,7 @@ namespace CrazyStorm_Player
         }
         List<ParticleType> EnsureTextTypes(ParticleSystem system, Text text)
         {
-            if (!instances.ContainsKey(system)) return null;
-            var file = instances[system];
-            return FontTextManager.UpdateTextResources(file, system, text, instances, (fileResource, pngBytes) =>
+            return FontTextManager.UpdateTextResources(system.File, system, text, instances, (fileResource, pngBytes) =>
             {
                 Texture2D newTexture = null;
                 using (var stream = new MemoryStream(pngBytes, false))
@@ -293,7 +291,7 @@ namespace CrazyStorm_Player
         void UpdateCurrentFrame()
         {
             var minCurrentFrame = float.MaxValue;
-            foreach (var instance in instances.Keys)
+            foreach (var instance in instances)
             {
                 if (minCurrentFrame > instance.CurrentFrame) minCurrentFrame = instance.CurrentFrame;
             }
@@ -330,7 +328,7 @@ namespace CrazyStorm_Player
             var type = particle.Type;
             if (type == null) return null;
             if (type.IsTransparentPlaceholder) return transparentTexture;
-            var file = instances[particle.System];
+            var file = particle.System.File;
             return type.ID >= ParticleType.DefaultTypeIndex ? defaultTexture : type.Image != null ? customTextures[file][type.Image.ID] : null;
         }
         Texture2D GetSystemMaskTexture(ParticleSystem system)
@@ -338,7 +336,7 @@ namespace CrazyStorm_Player
             Texture2D texture;
             if (!maskTextures.TryGetValue(system, out texture))
             {
-                texture = ResolveMaskTexture(instances[system], system);
+                texture = ResolveMaskTexture(system.File, system);
                 maskTextures[system] = texture;
             }
             return texture;
@@ -348,7 +346,7 @@ namespace CrazyStorm_Player
             Texture2D texture;
             if (!distortTextures.TryGetValue(system, out texture))
             {
-                texture = ResolveDistortTexture(instances[system], system);
+                texture = ResolveDistortTexture(system.File, system);
                 distortTextures[system] = texture;
             }
             return texture;
@@ -466,14 +464,14 @@ namespace CrazyStorm_Player
         {
             FrameworkDispatcher.Update();
             var minFrameFactor = 1f;
-            foreach (var instance in instances.Keys)
+            foreach (var instance in instances)
             {
                 instance.BodyPosition = controllable.selfPos.ToCore();
                 if (minFrameFactor > instance.FrameFactor) minFrameFactor = instance.FrameFactor;
             }
             controllable.Update(keyboard, minFrameFactor * ParticleSystem.FRAME_RATE_BASE / FrameRate);
             EventManager.Update(FrameRate);
-            foreach (var instance in instances.Keys)
+            foreach (var instance in instances)
             {
                 instance.Update(FrameRate);
                 ParticleManager.ClearLayerMasks();
@@ -498,7 +496,7 @@ namespace CrazyStorm_Player
             }
             spriteBatch.End();
             var maxOffset = new Vector2(float.MinValue, float.MinValue);
-            foreach (var instance in instances.Keys)
+            foreach (var instance in instances)
             {
                 var offset = (instance.ScreenOffset - instance.LogicOffset).ToXna();
                 if (maxOffset.X < offset.X) maxOffset.X = offset.X;
@@ -508,7 +506,7 @@ namespace CrazyStorm_Player
             particleBatchBegun = false;
             curveBatchBegun = false;
             lastBlendType = BlendType.None;
-            foreach (var instance in instances.Keys) ParticleManager.Draw(instance);
+            foreach (var instance in instances) ParticleManager.Draw(instance);
             EndCurveBatch();
             EndParticleBatch();
             spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied, SamplerState.LinearWrap, null, null, null);
@@ -537,12 +535,12 @@ namespace CrazyStorm_Player
         }
         public void SetStatus(int i)
         {
-            foreach(var instance in instances.Keys) instance.SetStatus(i);
+            foreach(var instance in instances) instance.SetStatus(i);
         }
         public void SkipFrame(float targetFrame, bool replayFromStart)
         {
             if (instances == null || instances.Count == 0) return;
-            foreach (var instance in instances.Keys)
+            foreach (var instance in instances)
             {
                 instance.BodyPosition = controllable.selfPos.ToCore();
                 instance.SkipFrame(targetFrame, replayFromStart, FrameRate);
