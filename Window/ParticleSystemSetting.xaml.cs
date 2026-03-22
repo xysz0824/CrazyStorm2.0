@@ -63,7 +63,7 @@ namespace CrazyStorm
             DelMaskType.IsEnabled = selectedParticle.CustomMaskTypes.Count > 0;
             TypeList.ItemsSource = selectedParticle.CustomTypes;
             DelType.IsEnabled = selectedParticle.CustomTypes.Count > 0;
-            file.UpdateResource();
+            file.CheckResourceStatus();
             //Load images.
             foreach (var image in file.Images)
             {

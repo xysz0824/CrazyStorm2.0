@@ -45,6 +45,7 @@ namespace CrazyStorm.Core
     }
     public class ParticleType : INotifyPropertyChanged, IXmlData, IGeneratePlayData, ILoadPlayData
     {
+        public static readonly FileResource DefaultImage = new FileResource(null, DefaultTypeIndex, "DefaultParticleImage", "");
         public static readonly List<ParticleType> DefaultTypes = new List<ParticleType>();
         public const int DefaultTypeIndex = 1000;
         public event PropertyChangedEventHandler PropertyChanged;
@@ -84,7 +85,6 @@ namespace CrazyStorm.Core
             }
         }
         public bool IsTextType { get; set; }
-        public bool IsTransparentPlaceholder { get; set; }
         public double TextPxRange { get; set; }
         public Vector2 StartPoint
         {
@@ -362,6 +362,11 @@ namespace CrazyStorm.Core
         #endregion
 
         #region Public Methods
+        public static void RefDefaultImage(object reference)
+        {
+            DefaultImage.Ref = reference;
+            foreach (var type in DefaultTypes) type.image = DefaultImage;
+        }
         public static void LoadDefaultTypes(string libraryPath, bool clear = false)
         {
             if (clear) DefaultTypes.Clear();
@@ -374,7 +379,7 @@ namespace CrazyStorm.Core
             }
             else
             {
-                libraryStream = new FileStream($"typelibrary\\{libraryPath}", FileMode.Open, FileAccess.Read);
+                libraryStream = new FileStream(libraryPath, FileMode.Open, FileAccess.Read);
             }
             using (StreamReader reader = new StreamReader(libraryStream, Encoding.UTF8))
             {

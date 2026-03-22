@@ -41,9 +41,9 @@ namespace CrazyStorm.Core
         string name;
         [XmlAttribute]
         OrderType orderType;
+        GenericContainer<ParticleType> customTypes;
         GenericContainer<DistortType> customDistortTypes;
         GenericContainer<MaskType> customMaskTypes;
-        GenericContainer<ParticleType> customTypes;
         GenericContainer<Layer> layers;
         GenericContainer<Note> notes;
         GenericContainer<Component> componentTree;
@@ -402,10 +402,10 @@ namespace CrazyStorm.Core
                 maskImageAttribute.Value = maskImage.ID.ToString();
                 particleSystemNode.Attributes.Append(maskImageAttribute);
             }
-            XmlHelper.StoreObjectList(customDistortTypes, doc, particleSystemNode, "CustomDistortTypes");
-            XmlHelper.StoreObjectList(customMaskTypes, doc, particleSystemNode, "CustomMaskTypes");
             //customTypes
             XmlHelper.StoreObjectList(customTypes, doc, particleSystemNode, "CustomTypes");
+            XmlHelper.StoreObjectList(customDistortTypes, doc, particleSystemNode, "CustomDistortTypes");
+            XmlHelper.StoreObjectList(customMaskTypes, doc, particleSystemNode, "CustomMaskTypes");
             //layers
             XmlHelper.StoreObjectList(layers, doc, particleSystemNode, "Layers");
             //notes
@@ -424,12 +424,13 @@ namespace CrazyStorm.Core
             PlayDataHelper.GenerateStruct(orderType, particleSystemBytes);
             //stringDataField
             PlayDataHelper.GenerateStringDataFields(this, particleSystemBytes);
+            //images
             particleSystemBytes.AddRange(BitConverter.GetBytes(distortImage != null ? distortImage.ID : -1));
             particleSystemBytes.AddRange(BitConverter.GetBytes(maskImage != null ? maskImage.ID : -1));
-            PlayDataHelper.GenerateObjectList(file, customDistortTypes, particleSystemBytes);
-            PlayDataHelper.GenerateObjectList(file, customMaskTypes, particleSystemBytes);
             //customTypes
             PlayDataHelper.GenerateObjectList(file, customTypes, particleSystemBytes);
+            PlayDataHelper.GenerateObjectList(file, customDistortTypes, particleSystemBytes);
+            PlayDataHelper.GenerateObjectList(file, customMaskTypes, particleSystemBytes);
             //layers
             PlayDataHelper.GenerateObjectList(file, layers, particleSystemBytes);
             //typeSoundMap
@@ -449,12 +450,13 @@ namespace CrazyStorm.Core
                 orderType = PlayDataHelper.ReadStruct<OrderType>(particleSystemReader);
                 //stringDataFields
                 PlayDataHelper.ReadStringDataFields(this, particleSystemReader);
+                //images
                 distortImageID = particleSystemReader.ReadInt32();
                 maskImageID = particleSystemReader.ReadInt32();
-                PlayDataHelper.ReadObjectList(CustomDistortTypes, particleSystemReader, version);
-                PlayDataHelper.ReadObjectList(CustomMaskTypes, particleSystemReader, version);
                 //customTypes
                 PlayDataHelper.ReadObjectList(CustomTypes, particleSystemReader, version);
+                PlayDataHelper.ReadObjectList(CustomDistortTypes, particleSystemReader, version);
+                PlayDataHelper.ReadObjectList(CustomMaskTypes, particleSystemReader, version);
                 //layers
                 PlayDataHelper.ReadObjectList(Layers, particleSystemReader, version);
                 for (int i = 0; i < Layers.Count; ++i)

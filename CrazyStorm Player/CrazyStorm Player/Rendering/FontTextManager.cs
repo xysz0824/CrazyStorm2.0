@@ -162,7 +162,6 @@ namespace CrazyStorm_Player
                 glyph.AtlasBounds.Right <= glyph.AtlasBounds.Left ||
                 glyph.AtlasBounds.Bottom <= glyph.AtlasBounds.Top)
             {
-                particleType.IsTransparentPlaceholder = true;
                 particleType.StartPoint = Vector2.Zero;
                 particleType.Width = 1;
                 particleType.Height = 1;
@@ -170,7 +169,6 @@ namespace CrazyStorm_Player
                 particleType.Radius = 0;
                 return;
             }
-            particleType.IsTransparentPlaceholder = false;
             int width = Math.Max(1, (int)Math.Ceiling(glyph.AtlasBounds.Right - glyph.AtlasBounds.Left));
             int height = Math.Max(1, (int)Math.Ceiling(glyph.AtlasBounds.Bottom - glyph.AtlasBounds.Top));
             particleType.StartPoint = new Vector2((float)Math.Floor(glyph.AtlasBounds.Left), (float)Math.Floor(glyph.AtlasBounds.Top));
@@ -351,8 +349,16 @@ namespace CrazyStorm_Player
             return EnsureTextCharacterTypes(file, instance, result);
         }
 
-        public static void Clear()
+        public static void Clear(Action<FileResource> onTextureDestroy)
         {
+            foreach (var file in TextBindings)
+            {
+                var bindings = file.Value;
+                foreach (var binding in bindings.Values)
+                {
+                    if (binding?.AtlasResource != null) onTextureDestroy?.Invoke(binding.AtlasResource);
+                }
+            }
             TextBindings.Clear();
             TextCharacterTypes.Clear();
             TextAtlasSystems.Clear();

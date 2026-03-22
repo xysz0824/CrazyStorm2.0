@@ -142,7 +142,7 @@ namespace CrazyStorm
         public void Initailize()
         {
             InitializeConfig();
-            ParticleType.LoadDefaultTypes(config.TypeLibraryPath);
+            ParticleType.LoadDefaultTypes($"typelibrary\\{config.TypeLibraryPath}");
             ChangeTheme(config.Theme);
         }
         public void StartNewFile()

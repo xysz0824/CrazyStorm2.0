@@ -39,10 +39,6 @@ namespace CrazyStorm_Player
         Vector2 backgroundScale;
         Vector2 backgroundPos;
         Texture2D defaultTexture;
-        Texture2D transparentTexture;
-        Dictionary<File, Dictionary<int, Texture2D>> customTextures;
-        Dictionary<ParticleSystem, Texture2D> distortTextures;
-        Dictionary<ParticleSystem, Texture2D> maskTextures;
         Dictionary<string, SoundEffect> sounds;
         Dictionary<string, SoundEffectInstance> soundInstances;
         Texture2D characterTexture;
@@ -133,8 +129,7 @@ namespace CrazyStorm_Player
             }
             defaultTexture = Texture2D.FromStream(gd, defaultTextureStream);
             defaultTextureStream.Dispose();
-            transparentTexture = new Texture2D(gd, 1, 1);
-            transparentTexture.SetData(new[] { new Color(255, 255, 255, 0) });
+            ParticleType.RefDefaultImage(defaultTexture);
             //Load main character texture
             if (!StringUtil.IsNullOrWhiteSpace(controllable.imagePath))
             {
@@ -149,36 +144,10 @@ namespace CrazyStorm_Player
             Stream slowModeTextureStream = assembly.GetManifestResourceStream("CrazyStorm_Player.ring.png");
             slowModeTexture = Texture2D.FromStream(gd, slowModeTextureStream);
             slowModeTextureStream.Dispose();
-            //Load custom textures and types
-            customTextures = new Dictionary<File, Dictionary<int, Texture2D>>();
-            foreach (var file in Files)
-            {
-                Environment.CurrentDirectory = AppDomain.CurrentDomain.SetupInformation.ApplicationBase;
-                if (!string.IsNullOrEmpty(file.ResourceDirectory)) Environment.CurrentDirectory = file.ResourceDirectory;
-                foreach (var image in file.Images)
-                {
-                    if (!customTextures.ContainsKey(file)) customTextures[file] = new Dictionary<int, Texture2D>();
-                    if (!System.IO.File.Exists(image.RelatviePath))
-                    {
-                        customTextures[file][image.ID] = null;
-                        continue;
-                    }
-                    using (var stream = new FileStream(image.RelatviePath, FileMode.Open, FileAccess.Read))
-                    {
-                        try
-                        {
-                            customTextures[file][image.ID] = Texture2D.FromStream(gd, stream);
-                        }
-                        catch
-                        {
-                            customTextures[file][image.ID] = null;
-                        }
-                    }
-                }
-            }
-            Environment.CurrentDirectory = AppDomain.CurrentDomain.SetupInformation.ApplicationBase;
-            distortTextures = new Dictionary<ParticleSystem, Texture2D>();
-            maskTextures = new Dictionary<ParticleSystem, Texture2D>();
+            //Load custom textures
+            File.OnRefImage += LoadTexture;
+            File.OnDerefImage += UnloadTexture;
+            foreach (var file in Files) file.RefResources();
             //sounds
             sounds = new Dictionary<string, SoundEffect>();
             soundInstances = new Dictionary<string, SoundEffectInstance>();
@@ -195,10 +164,8 @@ namespace CrazyStorm_Player
             foreach (var file in Files)
             {
                 var instance = file.ParticleSystems[SelectedParticleSystemIndex].Instantiate(file);
-                instances.Add(instance);
                 instance.Reset(true);
-                distortTextures[instance] = ResolveDistortTexture(file, instance);
-                maskTextures[instance] = ResolveMaskTexture(file, instance);
+                instances.Add(instance);
             }
             if (CurrentFrame != 1) SkipFrame(CurrentFrame, true);
         }
@@ -211,24 +178,16 @@ namespace CrazyStorm_Player
             ParticleManager.OnParticleDraw -= DrawParticle;
             ParticleManager.OnCurveParticleDraw -= DrawCurveParticle;
             Text.OnNeedTextType -= EnsureTextTypes;
+            File.OnRefImage -= LoadTexture;
+            File.OnDerefImage -= UnloadTexture;
             particleBatch?.Dispose();
             curveBatch?.Dispose();
             shaderContext?.Dispose();
             spriteBatch?.Dispose();
             background?.Dispose();
             defaultTexture?.Dispose();
-            transparentTexture?.Dispose();
-            foreach (var dict in customTextures.Values)
-            {
-                foreach (var tex in dict.Values)
-                {
-                    tex?.Dispose();
-                }
-            }
-            customTextures.Clear();
-            FontTextManager.Clear();
-            distortTextures?.Clear();
-            maskTextures?.Clear();
+            foreach (var file in Files) file.DerefResources();
+            FontTextManager.Clear(UnloadTexture);
             if (soundInstances != null)
             {
                 foreach (var instance in soundInstances.Values)
@@ -244,6 +203,38 @@ namespace CrazyStorm_Player
             pointTexture?.Dispose();
             slowModeTexture?.Dispose();
         }
+        object LoadTexture(FileResource image)
+        {
+            var file = image.File;
+            var appBase = AppDomain.CurrentDomain.SetupInformation.ApplicationBase;
+            Environment.CurrentDirectory = appBase;
+            if (!string.IsNullOrEmpty(file.ResourceDirectory)) Environment.CurrentDirectory = file.ResourceDirectory;
+            if (!System.IO.File.Exists(image.RelatviePath))
+            {
+                Environment.CurrentDirectory = appBase;
+                return null;
+            }
+            using (var stream = new FileStream(image.RelatviePath, FileMode.Open, FileAccess.Read))
+            {
+                try
+                {
+                    return Texture2D.FromStream(graphicsDevice, stream);
+                }
+                catch
+                {
+                    return null;
+                }
+                finally
+                {
+                    Environment.CurrentDirectory = appBase;
+                }
+            }
+        }
+        void UnloadTexture(FileResource image)
+        {
+            var texture = image.Ref as Texture2D;
+            texture?.Dispose();
+        }
         List<ParticleType> EnsureTextTypes(ParticleSystem system, Text text)
         {
             return FontTextManager.UpdateTextResources(system.File, system, text, instances, (fileResource, pngBytes) =>
@@ -253,10 +244,9 @@ namespace CrazyStorm_Player
                 {
                     newTexture = Texture2D.FromStream(graphicsDevice, stream);
                 }
-                if (!customTextures.ContainsKey(fileResource.File)) customTextures[fileResource.File] = new Dictionary<int, Texture2D>();
-                customTextures[fileResource.File].TryGetValue(fileResource.ID, out var oldTexture);
-                customTextures[fileResource.File][fileResource.ID] = newTexture;
+                Texture2D oldTexture = fileResource.Ref as Texture2D;
                 oldTexture?.Dispose();
+                fileResource.Ref = newTexture;
             });
         }
         void ForceImpactBody(CrazyStorm.Core.Vector2 speedVector)
@@ -297,59 +287,15 @@ namespace CrazyStorm_Player
             }
             if (minCurrentFrame != float.MaxValue) CurrentFrame = minCurrentFrame;
         }
-        Texture2D ResolveMaskTexture(File file, ParticleSystem system)
-        {
-            if (file == null || system == null || system.MaskImage == null) return null;
-            Dictionary<int, Texture2D> textures;
-            if (!customTextures.TryGetValue(file, out textures)) return null;
-            Texture2D texture;
-            return textures.TryGetValue(system.MaskImage.ID, out texture) ? texture : null;
-        }
-        Texture2D ResolveDistortTexture(File file, ParticleSystem system)
-        {
-            if (file == null || system == null || system.DistortImage == null) return null;
-            Dictionary<int, Texture2D> textures;
-            if (!customTextures.TryGetValue(file, out textures)) return null;
-            Texture2D texture;
-            return textures.TryGetValue(system.DistortImage.ID, out texture) ? texture : null;
-        }
         void DrawLayer(ParticleSystem system, Layer layer, BlendType blendType)
         {
             EndCurveBatch();
             EndParticleBatch();
             ParticleManager.ClearLayerMasks();
             ParticleManager.UpdateLayerMasks(system.Layers, layer);
-            shaderContext.UpdateLayerMaskState(system, GetSystemMaskTexture(system));
+            shaderContext.UpdateLayerMaskState(system, system.MaskImage?.Ref as Texture2D);
             BeginParticleBatches(blendType);
             lastBlendType = blendType;
-        }
-        Texture2D ResolveParticleTexture(ParticleBase particle)
-        {
-            var type = particle.Type;
-            if (type == null) return null;
-            if (type.IsTransparentPlaceholder) return transparentTexture;
-            var file = particle.System.File;
-            return type.ID >= ParticleType.DefaultTypeIndex ? defaultTexture : type.Image != null ? customTextures[file][type.Image.ID] : null;
-        }
-        Texture2D GetSystemMaskTexture(ParticleSystem system)
-        {
-            Texture2D texture;
-            if (!maskTextures.TryGetValue(system, out texture))
-            {
-                texture = ResolveMaskTexture(system.File, system);
-                maskTextures[system] = texture;
-            }
-            return texture;
-        }
-        Texture2D GetSystemDistortTexture(ParticleSystem system)
-        {
-            Texture2D texture;
-            if (!distortTextures.TryGetValue(system, out texture))
-            {
-                texture = ResolveDistortTexture(system.File, system);
-                distortTextures[system] = texture;
-            }
-            return texture;
         }
         void DrawParticle(Particle particle)
         {
@@ -363,7 +309,8 @@ namespace CrazyStorm_Player
             }
             lastBlendType = blendType;
             var type = particle.Type;
-            var tex = ResolveParticleTexture(particle);
+            if (type.Width <= 1 && type.Height <= 1) return;
+            var tex = type.Image.Ref as Texture2D;
             if (tex == null) return;
             var center = new Vector2(Width / 2, Height / 2) + particle.System.ScreenOffset.ToXna();
             var origin = type.CenterPoint.ToXna();
@@ -389,9 +336,11 @@ namespace CrazyStorm_Player
                 var col = (int)Math.Max(1, (tex.Width - type.StartPoint.x) / rect.Width);
                 rect.Offset(frame % col * rect.Width, frame / col * rect.Height);
             }
+            var maskTexture = particle.System.MaskImage?.Ref as Texture2D;
+            var distortTexture = particle.System.DistortImage?.Ref as Texture2D;
             var rad = MathHelper.ToRadians(particle.PRotation + 90);
             var renderData = shaderContext.BuildParticleRenderData(particle, tex, rect, color, rad, origin, scale,
-                spriteEffects, position, GetSystemMaskTexture(particle.System), GetSystemDistortTexture(particle.System), blendType);
+                spriteEffects, position, maskTexture, distortTexture, blendType);
             particleBatch.DrawParticle(renderData);
             if (!particle.AfterimageEffect) return;
             for (int i = 0; i < Particle.AFTERIMAGE_COUNT; ++i)
@@ -403,7 +352,7 @@ namespace CrazyStorm_Player
                     rad = MathHelper.ToRadians(afterImage.rot + 90);
                     color = new Color(color.R, color.G, color.B, (byte)(afterImage.alpha * alpha * 255f));
                     renderData = shaderContext.BuildParticleRenderData(particle, tex, rect, color, rad, origin, scale,
-                        spriteEffects, position, GetSystemMaskTexture(particle.System), GetSystemDistortTexture(particle.System), blendType);
+                        spriteEffects, position, maskTexture, distortTexture, blendType);
                     particleBatch.DrawParticle(renderData);
                 }
                 particle.AfterImageData[i] = afterImage;
@@ -421,7 +370,8 @@ namespace CrazyStorm_Player
             }
             lastBlendType = blendType;
             var type = particle.Type;
-            var tex = ResolveParticleTexture(particle);
+            if (type.Width <= 1 && type.Height <= 1) return;
+            var tex = type.Image.Ref as Texture2D;
             if (tex == null) return;
             var center = new Vector2(Width / 2, Height / 2) + particle.System.ScreenOffset.ToXna();
             float alpha = particle.Opacity / 100f - (ParticleBase.FOG_TIME - particle.FogFrame) / ParticleBase.FOG_TIME;
@@ -439,8 +389,9 @@ namespace CrazyStorm_Player
                 var col = (int)Math.Max(1, (tex.Width - type.StartPoint.x) / rect.Width);
                 rect.Offset(frame % col * rect.Width, frame / col * rect.Height);
             }
-            var renderData = shaderContext.BuildCurveRenderData(particle, tex, rect,
-                GetSystemMaskTexture(particle.System), GetSystemDistortTexture(particle.System));
+            var maskTexture = particle.System.MaskImage?.Ref as Texture2D;
+            var distortTexture = particle.System.DistortImage?.Ref as Texture2D;
+            var renderData = shaderContext.BuildCurveRenderData(particle, tex, rect, maskTexture, distortTexture);
             if (renderData.RequiresShader)
             {
                 DrawCurveParticleWithShader(particle, center, color, blendType, renderData);

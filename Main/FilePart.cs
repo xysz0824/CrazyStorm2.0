@@ -104,7 +104,7 @@ namespace CrazyStorm
         {
             filePath = savedPath;
             fileName = System.IO.Path.GetFileNameWithoutExtension(savedPath);
-            file.UpdateResource();
+            file.CheckResourceStatus();
             file.Save(savedPath);
             InitializeFile();
             saved = true;

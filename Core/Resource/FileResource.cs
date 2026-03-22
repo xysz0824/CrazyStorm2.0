@@ -37,6 +37,7 @@ namespace CrazyStorm.Core
         }
         public string AbsolutePath { get { return absolutePath; } }
         public string RelatviePath { get { return relativePath; }  set { relativePath = value; } }
+        public object Ref { get; set; }
         #endregion
 
         #region Constructor
@@ -54,6 +55,11 @@ namespace CrazyStorm.Core
         #region Public Methods
         public override void CheckValid()
         {
+            if (Ref != null)
+            {
+                isValid = true;
+                return;
+            }
             if (!StringUtil.IsNullOrWhiteSpace(file.ResourceDirectory))
             {
                 relativePath = relativePath.Replace(file.ResourceDirectory, "");

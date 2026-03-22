@@ -82,7 +82,7 @@ namespace CrazyStorm
                 player = new EmbeddedPlayer();
                 player.Width = config.ScreenWidth;
                 player.Height = config.ScreenHeight;
-                player.PlayerImpl = new PlayerImpl(config.TypeLibraryPath, config.ScreenWidth, config.ScreenHeight, config.FrameRate,
+                player.PlayerImpl = new PlayerImpl($"typelibrary\\{config.TypeLibraryPath}", config.ScreenWidth, config.ScreenHeight, config.FrameRate,
                     config.ParticleMaximum, config.CurveParticleMaximum);
                 player.PlayerImpl.FrameOrientation = config.FrameOrientation;
                 player.PlayerImpl.BackgroundPath = config.BackgroundPath;
@@ -209,7 +209,7 @@ namespace CrazyStorm
         }
         private void GeneratePlayFile_Click(object sender, RoutedEventArgs e)
         {
-            file.UpdateResource();
+            file.CheckResourceStatus();
             GeneratePlayFile();
         }
         private void PlayItem_Click(object sender, RoutedEventArgs e)
@@ -217,7 +217,7 @@ namespace CrazyStorm
             var path = VisualHelper.VisualDownwardSearch<Path>(PlayButton) as Path;
             if (player == null)
             {
-                file.UpdateResource();
+                file.CheckResourceStatus();
                 PlayCurrent();
                 path.Data = (Geometry)FindResource("Pause_Icon");
                 path.Fill = (Brush)FindResource("PauseIconBrush");

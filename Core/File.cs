@@ -19,6 +19,13 @@ namespace CrazyStorm.Core
 {
     public partial class File : IXmlData, IGeneratePlayData, ILoadPlayData
     {
+        public delegate object ResourceRefHandler(FileResource fileResource);
+        public static event ResourceRefHandler OnRefImage;
+        public static event ResourceRefHandler OnRefSound;
+        public delegate void ResourceDerefHandler(FileResource fileResource);
+        public static event ResourceDerefHandler OnDerefImage;
+        public static event ResourceDerefHandler OnDerefSound;
+
         #region Private Members
         List<ParticleSystem> particleSystems;
         GenericContainer<FileResource> images;
@@ -55,11 +62,10 @@ namespace CrazyStorm.Core
         #endregion
 
         #region Public Methods
-        public void UpdateResource()
+        public void CheckResourceStatus()
         {
             foreach (var item in images) item.CheckValid();
             foreach (var item in sounds) item.CheckValid();
-            foreach (var item in globals) item.CheckValid();
         }
         public object Clone()
         {
@@ -158,24 +164,18 @@ namespace CrazyStorm.Core
         public void Load(string filePath)
         {
             ResourceDirectory = Path.GetDirectoryName(filePath) + '\\';
-            if (IsCS1(filePath))
-            {
-                ConvertFromCS1(filePath);
-            }
+            if (IsCS1(filePath)) ConvertFromCS1(filePath);
             else
             {
                 var doc = new XmlDocument();
                 doc.Load(filePath);
                 var root = (XmlElement)doc.SelectSingleNode(VersionInfo.AppName.Replace(" ", ""));
                 if (root == null) throw new XmlException();
-                else
-                {
-                    BuildFromXml(root);
-                }
+                else BuildFromXml(root);
             }
             RebuildObjectReference();
             RebuildComponentTree();
-            UpdateResource();
+            CheckResourceStatus();
         }
         public void Save(string filePath)
         {
@@ -329,18 +329,10 @@ namespace CrazyStorm.Core
         {
             //Images
             PlayDataHelper.ReadObjectList(Images, reader, version);
-            foreach (var image in Images)
-            {
-                image.File = this;
-                image.CheckValid();
-            }
+            foreach (var image in Images) image.File = this;
             //Sounds
             PlayDataHelper.ReadObjectList(Sounds, reader, version);
-            foreach (var sound in Sounds)
-            {
-                sound.File = this;
-                sound.CheckValid();
-            }
+            foreach (var sound in Sounds) sound.File = this;
             //Globals
             PlayDataHelper.ReadObjectList(Globals, reader, version);
             //ParticleSystems
@@ -359,36 +351,22 @@ namespace CrazyStorm.Core
                 }
             }
         }
-        void RebuildObjectReference(File file)
+        public void RefResources()
         {
-            foreach (var particleSystem in file.ParticleSystems)
+            foreach (var image in Images) image.Ref = OnRefImage?.Invoke(image);
+            foreach (var sound in Sounds) sound.Ref = OnRefSound?.Invoke(sound);
+        }
+        public void DerefResources()
+        {
+            foreach (var image in Images)
             {
-                particleSystem.RebuildDistortImageReference(file.Images);
-                particleSystem.RebuildMaskImageReference(file.Images);
-                //Rebuild all custom types
-                foreach (var customType in particleSystem.CustomTypes)
-                {
-                    customType.RebuildImageReferenceFromCollection(file.Images);
-                }
-                //Collect all particle types
-                var particleTypes = new List<ParticleType>();
-                particleTypes.AddRange(ParticleType.DefaultTypes);
-                particleTypes.AddRange(particleSystem.CustomTypes);
-                //Rebuild components reference
-                foreach (var layer in particleSystem.Layers)
-                {
-                    foreach (var component in layer.Components)
-                    {
-                        component.RebuildReferenceFromCollection();
-                        //Rebuild particles reference
-                        if (component is Emitter)
-                        {
-                            (component as Emitter).InitialTemplate.RebuildReferenceFromCollection(particleTypes);
-                        }
-                    }
-                }
-                particleSystem.RebuildDistortTypeReferences();
-                particleSystem.RebuildMaskTypeReferences();
+                OnDerefImage?.Invoke(image);
+                image.Ref = null;
+            }
+            foreach (var sound in Sounds)
+            {
+                OnDerefSound?.Invoke(sound);
+                sound.Ref = null;
             }
         }
         public bool LoadPlayFile(byte[] bytes, string resourceDict, float baseVersion)
@@ -404,7 +382,7 @@ namespace CrazyStorm.Core
                 if (version >= baseVersion)
                 {
                     LoadPlayData(reader, version);
-                    RebuildObjectReference(this);
+                    RebuildObjectReference();
                     RebuildComponentTree();
                     stream.Dispose();
                     return true;

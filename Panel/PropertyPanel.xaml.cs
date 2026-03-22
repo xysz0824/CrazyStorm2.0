@@ -324,7 +324,7 @@ namespace CrazyStorm
         void OpenEventSetting(EventGroup eventGroup, Expression.Environment environment, 
             bool emitter, bool aboutParticle, bool center)
         {
-            file.UpdateResource();
+            file.CheckResourceStatus();
             Window window = new EventSetting(eventGroup, environment, file.Sounds, types, emitter, aboutParticle, center);
             window.ShowDialog();
             window.Close();
