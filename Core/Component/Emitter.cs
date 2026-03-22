@@ -176,7 +176,7 @@ namespace CrazyStorm.Core
             if (System.Sounds != null && System.TypeSoundMap != null && System.TypeSoundMap.ContainsKey(Template.Type.ID))
             {
                 var sound = System.Sounds.FirstOrDefault((item) => item.ID == System.TypeSoundMap[Template.Type.ID]);
-                if (sound != null) EventManager.PlaySound(sound.AbsolutePath);
+                if (sound != null) EventManager.PlaySound(sound);
             }
         }
         #endregion

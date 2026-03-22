@@ -26,7 +26,7 @@ namespace CrazyStorm.Core
                         VM.Execute(pc, expr[0], frameScale);
                         var label = VM.PopString();
                         var sound = pc.System.Sounds?.FirstOrDefault((item) => string.Equals(item.Label, label));
-                        if (sound != null) OnSoundPlay(sound.AbsolutePath);
+                        if (sound != null) OnSoundPlay(sound);
                     }
                     return false;
                 } },
@@ -37,7 +37,7 @@ namespace CrazyStorm.Core
                         VM.Execute(pc, expr[0], frameScale);
                         var label = VM.PopString();
                         var sound = pc.System.Sounds?.FirstOrDefault((item) => string.Equals(item.Label, label));
-                        if (sound != null) OnSoundStop(sound.AbsolutePath);
+                        if (sound != null) OnSoundStop(sound);
                     }
                     return false;
                 } },
@@ -165,7 +165,7 @@ namespace CrazyStorm.Core
                 } },
             };
         public static Func<string, PropertyContainer, VMInstruction[][], float, bool> OnFunctionCall;
-        public delegate void SoundPlayHandler(string path);
+        public delegate void SoundPlayHandler(FileResource sound);
         public static event SoundPlayHandler OnSoundPlay;
         public static event SoundPlayHandler OnSoundStop;
         public static bool CanSoundPlay => OnSoundPlay != null;
@@ -341,13 +341,13 @@ namespace CrazyStorm.Core
         {
             return uniqueId % (ParticleManager.MaximumParticleCount);
         }
-        public static void PlaySound(string path)
+        public static void PlaySound(FileResource sound)
         {
-            OnSoundPlay?.Invoke(path);
+            OnSoundPlay?.Invoke(sound);
         }
-        public static void StopSound(string path)
+        public static void StopSound(FileResource sound)
         {
-            OnSoundStop?.Invoke(path);
+            OnSoundStop?.Invoke(sound);
         }
     }
 }

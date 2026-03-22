@@ -39,13 +39,12 @@ namespace CrazyStorm_Player
         Vector2 backgroundScale;
         Vector2 backgroundPos;
         Texture2D defaultTexture;
-        Dictionary<string, SoundEffect> sounds;
-        Dictionary<string, SoundEffectInstance> soundInstances;
         Texture2D characterTexture;
         Texture2D pointTexture;
         Texture2D slowModeTexture;
         Controllable controllable;
         List<ParticleSystem> instances;
+        Dictionary<string, SoundEffectInstance> soundInstances;
         BlendType lastBlendType = BlendType.None;
         bool particleBatchBegun;
         bool curveBatchBegun;
@@ -144,12 +143,13 @@ namespace CrazyStorm_Player
             Stream slowModeTextureStream = assembly.GetManifestResourceStream("CrazyStorm_Player.ring.png");
             slowModeTexture = Texture2D.FromStream(gd, slowModeTextureStream);
             slowModeTextureStream.Dispose();
-            //Load custom textures
+            //Load resources
             File.OnRefImage += LoadTexture;
             File.OnDerefImage += UnloadTexture;
+            File.OnRefSound += LoadSound;
+            File.OnDerefSound += UnloadSound;
             foreach (var file in Files) file.RefResources();
             //sounds
-            sounds = new Dictionary<string, SoundEffect>();
             soundInstances = new Dictionary<string, SoundEffectInstance>();
             //final
             ForceField.OnForceImpactBody += ForceImpactBody;
@@ -178,43 +178,32 @@ namespace CrazyStorm_Player
             ParticleManager.OnParticleDraw -= DrawParticle;
             ParticleManager.OnCurveParticleDraw -= DrawCurveParticle;
             Text.OnNeedTextType -= EnsureTextTypes;
-            File.OnRefImage -= LoadTexture;
-            File.OnDerefImage -= UnloadTexture;
             particleBatch?.Dispose();
             curveBatch?.Dispose();
             shaderContext?.Dispose();
             spriteBatch?.Dispose();
             background?.Dispose();
             defaultTexture?.Dispose();
+            foreach (var instance in soundInstances.Values)
+            {
+                instance?.Stop();
+                instance?.Dispose();
+            }
+            soundInstances.Clear();
             foreach (var file in Files) file.DerefResources();
             FontTextManager.Clear(UnloadTexture);
-            if (soundInstances != null)
-            {
-                foreach (var instance in soundInstances.Values)
-                {
-                    instance?.Stop();
-                    instance?.Dispose();
-                }
-                soundInstances.Clear();
-            }
-            foreach (var sound in sounds.Values) sound?.Dispose();
-            sounds.Clear();
+            File.OnRefImage -= LoadTexture;
+            File.OnDerefImage -= UnloadTexture;
+            File.OnRefSound -= LoadSound;
+            File.OnDerefSound -= UnloadSound;
             characterTexture?.Dispose();
             pointTexture?.Dispose();
             slowModeTexture?.Dispose();
         }
         object LoadTexture(FileResource image)
         {
-            var file = image.File;
-            var appBase = AppDomain.CurrentDomain.SetupInformation.ApplicationBase;
-            Environment.CurrentDirectory = appBase;
-            if (!string.IsNullOrEmpty(file.ResourceDirectory)) Environment.CurrentDirectory = file.ResourceDirectory;
-            if (!System.IO.File.Exists(image.RelatviePath))
-            {
-                Environment.CurrentDirectory = appBase;
-                return null;
-            }
-            using (var stream = new FileStream(image.RelatviePath, FileMode.Open, FileAccess.Read))
+            if (!image.IsValid) return null;
+            using (var stream = new FileStream(image.AbsolutePath, FileMode.Open, FileAccess.Read))
             {
                 try
                 {
@@ -224,16 +213,32 @@ namespace CrazyStorm_Player
                 {
                     return null;
                 }
-                finally
-                {
-                    Environment.CurrentDirectory = appBase;
-                }
             }
         }
         void UnloadTexture(FileResource image)
         {
             var texture = image.Ref as Texture2D;
             texture?.Dispose();
+        }
+        object LoadSound(FileResource sound)
+        {
+            if (!sound.IsValid) return null;
+            using (var stream = new FileStream(sound.AbsolutePath, FileMode.Open, FileAccess.Read))
+            {
+                try
+                {
+                    return SoundEffect.FromStream(stream);
+                }
+                catch
+                {
+                    return null;
+                }
+            }
+        }
+        void UnloadSound(FileResource sound)
+        {
+            var soundEffect = sound.Ref as SoundEffect;
+            soundEffect?.Dispose();
         }
         List<ParticleType> EnsureTextTypes(ParticleSystem system, Text text)
         {
@@ -253,30 +258,25 @@ namespace CrazyStorm_Player
         {
             controllable.selfPos += speedVector.ToXna();
         }
-        void PlaySound(string path)
+        void PlaySound(FileResource fileResource)
         {
-            if (!sounds.ContainsKey(path))
+            if (!soundInstances.ContainsKey(fileResource.RelatviePath))
             {
-                using (var stream = new FileStream(path, FileMode.Open, FileAccess.Read))
-                {
-                    sounds[path] = SoundEffect.FromStream(stream);
-                }
+                var sound = fileResource.Ref as SoundEffect;
+                soundInstances[fileResource.RelatviePath] = sound?.CreateInstance();
             }
-            if (!soundInstances.ContainsKey(path))
-            {
-                soundInstances[path] = sounds[path].CreateInstance();
-            }
-            var soundInstance = soundInstances[path];
-            soundInstance.Volume = 0.5f;
-            soundInstance.Pitch = 0f;
-            soundInstance.Pan = 0f;
-            soundInstance.Stop();
-            soundInstance.Play();
+            var instance = soundInstances[fileResource.RelatviePath];
+            if (instance == null) return;
+            instance.Volume = 0.5f;
+            instance.Pitch = 0f;
+            instance.Pan = 0f;
+            instance.Stop();
+            instance.Play();
         }
-        void StopSound(string path)
+        void StopSound(FileResource fileResource)
         {
-            if (soundInstances == null || !soundInstances.ContainsKey(path)) return;
-            soundInstances[path]?.Stop();
+            if (!soundInstances.ContainsKey(fileResource.RelatviePath)) return;
+            soundInstances[fileResource.RelatviePath]?.Stop();
         }
         void UpdateCurrentFrame()
         {
