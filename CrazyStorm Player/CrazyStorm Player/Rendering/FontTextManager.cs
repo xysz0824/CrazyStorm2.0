@@ -112,26 +112,25 @@ namespace CrazyStorm_Player
             }
             if (!systems.Contains(instance)) systems.Add(instance);
         }
-        static void UpdateTextAtlas(TextBuildResult result, List<ParticleSystem> instances, 
-            Action<FileResource, byte[]> onTextureUpdate)
+        static void UpdateTextAtlas(TextBuildResult result, Action<FileResource, byte[]> onTextureUpdate)
         {
             List<ParticleSystem> systems;
             if (!TextAtlasSystems.TryGetValue(result.AtlasKey, out systems)) return;
             foreach (var system in systems)
             {
-                var binding = EnsureTextFileBinding(system.File, system, result, onTextureUpdate);
+                var binding = EnsureTextFileBinding(system, result, onTextureUpdate);
                 if (binding == null || binding.AtlasResource == null) continue;
                 UpdateTextCharacterTypes(system, result, binding.AtlasResource);
             }
         }
-        static TextFileBinding EnsureTextFileBinding(File file, ParticleSystem system, TextBuildResult result,
-             Action<FileResource, byte[]> onTextureUpdate)
+        static TextFileBinding EnsureTextFileBinding(ParticleSystem instance, TextBuildResult result, 
+            Action<FileResource, byte[]> onTextureUpdate)
         {
             Dictionary<TextAtlasKey, TextFileBinding> bindings;
-            if (!TextBindings.TryGetValue(file, out bindings))
+            if (!TextBindings.TryGetValue(instance.File, out bindings))
             {
                 bindings = new Dictionary<TextAtlasKey, TextFileBinding>();
-                TextBindings[file] = bindings;
+                TextBindings[instance.File] = bindings;
             }
 
             TextFileBinding binding;
@@ -139,8 +138,8 @@ namespace CrazyStorm_Player
             {
                 binding = new TextFileBinding
                 {
-                    AtlasResource = new FileResource(file, file.FileResourceIndex,
-                        $"{result.AtlasKey.FontFamily}_{result.AtlasKey.FontFace}_{system.Name}_TextAtlas", "")
+                    AtlasResource = new FileResource(instance.File, instance.File.FileResourceIndex,
+                        $"{result.AtlasKey.FontFamily}_{result.AtlasKey.FontFace}_{instance.Name}_TextAtlas", "")
                 };
                 bindings[result.AtlasKey] = binding;
             }
@@ -187,7 +186,7 @@ namespace CrazyStorm_Player
                 UpdateParticleType(item.Value, atlasResource, item.Key.Character, result.GlyphMap, result.DistanceRange);
             }
         }
-        static List<ParticleType> EnsureTextCharacterTypes(File file, ParticleSystem instance, TextBuildResult result)
+        static List<ParticleType> EnsureTextCharacterTypes(ParticleSystem instance, TextBuildResult result)
         {
             Dictionary<TextCharacterKey, ParticleType> characterTypes;
             if (!TextCharacterTypes.TryGetValue(instance, out characterTypes))
@@ -196,7 +195,7 @@ namespace CrazyStorm_Player
                 TextCharacterTypes[instance] = characterTypes;
             }
             var repeatable = new List<ParticleType>();
-            var atlasResource = TextBindings[file][result.AtlasKey].AtlasResource;
+            var atlasResource = TextBindings[instance.File][result.AtlasKey].AtlasResource;
             foreach (var character in result.Characters)
             {
                 var characterKey = new TextCharacterKey(result.AtlasKey, character);
@@ -338,15 +337,15 @@ namespace CrazyStorm_Player
             return glyphMap;
         }
 
-        public static List<ParticleType> UpdateTextResources(File file, ParticleSystem instance, Text text,
-            List<ParticleSystem> instances, Action<FileResource, byte[]> onTextureUpdate)
+        public static List<ParticleType> GetTextTypes(ParticleSystem instance, Text text, 
+            Action<FileResource, byte[]> onTextureUpdate)
         {
             var result = EnsureTextAtlas(text.FontFamily, text.FontFace, text.TextValue, text.CharsetPixelSize);
             if (result == null) throw new InvalidDataException();
             RegisterTextAtlasSystem(result.AtlasKey, instance);
-            EnsureTextFileBinding(file, instance, result, onTextureUpdate);
-            if (result.AtlasUpdated) UpdateTextAtlas(result, instances, onTextureUpdate);
-            return EnsureTextCharacterTypes(file, instance, result);
+            EnsureTextFileBinding(instance, result, onTextureUpdate);
+            if (result.AtlasUpdated) UpdateTextAtlas(result, onTextureUpdate);
+            return EnsureTextCharacterTypes(instance, result);
         }
 
         public static void Clear(Action<FileResource> onTextureDestroy)

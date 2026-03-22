@@ -20,11 +20,6 @@ using Vector2 = Microsoft.Xna.Framework.Vector2;
 
 namespace CrazyStorm_Player
 {
-    public enum FrameOrientation
-    {
-        Horizontal,
-        Vertical
-    }
     public class PlayerImpl
     {
         const int PARTICLE_PRESERVED_DIST = 50;
@@ -240,9 +235,9 @@ namespace CrazyStorm_Player
             var soundEffect = sound.Ref as SoundEffect;
             soundEffect?.Dispose();
         }
-        List<ParticleType> EnsureTextTypes(ParticleSystem system, Text text)
+        List<ParticleType> EnsureTextTypes(ParticleSystem instance, Text text)
         {
-            return FontTextManager.UpdateTextResources(system.File, system, text, instances, (fileResource, pngBytes) =>
+            return FontTextManager.GetTextTypes(instance, text, (fileResource, pngBytes) =>
             {
                 Texture2D newTexture = null;
                 using (var stream = new MemoryStream(pngBytes, false))
