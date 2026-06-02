@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core", "Core\Core.csproj", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CrazyStorm Player", "CrazyStorm Player\CrazyStorm Player\CrazyStorm Player.csproj", "{6969210A-FB47-48A8-B14C-52D4F0955E63}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CrazyStorm.McpServer", "CrazyStorm.McpServer\CrazyStorm.McpServer.csproj", "{914017D4-B5F4-45AA-BC74-FEA7FD754F34}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -69,6 +71,18 @@ Global
 		{6969210A-FB47-48A8-B14C-52D4F0955E63}.Release|Win32.Build.0 = Release|x86
 		{6969210A-FB47-48A8-B14C-52D4F0955E63}.Release|x86.ActiveCfg = Release|x86
 		{6969210A-FB47-48A8-B14C-52D4F0955E63}.Release|x86.Build.0 = Release|x86
+		{914017D4-B5F4-45AA-BC74-FEA7FD754F34}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{914017D4-B5F4-45AA-BC74-FEA7FD754F34}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{914017D4-B5F4-45AA-BC74-FEA7FD754F34}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{914017D4-B5F4-45AA-BC74-FEA7FD754F34}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{914017D4-B5F4-45AA-BC74-FEA7FD754F34}.Debug|Win32.ActiveCfg = Debug|Any CPU
+		{914017D4-B5F4-45AA-BC74-FEA7FD754F34}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{914017D4-B5F4-45AA-BC74-FEA7FD754F34}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{914017D4-B5F4-45AA-BC74-FEA7FD754F34}.Release|Any CPU.Build.0 = Release|Any CPU
+		{914017D4-B5F4-45AA-BC74-FEA7FD754F34}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{914017D4-B5F4-45AA-BC74-FEA7FD754F34}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{914017D4-B5F4-45AA-BC74-FEA7FD754F34}.Release|Win32.ActiveCfg = Release|Any CPU
+		{914017D4-B5F4-45AA-BC74-FEA7FD754F34}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
